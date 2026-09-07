@@ -78,7 +78,7 @@ test("WA2 operational golden path, responsive and console", async ({
         ),
       )
       .toBe(true);
-    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
     await page.screenshot({
       path: `work/qa/delivery-${width}.png`,
       fullPage: true,
@@ -96,7 +96,7 @@ test("WA2 operational golden path, responsive and console", async ({
         ),
       )
       .toBe(true);
-    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
     await page.screenshot({
       path: `work/qa/inbox-${width}.png`,
       fullPage: true,
@@ -201,7 +201,7 @@ test("recoverable send keeps draft, filters and out-of-coverage block payment", 
         ),
       )
       .toBe(true);
-    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
     await page.screenshot({
       path: `work/qa/zones-${width}.png`,
       fullPage: true,

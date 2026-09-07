@@ -181,6 +181,7 @@ for (const cluster of ["B", "C", "D"])
       "FREE DELIVERY is explicit; confirm whether the 30 AED column minimum also applies to B/C/D.",
   });
 export interface GeoService {
+  prepare?(location: Location): Promise<void>;
   resolve(location: Location): { address?: string; zoneId?: string } | null;
 }
 // Exact fixture points ONLY: never pretend these are real neighborhood boundaries.

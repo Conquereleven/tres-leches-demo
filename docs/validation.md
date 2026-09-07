@@ -2,7 +2,7 @@
 
 - `npm run typecheck`: pass (strict new TypeScript, UI, server, unit and browser tests).
 - `npm run lint`: pass, zero errors/warnings.
-- `npm test`: 19/19 passed: domain, source data, matching, payment integrity, concurrency, restart, signatures, HTTP origin/body validation, login/RBAC, bounded retries and provider timeouts.
+- `npm test`: 20/20 passed: domain, source data, matching, payment integrity, concurrency, restart, signatures, HTTP origin/body validation, login/RBAC, bounded retries and provider timeouts.
 - `npm run build`: pass; Vite 6.4.3 frontend + unchanged Sites package + compiled Node runtime.
 - `npm run test:sites`: 4/4 passed.
 - `PLAYWRIGHT_BROWSERS_PATH=./work/browsers npm run test:e2e:build`: 3/3 passed against compiled Node server with disposable database.

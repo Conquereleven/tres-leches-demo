@@ -6,7 +6,7 @@ All named cells are transcribed into `zoneSeed` in `server/domain/zones.ts`. JLT
 
 Only these small review groups remain:
 
-1. **Delivery fees**: not present in the screenshot. Non-free zones use `deliveryFeeAed: null`; order payment is blocked until an admin supplies a fee. Zero is accepted only as an explicit admin decision and requires freeDelivery to be set consistently.
+1. **Delivery fees**: not present in the screenshot. Non-free zones use `deliveryFeeAed: null`; order payment is blocked until an admin supplies a fee. Zero is accepted only as an explicit admin decision.
 2. **JLT B/C/D**: FREE DELIVERY is explicit. Each rule has `freeDelivery: true`, fee 0, but minimum null pending confirmation whether the 30 AED header also applies below the free-delivery label.
 3. **Source spelling / coverage specificity**: “REMRAN” remains as written (300). Confirm intended name before adding an alias. MAZAYA and TAJ RESIDENCE remain the source labels; confirm exact buildings before attaching geography. No inferred boundary is seeded.
 

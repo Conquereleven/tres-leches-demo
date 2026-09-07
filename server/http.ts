@@ -5,6 +5,7 @@ import { resolve, extname } from "node:path";
 import { z, ZodError } from "zod";
 import { Store } from "./db/store";
 import { quoteOrder } from "./domain/zones";
+import { commandSchema, inboundSchema } from "./domain/commands";
 import { CommerceService } from "./domain/service";
 import { DomainError, type Actor, catalog, numbers } from "./domain/model";
 import {
@@ -114,8 +115,12 @@ export const server = http.createServer(async (req, res) => {
           ).verify(raw, String(req.headers["x-hub-signature-256"] ?? ""))
         )
           throw new DomainError(401, "Firma inválida");
-        if (path === "/api/webhooks/whatsapp")
-          return json(res, 200, service.inbound(parse(raw)));
+        if (path === "/api/webhooks/whatsapp") {
+          const event = inboundSchema.parse(parse(raw));
+          if (event.type === "message" && event.location)
+            await service.geo.prepare?.(event.location);
+          return json(res, 200, service.inbound(event));
+        }
         if (path === "/api/webhooks/payment")
           return json(res, 200, service.paymentWebhook(parse(raw)));
         throw new DomainError(404, "Webhook no encontrado");
@@ -153,6 +158,12 @@ export const server = http.createServer(async (req, res) => {
         const s = store.read();
         for (const o of s.orders)
           if (
+            o.location &&
+            ["Building", "Awaiting Location", "Minimum Check"].includes(o.state)
+          )
+            await service.geo.prepare?.(o.location);
+        for (const o of s.orders)
+          if (
             ["Building", "Awaiting Location", "Minimum Check"].includes(o.state)
           )
             o.quote = quoteOrder(
@@ -179,8 +190,16 @@ export const server = http.createServer(async (req, res) => {
         });
       }
       if (req.method === "POST" && path === "/api/commands") {
+        const command = commandSchema.parse(parse(await rawBody(req)));
+        const location =
+          command.type === "location"
+            ? command.location
+            : "id" in command
+              ? store.read().orders.find((o) => o.id === command.id)?.location
+              : undefined;
+        if (location) await service.geo.prepare?.(location);
         const result = service.command(
-          parse(await rawBody(req)),
+          command,
           String(req.headers["idempotency-key"] ?? ""),
           current,
         );

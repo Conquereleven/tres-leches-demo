@@ -435,3 +435,21 @@ test("hanging provider calls time out without blocking the queue forever", async
   assert.equal(store.read().jobs[0]!.status, "unknown");
   store.close();
 });
+
+test("async geocoder boundary prepares network results before pure zone matching", async () => {
+  const { GeocodingAdapter } = await import("../../server/adapters/geo");
+  let calls = 0;
+  const geo = new GeocodingAdapter({
+    lookup: async (_point, signal) => {
+      assert.equal(signal.aborted, false);
+      calls++;
+      return { address: "Jumeirah Village Circle" };
+    },
+  });
+  const point = { lat: 25, lng: 55 };
+  assert.equal(matchZone(zoneSeed, undefined, point, geo), null);
+  await geo.prepare(point);
+  await geo.prepare(point);
+  assert.equal(calls, 1);
+  assert.equal(matchZone(zoneSeed, undefined, point, geo)?.id, "jvc");
+});
