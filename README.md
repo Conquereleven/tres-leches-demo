@@ -74,6 +74,10 @@ A queued job has a persisted lease, 10-second call budget and exponential retrie
 
 These are not advertised as plug-and-play Meta/Paymennt raw webhook endpoints. Real wire-format normalization and provider-specific trust verification belong in those adapters. Unknown `/api/*` returns JSON 404, never the SPA shell. The API rejects invalid signatures before JSON parsing. Do not expose the development server to the public network.
 
+## TL-18 staging preparation
+
+Current environment and activation contract: [TL-18 staging notes](docs/tl18-staging.md). Explicit development/test/staging profiles prevent database reuse; production activation is disabled. Staging requires real auth, HTTPS configuration, a new persistent SQLite path and verified backups. Offline onboarding mode never simulates provider success; configured test mode retains Paymennt TEST APIs. External WhatsApp sends stay disabled and the Paymennt webhook remains 503. Readiness/UAT view reports NOT READY with specific blockers.
+
 ## TL-13–TL-17 integration release
 
 Read [integration and deployment notes](docs/tl13-17-integration.md), [UAT checklist](docs/tl13-17-uat.md), and [baseline evidence](docs/tl13-17-baseline.md).
