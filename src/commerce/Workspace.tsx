@@ -23,6 +23,9 @@ export function CommerceWorkspace() {
   const refresh = useCallback(async () => {
     try {
       setData(await api<Data>("workspace"));
+      setError((previous) =>
+        previous.includes("Inicia sesión") ? "" : previous,
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error de conexión");
       if (e instanceof Error && e.message.includes("Inicia sesión"))
@@ -94,9 +97,11 @@ export function CommerceWorkspace() {
           <h1>Todo empieza con una conversación.</h1>
         </div>
         <span className="co-pill">
-          {data.mode === "demo"
-            ? "Sandbox · sin cobros ni mensajes reales"
-            : "Integración · WhatsApp real / pagos de prueba"}
+          {data.environment === "staging"
+            ? "STAGING / TEST · WhatsApp externo bloqueado"
+            : data.mode === "demo"
+              ? "Sandbox · sin cobros ni mensajes reales"
+              : "Integración · WhatsApp real / pagos de prueba"}
         </span>
       </header>
       <nav className="co-tabs" aria-label="Operaciones">
@@ -106,6 +111,9 @@ export function CommerceWorkspace() {
           ["production", "Producción"],
           ["delivery", "Entregas"],
           ["zones", "Zonas y tarifas"],
+          ...(data.environment === "staging"
+            ? [["readiness", "Preparación y UAT"]]
+            : []),
         ].map(([id, label]) => (
           <button
             key={id}
@@ -142,7 +150,9 @@ export function CommerceWorkspace() {
         </div>
       )}
       <fieldset className="co-fieldset" disabled={busy}>
-        {view === "zones" ? (
+        {view === "readiness" ? (
+          <ReadinessPanel data={data} run={run} />
+        ) : view === "zones" ? (
           <Zones key="zones" data={data} run={run} />
         ) : view === "inbox" ? (
           <div className="co-grid">
@@ -1182,5 +1192,62 @@ function Login({ onLogin }: { onLogin: () => Promise<void> }) {
         <button className="primary">Entrar al workspace</button>
       </form>
     </main>
+  );
+}
+
+function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
+  return (
+    <section className="co-zone-editor">
+      <p className="eyebrow">STAGING / TEST</p>
+      <h2>Preparación y UAT · {data.readiness?.overall ?? "NOT READY"}</h2>
+      <p>
+        Los estados indican lo comprobado. Una configuración presente no
+        confirma onboarding ni aceptación del cliente.
+      </p>
+      <div className="co-readiness-grid">
+        {Object.entries(data.readiness?.components ?? {}).map(
+          ([name, check]) => (
+            <article className="co-quote" key={name}>
+              <h3>{name}</h3>
+              <strong>{check.status}</strong>
+              <p>{check.detail}</p>
+              {check.checkedAt && (
+                <small>{new Date(check.checkedAt).toLocaleString()}</small>
+              )}
+            </article>
+          ),
+        )}
+      </div>
+      {data.actor.role === "admin" && (
+        <div className="co-row">
+          <button
+            onClick={() =>
+              void run({ provider: "paymennt" }, "admin/diagnostics")
+            }
+          >
+            Comprobar Paymennt TEST
+          </button>
+          <button
+            onClick={() => void run({ provider: "geo" }, "admin/diagnostics")}
+          >
+            Comprobar Mapbox
+          </button>
+        </div>
+      )}
+      <p>
+        Solo lectura: estas comprobaciones no crean cobros ni envían mensajes.
+        Pueden consumir una consulta del proveedor.
+      </p>
+      <h3>Diez escenarios de aceptación</h3>
+      <ol className="co-audit">
+        {data.uatScenarios?.map((s) => (
+          <li key={s.id}>
+            {s.title}
+            <strong> · {s.status}</strong>
+            <p>{s.reason}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }

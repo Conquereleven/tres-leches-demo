@@ -1,3 +1,4 @@
+import { PaymenntNotificationVerifier } from "./paymennt-notification";
 import type { AuthoritativeCheckout } from "../domain/checkout";
 import { ProviderFailure } from "./failure";
 import { z } from "zod";
@@ -64,6 +65,8 @@ export class PaymenntProvider implements PaymentProvider {
     private fetcher: typeof fetch = fetch,
     verifier?: WebhookVerifier,
   ) {
+    if (config.environment !== "test")
+      throw new Error("Live Paymennt disabled pending approved release");
     if (!config.apiKey || !config.apiSecret)
       throw new Error("Paymennt credentials required");
     this.base =
@@ -72,7 +75,7 @@ export class PaymenntProvider implements PaymentProvider {
         : "https://api.paymennt.com/mer/v2.0";
     // Fail closed: OpenAPI exposes hmacKey but does not specify signed bytes/header/encoding.
     // Enable only after obtaining the merchant's verified webhook contract and test vector.
-    this.verifier = verifier ?? { verify: () => false };
+    this.verifier = verifier ?? new PaymenntNotificationVerifier();
   }
   private async request(path: string, body?: unknown) {
     let response: Response;
@@ -156,6 +159,15 @@ export class PaymenntProvider implements PaymentProvider {
     if (found.requestId !== requestId)
       throw new ProviderFailure("unknown", false);
     return this.getCheckout(found.checkoutId);
+  }
+  async checkConnectivity() {
+    // Official read-only search, deliberately requesting no customer/order data for diagnostics.
+    z.object({
+      totalPages: z.number().int(),
+      content: z.array(z.unknown()),
+    }).parse(
+      await this.request("/checkout?requestId=TL18-DIAGNOSTIC-NO-CHECKOUT"),
+    );
   }
   async getStatus(reference: string) {
     return (await this.getCheckout(reference)).status;

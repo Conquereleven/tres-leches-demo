@@ -38,15 +38,16 @@ export function seed(): State {
 }
 export class Store {
   private db: DatabaseSync;
-  constructor(path: string, demo = true) {
+  constructor(
+    path: string,
+    demo: boolean | "staging" | "development" | "test" = true,
+    initial?: State,
+  ) {
     if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });
     this.db = new DatabaseSync(path);
     this.db.exec("PRAGMA busy_timeout = 5000");
     this.db.exec(
       readFileSync(new URL("./schema.sql", import.meta.url), "utf8"),
-    );
-    this.db.exec(
-      "CREATE TABLE IF NOT EXISTS runtime_profile (id INTEGER PRIMARY KEY CHECK(id=1), mode TEXT NOT NULL)",
     );
     const existing = this.db
       .prepare("SELECT mode FROM runtime_profile WHERE id=1")
@@ -54,10 +55,11 @@ export class Store {
     const hasData = !!this.db
       .prepare("SELECT 1 FROM commerce_state WHERE id=1")
       .get();
-    const requested = demo ? "demo" : "integration";
+    const requested =
+      typeof demo === "string" ? demo : demo ? "demo" : "integration";
     if (
       (existing && existing.mode !== requested) ||
-      (!existing && hasData && !demo)
+      (!existing && hasData && demo !== true)
     ) {
       this.db.close();
       throw new Error(
@@ -67,11 +69,16 @@ export class Store {
     this.db
       .prepare("INSERT OR IGNORE INTO runtime_profile VALUES (1, ?)")
       .run(requested);
-    this.db
-      .prepare("INSERT OR IGNORE INTO commerce_state VALUES (1, ?)")
-      .run(
-        JSON.stringify({ ...seed(), ...(demo ? {} : { conversations: [] }) }),
-      );
+    this.db.prepare("INSERT OR IGNORE INTO commerce_state VALUES (1, ?)").run(
+      JSON.stringify(
+        initial ?? {
+          ...seed(),
+          ...(demo === true || demo === "development" || demo === "test"
+            ? {}
+            : { conversations: [] }),
+        },
+      ),
+    );
   }
   read(): State {
     return JSON.parse(

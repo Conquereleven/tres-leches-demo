@@ -8,6 +8,24 @@ import type {
 } from "../../server/domain/model";
 export type Workspace = {
   mode: "demo" | "integration";
+  environment?: "development" | "test" | "staging";
+  readiness?: {
+    overall: "NOT READY" | "INTEGRATION READY";
+    components: Record<
+      string,
+      {
+        status: "READY" | "NOT CONFIGURED" | "BLOCKED" | "FAILED";
+        detail: string;
+        checkedAt?: string;
+      }
+    >;
+  };
+  uatScenarios?: {
+    id: number;
+    title: string;
+    status: string;
+    reason: string;
+  }[];
   integrationHealth?: { inboundFailed: number };
   actor: Actor;
   agents: { id: string; name: string }[];

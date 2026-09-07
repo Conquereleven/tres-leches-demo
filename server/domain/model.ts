@@ -159,6 +159,12 @@ export type InboundDelivery = {
   nextAt: number;
 };
 export type State = {
+  uatScenarios?: {
+    id: number;
+    title: string;
+    status: "BLOCKED";
+    reason: string;
+  }[];
   inboundDeliveries?: InboundDelivery[];
   zones: DeliveryZone[];
   conversations: Conversation[];

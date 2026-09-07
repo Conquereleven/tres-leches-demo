@@ -1,5 +1,12 @@
 import { trace, safeLog } from "./observability";
-import { integrationConfig } from "./config";
+import { integrationConfig, runtimeConfig, usersSchema } from "./config";
+import { stagingSeed } from "./db/staging-seed";
+import { BackupManager } from "./db/backups";
+import { Readiness } from "./readiness";
+import {
+  DisabledWhatsAppProvider,
+  UnconfiguredPaymentProvider,
+} from "./adapters/blocked";
 import { PaymenntProvider } from "./adapters/paymennt";
 import { MetaWhatsAppProvider } from "./adapters/meta";
 import { MapboxGeoProvider } from "./adapters/mapbox";
@@ -19,16 +26,53 @@ import {
   MockPaymentProvider,
   MockWhatsAppProvider,
 } from "./adapters/providers";
-const integration = integrationConfig(process.env);
-const demo = !integration;
+const runtime = runtimeConfig(process.env);
+const staging = runtime.staging;
+if (staging) process.umask(0o077);
+const integration = staging
+  ? staging.PROVIDER_MODE === "test"
+    ? integrationConfig({ ...process.env, INTEGRATION_MODE: "true" })
+    : null
+  : integrationConfig(process.env);
+const demo = !integration && !staging;
 const production = process.env.NODE_ENV === "production";
 if (production && demo && process.env.DEMO_MODE !== "true")
   throw new Error("Select explicit DEMO_MODE or INTEGRATION_MODE");
 const secret =
-  process.env.WEBHOOK_SECRET ??
+  process.env.WEBHOOK_SECRET ||
   (production ? "" : randomBytes(32).toString("hex"));
 const verifier = new HmacVerifier(secret);
-const store = new Store(process.env.DB_PATH ?? "data/commerce.sqlite", demo);
+const dbPath =
+  process.env.DB_PATH || `data/${runtime.environment}/commerce.sqlite`;
+if (
+  staging &&
+  (resolve(dbPath).includes("/dist/") || resolve(dbPath).endsWith("/dist"))
+)
+  throw new Error("Staging database must be outside static dist");
+const stagingAliases =
+  integration?.numbers ??
+  numbers.map((n) => ({ ...n, phone: "NOT CONFIGURED" }));
+const store = new Store(
+  dbPath,
+  staging
+    ? "staging"
+    : demo
+      ? (runtime.environment as "development" | "test")
+      : false,
+  staging
+    ? stagingSeed(stagingAliases, staging.STAGING_SEED === "uat")
+    : undefined,
+);
+const backups = staging
+  ? new BackupManager(
+      store,
+      dbPath,
+      staging.BACKUP_DIR,
+      staging.BACKUP_RETENTION_COUNT,
+      staging.BACKUP_INTERVAL_MINUTES,
+    )
+  : undefined;
+if (backups) await backups.run();
 const meta = integration
   ? new MetaWhatsAppProvider({
       token: integration.META_ACCESS_TOKEN,
@@ -39,48 +83,59 @@ const meta = integration
       paymentTemplate: integration.paymentTemplate,
     })
   : null;
+const paymennt = integration
+  ? new PaymenntProvider({
+      apiKey: integration.PAYMENNT_API_KEY,
+      apiSecret: integration.PAYMENNT_API_SECRET,
+      environment: "test",
+    })
+  : undefined;
+const geoProvider = integration
+  ? new MapboxGeoProvider(integration.MAPBOX_ACCESS_TOKEN)
+  : undefined;
 const service = new CommerceService(
   store,
-  meta ?? new MockWhatsAppProvider(),
-  integration
-    ? new PaymenntProvider({
-        apiKey: integration.PAYMENNT_API_KEY,
-        apiSecret: integration.PAYMENNT_API_SECRET,
-        environment: "test",
-      })
-    : new MockPaymentProvider(
-        verifier,
-        (reference) =>
-          store.read().payments.find((p) => p.providerReference === reference)
-            ?.status,
-      ),
-  integration
-    ? new GeocodingAdapter(
-        new MapboxGeoProvider(integration.MAPBOX_ACCESS_TOKEN),
-      )
-    : undefined,
+  staging || integration
+    ? new DisabledWhatsAppProvider()
+    : new MockWhatsAppProvider(),
+  paymennt ??
+    (staging
+      ? new UnconfiguredPaymentProvider()
+      : new MockPaymentProvider(
+          verifier,
+          (reference) =>
+            store.read().payments.find((p) => p.providerReference === reference)
+              ?.status,
+        )),
+  geoProvider
+    ? new GeocodingAdapter(geoProvider)
+    : staging
+      ? { resolve: () => null }
+      : undefined,
   10000,
-  integration?.numbers ?? numbers,
-);
-const usersSchema = z.array(
-  z.object({
-    id: z.string().regex(/^[a-zA-Z0-9_-]{1,100}$/),
-    role: z.enum(["admin", "manager", "operator", "agent"]),
-    salt: z.string().min(16),
-    hash: z.string().regex(/^[a-f0-9]{128}$/),
-  }),
+  staging ? stagingAliases : (integration?.numbers ?? numbers),
 );
 const users = usersSchema.parse(
   JSON.parse(process.env.OPERATOR_USERS_JSON ?? "[]"),
 );
 service.agentIds = users.length ? users.map((u) => u.id) : ["liza", "andrea"];
-if ((production || integration) && !users.length)
+if ((production || integration || staging) && !users.length)
   throw new Error("Production sandbox requires OPERATOR_USERS_JSON");
+const readiness = new Readiness(
+  runtime,
+  integration,
+  store,
+  !!users.length && !!(production || integration || staging),
+  backups,
+  paymennt,
+  geoProvider,
+);
 const sessions = new Map<string, { actor: Actor; expires: number }>();
 const limiter = new Map<string, { count: number; until: number }>();
 const origin = process.env.APP_ORIGIN ?? "http://127.0.0.1:5173";
 function actor(req: http.IncomingMessage): Actor {
-  if (!production && !integration) return { id: "liza", role: "admin" };
+  if (!production && !integration && !staging)
+    return { id: "liza", role: "admin" };
   const cookie = req.headers.cookie
     ?.split(";")
     .map((x) => x.trim())
@@ -141,14 +196,13 @@ export const server = http.createServer(async (req, res) => {
       if (req.method === "GET" && path === "/api/health")
         return json(res, 200, {
           ok: true,
+          environment: runtime.environment,
           mode: demo ? "demo" : "integration",
         });
-      if (req.method === "GET" && path === "/api/ready")
-        return json(res, store.healthy() ? 200 : 503, {
-          storage: store.healthy(),
-          mode: demo ? "demo" : "integration",
-          pilotReady: false,
-        });
+      if (req.method === "GET" && path === "/api/ready") {
+        const result = readiness.snapshot();
+        return json(res, result.storage ? 200 : 503, result);
+      }
       if (req.method === "GET" && path === "/api/webhooks/whatsapp" && meta) {
         const challenge = meta.challenge(url.searchParams);
         if (!challenge) throw new DomainError(403, "Verificación rechazada");
@@ -157,11 +211,13 @@ export const server = http.createServer(async (req, res) => {
       }
       if (req.method === "POST" && path.startsWith("/api/webhooks/")) {
         const raw = await rawBody(req);
-        if (integration && path === "/api/webhooks/payment")
+        if ((integration || staging) && path === "/api/webhooks/payment")
           throw new DomainError(
             503,
             "Paymennt webhook contract pending verification; use Check Status",
           );
+        if (staging && !meta && path === "/api/webhooks/whatsapp")
+          throw new DomainError(503, "BLOCKED — EXTERNAL CREDENTIALS");
         if (meta && path === "/api/webhooks/whatsapp") {
           if (
             !meta.verifier.verify(
@@ -211,15 +267,37 @@ export const server = http.createServer(async (req, res) => {
         const id = randomBytes(32).toString("hex");
         sessions.set(id, {
           actor: { id: user.id, role: user.role },
-          expires: Date.now() + 8 * 3600000,
+          expires: Date.now() + runtime.sessionTtlSeconds * 1000,
         });
         res.setHeader(
           "Set-Cookie",
-          `tl_session=${id}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=28800`,
+          `tl_session=${id}; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=${runtime.sessionTtlSeconds}`,
         );
         return json(res, 200, { ok: true });
       }
       const current = actor(req);
+      if (path === "/api/admin/diagnostics") {
+        if (current.role !== "admin")
+          throw new DomainError(
+            403,
+            "Solo administradores pueden ejecutar diagnósticos",
+          );
+        if (req.method === "GET") return json(res, 200, readiness.snapshot());
+        if (req.method === "POST") {
+          const body = z
+            .object({ provider: z.enum(["paymennt", "geo"]) })
+            .strict()
+            .parse(parse(await rawBody(req)));
+          try {
+            return json(res, 200, await readiness.probe(body.provider));
+          } catch {
+            throw new DomainError(
+              409,
+              "Diagnóstico no disponible o en curso; espera e intenta de nuevo",
+            );
+          }
+        }
+      }
       if (req.method === "POST" && path === "/api/logout") {
         for (const [key, session] of sessions)
           if (session.actor.id === current.id) sessions.delete(key);
@@ -260,6 +338,7 @@ export const server = http.createServer(async (req, res) => {
               o.manualZoneId,
             );
         return json(res, 200, {
+          environment: runtime.environment,
           mode: demo ? "demo" : "integration",
           actor: current,
           agents: users.length
@@ -274,6 +353,8 @@ export const server = http.createServer(async (req, res) => {
           conversations: s.conversations,
           orders: s.orders,
           payments: s.payments,
+          readiness: readiness.snapshot(),
+          uatScenarios: s.uatScenarios ?? [],
           integrationHealth: {
             inboundFailed: (s.inboundDeliveries ?? []).filter(
               (d) => d.status === "failed",
@@ -399,6 +480,11 @@ export const server = http.createServer(async (req, res) => {
     );
   }
 });
+const backupTimer = backups
+  ? setInterval(() => {
+      void backups.run().catch(() => safeLog("worker.failed"));
+    }, backups.intervalMinutes * 60000)
+  : undefined;
 let working = false;
 const timer = setInterval(() => {
   if (working) return;
@@ -424,9 +510,18 @@ server.listen(
 );
 function close() {
   clearInterval(timer);
+  if (backupTimer) clearInterval(backupTimer);
   server.close(() => {
-    store.close();
-    process.exit(0);
+    const finish = setInterval(() => {
+      if (working) return;
+      clearInterval(finish);
+      void (backups?.run() ?? Promise.resolve())
+        .catch(() => {})
+        .finally(() => {
+          store.close();
+          process.exit(0);
+        });
+    }, 25);
   });
 }
 process.on("SIGTERM", close);

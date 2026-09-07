@@ -941,11 +941,18 @@ export class CommerceService {
                 ? "failed"
                 : "pending";
           j.nextAt = Date.now() + 1000 * 2 ** j.attempts;
-          j.lastError = rejected
-            ? "Solicitud rechazada: revisa configuración y ventana de WhatsApp antes de reintentar"
-            : safe
-              ? "Proveedor no disponible; reintento pendiente"
-              : "Resultado incierto; conciliación requerida";
+          j.lastError =
+            error instanceof ProviderFailure &&
+            error.code === "OUTBOUND_DISABLED"
+              ? "BLOCKED — WhatsApp externo deshabilitado en TL-18"
+              : error instanceof ProviderFailure &&
+                  error.code === "NOT_CONFIGURED"
+                ? "BLOCKED — EXTERNAL CREDENTIALS"
+                : rejected
+                  ? "Solicitud rechazada: revisa configuración y ventana de WhatsApp antes de reintentar"
+                  : safe
+                    ? "Proveedor no disponible; reintento pendiente"
+                    : "Resultado incierto; conciliación requerida";
           const m = s.conversations
             .flatMap((c) => c.messages)
             .find((m) => m.id === j.entityId);
