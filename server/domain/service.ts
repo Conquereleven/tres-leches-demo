@@ -1,3 +1,6 @@
+import { trace, safeLog } from "../observability";
+import { ProviderFailure } from "../adapters/failure";
+import type { AuthoritativeCheckout } from "./checkout";
 import { createHash, randomUUID } from "node:crypto";
 import {
   type Actor,
@@ -35,6 +38,8 @@ export class CommerceService {
     public payment: PaymentProvider,
     public geo: GeoService = new MockGeoService(),
     private timeoutMs = 10000,
+    public operationalNumbers = numbers,
+    public agentIds = ["liza", "andrea"],
   ) {}
   private async bounded<T>(work: Promise<T>): Promise<T> {
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -76,11 +81,19 @@ export class CommerceService {
     requireThat(c.status === "open", "Reabre la conversación para continuar");
   }
   private quote(s: State, o: Order) {
-    o.quote = quoteOrder(s.zones, o.lines, o.address, o.location, this.geo);
+    o.quote = quoteOrder(
+      s.zones,
+      o.lines,
+      o.address,
+      o.location,
+      this.geo,
+      o.manualZoneId,
+    );
   }
   private enqueue(s: State, kind: Job["kind"], entityId: string) {
     s.jobs.push({
       id: randomUUID(),
+      correlationId: trace.getStore() ?? randomUUID(),
       kind,
       entityId,
       status: "pending",
@@ -88,11 +101,17 @@ export class CommerceService {
       nextAt: Date.now(),
     });
   }
-  private message(s: State, c: Conversation, text: string) {
+  private message(
+    s: State,
+    c: Conversation,
+    text: string,
+    paymentContext?: { amountAed: string; url: string },
+  ) {
     const id = randomUUID();
     c.messages.push({
       id,
       direction: "out",
+      paymentContext,
       text,
       at: now(),
       status: "queued",
@@ -184,7 +203,7 @@ export class CommerceService {
       this.version(c, cmd.version);
       if (cmd.type === "assign") {
         requireThat(
-          actor.role === "admin" ||
+          ["admin", "manager"].includes(actor.role) ||
             cmd.agent === actor.id ||
             cmd.agent === null,
           "Asignación no permitida",
@@ -193,11 +212,11 @@ export class CommerceService {
         requireThat(
           !c.assignedAgent ||
             c.assignedAgent === actor.id ||
-            actor.role === "admin",
+            ["admin", "manager"].includes(actor.role),
           "Ya asignada a otro agente",
         );
         requireThat(
-          cmd.agent === null || ["liza", "andrea"].includes(cmd.agent),
+          cmd.agent === null || this.agentIds.includes(cmd.agent),
           "Agente desconocido",
           400,
         );
@@ -268,6 +287,27 @@ export class CommerceService {
     this.version(o, cmd.version);
     const c = this.conversation(s, o.conversationId);
     this.owned(c, actor);
+    if (cmd.type === "manualZone") {
+      requireThat(
+        ["Building", "Awaiting Location", "Minimum Check"].includes(o.state),
+        "Pedido bloqueado",
+      );
+      requireThat(
+        s.zones.some((z) => z.id === cmd.zoneId && z.active),
+        "Zona inválida",
+        400,
+      );
+      o.manualZoneId = cmd.zoneId;
+      o.audit.push({
+        ...at(),
+        actor: actor.id,
+        action: `Zona manual ${cmd.zoneId}: ${cmd.reason}`,
+      });
+      this.quote(s, o);
+      if (o.state !== "Minimum Check") transition(o, "Minimum Check", actor.id);
+      else o.version++;
+      return o;
+    }
     if (cmd.type === "editOrder" || cmd.type === "location") {
       requireThat(
         ["Building", "Awaiting Location", "Minimum Check"].includes(o.state),
@@ -282,6 +322,7 @@ export class CommerceService {
         );
         o.lines = cmd.lines;
       } else {
+        o.manualZoneId = undefined;
         o.address = cmd.address;
         o.location = cmd.location;
         c.address = cmd.address;
@@ -307,7 +348,16 @@ export class CommerceService {
         !s.payments.some(
           (p) =>
             p.orderId === o.id &&
-            ["creating", "pending", "paid"].includes(p.status),
+            [
+              "creating",
+              "pending",
+              "authorized",
+              "pending_confirmation",
+              "paid",
+              "partially_refunded",
+              "refunded",
+              "chargeback",
+            ].includes(p.status),
         ),
         "Ya existe una solicitud de pago activa",
       );
@@ -316,6 +366,7 @@ export class CommerceService {
         orderId: o.id,
         amountFils: o.quote!.totalFils!,
         currency: "AED",
+        provider: this.payment.name ?? "mock",
         status: "creating",
         createdAt: now(),
         updatedAt: now(),
@@ -343,6 +394,7 @@ export class CommerceService {
         s,
         c,
         `Your order total is AED ${(p.amountFils / 100).toFixed(2)}. Complete your payment here: ${p.url}`,
+        { amountAed: (p.amountFils / 100).toFixed(2), url: p.url },
       );
       p.timeline.push({
         ...at(),
@@ -353,6 +405,15 @@ export class CommerceService {
       return o;
     }
     if (cmd.type === "transition") {
+      if (
+        ["Production", "Ready", "Out for Delivery", "Delivered"].includes(
+          cmd.state,
+        )
+      )
+        requireThat(
+          s.payments.find((p) => p.id === o.paymentId)?.status === "paid",
+          "Pago requiere revisión antes de fulfillment",
+        );
       requireThat(
         !["Paid", "Confirmed", "Awaiting Payment"].includes(cmd.state),
         "Este estado solo puede ser aplicado por el flujo de pago",
@@ -362,7 +423,16 @@ export class CommerceService {
           !s.payments.some(
             (p) =>
               p.orderId === o.id &&
-              ["creating", "pending", "paid"].includes(p.status),
+              [
+                "creating",
+                "pending",
+                "authorized",
+                "pending_confirmation",
+                "paid",
+                "partially_refunded",
+                "refunded",
+                "chargeback",
+              ].includes(p.status),
           ),
           "Resuelve o cancela el cobro con el proveedor antes de modificar el pedido",
         );
@@ -370,6 +440,64 @@ export class CommerceService {
       return o;
     }
     throw new DomainError(400, "Comando no soportado");
+  }
+  acceptInboundBatch(rawEvents: unknown[]) {
+    const events = rawEvents.map((e) => inboundSchema.parse(e));
+    return this.store.write((s) => {
+      s.inboundDeliveries ??= [];
+      for (const event of events) {
+        const previous = s.inboundDeliveries.find(
+          (d) => d.id === event.eventId,
+        );
+        const digest = hash(event);
+        if (previous)
+          requireThat(
+            previous.hash === digest,
+            "Evento reutilizado con datos diferentes",
+          );
+        else
+          s.inboundDeliveries.push({
+            id: event.eventId,
+            event,
+            hash: digest,
+            status: "pending",
+            attempts: 0,
+            nextAt: Date.now(),
+          });
+      }
+      safeLog("webhook.accepted", { count: events.length });
+      return { accepted: events.length };
+    });
+  }
+  private async drainInbound() {
+    const due = (this.store.read().inboundDeliveries ?? [])
+      .filter((d) => d.status === "pending" && d.nextAt <= Date.now())
+      .slice(0, 20);
+    for (const delivery of due) {
+      try {
+        const event = inboundSchema.parse(delivery.event);
+        if (event.type === "message" && event.location) {
+          // A geocoder outage must not lose the customer's message; unresolved GPS stays blocked for manual review.
+          try {
+            await this.geo.prepare?.(event.location);
+          } catch {
+            /* The pure resolver returns no cached zone. */
+          }
+        }
+        this.inbound(event);
+        this.store.write((s) => {
+          s.inboundDeliveries!.find((d) => d.id === delivery.id)!.status =
+            "done";
+        });
+      } catch {
+        this.store.write((s) => {
+          const d = s.inboundDeliveries!.find((d) => d.id === delivery.id)!;
+          d.attempts++;
+          d.nextAt = Date.now() + Math.min(60000, 1000 * 2 ** d.attempts);
+          if (d.attempts >= 12) d.status = "failed";
+        });
+      }
+    }
   }
   inbound(raw: unknown) {
     const e = inboundSchema.parse(raw);
@@ -395,7 +523,9 @@ export class CommerceService {
           if (current < 2) m.status = "failed";
         } else if (ranks[e.status] > current) m.status = e.status;
       } else {
-        const n = numbers.find((n) => n.id === e.sourceNumberId);
+        const n = this.operationalNumbers.find(
+          (n) => n.id === e.sourceNumberId,
+        );
         requireThat(n, "Número de origen desconocido", 400);
         let c = s.conversations.find(
           (c) => c.sourceNumberId === n.id && c.phone === e.phone,
@@ -422,7 +552,7 @@ export class CommerceService {
           text: e.text,
           location: e.location,
           status: "received",
-          at: now(),
+          at: e.at ?? now(),
         });
         c.unread = true;
         c.status = "open";
@@ -437,6 +567,7 @@ export class CommerceService {
                 o.state,
               ),
           )) {
+            o.manualZoneId = undefined;
             o.location = e.location;
             o.address = undefined;
             this.quote(s, o);
@@ -456,6 +587,11 @@ export class CommerceService {
     });
   }
   paymentWebhook(raw: unknown) {
+    requireThat(
+      !this.payment.getCheckout,
+      "Usa conciliación autoritativa",
+      403,
+    );
     const e = paymentEventSchema.parse(raw);
     return this.store.write((s) => {
       const key = `payment:${e.eventId}`,
@@ -528,7 +664,151 @@ export class CommerceService {
       return { duplicate: false };
     });
   }
+  private reconciling = new Set<string>();
+  async reconcile(paymentId: string, actor: Actor) {
+    const snapshot = this.store.read();
+    const p = snapshot.payments.find((p) => p.id === paymentId);
+    requireThat(p, "Pago no encontrado", 404);
+    const order = this.order(snapshot, p.orderId);
+    if (actor.role !== "admin" && actor.role !== "manager")
+      this.owned(this.conversation(snapshot, order.conversationId), actor);
+    requireThat(
+      this.payment.getCheckout,
+      "La conciliación real no está disponible en demo",
+      409,
+    );
+    requireThat(!this.reconciling.has(paymentId), "Conciliación en curso", 409);
+    this.reconciling.add(paymentId);
+    try {
+      const checkout = p.providerReference
+        ? await this.payment.getCheckout(p.providerReference)
+        : await this.payment.findCheckout?.(p.id);
+      requireThat(
+        checkout,
+        "Checkout aún no encontrado; no se creará otro cobro automáticamente",
+        409,
+      );
+      if (!p.providerReference)
+        this.store.write((s) => {
+          const current = s.payments.find((x) => x.id === p.id)!;
+          const job = s.jobs.find(
+            (j) => j.kind === "payment" && j.entityId === p.id,
+          );
+          requireThat(
+            job?.status === "unknown",
+            "Espera al resultado de creación antes de recuperar",
+            409,
+          );
+          requireThat(
+            checkout.requestId === p.id &&
+              checkout.orderId === p.orderId &&
+              checkout.amountFils === p.amountFils &&
+              checkout.currency === p.currency,
+            "Checkout recuperado no coincide",
+            409,
+          );
+          current.providerReference = checkout.checkoutId;
+          current.providerCheckoutId = checkout.checkoutId;
+          current.url = checkout.url;
+          job.status = "done";
+          current.timeline.push({
+            ...at(),
+            actor: actor.id,
+            action: "Checkout recuperado por requestId; no se creó otro cobro",
+          });
+          if (checkout.status === "pending" && checkout.url)
+            this.message(
+              s,
+              this.conversation(s, order.conversationId),
+              `Your order total is AED ${(p.amountFils / 100).toFixed(2)}. Complete your payment here: ${checkout.url}`,
+              { amountAed: (p.amountFils / 100).toFixed(2), url: checkout.url },
+            );
+        });
+      const result = this.applyCheckout(paymentId, checkout, actor.id);
+      safeLog("reconciliation.complete", { status: result.status });
+      return result;
+    } finally {
+      this.reconciling.delete(paymentId);
+    }
+  }
+  private applyCheckout(
+    paymentId: string,
+    checkout: AuthoritativeCheckout,
+    actor: string,
+  ) {
+    return this.store.write((s) => {
+      const p = s.payments.find((p) => p.id === paymentId)!;
+      requireThat(
+        checkout.checkoutId === p.providerReference &&
+          checkout.requestId === p.id &&
+          checkout.orderId === p.orderId &&
+          checkout.amountFils === p.amountFils &&
+          checkout.currency === p.currency,
+        "Conciliación bloqueada: referencia, importe o moneda no coincide",
+        409,
+      );
+      const o = this.order(s, p.orderId);
+      const previous = p.status;
+      const settled = ["paid", "partially_refunded", "refunded", "chargeback"];
+      const regression =
+        (settled.includes(previous) && !settled.includes(checkout.status)) ||
+        (previous === "refunded" &&
+          checkout.status !== "refunded" &&
+          checkout.status !== "chargeback") ||
+        (previous === "partially_refunded" && checkout.status === "paid") ||
+        (previous === "chargeback" && checkout.status !== "chargeback");
+      p.lastReconciledAt = now();
+      p.providerRawStatus = checkout.rawStatus;
+      if (regression) {
+        p.timeline.push({
+          ...at(),
+          actor,
+          action:
+            "Estado anterior recibido: revisión requerida; no se revierte el pago",
+        });
+        return { status: p.status, reviewRequired: true };
+      }
+      p.status = checkout.status;
+      p.updatedAt = now();
+      if (previous !== p.status)
+        p.timeline.push({
+          ...at(),
+          actor,
+          action: `Conciliación Paymennt: ${previous} → ${p.status}`,
+        });
+      if (p.status === "paid" && !p.paidAt) {
+        // Receipt time, not a fabricated provider transaction timestamp.
+        p.paidAt = now();
+        if (
+          o.state === "Awaiting Payment" &&
+          o.paymentId === p.id &&
+          !s.payments.some(
+            (other) =>
+              other.id !== p.id &&
+              other.orderId === o.id &&
+              settled.includes(other.status),
+          )
+        ) {
+          transition(o, "Paid", actor);
+          transition(o, "Confirmed", actor);
+        } else
+          p.timeline.push({
+            ...at(),
+            actor,
+            action: "Pago tardío: revisión manual antes de fulfillment",
+          });
+      }
+      if (
+        ["failed", "expired", "cancelled"].includes(p.status) &&
+        o.paymentId === p.id &&
+        o.state === "Awaiting Payment"
+      )
+        transition(o, "Building", actor);
+      return { status: p.status };
+    });
+  }
   async drain() {
+    await this.drainInbound();
     for (let count = 0; count < 20; count++) {
       const claimed = this.store.write((s) => {
         const j = s.jobs.find(
@@ -553,6 +833,11 @@ export class CommerceService {
         return structuredClone(j);
       });
       if (!claimed) break;
+      trace.enterWith(claimed.correlationId ?? claimed.id);
+      safeLog("outbox.attempt", {
+        kind: claimed.kind,
+        attempt: claimed.attempts,
+      });
       try {
         const snapshot = this.store.read();
         if (claimed.kind === "payment") {
@@ -581,6 +866,8 @@ export class CommerceService {
             const p = s.payments.find((p) => p.id === claimed.entityId)!;
             p.url = result.url;
             p.providerReference = result.reference;
+            p.provider = result.provider ?? "mock";
+            p.providerCheckoutId = result.checkoutId;
             p.status = "pending";
             p.updatedAt = now();
             p.timeline.push({
@@ -593,6 +880,7 @@ export class CommerceService {
               s,
               this.conversation(s, o.conversationId),
               `Your order total is AED ${(p.amountFils / 100).toFixed(2)}. Complete your payment here: ${p.url}`,
+              { amountAed: (p.amountFils / 100).toFixed(2), url: p.url },
             );
             job.status = "done";
           });
@@ -605,6 +893,12 @@ export class CommerceService {
             this.wa.send({
               ...sourceOf(c),
               text: m.text,
+              paymentContext: m.paymentContext,
+              lastInboundAt: c.messages
+                .filter((m) => m.direction === "in")
+                .map((m) => m.at)
+                .sort()
+                .at(-1),
               idempotencyKey: m.id,
             }),
           );
@@ -621,11 +915,15 @@ export class CommerceService {
             const m = c.messages.find((m) => m.id === claimed.entityId)!;
             m.providerId = result.providerId;
             m.status = result.status;
-            c.version++;
+            // Delivery acknowledgment changes no operator-owned fields; avoid false editing conflicts.
             job.status = "done";
           });
         }
-      } catch {
+      } catch (error) {
+        safeLog("outbox.failed", {
+          kind: claimed.kind,
+          attempt: claimed.attempts,
+        });
         this.store.write((s) => {
           const j = s.jobs.find((j) => j.id === claimed.id)!;
           if (j.attempts !== claimed.attempts) return;
@@ -633,11 +931,21 @@ export class CommerceService {
             j.kind === "payment"
               ? this.payment.idempotentCreate
               : this.wa.idempotentSend;
-          j.status = !safe ? "unknown" : j.attempts >= 3 ? "failed" : "pending";
+          const rejected =
+            error instanceof ProviderFailure && error.certainty === "rejected";
+          j.status = rejected
+            ? "failed"
+            : !safe
+              ? "unknown"
+              : j.attempts >= 3
+                ? "failed"
+                : "pending";
           j.nextAt = Date.now() + 1000 * 2 ** j.attempts;
-          j.lastError = safe
-            ? "Proveedor no disponible; reintento pendiente"
-            : "Resultado incierto; conciliación requerida";
+          j.lastError = rejected
+            ? "Solicitud rechazada: revisa configuración y ventana de WhatsApp antes de reintentar"
+            : safe
+              ? "Proveedor no disponible; reintento pendiente"
+              : "Resultado incierto; conciliación requerida";
           const m = s.conversations
             .flatMap((c) => c.messages)
             .find((m) => m.id === j.entityId);

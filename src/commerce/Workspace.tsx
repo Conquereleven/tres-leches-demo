@@ -93,7 +93,11 @@ export function CommerceWorkspace() {
           <p className="eyebrow">TRES LECHES · OPERACIONES</p>
           <h1>Todo empieza con una conversación.</h1>
         </div>
-        <span className="co-pill">Sandbox · sin cobros ni mensajes reales</span>
+        <span className="co-pill">
+          {data.mode === "demo"
+            ? "Sandbox · sin cobros ni mensajes reales"
+            : "Integración · WhatsApp real / pagos de prueba"}
+        </span>
       </header>
       <nav className="co-tabs" aria-label="Operaciones">
         {[
@@ -111,10 +115,19 @@ export function CommerceWorkspace() {
             {label}
           </button>
         ))}
+        {data.mode === "integration" && (
+          <button onClick={() => void run({}, "logout")}>Cerrar sesión</button>
+        )}
         <button className="co-refresh" onClick={() => void refresh()}>
           Actualizar
         </button>
       </nav>
+      {data.integrationHealth?.inboundFailed ? (
+        <p className="co-error" role="alert">
+          Hay {data.integrationHealth.inboundFailed} notificaciones pendientes
+          de revisión técnica.
+        </p>
+      ) : null}
       {error && (
         <div className="co-error" role="alert">
           {error}
@@ -444,34 +457,36 @@ function ConversationPanel({
         ))}
       </div>
       <div className="co-chat-bottom">
-        <details>
-          <summary>Respuestas guardadas · demo</summary>
-          <button
-            onClick={() =>
-              setDraft("¡Hola! ¿Qué fecha y franja prefieres para tu pedido?")
-            }
-          >
-            Disponibilidad
-          </button>
-          <button
-            onClick={() =>
-              setDraft(
-                "Compártenos tu ubicación para confirmar cobertura, mínimo y entrega.",
-              )
-            }
-          >
-            Solicitar ubicación
-          </button>
-          <button
-            onClick={() =>
-              setDraft(
-                "Puedes recoger en nuestra cocina demo de Al Quoz. Te avisaremos cuando esté listo.",
-              )
-            }
-          >
-            Pickup
-          </button>
-        </details>
+        {data.mode === "demo" && (
+          <details>
+            <summary>Respuestas guardadas · demo</summary>
+            <button
+              onClick={() =>
+                setDraft("¡Hola! ¿Qué fecha y franja prefieres para tu pedido?")
+              }
+            >
+              Disponibilidad
+            </button>
+            <button
+              onClick={() =>
+                setDraft(
+                  "Compártenos tu ubicación para confirmar cobertura, mínimo y entrega.",
+                )
+              }
+            >
+              Solicitar ubicación
+            </button>
+            <button
+              onClick={() =>
+                setDraft(
+                  "Puedes recoger en nuestra cocina demo de Al Quoz. Te avisaremos cuando esté listo.",
+                )
+              }
+            >
+              Pickup
+            </button>
+          </details>
+        )}
         <div className="co-compose">
           <label className="sr-only" htmlFor="co-draft">
             Mensaje
@@ -508,11 +523,13 @@ function ConversationPanel({
           Las respuestas salen desde {c.sourceNumberId.toUpperCase()}.
           Traducciones solo para uso interno.
         </p>
-        <button
-          onClick={() => void run({ conversationId: c.id }, "demo/location")}
-        >
-          Simular GPS entrante · JVC
-        </button>
+        {data.mode === "demo" && (
+          <button
+            onClick={() => void run({ conversationId: c.id }, "demo/location")}
+          >
+            Simular GPS entrante · JVC
+          </button>
+        )}
         {data.jobs
           .filter(
             (j) =>
@@ -546,7 +563,9 @@ function OrderPanel({
 }) {
   const [address, setAddress] = useState(""),
     [product, setProduct] = useState("pan"),
-    [quantity, setQuantity] = useState(1);
+    [quantity, setQuantity] = useState(1),
+    [manualZone, setManualZone] = useState(""),
+    [manualReason, setManualReason] = useState("");
   const p = data.payments.find((p) => p.id === o.paymentId),
     c = data.conversations.find((c) => c.id === o.conversationId)!,
     editable = ["Building", "Awaiting Location", "Minimum Check"].includes(
@@ -565,6 +584,14 @@ function OrderPanel({
         <h3>{o.id}</h3>
         <span className="co-state">{o.state}</span>
       </div>
+      {p?.provider === "paymennt" &&
+        (owned || ["admin", "manager"].includes(data.actor.role)) && (
+          <button
+            onClick={() => void run({ paymentId: p.id }, "payments/reconcile")}
+          >
+            Check Status · conciliar pago
+          </button>
+        )}
       <fieldset className="co-fieldset" disabled={!owned}>
         <ul className="co-lines">
           {o.lines.map((l) => (
@@ -658,6 +685,50 @@ function OrderPanel({
             >
               Resolver dirección
             </button>
+            <details>
+              <summary>Revisar y seleccionar zona</summary>
+              <p>
+                Confirma la ubicación con el cliente. La selección queda
+                registrada.
+              </p>
+              <label>
+                Zona confirmada
+                <select
+                  value={manualZone}
+                  onChange={(e) => setManualZone(e.target.value)}
+                >
+                  <option value="">Seleccionar zona</option>
+                  {data.zones
+                    .filter((z) => z.active)
+                    .map((z) => (
+                      <option key={z.id} value={z.id}>
+                        {z.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <label>
+                Motivo de la selección
+                <input
+                  value={manualReason}
+                  onChange={(e) => setManualReason(e.target.value)}
+                />
+              </label>
+              <button
+                disabled={!manualZone || manualReason.trim().length < 5}
+                onClick={() =>
+                  void run({
+                    type: "manualZone",
+                    id: o.id,
+                    version: o.version,
+                    zoneId: manualZone,
+                    reason: manualReason,
+                  })
+                }
+              >
+                Confirmar zona manual
+              </button>
+            </details>
           </>
         )}
         <div className={"co-quote " + (o.quote?.eligible ? "eligible" : "")}>
@@ -729,19 +800,31 @@ function OrderPanel({
                 >
                   Reenviar enlace
                 </button>
-                <details>
-                  <summary>Simular resultado de pago</summary>
-                  {(["paid", "failed", "expired"] as const).map((status) => (
-                    <button
-                      key={status}
-                      onClick={() =>
-                        void run({ paymentId: p.id, status }, "demo/payment")
-                      }
-                    >
-                      Simular {status}
-                    </button>
-                  ))}
-                </details>
+                {data.mode === "demo" && (
+                  <details>
+                    <summary>Simular resultado de pago</summary>
+                    {(["paid", "failed", "expired"] as const).map((status) => (
+                      <button
+                        key={status}
+                        onClick={() =>
+                          void run({ paymentId: p.id, status }, "demo/payment")
+                        }
+                      >
+                        Simular {status}
+                      </button>
+                    ))}
+                  </details>
+                )}
+              </>
+            )}
+            {p.provider === "paymennt" && (
+              <>
+                <p>
+                  Última conciliación:{" "}
+                  {p.lastReconciledAt
+                    ? new Date(p.lastReconciledAt).toLocaleString()
+                    : "Pendiente"}
+                </p>
               </>
             )}
             <ul className="co-audit">
@@ -755,6 +838,14 @@ function OrderPanel({
               ))}
             </ul>
             {p.transactionId && <small>Transacción: {p.transactionId}</small>}
+            {data.jobs
+              .filter((j) => j.entityId === p.id && j.status === "unknown")
+              .map((j) => (
+                <p key={j.id} className="co-error">
+                  {j.lastError}. Usa Check Status para buscar el checkout
+                  existente.
+                </p>
+              ))}
             {data.jobs
               .filter((j) => j.entityId === p.id && j.status === "failed")
               .map((j) => (
@@ -1013,6 +1104,21 @@ function ZoneEditor({
         <details>
           <summary>Límites geográficos · configuración avanzada</summary>
           <label>
+            Identificadores geográficos verificados · uno por línea
+            <textarea
+              value={(draft.canonicalIds ?? []).join("\n")}
+              onChange={(e) =>
+                setDraft({
+                  ...draft,
+                  canonicalIds: e.target.value
+                    .split("\n")
+                    .map((x) => x.trim())
+                    .filter(Boolean),
+                })
+              }
+            />
+          </label>
+          <label>
             Polígono JSON · puntos lat/lng
             <textarea
               value={polygon}
@@ -1056,10 +1162,12 @@ function Login({ onLogin }: { onLogin: () => Promise<void> }) {
         <h1>Inicia sesión</h1>
         <label>
           Agente
-          <select value={id} onChange={(e) => setId(e.target.value)}>
-            <option value="liza">Liza</option>
-            <option value="andrea">Andrea</option>
-          </select>
+          <input
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+            autoComplete="username"
+            required
+          />
         </label>
         <label>
           Contraseña

@@ -1,3 +1,9 @@
+import { trace, safeLog } from "./observability";
+import { integrationConfig } from "./config";
+import { PaymenntProvider } from "./adapters/paymennt";
+import { MetaWhatsAppProvider } from "./adapters/meta";
+import { MapboxGeoProvider } from "./adapters/mapbox";
+import { GeocodingAdapter } from "./adapters/geo";
 import http from "node:http";
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { readFileSync, existsSync, statSync } from "node:fs";
@@ -13,33 +19,53 @@ import {
   MockPaymentProvider,
   MockWhatsAppProvider,
 } from "./adapters/providers";
-const demo =
-  process.env.DEMO_MODE === "true" || process.env.NODE_ENV !== "production";
-// Real provider activation is deliberately fail-closed until reviewed adapters are installed.
-if (!demo)
-  throw new Error(
-    "Real mode requires reviewed WhatsApp/Payment/Geo adapters; DEMO_MODE=true runs a labelled sandbox.",
-  );
+const integration = integrationConfig(process.env);
+const demo = !integration;
 const production = process.env.NODE_ENV === "production";
+if (production && demo && process.env.DEMO_MODE !== "true")
+  throw new Error("Select explicit DEMO_MODE or INTEGRATION_MODE");
 const secret =
   process.env.WEBHOOK_SECRET ??
   (production ? "" : randomBytes(32).toString("hex"));
 const verifier = new HmacVerifier(secret);
-const store = new Store(process.env.DB_PATH ?? "data/commerce.sqlite");
+const store = new Store(process.env.DB_PATH ?? "data/commerce.sqlite", demo);
+const meta = integration
+  ? new MetaWhatsAppProvider({
+      token: integration.META_ACCESS_TOKEN,
+      appSecret: integration.META_APP_SECRET,
+      verifyToken: integration.META_VERIFY_TOKEN,
+      version: integration.META_GRAPH_VERSION,
+      numbers: integration.numbers,
+      paymentTemplate: integration.paymentTemplate,
+    })
+  : null;
 const service = new CommerceService(
   store,
-  new MockWhatsAppProvider(),
-  new MockPaymentProvider(
-    verifier,
-    (reference) =>
-      store.read().payments.find((p) => p.providerReference === reference)
-        ?.status,
-  ),
+  meta ?? new MockWhatsAppProvider(),
+  integration
+    ? new PaymenntProvider({
+        apiKey: integration.PAYMENNT_API_KEY,
+        apiSecret: integration.PAYMENNT_API_SECRET,
+        environment: "test",
+      })
+    : new MockPaymentProvider(
+        verifier,
+        (reference) =>
+          store.read().payments.find((p) => p.providerReference === reference)
+            ?.status,
+      ),
+  integration
+    ? new GeocodingAdapter(
+        new MapboxGeoProvider(integration.MAPBOX_ACCESS_TOKEN),
+      )
+    : undefined,
+  10000,
+  integration?.numbers ?? numbers,
 );
 const usersSchema = z.array(
   z.object({
-    id: z.enum(["liza", "andrea"]),
-    role: z.enum(["admin", "agent"]),
+    id: z.string().regex(/^[a-zA-Z0-9_-]{1,100}$/),
+    role: z.enum(["admin", "manager", "operator", "agent"]),
     salt: z.string().min(16),
     hash: z.string().regex(/^[a-f0-9]{128}$/),
   }),
@@ -47,13 +73,14 @@ const usersSchema = z.array(
 const users = usersSchema.parse(
   JSON.parse(process.env.OPERATOR_USERS_JSON ?? "[]"),
 );
-if (production && !users.length)
+service.agentIds = users.length ? users.map((u) => u.id) : ["liza", "andrea"];
+if ((production || integration) && !users.length)
   throw new Error("Production sandbox requires OPERATOR_USERS_JSON");
 const sessions = new Map<string, { actor: Actor; expires: number }>();
 const limiter = new Map<string, { count: number; until: number }>();
 const origin = process.env.APP_ORIGIN ?? "http://127.0.0.1:5173";
 function actor(req: http.IncomingMessage): Actor {
-  if (!production) return { id: "liza", role: "admin" };
+  if (!production && !integration) return { id: "liza", role: "admin" };
   const cookie = req.headers.cookie
     ?.split(";")
     .map((x) => x.trim())
@@ -91,6 +118,14 @@ function json(res: http.ServerResponse, status: number, value: unknown) {
   res.end(JSON.stringify(value));
 }
 export const server = http.createServer(async (req, res) => {
+  const correlationId = randomBytes(12).toString("hex");
+  trace.enterWith(correlationId);
+  res.setHeader("X-Request-Id", correlationId);
+  res.on("finish", () =>
+    trace.run(correlationId, () =>
+      safeLog("http.complete", { status: res.statusCode }),
+    ),
+  );
   try {
     const url = new URL(req.url ?? "/", origin),
       path = url.pathname;
@@ -104,9 +139,40 @@ export const server = http.createServer(async (req, res) => {
       else if (++rate.count > (path === "/api/login" ? 10 : 300))
         throw new DomainError(429, "Demasiadas solicitudes; espera un minuto");
       if (req.method === "GET" && path === "/api/health")
-        return json(res, 200, { ok: true, mode: "demo" });
+        return json(res, 200, {
+          ok: true,
+          mode: demo ? "demo" : "integration",
+        });
+      if (req.method === "GET" && path === "/api/ready")
+        return json(res, store.healthy() ? 200 : 503, {
+          storage: store.healthy(),
+          mode: demo ? "demo" : "integration",
+          pilotReady: false,
+        });
+      if (req.method === "GET" && path === "/api/webhooks/whatsapp" && meta) {
+        const challenge = meta.challenge(url.searchParams);
+        if (!challenge) throw new DomainError(403, "Verificación rechazada");
+        res.writeHead(200, { "Content-Type": "text/plain" });
+        return res.end(challenge);
+      }
       if (req.method === "POST" && path.startsWith("/api/webhooks/")) {
         const raw = await rawBody(req);
+        if (integration && path === "/api/webhooks/payment")
+          throw new DomainError(
+            503,
+            "Paymennt webhook contract pending verification; use Check Status",
+          );
+        if (meta && path === "/api/webhooks/whatsapp") {
+          if (
+            !meta.verifier.verify(
+              raw,
+              String(req.headers["x-hub-signature-256"] ?? ""),
+            )
+          )
+            throw new DomainError(401, "Firma inválida");
+          const events = meta.normalize(parse(raw));
+          return json(res, 200, service.acceptInboundBatch(events));
+        }
         if (
           !(
             path === "/api/webhooks/payment"
@@ -154,6 +220,21 @@ export const server = http.createServer(async (req, res) => {
         return json(res, 200, { ok: true });
       }
       const current = actor(req);
+      if (req.method === "POST" && path === "/api/logout") {
+        for (const [key, session] of sessions)
+          if (session.actor.id === current.id) sessions.delete(key);
+        res.setHeader(
+          "Set-Cookie",
+          "tl_session=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0",
+        );
+        return json(res, 200, { ok: true });
+      }
+      if (req.method === "POST" && path === "/api/payments/reconcile") {
+        const body = z
+          .object({ paymentId: z.string().min(1) })
+          .parse(parse(await rawBody(req)));
+        return json(res, 200, await service.reconcile(body.paymentId, current));
+      }
       if (req.method === "GET" && path === "/api/workspace") {
         const s = store.read();
         for (const o of s.orders)
@@ -161,7 +242,11 @@ export const server = http.createServer(async (req, res) => {
             o.location &&
             ["Building", "Awaiting Location", "Minimum Check"].includes(o.state)
           )
-            await service.geo.prepare?.(o.location);
+            try {
+              await service.geo.prepare?.(o.location);
+            } catch {
+              /* Keep unresolved GPS reviewable during provider outage. */
+            }
         for (const o of s.orders)
           if (
             ["Building", "Awaiting Location", "Minimum Check"].includes(o.state)
@@ -172,20 +257,28 @@ export const server = http.createServer(async (req, res) => {
               o.address,
               o.location,
               service.geo,
+              o.manualZoneId,
             );
         return json(res, 200, {
-          mode: "demo",
+          mode: demo ? "demo" : "integration",
           actor: current,
-          agents: [
-            { id: "liza", name: "Liza" },
-            { id: "andrea", name: "Andrea" },
-          ],
-          numbers,
+          agents: users.length
+            ? users.map((u) => ({ id: u.id, name: u.id }))
+            : [
+                { id: "liza", name: "Liza" },
+                { id: "andrea", name: "Andrea" },
+              ],
+          numbers: service.operationalNumbers,
           catalog,
           zones: s.zones,
           conversations: s.conversations,
           orders: s.orders,
           payments: s.payments,
+          integrationHealth: {
+            inboundFailed: (s.inboundDeliveries ?? []).filter(
+              (d) => d.status === "failed",
+            ).length,
+          },
           jobs: s.jobs.filter((j) => j.status !== "done"),
         });
       }
@@ -197,7 +290,13 @@ export const server = http.createServer(async (req, res) => {
             : "id" in command
               ? store.read().orders.find((o) => o.id === command.id)?.location
               : undefined;
-        if (location) await service.geo.prepare?.(location);
+        if (location) {
+          try {
+            await service.geo.prepare?.(location);
+          } catch {
+            /* Persist location; payment remains blocked until resolution. */
+          }
+        }
         const result = service.command(
           command,
           String(req.headers["idempotency-key"] ?? ""),
@@ -206,7 +305,7 @@ export const server = http.createServer(async (req, res) => {
         return json(res, 200, result);
       }
       // These fixtures exist only in the sandbox; the same domain path validates signed webhooks.
-      if (req.method === "POST" && path === "/api/demo/location") {
+      if (demo && req.method === "POST" && path === "/api/demo/location") {
         const b = z
           .object({ conversationId: z.string() })
           .parse(parse(await rawBody(req)));
@@ -228,7 +327,7 @@ export const server = http.createServer(async (req, res) => {
           }),
         );
       }
-      if (req.method === "POST" && path === "/api/demo/payment") {
+      if (demo && req.method === "POST" && path === "/api/demo/payment") {
         const b = z
           .object({
             paymentId: z.string(),
@@ -307,7 +406,7 @@ const timer = setInterval(() => {
   void service
     .drain()
     .catch(() => {
-      /* Retain queued work; the next tick retries a transient storage failure. */
+      safeLog("worker.failed");
     })
     .finally(() => {
       working = false;

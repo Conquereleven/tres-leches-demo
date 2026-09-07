@@ -3,6 +3,7 @@ import type { Location } from "../domain/model";
 import type { GeoService } from "../domain/zones";
 const resultSchema = z
   .object({
+    canonicalIds: z.array(z.string()).optional(),
     address: z.string().min(1).max(500).optional(),
     zoneId: z.string().min(1).max(100).optional(),
   })

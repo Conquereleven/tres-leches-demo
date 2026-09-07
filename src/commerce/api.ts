@@ -7,7 +7,8 @@ import type {
   Job,
 } from "../../server/domain/model";
 export type Workspace = {
-  mode: "demo";
+  mode: "demo" | "integration";
+  integrationHealth?: { inboundFailed: number };
   actor: Actor;
   agents: { id: string; name: string }[];
   numbers: { id: string; label: string; phone: string }[];

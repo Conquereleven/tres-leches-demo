@@ -182,7 +182,9 @@ for (const cluster of ["B", "C", "D"])
   });
 export interface GeoService {
   prepare?(location: Location): Promise<void>;
-  resolve(location: Location): { address?: string; zoneId?: string } | null;
+  resolve(
+    location: Location,
+  ): { address?: string; zoneId?: string; canonicalIds?: string[] } | null;
 }
 // Exact fixture points ONLY: never pretend these are real neighborhood boundaries.
 export class MockGeoService implements GeoService {
@@ -231,6 +233,14 @@ export function matchZone(
       const resolved = geo.resolve(location);
       if (resolved?.zoneId)
         candidates = active.filter((z) => z.id === resolved.zoneId);
+      else if (
+        resolved?.canonicalIds?.some((id) =>
+          active.some((z) => z.canonicalIds?.includes(id)),
+        )
+      )
+        candidates = active.filter((z) =>
+          z.canonicalIds?.some((id) => resolved.canonicalIds?.includes(id)),
+        );
       else if (resolved?.address)
         return matchZone(zones, resolved.address, undefined, geo);
     }
@@ -270,13 +280,16 @@ export function quoteOrder(
   address?: string,
   location?: Location,
   geo?: GeoService,
+  manualZoneId?: string,
 ): Quote {
   const subtotalFils = lines.reduce(
     (sum, l) =>
       sum + catalog.find((p) => p.id === l.productId)!.priceFils * l.quantity,
     0,
   );
-  const zone = matchZone(zones, address, location, geo);
+  const zone = manualZoneId
+    ? zones.find((z) => z.id === manualZoneId && z.active)
+    : matchZone(zones, address, location, geo);
   const feeFils =
     zone?.deliveryFeeAed == null ? null : Math.round(zone.deliveryFeeAed * 100);
   const minimumMet =
@@ -292,6 +305,7 @@ export function quoteOrder(
           ? "Agrega productos"
           : "Listo para solicitar pago";
   return {
+    resolutionCode: zone ? "RESOLVED" : "ZONE_REVIEW_REQUIRED",
     zoneId: zone?.id ?? null,
     zoneName: zone?.name ?? null,
     minOrderAed: zone?.minOrderAed ?? null,

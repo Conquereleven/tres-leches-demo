@@ -173,7 +173,10 @@ test("recoverable send keeps draft, filters and out-of-coverage block payment", 
   await expect(page.locator(".co-message.out")).toContainText(
     "Demo recoverable reply",
   );
+  await expect(page.locator(".co-message.out")).toContainText("sent");
+  await expect(page.locator(".commerce")).toHaveAttribute("aria-busy", "false");
   await page.getByRole("button", { name: "Crear pedido", exact: true }).click();
+  await expect(page.getByTestId("order-panel")).toBeVisible();
   await page
     .getByRole("button", { name: "Guardar producto", exact: true })
     .click();
@@ -185,6 +188,23 @@ test("recoverable send keeps draft, filters and out-of-coverage block payment", 
   await expect(
     page.getByRole("button", { name: "Request Payment", exact: true }),
   ).toBeDisabled();
+  await page.getByText("Revisar y seleccionar zona", { exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Zona confirmada", exact: true })
+    .selectOption("jvc");
+  await page
+    .getByLabel("Motivo de la selección", { exact: true })
+    .fill("Synthetic UAT: confirmed with fixture customer");
+  await page
+    .getByRole("button", { name: "Confirmar zona manual", exact: true })
+    .click();
+  await expect(page.locator(".co-quote")).toContainText("No cumple el mínimo");
+  await expect(
+    page.getByRole("button", { name: "Request Payment", exact: true }),
+  ).toBeDisabled();
+  await expect(page.getByTestId("order-panel")).toContainText(
+    "Zona manual jvc",
+  );
   await page.getByLabel("Buscar conversación").fill("No existe");
   await expect(
     page.getByText("Sin conversaciones para estos filtros."),

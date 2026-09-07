@@ -1,3 +1,4 @@
+import type { AuthoritativeCheckout } from "../domain/checkout";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { Payment, Conversation } from "../domain/model";
 export interface WebhookVerifier {
@@ -28,6 +29,9 @@ export interface WhatsAppProvider {
     sourcePhoneNumber: string;
     recipient: string;
     text: string;
+    lastInboundAt?: string;
+    paymentContext?: { amountAed: string; url: string };
+    template?: { name: string; language: string; parameters: string[] };
     idempotencyKey: string;
   }): Promise<{ providerId: string; status: "sent" }>;
 }
@@ -41,6 +45,8 @@ export class MockWhatsAppProvider implements WhatsAppProvider {
   }
 }
 export interface PaymentProvider {
+  readonly name?: "mock" | "paymennt";
+  findCheckout?(requestId: string): Promise<AuthoritativeCheckout | null>;
   readonly idempotentCreate: boolean;
   readonly capabilities: { cancel: boolean; resend: boolean };
   createPaymentLink(input: {
@@ -49,7 +55,13 @@ export interface PaymentProvider {
     amountFils: number;
     currency: "AED";
     idempotencyKey: string;
-  }): Promise<{ reference: string; url: string }>;
+  }): Promise<{
+    reference: string;
+    url: string;
+    provider?: "mock" | "paymennt";
+    checkoutId?: string;
+  }>;
+  getCheckout?(reference: string): Promise<AuthoritativeCheckout>;
   getStatus(reference: string): Promise<Payment["status"]>;
   verifier: WebhookVerifier;
   cancel?(reference: string): Promise<void>;

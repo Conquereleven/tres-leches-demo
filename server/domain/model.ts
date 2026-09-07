@@ -31,6 +31,7 @@ export const zoneSchema = z
     freeDelivery: z.boolean(),
     active: z.boolean(),
     priority: z.number().int().min(0).max(100),
+    canonicalIds: z.array(z.string().min(1).max(200)).max(30).optional(),
     polygon: z.array(locationSchema).min(3).optional(),
     review: z.string().optional(),
     version: z.number().int().nonnegative(),
@@ -65,6 +66,7 @@ export type Message = {
   providerId?: string;
   location?: Location;
   translation?: string;
+  paymentContext?: { amountAed: string; url: string };
 };
 export type Conversation = {
   id: string;
@@ -92,6 +94,7 @@ export type Quote = {
   minimumMet: boolean;
   eligible: boolean;
   reason: string;
+  resolutionCode?: "RESOLVED" | "ZONE_REVIEW_REQUIRED";
   zoneVersion: number | null;
 };
 export type Order = {
@@ -104,6 +107,7 @@ export type Order = {
   address?: string;
   quote: Quote | null;
   paymentId?: string;
+  manualZoneId?: string;
   audit: Audit[];
 };
 export type Payment = {
@@ -111,15 +115,32 @@ export type Payment = {
   orderId: string;
   amountFils: number;
   currency: "AED";
-  status: "creating" | "pending" | "paid" | "failed" | "expired" | "cancelled";
+  status:
+    | "creating"
+    | "pending"
+    | "authorized"
+    | "pending_confirmation"
+    | "paid"
+    | "failed"
+    | "expired"
+    | "cancelled"
+    | "refunded"
+    | "partially_refunded"
+    | "chargeback";
   url?: string;
   providerReference?: string;
+  provider?: "mock" | "paymennt";
+  providerCheckoutId?: string;
+  providerRawStatus?: string;
+  paidAt?: string;
+  lastReconciledAt?: string;
   transactionId?: string;
   createdAt: string;
   updatedAt: string;
   timeline: Audit[];
 };
 export type Job = {
+  correlationId?: string;
   id: string;
   kind: "message" | "payment";
   entityId: string;
@@ -129,7 +150,16 @@ export type Job = {
   leaseUntil?: number;
   lastError?: string;
 };
+export type InboundDelivery = {
+  id: string;
+  event: unknown;
+  hash: string;
+  status: "pending" | "done" | "failed";
+  attempts: number;
+  nextAt: number;
+};
 export type State = {
+  inboundDeliveries?: InboundDelivery[];
   zones: DeliveryZone[];
   conversations: Conversation[];
   orders: Order[];
@@ -151,7 +181,10 @@ export const numbers = [
   { id: "wa2", label: "WA2", phone: "+971 50 000 0002" },
   { id: "wa3", label: "WA3", phone: "+971 50 000 0003" },
 ];
-export type Actor = { id: string; role: "admin" | "agent" };
+export type Actor = {
+  id: string;
+  role: "admin" | "manager" | "operator" | "agent";
+};
 export class DomainError extends Error {
   constructor(
     public status: number,

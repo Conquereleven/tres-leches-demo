@@ -1,4 +1,4 @@
-import { DatabaseSync } from "node:sqlite";
+import { DatabaseSync, backup } from "node:sqlite";
 import { readFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { type State, numbers, now } from "../domain/model";
@@ -38,16 +38,40 @@ export function seed(): State {
 }
 export class Store {
   private db: DatabaseSync;
-  constructor(path: string) {
+  constructor(path: string, demo = true) {
     if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });
     this.db = new DatabaseSync(path);
     this.db.exec("PRAGMA busy_timeout = 5000");
     this.db.exec(
       readFileSync(new URL("./schema.sql", import.meta.url), "utf8"),
     );
+    this.db.exec(
+      "CREATE TABLE IF NOT EXISTS runtime_profile (id INTEGER PRIMARY KEY CHECK(id=1), mode TEXT NOT NULL)",
+    );
+    const existing = this.db
+      .prepare("SELECT mode FROM runtime_profile WHERE id=1")
+      .get() as { mode: string } | undefined;
+    const hasData = !!this.db
+      .prepare("SELECT 1 FROM commerce_state WHERE id=1")
+      .get();
+    const requested = demo ? "demo" : "integration";
+    if (
+      (existing && existing.mode !== requested) ||
+      (!existing && hasData && !demo)
+    ) {
+      this.db.close();
+      throw new Error(
+        "Use a separate database for integration; never promote sandbox records",
+      );
+    }
+    this.db
+      .prepare("INSERT OR IGNORE INTO runtime_profile VALUES (1, ?)")
+      .run(requested);
     this.db
       .prepare("INSERT OR IGNORE INTO commerce_state VALUES (1, ?)")
-      .run(JSON.stringify(seed()));
+      .run(
+        JSON.stringify({ ...seed(), ...(demo ? {} : { conversations: [] }) }),
+      );
   }
   read(): State {
     return JSON.parse(
@@ -72,6 +96,22 @@ export class Store {
       this.db.exec("ROLLBACK");
       throw error;
     }
+  }
+  async backup(destination: string) {
+    await backup(this.db, destination);
+    const restored = new DatabaseSync(destination, { readOnly: true });
+    try {
+      const result = restored.prepare("PRAGMA integrity_check").get() as {
+        integrity_check: string;
+      };
+      if (result.integrity_check !== "ok")
+        throw new Error("Backup integrity check failed");
+    } finally {
+      restored.close();
+    }
+  }
+  healthy() {
+    return !!this.db.prepare("SELECT 1 FROM commerce_state WHERE id=1").get();
   }
   close() {
     this.db.close();
