@@ -1,0 +1,170 @@
+import { z } from "zod";
+export const states = [
+  "New",
+  "Building",
+  "Awaiting Location",
+  "Minimum Check",
+  "Awaiting Payment",
+  "Paid",
+  "Confirmed",
+  "Production",
+  "Ready",
+  "Out for Delivery",
+  "Delivered",
+  "Cancelled",
+] as const;
+export type OrderState = (typeof states)[number];
+export const locationSchema = z
+  .object({
+    lat: z.number().finite().min(-90).max(90),
+    lng: z.number().finite().min(-180).max(180),
+  })
+  .strict();
+export type Location = z.infer<typeof locationSchema>;
+export const zoneSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1).max(150),
+    aliases: z.array(z.string().min(1).max(150)).max(30),
+    minOrderAed: z.number().nonnegative().max(100000).nullable(),
+    deliveryFeeAed: z.number().nonnegative().max(10000).nullable(),
+    freeDelivery: z.boolean(),
+    active: z.boolean(),
+    priority: z.number().int().min(0).max(100),
+    polygon: z.array(locationSchema).min(3).optional(),
+    review: z.string().optional(),
+    version: z.number().int().nonnegative(),
+  })
+  .strict()
+  .refine(
+    (z) => !z.freeDelivery || z.deliveryFeeAed === 0,
+    "Free delivery requires a zero fee",
+  );
+export type DeliveryZone = z.infer<typeof zoneSchema>;
+export type Audit = {
+  at: string;
+  actor: string;
+  action: string;
+  from?: OrderState;
+  to?: OrderState;
+};
+export type Message = {
+  id: string;
+  direction: "in" | "out";
+  text: string;
+  at: string;
+  status:
+    | "received"
+    | "queued"
+    | "sending"
+    | "sent"
+    | "delivered"
+    | "read"
+    | "failed"
+    | "unknown";
+  providerId?: string;
+  location?: Location;
+  translation?: string;
+};
+export type Conversation = {
+  id: string;
+  customer: string;
+  phone: string;
+  sourceNumberId: string;
+  sourcePhoneNumber: string;
+  assignedAgent: string | null;
+  status: "open" | "closed";
+  unread: boolean;
+  version: number;
+  messages: Message[];
+  location?: Location;
+  address?: string;
+  audit: Audit[];
+};
+export type Line = { productId: string; quantity: number };
+export type Quote = {
+  zoneId: string | null;
+  zoneName: string | null;
+  minOrderAed: number | null;
+  feeFils: number | null;
+  subtotalFils: number;
+  totalFils: number | null;
+  minimumMet: boolean;
+  eligible: boolean;
+  reason: string;
+  zoneVersion: number | null;
+};
+export type Order = {
+  id: string;
+  conversationId: string;
+  state: OrderState;
+  version: number;
+  lines: Line[];
+  location?: Location;
+  address?: string;
+  quote: Quote | null;
+  paymentId?: string;
+  audit: Audit[];
+};
+export type Payment = {
+  id: string;
+  orderId: string;
+  amountFils: number;
+  currency: "AED";
+  status: "creating" | "pending" | "paid" | "failed" | "expired" | "cancelled";
+  url?: string;
+  providerReference?: string;
+  transactionId?: string;
+  createdAt: string;
+  updatedAt: string;
+  timeline: Audit[];
+};
+export type Job = {
+  id: string;
+  kind: "message" | "payment";
+  entityId: string;
+  status: "pending" | "processing" | "done" | "failed" | "unknown";
+  attempts: number;
+  nextAt: number;
+  leaseUntil?: number;
+  lastError?: string;
+};
+export type State = {
+  zones: DeliveryZone[];
+  conversations: Conversation[];
+  orders: Order[];
+  payments: Payment[];
+  jobs: Job[];
+  events: Record<string, string>;
+  commands: Record<string, { hash: string; result: unknown }>;
+  audit: Audit[];
+};
+export const catalog = [
+  { id: "pan", name: "Pan de Muerto", priceFils: 6800 },
+  { id: "tres", name: "Pastel Tres Leches", priceFils: 12000 },
+  { id: "concha", name: "Conchas · caja de 6", priceFils: 4800 },
+  { id: "choco", name: "Pastel de Chocolate", priceFils: 13500 },
+  { id: "flan", name: "Flan Napolitano", priceFils: 7800 },
+];
+export const numbers = [
+  { id: "wa1", label: "WA1", phone: "+971 50 000 0001" },
+  { id: "wa2", label: "WA2", phone: "+971 50 000 0002" },
+  { id: "wa3", label: "WA3", phone: "+971 50 000 0003" },
+];
+export type Actor = { id: string; role: "admin" | "agent" };
+export class DomainError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
+    super(message);
+  }
+}
+export function requireThat(
+  value: unknown,
+  message: string,
+  status = 409,
+): asserts value {
+  if (!value) throw new DomainError(status, message);
+}
+export const now = () => new Date().toISOString();
