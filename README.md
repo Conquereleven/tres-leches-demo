@@ -1,6 +1,6 @@
 # Tres Leches · WhatsApp Commerce OS
 
-Extends the preserved TL-01–TL-08 storefront with TL-09–TL-12. Start at **Gestión → Inbox**. The seed contains 91 source-derived rules. All customers, three numbers, GPS fixture points, messages and payments are explicitly simulated. No real payment or WhatsApp API is called.
+Extends the preserved TL-01–TL-08 storefront with TL-09–TL-12. Start at **Gestión → Inbox**. The seed contains 91 source-derived rules. Default demo mode uses simulated customers, numbers, GPS and payments. TL-13–TL-17 adds opt-in server adapters for test integration; see the current integration notes before configuring external accounts.
 
 ## Run and validate
 
@@ -74,15 +74,14 @@ A queued job has a persisted lease, 10-second call budget and exponential retrie
 
 These are not advertised as plug-and-play Meta/Paymennt raw webhook endpoints. Real wire-format normalization and provider-specific trust verification belong in those adapters. Unknown `/api/*` returns JSON 404, never the SPA shell. The API rejects invalid signatures before JSON parsing. Do not expose the development server to the public network.
 
-## Connecting real providers later
+## TL-13–TL-17 integration release
 
-**Paymennt is identified** in the updated source conversation. Its official [payment-link integration flow](https://docs.paymennt.com/docs/payment/links) says to create the checkout, obtain/share the redirect link, receive an update, then **retrieve the checkout status server-side** before fulfillment. Implement the real PaymentProvider with that verification and amount/currency/reference checks. The mock HMAC scheme is our sandbox contract, not a claim about Paymennt's actual signature protocol. Confirm checkout API credentials, sandbox base URL, merchant/currency, event authentication, capture-vs-authorized semantics, expiry, cancellation and idempotency guarantees with the merchant account. Never treat AUTHORIZED as PAID. Proposed env names: `PAYMENNT_API_KEY`, `PAYMENNT_API_SECRET`, `PAYMENNT_BASE_URL`.
+Read [integration and deployment notes](docs/tl13-17-integration.md), [UAT checklist](docs/tl13-17-uat.md), and [baseline evidence](docs/tl13-17-baseline.md).
 
-For Meta, implement WhatsAppProvider using `META_ACCESS_TOKEN`, `META_APP_SECRET`, `META_VERIFY_TOKEN`, `META_GRAPH_VERSION` and a three-number `META_PHONE_NUMBERS_JSON` mapping. Validate app-secret signatures over raw bytes, support Meta's verification challenge, normalize all events in each webhook batch, preserve each `phone_number_id`, enforce the service window/template policy and handle status callbacks. Confirm ownership/coexistence or migration of the three existing numbers. Do not declare send idempotency unless the chosen provider actually guarantees it; uncertain requests need provider lookup/manual reconciliation.
+Paymennt checkout creation, authoritative Check Status and lost-response recovery are implemented. Meta supports three configured numbers, signed inbound batches, persistent inbox/outbox and approved payment templates. Mapbox permanent reverse geocoding provides canonical evidence; commercial rules remain ours. A new integration database cannot contain sandbox records.
 
-Replace MockGeoService with `GeocodingAdapter` and a reviewed asynchronous `GeocodingProvider` implementation for Google/Mapbox. HTTP orchestration prepares geocoding outside database transactions; validated results are cached briefly and the commercial matching remains pure. An unknown GPS is never silently matched to an unrelated manual address; operators can explicitly resolve a manual address instead. No real neighborhood polygons are invented. Environment names: `GEO_PROVIDER`, `GEO_API_KEY`.
+**NOT READY for release:** Paymennt notification authentication/payload contract still requires official confirmation and implementation; the endpoint fails closed. External credentials/onboarding, real geographic sampling and client UAT remain blocked. Live payment activation is disabled. Use `.env.example` for current variable names; historical TL-09–TL-12 reports describe the original sandbox only.
 
-Real mode fails closed (`DEMO_MODE=false` in production) until reviewed adapters are installed. For an HTTPS **production sandbox**, explicitly set `NODE_ENV=production`, `DEMO_MODE=true`, `APP_ORIGIN`, `WEBHOOK_SECRET` and `OPERATOR_USERS_JSON`. Generate salted password hashes with `scripts/operator-password.mjs` (stdin). Place Node behind a TLS reverse proxy and use persistent disk. Demo endpoints are appropriate only for the sandbox and must be removed/disabled when enabling real mode.
 
 ## Hosting compatibility
 

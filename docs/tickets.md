@@ -26,3 +26,7 @@ Implemented all requested states and allowed transitions in the server domain. P
 - Commit event receipt, state change and outbound job atomically. External calls happen after commit and outside the database lock.
 - Keep original static Sites package unchanged. Full runtime is Node; a static-only deployment cannot serve the operational API.
 - Production-sandbox authentication is new because the original prototype had none. Real integrations fail closed pending configured, reviewed adapters.
+
+## TL-13–TL-17 follow-on
+
+Current implementation and remaining release blockers are in `tl13-17-integration.md` and `tl13-17-uat.md`. Earlier sections above are historical TL-09–TL-12 sandbox scope. The current release is NOT READY until the Paymennt webhook contract is verified/implemented and its tests pass; merchant UAT additionally requires external credentials and onboarding.
