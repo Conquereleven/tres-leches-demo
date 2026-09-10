@@ -1,0 +1,332 @@
+{
+  "brand": {
+    "wordmark": {
+      "id": "wordmark",
+      "alt": "Pastelerías 3L — Mexico City since 1982",
+      "status": "AVAILABLE",
+      "src": "/brand/wordmark.png",
+      "source": "Corporate manual, page 4; original artwork extraction"
+    },
+    "circle": {
+      "id": "circle",
+      "alt": "Pastelerías 3L",
+      "status": "AVAILABLE",
+      "src": "/brand/circle.png",
+      "source": "Corporate manual, page 4; original artwork extraction"
+    },
+    "circleNegative": {
+      "id": "circle-negative",
+      "alt": "Pastelerías 3L",
+      "status": "AVAILABLE",
+      "src": "/brand/circle-negative.png",
+      "source": "Corporate manual, page 4; original artwork extraction"
+    },
+    "icon": {
+      "id": "icon",
+      "alt": "3L",
+      "status": "AVAILABLE",
+      "src": "/brand/icon.png",
+      "source": "Corporate manual, page 4; original artwork extraction"
+    },
+    "stars": {
+      "id": "stars",
+      "alt": "",
+      "status": "AVAILABLE",
+      "src": "/brand/stars.png",
+      "source": "Corporate manual, page 4; original artwork extraction"
+    },
+    "hero": {
+      "id": "hero",
+      "alt": "Approved Tres Leches soaking film",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    "poster": {
+      "id": "hero-poster",
+      "alt": "Tres Leches soaking film poster",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    "pattern": {
+      "id": "pattern",
+      "alt": "Original 3L pattern",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    "ticker": {
+      "id": "ticker",
+      "alt": "Original 3L illustrated motifs",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    "alicia": {
+      "id": "alicia",
+      "alt": "Approved portrait of Alicia",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    "family": {
+      "id": "family",
+      "alt": "3L family baking together",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    "slices": {
+      "id": "slices",
+      "alt": "3L cake slices",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    "social": {
+      "id": "social",
+      "alt": "Approved 3L community photography",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    "dubai": {
+      "id": "dubai",
+      "alt": "Original 3L Dubai illustration",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    "promotion": {
+      "id": "promotion",
+      "alt": "Approved promotional photography",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    "og": {
+      "id": "open-graph",
+      "alt": "Approved sharing image",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    }
+  },
+  "collections": {
+    "featured": [
+      {
+        "id": "Featured cake-1",
+        "name": null,
+        "image": {
+          "id": "Featured cake-1",
+          "alt": "Featured cake photograph pending approval",
+          "status": "NEEDS-CLIENT-ASSET",
+          "src": null,
+          "source": "Client delivery pending"
+        },
+        "status": "pending",
+        "description": null
+      },
+      {
+        "id": "Featured cake-2",
+        "name": null,
+        "image": {
+          "id": "Featured cake-2",
+          "alt": "Featured cake photograph pending approval",
+          "status": "NEEDS-CLIENT-ASSET",
+          "src": null,
+          "source": "Client delivery pending"
+        },
+        "status": "pending",
+        "description": null
+      },
+      {
+        "id": "Featured cake-3",
+        "name": null,
+        "image": {
+          "id": "Featured cake-3",
+          "alt": "Featured cake photograph pending approval",
+          "status": "NEEDS-CLIENT-ASSET",
+          "src": null,
+          "source": "Client delivery pending"
+        },
+        "status": "pending",
+        "description": null
+      }
+    ],
+    "bakery": [
+      {
+        "id": "Bakery item-1",
+        "name": null,
+        "image": {
+          "id": "Bakery item-1",
+          "alt": "Bakery item photograph pending approval",
+          "status": "NEEDS-CLIENT-ASSET",
+          "src": null,
+          "source": "Client delivery pending"
+        },
+        "status": "pending",
+        "description": null
+      },
+      {
+        "id": "Bakery item-2",
+        "name": null,
+        "image": {
+          "id": "Bakery item-2",
+          "alt": "Bakery item photograph pending approval",
+          "status": "NEEDS-CLIENT-ASSET",
+          "src": null,
+          "source": "Client delivery pending"
+        },
+        "status": "pending",
+        "description": null
+      },
+      {
+        "id": "Bakery item-3",
+        "name": null,
+        "image": {
+          "id": "Bakery item-3",
+          "alt": "Bakery item photograph pending approval",
+          "status": "NEEDS-CLIENT-ASSET",
+          "src": null,
+          "source": "Client delivery pending"
+        },
+        "status": "pending",
+        "description": null
+      }
+    ],
+    "jars": [
+      {
+        "id": "Cake jar-1",
+        "name": null,
+        "image": {
+          "id": "Cake jar-1",
+          "alt": "Cake jar photograph pending approval",
+          "status": "NEEDS-CLIENT-ASSET",
+          "src": null,
+          "source": "Client delivery pending"
+        },
+        "status": "pending",
+        "description": null
+      },
+      {
+        "id": "Cake jar-2",
+        "name": null,
+        "image": {
+          "id": "Cake jar-2",
+          "alt": "Cake jar photograph pending approval",
+          "status": "NEEDS-CLIENT-ASSET",
+          "src": null,
+          "source": "Client delivery pending"
+        },
+        "status": "pending",
+        "description": null
+      },
+      {
+        "id": "Cake jar-3",
+        "name": null,
+        "image": {
+          "id": "Cake jar-3",
+          "alt": "Cake jar photograph pending approval",
+          "status": "NEEDS-CLIENT-ASSET",
+          "src": null,
+          "source": "Client delivery pending"
+        },
+        "status": "pending",
+        "description": null
+      }
+    ],
+    "custom": [
+      {
+        "id": "Custom cake category-1",
+        "name": null,
+        "image": {
+          "id": "Custom cake category-1",
+          "alt": "Custom cake category photograph pending approval",
+          "status": "NEEDS-CLIENT-ASSET",
+          "src": null,
+          "source": "Client delivery pending"
+        },
+        "status": "pending",
+        "description": null
+      },
+      {
+        "id": "Custom cake category-2",
+        "name": null,
+        "image": {
+          "id": "Custom cake category-2",
+          "alt": "Custom cake category photograph pending approval",
+          "status": "NEEDS-CLIENT-ASSET",
+          "src": null,
+          "source": "Client delivery pending"
+        },
+        "status": "pending",
+        "description": null
+      },
+      {
+        "id": "Custom cake category-3",
+        "name": null,
+        "image": {
+          "id": "Custom cake category-3",
+          "alt": "Custom cake category photograph pending approval",
+          "status": "NEEDS-CLIENT-ASSET",
+          "src": null,
+          "source": "Client delivery pending"
+        },
+        "status": "pending",
+        "description": null
+      }
+    ]
+  },
+  "occasions": [
+    {
+      "id": "occasion-Birthdays",
+      "alt": "Birthdays gallery pending approval",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    {
+      "id": "occasion-Weddings",
+      "alt": "Weddings gallery pending approval",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    {
+      "id": "occasion-Baby Showers",
+      "alt": "Baby Showers gallery pending approval",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    {
+      "id": "occasion-Anniversaries",
+      "alt": "Anniversaries gallery pending approval",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    {
+      "id": "occasion-Corporate",
+      "alt": "Corporate gallery pending approval",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    },
+    {
+      "id": "occasion-Other Moments",
+      "alt": "Other Moments gallery pending approval",
+      "status": "NEEDS-CLIENT-ASSET",
+      "src": null,
+      "source": "Client delivery pending"
+    }
+  ],
+  "destinations": {
+    "whatsapp": null,
+    "instagram": null,
+    "tiktok": null,
+    "privacy": null
+  }
+}
