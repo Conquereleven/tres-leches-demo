@@ -108,6 +108,7 @@ test("original storefront checkout, capacity and legacy conversation remain usab
   page,
 }) => {
   await page.goto("/");
+  await page.getByRole("button", { name: "MVP demo", exact: true }).click();
   await page.getByRole("button", { name: "Pedir ahora", exact: true }).click();
   await page.getByRole("button", { name: "Continuar", exact: true }).click();
   await page.getByRole("button", { name: "Continuar", exact: true }).click();
