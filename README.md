@@ -92,3 +92,9 @@ Paymennt checkout creation, authoritative Check Status and lost-response recover
 The original `.openai/hosting.json`, Worker, packaging script and four hosting tests are preserved. Their output remains a **static demo package**; deploying it alone does not deploy the Node/SQLite backend. This branch's full functional runtime is Node. Do not publish the static Worker as the Commerce OS. A future Sites deployment needs a separately configured backend or a deliberate D1/Worker persistence migration. No site was published and no merge/push was performed.
 
 See [source-data review](docs/data-review.md) and the original screenshots in `docs/sources/`.
+
+## Approved customer brand foundation (TL-19–TL-21)
+
+The default page is the 3L editorial experience. **Gestión** opens Commerce OS; **MVP demo** preserves the original fictitious checkout. Real customer content is isolated in `src/brand/content.ts`: missing products, imagery, WhatsApp/social destinations and newsletter integration remain explicit data slots. This branch is a reviewable foundation, not a customer launch.
+
+See [brand implementation and activation checklist](docs/brand/implementation.md) and [asset manifest](docs/brand/asset-manifest.json). `npm run build` also prerenders readable customer content for browsers without JavaScript. Brand E2E includes eight responsive widths, keyboard/modal controls, reduced motion, axe and layout stability. Existing operational tests remain in the same suite.

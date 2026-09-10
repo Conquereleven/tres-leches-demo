@@ -451,6 +451,8 @@ export const server = http.createServer(async (req, res) => {
       ".css": "text/css",
       ".png": "image/png",
       ".svg": "image/svg+xml",
+      ".woff2": "font/woff2",
+      ".mp4": "video/mp4",
       ".ico": "image/x-icon",
     };
     res.writeHead(200, {
@@ -458,7 +460,7 @@ export const server = http.createServer(async (req, res) => {
       "X-Content-Type-Options": "nosniff",
       "Referrer-Policy": "same-origin",
       "Content-Security-Policy":
-        "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; script-src 'self'; frame-ancestors 'none'",
+        "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; script-src 'self'; frame-ancestors 'none'",
     });
     res.end(req.method === "HEAD" ? undefined : readFileSync(file));
   } catch (error) {
