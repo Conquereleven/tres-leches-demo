@@ -1,100 +1,39 @@
-# Tres Leches · WhatsApp Commerce OS
+# Pastelerías 3L · Commerce OS
 
-Extends the preserved TL-01–TL-08 storefront with TL-09–TL-12. Start at **Gestión → Inbox**. The seed contains 91 source-derived rules. Default demo mode uses simulated customers, numbers, GPS and payments. TL-13–TL-17 adds opt-in server adapters for test integration; see the current integration notes before configuring external accounts.
+Canonical operations live at `/operations/inbox`; the approved brand site remains at `/`. There is one operational Inbox, no MVP/demo UI and no runtime fixtures. A new database contains source-derived delivery rules and **zero products, conversations, orders or payments**.
 
-## Run and validate
+TL-25 activation instructions: [today's runbook](docs/today-activation-runbook.md). Catalog handoff: [template and validated import](docs/catalog/README.md). Commercial provenance: [data review](docs/data-review.md). Earlier TL09–TL24 notes are historical; blocked-contract/demo instructions there do not apply to this release.
 
-Node >=22.13 (tested with Node 26.4), npm, writable local disk.
+## Local validation
+
+Node >=22.13, npm, writable local SQLite storage. Development starts empty and has no external send/payment success fallback.
 
 ```sh
 npm ci
 npm run dev
-# Local storefront + workspace: http://127.0.0.1:5173
-npm run typecheck
 npm run lint
+npm run typecheck
 npm test
 npm run build
 npm run test:sites
-npx playwright install chromium
-npm run test:e2e
 npm run test:e2e:build
 npm run audit
+npm run scan:secrets
 ```
 
-`npm run dev` runs the Node API on loopback port 3001 and Vite on 5173 with a same-origin API proxy. `npm start` serves the built frontend and API from `dist/node/server.mjs`; it needs no TypeScript runtime. Set `APP_ORIGIN` to that server's exact public origin. Environment configuration is process-based; inject `.env.example` values using the deployment environment or Node's `--env-file` flag. Never use `VITE_*` for secrets.
+Development serves UI on 5173 and API on 3001. `npm start` serves the compiled frontend/API on 3001. Playwright uses disposable fixture databases and its own local server; never point tests at real operational data. `PLAYWRIGHT_BROWSERS_PATH` may select an existing Chromium installation.
 
-For repeatable browser tests, the Playwright server uses a fresh temporary SQLite database on each run. Do not point tests at a live operational database. The optional `PLAYWRIGHT_BROWSERS_PATH` environment variable can locate an existing browser installation.
+## Operational boundaries
 
-## What changed
+- Strict TypeScript/Zod domain commands enforce assignment, versions, catalog eligibility, delivery rules and state transitions. Money is integer fils. Issued payments retain the commercial quote and catalog snapshot.
+- SQLite transactions persist commands, inbound receipts, outbound jobs, payment notifications and audit. This release is a single Node/SQLite operational instance with verified online backups; do not run multiple workers against a shared network filesystem.
+- Meta supports three explicit source mappings, raw HMAC verification, batched inbound text/GPS/statuses and persistent outbound processing. Replies use the original number. Unknown send outcome stops for review; outside 24h a configured approved template is required.
+- Paymennt always uses the TEST API. The Base64 HMAC verifier reads exact bytes with the registered private `hmacKey`. Allowed topics trigger durable reconciliation. Only authoritative GET matching checkout/request/order/AED/grand total can mark Paid/Confirmed. Settled payments never regress from older notifications; refunds require operator review without erasing fulfillment history.
+- Approved catalog import supports dry-run, apply and catalog-only rollback with pre-change backups. Empty/unknown products cannot generate a charge. [Catalog contract](docs/catalog/README.md).
+- Provider groups activate independently through server configuration. Secrets must never use `VITE_*` or enter static assets. `.env.example` documents required names without credential defaults. Readiness is admin/staging-only; its public health endpoint contains no provider diagnostics.
 
-| Ticket | Implementation |
-| --- | --- |
-| TL-09 | Structured source-derived zones, aliases, longest-specific-name matching, boundary-inclusive polygons with priority, exact-point mock GeoService, commercial eligibility and admin editor. |
-| TL-10 | Three isolated number identities, unified inbox and filters, agent ownership, version checks, durable outbound queue, normalized signed inbound/status webhooks. |
-| TL-11 | Swappable PaymentProvider, deterministic mock links, same-source WhatsApp delivery, resend, reconciliation/timeline and duplicate-safe payment webhooks. |
-| TL-12 | Server-validated state transitions, audit actors/timestamps, locked checkout quotes, production/delivery views and late-payment review handling. |
+## Release boundaries
 
-The old storefront, checkout, orders, capacity, metrics, translation and approved-answer demo remain available. **Pedidos** and **Inbox anterior · demo** in the outer navigation are the original in-memory MVP. The **Inbox** workspace's own Pedidos/Producción/Entregas views use the new persisted model. Legacy fictitious records are not misrepresented as reconciled operational orders. The catalog is unchanged; storefront-to-operational-order persistence is a separate migration, not silently performed on demo history.
+Default external outbound is off. Registration is an explicit TEST-only server command that stores the one-time key privately and refuses automatic re-registration after uncertain outcomes. Production and live Paymennt remain deliberately disabled pending real provider tests and Lisa UAT. Automated fixtures never establish PILOT READY.
 
-## Golden path
-
-1. Open Gestión → Inbox; WA2's Valentina conversation is selected.
-2. In Zonas y tarifas select JVC. Enter a delivery fee confirmed by the business, or an explicitly agreed demo-only value. The source did not specify a fee; no value is invented in the seed.
-3. Return to Inbox, take the conversation, create a pedido and add Pastel Tres Leches ×1 (AED120).
-4. Use **Simular GPS entrante · JVC**, or resolve a manual address containing JVC.
-5. Request Payment. The durable queue creates the mock link and sends it via WA2.
-6. Simular resultado de pago → Simular paid. The order records Paid then Confirmed.
-7. Advance through Production → Ready → Out for Delivery → Delivered. Inspect both timelines.
-
-The E2E uses AED10 **only in its disposable test database**. It is not a business tariff or a seed value.
-
-## Boundaries and persistence
-
-- `server/domain/`: Zod validation, state machine, delivery eligibility, command handling. All prices are calculated server-side from the catalog in integer fils. Minimum excludes delivery fee.
-- `server/adapters/providers.ts`: WhatsAppProvider, PaymentProvider, HMAC verifier and mock implementations. `server/domain/zones.ts`: GeoService and mock.
-- `server/db/schema.sql`: versioned SQLite schema. All aggregate changes, event receipts, command receipts and outbound jobs commit together under `BEGIN IMMEDIATE`; WAL/busy timeout support concurrent connections on one host. No external I/O is performed inside the transaction.
-- `server/http.ts`: same-origin API, body limit, rate limit, authenticated production-sandbox sessions, RBAC and static serving. No request payloads, secrets, phone numbers or provider error bodies are logged.
-- `src/commerce/`: typed UI; it calls only the internal API. New TypeScript is strict with unchecked-index protection. The preserved JSX MVP remains JavaScript, intentionally not disguised with `any` or `@ts-nocheck` conversions.
-
-The SQLite document is an atomic aggregate store for a **single-node deployment**, not a horizontally scalable database. It grows with audit/event history. Before high-volume use, move to normalized relational tables, indexed unique provider/event references, retention/archive policies, backup/restore monitoring and a dedicated queue runner. There is no silent deletion of idempotency receipts. Keep the database on persistent disk with restricted filesystem permissions. Sessions expire after eight hours and require login again after process restart.
-
-A queued job has a persisted lease, 10-second call budget and exponential retries (2/4/8 second intervals, maximum three automatic attempts). Automatic retries require the adapter to declare actual provider idempotency support. An uncertain non-idempotent send is stopped for reconciliation rather than duplicated. A failed safe job exposes a retry action. A late payment is recorded as money received but does not resurrect a cancelled/replaced order. Captured/pending payments block cancellation unless the provider offers a reviewed cancellation flow; the mock deliberately declares no cancellation support.
-
-## HTTP contract
-
-| Route | Purpose |
-| --- | --- |
-| GET `/api/health` | Readiness and explicit sandbox mode |
-| GET `/api/workspace` | Current authenticated workspace snapshot |
-| POST `/api/commands` | Zod command; requires `Idempotency-Key`, expected record version and matching Origin |
-| POST `/api/login` | Production-sandbox operator login; scrypt password verification and HttpOnly/Secure/SameSite cookie |
-| POST `/api/webhooks/whatsapp` | HMAC-verified **normalized internal contract**; inbound message/GPS or delivery status |
-| POST `/api/webhooks/payment` | HMAC-verified **normalized internal contract**; reference/amount/currency/transaction reconciliation |
-| POST `/api/demo/location`, `/api/demo/payment` | Explicit sandbox fixtures using the same domain event handlers |
-
-These are not advertised as plug-and-play Meta/Paymennt raw webhook endpoints. Real wire-format normalization and provider-specific trust verification belong in those adapters. Unknown `/api/*` returns JSON 404, never the SPA shell. The API rejects invalid signatures before JSON parsing. Do not expose the development server to the public network.
-
-## TL-18 staging preparation
-
-Current environment and activation contract: [TL-18 staging notes](docs/tl18-staging.md). Explicit development/test/staging profiles prevent database reuse; production activation is disabled. Staging requires real auth, HTTPS configuration, a new persistent SQLite path and verified backups. Offline onboarding mode never simulates provider success; configured test mode retains Paymennt TEST APIs. External WhatsApp sends stay disabled and the Paymennt webhook remains 503. Readiness/UAT view reports NOT READY with specific blockers.
-
-## TL-13–TL-17 integration release
-
-Read [integration and deployment notes](docs/tl13-17-integration.md), [UAT checklist](docs/tl13-17-uat.md), and [baseline evidence](docs/tl13-17-baseline.md).
-
-Paymennt checkout creation, authoritative Check Status and lost-response recovery are implemented. Meta supports three configured numbers, signed inbound batches, persistent inbox/outbox and approved payment templates. Mapbox permanent reverse geocoding provides canonical evidence; commercial rules remain ours. A new integration database cannot contain sandbox records.
-
-**NOT READY for release:** Paymennt notification authentication/payload contract still requires official confirmation and implementation; the endpoint fails closed. External credentials/onboarding, real geographic sampling and client UAT remain blocked. Live payment activation is disabled. Use `.env.example` for current variable names; historical TL-09–TL-12 reports describe the original sandbox only.
-
-
-## Hosting compatibility
-
-The original `.openai/hosting.json`, Worker, packaging script and four hosting tests are preserved. Their output remains a **static demo package**; deploying it alone does not deploy the Node/SQLite backend. This branch's full functional runtime is Node. Do not publish the static Worker as the Commerce OS. A future Sites deployment needs a separately configured backend or a deliberate D1/Worker persistence migration. No site was published and no merge/push was performed.
-
-See [source-data review](docs/data-review.md) and the original screenshots in `docs/sources/`.
-
-## Approved customer brand foundation (TL-19–TL-21)
-
-The default page is the 3L editorial experience. **Gestión** opens Commerce OS; **MVP demo** preserves the original fictitious checkout. Real customer content is isolated in `src/brand/content.ts`: missing products, imagery, WhatsApp/social destinations and newsletter integration remain explicit data slots. This branch is a reviewable foundation, not a customer launch.
-
-See [brand implementation and activation checklist](docs/brand/implementation.md) and [asset manifest](docs/brand/asset-manifest.json). `npm run build` also prerenders readable customer content for browsers without JavaScript. Brand E2E includes eight responsive widths, keyboard/modal controls, reduced motion, axe and layout stability. Existing operational tests remain in the same suite.
+The preserved Sites Worker is static-only: `dist/client`, `dist/server/index.js` and `dist/.openai/hosting.json` remain compatible, but the full operational backend is compiled Node + SQLite. Do not deploy the static Worker as Commerce OS. No push, merge or deployment is part of TL-25.

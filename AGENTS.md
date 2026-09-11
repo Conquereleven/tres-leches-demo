@@ -36,3 +36,10 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 ## TL-24 release cleanup (supersedes prototype/demo instructions above)
 - Runtime and navigation must contain only canonical operations and the approved brand site. No legacy MVP entry or synthetic data.
 - Test fixtures belong under tests/ and must be injected explicitly; staging seeds are empty. Preserve production/provider activation gates.
+
+## TL-25 provider activation
+- Paymennt notifications use raw bytes, Base64 HMAC-SHA256 with the private registered hmacKey. Notification payload is never financial authority; GET reconciliation and durable receipts are mandatory.
+- Independent provider groups activate by configuration; Meta outbound remains explicit, same-origin and governed by the 24h/template policy.
+- Approved catalog lives in SQLite; use the validated admin import with backup. No runtime product fixtures.
+- Admin readiness is staging-only. Do not assert PILOT READY or enable live/production without real provider validation and Lisa UAT.
+- Current activation instructions: `docs/today-activation-runbook.md`; older TL18 blocked-contract notes are historical.

@@ -7,7 +7,7 @@ All named cells are transcribed into `zoneSeed` in `server/domain/zones.ts`. JLT
 Only these small review groups remain:
 
 1. **Delivery fees**: not present in the screenshot. Non-free zones use `deliveryFeeAed: null`; order payment is blocked until an admin supplies a fee. Zero is accepted only as an explicit admin decision.
-2. **JLT B/C/D**: FREE DELIVERY is explicit. Each rule has `freeDelivery: true`, fee 0, but minimum null pending confirmation whether the 30 AED header also applies below the free-delivery label.
-3. **Source spelling / coverage specificity**: “REMRAN” remains as written (300). Confirm intended name before adding an alias. MAZAYA and TAJ RESIDENCE remain the source labels; confirm exact buildings before attaching geography. No inferred boundary is seeded.
+2. **JLT B/C/D — RESOLVED (TL-25)**: confirmed minimum 30 AED for each; existing FREE DELIVERY and zero fee are preserved. Existing databases receive a one-time audited migration marker without replacing other rules.
+3. **Source spelling / coverage specificity**: **REMRAN/Remraam — RESOLVED (TL-25)**: canonical name Remraam, minimum 300 AED, legacy REMRAN alias retained; stable `remran` ID preserves existing references. Its delivery fee remains unknown. MAZAYA and TAJ RESIDENCE remain the source labels; confirm exact buildings before attaching geography. No inferred boundary is seeded.
 
-Known conventional aliases (e.g. JVC / Jumeirah Village Circle) are matching aids, not new business zones or rates. All unspecified geography stays unset. The GPS mock recognizes exactly one documented fixture: (25.0657,55.2089) → JVC. Any other coordinate without an admin polygon is outside known coverage. It must not be used as a Dubai geocoder.
+Known conventional aliases (e.g. JVC / Jumeirah Village Circle) are matching aids, not new business zones or rates. All unspecified geography stays unset. Test-only GPS fixtures under `tests/` recognize: (25.0657,55.2089) → JVC. Any other coordinate without an admin polygon is outside known coverage. Runtime contains no mock fallback; configure Mapbox or reviewed admin mappings.
