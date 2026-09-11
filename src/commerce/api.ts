@@ -10,7 +10,11 @@ export type Workspace = {
   mode: "integration";
   environment?: "development" | "test" | "staging";
   readiness?: {
-    overall: "NOT READY" | "INTEGRATION READY";
+    overall:
+      | "NOT READY"
+      | "INTERNAL READY / EXTERNAL INPUT REQUIRED"
+      | "INTEGRATION READY"
+      | "PILOT READY";
     components: Record<
       string,
       {

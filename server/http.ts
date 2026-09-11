@@ -1,6 +1,17 @@
+import {
+  PaymenntNotificationVerifier,
+  notificationSchema,
+  paymentTopics,
+} from "./adapters/paymennt-notification";
+import { loadWebhookSecret } from "./adapters/paymennt-secrets";
 import { assertCleanRuntime } from "./db/runtime-safety";
 import { trace, safeLog } from "./observability";
-import { integrationConfig, runtimeConfig, usersSchema } from "./config";
+import {
+  integrationConfig,
+  runtimeConfig,
+  usersSchema,
+  activationConfig,
+} from "./config";
 import { BackupManager } from "./db/backups";
 import { Readiness } from "./readiness";
 import {
@@ -20,7 +31,12 @@ import { Store, seed } from "./db/store";
 import { quoteOrder } from "./domain/zones";
 import { commandSchema, inboundSchema } from "./domain/commands";
 import { CommerceService } from "./domain/service";
-import { DomainError, type Actor, catalog, numbers } from "./domain/model";
+import {
+  DomainError,
+  type Actor,
+  numbers,
+  locationSchema,
+} from "./domain/model";
 import { HmacVerifier } from "./adapters/providers";
 export async function startServer(
   overrides: {
@@ -37,11 +53,8 @@ export async function startServer(
   const runtime = runtimeConfig(process.env);
   const staging = runtime.staging;
   if (staging) process.umask(0o077);
-  const integration = staging
-    ? staging.PROVIDER_MODE === "test"
-      ? integrationConfig({ ...process.env, INTEGRATION_MODE: "true" })
-      : null
-    : integrationConfig(process.env);
+  const integration = staging ? null : integrationConfig(process.env);
+  const activation = activationConfig(process.env);
   const production = process.env.NODE_ENV === "production";
   const secret =
     process.env.WEBHOOK_SECRET ||
@@ -55,7 +68,7 @@ export async function startServer(
   )
     throw new Error("Staging database must be outside static dist");
   const stagingAliases =
-    integration?.numbers ??
+    activation.meta?.numbers ??
     numbers.map((n) => ({ ...n, phone: "NOT CONFIGURED" }));
   const store = new Store(
     dbPath,
@@ -73,29 +86,30 @@ export async function startServer(
       )
     : undefined;
   if (backups) await backups.run();
-  const meta = integration
-    ? new MetaWhatsAppProvider({
-        token: integration.META_ACCESS_TOKEN,
-        appSecret: integration.META_APP_SECRET,
-        verifyToken: integration.META_VERIFY_TOKEN,
-        version: integration.META_GRAPH_VERSION,
-        numbers: integration.numbers,
-        paymentTemplate: integration.paymentTemplate,
-      })
-    : null;
-  const paymennt = integration
-    ? new PaymenntProvider({
-        apiKey: integration.PAYMENNT_API_KEY,
-        apiSecret: integration.PAYMENNT_API_SECRET,
-        environment: "test",
-      })
+  const meta =
+    overrides.whatsapp instanceof MetaWhatsAppProvider
+      ? overrides.whatsapp
+      : activation.meta
+        ? new MetaWhatsAppProvider(activation.meta)
+        : null;
+  const webhookSecret = loadWebhookSecret(
+    process.env.PAYMENNT_WEBHOOK_SECRET_FILE,
+  );
+  const paymentVerifier = new PaymenntNotificationVerifier(
+    webhookSecret?.hmacKey,
+  );
+  const paymennt = activation.paymennt
+    ? new PaymenntProvider(activation.paymennt, fetch, paymentVerifier)
     : undefined;
-  const geoProvider = integration
-    ? new MapboxGeoProvider(integration.MAPBOX_ACCESS_TOKEN)
+  const geoProvider = activation.geoToken
+    ? new MapboxGeoProvider(activation.geoToken)
     : undefined;
   const service = new CommerceService(
     store,
-    overrides.whatsapp ?? new DisabledWhatsAppProvider(),
+    overrides.whatsapp ??
+      (meta && process.env.META_OUTBOUND_ENABLED === "true"
+        ? meta
+        : new DisabledWhatsAppProvider()),
     overrides.payment ?? paymennt ?? new UnconfiguredPaymentProvider(),
     overrides.geo ??
       (geoProvider
@@ -118,6 +132,11 @@ export async function startServer(
     backups,
     paymennt,
     geoProvider,
+    {
+      activation,
+      webhookConfigured: !!webhookSecret,
+      outboundEnabled: process.env.META_OUTBOUND_ENABLED === "true",
+    },
   );
   const sessions = new Map<string, { actor: Actor; expires: number }>();
   const limiter = new Map<string, { count: number; until: number }>();
@@ -145,11 +164,11 @@ export async function startServer(
         throw new DomainError(413, "Solicitud demasiado grande");
       chunks.push(bytes);
     }
-    return Buffer.concat(chunks).toString("utf8");
+    return Buffer.concat(chunks);
   }
-  function parse(raw: string): unknown {
+  function parse(raw: string | Buffer): unknown {
     try {
-      return JSON.parse(raw);
+      return JSON.parse(raw.toString());
     } catch {
       throw new DomainError(400, "JSON inválido");
     }
@@ -194,7 +213,10 @@ export async function startServer(
           });
         if (req.method === "GET" && path === "/api/ready") {
           const result = readiness.snapshot();
-          return json(res, result.storage ? 200 : 503, result);
+          return json(res, result.storage ? 200 : 503, {
+            storage: result.storage,
+            environment: runtime.environment,
+          });
         }
         if (req.method === "GET" && path === "/api/webhooks/whatsapp" && meta) {
           const challenge = meta.challenge(url.searchParams);
@@ -204,11 +226,27 @@ export async function startServer(
         }
         if (req.method === "POST" && path.startsWith("/api/webhooks/")) {
           const raw = await rawBody(req);
-          if (!isolatedTest && path === "/api/webhooks/payment")
-            throw new DomainError(
-              503,
-              "Paymennt webhook contract pending verification; use Check Status",
+          if (
+            path === "/api/webhooks/payment" &&
+            (!isolatedTest || service.payment.name === "paymennt")
+          ) {
+            if (!paymentVerifier.configured)
+              throw new DomainError(503, "WEBHOOK NOT CONFIGURED");
+            if (
+              !paymentVerifier.verify(
+                raw,
+                String(req.headers["x-pointcheckout-hmac-sha256"] ?? ""),
+              )
+            )
+              throw new DomainError(401, "Firma inválida");
+            z.enum(paymentTopics).parse(req.headers["x-pointcheckout-topic"]);
+            const event = notificationSchema.parse(parse(raw));
+            return json(
+              res,
+              200,
+              await service.acceptPaymentNotification(event),
             );
+          }
           if (!isolatedTest && !meta && path === "/api/webhooks/whatsapp")
             throw new DomainError(503, "BLOCKED — EXTERNAL CREDENTIALS");
           if (meta && path === "/api/webhooks/whatsapp") {
@@ -270,7 +308,7 @@ export async function startServer(
         }
         const current = actor(req);
         if (path === "/api/admin/diagnostics") {
-          if (current.role !== "admin")
+          if (current.role !== "admin" || !staging)
             throw new DomainError(
               403,
               "Solo administradores pueden ejecutar diagnósticos",
@@ -278,11 +316,18 @@ export async function startServer(
           if (req.method === "GET") return json(res, 200, readiness.snapshot());
           if (req.method === "POST") {
             const body = z
-              .object({ provider: z.enum(["paymennt", "geo"]) })
+              .object({
+                provider: z.enum(["paymennt", "geo", "meta"]),
+                location: locationSchema.optional(),
+              })
               .strict()
               .parse(parse(await rawBody(req)));
             try {
-              return json(res, 200, await readiness.probe(body.provider));
+              return json(
+                res,
+                200,
+                await readiness.probe(body.provider, body.location),
+              );
             } catch {
               throw new DomainError(
                 409,
@@ -337,6 +382,7 @@ export async function startServer(
                 o.location,
                 service.geo,
                 o.manualZoneId,
+                s.catalog ?? [],
               );
           return json(res, 200, {
             environment: runtime.environment,
@@ -344,12 +390,17 @@ export async function startServer(
             actor: current,
             agents: users.map((u) => ({ id: u.id, name: u.id })),
             numbers: service.operationalNumbers,
-            catalog,
+            catalog: (s.catalog ?? []).filter(
+              (p) => p.active !== false && p.availability !== "unavailable",
+            ),
             zones: s.zones,
             conversations: s.conversations,
             orders: s.orders,
             payments: s.payments,
-            readiness: readiness.snapshot(),
+            readiness:
+              staging && current.role === "admin"
+                ? readiness.snapshot()
+                : undefined,
             uatScenarios: s.uatScenarios ?? [],
             integrationHealth: {
               inboundFailed: (s.inboundDeliveries ?? []).filter(

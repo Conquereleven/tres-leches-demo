@@ -4,6 +4,7 @@ import {
   type Quote,
   type Line,
   catalog,
+  type CatalogItem,
 } from "./model";
 // Transcribed from the supplied “MINIMUM ORDER FOR DELIVERY” image. Unknown fees stay null.
 const bands: [number, string[]][] = [
@@ -112,7 +113,7 @@ const bands: [number, string[]][] = [
       "KITEBEACH",
       "FESTIVAL CITY",
       "DUBAI SOUTH",
-      "REMRAN",
+      "Remraam",
       "EXPO SITE",
       "D3 DISTRICT",
       "DIFC",
@@ -133,6 +134,7 @@ export const normalize = (v: string) =>
     .replace(/[^a-z0-9]+/g, " ")
     .trim();
 const aliasMap: Record<string, string[]> = {
+  Remraam: ["REMRAN"],
   JVC: ["Jumeirah Village Circle"],
   JVT: ["Jumeirah Village Triangle"],
   "JUMEIRAH ISLAND": ["Jumeirah Islands"],
@@ -151,7 +153,7 @@ const aliasMap: Record<string, string[]> = {
 };
 export const zoneSeed: DeliveryZone[] = bands.flatMap(([min, names]) =>
   names.map((name) => ({
-    id: normalize(name).replaceAll(" ", "-"),
+    id: name === "Remraam" ? "remran" : normalize(name).replaceAll(" ", "-"),
     name,
     aliases: aliasMap[name] ?? [],
     minOrderAed: min,
@@ -160,10 +162,7 @@ export const zoneSeed: DeliveryZone[] = bands.flatMap(([min, names]) =>
     active: true,
     priority: 10,
     version: 0,
-    review:
-      name === "REMRAN"
-        ? "Source spells REMRAN; confirm intended locality."
-        : "Delivery fee not supplied; admin confirmation required.",
+    review: "Delivery fee not supplied; admin confirmation required.",
   })),
 );
 for (const cluster of ["B", "C", "D"])
@@ -171,14 +170,13 @@ for (const cluster of ["B", "C", "D"])
     id: `jlt-cluster-${cluster.toLowerCase()}`,
     name: `JLT Cluster ${cluster}`,
     aliases: [],
-    minOrderAed: null,
+    minOrderAed: 30,
     deliveryFeeAed: 0,
     freeDelivery: true,
     active: true,
     priority: 20,
     version: 0,
-    review:
-      "FREE DELIVERY is explicit; confirm whether the 30 AED column minimum also applies to B/C/D.",
+    review: "TL-25 confirmed: minimum 30 AED and free delivery.",
   });
 export interface GeoService {
   prepare?(location: Location): Promise<void>;
@@ -275,10 +273,20 @@ export function quoteOrder(
   location?: Location,
   geo?: GeoService,
   manualZoneId?: string,
+  products: CatalogItem[] = catalog,
 ): Quote {
+  const validProducts = lines.every((l) =>
+    products.some(
+      (p) =>
+        p.id === l.productId &&
+        p.active !== false &&
+        p.availability !== "unavailable",
+    ),
+  );
   const subtotalFils = lines.reduce(
     (sum, l) =>
-      sum + catalog.find((p) => p.id === l.productId)!.priceFils * l.quantity,
+      sum +
+      (products.find((p) => p.id === l.productId)?.priceFils ?? 0) * l.quantity,
     0,
   );
   const zone = manualZoneId
@@ -289,15 +297,17 @@ export function quoteOrder(
   const minimumMet =
     zone?.minOrderAed != null &&
     subtotalFils >= Math.round(zone.minOrderAed * 100);
-  const reason = !zone
-    ? "Fuera de cobertura o ubicación ambigua"
-    : zone.minOrderAed == null || feeFils == null
-      ? "Regla pendiente de revisión"
-      : !minimumMet
-        ? "No cumple el mínimo"
-        : !subtotalFils
-          ? "Agrega productos"
-          : "Listo para solicitar pago";
+  const reason = !validProducts
+    ? "Producto no disponible en el catálogo aprobado"
+    : !zone
+      ? "Fuera de cobertura o ubicación ambigua"
+      : zone.minOrderAed == null || feeFils == null
+        ? "Regla pendiente de revisión"
+        : !minimumMet
+          ? "No cumple el mínimo"
+          : !subtotalFils
+            ? "Agrega productos"
+            : "Listo para solicitar pago";
   return {
     resolutionCode: zone ? "RESOLVED" : "ZONE_REVIEW_REQUIRED",
     zoneId: zone?.id ?? null,
@@ -307,7 +317,12 @@ export function quoteOrder(
     subtotalFils,
     totalFils: feeFils === null ? null : subtotalFils + feeFils,
     minimumMet,
-    eligible: !!zone && minimumMet && feeFils !== null && subtotalFils > 0,
+    eligible:
+      validProducts &&
+      !!zone &&
+      minimumMet &&
+      feeFils !== null &&
+      subtotalFils > 0,
     reason,
     zoneVersion: zone?.version ?? null,
   };

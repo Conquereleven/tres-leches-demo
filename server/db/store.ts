@@ -5,6 +5,8 @@ import { type State } from "../domain/model";
 import { zoneSeed } from "../domain/zones";
 export function seed(): State {
   return {
+    catalog: [],
+    paymentNotifications: [],
     zones: structuredClone(zoneSeed),
     conversations: [],
     orders: [],
@@ -57,6 +59,29 @@ export class Store {
     this.db
       .prepare("INSERT OR IGNORE INTO commerce_state VALUES (1, ?)")
       .run(JSON.stringify(initial ?? seed()));
+    this.write((s) => {
+      if (s.events["migration:tl25-commercial"]) return;
+      for (const zone of s.zones) {
+        if (
+          ["jlt-cluster-b", "jlt-cluster-c", "jlt-cluster-d"].includes(
+            zone.id,
+          ) &&
+          zone.minOrderAed !== 30
+        ) {
+          zone.minOrderAed = 30;
+          zone.version++;
+          zone.review = "TL-25 minimum confirmed";
+        }
+        if (zone.id === "remran" && zone.name !== "Remraam") {
+          zone.name = "Remraam";
+          zone.aliases = [...new Set([...zone.aliases, "REMRAN"])];
+          zone.version++;
+          zone.review =
+            "Delivery fee not supplied; admin confirmation required.";
+        }
+      }
+      s.events["migration:tl25-commercial"] = "resolved";
+    });
   }
   read(): State {
     return JSON.parse(

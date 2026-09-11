@@ -104,9 +104,8 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
     const ready = await (
       await context.request.get(origin + "/api/ready")
     ).json();
-    expect(ready.overall).toBe("NOT READY");
-    expect(ready.components.backup.status).toBe("READY");
-    expect(ready.components.Paymennt.status).toBe("NOT CONFIGURED");
+    expect(ready.storage).toBe(true);
+    expect(ready.components).toBeUndefined();
     expect(
       (
         await context.request.post(origin + "/api/webhooks/payment", {
@@ -135,6 +134,11 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
     const clean = await (
       await context.request.get(origin + "/api/workspace")
     ).json();
+    expect(clean.readiness.overall).toBe(
+      "INTERNAL READY / EXTERNAL INPUT REQUIRED",
+    );
+    expect(clean.readiness.components.backup.status).toBe("READY");
+    expect(clean.readiness.components.Paymennt.status).toBe("NOT CONFIGURED");
     for (const field of [
       "conversations",
       "orders",
@@ -209,10 +213,12 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
       .click();
     await page.reload();
     await expect(
-      page.getByRole("heading", { name: "Preparación y UAT · NOT READY" }),
+      page.getByRole("heading", {
+        name: "Preparación y UAT · INTERNAL READY / EXTERNAL INPUT REQUIRED",
+      }),
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Diez escenarios de aceptación" }),
+      page.getByRole("heading", { name: "Validación con Lisa" }),
     ).toBeVisible();
     await page.getByRole("button", { name: "Comprobar Paymennt TEST" }).click();
     await expect(page.locator(".commerce")).toHaveAttribute(
@@ -233,8 +239,9 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
       await page.evaluate(() =>
         window.scrollTo({ top: 0, behavior: "instant" }),
       );
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
       await page.screenshot({
-        path: `work/qa/tl18-readiness-${width}.png`,
+        path: `work/qa/tl25-readiness-${width}.png`,
         fullPage: true,
       });
     }
@@ -270,6 +277,7 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
       const workspace = await (
         await context.request.get(origin + "/api/workspace")
       ).json();
+      expect(workspace.readiness).toBeUndefined();
       expect(workspace.conversations).toHaveLength(0);
       expect(workspace.orders).toHaveLength(0);
       expect(workspace.uatScenarios).toHaveLength(0);

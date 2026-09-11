@@ -18,6 +18,9 @@ export class Store extends RealStore {
     initial?: ReturnType<typeof seed>,
   ) {
     super(path, mode, initial ?? (mode === true ? seed() : undefined));
+    this.write((s) => {
+      s.catalog = structuredClone(testCatalog);
+    });
   }
 }
 export class CommerceService extends RealService {

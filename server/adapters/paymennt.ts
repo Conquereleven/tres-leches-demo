@@ -1,3 +1,4 @@
+import { webhookSecretSchema } from "./paymennt-secrets";
 import { PaymenntNotificationVerifier } from "./paymennt-notification";
 import type { AuthoritativeCheckout } from "../domain/checkout";
 import { ProviderFailure } from "./failure";
@@ -73,8 +74,7 @@ export class PaymenntProvider implements PaymentProvider {
       config.environment === "test"
         ? "https://api.test.paymennt.com/mer/v2.0"
         : "https://api.paymennt.com/mer/v2.0";
-    // Fail closed: OpenAPI exposes hmacKey but does not specify signed bytes/header/encoding.
-    // Enable only after obtaining the merchant's verified webhook contract and test vector.
+    // TL-25 Support contract implemented; a missing registered key still fails closed.
     this.verifier = verifier ?? new PaymenntNotificationVerifier();
   }
   private async request(path: string, body?: unknown) {
@@ -159,6 +159,16 @@ export class PaymenntProvider implements PaymentProvider {
     if (found.requestId !== requestId)
       throw new ProviderFailure("unknown", false);
     return this.getCheckout(found.checkoutId);
+  }
+  async registerWebhook(address: string) {
+    const url = new URL(address);
+    if (url.protocol !== "https:" || url.username || url.password)
+      throw new Error("HTTPS webhook required");
+    const result = webhookSecretSchema.parse(
+      await this.request("/webhooks", { address }),
+    );
+    if (result.address !== address) throw new Error("Webhook address mismatch");
+    return result;
   }
   async checkConnectivity() {
     // Official read-only search, deliberately requesting no customer/order data for diagnostics.

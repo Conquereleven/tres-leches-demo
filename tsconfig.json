@@ -17,6 +17,7 @@
   "include": [
     "src",
     "server",
+    "scripts/*.ts",
     "tests/commerce",
     "tests/e2e",
     "playwright.config.ts"

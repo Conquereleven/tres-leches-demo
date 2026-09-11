@@ -34,16 +34,19 @@ test("TL18 environment matrix separates framework production from staging and re
   );
   assert.throws(
     () => runtimeConfig({ APP_ENV: "production", PRODUCTION_APPROVED: "true" }),
-    /disabled/,
+    /disabled|explicit provider configuration/,
   );
-  assert.throws(() => runtimeConfig({ NODE_ENV: "production" }), /disabled/);
+  assert.throws(
+    () => runtimeConfig({ NODE_ENV: "production" }),
+    /disabled|explicit provider configuration/,
+  );
   assert.throws(
     () => runtimeConfig({ PAYMENNT_ENVIRONMENT: "live" }),
-    /disabled/,
+    /disabled|explicit provider configuration/,
   );
   assert.throws(
     () => runtimeConfig({ META_OUTBOUND_ENABLED: "true" }),
-    /disabled/,
+    /disabled|explicit provider configuration/,
   );
 });
 for (const key of [
@@ -90,8 +93,8 @@ test("TL18 rejects insecure origins, excessive sessions, missing roles, duplicat
 });
 test("TL18 notification slot always rejects and Paymennt adapter itself refuses live mode", () => {
   const verifier = new PaymenntNotificationVerifier();
-  assert.equal(verifier.verify(), false);
-  assert.equal(verifier.status, "BLOCKED");
+  assert.equal(verifier.verify("{}", ""), false);
+  assert.equal(verifier.status, "IMPLEMENTED");
   assert.throws(
     () =>
       new PaymenntProvider({
@@ -99,7 +102,7 @@ test("TL18 notification slot always rejects and Paymennt adapter itself refuses 
         apiSecret: "fixture",
         environment: "live",
       }),
-    /disabled/,
+    /disabled|explicit provider configuration/,
   );
 });
 test("TL18 fresh staging seed labels every record TEST and creates no payments or jobs", () => {
@@ -268,10 +271,13 @@ test("TL18 readiness redacts credentials and connectivity probes are GET-only wi
     );
     assert.equal((await readiness.probe("paymennt")).status, "READY");
     assert.match(calls[0]!, /^https:\/\/api\.test\.paymennt\.com/);
-    assert.equal(readiness.snapshot().overall, "NOT READY");
+    assert.equal(
+      readiness.snapshot().overall,
+      "INTERNAL READY / EXTERNAL INPUT REQUIRED",
+    );
     assert.equal(
       readiness.snapshot().components.PaymenntNotification?.status,
-      "BLOCKED",
+      "READY",
     );
     const serialized = JSON.stringify(readiness.snapshot());
     for (const secret of [

@@ -2,19 +2,19 @@ import type { AuthoritativeCheckout } from "../domain/checkout";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { Payment, Conversation } from "../domain/model";
 export interface WebhookVerifier {
-  verify(raw: string, signature: string): boolean;
+  verify(raw: string | Buffer, signature: string): boolean;
 }
 export class HmacVerifier implements WebhookVerifier {
   constructor(private secret: string) {
     if (secret.length < 24)
       throw new Error("Webhook secret must be at least 24 characters");
   }
-  sign(raw: string) {
+  sign(raw: string | Buffer) {
     return (
       "sha256=" + createHmac("sha256", this.secret).update(raw).digest("hex")
     );
   }
-  verify(raw: string, signature: string) {
+  verify(raw: string | Buffer, signature: string) {
     const expected = Buffer.from(this.sign(raw)),
       received = Buffer.from(signature);
     return (

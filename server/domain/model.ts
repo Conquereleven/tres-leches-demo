@@ -64,6 +64,7 @@ export type Message = {
     | "failed"
     | "unknown";
   providerId?: string;
+  sentAt?: string;
   location?: Location;
   translation?: string;
   paymentContext?: { amountAed: string; url: string };
@@ -103,6 +104,7 @@ export type Order = {
   state: OrderState;
   version: number;
   lines: Line[];
+  catalogSnapshot?: CatalogItem[];
   location?: Location;
   address?: string;
   quote: Quote | null;
@@ -158,7 +160,29 @@ export type InboundDelivery = {
   attempts: number;
   nextAt: number;
 };
+export type CatalogItem = {
+  id: string;
+  name: string;
+  category?: string;
+  description?: string;
+  priceFils: number;
+  active?: boolean;
+  availability?: "available" | "unavailable";
+  image?: string;
+  whatsappPrefill?: string;
+};
+export type NotificationReceipt = {
+  id: string;
+  checkoutId: string;
+  status: string;
+  receivedAt: string;
+  completedAt?: string;
+  nextAt: number;
+  attempts: number;
+};
 export type State = {
+  catalog?: CatalogItem[];
+  paymentNotifications?: NotificationReceipt[];
   uatScenarios?: {
     id: number;
     title: string;

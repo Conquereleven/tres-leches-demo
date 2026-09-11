@@ -114,7 +114,7 @@ export function CommerceWorkspace() {
           ["production", "Producción"],
           ["delivery", "Entregas"],
           ["zones", "Zonas y tarifas"],
-          ...(data.environment === "staging"
+          ...(data.environment === "staging" && data.actor.role === "admin"
             ? [["readiness", "Preparación y UAT"]]
             : []),
         ].map(([id, label]) => (
@@ -156,7 +156,9 @@ export function CommerceWorkspace() {
         </div>
       )}
       <fieldset className="co-fieldset" disabled={busy}>
-        {view === "readiness" ? (
+        {view === "readiness" &&
+        data.environment === "staging" &&
+        data.actor.role === "admin" ? (
           <ReadinessPanel data={data} run={run} />
         ) : view === "zones" ? (
           <Zones key="zones" data={data} run={run} />
@@ -584,12 +586,15 @@ function OrderPanel({
             <li key={l.productId}>
               <span>
                 {l.quantity} ×{" "}
-                {data.catalog.find((p) => p.id === l.productId)?.name}
+                {(o.catalogSnapshot ?? data.catalog).find(
+                  (p) => p.id === l.productId,
+                )?.name ?? l.productId}
               </span>
               <span>
                 {money(
-                  data.catalog.find((p) => p.id === l.productId)!.priceFils *
-                    l.quantity,
+                  ((o.catalogSnapshot ?? data.catalog).find(
+                    (p) => p.id === l.productId,
+                  )?.priceFils ?? 0) * l.quantity,
                 )}
               </span>
               {editable && (
@@ -1171,8 +1176,27 @@ function Login({ onLogin }: { onLogin: () => Promise<void> }) {
 }
 
 function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
+  const [latitude, setLatitude] = useState(""),
+    [longitude, setLongitude] = useState("");
+  const labels: Record<string, string> = {
+    database: "Base de datos",
+    authentication: "Acceso y roles",
+    PaymenntNotification: "Firma Paymennt",
+    PaymenntWebhook: "Registro webhook",
+    PaymenntLastNotification: "Última notificación",
+    PaymenntReconciliation: "Conciliación",
+    PaymenntPending: "Notificaciones pendientes",
+    MetaAccount: "Cuenta Meta",
+    GeoProvider: "Conexión Mapbox",
+    GeoMapping: "Cobertura GPS",
+    Commercial: "Reglas de entrega",
+    Catalog: "Catálogo aprobado",
+    backup: "Copias de seguridad",
+    APP_ENV: "Entorno",
+    UAT: "Aceptación con Lisa",
+  };
   return (
-    <section className="co-zone-editor">
+    <section className="co-zone-editor co-readiness-panel">
       <p className="eyebrow">STAGING / TEST</p>
       <h2>Preparación y UAT · {data.readiness?.overall ?? "NOT READY"}</h2>
       <p>
@@ -1183,7 +1207,7 @@ function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
         {Object.entries(data.readiness?.components ?? {}).map(
           ([name, check]) => (
             <article className="co-quote" key={name}>
-              <h3>{name}</h3>
+              <h3>{labels[name] ?? name}</h3>
               <strong>{check.status}</strong>
               <p>{check.detail}</p>
               {check.checkedAt && (
@@ -1194,7 +1218,7 @@ function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
         )}
       </div>
       {data.actor.role === "admin" && (
-        <div className="co-row">
+        <div className="co-readiness-actions">
           <button
             onClick={() =>
               void run({ provider: "paymennt" }, "admin/diagnostics")
@@ -1203,7 +1227,45 @@ function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
             Comprobar Paymennt TEST
           </button>
           <button
-            onClick={() => void run({ provider: "geo" }, "admin/diagnostics")}
+            onClick={() => void run({ provider: "meta" }, "admin/diagnostics")}
+          >
+            Validar configuración Meta
+          </button>
+          <label>
+            Latitud real
+            <input
+              aria-label="Latitud real"
+              inputMode="decimal"
+              value={latitude}
+              onChange={(e) => setLatitude(e.target.value)}
+            />
+          </label>
+          <label>
+            Longitud real
+            <input
+              aria-label="Longitud real"
+              inputMode="decimal"
+              value={longitude}
+              onChange={(e) => setLongitude(e.target.value)}
+            />
+          </label>
+          <button
+            onClick={() =>
+              void run(
+                {
+                  provider: "geo",
+                  ...(latitude && longitude
+                    ? {
+                        location: {
+                          lat: Number(latitude),
+                          lng: Number(longitude),
+                        },
+                      }
+                    : {}),
+                },
+                "admin/diagnostics",
+              )
+            }
           >
             Comprobar Mapbox
           </button>
@@ -1213,7 +1275,11 @@ function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
         Solo lectura: estas comprobaciones no crean cobros ni envían mensajes.
         Pueden consumir una consulta del proveedor.
       </p>
-      <h3>Diez escenarios de aceptación</h3>
+      <h3>Validación con Lisa</h3>
+      <p>
+        Completa las pruebas con cuentas reales siguiendo el runbook de
+        activación. Esta pantalla no acredita aceptación del cliente.
+      </p>
       <ol className="co-audit">
         {data.uatScenarios?.map((s) => (
           <li key={s.id}>

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { catalog, locationSchema, states, zoneSchema } from "./model";
+import { locationSchema, states, zoneSchema } from "./model";
 const base = {
   id: z.string().min(1).max(100),
   version: z.number().int().nonnegative(),
@@ -28,9 +28,7 @@ export const commandSchema = z.discriminatedUnion("type", [
     lines: z
       .array(
         z.object({
-          productId: z
-            .string()
-            .refine((id) => catalog.some((p) => p.id === id)),
+          productId: z.string().min(1).max(100),
           quantity: z.number().int().min(1).max(100),
         }),
       )

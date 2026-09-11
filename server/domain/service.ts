@@ -1,3 +1,7 @@
+import {
+  notificationIdentity,
+  type PaymenntNotification,
+} from "../adapters/paymennt-notification";
 import { trace, safeLog } from "../observability";
 import { ProviderFailure } from "../adapters/failure";
 import type { AuthoritativeCheckout } from "./checkout";
@@ -9,6 +13,7 @@ import {
   type Order,
   type Payment,
   type Job,
+  type NotificationReceipt,
   requireThat,
   now,
   numbers,
@@ -88,6 +93,7 @@ export class CommerceService {
       o.location,
       this.geo,
       o.manualZoneId,
+      s.catalog ?? [],
     );
   }
   private enqueue(s: State, kind: Job["kind"], entityId: string) {
@@ -320,7 +326,20 @@ export class CommerceService {
           "Productos duplicados",
           400,
         );
+        requireThat(
+          cmd.lines.every((l) =>
+            (s.catalog ?? []).some(
+              (p) =>
+                p.id === l.productId &&
+                p.active !== false &&
+                p.availability !== "unavailable",
+            ),
+          ),
+          "Producto no disponible en catálogo aprobado",
+          400,
+        );
         o.lines = cmd.lines;
+        o.catalogSnapshot = undefined;
       } else {
         o.manualZoneId = undefined;
         o.address = cmd.address;
@@ -374,6 +393,11 @@ export class CommerceService {
           { ...at(), actor: actor.id, action: "Solicitud de pago creada" },
         ],
       };
+      o.catalogSnapshot = structuredClone(
+        (s.catalog ?? []).filter((p) =>
+          o.lines.some((l) => l.productId === p.id),
+        ),
+      );
       s.payments.push(p);
       o.paymentId = p.id;
       transition(o, "Awaiting Payment", actor.id);
@@ -664,8 +688,54 @@ export class CommerceService {
       return { duplicate: false };
     });
   }
+  async acceptPaymentNotification(event: PaymenntNotification) {
+    const id = notificationIdentity(event);
+    const receipt = this.store.write((s) => {
+      s.paymentNotifications ??= [];
+      const existing = s.paymentNotifications.find((r) => r.id === id);
+      if (existing) return existing;
+      const item: NotificationReceipt = {
+        id,
+        checkoutId: event.id,
+        status: event.status,
+        receivedAt: now(),
+        nextAt: Date.now(),
+        attempts: 0,
+      };
+      s.paymentNotifications.push(item);
+      return item;
+    });
+    if (receipt.completedAt) return { duplicate: true };
+    await this.reconcileNotification(id);
+    return { duplicate: false };
+  }
+  private async reconcileNotification(id: string) {
+    const receipt = this.store
+      .read()
+      .paymentNotifications?.find((r) => r.id === id);
+    if (!receipt || receipt.completedAt) return;
+    const payment = this.store
+      .read()
+      .payments.find((p) => p.providerReference === receipt.checkoutId);
+    try {
+      requireThat(payment, "Checkout aún no asociado; reintentar", 503);
+      await this.reconcile(
+        payment.id,
+        { id: "paymennt-notification", role: "admin" },
+        id,
+      );
+    } catch (error) {
+      this.store.write((s) => {
+        const r = s.paymentNotifications!.find((r) => r.id === id)!;
+        r.attempts++;
+        r.nextAt =
+          Date.now() + Math.min(3600000, 30000 * 2 ** Math.min(r.attempts, 7));
+      });
+      throw error;
+    }
+  }
   private reconciling = new Set<string>();
-  async reconcile(paymentId: string, actor: Actor) {
+  async reconcile(paymentId: string, actor: Actor, receiptId?: string) {
     const snapshot = this.store.read();
     const p = snapshot.payments.find((p) => p.id === paymentId);
     requireThat(p, "Pago no encontrado", 404);
@@ -724,7 +794,35 @@ export class CommerceService {
               { amountAed: (p.amountFils / 100).toFixed(2), url: checkout.url },
             );
         });
-      const result = this.applyCheckout(paymentId, checkout, actor.id);
+      if (receiptId) {
+        const receipt = this.store
+          .read()
+          .paymentNotifications?.find((r) => r.id === receiptId);
+        const expectedTerminal =
+          receipt &&
+          ["PAID", "FAILED", "EXPIRED", "CANCELLED", "REFUNDED"].includes(
+            receipt.status.toUpperCase(),
+          );
+        requireThat(
+          !(
+            expectedTerminal &&
+            ["pending", "authorized", "pending_confirmation"].includes(
+              checkout.status,
+            ) &&
+            !["paid", "refunded", "partially_refunded", "chargeback"].includes(
+              p.status,
+            )
+          ),
+          "Checkout aún no refleja la notificación; reintentar conciliación",
+          503,
+        );
+      }
+      const result = this.applyCheckout(
+        paymentId,
+        checkout,
+        actor.id,
+        receiptId,
+      );
       safeLog("reconciliation.complete", { status: result.status });
       return result;
     } finally {
@@ -735,6 +833,7 @@ export class CommerceService {
     paymentId: string,
     checkout: AuthoritativeCheckout,
     actor: string,
+    receiptId?: string,
   ) {
     return this.store.write((s) => {
       const p = s.payments.find((p) => p.id === paymentId)!;
@@ -748,7 +847,31 @@ export class CommerceService {
         409,
       );
       const o = this.order(s, p.orderId);
+      if (receiptId) {
+        const receipt = s.paymentNotifications!.find(
+          (r) => r.id === receiptId,
+        )!;
+        if (receipt.completedAt) return { status: p.status };
+        receipt.completedAt = now();
+        s.audit.push({
+          at: now(),
+          actor,
+          action: "Verified Paymennt notification reconciled",
+        });
+      }
       const previous = p.status;
+      if (
+        ["refunded", "partially_refunded", "chargeback"].includes(
+          checkout.status,
+        ) &&
+        previous !== checkout.status
+      )
+        p.timeline.push({
+          ...at(),
+          actor,
+          action:
+            "Revisión requerida: devolución/disputa; historial de fulfillment conservado",
+        });
       const settled = ["paid", "partially_refunded", "refunded", "chargeback"];
       const regression =
         (settled.includes(previous) && !settled.includes(checkout.status)) ||
@@ -809,6 +932,15 @@ export class CommerceService {
   }
   async drain() {
     await this.drainInbound();
+    for (const receipt of (this.store.read().paymentNotifications ?? [])
+      .filter((r) => !r.completedAt && r.nextAt <= Date.now())
+      .slice(0, 10)) {
+      try {
+        await this.reconcileNotification(receipt.id);
+      } catch {
+        /* Durable retry; never log provider payload. */
+      }
+    }
     for (let count = 0; count < 20; count++) {
       const claimed = this.store.write((s) => {
         const j = s.jobs.find(
@@ -915,6 +1047,7 @@ export class CommerceService {
             const m = c.messages.find((m) => m.id === claimed.entityId)!;
             m.providerId = result.providerId;
             m.status = result.status;
+            m.sentAt = now();
             // Delivery acknowledgment changes no operator-owned fields; avoid false editing conflicts.
             job.status = "done";
           });
@@ -943,16 +1076,22 @@ export class CommerceService {
           j.nextAt = Date.now() + 1000 * 2 ** j.attempts;
           j.lastError =
             error instanceof ProviderFailure &&
-            error.code === "OUTBOUND_DISABLED"
-              ? "BLOCKED — WhatsApp externo deshabilitado en TL-18"
+            error.code === "PAYMENT_TEMPLATE_REQUIRED"
+              ? "Fuera de la ventana de 24 horas: configura una plantilla aprobada de pago"
               : error instanceof ProviderFailure &&
-                  error.code === "NOT_CONFIGURED"
-                ? "BLOCKED — EXTERNAL CREDENTIALS"
-                : rejected
-                  ? "Solicitud rechazada: revisa configuración y ventana de WhatsApp antes de reintentar"
-                  : safe
-                    ? "Proveedor no disponible; reintento pendiente"
-                    : "Resultado incierto; conciliación requerida";
+                  error.code === "ORIGIN_NOT_CONFIGURED"
+                ? "Número de origen no configurado; no se usará otro número"
+                : error instanceof ProviderFailure &&
+                    error.code === "OUTBOUND_DISABLED"
+                  ? "WhatsApp externo deshabilitado; requiere activación explícita"
+                  : error instanceof ProviderFailure &&
+                      error.code === "NOT_CONFIGURED"
+                    ? "BLOCKED — EXTERNAL CREDENTIALS"
+                    : rejected
+                      ? "Solicitud rechazada: revisa configuración y ventana de WhatsApp antes de reintentar"
+                      : safe
+                        ? "Proveedor no disponible; reintento pendiente"
+                        : "Resultado incierto; conciliación requerida";
           const m = s.conversations
             .flatMap((c) => c.messages)
             .find((m) => m.id === j.entityId);

@@ -88,8 +88,11 @@ export function runtimeConfig(env: NodeJS.ProcessEnv) {
     );
   if (env.PAYMENNT_ENVIRONMENT && env.PAYMENNT_ENVIRONMENT !== "test")
     throw new Error("Paymennt live activation is disabled");
-  if (env.META_OUTBOUND_ENABLED && env.META_OUTBOUND_ENABLED !== "false")
-    throw new Error("Real WhatsApp sends are disabled in TL-18");
+  if (
+    env.META_OUTBOUND_ENABLED === "true" &&
+    !(env.PROVIDER_MODE === "test" || env.INTEGRATION_MODE === "true")
+  )
+    throw new Error("Meta outbound requires explicit provider configuration");
   if (environment !== "staging")
     return { environment, staging: null, sessionTtlSeconds: 28800 };
   const staging = z
@@ -112,7 +115,7 @@ export function runtimeConfig(env: NodeJS.ProcessEnv) {
       WEBHOOK_SECRET: z.string().min(24),
       PROVIDER_MODE: z.enum(["offline", "test"]),
       PAYMENNT_ENVIRONMENT: z.literal("test"),
-      META_OUTBOUND_ENABLED: z.literal("false"),
+      META_OUTBOUND_ENABLED: z.enum(["false", "true"]),
       OPERATOR_USERS_JSON: z.string().min(2),
       STAGING_SEED: z.literal("empty"),
     })
@@ -130,4 +133,49 @@ export function runtimeConfig(env: NodeJS.ProcessEnv) {
     staging,
     sessionTtlSeconds: staging.SESSION_TTL_SECONDS,
   };
+}
+
+/** Independent groups allow Meta activation before payment credentials arrive. */
+export function activationConfig(env: NodeJS.ProcessEnv) {
+  const enabled =
+    env.PROVIDER_MODE === "test" || env.INTEGRATION_MODE === "true";
+  const meta =
+    enabled && env.META_ACCESS_TOKEN
+      ? {
+          token: env.META_ACCESS_TOKEN,
+          appSecret: z.string().min(24).parse(env.META_APP_SECRET),
+          verifyToken: z.string().min(24).parse(env.META_VERIFY_TOKEN),
+          version: z
+            .string()
+            .regex(/^v\d+\.0$/)
+            .parse(env.META_GRAPH_VERSION),
+          numbers: metaNumbersSchema.parse(
+            JSON.parse(env.META_NUMBERS_JSON ?? "[]"),
+          ),
+          paymentTemplate: env.META_PAYMENT_TEMPLATE_JSON
+            ? z
+                .object({
+                  name: z.string().regex(/^[a-z0-9_]+$/),
+                  language: z.string().min(2).max(10),
+                })
+                .strict()
+                .parse(JSON.parse(env.META_PAYMENT_TEMPLATE_JSON))
+            : undefined,
+        }
+      : undefined;
+  const paymennt =
+    enabled && env.PAYMENNT_API_KEY
+      ? {
+          apiKey: env.PAYMENNT_API_KEY,
+          apiSecret: z.string().min(1).parse(env.PAYMENNT_API_SECRET),
+          environment: "test" as const,
+        }
+      : undefined;
+  const geoToken =
+    enabled && env.MAPBOX_ACCESS_TOKEN ? env.MAPBOX_ACCESS_TOKEN : undefined;
+  if (geoToken && env.MAPBOX_PERMANENT_ENABLED !== "true")
+    throw new Error("Mapbox permanent geocoding entitlement required");
+  if (env.META_OUTBOUND_ENABLED === "true" && !meta)
+    throw new Error("Meta outbound requires all origin number configuration");
+  return { meta, paymennt, geoToken };
 }

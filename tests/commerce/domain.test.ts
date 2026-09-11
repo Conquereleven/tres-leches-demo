@@ -10,10 +10,7 @@ import {
   HmacVerifier,
   type WhatsAppProvider,
 } from "../../server/adapters/providers";
-import {
-  zoneSeed,
-  contains,
-} from "../../server/domain/zones";
+import { zoneSeed, contains } from "../../server/domain/zones";
 import {
   zoneSchema,
   type Order,
@@ -86,16 +83,13 @@ const current = (f: ReturnType<typeof fixture>, id: string) =>
 test("seed preserves every source band, explicit free delivery and unknown fees", () => {
   assert.deepEqual(
     [...new Set(zoneSeed.map((z) => z.minOrderAed))],
-    [30, 50, 100, 150, 200, 250, 300, null],
+    [30, 50, 100, 150, 200, 250, 300],
   );
   assert.equal(zoneSeed.filter((z) => z.freeDelivery).length, 3);
   for (const z of zoneSeed) zoneSchema.parse(z);
-  assert.equal(zoneSeed.find((z) => z.name === "REMRAN")?.minOrderAed, 300);
+  assert.equal(zoneSeed.find((z) => z.name === "Remraam")?.minOrderAed, 300);
   assert.equal(zoneSeed.find((z) => z.id === "jvc")?.deliveryFeeAed, null);
-  assert.equal(
-    zoneSeed.find((z) => z.id === "jlt-cluster-b")?.minOrderAed,
-    null,
-  );
+  assert.equal(zoneSeed.find((z) => z.id === "jlt-cluster-b")?.minOrderAed, 30);
 });
 test("longest alias matching, case, word boundaries and ambiguous locations", () => {
   assert.equal(

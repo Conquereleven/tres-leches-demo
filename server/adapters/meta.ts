@@ -152,14 +152,40 @@ export class MetaWhatsAppProvider implements WhatsAppProvider {
       }
     return result;
   }
+  async validateConfiguration() {
+    for (const n of this.numbers) {
+      let response: Response;
+      try {
+        response = await this.fetcher(
+          `https://graph.facebook.com/${this.config.version}/${n.wabaId}/phone_numbers?fields=id&limit=100`,
+          {
+            method: "GET",
+            redirect: "error",
+            signal: AbortSignal.timeout(8000),
+            headers: { Authorization: `Bearer ${this.config.token}` },
+          },
+        );
+      } catch {
+        throw new ProviderFailure("unknown", true);
+      }
+      if (!response.ok) throw new ProviderFailure("rejected", false);
+      const body = z
+        .object({ data: z.array(z.object({ id: z.string() })) })
+        .parse(await response.json());
+      if (!body.data.some((p) => p.id === n.phoneNumberId))
+        throw new ProviderFailure("rejected", false);
+    }
+  }
   async send(input: Parameters<WhatsAppProvider["send"]>[0]) {
     const n = this.numbers.find(
       (n) =>
         n.id === input.sourceNumberId && n.phone === input.sourcePhoneNumber,
     );
-    if (!n) throw new ProviderFailure("rejected", false);
+    if (!n)
+      throw new ProviderFailure("rejected", false, "ORIGIN_NOT_CONFIGURED");
     const inWindow =
       input.lastInboundAt &&
+      Date.now() - Date.parse(input.lastInboundAt) >= 0 &&
       Date.now() - Date.parse(input.lastInboundAt) < 86400000;
     const template =
       input.template ??
@@ -172,7 +198,8 @@ export class MetaWhatsAppProvider implements WhatsAppProvider {
             ],
           }
         : undefined);
-    if (!inWindow && !template) throw new ProviderFailure("rejected", false);
+    if (!inWindow && !template)
+      throw new ProviderFailure("rejected", false, "PAYMENT_TEMPLATE_REQUIRED");
     const body = {
       messaging_product: "whatsapp",
       recipient_type: "individual",

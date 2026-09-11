@@ -1,7 +1,9 @@
+import { testCatalog } from "./catalog";
 import { type State, numbers, now } from "../../server/domain/model";
 import { zoneSeed } from "../../server/domain/zones";
 export function seed(): State {
   return {
+    catalog: structuredClone(testCatalog),
     zones: structuredClone(zoneSeed),
     conversations: numbers.map((n, i) => ({
       id: `conversation-${n.id}`,

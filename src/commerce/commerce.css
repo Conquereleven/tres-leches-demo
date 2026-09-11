@@ -515,3 +515,22 @@
   max-height: none;
   overflow: visible;
 }
+
+.commerce .co-readiness-panel {
+  max-width: 1100px;
+  min-width: 0;
+}
+.commerce .co-readiness-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  align-items: end;
+  gap: 12px;
+  margin-top: 24px;
+}
+.commerce .co-readiness-actions > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.commerce .co-readiness-actions label {
+  margin: 0;
+}

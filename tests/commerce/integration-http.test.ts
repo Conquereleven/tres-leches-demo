@@ -155,7 +155,7 @@ test("integration HTTP protects sessions, accepts signed Meta batches and disabl
       pilotReady: boolean;
     };
     assert.equal(ready.storage, true);
-    assert.equal(ready.pilotReady, false);
+    assert.equal(ready.pilotReady, undefined);
     assert.equal(
       (
         await fetch(base + "/logout", {
