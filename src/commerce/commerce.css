@@ -534,3 +534,75 @@
 .commerce .co-readiness-actions label {
   margin: 0;
 }
+
+.co-ai-panel {
+  background: #f6f0e7;
+  border: 1px solid #c8b9a9;
+  border-radius: 8px;
+  margin: 16px 0;
+  padding: 16px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.co-ai-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+.co-ai-heading span,
+.co-ai-caption {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.co-ai-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: end;
+  margin: 10px 0;
+}
+.co-ai-controls > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.co-ai-controls label {
+  flex: 1 1 180px;
+  margin: 0;
+}
+.co-ai-handoff {
+  border-left: 3px solid #ad490d;
+  padding-left: 10px;
+}
+.co-ai-action {
+  border-top: 1px solid #c8b9a9;
+  margin-top: 14px;
+  padding-top: 12px;
+}
+.co-ai-action dl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
+}
+.co-ai-action dd {
+  margin: 0;
+}
+.co-ai-panel details {
+  margin-top: 12px;
+}
+.co-ai-panel summary,
+.co-ai-knowledge summary {
+  cursor: pointer;
+  padding: 10px 0;
+}
+.co-ai-knowledge {
+  margin: 20px 0;
+  border-top: 1px solid #c8b9a9;
+  padding-top: 10px;
+}
+
+/* AA contrast for small white operator button labels. */
+.commerce button.primary {
+  background: #b84608;
+}

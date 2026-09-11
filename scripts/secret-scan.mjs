@@ -12,6 +12,7 @@ const files = execFileSync(
 const signatures = [
   /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/,
   /\bAKIA[0-9A-Z]{16}\b/,
+  /\bsk-(?:proj-|svcacct-)?[A-Za-z0-9_-]{40,}\b/,
   /\bsk_live_[A-Za-z0-9]{20,}\b/,
   /\bEAA[A-Za-z0-9]{70,}\b/,
   /\bgh[pousr]_[A-Za-z0-9]{30,}\b/,
@@ -35,7 +36,7 @@ if (existsSync(assets))
   for (const file of readdirSync(assets).filter((f) => f.endsWith(".js"))) {
     const source = readFileSync(join(assets, file), "utf8");
     if (
-      /META_ACCESS_TOKEN|META_APP_SECRET|PAYMENNT_API_SECRET|PAYMENNT_WEBHOOK_SECRET_FILE|X-Paymennt-Api-Secret/.test(
+      /AI_API_KEY|META_ACCESS_TOKEN|META_APP_SECRET|PAYMENNT_API_SECRET|PAYMENNT_WEBHOOK_SECRET_FILE|X-Paymennt-Api-Secret/.test(
         source,
       )
     ) {

@@ -1,3 +1,4 @@
+import { AgentPanel, AgentKnowledgeEditor } from "./AgentPanel";
 import { useCallback, useEffect, useState, useRef } from "react";
 import type {
   Conversation,
@@ -164,7 +165,10 @@ export function CommerceWorkspace() {
           <Zones key="zones" data={data} run={run} />
         ) : view === "inbox" ? (
           <div className="co-grid">
-            <aside className={`co-list${shown.length ? "" : " co-list-empty"}`}>
+            <aside
+              aria-label="Conversaciones"
+              className={`co-list${shown.length ? "" : " co-list-empty"}`}
+            >
               <div className="co-filters">
                 <div className="co-number-tabs">
                   {["all", ...data.numbers.map((n) => n.id)].map((id) => (
@@ -270,7 +274,7 @@ export function CommerceWorkspace() {
             {c ? (
               <>
                 <ConversationPanel key={c.id} c={c} data={data} run={run} />
-                <aside className="co-order-side">
+                <aside aria-label="Pedido y cliente" className="co-order-side">
                   <div className="co-section">
                     <p className="eyebrow">PEDIDOS VINCULADOS</p>
                     <h2>Pedido y entrega</h2>
@@ -408,6 +412,7 @@ function ConversationPanel({
           {owned ? "Liberar conversación" : "Tomar conversación"}
         </button>
       </header>
+      <AgentPanel key={c.id} c={c} data={data} run={run} />
       <div className="co-two co-chat-tools">
         <label>
           Asignar agente
@@ -1275,6 +1280,7 @@ function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
         Solo lectura: estas comprobaciones no crean cobros ni envían mensajes.
         Pueden consumir una consulta del proveedor.
       </p>
+      <AgentKnowledgeEditor data={data} run={run} />
       <h3>Validación con Lisa</h3>
       <p>
         Completa las pruebas con cuentas reales siguiendo el runbook de

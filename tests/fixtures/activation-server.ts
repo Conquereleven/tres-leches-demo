@@ -1,3 +1,4 @@
+import { orderingFixtureProvider } from "./agent-provider";
 // TL25 isolated provider harness. Never bundled or imported by runtime.
 import { createHmac, randomUUID } from "node:crypto";
 import { writeFileSync } from "node:fs";
@@ -13,7 +14,14 @@ import { GeocodingAdapter } from "../../server/adapters/geo";
 import { MapboxGeoProvider } from "../../server/adapters/mapbox";
 import { validateCatalog } from "../../server/domain/catalog";
 process.env.APP_ENV = "test";
-process.env.OPERATOR_USERS_JSON = JSON.stringify([{ id: "liza", role: "admin", salt: "fixture-salt-only-24-chars", hash: "a".repeat(128) }]);
+process.env.OPERATOR_USERS_JSON = JSON.stringify([
+  {
+    id: "liza",
+    role: "admin",
+    salt: "fixture-salt-only-24-chars",
+    hash: "a".repeat(128),
+  },
+]);
 const secret = "tl25-private-fixture-signing-key";
 const numbers: MetaNumber[] = [1, 2, 3].map((n) => ({
   id: `wa${n}` as MetaNumber["id"],
@@ -100,7 +108,9 @@ const geo = new GeocodingAdapter(
                 name: "JLT Cluster B",
                 feature_type: "neighborhood",
                 mapbox_id: "fixture-jlt-b",
-                context: { country: { name: "United Arab Emirates", country_code: "AE" } },
+                context: {
+                  country: { name: "United Arab Emirates", country_code: "AE" },
+                },
               },
             },
           ],
@@ -110,6 +120,9 @@ const geo = new GeocodingAdapter(
 );
 const app = await startServer({
   initial,
+  ...(process.env.AI_TEST_FIXTURE === "true"
+    ? { agentProvider: orderingFixtureProvider("fixture-product") }
+    : {}),
   whatsapp: meta,
   payment: paymennt,
   geo,

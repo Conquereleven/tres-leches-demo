@@ -1,3 +1,8 @@
+import { agentConfig } from "./agents/config";
+import { AgentOrchestrator } from "./agents/orchestrator";
+import { OpenAIAgentProvider } from "./agents/provider";
+import { CommerceAgentGateway } from "./domain/agent-gateway";
+import { modes } from "./agents/model";
 import {
   PaymenntNotificationVerifier,
   notificationSchema,
@@ -41,6 +46,7 @@ import { HmacVerifier } from "./adapters/providers";
 export async function startServer(
   overrides: {
     initial?: ReturnType<typeof seed>;
+    agentProvider?: import("./agents/model").AgentModelProvider;
     whatsapp?: import("./adapters/providers").WhatsAppProvider;
     payment?: import("./adapters/providers").PaymentProvider;
     geo?: import("./domain/zones").GeoService;
@@ -124,6 +130,22 @@ export async function startServer(
   service.agentIds = users.map((u) => u.id);
   if ((production || integration || staging) && !users.length)
     throw new Error("Operations require OPERATOR_USERS_JSON");
+  const aiConfig = agentConfig(process.env);
+  if (overrides.agentProvider) {
+    aiConfig.configured = true;
+    aiConfig.enabled = true;
+    aiConfig.model = overrides.agentProvider.model;
+    aiConfig.provider = overrides.agentProvider.name;
+  }
+  const aiGateway = new CommerceAgentGateway(service, aiConfig);
+  const ai = new AgentOrchestrator(
+    aiGateway,
+    aiConfig,
+    overrides.agentProvider ??
+      (aiConfig.configured
+        ? new OpenAIAgentProvider(process.env.AI_API_KEY!, aiConfig.model)
+        : undefined),
+  );
   const readiness = new Readiness(
     runtime,
     integration,
@@ -136,6 +158,7 @@ export async function startServer(
       activation,
       webhookConfigured: !!webhookSecret,
       outboundEnabled: process.env.META_OUTBOUND_ENABLED === "true",
+      ai: () => ({ config: aiConfig, summary: aiGateway.summary() }),
     },
   );
   const sessions = new Map<string, { actor: Actor; expires: number }>();
@@ -307,6 +330,69 @@ export async function startServer(
           return json(res, 200, { ok: true });
         }
         const current = actor(req);
+        if (path === "/api/ai/knowledge" && req.method === "POST") {
+          aiGateway.updateKnowledge(parse(await rawBody(req)), current);
+          return json(res, 200, { ok: true });
+        }
+        if (path === "/api/ai/control" && req.method === "POST") {
+          const body = z
+            .object({
+              id: z.string(),
+              version: z.number().int(),
+              action: z.enum(["takeover", "return", "pause", "resolve"]),
+              mode: z.enum(modes).optional(),
+            })
+            .strict()
+            .parse(parse(await rawBody(req)));
+          aiGateway.control(
+            body.id,
+            current,
+            body.version,
+            body.action,
+            body.mode,
+          );
+          return json(res, 200, { ok: true });
+        }
+        if (path === "/api/ai/generate" && req.method === "POST") {
+          const body = z
+            .object({ id: z.string(), version: z.number().int() })
+            .strict()
+            .parse(parse(await rawBody(req)));
+          const context = aiGateway.snapshot(body.id);
+          if (
+            context.version !== body.version ||
+            (context.owner && context.owner !== current.id)
+          )
+            throw new DomainError(
+              409,
+              "Toma la conversación y actualiza antes de generar",
+            );
+          if (!aiConfig.enabled || !aiConfig.configured)
+            throw new DomainError(409, "AI NOT CONFIGURED");
+          await ai.process(body.id, true);
+          return json(res, 200, { ok: true });
+        }
+        if (path === "/api/ai/approve" && req.method === "POST") {
+          const body = z
+            .object({
+              id: z.string(),
+              runId: z.string(),
+              version: z.number().int(),
+              action: z.enum(["send", "reject", "action"]),
+              text: z.string().max(4000).optional(),
+            })
+            .strict()
+            .parse(parse(await rawBody(req)));
+          aiGateway.approve(
+            body.id,
+            body.runId,
+            current,
+            body.version,
+            body.action,
+            body.text,
+          );
+          return json(res, 200, { ok: true });
+        }
         if (path === "/api/admin/diagnostics") {
           if (current.role !== "admin" || !staging)
             throw new DomainError(
@@ -406,6 +492,16 @@ export async function startServer(
               inboundFailed: (s.inboundDeliveries ?? []).filter(
                 (d) => d.status === "failed",
               ).length,
+            },
+            ai: {
+              configured: aiConfig.configured,
+              enabled: aiConfig.enabled,
+              defaultMode: aiConfig.defaultMode,
+              autonomousAllowed: aiConfig.autonomousAllowed,
+              ...aiGateway.summary(),
+              knowledge:
+                current.role === "admin" ? (s.ai?.knowledge ?? []) : undefined,
+              enquiries: s.ai?.enquiries ?? [],
             },
             jobs: s.jobs.filter((j) => j.status !== "done"),
           });
@@ -517,6 +613,17 @@ export async function startServer(
         void backups.run().catch(() => safeLog("worker.failed"));
       }, backups.intervalMinutes * 60000)
     : undefined;
+  let agentWorking = false;
+  const agentTimer = setInterval(() => {
+    if (agentWorking || !aiConfig.enabled || !aiConfig.configured) return;
+    agentWorking = true;
+    void ai
+      .tick()
+      .catch(() => {})
+      .finally(() => {
+        agentWorking = false;
+      });
+  }, 1000);
   let working = false;
   const timer = setInterval(() => {
     if (working) return;
@@ -540,10 +647,11 @@ export async function startServer(
   );
   function close() {
     clearInterval(timer);
+    clearInterval(agentTimer);
     if (backupTimer) clearInterval(backupTimer);
     server.close(() => {
       const finish = setInterval(() => {
-        if (working) return;
+        if (working || agentWorking) return;
         clearInterval(finish);
         void (backups?.run() ?? Promise.resolve())
           .catch(() => {})

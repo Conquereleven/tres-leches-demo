@@ -2,6 +2,7 @@ import {
   notificationIdentity,
   type PaymenntNotification,
 } from "../adapters/paymennt-notification";
+import { agentFingerprint } from "./agent-state";
 import { trace, safeLog } from "../observability";
 import { ProviderFailure } from "../adapters/failure";
 import type { AuthoritativeCheckout } from "./checkout";
@@ -37,6 +38,58 @@ const hash = (v: unknown) =>
   createHash("sha256").update(JSON.stringify(v)).digest("hex");
 const at = () => ({ at: now() });
 export class CommerceService {
+  agentAutomationAllowed = false;
+  enqueueAgentReply(runId: string) {
+    return this.store.write((s) => {
+      const run = s.ai?.runs.find((r) => r.id === runId);
+      requireThat(
+        run &&
+          run.status === "suggested" &&
+          run.suggestion &&
+          run.disposition === "AUTOMATED_LOW_RISK",
+        "AI proposal unavailable",
+        409,
+      );
+      const c = this.conversation(s, run.conversationId),
+        session = s.ai!.sessions[c.id]!;
+      requireThat(
+        this.agentAutomationAllowed &&
+          c.version === run.version &&
+          c.assignedAgent === run.owner &&
+          session.epoch === run.epoch &&
+          session.state === "AI_ACTIVE" &&
+          session.activeRunId === run.id &&
+          c.sourceNumberId === run.sourceNumberId &&
+          c.status === "open" &&
+          agentFingerprint(s, c) === run.fingerprint,
+        "AI send aborted: context changed",
+        409,
+      );
+      const inbound = c.messages.filter((m) => m.direction === "in").at(-1);
+      requireThat(
+        inbound &&
+          Date.now() - Date.parse(inbound.at) < 86400000 &&
+          Date.parse(inbound.at) <= Date.now(),
+        "AI service window blocked",
+        409,
+      );
+      this.message(s, c, run.suggestion);
+      c.messages.at(-1)!.agentGuard = {
+        runId,
+        version: c.version,
+        owner: c.assignedAgent,
+        epoch: session.epoch,
+        sourceNumberId: c.sourceNumberId,
+      };
+      run.status = "queued";
+      c.audit.push({
+        at: now(),
+        actor: "ai-agent",
+        action: "Approved low-risk AI response queued",
+      });
+    });
+  }
+
   constructor(
     public store: Store,
     public wa: WhatsAppProvider,
@@ -227,6 +280,11 @@ export class CommerceService {
           400,
         );
         c.assignedAgent = cmd.agent;
+        const ai = s.ai?.sessions[c.id];
+        if (ai) {
+          ai.state = "HUMAN_ACTIVE";
+          ai.epoch++;
+        }
         c.version++;
         c.audit.push({
           ...at(),
@@ -251,6 +309,11 @@ export class CommerceService {
       }
       this.owned(c, actor);
       if (cmd.type === "send") {
+        const ai = s.ai?.sessions[c.id];
+        if (ai) {
+          ai.state = "HUMAN_ACTIVE";
+          ai.epoch++;
+        }
         this.message(s, c, cmd.text);
         return c;
       }
@@ -1021,6 +1084,48 @@ export class CommerceService {
             c.messages.some((m) => m.id === claimed.entityId),
           )!;
           const m = c.messages.find((m) => m.id === claimed.entityId)!;
+          if (m.agentGuard) {
+            const allowed = this.store.write((s) => {
+              const current = this.conversation(s, c.id),
+                session = s.ai?.sessions[c.id],
+                run = s.ai?.runs.find((r) => r.id === m.agentGuard!.runId);
+              const incoming = current.messages
+                .filter((m) => m.direction === "in")
+                .at(-1);
+              const origin = this.operationalNumbers.find(
+                (n) =>
+                  n.id === current.sourceNumberId &&
+                  n.phone === current.sourcePhoneNumber,
+              );
+              const valid =
+                this.agentAutomationAllowed &&
+                session?.state === "AI_ACTIVE" &&
+                session.activeRunId === run?.id &&
+                session.epoch === m.agentGuard!.epoch &&
+                current.version === m.agentGuard!.version &&
+                current.assignedAgent === m.agentGuard!.owner &&
+                current.sourceNumberId === m.agentGuard!.sourceNumberId &&
+                origin &&
+                incoming &&
+                Date.now() - Date.parse(incoming.at) < 86400000 &&
+                Date.parse(incoming.at) <= Date.now() &&
+                run &&
+                agentFingerprint(s, current) === run.fingerprint;
+              if (!valid) {
+                const job = s.jobs.find((j) => j.id === claimed.id)!;
+                job.status = "done";
+                job.lastError =
+                  "AI send aborted: ownership, version, policy or source changed";
+                current.messages.find((x) => x.id === m.id)!.status = "failed";
+                if (run) {
+                  run.status = "aborted";
+                  run.handoffReason = "SEND_GUARD_ABORTED";
+                }
+              }
+              return !!valid;
+            });
+            if (!allowed) continue;
+          }
           const result = await this.bounded(
             this.wa.send({
               ...sourceOf(c),
@@ -1048,6 +1153,10 @@ export class CommerceService {
             m.providerId = result.providerId;
             m.status = result.status;
             m.sentAt = now();
+            if (m.agentGuard) {
+              const run = s.ai?.runs.find((r) => r.id === m.agentGuard!.runId);
+              if (run) run.status = "sent";
+            }
             // Delivery acknowledgment changes no operator-owned fields; avoid false editing conflicts.
             job.status = "done";
           });
@@ -1095,6 +1204,25 @@ export class CommerceService {
           const m = s.conversations
             .flatMap((c) => c.messages)
             .find((m) => m.id === j.entityId);
+          if (m?.agentGuard) {
+            const run = s.ai?.runs.find((r) => r.id === m.agentGuard!.runId);
+            if (run) {
+              run.status = "failed";
+              run.handoffReason = "WHATSAPP_PROVIDER_FAILURE";
+            }
+            const owner = s.conversations.find((c) =>
+              c.messages.some((x) => x.id === m.id),
+            );
+            const session = owner && s.ai?.sessions[owner.id];
+            if (
+              session &&
+              !["HUMAN_ACTIVE", "AI_PAUSED"].includes(session.state)
+            ) {
+              session.state = "HUMAN_REQUIRED";
+              session.handoffReason = "WHATSAPP_PROVIDER_FAILURE";
+              session.epoch++;
+            }
+          }
           if (m)
             m.status =
               j.status === "unknown"

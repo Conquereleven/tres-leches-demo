@@ -65,6 +65,13 @@ export type Message = {
     | "unknown";
   providerId?: string;
   sentAt?: string;
+  agentGuard?: {
+    runId: string;
+    version: number;
+    owner: string | null;
+    epoch: number;
+    sourceNumberId: string;
+  };
   location?: Location;
   translation?: string;
   paymentContext?: { amountAed: string; url: string };
@@ -181,6 +188,7 @@ export type NotificationReceipt = {
   attempts: number;
 };
 export type State = {
+  ai?: import("../agents/model").AgentData;
   catalog?: CatalogItem[];
   paymentNotifications?: NotificationReceipt[];
   uatScenarios?: {

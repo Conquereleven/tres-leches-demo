@@ -28,6 +28,10 @@ export class Readiness {
       activation: ReturnType<typeof activationConfig>;
       webhookConfigured: boolean;
       outboundEnabled: boolean;
+      ai?: () => {
+        config: import("./agents/model").AgentConfig;
+        summary: ReturnType<import("./agents/model").AgentGateway["summary"]>;
+      };
     },
   ) {}
   snapshot() {
@@ -202,6 +206,12 @@ export class Readiness {
         ].join("; "),
       );
     }
+    const ai = this.activation?.ai?.();
+    if (ai)
+      components.AI = {
+        status: ai.config.configured ? "READY" : "NOT CONFIGURED",
+        detail: `Provider configured: ${yes(ai.config.configured)}; model configured: ${yes(ai.config.model)}; enabled: ${yes(ai.config.enabled)}; default: ${ai.config.defaultMode}; autonomous allowed: ${yes(ai.config.autonomousAllowed)}; approved knowledge: ${ai.summary.configuredKnowledge}; catalog ready: ${yes(state?.catalog?.length)}; Meta ready: ${yes(meta)}; Paymennt ready: ${yes(this.paymennt)}; last successful inference: ${ai.summary.lastSuccess ?? "none"}; recent errors: ${ai.summary.errors}`,
+      };
     const integrationReady =
       healthy &&
       this.authenticated &&

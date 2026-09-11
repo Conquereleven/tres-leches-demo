@@ -7,6 +7,16 @@ import type {
   Job,
 } from "../../server/domain/model";
 export type Workspace = {
+  ai?: {
+    configured: boolean;
+    enabled: boolean;
+    defaultMode: import("../../server/agents/model").Mode;
+    autonomousAllowed: boolean;
+    sessions: Record<string, import("../../server/agents/model").AgentSession>;
+    runs: import("../../server/agents/model").AgentRun[];
+    knowledge?: import("../../server/agents/model").Knowledge[];
+    enquiries: import("../../server/agents/model").Enquiry[];
+  };
   mode: "integration";
   environment?: "development" | "test" | "staging";
   readiness?: {

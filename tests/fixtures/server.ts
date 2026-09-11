@@ -1,3 +1,4 @@
+import { orderingFixtureProvider } from "./agent-provider";
 import { scryptSync } from "node:crypto";
 import { startServer } from "../../server/http";
 import { seed } from "./runtime";
@@ -25,6 +26,7 @@ process.env.OPERATOR_USERS_JSON ??= JSON.stringify(
 );
 const app = await startServer({
   initial: seed(),
+  agentProvider: orderingFixtureProvider("tres"),
   whatsapp: new MockWhatsAppProvider(),
   payment: new MockPaymentProvider(verifier),
   geo: new MockGeoService(),
