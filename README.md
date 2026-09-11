@@ -37,3 +37,7 @@ Development serves UI on 5173 and API on 3001. `npm start` serves the compiled f
 Default external outbound is off. Registration is an explicit TEST-only server command that stores the one-time key privately and refuses automatic re-registration after uncertain outcomes. Production and live Paymennt remain deliberately disabled pending real provider tests and Lisa UAT. Automated fixtures never establish PILOT READY.
 
 The preserved Sites Worker is static-only: `dist/client`, `dist/server/index.js` and `dist/.openai/hosting.json` remain compatible, but the full operational backend is compiled Node + SQLite. Do not deploy the static Worker as Commerce OS. No push, merge or deployment is part of TL-25.
+
+### TL-26 AI copilot
+
+The existing Inbox now supports private, grounded AI suggestions, explicit commercial-action approval, human takeover and approved bilingual knowledge. Runtime AI is disabled by default and never falls back to a mock. See [architecture](docs/ai-agents/architecture.md), [policy](docs/ai-agents/policy.md), [operator guide](docs/ai-agents/operator-guide.md) and [activation runbook](docs/ai-agents/activation-runbook.md).
