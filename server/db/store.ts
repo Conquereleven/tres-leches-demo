@@ -27,7 +27,8 @@ export class Store {
       | "development"
       | "test"
       | "release"
-      | "release-staging" = false,
+      | "release-staging"
+      | "release-production" = false,
     initial?: State,
   ) {
     if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });

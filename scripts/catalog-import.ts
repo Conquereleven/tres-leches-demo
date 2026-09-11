@@ -36,13 +36,18 @@ try {
     console.log(JSON.stringify({ valid: true, count: products.length }));
   else {
     if (
-      process.env.APP_ENV !== "staging" ||
+      !["staging", "production"].includes(process.env.APP_ENV ?? "") ||
       !process.env.DB_PATH?.startsWith("/") ||
       !existsSync(process.env.DB_PATH) ||
       !process.env.BACKUP_DIR?.startsWith("/")
     )
       throw new Error();
-    const store = new Store(process.env.DB_PATH, "release-staging");
+    const store = new Store(
+      process.env.DB_PATH,
+      process.env.APP_ENV === "production"
+        ? "release-production"
+        : "release-staging",
+    );
     try {
       const backup = resolve(
         process.env.BACKUP_DIR,

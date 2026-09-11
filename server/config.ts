@@ -82,10 +82,20 @@ export function runtimeConfig(env: NodeJS.ProcessEnv) {
     throw new Error(
       "Demo seeds disabled: inject fixtures through the test harness only",
     );
-  if (environment === "production")
-    throw new Error(
-      "Production disabled: explicit release approval and reviewed activation required",
-    );
+  if (environment === "production") {
+    if (
+      env.PROVIDER_MODE !== "offline" ||
+      env.META_OUTBOUND_ENABLED !== "false" ||
+      env.AI_ENABLED !== "false" ||
+      env.AI_AGENT_DEFAULT_MODE !== "copilot" ||
+      env.AI_AUTONOMOUS_ALLOWED !== "false" ||
+      env.INTEGRATION_MODE === "true" ||
+      env.STAGING_SEED !== undefined
+    )
+      throw new Error(
+        "Production provider activation disabled; offline copilot configuration required",
+      );
+  }
   if (env.PAYMENNT_ENVIRONMENT && env.PAYMENNT_ENVIRONMENT !== "test")
     throw new Error("Paymennt live activation is disabled");
   if (
@@ -93,7 +103,7 @@ export function runtimeConfig(env: NodeJS.ProcessEnv) {
     !(env.PROVIDER_MODE === "test" || env.INTEGRATION_MODE === "true")
   )
     throw new Error("Meta outbound requires explicit provider configuration");
-  if (environment !== "staging")
+  if (environment !== "staging" && environment !== "production")
     return { environment, staging: null, sessionTtlSeconds: 28800 };
   const staging = z
     .object({
@@ -119,7 +129,11 @@ export function runtimeConfig(env: NodeJS.ProcessEnv) {
       OPERATOR_USERS_JSON: z.string().min(2),
       STAGING_SEED: z.literal("empty"),
     })
-    .parse(env);
+    .parse(
+      environment === "production" ? { ...env, STAGING_SEED: "empty" } : env,
+    );
+  // `staging` is the existing secure-hosted-runtime contract; production shares
+  // its HTTPS/auth/backup requirements but never consumes staging seed input.
   if (env.DEMO_MODE === "true")
     throw new Error("Staging cannot enable demo mode");
   if (env.INTEGRATION_MODE === "true")

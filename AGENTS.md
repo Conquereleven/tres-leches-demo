@@ -43,3 +43,8 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Approved catalog lives in SQLite; use the validated admin import with backup. No runtime product fixtures.
 - Admin readiness is staging-only. Do not assert PILOT READY or enable live/production without real provider validation and Lisa UAT.
 - Current activation instructions: `docs/today-activation-runbook.md`; older TL18 blocked-contract notes are historical.
+
+## Authorized offline Production release (2026-09-11)
+- Production may run the current code with providers offline; this supersedes the earlier unconditional production boot block, not the LIVE payment gate.
+- Require a dedicated release-production database, secure hosted configuration, no STAGING_SEED variable, Meta/AI disabled and copilot defaults. Never copy staging secrets or databases.
+- Authenticated admin readiness GET is available in production; provider probes remain staging-only. See docs/production-offline-release.md.

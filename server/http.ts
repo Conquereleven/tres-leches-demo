@@ -78,7 +78,13 @@ export async function startServer(
     numbers.map((n) => ({ ...n, phone: "NOT CONFIGURED" }));
   const store = new Store(
     dbPath,
-    isolatedTest ? "test" : staging ? "release-staging" : "release",
+    isolatedTest
+      ? "test"
+      : runtime.environment === "production"
+        ? "release-production"
+        : staging
+          ? "release-staging"
+          : "release",
     overrides.initial ?? seed(),
   );
   if (!isolatedTest) assertCleanRuntime(store.read());
@@ -232,7 +238,9 @@ export async function startServer(
           return json(res, 200, {
             ok: true,
             environment: runtime.environment,
-            mode: "integration",
+            mode:
+              runtime.environment === "production" ? "offline" : "integration",
+            revision: process.env.BUILD_SOURCE_SHA ?? "unknown",
           });
         if (req.method === "GET" && path === "/api/ready") {
           const result = readiness.snapshot();
@@ -641,9 +649,12 @@ export async function startServer(
       if (v.expires < Date.now()) sessions.delete(k);
   }, 300);
   server.listen(
-    Number(process.env.API_PORT ?? 3001),
+    Number(process.env.PORT ?? process.env.API_PORT ?? 3001),
     process.env.HOST ?? "127.0.0.1",
-    () => console.log(`Commerce listening on ${process.env.API_PORT ?? 3001}`),
+    () =>
+      console.log(
+        `Commerce listening on ${process.env.PORT ?? process.env.API_PORT ?? 3001}`,
+      ),
   );
   function close() {
     clearInterval(timer);
