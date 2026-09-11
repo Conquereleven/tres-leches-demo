@@ -186,12 +186,6 @@ export interface GeoService {
     location: Location,
   ): { address?: string; zoneId?: string; canonicalIds?: string[] } | null;
 }
-// Exact fixture points ONLY: never pretend these are real neighborhood boundaries.
-export class MockGeoService implements GeoService {
-  resolve(p: Location) {
-    return p.lat === 25.0657 && p.lng === 55.2089 ? { zoneId: "jvc" } : null;
-  }
-}
 export function contains(point: Location, polygon: Location[]): boolean {
   let inside = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
@@ -221,7 +215,7 @@ export function matchZone(
   zones: DeliveryZone[],
   address?: string,
   location?: Location,
-  geo: GeoService = new MockGeoService(),
+  geo: GeoService = { resolve: () => null },
 ): DeliveryZone | null {
   const active = zones.filter((z) => z.active);
   let candidates: DeliveryZone[] = [];

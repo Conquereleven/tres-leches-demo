@@ -68,12 +68,19 @@ export function runtimeConfig(env: NodeJS.ProcessEnv) {
     .enum(["development", "test", "staging", "production"])
     .parse(
       env.APP_ENV ??
-        (env.NODE_ENV === "test" ||
-        (env.DEMO_MODE === "true" && env.NODE_ENV === "production")
+        (env.NODE_ENV === "test"
           ? "test"
           : env.NODE_ENV === "production"
             ? "production"
             : "development"),
+    );
+  if (
+    env.ALLOW_DEMO_DATA === "true" ||
+    env.DEMO_MODE === "true" ||
+    env.STAGING_SEED === "uat"
+  )
+    throw new Error(
+      "Demo seeds disabled: inject fixtures through the test harness only",
     );
   if (environment === "production")
     throw new Error(
@@ -107,7 +114,7 @@ export function runtimeConfig(env: NodeJS.ProcessEnv) {
       PAYMENNT_ENVIRONMENT: z.literal("test"),
       META_OUTBOUND_ENABLED: z.literal("false"),
       OPERATOR_USERS_JSON: z.string().min(2),
-      STAGING_SEED: z.enum(["empty", "uat"]),
+      STAGING_SEED: z.literal("empty"),
     })
     .parse(env);
   if (env.DEMO_MODE === "true")

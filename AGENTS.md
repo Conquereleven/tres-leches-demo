@@ -32,3 +32,7 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Heritage is MEXICO CITY SINCE 1982. Missing imagery, products, phone numbers, reviews, URLs and legal content remain explicit data slots. The supplied MP4 is a filmed screen reference, not a production hero asset.
 - No push, deploy or merge without explicit user approval. Build includes a prerendered brand shell for no-JavaScript reading; the preserved Worker is still static-only.
 - Brand QA covers 320/375/390/430/768/1024/1280/1440, keyboard/modal, reduced motion, axe and original Commerce regressions. See `docs/brand/implementation.md`.
+
+## TL-24 release cleanup (supersedes prototype/demo instructions above)
+- Runtime and navigation must contain only canonical operations and the approved brand site. No legacy MVP entry or synthetic data.
+- Test fixtures belong under tests/ and must be injected explicitly; staging seeds are empty. Preserve production/provider activation gates.

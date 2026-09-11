@@ -20,7 +20,7 @@ import {
   inboundSchema,
   paymentEventSchema,
 } from "./commands";
-import { type GeoService, MockGeoService, quoteOrder } from "./zones";
+import { type GeoService, quoteOrder } from "./zones";
 import { transition } from "./workflow";
 import { Store } from "../db/store";
 import {
@@ -36,7 +36,7 @@ export class CommerceService {
     public store: Store,
     public wa: WhatsAppProvider,
     public payment: PaymentProvider,
-    public geo: GeoService = new MockGeoService(),
+    public geo: GeoService = { resolve: () => null },
     private timeoutMs = 10000,
     public operationalNumbers = numbers,
     public agentIds = ["liza", "andrea"],
@@ -366,7 +366,7 @@ export class CommerceService {
         orderId: o.id,
         amountFils: o.quote!.totalFils!,
         currency: "AED",
-        provider: this.payment.name ?? "mock",
+        provider: this.payment.name,
         status: "creating",
         createdAt: now(),
         updatedAt: now(),
@@ -674,7 +674,7 @@ export class CommerceService {
       this.owned(this.conversation(snapshot, order.conversationId), actor);
     requireThat(
       this.payment.getCheckout,
-      "La conciliación real no está disponible en demo",
+      "La conciliación requiere un proveedor de pagos configurado",
       409,
     );
     requireThat(!this.reconciling.has(paymentId), "Conciliación en curso", 409);
@@ -866,7 +866,7 @@ export class CommerceService {
             const p = s.payments.find((p) => p.id === claimed.entityId)!;
             p.url = result.url;
             p.providerReference = result.reference;
-            p.provider = result.provider ?? "mock";
+            p.provider = result.provider ?? this.payment.name;
             p.providerCheckoutId = result.checkoutId;
             p.status = "pending";
             p.updatedAt = now();

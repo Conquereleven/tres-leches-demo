@@ -1,7 +1,7 @@
 import { build } from "esbuild";
 import { copyFileSync, mkdirSync } from "node:fs";
 await build({
-  entryPoints: ["server/http.ts"],
+  entryPoints: ["server/main.ts"],
   bundle: true,
   platform: "node",
   format: "esm",

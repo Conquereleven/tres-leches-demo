@@ -10,7 +10,7 @@ const secret = "http-test-webhook-secret-24-characters";
 async function start(port: number, production = false) {
   const dir = mkdtempSync(join(tmpdir(), "tl-http-"));
   const salt = "salt-at-least-16-characters";
-  const child = spawn(process.execPath, ["--import", "tsx", "server/http.ts"], {
+  const child = spawn(process.execPath, ["--import", "tsx", "tests/fixtures/server.ts"], {
     env: {
       ...process.env,
       API_PORT: String(port),

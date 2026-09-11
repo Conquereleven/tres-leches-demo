@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { test, expect } from "@playwright/test";
 import { spawn, execFileSync } from "node:child_process";
 import { mkdtempSync, rmSync, readFileSync, readdirSync } from "node:fs";
@@ -37,7 +38,7 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
     process.execPath,
     process.env.E2E_BUILD
       ? ["dist/node/server.mjs"]
-      : ["--import", "tsx", "server/http.ts"],
+      : ["--import", "tsx", "server/main.ts"],
     {
       env: {
         ...process.env,
@@ -122,7 +123,7 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
       .fill("fixture-password-not-shipped");
     await page.getByRole("button", { name: "Entrar al workspace" }).click();
     await expect(
-      page.getByText("STAGING / TEST · WhatsApp externo bloqueado", {
+      page.getByText("Staging · conexiones pendientes de activación", {
         exact: true,
       }),
     ).toBeVisible();
@@ -131,9 +132,82 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
     page.on("console", (m) => {
       if (m.type() === "error" || m.type() === "warning") errors.push(m.text());
     });
+    const clean = await (
+      await context.request.get(origin + "/api/workspace")
+    ).json();
+    for (const field of [
+      "conversations",
+      "orders",
+      "payments",
+      "jobs",
+      "catalog",
+      "uatScenarios",
+    ])
+      expect(clean[field]).toHaveLength(0);
+    expect(
+      clean.zones.find((z: { id: string }) => z.id === "jvc").deliveryFeeAed,
+    ).toBeNull();
+    expect(JSON.stringify(clean)).not.toMatch(
+      /25\.0657|mock-pay-|TEST-CONVERSATION|50000100/,
+    );
+    for (const route of ["/api/demo/location", "/api/demo/payment"])
+      expect(
+        (
+          await context.request.post(origin + route, {
+            headers: { Origin: origin },
+            data: {},
+          })
+        ).status(),
+      ).toBe(404);
+    expect(
+      (await context.request.get(origin + "/qa-comparison.html")).status(),
+    ).toBe(404);
+    expect(
+      (await context.request.get(origin + "/operations/legacy-inbox")).status(),
+    ).toBe(404);
+    for (const width of [390, 768, 1024, 1440]) {
+      await page.setViewportSize({ width, height: 1000 });
+      await expect(
+        page
+          .getByRole("navigation", { name: "Operaciones" })
+          .getByRole("button", { name: /Inbox/ }),
+      ).toHaveCount(1);
+      await expect(page.locator(".admin-header")).toHaveCount(0);
+      await expect(page.locator("body")).not.toContainText("MVP demo");
+      await expect(page.locator("body")).not.toContainText("Inbox anterior");
+      await expect(page.getByText(/No conversations yet/)).toBeVisible();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+      await page.screenshot({
+        path: `work/qa/tl24-inbox-${width}.png`,
+        fullPage: true,
+      });
+      if (width === 390)
+        await page
+          .getByRole("navigation", { name: "Operaciones" })
+          .screenshot({ path: "work/qa/tl24-mobile-nav.png" });
+      await page.getByRole("button", { name: "Pedidos", exact: true }).click();
+      await expect(page.getByText(/No orders yet/)).toBeVisible();
+      await page.screenshot({
+        path: `work/qa/tl24-orders-${width}.png`,
+        fullPage: true,
+      });
+      await page
+        .getByRole("button", { name: "Producción", exact: true })
+        .click();
+      await expect(page.getByText(/No production items yet/)).toBeVisible();
+      await page
+        .getByRole("button", { name: "Inbox unificado", exact: true })
+        .click();
+    }
     await page
       .getByRole("button", { name: "Preparación y UAT", exact: true })
       .click();
+    await page.reload();
     await expect(
       page.getByRole("heading", { name: "Preparación y UAT · NOT READY" }),
     ).toBeVisible();
@@ -156,7 +230,9 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
           () => document.documentElement.scrollWidth <= innerWidth,
         ),
       ).toBe(true);
-      await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+      await page.evaluate(() =>
+        window.scrollTo({ top: 0, behavior: "instant" }),
+      );
       await page.screenshot({
         path: `work/qa/tl18-readiness-${width}.png`,
         fullPage: true,
@@ -194,9 +270,9 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
       const workspace = await (
         await context.request.get(origin + "/api/workspace")
       ).json();
-      expect(workspace.conversations).toHaveLength(3);
-      expect(workspace.orders).toHaveLength(3);
-      expect(workspace.uatScenarios).toHaveLength(10);
+      expect(workspace.conversations).toHaveLength(0);
+      expect(workspace.orders).toHaveLength(0);
+      expect(workspace.uatScenarios).toHaveLength(0);
       expect(
         (
           await context.request.post(origin + "/api/commands", {

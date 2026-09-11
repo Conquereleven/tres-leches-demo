@@ -1,17 +1,17 @@
+import { quoteOrder } from "../fixtures/runtime";
+import { matchZone } from "../fixtures/runtime";
+import { MockWhatsAppProvider } from "../fixtures/providers";
+import { MockPaymentProvider } from "../fixtures/providers";
 import test from "node:test";
 import assert from "node:assert/strict";
-import { Store, seed } from "../../server/db/store";
-import { CommerceService } from "../../server/domain/service";
+import { Store, seed } from "../fixtures/runtime";
+import { CommerceService } from "../fixtures/runtime";
 import {
   HmacVerifier,
-  MockPaymentProvider,
-  MockWhatsAppProvider,
   type WhatsAppProvider,
 } from "../../server/adapters/providers";
 import {
   zoneSeed,
-  matchZone,
-  quoteOrder,
   contains,
 } from "../../server/domain/zones";
 import {

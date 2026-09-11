@@ -1688,7 +1688,7 @@
     animation: none !important;
   }
 }
-/* Scoped resets against the preserved demo's global footer/button styles. */
+/* Scoped customer typography and control resets. */
 .brand-experience .b-footer,
 .brand-experience .b-floating-order {
   color: var(--text-primary);
@@ -1764,4 +1764,12 @@
   .brand-experience .b-voices blockquote {
     animation: none;
   }
+}
+
+/* Canonical workspace return link. */
+a.b-return {
+  display: flex;
+  align-items: center;
+  padding: 12px 3vw;
+  text-decoration: none;
 }

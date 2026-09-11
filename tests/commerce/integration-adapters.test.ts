@@ -1,3 +1,4 @@
+import { MockWhatsAppProvider } from "../fixtures/providers";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
@@ -14,9 +15,9 @@ import {
 } from "../../server/adapters/meta";
 import { MapboxGeoProvider } from "../../server/adapters/mapbox";
 import { GeocodingAdapter } from "../../server/adapters/geo";
-import { Store } from "../../server/db/store";
-import { CommerceService } from "../../server/domain/service";
-import { MockWhatsAppProvider } from "../../server/adapters/providers";
+import { Store } from "../fixtures/runtime";
+import { CommerceService } from "../fixtures/runtime";
+
 import { zoneSeed, matchZone, quoteOrder } from "../../server/domain/zones";
 import { integrationConfig } from "../../server/config";
 import type { Order } from "../../server/domain/model";

@@ -127,10 +127,16 @@ export class Readiness {
           await this.paymennt.checkConnectivity();
         } else {
           if (!this.geo) throw new Error();
-          await this.geo.lookup(
-            { lat: 25.0657, lng: 55.2089 },
-            AbortSignal.timeout(8000),
-          );
+          const location = this.store
+            .read()
+            .conversations.find((c) => c.location)?.location;
+          if (!location)
+            return {
+              status: "BLOCKED" as const,
+              detail:
+                "A received customer location is required for a geographic check",
+            };
+          await this.geo.lookup(location, AbortSignal.timeout(8000));
         }
         // Geo success means HTTP/schema success, never proof of commercial coverage or Dubai accuracy.
         this.connectivity[provider] = {

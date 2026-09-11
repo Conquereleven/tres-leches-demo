@@ -24,6 +24,10 @@ test("WA2 operational golden path, responsive and console", async ({
     .getByRole("button", { name: "Inbox unificado", exact: true })
     .click();
   await page
+    .locator(".co-conversation")
+    .filter({ hasText: "Valentina" })
+    .click();
+  await page
     .getByRole("button", { name: "Tomar conversación", exact: true })
     .click();
   await expect(
@@ -38,9 +42,10 @@ test("WA2 operational golden path, responsive and console", async ({
     .getByRole("button", { name: "Guardar producto", exact: true })
     .click();
   await expect(page.locator(".co-state")).toHaveText("Awaiting Location");
-  await page
-    .getByRole("button", { name: "Simular GPS entrante · JVC", exact: true })
-    .click();
+  await page.request.post("/api/demo/location", {
+    data: { conversationId: "conversation-wa2" },
+  });
+  await page.getByRole("button", { name: "Actualizar", exact: true }).click();
   await expect(page.locator(".co-state")).toHaveText("Minimum Check");
   await expect(page.locator(".co-quote")).toContainText("AED 130.00");
   await page
@@ -53,8 +58,11 @@ test("WA2 operational golden path, responsive and console", async ({
     "Complete your payment here",
   );
   await expect(page.locator(".co-message.out")).toContainText("WA2");
-  await page.getByText("Simular resultado de pago", { exact: true }).click();
-  await page.getByRole("button", { name: "Simular paid", exact: true }).click();
+  const snapshot = await (await page.request.get("/api/workspace")).json();
+  await page.request.post("/api/demo/payment", {
+    data: { paymentId: snapshot.payments[0].id, status: "paid" },
+  });
+  await page.getByRole("button", { name: "Actualizar", exact: true }).click();
   await expect(page.locator(".co-state")).toHaveText("Confirmed");
   for (const state of [
     "Production",
@@ -104,38 +112,18 @@ test("WA2 operational golden path, responsive and console", async ({
   }
   expect(errors).toEqual([]);
 });
-test("original storefront checkout, capacity and legacy conversation remain usable", async ({
-  page,
-}) => {
+test("legacy MVP surface is removed", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "MVP demo", exact: true }).click();
-  await page.getByRole("button", { name: "Pedir ahora", exact: true }).click();
-  await page.getByRole("button", { name: "Continuar", exact: true }).click();
-  await page.getByRole("button", { name: "Continuar", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Confirmar pedido", exact: true })
-    .click();
-  await expect(page.getByText("¡Gracias, Valentina!")).toBeVisible();
-  await page
-    .getByRole("button", { name: "Volver a la tienda", exact: true })
-    .click();
-  await page.getByRole("button", { name: "Gestión", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Pedidos", exact: true })
-    .first()
-    .click();
-  await expect(page.getByText("#TL-1049", { exact: true })).toBeVisible();
-  await page
-    .getByRole("button", { name: "Ver detalle", exact: true })
-    .first()
-    .click();
-  await expect(page.getByRole("dialog")).toBeVisible();
-  await page
-    .getByRole("button", { name: "Abrir conversación", exact: true })
-    .click();
   await expect(
-    page.getByText("Valentina García", { exact: true }).first(),
-  ).toBeVisible();
+    page.getByRole("button", { name: "MVP demo", exact: true }),
+  ).toHaveCount(0);
+  await page.goto("/legacy-inbox");
+  await expect(page).toHaveURL(/\/operations\/inbox$/);
+  await expect(
+    page
+      .getByRole("navigation", { name: "Operaciones" })
+      .getByRole("button", { name: /Inbox/ }),
+  ).toHaveCount(1);
 });
 
 test("recoverable send keeps draft, filters and out-of-coverage block payment", async ({

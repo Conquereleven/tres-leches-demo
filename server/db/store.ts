@@ -1,33 +1,12 @@
 import { DatabaseSync, backup } from "node:sqlite";
 import { readFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { type State, numbers, now } from "../domain/model";
+import { type State } from "../domain/model";
 import { zoneSeed } from "../domain/zones";
 export function seed(): State {
   return {
     zones: structuredClone(zoneSeed),
-    conversations: numbers.map((n, i) => ({
-      id: `conversation-${n.id}`,
-      customer: ["Ana Torres", "Valentina García", "Mónica Silva"][i]!,
-      phone: `+97150000100${i}`,
-      sourceNumberId: n.id,
-      sourcePhoneNumber: n.phone,
-      assignedAgent: null,
-      status: "open",
-      unread: true,
-      version: 0,
-      audit: [],
-      messages: [
-        {
-          id: `seed-${n.id}`,
-          direction: "in",
-          text: "¡Hola! Quiero pedir un pastel para entrega.",
-          translation: "Hello! I would like to order a cake for delivery.",
-          at: now(),
-          status: "received",
-        },
-      ],
-    })),
+    conversations: [],
     orders: [],
     payments: [],
     jobs: [],
@@ -40,7 +19,13 @@ export class Store {
   private db: DatabaseSync;
   constructor(
     path: string,
-    demo: boolean | "staging" | "development" | "test" = true,
+    demo:
+      | boolean
+      | "staging"
+      | "development"
+      | "test"
+      | "release"
+      | "release-staging" = false,
     initial?: State,
   ) {
     if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true });
@@ -69,16 +54,9 @@ export class Store {
     this.db
       .prepare("INSERT OR IGNORE INTO runtime_profile VALUES (1, ?)")
       .run(requested);
-    this.db.prepare("INSERT OR IGNORE INTO commerce_state VALUES (1, ?)").run(
-      JSON.stringify(
-        initial ?? {
-          ...seed(),
-          ...(demo === true || demo === "development" || demo === "test"
-            ? {}
-            : { conversations: [] }),
-        },
-      ),
-    );
+    this.db
+      .prepare("INSERT OR IGNORE INTO commerce_state VALUES (1, ?)")
+      .run(JSON.stringify(initial ?? seed()));
   }
   read(): State {
     return JSON.parse(

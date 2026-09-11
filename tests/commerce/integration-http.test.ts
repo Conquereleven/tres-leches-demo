@@ -12,7 +12,7 @@ test("integration HTTP protects sessions, accepts signed Meta batches and disabl
   const secret = "synthetic-secret-at-least-24-characters";
   const origin = "https://integration.example.invalid";
   const salt = "synthetic-user-salt";
-  const child = spawn(process.execPath, ["--import", "tsx", "server/http.ts"], {
+  const child = spawn(process.execPath, ["--import", "tsx", "server/main.ts"], {
     env: {
       ...process.env,
       API_PORT: "3105",

@@ -11,8 +11,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { runtimeConfig, integrationConfig } from "../../server/config";
-import { Store } from "../../server/db/store";
-import { stagingSeed } from "../../server/db/staging-seed";
+import { Store } from "../fixtures/runtime";
+import { stagingSeed } from "../fixtures/staging-seed";
 import { BackupManager } from "../../server/db/backups";
 import { Readiness } from "../../server/readiness";
 import { PaymenntNotificationVerifier } from "../../server/adapters/paymennt-notification";
@@ -22,7 +22,7 @@ import {
 } from "../../server/adapters/blocked";
 import { PaymenntProvider } from "../../server/adapters/paymennt";
 import { MapboxGeoProvider } from "../../server/adapters/mapbox";
-import { CommerceService } from "../../server/domain/service";
+import { CommerceService } from "../fixtures/runtime";
 import { numbers } from "../../server/domain/model";
 import { stagingEnv } from "../fixtures/staging";
 test("TL18 environment matrix separates framework production from staging and rejects production activation", () => {
@@ -291,7 +291,7 @@ test("TL18 readiness redacts credentials and connectivity probes are GET-only wi
       paymennt,
       geo,
     );
-    assert.equal((await geoReadiness.probe("geo")).status, "READY");
+    assert.equal((await geoReadiness.probe("geo")).status, "BLOCKED");
     const failing = new Readiness(
       runtimeConfig(env),
       config,

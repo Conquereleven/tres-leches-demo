@@ -1,15 +1,15 @@
+import { MockWhatsAppProvider } from "../fixtures/providers";
+import { MockPaymentProvider } from "../fixtures/providers";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
-import { Store } from "../../server/db/store";
-import { CommerceService } from "../../server/domain/service";
+import { Store } from "../fixtures/runtime";
+import { CommerceService } from "../fixtures/runtime";
 import {
   HmacVerifier,
-  MockPaymentProvider,
-  MockWhatsAppProvider,
 } from "../../server/adapters/providers";
 const verifier = new HmacVerifier("test-long-secret-more-than-24-characters");
 test("restart retains command receipts, queued work and sends from original number", async () => {

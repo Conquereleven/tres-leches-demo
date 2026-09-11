@@ -7,7 +7,7 @@ import type {
   Job,
 } from "../../server/domain/model";
 export type Workspace = {
-  mode: "demo" | "integration";
+  mode: "integration";
   environment?: "development" | "test" | "staging";
   readiness?: {
     overall: "NOT READY" | "INTEGRATION READY";

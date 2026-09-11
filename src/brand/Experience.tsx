@@ -232,13 +232,7 @@ function Newsletter() {
     </Section>
   );
 }
-export function BrandExperience({
-  onManage,
-  onDemo,
-}: {
-  onManage: () => void;
-  onDemo: () => void;
-}) {
+export function BrandExperience({ onManage }: { onManage: () => void }) {
   const root = useRef<HTMLDivElement>(null);
   useMotion(root);
   const [dialog, setDialog] = useState<DialogKind>(null),
@@ -687,7 +681,6 @@ export function BrandExperience({
           <span>Pastelerías 3L</span>
           <div>
             <button onClick={onManage}>Gestión</button>
-            <button onClick={onDemo}>MVP demo</button>
           </div>
         </div>
       </footer>

@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 const children = [
-  spawn("node", ["--import", "tsx", "server/http.ts"], { stdio: "inherit" }),
+  spawn("node", ["--import", "tsx", "server/main.ts"], { stdio: "inherit" }),
   spawn(
     "node",
     [

@@ -7,7 +7,7 @@
 }
 .commerce h1,
 .commerce h2 {
-  font-family: "Playfair Display", serif;
+  font-family: "3L Abril", serif;
   font-weight: 500;
 }
 .commerce h1 {
@@ -501,53 +501,6 @@
     min-height: 44px;
   }
 }
-@media (max-width: 1100px) {
-  .admin-header {
-    height: auto;
-    min-height: 76px;
-    padding: 12px 16px;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .admin-header .brand {
-    display: flex;
-  }
-  .admin-header .shop-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .admin-header .admin-actions {
-    margin-left: auto;
-  }
-  .admin-header nav {
-    order: 3;
-    width: 100%;
-    margin: 0;
-    display: flex;
-  }
-  .admin-header nav button {
-    flex: 1;
-    min-width: 0;
-    min-height: 44px;
-    height: auto;
-    padding: 9px 6px;
-    font-size: 13px;
-  }
-}
-@media (max-width: 450px) {
-  .admin-header .avatar {
-    display: none;
-  }
-  .admin-header nav button {
-    font-size: 12px;
-    gap: 4px;
-  }
-  .admin-header nav button svg {
-    flex-shrink: 0;
-  }
-}
-
 .commerce .co-readiness-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
@@ -556,4 +509,9 @@
 .commerce .co-readiness-grid article {
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.co-list.co-list-empty {
+  max-height: none;
+  overflow: visible;
 }

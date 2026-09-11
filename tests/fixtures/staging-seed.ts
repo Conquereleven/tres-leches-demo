@@ -1,5 +1,5 @@
-import { zoneSeed } from "../domain/zones";
-import type { State } from "../domain/model";
+import { zoneSeed } from "../../server/domain/zones";
+import type { State } from "../../server/domain/model";
 const scenarios = [
   "WA1 inbound and reply",
   "WA2 GPS and commercial rule",

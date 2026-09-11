@@ -21,7 +21,7 @@ export const stagingEnv = (dir: string): NodeJS.ProcessEnv => ({
   PROVIDER_MODE: "offline",
   PAYMENNT_ENVIRONMENT: "test",
   META_OUTBOUND_ENABLED: "false",
-  STAGING_SEED: "uat",
+  STAGING_SEED: "empty",
   OPERATOR_USERS_JSON: JSON.stringify(
     ["admin", "manager", "operator"].map((role) => ({
       id: `test-${role}`,

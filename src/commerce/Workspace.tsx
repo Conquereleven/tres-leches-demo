@@ -12,13 +12,18 @@ export function CommerceWorkspace() {
   const [data, setData] = useState<Data | null>(null),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
-    [view, setView] = useState("inbox"),
-    [selected, setSelected] = useState("conversation-wa2"),
+    [view, setView] = useState(location.pathname.split("/")[2] || "inbox"),
+    [selected, setSelected] = useState(""),
     [filter, setFilter] = useState("all"),
     [search, setSearch] = useState(""),
     [unread, setUnread] = useState(false),
     [agent, setAgent] = useState("all"),
     [status, setStatus] = useState("all");
+  useEffect(() => {
+    const sync = () => setView(location.pathname.split("/")[2] || "inbox");
+    window.addEventListener("popstate", sync);
+    return () => window.removeEventListener("popstate", sync);
+  }, []);
   const pending = useRef(new Map<string, string>());
   const refresh = useCallback(async () => {
     try {
@@ -98,10 +103,8 @@ export function CommerceWorkspace() {
         </div>
         <span className="co-pill">
           {data.environment === "staging"
-            ? "STAGING / TEST · WhatsApp externo bloqueado"
-            : data.mode === "demo"
-              ? "Sandbox · sin cobros ni mensajes reales"
-              : "Integración · WhatsApp real / pagos de prueba"}
+            ? "Staging · conexiones pendientes de activación"
+            : "Operaciones"}
         </span>
       </header>
       <nav className="co-tabs" aria-label="Operaciones">
@@ -118,7 +121,10 @@ export function CommerceWorkspace() {
           <button
             key={id}
             aria-current={view === id ? "page" : undefined}
-            onClick={() => setView(id!)}
+            onClick={() => {
+              history.pushState({}, "", `/operations/${id}`);
+              setView(id!);
+            }}
           >
             {label}
           </button>
@@ -156,7 +162,7 @@ export function CommerceWorkspace() {
           <Zones key="zones" data={data} run={run} />
         ) : view === "inbox" ? (
           <div className="co-grid">
-            <aside className="co-list">
+            <aside className={`co-list${shown.length ? "" : " co-list-empty"}`}>
               <div className="co-filters">
                 <div className="co-number-tabs">
                   {["all", ...data.numbers.map((n) => n.id)].map((id) => (
@@ -216,7 +222,9 @@ export function CommerceWorkspace() {
               </div>
               {shown.length === 0 && (
                 <p className="co-empty">
-                  Sin conversaciones para estos filtros.
+                  {data.conversations.length
+                    ? "Sin conversaciones para estos filtros."
+                    : "No conversations yet. Las conversaciones aparecerán aquí al recibir mensajes en los números conectados."}
                 </p>
               )}
               {shown.map((item) => (
@@ -351,7 +359,11 @@ export function CommerceWorkspace() {
                   : ["Ready", "Out for Delivery", "Delivered"]
                 ).includes(o.state),
             ).length === 0 && (
-              <p className="co-empty">No hay pedidos en esta etapa.</p>
+              <p className="co-empty">
+                {view === "production"
+                  ? "No production items yet. Los pedidos confirmados aparecerán aquí al pasar a producción."
+                  : "No orders yet. Los pedidos aparecerán aquí cuando el equipo los registre."}
+              </p>
             )}
           </div>
         )}
@@ -467,36 +479,6 @@ function ConversationPanel({
         ))}
       </div>
       <div className="co-chat-bottom">
-        {data.mode === "demo" && (
-          <details>
-            <summary>Respuestas guardadas · demo</summary>
-            <button
-              onClick={() =>
-                setDraft("¡Hola! ¿Qué fecha y franja prefieres para tu pedido?")
-              }
-            >
-              Disponibilidad
-            </button>
-            <button
-              onClick={() =>
-                setDraft(
-                  "Compártenos tu ubicación para confirmar cobertura, mínimo y entrega.",
-                )
-              }
-            >
-              Solicitar ubicación
-            </button>
-            <button
-              onClick={() =>
-                setDraft(
-                  "Puedes recoger en nuestra cocina demo de Al Quoz. Te avisaremos cuando esté listo.",
-                )
-              }
-            >
-              Pickup
-            </button>
-          </details>
-        )}
         <div className="co-compose">
           <label className="sr-only" htmlFor="co-draft">
             Mensaje
@@ -533,13 +515,7 @@ function ConversationPanel({
           Las respuestas salen desde {c.sourceNumberId.toUpperCase()}.
           Traducciones solo para uso interno.
         </p>
-        {data.mode === "demo" && (
-          <button
-            onClick={() => void run({ conversationId: c.id }, "demo/location")}
-          >
-            Simular GPS entrante · JVC
-          </button>
-        )}
+
         {data.jobs
           .filter(
             (j) =>
@@ -572,7 +548,7 @@ function OrderPanel({
   run: Run;
 }) {
   const [address, setAddress] = useState(""),
-    [product, setProduct] = useState("pan"),
+    [product, setProduct] = useState(data.catalog[0]?.id ?? ""),
     [quantity, setQuantity] = useState(1),
     [manualZone, setManualZone] = useState(""),
     [manualReason, setManualReason] = useState("");
@@ -661,7 +637,14 @@ function OrderPanel({
                 />
               </label>
             </div>
+            {!data.catalog.length && (
+              <p className="co-empty">
+                Catálogo pendiente de aprobación. Los productos estarán
+                disponibles cuando se configure el catálogo oficial.
+              </p>
+            )}
             <button
+              disabled={!data.catalog.some((p) => p.id === product)}
               onClick={() => {
                 const lines = o.lines.filter((l) => l.productId !== product);
                 void run({
@@ -679,7 +662,7 @@ function OrderPanel({
               <input
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="JVC, edificio y apartamento"
+                placeholder="Zona, edificio y apartamento"
               />
             </label>
             <button
@@ -784,6 +767,12 @@ function OrderPanel({
             Request Payment
           </button>
         )}
+        {!p && (
+          <p className="co-empty">
+            No payments yet. El estado aparecerá aquí al solicitar el pago del
+            pedido.
+          </p>
+        )}
         {p && (
           <div className="co-payment">
             <h4>Pago · {p.status}</h4>
@@ -810,21 +799,6 @@ function OrderPanel({
                 >
                   Reenviar enlace
                 </button>
-                {data.mode === "demo" && (
-                  <details>
-                    <summary>Simular resultado de pago</summary>
-                    {(["paid", "failed", "expired"] as const).map((status) => (
-                      <button
-                        key={status}
-                        onClick={() =>
-                          void run({ paymentId: p.id, status }, "demo/payment")
-                        }
-                      >
-                        Simular {status}
-                      </button>
-                    ))}
-                  </details>
-                )}
               </>
             )}
             {p.provider === "paymennt" && (
@@ -1133,12 +1107,13 @@ function ZoneEditor({
             <textarea
               value={polygon}
               onChange={(e) => setPolygon(e.target.value)}
-              placeholder='[{"lat":25.0,"lng":55.0}, …]'
+              placeholder="Polígono aprobado en formato JSON"
             />
           </label>
           <p>
-            No hay polígonos reales precargados. El GPS de demostración reconoce
-            únicamente el punto fixture de JVC.
+            La ubicación se verificará con el proveedor geográfico o con límites
+            aprobados. Sin cobertura verificada, se requiere revisión del
+            operador.
           </p>
         </details>
         {error && <p role="alert">{error}</p>}
