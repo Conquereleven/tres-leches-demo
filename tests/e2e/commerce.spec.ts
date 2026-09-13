@@ -10,7 +10,7 @@ test("WA2 operational golden path, responsive and console", async ({
   await page.goto("/");
   await page.getByRole("button", { name: "Gestión", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Todo empieza con una conversación." }),
+    page.getByRole("heading", { name: "Inbox", exact: true }),
   ).toBeVisible();
   await page
     .getByRole("button", { name: "Zonas y tarifas", exact: true })

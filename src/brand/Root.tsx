@@ -12,14 +12,7 @@ export function Root() {
     return () => window.removeEventListener("popstate", sync);
   }, []);
   return operations ? (
-    <>
-      <header>
-        <a className="b-return" href="/">
-          ← Pastelerías 3L
-        </a>
-      </header>
-      <CommerceWorkspace />
-    </>
+    <CommerceWorkspace />
   ) : (
     <BrandExperience
       onManage={() => {

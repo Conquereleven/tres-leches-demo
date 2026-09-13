@@ -1,3 +1,5 @@
+import { OperationsShell } from "./OperationsShell";
+import { ChatsCircle, Receipt, Oven, Truck } from "@phosphor-icons/react";
 import { AgentPanel, AgentKnowledgeEditor } from "./AgentPanel";
 import { useCallback, useEffect, useState, useRef } from "react";
 import type {
@@ -8,6 +10,7 @@ import type {
 } from "../../server/domain/model";
 import { api, money, type Workspace as Data } from "./api";
 import "./commerce.css";
+import "./operations-shell.css";
 type Run = (body: Record<string, unknown>, path?: string) => Promise<boolean>;
 export function CommerceWorkspace() {
   const [data, setData] = useState<Data | null>(null),
@@ -96,47 +99,17 @@ export function CommerceWorkspace() {
         .includes(search.toLowerCase()),
   );
   return (
-    <main className="commerce" aria-busy={busy}>
-      <header className="co-heading">
-        <div>
-          <p className="eyebrow">TRES LECHES · OPERACIONES</p>
-          <h1>Todo empieza con una conversación.</h1>
-        </div>
-        <span className="co-pill">
-          {data.environment === "staging"
-            ? "Staging · conexiones pendientes de activación"
-            : "Operaciones"}
-        </span>
-      </header>
-      <nav className="co-tabs" aria-label="Operaciones">
-        {[
-          ["inbox", "Inbox unificado"],
-          ["orders", "Pedidos"],
-          ["production", "Producción"],
-          ["delivery", "Entregas"],
-          ["zones", "Zonas y tarifas"],
-          ...(data.environment === "staging" && data.actor.role === "admin"
-            ? [["readiness", "Preparación y UAT"]]
-            : []),
-        ].map(([id, label]) => (
-          <button
-            key={id}
-            aria-current={view === id ? "page" : undefined}
-            onClick={() => {
-              history.pushState({}, "", `/operations/${id}`);
-              setView(id!);
-            }}
-          >
-            {label}
-          </button>
-        ))}
-        {data.mode === "integration" && (
-          <button onClick={() => void run({}, "logout")}>Cerrar sesión</button>
-        )}
-        <button className="co-refresh" onClick={() => void refresh()}>
-          Actualizar
-        </button>
-      </nav>
+    <OperationsShell
+      data={data}
+      view={view}
+      busy={busy}
+      onNavigate={(id) => {
+        history.pushState({}, "", `/operations/${id}`);
+        setView(id);
+      }}
+      onRefresh={() => void refresh()}
+      onLogout={() => void run({}, "logout")}
+    >
       {data.integrationHealth?.inboundFailed ? (
         <p className="co-error" role="alert">
           Hay {data.integrationHealth.inboundFailed} notificaciones pendientes
@@ -310,6 +283,9 @@ export function CommerceWorkspace() {
                       <OrderPanel key={o.id} order={o} data={data} run={run} />
                     ))
                   )}
+                  <div className="ops-copilot-slot">
+                    <AgentPanel key={c.id} c={c} data={data} run={run} />
+                  </div>
                   <div className="co-section">
                     <h3>Actividad de conversación</h3>
                     <ul className="co-audit">
@@ -326,7 +302,20 @@ export function CommerceWorkspace() {
                 </aside>
               </>
             ) : (
-              <p className="co-empty">Selecciona una conversación.</p>
+              <div className="ops-inbox-welcome">
+                <span className="ops-empty-icon">
+                  <ChatsCircle size={32} aria-hidden="true" />
+                </span>
+                <p className="ops-kicker">TU ESPACIO DE ATENCIÓN</p>
+                <h2>Cada conversación, bien atendida.</h2>
+                <p>
+                  Selecciona una conversación para gestionar mensajes, pedidos y
+                  asistencia de AI Copilot en un solo lugar.
+                </p>
+                <div className="ops-welcome-foot">
+                  Conversación · Pedido · Seguimiento
+                </div>
+              </div>
             )}
           </div>
         ) : (
@@ -342,6 +331,36 @@ export function CommerceWorkspace() {
               )
               .map((o) => (
                 <article key={o.id} className="co-board-card">
+                  <header className="ops-order-summary">
+                    <div className="co-row">
+                      <span className="co-state">{o.state}</span>
+                      <strong>{money(o.quote?.totalFils)}</strong>
+                    </div>
+                    <h2>
+                      {data.conversations.find((c) => c.id === o.conversationId)
+                        ?.customer ?? "Cliente"}
+                    </h2>
+                    <p>{o.id}</p>
+                    <dl>
+                      <div>
+                        <dt>Pago</dt>
+                        <dd>
+                          {data.payments.find((p) => p.id === o.paymentId)
+                            ?.status ?? "Sin solicitud"}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Zona</dt>
+                        <dd>{o.quote?.zoneName ?? "Ubicación pendiente"}</dd>
+                      </div>
+                    </dl>
+                    {o.audit.at(-1)?.at && (
+                      <small>
+                        Última actividad ·{" "}
+                        {new Date(o.audit.at(-1)!.at).toLocaleString()}
+                      </small>
+                    )}
+                  </header>
                   <button
                     className="co-link"
                     onClick={() => {
@@ -354,7 +373,10 @@ export function CommerceWorkspace() {
                       .find((c) => c.id === o.conversationId)
                       ?.sourceNumberId.toUpperCase()}
                   </button>
-                  <OrderPanel order={o} data={data} run={run} />
+                  <details className="ops-order-details">
+                    <summary>Ver pedido y seguimiento</summary>
+                    <OrderPanel order={o} data={data} run={run} />
+                  </details>
                 </article>
               ))}
             {data.orders.filter(
@@ -365,16 +387,34 @@ export function CommerceWorkspace() {
                   : ["Ready", "Out for Delivery", "Delivered"]
                 ).includes(o.state),
             ).length === 0 && (
-              <p className="co-empty">
-                {view === "production"
-                  ? "No production items yet. Los pedidos confirmados aparecerán aquí al pasar a producción."
-                  : "No orders yet. Los pedidos aparecerán aquí cuando el equipo los registre."}
-              </p>
+              <div className="ops-board-empty">
+                <span className="ops-empty-icon">
+                  {view === "production" ? (
+                    <Oven size={30} />
+                  ) : view === "delivery" ? (
+                    <Truck size={30} />
+                  ) : (
+                    <Receipt size={30} />
+                  )}
+                </span>
+                <h2>
+                  {view === "production"
+                    ? "La cocina está al día"
+                    : view === "delivery"
+                      ? "Las próximas entregas, aquí"
+                      : "Todo listo para el primer pedido"}
+                </h2>
+                <p className="co-empty">
+                  {view === "production"
+                    ? "No production items yet. Los pedidos confirmados aparecerán aquí al pasar a producción."
+                    : "No orders yet. Los pedidos aparecerán aquí cuando el equipo los registre."}
+                </p>
+              </div>
             )}
           </div>
         )}
       </fieldset>
-    </main>
+    </OperationsShell>
   );
 }
 function ConversationPanel({
@@ -412,7 +452,6 @@ function ConversationPanel({
           {owned ? "Liberar conversación" : "Tomar conversación"}
         </button>
       </header>
-      <AgentPanel key={c.id} c={c} data={data} run={run} />
       <div className="co-two co-chat-tools">
         <label>
           Asignar agente
@@ -1001,6 +1040,12 @@ function ZoneEditor({
     >
       <p className="eyebrow">REGLA CONFIGURABLE</p>
       <h2>{zone.name}</h2>
+      {(zone.minOrderAed == null || zone.deliveryFeeAed == null) && (
+        <p className="ops-rule-warning">
+          Regla pendiente de revisión. Esta zona no permite solicitar el pago
+          hasta confirmar los valores comerciales.
+        </p>
+      )}
       <fieldset className="co-fieldset" disabled={disabled}>
         <label>
           Nombre
@@ -1208,20 +1253,41 @@ function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
         Los estados indican lo comprobado. Una configuración presente no
         confirma onboarding ni aceptación del cliente.
       </p>
-      <div className="co-readiness-grid">
-        {Object.entries(data.readiness?.components ?? {}).map(
-          ([name, check]) => (
-            <article className="co-quote" key={name}>
-              <h3>{labels[name] ?? name}</h3>
-              <strong>{check.status}</strong>
-              <p>{check.detail}</p>
-              {check.checkedAt && (
-                <small>{new Date(check.checkedAt).toLocaleString()}</small>
-              )}
-            </article>
-          ),
-        )}
-      </div>
+      {[
+        ["Infraestructura", /^(APP_ENV|HTTPS|authentication|UAT)$/],
+        ["Meta WhatsApp", /^(Meta|WA[123])/i],
+        ["Paymennt", /^Paymennt/i],
+        ["AI Copilot", /^AI/i],
+        ["Catálogo", /^Catalog/i],
+        ["Ubicación y reglas", /^(Geo|Commercial)/i],
+        ["Storage y backups", /^(database|backup)$/],
+        ["Otros sistemas", /./],
+      ].map(([group, pattern], index, groups) => {
+        const checks = Object.entries(data.readiness?.components ?? {}).filter(
+          ([name]) =>
+            (pattern as RegExp).test(name) &&
+            !groups
+              .slice(0, index)
+              .some(([, previous]) => (previous as RegExp).test(name)),
+        );
+        return checks.length ? (
+          <section className="ops-readiness-group" key={String(group)}>
+            <h2>{String(group)}</h2>
+            <div className="co-readiness-grid">
+              {checks.map(([name, check]) => (
+                <article className="co-quote" key={name}>
+                  <h3>{labels[name] ?? name}</h3>
+                  <strong data-status={check.status}>{check.status}</strong>
+                  <p>{check.detail}</p>
+                  {check.checkedAt && (
+                    <small>{new Date(check.checkedAt).toLocaleString()}</small>
+                  )}
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null;
+      })}
       {data.actor.role === "admin" && (
         <div className="co-readiness-actions">
           <button

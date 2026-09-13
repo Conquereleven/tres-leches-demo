@@ -48,3 +48,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Production may run the current code with providers offline; this supersedes the earlier unconditional production boot block, not the LIVE payment gate.
 - Require a dedicated release-production database, secure hosted configuration, no STAGING_SEED variable, Meta/AI disabled and copilot defaults. Never copy staging secrets or databases.
 - Authenticated admin readiness GET is available in production; provider probes remain staging-only. See docs/production-offline-release.md.
+
+## TL-27 premium operations shell
+- Operations use a fixed left sidebar (252px desktop, 80px tablet rail) and a native modal drawer below 768px. One centralized navigation; existing permissions and routes remain authoritative.
+- Approved operations styling: Montserrat UI, warm neutral surfaces, restrained lavender and taupe. No decorative headings for operational data; customer storefront unchanged.
+- UI-only scope: preserve providers, auth, domain logic, database, state machine and commercial rules. No fake catalog/conversations/metrics.
+- Branch feature/3l-premium-dashboard-shell stays local until Rodrigo reviews screenshots. No automatic production deployment or merge.

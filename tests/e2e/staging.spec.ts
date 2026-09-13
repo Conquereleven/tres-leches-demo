@@ -122,7 +122,7 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
       .fill("fixture-password-not-shipped");
     await page.getByRole("button", { name: "Entrar al workspace" }).click();
     await expect(
-      page.getByText("Staging · conexiones pendientes de activación", {
+      page.getByText("Staging", {
         exact: true,
       }),
     ).toBeVisible();
@@ -171,11 +171,15 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
     ).toBe(404);
     for (const width of [390, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
+      if (width === 390)
+        await page.getByRole("button", { name: "Abrir menú" }).click();
       await expect(
         page
           .getByRole("navigation", { name: "Operaciones" })
           .getByRole("button", { name: /Inbox/ }),
       ).toHaveCount(1);
+      if (width === 390)
+        await page.getByRole("button", { name: "Cerrar menú" }).click();
       await expect(page.locator(".admin-header")).toHaveCount(0);
       await expect(page.locator("body")).not.toContainText("MVP demo");
       await expect(page.locator("body")).not.toContainText("Inbox anterior");
@@ -190,20 +194,26 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
         path: `work/qa/tl24-inbox-${width}.png`,
         fullPage: true,
       });
-      if (width === 390)
+      if (width === 390) {
+        await page.getByRole("button", { name: "Abrir menú" }).click();
         await page
           .getByRole("navigation", { name: "Operaciones" })
           .screenshot({ path: "work/qa/tl24-mobile-nav.png" });
+      }
       await page.getByRole("button", { name: "Pedidos", exact: true }).click();
       await expect(page.getByText(/No orders yet/)).toBeVisible();
       await page.screenshot({
         path: `work/qa/tl24-orders-${width}.png`,
         fullPage: true,
       });
+      if (width === 390)
+        await page.getByRole("button", { name: "Abrir menú" }).click();
       await page
         .getByRole("button", { name: "Producción", exact: true })
         .click();
       await expect(page.getByText(/No production items yet/)).toBeVisible();
+      if (width === 390)
+        await page.getByRole("button", { name: "Abrir menú" }).click();
       await page
         .getByRole("button", { name: "Inbox unificado", exact: true })
         .click();
