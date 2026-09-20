@@ -21,8 +21,8 @@ dependency clears · **NEEDS BUSINESS INPUT** = a fact only the owner can supply
 | 4 | Refund / Cancellation Policy published | **BLOCKED** | `/refund-policy` is built and QA'd locally and answers all three of Paymennt's questions. The three commercial rules behind it are still unset — see "Decisions required" below. Pending deployment. |
 | 5 | Delivery Policy published | **BLOCKED** | `/delivery-policy` is built and QA'd locally from the real zone engine: 7 minimum-order bands plus the free-delivery band, transcribed from `docs/sources/delivery-minimums.jpeg` and kept identical to `server/domain/zones.ts`. Pending deployment. |
 | 6 | Business contact details visible | **NEEDS BUSINESS INPUT** | **Hardest blocker.** `phone`, `email`, `whatsapp`, `address` and `supportHours` are all `null`, so `/contact` renders with no reachable channel at all — only "Pastelerías 3L · Dubai, United Arab Emirates". A customer cannot currently answer "who do I contact if there is a problem with my order?", which is exactly Paymennt's requirement. |
-| 7 | Visa logo visible in footer | **NEEDS BUSINESS INPUT** | Renders in the footer on every page at 52×20, correct aspect ratio, `alt="Visa"`. The asset is a locally hosted reproduction, not a file obtained from the Visa brand centre or from Paymennt. Confirm the approved asset before review. |
-| 8 | Mastercard logo visible in footer | **NEEDS BUSINESS INPUT** | Renders at 41×26, correct aspect ratio, `alt="Mastercard"`. Two points to confirm: the asset is a reproduction rather than an approved file, and it is the symbol only (interlocking circles) without the wordmark. Mastercard acceptance marks normally carry the wordmark. |
+| 7 | Visa logo visible in footer | **NEEDS BUSINESS INPUT** | Renders in the footer on every page at 52×20, correct aspect ratio, `alt="Visa"`. The asset is still a locally hosted reproduction. The official Visa Brand Mark SVG is at <https://globalclient.visa.com/brand-mark>, behind a form (name, title, company, business email, country) plus Visa's Terms of Use — it must be completed by an authorised person at the merchant, and the Company field needs the registered legal entity from item 2. Rodrigo is submitting it. |
+| 8 | Mastercard logo visible in footer | **NEEDS BUSINESS INPUT** | Renders at 41×26, correct aspect ratio, `alt="Mastercard"`. The asset is still a locally hosted reproduction, symbol only. The official file is `mc_symbol_SVG.zip` ("WEBSITES & APPS · Mastercard Symbol") from <https://www.mastercard.com/brandcenter/> → Download Artwork; downloading it accepts the Mastercard Artwork Download Agreement, so it must be done by an authorised person at the merchant. Rodrigo is downloading it. |
 | 9 | All footer links work | **PASS** | All five links (`/terms`, `/privacy`, `/refund-policy`, `/delivery-policy`, `/contact`) resolve 200 on every page, including the home page, and are reachable from the mobile menu. |
 | 10 | Desktop QA passed | **PASS** | Verified at 1440px and 1024px. No horizontal overflow, no overlap, no console errors. Footer and policy pages render in the 3L design system. |
 | 11 | Mobile QA passed | **PASS** | Verified at 768px and 390px. No horizontal overflow, no overlapping content, policy text readable, one `h1` per page, no heading-level skips. |
@@ -62,8 +62,12 @@ corresponding page.
 
 **Payment branding (blocks requirement 7 and 8)**
 
-14. Approved Visa and Mastercard acceptance assets, ideally supplied by Paymennt
-    or downloaded from the brand centres, plus confirmation of permitted use.
+14. The official Visa Brand Mark SVG and Mastercard Symbol SVG, downloaded from
+    the brand centres by an authorised person at the merchant. Both gates are
+    legal acceptances on behalf of the business, so they cannot be completed on
+    the merchant's behalf. Sources, variant choice and handling rules are
+    recorded in `public/payments/README.md`. Both marks sit on a white tile in
+    the footer, so the light-background variant is the correct one for each.
 
 ## What was verified
 
