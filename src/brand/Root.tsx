@@ -1,23 +1,23 @@
 import { useEffect, useState } from "react";
 import { CommerceWorkspace } from "../commerce/Workspace";
 import { BrandExperience } from "./Experience";
+import { PolicyPage } from "./Policies";
+import { isPolicyPath } from "./business";
 export function Root() {
-  const [operations, setOperations] = useState(
-    location.pathname.startsWith("/operations"),
-  );
+  const [path, setPath] = useState(location.pathname);
   useEffect(() => {
-    const sync = () =>
-      setOperations(location.pathname.startsWith("/operations"));
+    const sync = () => setPath(location.pathname);
     window.addEventListener("popstate", sync);
     return () => window.removeEventListener("popstate", sync);
   }, []);
-  return operations ? (
-    <CommerceWorkspace />
-  ) : (
+  if (path.startsWith("/operations")) return <CommerceWorkspace />;
+  const page = path.replace(/\/+$/, "");
+  if (isPolicyPath(page)) return <PolicyPage path={page} />;
+  return (
     <BrandExperience
       onManage={() => {
         history.pushState({}, "", "/operations/inbox");
-        setOperations(true);
+        setPath("/operations/inbox");
       }}
     />
   );

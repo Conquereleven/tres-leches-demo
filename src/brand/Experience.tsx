@@ -30,13 +30,14 @@ import {
   Logo,
   Modal,
 } from "./primitives";
+import { OrderAcknowledgement, SiteFooter } from "./SiteChrome";
+import { contactChannels, legalEntityLabel, policyRoutes } from "./business";
 import "./brand.css";
 type DialogKind =
   | "contact"
   | "story"
   | "collection"
   | "social"
-  | "privacy"
   | "faq"
   | "promotion"
   | "menu"
@@ -626,64 +627,18 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             </h3>
             <p>{approved.dubai}</p>
             <WhatsAppCTA unavailable={contact}>ORDER NOW</WhatsAppCTA>
+            <OrderAcknowledgement />
           </div>
           <ImageFrame asset={assets.dubai} />
         </Section>
         <Newsletter />
       </main>
-      <footer className="b-footer">
-        <div className="b-footer-main">
-          <div>
-            <Logo />
-            <p>
-              Cakes, jars, bakery
-              <br />
-              and so much more.
-            </p>
-            <SectionLabel>{approved.heritage}</SectionLabel>
-          </div>
-          <nav aria-label="Collections">
-            <a href="#home">HOME</a>
-            <a href="#collection">CAKES</a>
-            <a href="#jars">CAKE JARS</a>
-            <a href="#bakery">BAKERY</a>
-            <a href="#occasions">SPECIAL OCCASIONS</a>
-          </nav>
-          <nav aria-label="Information">
-            <button onClick={() => setDialog("faq")}>FAQ</button>
-            <button onClick={contact}>CONTACT</button>
-            {destinations.privacy ? (
-              <a href={destinations.privacy}>PRIVACY</a>
-            ) : (
-              <button onClick={() => setDialog("privacy")}>PRIVACY</button>
-            )}
-            {(["instagram", "tiktok"] as const).map((network) =>
-              destinations[network] ? (
-                <a key={network} href={destinations[network]!}>
-                  {network === "instagram" ? "Instagram" : "TikTok"}
-                </a>
-              ) : (
-                <button key={network} onClick={() => setDialog("social")}>
-                  {network === "instagram" ? "Instagram" : "TikTok"}
-                </button>
-              ),
-            )}
-            <WhatsAppCTA unavailable={contact}>WhatsApp</WhatsAppCTA>
-          </nav>
-          <WhatsAppCTA unavailable={contact} />
-        </div>
-        <p className="b-closing">
-          SWEET PEOPLE.
-          <br />
-          BRIGHTER DAYS.
-        </p>
-        <div className="b-footer-bottom">
-          <span>Pastelerías 3L</span>
-          <div>
-            <button onClick={onManage}>Gestión</button>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter
+        onContactUnavailable={contact}
+        onFaq={() => setDialog("faq")}
+        onSocial={() => setDialog("social")}
+        onManage={onManage}
+      />
       <WhatsAppCTA
         className="b-floating-order"
         ariaLabel="Order on WhatsApp"
@@ -704,11 +659,9 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
                     ? "THE CAKE COLLECTION"
                     : dialog === "social"
                       ? "FOLLOW OUR JOURNEY"
-                      : dialog === "privacy"
-                        ? "PRIVACY"
-                        : dialog === "faq"
-                          ? "YOUR QUESTIONS"
-                          : "A LITTLE DISCOVERY"
+                      : dialog === "faq"
+                        ? "YOUR QUESTIONS"
+                        : "A LITTLE DISCOVERY"
           }
           onClose={close}
         >
@@ -716,15 +669,33 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             <nav className="b-modal-nav" aria-label="Mobile navigation">
               {navigation}
               <button onClick={contact}>ORDER ON WHATSAPP</button>
+              {policyRoutes.map((r) => (
+                <a key={r.path} href={r.path}>
+                  {r.label.toUpperCase()}
+                </a>
+              ))}
               <button onClick={onManage}>Gestión</button>
             </nav>
           ) : dialog === "contact" ? (
             <>
-              <p>
-                The official WhatsApp contact is awaiting confirmation. Ordering
-                will be available here once it is connected.
-              </p>
-              <p className="b-caption">No message has been sent.</p>
+              {contactChannels().length ? (
+                <ul className="b-modal-channels">
+                  {contactChannels().map((c) => (
+                    <li key={c.kind}>
+                      <span className="b-label">{c.label}</span>{" "}
+                      <a href={c.href}>{c.value}</a>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>
+                  The official WhatsApp contact is awaiting confirmation.
+                  Ordering will be available here once it is connected.
+                </p>
+              )}
+              <p className="b-caption">{legalEntityLabel()}</p>
+              <TextLink href="/contact">ALL CONTACT DETAILS</TextLink>
+              <OrderAcknowledgement />
             </>
           ) : dialog === "story" ? (
             <>
@@ -745,11 +716,6 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               <p>@3L.DUBAI</p>
               <p>Official social links are awaiting confirmation.</p>
             </>
-          ) : dialog === "privacy" ? (
-            <p>
-              The approved privacy policy is awaiting publication. Newsletter
-              subscriptions are currently unavailable.
-            </p>
           ) : dialog === "faq" ? (
             <>
               <p>Ordering information is awaiting confirmation.</p>

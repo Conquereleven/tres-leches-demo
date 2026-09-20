@@ -43,6 +43,16 @@ import {
   locationSchema,
 } from "./domain/model";
 import { HmacVerifier } from "./adapters/providers";
+/** Public customer policy/contact routes; keep in sync with src/brand/business.ts. */
+export const customerPages = [
+  "/terms",
+  "/privacy",
+  "/refund-policy",
+  "/delivery-policy",
+  "/contact",
+] as const;
+const customerCsp =
+  "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; script-src 'self'; frame-ancestors 'none'";
 export async function startServer(
   overrides: {
     initial?: ReturnType<typeof seed>;
@@ -557,6 +567,26 @@ export async function startServer(
         candidate = resolve(root, "." + decodeURIComponent(path));
       if (candidate !== root && !candidate.startsWith(root + "/"))
         throw new DomainError(404, "No encontrado");
+      // Public customer pages are prerendered to <page>.html at build time.
+      const customerPage = customerPages.find(
+        (p) => p === path.replace(/\/+$/, ""),
+      );
+      if (customerPage) {
+        const page = resolve(root, `.${customerPage}.html`);
+        const file = existsSync(page) ? page : resolve(root, "index.html");
+        if (!existsSync(file))
+          throw new DomainError(
+            404,
+            "Ejecuta el build para servir la aplicación",
+          );
+        res.writeHead(200, {
+          "Content-Type": "text/html",
+          "X-Content-Type-Options": "nosniff",
+          "Referrer-Policy": "same-origin",
+          "Content-Security-Policy": customerCsp,
+        });
+        return res.end(req.method === "HEAD" ? undefined : readFileSync(file));
+      }
       if (
         !existsSync(candidate) &&
         ![
@@ -593,8 +623,7 @@ export async function startServer(
         "Content-Type": mime[extname(file)] ?? "application/octet-stream",
         "X-Content-Type-Options": "nosniff",
         "Referrer-Policy": "same-origin",
-        "Content-Security-Policy":
-          "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; script-src 'self'; frame-ancestors 'none'",
+        "Content-Security-Policy": customerCsp,
       });
       res.end(req.method === "HEAD" ? undefined : readFileSync(file));
     } catch (error) {

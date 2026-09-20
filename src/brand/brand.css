@@ -1773,3 +1773,353 @@ a.b-return {
   padding: 12px 3vw;
   text-decoration: none;
 }
+
+/* Global footer: policies column, secure-payment marks and ordering acknowledgement. */
+.brand-experience .b-footer-main {
+  grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+}
+.brand-experience .b-footer-main > div:first-child .b-button {
+  margin-top: 1.5rem;
+}
+.brand-experience .b-payments {
+  max-width: var(--container);
+  margin: 4rem auto 0;
+  padding-top: 2rem;
+  border-top: var(--border);
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 1rem 2rem;
+}
+.brand-experience .b-payments ul {
+  display: flex;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.brand-experience .b-payments li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 46px;
+  background: #fff;
+  border: var(--border);
+  border-radius: 8px;
+}
+.brand-experience .b-payments li img {
+  display: block;
+  width: auto;
+  height: 20px;
+}
+.brand-experience .b-payments li img[alt="Mastercard"] {
+  height: 26px;
+}
+.brand-experience .b-footer .b-payments .b-caption {
+  font-size: var(--caption);
+  max-width: 62ch;
+  justify-self: end;
+  text-align: right;
+}
+.brand-experience .b-acknowledgement,
+.b-modal .b-acknowledgement {
+  font-size: var(--caption);
+  line-height: 1.7;
+  color: var(--text-secondary);
+  max-width: 46ch;
+  margin-top: 1rem;
+}
+.brand-experience .b-acknowledgement a,
+.b-modal .b-acknowledgement a,
+.brand-experience .b-policy article a,
+.brand-experience .b-policy-intro a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--brand-gold);
+}
+.b-modal .b-modal-channels {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+@media (max-width: 1100px) {
+  .brand-experience .b-footer-main {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .brand-experience .b-footer-main > div:first-child {
+    grid-column: 1/-1;
+  }
+  .brand-experience .b-payments {
+    grid-template-columns: auto 1fr;
+  }
+  .brand-experience .b-footer .b-payments .b-caption {
+    grid-column: 1/-1;
+    justify-self: start;
+    text-align: left;
+  }
+}
+@media (max-width: 640px) {
+  .brand-experience .b-footer-main {
+    grid-template-columns: 1fr 1fr;
+  }
+  .brand-experience .b-footer-main > nav[aria-label="Policies"] {
+    grid-column: 1/-1;
+  }
+  .brand-experience .b-payments {
+    grid-template-columns: 1fr;
+    margin-top: 3rem;
+  }
+  .brand-experience .b-footer-main > div:first-child .b-button {
+    width: 100%;
+  }
+}
+
+/* Customer policy pages: same tokens, header and footer as the storefront. */
+.brand-experience.b-policy-page {
+  min-height: 100vh;
+}
+.brand-experience .b-policy {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-7);
+}
+.brand-experience .b-policy-hero {
+  max-width: 60rem;
+  padding-bottom: var(--space-5);
+  border-bottom: var(--border);
+}
+.brand-experience .b-policy-hero .b-stars {
+  display: block;
+  margin-bottom: var(--space-3);
+}
+.brand-experience .b-policy-hero h1 {
+  font-size: var(--display-lg);
+  margin: var(--space-2) 0 var(--space-3);
+}
+.brand-experience .b-policy-intro p {
+  font-size: 1.125rem;
+  max-width: 60ch;
+  color: var(--text-secondary);
+}
+.brand-experience .b-policy-hero .b-caption {
+  margin-top: var(--space-3);
+}
+.brand-experience .b-policy-summary {
+  list-style: none;
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+.brand-experience .b-policy-summary li {
+  background: var(--surface-paper);
+  border: var(--border);
+  border-radius: var(--radius-panel);
+  padding: 1.5rem;
+}
+.brand-experience .b-policy-summary li:first-child {
+  background: var(--accent-rose);
+  border-color: transparent;
+}
+.brand-experience .b-policy-summary li .b-label {
+  margin-bottom: 0.5rem;
+}
+.brand-experience .b-policy-summary li p:last-child {
+  font-size: var(--body-small);
+  line-height: 1.65;
+}
+.brand-experience .b-policy-body {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 46rem);
+  gap: var(--space-6);
+  margin-top: var(--space-6);
+}
+.brand-experience .b-policy-body > article:only-child {
+  grid-column: 1/-1;
+  max-width: 46rem;
+}
+.brand-experience .b-policy-toc {
+  position: sticky;
+  top: 110px;
+  align-self: start;
+  font-size: var(--body-small);
+}
+.brand-experience .b-policy-toc ol {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  border-left: var(--border);
+}
+.brand-experience .b-policy-toc a {
+  display: block;
+  padding: 0.4rem 0 0.4rem 1rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+.brand-experience .b-policy-toc a:hover {
+  color: var(--text-primary);
+}
+.brand-experience .b-policy article section {
+  padding: var(--space-4) 0;
+  border-bottom: var(--border);
+  scroll-margin-top: 110px;
+}
+.brand-experience .b-policy article section:first-child {
+  padding-top: 0;
+}
+.brand-experience .b-policy article h2 {
+  font-size: var(--heading);
+  margin-bottom: var(--space-2);
+}
+.brand-experience .b-policy article h3 {
+  font-family: var(--body-font);
+  font-size: var(--label);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin: var(--space-3) 0 0.35rem;
+}
+.brand-experience .b-policy article p + p,
+.brand-experience .b-policy article :is(ul, ol) + p,
+.brand-experience .b-policy article p + :is(ul, ol) {
+  margin-top: 1rem;
+}
+.brand-experience .b-policy article :is(ul, ol) {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+}
+.brand-experience .b-policy article li + li {
+  margin-top: 0.4rem;
+}
+.brand-experience .b-policy article li::marker {
+  color: var(--brand-gold);
+}
+.brand-experience .b-policy-channels {
+  list-style: none !important;
+  padding: 0 !important;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0 0 !important;
+}
+.brand-experience .b-policy-channels li {
+  margin: 0 !important;
+  padding: 1.25rem;
+  background: var(--surface-paper);
+  border: var(--border);
+  border-radius: var(--radius-panel);
+  display: grid;
+  gap: 0.25rem;
+}
+.brand-experience .b-policy-channels a {
+  font-size: 1.05rem;
+  overflow-wrap: anywhere;
+}
+.brand-experience .b-policy-facts {
+  margin: 1.25rem 0 0;
+  display: grid;
+  gap: 0;
+  border-top: var(--border);
+}
+.brand-experience .b-policy-facts > div {
+  display: grid;
+  grid-template-columns: 12rem 1fr;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: var(--border);
+}
+.brand-experience .b-policy-facts dt {
+  font-size: var(--label);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  padding-top: 0.2rem;
+}
+.brand-experience .b-policy-facts dd {
+  margin: 0;
+}
+.brand-experience .b-policy-zones {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.brand-experience .b-policy-zones article {
+  background: var(--surface-paper);
+  border: var(--border);
+  border-radius: var(--radius-panel);
+  padding: 1.25rem;
+}
+.brand-experience .b-policy-zones article:first-child {
+  background: var(--accent-rose);
+  border-color: transparent;
+}
+.brand-experience .b-policy .b-policy-zones ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  font-size: var(--body-small);
+  line-height: 1.5;
+}
+.brand-experience .b-policy .b-policy-zones li + li {
+  margin-top: 0.25rem;
+}
+.brand-experience .b-policy-related {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+  margin-top: var(--space-6);
+  padding-top: var(--space-3);
+  border-top: var(--border);
+}
+.brand-experience .b-policy-related a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  font-size: var(--button);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.brand-experience .b-policy-page .b-footer {
+  border-top: var(--border);
+}
+@media (max-width: 1100px) {
+  .brand-experience .b-policy-body {
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+}
+@media (max-width: 899px) {
+  .brand-experience .b-policy {
+    padding: var(--space-5) 2rem var(--space-6);
+  }
+  .brand-experience .b-policy-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .brand-experience .b-policy-toc {
+    position: static;
+    padding: 1.25rem;
+    background: var(--surface-paper);
+    border: var(--border);
+    border-radius: var(--radius-panel);
+  }
+}
+@media (max-width: 640px) {
+  .brand-experience .b-policy {
+    padding: var(--space-4) 1.25rem var(--space-6);
+  }
+  .brand-experience .b-policy-facts > div {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+  .brand-experience .b-policy-summary {
+    grid-template-columns: 1fr;
+  }
+}
