@@ -154,8 +154,11 @@ export function ImageFrame({
 }
 export function Logo({
   variant = "wordmark",
+  /** Below-the-fold placements (the footer) pass true so the mark is deferred. */
+  lazy = false,
 }: {
   variant?: "wordmark" | "circle" | "circleNegative" | "icon";
+  lazy?: boolean;
 }) {
   const asset = assets[variant];
   return (
@@ -163,6 +166,8 @@ export function Logo({
       className={`b-logo b-logo-${variant}`}
       src={asset.src!}
       alt={asset.alt}
+      loading={lazy ? "lazy" : "eager"}
+      decoding="async"
       width={variant === "wordmark" ? 430 : 220}
       height={variant === "wordmark" ? 110 : 220}
     />

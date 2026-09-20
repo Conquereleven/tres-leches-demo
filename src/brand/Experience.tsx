@@ -31,6 +31,7 @@ import {
   Modal,
 } from "./primitives";
 import { OrderAcknowledgement, SiteFooter } from "./SiteChrome";
+import { useReveal } from "./useReveal";
 import { contactChannels, legalEntityLabel, policyRoutes } from "./business";
 import "./brand.css";
 type DialogKind =
@@ -49,21 +50,24 @@ const doors = [
   ["04", "SPECIAL OCCASIONS", "occasions"],
 ] as const;
 function useMotion(root: React.RefObject<HTMLDivElement | null>) {
+  // Entrance motion for [data-reveal] sections. Content renders visible and is
+  // only hidden once useReveal can guarantee it will be shown again.
+  useReveal(root);
   useEffect(() => {
     const node = root.current;
     if (!node) return;
     const media = matchMedia("(prefers-reduced-motion: reduce)");
+    // Presence tracking only: .b-in-view drives the floating order button and
+    // the ticker. It never controls the visibility of content.
     const observer = new IntersectionObserver(
       (entries) =>
-        entries.forEach((entry) => {
-          entry.target.classList.toggle("b-in-view", entry.isIntersecting);
-          if (entry.isIntersecting && !media.matches)
-            entry.target.classList.add("b-arrive");
-        }),
+        entries.forEach((entry) =>
+          entry.target.classList.toggle("b-in-view", entry.isIntersecting),
+        ),
       { threshold: 0.08 },
     );
     node
-      .querySelectorAll("[data-reveal],.b-ticker,.b-footer")
+      .querySelectorAll(".b-ticker,.b-footer")
       .forEach((el) => observer.observe(el));
     const video = node.querySelector("video");
     const vObserver = new IntersectionObserver((entries) => {
@@ -367,6 +371,11 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
                 className="b-hero-poster"
                 src={assets.poster.src}
                 alt={assets.poster.alt}
+                /* Above the fold and the LCP candidate once the asset lands:
+                   never lazy, and hinted ahead of the rest of the page. */
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
               />
             ) : (
               <div className="b-hero-fallback">
@@ -405,7 +414,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
         </Section>
         <Section id="collection" className="b-collection">
           <SectionLabel>THE FEATURED COLLECTION</SectionLabel>
-          <div className="b-featured">
+          <div className="b-featured" data-reveal-group>
             {collections.featured.map((p, i) => (
               <article key={p.id}>
                 <ImageFrame asset={p.image} />
@@ -477,7 +486,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             <br />
             TO DISCOVER.
           </EditorialHeading>
-          <div className="b-doors">
+          <div className="b-doors" data-reveal-group>
             {doors.map(([number, name, id]) => (
               <a
                 key={id}

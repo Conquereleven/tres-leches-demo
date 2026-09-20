@@ -1062,9 +1062,9 @@
 .brand-experience.b-entered .b-hero-copy > * {
   animation-delay: 0s;
 }
-.brand-experience .b-arrive {
-  animation: b-reveal var(--reveal) var(--ease);
-}
+/* b-arrive removed in TL-29: section entrance is now the [data-reveal] +
+   [data-revealed] transition contract at the end of this file. b-reveal is
+   still used by the hero copy entrance above. */
 @keyframes b-reveal {
   from {
     opacity: 0.2;
@@ -2121,5 +2121,153 @@ a.b-return {
   }
   .brand-experience .b-policy-summary {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ─── TL-29 motion system ───────────────────────────────────────────────────
+   Activates the motion vocabulary already declared in :root. Two rules govern
+   everything below:
+
+   1. Content is visible unless [data-motion="on"] is present on the storefront
+      root, and only useReveal sets that — after it has an IntersectionObserver,
+      reduced motion is off, and a failsafe timer is armed. Prerendered HTML,
+      JS-disabled visitors and policy pages (which never call useReveal) all get
+      the fully visible page.
+   2. Nothing that converts or that Paymennt must see is ever reveal-gated:
+      the WhatsApp CTA, the footer, its policy links and the payment marks are
+      excluded by selector below and carry no entrance motion.
+   ───────────────────────────────────────────────────────────────────────── */
+.brand-experience {
+  --rise: 16px;
+  --rise-sm: 8px;
+  --hover-scale: 1.02;
+  --image-zoom: 1.02;
+  --stagger-step: 90ms;
+}
+
+/* Entrance: opacity + translateY only. Both composite; neither causes layout. */
+.brand-experience[data-motion="on"] [data-reveal] {
+  transition:
+    opacity var(--reveal) var(--ease),
+    transform var(--reveal) var(--ease);
+}
+.brand-experience[data-motion="on"] [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+  transform: translateY(var(--rise));
+}
+
+/* Restrained stagger for grouped children. Capped at four steps (~270ms): past
+   that the visitor is waiting for the page instead of reading it. */
+.brand-experience[data-motion="on"] [data-reveal-group] > * {
+  transition:
+    opacity var(--reveal) var(--ease),
+    transform var(--reveal) var(--ease);
+}
+.brand-experience[data-motion="on"]
+  [data-reveal]:not([data-revealed])
+  [data-reveal-group]
+  > * {
+  opacity: 0;
+  transform: translateY(var(--rise-sm));
+}
+.brand-experience[data-motion="on"] [data-reveal-group] > :nth-child(2) {
+  transition-delay: var(--stagger-step);
+}
+.brand-experience[data-motion="on"] [data-reveal-group] > :nth-child(3) {
+  transition-delay: calc(var(--stagger-step) * 2);
+}
+.brand-experience[data-motion="on"] [data-reveal-group] > :nth-child(n + 4) {
+  transition-delay: calc(var(--stagger-step) * 3);
+}
+
+/* The footer and everything in it stays static: policy links, business
+   identity and the Visa/Mastercard marks must be immediately visible. */
+.brand-experience[data-motion="on"] .b-footer,
+.brand-experience[data-motion="on"] .b-footer * {
+  opacity: 1;
+  transform: none;
+}
+
+/* Image hover: a 2% zoom inside an aspect-ratio frame, so nothing reflows.
+   Paired with :focus-within so keyboard users get the same affordance. */
+.brand-experience .b-featured article:hover img,
+.brand-experience .b-featured article:focus-within img {
+  transform: scale(var(--image-zoom));
+}
+.brand-experience .b-featured article {
+  transition: opacity var(--micro) var(--ease);
+}
+/* Sibling softening, scoped to pointers that can actually hover. */
+@media (hover: hover) {
+  .brand-experience .b-featured:has(article:hover) article:not(:hover) {
+    opacity: 0.88;
+  }
+}
+
+/* CTA micro-interactions. Fast, reversible, and never layout-affecting. */
+.brand-experience .b-button:active,
+.b-modal .b-button:active {
+  transform: translateY(0) scale(0.99);
+  transition-duration: 90ms;
+}
+.brand-experience .b-button svg,
+.b-modal .b-button svg {
+  transition: transform var(--micro) var(--ease);
+}
+.brand-experience .b-button:hover svg,
+.brand-experience .b-button:focus-visible svg,
+.b-modal .b-button:hover svg {
+  transform: translateX(3px);
+}
+/* The primary WhatsApp CTA must not move under the pointer or thumb while it
+   is being tapped: it gets colour and arrow feedback, never a lift. */
+.brand-experience .b-whatsapp:hover,
+.brand-experience .b-whatsapp:focus-visible,
+.b-modal .b-whatsapp:hover {
+  transform: none;
+}
+.brand-experience .b-whatsapp:active,
+.b-modal .b-whatsapp:active {
+  transform: scale(0.99);
+}
+
+/* Mobile: shorter distance, half the stagger, no hover-dependent effects. */
+@media (max-width: 899px) {
+  .brand-experience {
+    --rise: var(--rise-sm);
+    --stagger-step: 45ms;
+  }
+  .brand-experience[data-motion="on"] [data-reveal-group] > :nth-child(n + 3) {
+    transition-delay: var(--stagger-step);
+  }
+  .brand-experience .b-featured article:hover img,
+  .brand-experience .b-featured article:focus-within img {
+    transform: none;
+  }
+}
+
+/* Per-component reduced-motion resets. The global rule earlier in this file
+   removes the transitions; these guarantee the resting state is visible, so a
+   reduced-motion visitor can never be left looking at a hidden section. */
+@media (prefers-reduced-motion: reduce) {
+  .brand-experience [data-reveal],
+  .brand-experience [data-reveal]:not([data-revealed]),
+  .brand-experience [data-reveal-group] > *,
+  .brand-experience [data-reveal]:not([data-revealed]) [data-reveal-group] > *,
+  .brand-experience .b-featured article,
+  .brand-experience .b-footer,
+  .brand-experience .b-footer * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    transition-delay: 0s !important;
+  }
+  .brand-experience .b-featured article:hover img,
+  .brand-experience .b-featured article:focus-within img,
+  .brand-experience .b-button:hover,
+  .brand-experience .b-button:active,
+  .brand-experience .b-button:hover svg,
+  .brand-experience .b-whatsapp:active {
+    transform: none !important;
   }
 }

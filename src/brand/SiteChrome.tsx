@@ -66,7 +66,7 @@ export function SiteFooter({
     <footer className="b-footer">
       <div className="b-footer-main">
         <div>
-          <Logo />
+          <Logo lazy />
           <p>
             Cakes, jars, bakery
             <br />
