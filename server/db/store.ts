@@ -19,6 +19,7 @@ export function seed(): State {
 }
 export class Store {
   private db: DatabaseSync;
+  private transactionState?: State;
   constructor(
     path: string,
     demo:
@@ -85,6 +86,7 @@ export class Store {
     });
   }
   read(): State {
+    if (this.transactionState) return structuredClone(this.transactionState);
     return JSON.parse(
       (
         this.db
@@ -93,7 +95,20 @@ export class Store {
       ).document,
     ) as State;
   }
+  /** Compose existing synchronous domain commands in one durable SQLite transaction. */
+  transaction<T>(fn: () => T): T {
+    if (this.transactionState) return fn();
+    return this.write((state) => {
+      this.transactionState = state;
+      try {
+        return fn();
+      } finally {
+        this.transactionState = undefined;
+      }
+    });
+  }
   write<T>(fn: (s: State) => T): T {
+    if (this.transactionState) return fn(this.transactionState);
     this.db.exec("BEGIN IMMEDIATE");
     try {
       const s = this.read();

@@ -188,6 +188,10 @@ export type NotificationReceipt = {
   attempts: number;
 };
 export type State = {
+  webCheckouts?: Record<
+    string,
+    { inputHash: string; orderId: string; createdAt: string }
+  >;
   ai?: import("../agents/model").AgentData;
   catalog?: CatalogItem[];
   paymentNotifications?: NotificationReceipt[];

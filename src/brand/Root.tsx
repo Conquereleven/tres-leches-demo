@@ -1,3 +1,4 @@
+import { CheckoutReturn } from "./Checkout";
 import { useEffect, useState } from "react";
 import { CommerceWorkspace } from "../commerce/Workspace";
 import { BrandExperience } from "./Experience";
@@ -12,6 +13,7 @@ export function Root() {
   }, []);
   if (path.startsWith("/operations")) return <CommerceWorkspace />;
   const page = path.replace(/\/+$/, "");
+  if (page === "/checkout/return") return <CheckoutReturn />;
   if (isPolicyPath(page)) return <PolicyPage path={page} />;
   return (
     <BrandExperience

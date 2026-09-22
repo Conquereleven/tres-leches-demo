@@ -1,3 +1,4 @@
+import { ProductCheckout } from "./Checkout";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowDown, ArrowUpRight, List, Play } from "@phosphor-icons/react";
 import {
@@ -136,7 +137,9 @@ function ProductExperience({
             ))}
           </div>
         )}
-        {product.status === "out-of-stock" ? (
+        {product.id === "pan-de-muerto" && product.status === "available" ? (
+          <ProductCheckout product={product} unavailable={unavailable} />
+        ) : product.status === "out-of-stock" ? (
           <Button disabled>OUT OF STOCK</Button>
         ) : (
           <WhatsAppCTA

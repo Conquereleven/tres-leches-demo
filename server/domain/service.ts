@@ -166,6 +166,8 @@ export class CommerceService {
     text: string,
     paymentContext?: { amountAed: string; url: string },
   ) {
+    // Public web orders have no WhatsApp origin. Never route them through a default number.
+    if (c.sourceNumberId === "web") return;
     const id = randomUUID();
     c.messages.push({
       id,

@@ -1,3 +1,8 @@
+import {
+  createWebCheckout,
+  quoteWebCheckout,
+  readWebCheckoutStatus,
+} from "./domain/web-checkout";
 import { agentConfig } from "./agents/config";
 import { AgentOrchestrator } from "./agents/orchestrator";
 import { OpenAIAgentProvider } from "./agents/provider";
@@ -244,6 +249,73 @@ export async function startServer(
             429,
             "Demasiadas solicitudes; espera un minuto",
           );
+        if (path.startsWith("/api/checkout")) {
+          const enabled =
+            ((runtime.environment === "staging" &&
+              process.env.PROVIDER_MODE === "test" &&
+              !!paymennt) ||
+              (isolatedTest &&
+                overrides.payment instanceof PaymenntProvider)) &&
+            !!webhookSecret;
+          if (req.method === "GET" && path === "/api/checkout/config") {
+            const s = store.read();
+            const product = s.catalog?.find(
+              (p) =>
+                p.id === "pan-de-muerto" &&
+                p.active !== false &&
+                p.availability !== "unavailable",
+            );
+            return json(res, 200, {
+              enabled: enabled && !!product,
+              mode: enabled ? "test" : "offline",
+              product: product
+                ? {
+                    id: product.id,
+                    name: product.name,
+                    priceFils: product.priceFils,
+                  }
+                : null,
+              zones: s.zones
+                .filter(
+                  (z) =>
+                    z.active &&
+                    z.minOrderAed != null &&
+                    z.deliveryFeeAed != null,
+                )
+                .map((z) => ({
+                  id: z.id,
+                  name: z.name,
+                  minOrderAed: z.minOrderAed,
+                  deliveryFeeAed: z.deliveryFeeAed,
+                })),
+            });
+          }
+          if (!enabled)
+            throw new DomainError(
+              503,
+              "Online payment is unavailable. Please order via WhatsApp.",
+            );
+          if (req.method !== "POST")
+            throw new DomainError(405, "Method not allowed");
+          if (req.headers.origin !== origin)
+            throw new DomainError(403, "Origin rejected");
+          if (
+            !(req.headers["content-type"] ?? "").startsWith("application/json")
+          )
+            throw new DomainError(415, "JSON required");
+          const body = parse(await rawBody(req));
+          if (path === "/api/checkout/quote")
+            return json(res, 200, quoteWebCheckout(service, body));
+          if (path === "/api/checkout/status") {
+            const { key } = z.object({ key: z.uuid() }).strict().parse(body);
+            return json(res, 200, readWebCheckoutStatus(service, key));
+          }
+          if (path === "/api/checkout") {
+            const key = z.uuid().parse(req.headers["idempotency-key"]);
+            return json(res, 200, await createWebCheckout(service, body, key));
+          }
+          throw new DomainError(404, "Not found");
+        }
         if (req.method === "GET" && path === "/api/health")
           return json(res, 200, {
             ok: true,
@@ -596,6 +668,7 @@ export async function startServer(
         !existsSync(candidate) &&
         ![
           "/",
+          "/checkout/return",
           "/operations/inbox",
           "/operations/orders",
           "/operations/production",
