@@ -65,24 +65,31 @@ Official Mastercard Symbol artwork, unmodified.
   Visa's 20px so the two marks match optically.
 - The unofficial reproduction previously at this path has been replaced.
 
-### `visa.svg` — UNOFFICIAL PLACEHOLDER
+### `visa.svg` — OFFICIAL
 
-**Still a locally reproduced placeholder, not official artwork.** It must be
-replaced before the site is submitted to Paymennt for LIVE review, and must
-never be described to Paymennt as approved.
+Official Visa Brand Mark artwork, unmodified.
 
-The official Visa Brand Mark requires the form at
-<https://globalclient.visa.com/brand-mark> (first name, last name, title,
-company, business email, country) plus acceptance of Visa's Terms of Use, so it
-must be completed by an authorised person at the merchant. The Company field is
-**Golositalia FZCO**. Take the **SVG**, light-background Visa Blue Brand Mark.
+- Package: **Visa Brand Mark DIGITAL 2025**
+  (`visa-brand-mark-digital-2025.zip`), downloaded by the merchant from the
+  Visa Brand Center after completing Visa's form and accepting its Terms of Use.
+- Source: <https://corporate.visa.com/en/about-visa/brand.html> → Brand
+  essentials → Download Visa Brand Mark → <https://globalclient.visa.com/brand-mark>
+- Variant selected: global (non-Canada) **DIGITAL**, **blue RGB** — the Visa
+  Blue Brand Mark for light backgrounds, which is what the white payment tile
+  requires.
+- Original filename:
+  `Visa Brand Mark DIGITAL/VBM_digital_2025/blue/VBM_bluRGB_2025.svg`
+- Integrated: 22 September 2026, stored byte-for-byte (1560 bytes, SHA-256
+  `733ef827287b926d3bd37907787859f810ef44ad9fc09f0252661d58c44e22c1`).
+- `viewBox="0 0 278.075 169.374"` (ratio 1.642), Visa Blue `#1434cb`.
+  Paths, colours, viewBox and proportions are unaltered.
+- The package also contains black and white variants, Canada-specific marks,
+  `.ai` and `.png` versions and Visa's ReadMe. Only the file above is stored in
+  the repository; the rest stay in the downloaded package.
+- Like Mastercard's, the artboard carries Visa's required clear space, so the
+  box is larger than the visible wordmark. Both marks use a 32px box, which
+  lands their visible artwork at a matching optical size.
+- The unofficial reproduction previously at this path has been replaced.
 
-Swapping it in requires no code or layout change: save the official file over
-`public/payments/visa.svg`. The only thing to check afterwards is the intrinsic
-`width`/`height` pair on the Visa `<img>` in `src/brand/SiteChrome.tsx`
-(`PaymentMarks`), currently `52 × 20`. If the official artwork has a different
-aspect ratio, update that pair to match its viewBox so the mark reserves the
-right space and causes no layout shift; CSS sets height only and leaves width
-`auto`, so the ratio is preserved either way.
-
-Tracked as items 7 and 8 in `docs/paymennt/website-live-compliance.md`.
+Both marks are now official artwork. Tracked as items 7 and 8 in
+`docs/paymennt/website-live-compliance.md`.

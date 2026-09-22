@@ -133,10 +133,11 @@ export function ResponsiveMedia({
       decoding="async"
     />
   ) : (
-    <div className="b-data-slot" data-asset={asset.id}>
-      <span className="b-label">IMAGE PENDING</span>
-      <span>{asset.alt}</span>
-    </div>
+    /* No approved photograph yet. Rather than label the gap for customers, the
+       slot renders a decorative brand panel: palette, geometry and whitespace
+       only, no text and no network request. `data-asset` keeps the slot
+       identifiable in the DOM for whoever supplies the image later. */
+    <div className="b-media-panel" data-asset={asset.id} aria-hidden="true" />
   );
 }
 export function ImageFrame({

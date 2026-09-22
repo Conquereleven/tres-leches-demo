@@ -24,12 +24,15 @@ export function PaymentMarks() {
       </p>
       <ul aria-labelledby="b-payments-label">
         <li>
-          <img src="/payments/visa.svg" alt="Visa" width="52" height="20" />
+          {/* Official Visa Brand Mark, viewBox 278.075 × 169.374 (ratio 1.642).
+              The artboard carries Visa's required clear space, so the box is
+              larger than the visible wordmark by design. */}
+          <img src="/payments/visa.svg" alt="Visa" width="53" height="32" />
         </li>
         <li>
           {/* Official Mastercard Symbol, viewBox 152.4 × 108 (ratio 1.411).
-              The artboard carries Mastercard's required clear space, so the
-              box is taller than the visible symbol by design. */}
+              Same clear-space arrangement, so both marks use a 32px box and
+              their visible artwork lands at a matching optical size. */}
           <img
             src="/payments/mastercard.svg"
             alt="Mastercard"

@@ -242,3 +242,56 @@ test("payment marks are static, never reveal-gated", () => {
   for (const alt of ['alt="Visa"', 'alt="Mastercard"'])
     assert.ok(marks.includes(alt), `${alt} missing`);
 });
+
+test("no customer-visible development placeholder reaches the rendered page", () => {
+  // Experience.tsx imports brand.css, which the node test loader cannot read,
+  // so the storefront is checked at source level: comments are stripped and
+  // the remaining JSX text and string literals must carry no dev placeholder.
+  const banned =
+    /\b(IMAGE PENDING|DATA SLOT|awaiting confirmation|awaiting approval|awaiting delivery|Approved content pending|ORIGINAL ASSET PENDING|pending approval|pending confirmation|Provisional categories|TBD|Lorem ipsum)\b/i;
+  const stripComments = (src: string) =>
+    src.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
+  for (const file of ["Experience.tsx", "SiteChrome.tsx", "primitives.tsx"]) {
+    const hit = banned.exec(
+      stripComments(readFileSync(`src/brand/${file}`, "utf8")),
+    );
+    assert.equal(hit, null, `${file} renders a placeholder: "${hit?.[0]}"`);
+  }
+  // Policy pages are rendered for real and must be equally clean.
+  for (const { path } of policyRoutes) {
+    const text = renderToStaticMarkup(
+      createElement(PolicyPage, { path }),
+    ).replace(/<[^>]+>/g, " ");
+    const hit = banned.exec(text);
+    assert.equal(hit, null, `${path} renders a placeholder: "${hit?.[0]}"`);
+  }
+  // The HTML shell's noscript copy is customer-visible too.
+  assert.doesNotMatch(readFileSync("index.html", "utf8"), banned);
+});
+
+test("the Visa mark is the official Brand Mark DIGITAL 2025 artwork", () => {
+  const svg = readFileSync("public/payments/visa.svg", "utf8");
+  assert.match(
+    svg,
+    /viewBox="0 0 278\.075 169\.374"/,
+    "official viewBox altered",
+  );
+  assert.ok(svg.includes("#1434cb"), "official Visa Blue missing");
+  assert.ok(svg.includes("VBM_bluRGB_2025"), "not the official blue RGB file");
+  assert.equal(
+    Buffer.byteLength(svg),
+    1560,
+    "file differs from the official artwork",
+  );
+  const chrome = readFileSync("src/brand/SiteChrome.tsx", "utf8");
+  assert.match(chrome, /width="53"\s*\n?\s*height="32"|width="53" height="32"/);
+});
+
+test("the intro preloader is gone and nothing gates first paint", () => {
+  const css = readFileSync("src/brand/brand.css", "utf8");
+  const src = readFileSync("src/brand/Experience.tsx", "utf8");
+  assert.doesNotMatch(css, /b-preloader/);
+  assert.doesNotMatch(src, /b-preloader/);
+  assert.doesNotMatch(src, /3l-entered/);
+  assert.doesNotMatch(readFileSync("index.html", "utf8"), /b-preloader/);
+});

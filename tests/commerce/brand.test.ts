@@ -82,6 +82,9 @@ test("critical motion has a global reduced motion fallback", () => {
   const css = readFileSync("src/brand/brand.css", "utf8").replace(/\s/g, "");
   assert.match(css, /@media\(prefers-reduced-motion:reduce\)/);
   assert.match(css, /animation:none!important/);
-  assert.match(css, /\.b-preloader\{display:none;?\}/);
+  // The intro preloader was removed in TL-30; reduced motion must instead
+  // guarantee revealed content resolves visible.
+  assert.doesNotMatch(css, /b-preloader/);
+  assert.match(css, /opacity:1!important/);
   assert.match(css, /scroll-behavior:auto/);
 });

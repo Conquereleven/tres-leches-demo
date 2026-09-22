@@ -99,6 +99,10 @@ function ProductExperience({
   const [selected, setSelected] = useState(0);
   const product = products[selected]!;
   const message = productInquiry(product);
+  // A selector is only meaningful once products have confirmed names. Until
+  // then the section keeps its heading, artwork and ordering CTA, and simply
+  // does not offer a list of unnamed items.
+  const named = products.filter((p) => p.name);
   return (
     <Section id={id} className={`b-product-experience b-${id}`}>
       <div className="b-product-copy">
@@ -106,30 +110,29 @@ function ProductExperience({
           {id === "custom" ? "THE 3L ATELIER" : "THE COLLECTION"}
         </SectionLabel>
         <EditorialHeading>{title}</EditorialHeading>
-        <div className="b-product-list" aria-label={`${title} selection`}>
-          {products.map((p, i) => (
-            <button
-              key={p.id}
-              aria-pressed={selected === i}
-              onFocus={() => setSelected(i)}
-              onMouseEnter={() => setSelected(i)}
-              onClick={() => setSelected(i)}
-            >
-              <span className="b-label">0{i + 1}</span>
-              <span>
-                {p.name ??
-                  `${title === "CAKE JARS" ? "Flavor" : title === "CUSTOM CAKES" ? "Category" : "Product"} awaiting confirmation`}
-              </span>
-              <span>
-                {p.status === "out-of-stock"
-                  ? "OUT OF STOCK"
-                  : selected === i
-                    ? "Selected"
-                    : "Select"}
-              </span>
-            </button>
-          ))}
-        </div>
+        {named.length > 0 && (
+          <div className="b-product-list" aria-label={`${title} selection`}>
+            {products.map((p, i) => (
+              <button
+                key={p.id}
+                aria-pressed={selected === i}
+                onFocus={() => setSelected(i)}
+                onMouseEnter={() => setSelected(i)}
+                onClick={() => setSelected(i)}
+              >
+                <span className="b-label">0{i + 1}</span>
+                <span>{p.name}</span>
+                <span>
+                  {p.status === "out-of-stock"
+                    ? "OUT OF STOCK"
+                    : selected === i
+                      ? "Selected"
+                      : "Select"}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
         {product.status === "out-of-stock" ? (
           <Button disabled>OUT OF STOCK</Button>
         ) : (
@@ -148,9 +151,7 @@ function ProductExperience({
       </div>
       <div className="b-selected-product" aria-live="polite">
         <ImageFrame key={product.id} asset={product.image} />
-        <p className="b-caption">
-          {product.name ?? `DATA SLOT · ${product.id}`}
-        </p>
+        {product.name && <p className="b-caption">{product.name}</p>}
       </div>
     </Section>
   );
@@ -230,42 +231,36 @@ function Newsletter() {
           <span>{approved.consent}</span>
         </label>
         <p id="b-news-message" role="status" className="b-form-status">
-          {message ||
-            "Subscriptions will open when our newsletter service is connected."}
+          {message}
         </p>
       </form>
     </Section>
   );
 }
+/** Only a fully approved offer (copy, CTA and artwork) may render publicly. */
+const promotionReady = Boolean(
+  promotion.enabled &&
+  promotion.message &&
+  promotion.cta &&
+  assets.promotion.src,
+);
+
 export function BrandExperience({ onManage }: { onManage: () => void }) {
+  const voices = visibleTestimonials(testimonials);
   const root = useRef<HTMLDivElement>(null);
   useMotion(root);
   const [dialog, setDialog] = useState<DialogKind>(null),
     [selectedDoor, setSelectedDoor] = useState<string>("jars"),
     [occasion, setOccasion] = useState(0),
-    [entered, setEntered] = useState(false),
     [scrolled, setScrolled] = useState(false),
     [videoFailed, setVideoFailed] = useState(false);
   useEffect(() => {
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-    let seen = false;
-    try {
-      seen = sessionStorage.getItem("3l-entered") === "1";
-      sessionStorage.setItem("3l-entered", "1");
-    } catch {
-      /* Private storage may be unavailable; never block content. */
-    }
-    const timer = setTimeout(
-      () => setEntered(true),
-      seen || reduced.matches ? 0 : 3000,
-    );
+    // The 3s intro splash was removed in TL-30: the site loads in well under
+    // half a second, so the splash only deferred LCP and the WhatsApp CTA.
     const scroll = () => setScrolled(window.scrollY > 48);
     scroll();
     window.addEventListener("scroll", scroll, { passive: true });
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("scroll", scroll);
-    };
+    return () => window.removeEventListener("scroll", scroll);
   }, []);
   useEffect(() => {
     if (
@@ -310,22 +305,10 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
   );
   const close = () => setDialog(null);
   return (
-    <div
-      ref={root}
-      className={`brand-experience ${entered ? "b-entered" : ""}`}
-      lang="en"
-    >
+    <div ref={root} className="brand-experience b-entered" lang="en">
       <a className="b-skip" href="#main-content">
         Skip to content
       </a>
-      {!entered && (
-        <div className="b-preloader" aria-hidden="true">
-          <div className="b-preloader-mark">
-            <StarMotif />
-            <Logo variant="icon" />
-          </div>
-        </div>
-      )}
       <header className={`b-header ${scrolled ? "b-scrolled" : ""}`}>
         <nav className="b-nav-left" aria-label="Primary">
           <a href="#story">OUR STORY</a>
@@ -417,15 +400,13 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
         <Section id="collection" className="b-collection">
           <SectionLabel>THE FEATURED COLLECTION</SectionLabel>
           <div className="b-featured" data-reveal-group>
-            {collections.featured.map((p, i) => (
+            {collections.featured.map((p) => (
+              /* Without a confirmed product name the tile stays purely
+                 visual — a brand panel under the section heading — rather
+                 than announcing that data is missing. */
               <article key={p.id}>
                 <ImageFrame asset={p.image} />
-                <h3>
-                  {p.name ?? `Featured cake ${String(i + 1).padStart(2, "0")}`}
-                </h3>
-                <p className="b-caption">
-                  {p.name ? "" : "DATA SLOT · Product selection pending"}
-                </p>
+                {p.name && <h3>{p.name}</h3>}
               </article>
             ))}
           </div>
@@ -463,7 +444,9 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               WITH LOVE.
               <br />A FAMILY LEGACY.
             </EditorialHeading>
-            <p className="b-pending-copy">Approved family story pending.</p>
+            {/* No approved story paragraph yet. The heading and the
+                DISCOVER OUR STORY action carry the section on their own;
+                marketing copy is not written here. */}
             <Button
               className="b-text-button"
               onClick={() => setDialog("story")}
@@ -541,9 +524,6 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               OCCASIONS
             </EditorialHeading>
             <p>Cakes for life’s most meaningful moments, big and small.</p>
-            <p className="b-caption">
-              Provisional categories · pending confirmation
-            </p>
           </div>
           <div className="b-occasion-layout">
             <div className="b-occasion-tabs" aria-label="Occasion category">
@@ -560,9 +540,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             </div>
             <div aria-live="polite">
               <ImageFrame key={occasion} asset={occasionAssets[occasion]!} />
-              <p className="b-caption">
-                {occasions[occasion]} · approved gallery pending
-              </p>
+              <p className="b-caption">{occasions[occasion]}</p>
             </div>
           </div>
           <WhatsAppCTA
@@ -572,29 +550,26 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             REQUEST A CAKE
           </WhatsAppCTA>
         </Section>
-        <Section id="voices" className="b-voices">
-          <SectionLabel>FROM YOUR MOMENTS</SectionLabel>
-          <EditorialHeading>
-            A LITTLE
-            <br />
-            SWEETNESS, SHARED.
-          </EditorialHeading>
-          <div className="b-voice-universe">
-            {visibleTestimonials(testimonials).length
-              ? visibleTestimonials(testimonials).map((t) => (
-                  <blockquote key={t.id}>
-                    <p>{t.text}</p>
-                    <cite>{t.source}</cite>
-                  </blockquote>
-                ))
-              : ["Google", "Instagram", "WhatsApp"].map((source) => (
-                  <div className="b-voice-slot" key={source}>
-                    <SectionLabel>{source}</SectionLabel>
-                    <p>Verified customer voice pending.</p>
-                  </div>
-                ))}
-          </div>
-        </Section>
+        {/* Only verified, permissioned customer quotes appear here. With none
+            approved the section is omitted rather than shown as empty slots. */}
+        {voices.length > 0 && (
+          <Section id="voices" className="b-voices">
+            <SectionLabel>FROM YOUR MOMENTS</SectionLabel>
+            <EditorialHeading>
+              A LITTLE
+              <br />
+              SWEETNESS, SHARED.
+            </EditorialHeading>
+            <div className="b-voice-universe">
+              {voices.map((t) => (
+                <blockquote key={t.id}>
+                  <p>{t.text}</p>
+                  <cite>{t.source}</cite>
+                </blockquote>
+              ))}
+            </div>
+          </Section>
+        )}
         <Section id="community" className="b-community">
           <SectionLabel>@3L.DUBAI</SectionLabel>
           <EditorialHeading>MORE THAN A CAKE.</EditorialHeading>
@@ -605,28 +580,28 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               FOLLOW OUR JOURNEY
             </TextLink>
           ) : (
-            <Button onClick={() => setDialog("social")}>
-              FOLLOW OUR JOURNEY
-              <ArrowUpRight aria-hidden />
-            </Button>
+            <WhatsAppCTA unavailable={contact}>SAY HELLO</WhatsAppCTA>
           )}
         </Section>
-        <section
-          id="promotion"
-          className="b-promotion-slot"
-          aria-label="Promotional discovery"
-        >
-          <span className="b-caption">
-            PROMOTION · Approved content pending
-          </span>
-          <button
-            className="b-text-button"
-            onClick={() => setDialog("promotion")}
+        {/* The promotion block renders only when a real, approved offer
+            exists. With nothing approved it is omitted entirely rather than
+            shown as an empty teaser — we do not advertise a non-offer. */}
+        {promotionReady && (
+          <section
+            id="promotion"
+            className="b-promotion-slot"
+            aria-label="Promotional discovery"
           >
-            Discover more
-            <ArrowUpRight aria-hidden />
-          </button>
-        </section>
+            <span className="b-caption">{promotion.message}</span>
+            <button
+              className="b-text-button"
+              onClick={() => setDialog("promotion")}
+            >
+              Discover more
+              <ArrowUpRight aria-hidden />
+            </button>
+          </section>
+        )}
         <Section id="dubai" className="b-dubai">
           <div>
             <SectionLabel>MEXICO CITY → DUBAI</SectionLabel>
@@ -647,7 +622,11 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
       <SiteFooter
         onContactUnavailable={contact}
         onFaq={() => setDialog("faq")}
-        onSocial={() => setDialog("social")}
+        onSocial={
+          destinations.instagram || destinations.tiktok
+            ? () => setDialog("social")
+            : undefined
+        }
         onManage={onManage}
       />
       <WhatsAppCTA
@@ -700,8 +679,8 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
                 </ul>
               ) : (
                 <p>
-                  The official WhatsApp contact is awaiting confirmation.
-                  Ordering will be available here once it is connected.
+                  Please see our <a href="/contact">contact page</a> for the
+                  ways to reach our customer care team.
                 </p>
               )}
               <p className="b-caption">{legalEntityLabel()}</p>
@@ -712,34 +691,55 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             <>
               <p>{approved.hero}</p>
               <ImageFrame asset={assets.family} />
-              <p>
-                The approved family story and original film are awaiting
-                delivery.
-              </p>
+              <p>{approved.heritage}</p>
             </>
           ) : dialog === "collection" ? (
             <>
-              <p>The complete cake collection is awaiting approval.</p>
+              <p>
+                Message us and our team will share the cakes available today,
+                with prices in AED.
+              </p>
+              <WhatsAppCTA
+                unavailable={contact}
+                message="Hello 3L, could you share your current collection?"
+              >
+                ASK FOR TODAY’S COLLECTION
+              </WhatsAppCTA>
               <TextLink href="#jars">EXPLORE CAKE JARS</TextLink>
             </>
           ) : dialog === "social" ? (
             <>
               <p>@3L.DUBAI</p>
-              <p>Official social links are awaiting confirmation.</p>
+              {/* Reachable only when a profile is configured; the entry
+                  points are hidden otherwise, so there is no empty state. */}
+              <nav className="b-modal-nav" aria-label="Social profiles">
+                {destinations.instagram && (
+                  <a href={destinations.instagram}>INSTAGRAM</a>
+                )}
+                {destinations.tiktok && (
+                  <a href={destinations.tiktok}>TIKTOK</a>
+                )}
+              </nav>
             </>
           ) : dialog === "faq" ? (
             <>
-              <p>Ordering information is awaiting confirmation.</p>
+              <p>
+                How ordering, delivery, cancellations and refunds work is set
+                out in full on our policy pages.
+              </p>
+              <nav className="b-modal-nav" aria-label="Customer information">
+                <a href="/contact">HOW TO ORDER</a>
+                <a href="/delivery-policy">DELIVERY POLICY</a>
+                <a href="/refund-policy">REFUND &amp; CANCELLATION</a>
+                <a href="/terms">TERMS &amp; CONDITIONS</a>
+              </nav>
               <Button onClick={contact}>CONTACT 3L</Button>
             </>
           ) : (
             <>
               <ImageFrame asset={assets.promotion} />
-              <p>
-                {promotion.message ??
-                  "Approved promotional image and message pending."}
-              </p>
-              {promotion.enabled && promotion.cta && (
+              {promotion.message && <p>{promotion.message}</p>}
+              {promotion.cta && (
                 <WhatsAppCTA unavailable={contact}>{promotion.cta}</WhatsAppCTA>
               )}
             </>
