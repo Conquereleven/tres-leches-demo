@@ -80,12 +80,14 @@ export const slots = (category: string, count: number): Product[] =>
 const panDeMuerto: Product = {
   id: "pan-de-muerto",
   name: "Pan de Muerto",
-  /**
-   * No approved photograph yet, so the card renders the brand media panel
-   * rather than stand-in artwork. Supplying a real photo is a one-file swap:
-   * drop it in public/assets/ and set `src` to its path.
-   */
-  image: pending("pan-de-muerto", "Pan de Muerto"),
+  /** Owner-supplied product photograph, 22 September 2026. Stored unmodified. */
+  image: {
+    id: "pan-de-muerto",
+    alt: "Pan de Muerto — sugar-dusted Mexican sweet bread",
+    status: "AVAILABLE",
+    src: "/assets/pan-de-muerto.webp",
+    source: "Supplied by the owner, 22 September 2026",
+  },
   status: "available",
   description: "Traditional Mexican sweet bread, baked fresh in Dubai.",
   priceFils: 2500,

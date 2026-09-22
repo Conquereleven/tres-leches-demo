@@ -85,7 +85,9 @@ export async function startServer(
     throw new Error("Staging database must be outside static dist");
   const stagingAliases =
     activation.meta?.numbers ??
-    numbers.map((n) => ({ ...n, phone: "NOT CONFIGURED" }));
+    (runtime.environment === "production"
+      ? []
+      : numbers.map((n) => ({ ...n, phone: "NOT CONFIGURED" })));
   const store = new Store(
     dbPath,
     isolatedTest
@@ -614,6 +616,9 @@ export async function startServer(
         ".js": "text/javascript",
         ".css": "text/css",
         ".png": "image/png",
+        ".webp": "image/webp",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
         ".svg": "image/svg+xml",
         ".woff2": "font/woff2",
         ".mp4": "video/mp4",
