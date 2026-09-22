@@ -8,6 +8,7 @@ import {
   deliveryBands,
   freeDeliveryAreas,
   legalEntityLabel,
+  pendingBusinessFacts,
   policyRoutes,
   isPolicyPath,
 } from "../../src/brand/business";
@@ -109,4 +110,80 @@ test("published delivery minimums stay identical to the operational zone seed", 
     ),
   );
   assert.ok(existsSync("docs/sources/delivery-minimums.jpeg"));
+});
+
+test("confirmed merchant identity and contacts render on the customer pages", () => {
+  assert.equal(business.legalName, "Golositalia FZCO");
+  assert.equal(business.tradingName, "Pastelerías 3L");
+  assert.match(
+    legalEntityLabel(),
+    /Golositalia FZCO, trading as Pastelerías 3L/,
+  );
+  assert.ok(business.address?.includes("Cluster C"));
+  assert.equal(business.supportContacts.length, 3);
+  for (const c of business.supportContacts)
+    assert.match(
+      c.phone,
+      /^\+971 \d{2} \d{3} \d{4}$/,
+      `bad format: ${c.phone}`,
+    );
+
+  const terms = render("/terms");
+  assert.ok(
+    terms.includes("Golositalia FZCO"),
+    "legal entity missing from Terms",
+  );
+  assert.ok(
+    terms.includes("Pastelerías 3L"),
+    "trading name missing from Terms",
+  );
+
+  const contact = render("/contact");
+  assert.ok(
+    contact.includes(business.address!),
+    "address missing from Contact",
+  );
+  for (const c of business.supportContacts) {
+    assert.ok(contact.includes(c.phone), `${c.phone} missing from Contact`);
+    assert.ok(
+      contact.includes(`tel:${c.phone.replace(/\s+/g, "")}`),
+      `dialable link missing for ${c.phone}`,
+    );
+  }
+});
+
+test("the cancellation rule is stated consistently and never called a tax", () => {
+  const refund = render("/refund-policy");
+  const terms = render("/terms");
+  for (const html of [refund, terms]) {
+    assert.ok(html.includes("12 hours"), "12-hour cut-off missing");
+    assert.ok(html.includes("90%"), "90% refund missing");
+    assert.ok(html.includes("10%"), "10% fee missing");
+    assert.ok(
+      /non-refundable/.test(html),
+      "inside-cut-off non-refundable rule missing",
+    );
+    // The fee is an administrative fee; it must not be described as a tax.
+    assert.doesNotMatch(html, /\bVAT\b/, "must not describe the fee as VAT");
+    assert.doesNotMatch(
+      html,
+      /Corporate Tax/i,
+      "must not describe the fee as Corporate Tax",
+    );
+  }
+  assert.ok(
+    refund.includes("delivery of your order becomes impossible") ||
+      refund.includes("becomes impossible"),
+    "impossible-delivery refund reason missing",
+  );
+});
+
+test("the WhatsApp ordering number is still unconfirmed and is not guessed", () => {
+  // Three support numbers are confirmed; none is approved as the WhatsApp
+  // ordering line, so business.whatsapp must stay unset.
+  assert.equal(business.whatsapp, null);
+  assert.ok(
+    pendingBusinessFacts().includes("business.whatsapp"),
+    "whatsapp must remain listed as pending",
+  );
 });

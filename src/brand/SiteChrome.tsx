@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { List } from "@phosphor-icons/react";
 import { approved } from "./content";
-import { business, legalEntityLabel, policyRoutes } from "./business";
+import {
+  business,
+  legalEntityLabel,
+  phoneHref,
+  policyRoutes,
+} from "./business";
 import { Logo, Modal, SectionLabel, WhatsAppCTA } from "./primitives";
 
 /** Card acceptance marks. Locally hosted; no endorsement is implied. */
@@ -111,8 +116,19 @@ export function SiteFooter({
       </p>
       <div className="b-footer-bottom">
         <span>
-          © {new Date().getFullYear()} {legalEntityLabel()} · {business.city},{" "}
-          {business.country}
+          © {new Date().getFullYear()} {legalEntityLabel()} ·{" "}
+          {business.address ?? `${business.city}, ${business.country}`}
+          {business.supportContacts.length > 0 && (
+            <>
+              {" · "}
+              {business.supportContacts.map((c, i) => (
+                <span key={c.phone}>
+                  {i > 0 && " · "}
+                  <a href={phoneHref(c.phone)}>{c.phone}</a>
+                </span>
+              ))}
+            </>
+          )}
         </span>
         {onManage && (
           <div>

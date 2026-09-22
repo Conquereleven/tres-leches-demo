@@ -8,6 +8,9 @@ import { useEffect, type ReactNode } from "react";
 import { ArrowUpRight } from "@phosphor-icons/react";
 import {
   business,
+  cancellationCutoffHours,
+  cancellationFeePercent,
+  cancellationRefundPercent,
   contactChannels,
   deliveryBands,
   freeDeliveryAreas,
@@ -35,6 +38,10 @@ const L = ({ to, children }: { to: PolicyPath; children: ReactNode }) => (
   <a href={to}>{children}</a>
 );
 const who = () => business.legalName ?? business.tradingName;
+// Short aliases for the confirmed cancellation rule, used across several pages.
+const cutoff = cancellationCutoffHours;
+const refundPct = cancellationRefundPercent;
+const feePct = cancellationFeePercent;
 
 function ContactDetails() {
   const channels = contactChannels();
@@ -170,16 +177,26 @@ export const pages: Record<PolicyPath, Page> = {
           <>
             <p>
               This website and our ordering service are operated by{" "}
-              <strong>{legalEntityLabel()}</strong>, based in {business.city},{" "}
-              {business.country}
+              <strong>{business.legalName ?? business.tradingName}</strong>
+              {business.legalName ? (
+                <>
+                  , the legal entity behind the{" "}
+                  <strong>{business.tradingName}</strong> brand
+                </>
+              ) : null}
               {business.tradeLicence
                 ? ` (trade licence ${business.tradeLicence})`
                 : ""}
-              .{business.address ? ` Our address is ${business.address}.` : ""}
+              .{" "}
+              {business.address
+                ? `Our business address is ${business.address}.`
+                : `We are based in ${business.city}, ${business.country}.`}
             </p>
             <p>
-              In these terms, “we”, “us”, “our” and “3L” mean {who()}. “You”
-              means the person placing the order or using this website.
+              In these terms, “we”, “us”, “our” and “3L” mean {who()}, and{" "}
+              {business.tradingName} is the customer-facing brand under which we
+              trade. “You” means the person placing the order or using this
+              website.
             </p>
           </>
         ),
@@ -321,12 +338,24 @@ export const pages: Record<PolicyPath, Page> = {
         id: "cancellation",
         title: "10. Cancellations and refunds",
         body: (
-          <p>
-            You can cancel an order at no cost before you pay. Once payment is
-            verified your order is confirmed, and cancellation or refund
-            requests are reviewed by our team as described in our{" "}
-            <L to="/refund-policy">Refund &amp; Cancellation Policy</L>.
-          </p>
+          <>
+            <p>
+              You can cancel an order at no cost before you pay. Once payment is
+              verified your order is confirmed.
+            </p>
+            <p>
+              A confirmed order may be cancelled {decide.paidCancellationWindow}
+              . We then refund {refundPct}% of the amount paid and retain{" "}
+              {feePct}% as a cancellation and administrative fee. If fewer than{" "}
+              {cutoff} hours remain before the scheduled delivery time, the
+              order cannot be cancelled and is non-refundable.
+            </p>
+            <p>
+              The full rules, including the other circumstances in which we
+              issue a refund, are in our{" "}
+              <L to="/refund-policy">Refund &amp; Cancellation Policy</L>.
+            </p>
+          </>
         ),
       },
       {
@@ -616,10 +645,12 @@ export const pages: Record<PolicyPath, Page> = {
         text: "Cancel or change your order at any time, free of charge. Nothing is charged until you complete payment.",
       },
       {
-        title: "After payment",
-        text: decide.paidCancellationWindow
-          ? `Your order is confirmed. You can request a cancellation ${decide.paidCancellationWindow}.`
-          : "Your order is confirmed and cannot be cancelled automatically. Contact us straight away — our team reviews every request.",
+        title: `${cutoff} hours or more before delivery`,
+        text: `You can cancel your order. We refund ${refundPct}% of the amount paid and retain ${feePct}% as a cancellation and administrative fee.`,
+      },
+      {
+        title: `Less than ${cutoff} hours before delivery`,
+        text: "The order can no longer be cancelled, and it is non-refundable.",
       },
       {
         title: "Something wrong?",
@@ -651,29 +682,25 @@ export const pages: Record<PolicyPath, Page> = {
           <>
             <p>
               Once your payment is verified, your order is confirmed and
-              scheduled for preparation. Paid orders cannot be cancelled or
-              changed automatically. Please contact us as soon as possible if
-              you need to cancel.
+              scheduled for preparation. Paid orders cannot be cancelled
+              automatically — please contact us to request a cancellation.
             </p>
-            {decide.paidCancellationWindow ? (
-              <p>
-                You can cancel a paid order {decide.paidCancellationWindow}.
-                {decide.paidCancellationRefund
-                  ? ` Approved cancellations within this period receive ${decide.paidCancellationRefund}.`
-                  : ""}
-              </p>
-            ) : (
-              <p>
-                Our team reviews each cancellation request individually, taking
-                into account whether preparation of your order has started.
-                Because our products are freshly made to order and perishable —
-                and custom cakes are made to your specific design — we may be
-                unable to cancel an order once preparation has begun.
-              </p>
-            )}
             <p>
-              If we approve a cancellation, we will confirm the refund amount to
-              you in writing before processing it.
+              You can cancel a paid order {decide.paidCancellationWindow}. Where
+              we receive your request within that period, we refund{" "}
+              <strong>{refundPct}% of the amount you paid</strong> and retain{" "}
+              <strong>{feePct}%</strong> as a cancellation and administrative
+              fee.
+            </p>
+            <p>
+              If fewer than {cutoff} hours remain before the scheduled delivery
+              time, the order can no longer be cancelled and it is{" "}
+              <strong>non-refundable</strong>. Our products are freshly made to
+              order and perishable, and preparation is already under way by that
+              point.
+            </p>
+            <p>
+              We will confirm the refund amount to you before processing it.
             </p>
           </>
         ),
@@ -720,15 +747,46 @@ export const pages: Record<PolicyPath, Page> = {
         ),
       },
       {
+        id: "when-refunds",
+        title: "5. When a refund is available",
+        body: (
+          <>
+            <p>We issue a refund where:</p>
+            <ol>
+              <li>we made an error with your order;</li>
+              <li>
+                you received an incorrect product, and the issue can reasonably
+                be verified;
+              </li>
+              <li>delivery of your order becomes impossible; or</li>
+              <li>
+                you cancel your order at least {cutoff} hours before the
+                scheduled delivery time.
+              </li>
+            </ol>
+            <p>
+              In cases 1 to 3 we refund the amount paid for the affected items.
+              In case 4 we refund {refundPct}% of the amount paid and retain{" "}
+              {feePct}% as a cancellation and administrative fee.
+            </p>
+            <p>
+              Where fewer than {cutoff} hours remain before the scheduled
+              delivery time, the order cannot be cancelled and no refund is
+              available.
+            </p>
+          </>
+        ),
+      },
+      {
         id: "limitations",
-        title: "5. When a refund may not be possible",
+        title: "6. When a refund may not be possible",
         body: (
           <>
             <p>We may decline a refund request where:</p>
             <ul>
               <li>
-                preparation had already started when a change-of-mind
-                cancellation was requested;
+                the cancellation was requested with fewer than {cutoff} hours
+                remaining before the scheduled delivery time;
               </li>
               <li>
                 a delivery could not be completed because of incorrect delivery
@@ -758,12 +816,11 @@ export const pages: Record<PolicyPath, Page> = {
       },
       {
         id: "how-to-request",
-        title: "6. How to request a cancellation or refund",
+        title: "7. How to request a cancellation or refund",
         body: (
           <ol>
             <li>
-              Contact our customer care team using the details below — WhatsApp
-              is the fastest way to reach us.
+              Contact our customer care team on any of the numbers listed below.
             </li>
             <li>
               Give your order reference, the name on the order and the reason
@@ -782,7 +839,7 @@ export const pages: Record<PolicyPath, Page> = {
       },
       {
         id: "refund-method",
-        title: "7. How refunds are paid",
+        title: "8. How refunds are paid",
         body: (
           <p>
             Approved refunds are made to the original Visa or Mastercard card

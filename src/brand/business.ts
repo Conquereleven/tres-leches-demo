@@ -9,32 +9,50 @@ import { destinations, whatsappUrl } from "./content";
 
 export type DeliveryBand = { minOrderAed: number; areas: string[] };
 
+/** A named person or desk a customer can reach. Phone is display format. */
+export type SupportContact = { name: string; phone: string };
+
 export const business = {
   /** Customer-facing brand used across the approved site. */
   tradingName: "Pastelerías 3L",
   brandDescription: "Tres Leches cakes, cake jars and bakery",
   heritage: "Mexico City since 1982",
-  /** OWNER INPUT: registered legal entity exactly as on the trade licence. */
-  legalName: null as string | null,
+  /** Confirmed by the owner 22 September 2026: the merchant legal entity. */
+  legalName: "Golositalia FZCO" as string | null,
   /** OWNER INPUT: trade licence number and issuing authority, if to be shown. */
   tradeLicence: null as string | null,
-  /** OWNER INPUT: registered/business address in the UAE. */
-  address: null as string | null,
+  /** Confirmed by the owner 22 September 2026. */
+  address:
+    "Golositalia JLT, Jumeirah Lakes Towers, Cluster C, Retail Shop C6/A, Dubai, United Arab Emirates" as
+      string | null,
   /** Verified: the site and delivery zones serve Dubai only. */
   city: "Dubai",
   country: "United Arab Emirates",
-  /** OWNER INPUT: customer-service email. */
+  /** OWNER INPUT: no customer-service email has been confirmed yet. */
   email: null as string | null,
-  /** OWNER INPUT: customer-service phone in E.164 (e.g. +9715XXXXXXXX). */
-  phone: null as string | null,
-  /** Same source as every ORDER ON WHATSAPP button (content.ts). */
+  /**
+   * Confirmed customer-support numbers, 22 September 2026. Display format is
+   * the UAE international form; `phoneHref` derives the dialable E.164 value.
+   * These are support numbers. None of them is confirmed as the WhatsApp
+   * ordering number — that remains `whatsapp` below and is still unset.
+   */
+  supportContacts: [
+    { name: "Liza", phone: "+971 52 168 3319" },
+    { name: "Sebastiano", phone: "+971 50 675 7352" },
+    { name: "Golositalia store", phone: "+971 55 640 6776" },
+  ] as SupportContact[],
+  /**
+   * Same source as every ORDER ON WHATSAPP button (content.ts). Still unset:
+   * which of the support numbers is the WhatsApp ordering line has not been
+   * confirmed, and it must not be guessed.
+   */
   whatsapp: destinations.whatsapp,
   /** OWNER INPUT: e.g. "Daily, 9:00 am – 9:00 pm (GST)". */
   supportHours: null as string | null,
   currency: "AED",
   /** Hosted payment page used by the existing checkout integration. */
   paymentProcessor: "Paymennt",
-  policiesUpdated: "18 September 2026",
+  policiesUpdated: "22 September 2026",
 };
 
 /**
@@ -42,10 +60,13 @@ export const business = {
  * neutral, accurate sentence (review by our team) instead of an invented rule.
  */
 export const policyDecisions = {
-  /** OWNER INPUT: e.g. "up to 24 hours before the agreed delivery time". */
-  paidCancellationWindow: null as string | null,
-  /** OWNER INPUT: refund amount for an approved paid cancellation, e.g. "a full refund". */
-  paidCancellationRefund: null as string | null,
+  /** Confirmed 22 September 2026. */
+  paidCancellationWindow:
+    "up to 12 hours before the scheduled delivery time" as string | null,
+  /** Confirmed 22 September 2026. Deliberately not described as a tax. */
+  paidCancellationRefund:
+    "a refund of 90% of the amount paid, with 10% retained as a cancellation and administrative fee" as
+      string | null,
   /** OWNER INPUT: deadline to report damaged/incorrect/missing items, e.g. "within 2 hours of delivery". */
   issueReportWindow: null as string | null,
   /** OWNER INPUT: minimum notice for orders / custom cakes, e.g. "48 hours for custom cakes". */
@@ -55,6 +76,13 @@ export const policyDecisions = {
   /** OWNER INPUT: what happens after a failed delivery (redelivery charge, refund). */
   failedDeliveryOutcome: null as string | null,
 };
+
+/** The confirmed cancellation cut-off, in hours before scheduled delivery. */
+export const cancellationCutoffHours = 12;
+/** Percentage of the amount paid refunded on an eligible cancellation. */
+export const cancellationRefundPercent = 90;
+/** Percentage retained as a cancellation and administrative fee. */
+export const cancellationFeePercent = 10;
 
 /**
  * Transcribed from docs/sources/delivery-minimums.jpeg and kept identical to
@@ -199,12 +227,12 @@ export function contactChannels(): ContactChannel[] {
       value: business.whatsapp,
       href: wa,
     });
-  if (business.phone)
+  for (const contact of business.supportContacts)
     channels.push({
       kind: "phone",
-      label: "Phone",
-      value: business.phone,
-      href: phoneHref(business.phone),
+      label: contact.name,
+      value: contact.phone,
+      href: phoneHref(contact.phone),
     });
   if (business.email)
     channels.push({
@@ -223,11 +251,12 @@ export function pendingBusinessFacts(): string[] {
     "legalName",
     "address",
     "email",
-    "phone",
     "whatsapp",
     "supportHours",
   ] as const)
     if (!business[key]) missing.push(`business.${key}`);
+  if (business.supportContacts.length === 0)
+    missing.push("business.supportContacts");
   for (const [key, value] of Object.entries(policyDecisions))
     if (!value) missing.push(`policyDecisions.${key}`);
   return missing;
