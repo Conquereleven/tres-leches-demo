@@ -208,6 +208,13 @@ export const legalEntityLabel = () =>
 
 export const phoneHref = (phone: string) => `tel:${phone.replace(/\s+/g, "")}`;
 
+/** Presents a stored UAE number as +971 5X XXX XXXX for display. */
+export function formatUaePhone(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  const m = /^971(\d{2})(\d{3})(\d{4})$/.exec(digits);
+  return m ? `+971 ${m[1]} ${m[2]} ${m[3]}` : phone;
+}
+
 export type ContactChannel = {
   kind: "whatsapp" | "phone" | "email";
   label: string;
@@ -223,8 +230,8 @@ export function contactChannels(): ContactChannel[] {
   if (wa && business.whatsapp)
     channels.push({
       kind: "whatsapp",
-      label: "WhatsApp",
-      value: business.whatsapp,
+      label: "WhatsApp — orders",
+      value: formatUaePhone(business.whatsapp),
       href: wa,
     });
   for (const contact of business.supportContacts)

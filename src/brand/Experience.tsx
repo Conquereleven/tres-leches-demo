@@ -378,10 +378,12 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
                 decoding="async"
               />
             ) : (
-              <div className="b-hero-fallback">
-                <Logo variant="circle" />
-                <p className="b-caption">HERO FILM · ORIGINAL ASSET PENDING</p>
-              </div>
+              /* Brand-system hero panel shown until the approved film or
+                 photography is supplied. Pure CSS, no network request, and
+                 purely decorative — the headline and CTAs above carry all
+                 meaning. Dropping a real asset into assets.hero/assets.poster
+                 replaces this without touching the hero layout. */
+              <div className="b-hero-canvas" aria-hidden="true" />
             )}
           </div>
           <div className="b-hero-copy">

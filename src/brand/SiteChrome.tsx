@@ -9,7 +9,13 @@ import {
 } from "./business";
 import { Logo, Modal, SectionLabel, WhatsAppCTA } from "./primitives";
 
-/** Card acceptance marks. Locally hosted; no endorsement is implied. */
+/**
+ * Card acceptance marks. Locally hosted; no endorsement is implied.
+ * Intrinsic width/height match each file's viewBox aspect ratio so the marks
+ * reserve their space before the SVG loads and cause no layout shift.
+ * Swapping either file for official artwork of the same proportions needs no
+ * change here — see public/payments/README.md.
+ */
 export function PaymentMarks() {
   return (
     <div className="b-payments">
@@ -21,11 +27,14 @@ export function PaymentMarks() {
           <img src="/payments/visa.svg" alt="Visa" width="52" height="20" />
         </li>
         <li>
+          {/* Official Mastercard Symbol, viewBox 152.4 × 108 (ratio 1.411).
+              The artboard carries Mastercard's required clear space, so the
+              box is taller than the visible symbol by design. */}
           <img
             src="/payments/mastercard.svg"
             alt="Mastercard"
-            width="40"
-            height="25"
+            width="45"
+            height="32"
           />
         </li>
       </ul>

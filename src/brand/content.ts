@@ -100,7 +100,17 @@ export const destinations: {
   instagram: string | null;
   tiktok: string | null;
   privacy: string | null;
-} = { whatsapp: null, instagram: null, tiktok: null, privacy: null };
+} = {
+  /**
+   * Official WhatsApp ordering number, confirmed by the owner 22 September
+   * 2026 (Liza). Stored unspaced so `whatsappUrl` produces wa.me/971521683319.
+   * This is the single source for every ORDER ON WHATSAPP control on the site.
+   */
+  whatsapp: "+971521683319",
+  instagram: null,
+  tiktok: null,
+  privacy: null,
+};
 export const promotion: {
   enabled: boolean;
   message: string | null;

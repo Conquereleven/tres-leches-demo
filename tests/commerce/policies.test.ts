@@ -13,6 +13,7 @@ import {
   isPolicyPath,
 } from "../../src/brand/business";
 import { PolicyPage, pages } from "../../src/brand/Policies";
+import { whatsappUrl } from "../../src/brand/content";
 import { zoneSeed } from "../../server/domain/zones";
 import { customerPages } from "../../server/http";
 
@@ -56,7 +57,7 @@ test("terms identify the business and every page carries the global footer", () 
   }
   for (const logo of ["visa", "mastercard"]) {
     const svg = readFileSync(`public/payments/${logo}.svg`, "utf8");
-    assert.match(svg, /^<svg[^>]+viewBox=/);
+    assert.match(svg, /<svg[^>]*[\s\S]*?viewBox=/);
     assert.doesNotMatch(svg, /<script|href="http/i);
   }
 });
@@ -178,12 +179,66 @@ test("the cancellation rule is stated consistently and never called a tax", () =
   );
 });
 
-test("the WhatsApp ordering number is still unconfirmed and is not guessed", () => {
-  // Three support numbers are confirmed; none is approved as the WhatsApp
-  // ordering line, so business.whatsapp must stay unset.
-  assert.equal(business.whatsapp, null);
+test("the WhatsApp ordering number is configured and every CTA derives from it", () => {
+  assert.equal(business.whatsapp, "+971521683319");
+  const url = whatsappUrl(business.whatsapp, "test");
   assert.ok(
-    pendingBusinessFacts().includes("business.whatsapp"),
-    "whatsapp must remain listed as pending",
+    url?.startsWith("https://wa.me/971521683319?text="),
+    `bad url: ${url}`,
   );
+  assert.ok(!pendingBusinessFacts().includes("business.whatsapp"));
+
+  // No component may build a wa.me link or embed the number independently.
+  for (const f of [
+    "Experience.tsx",
+    "SiteChrome.tsx",
+    "Policies.tsx",
+    "primitives.tsx",
+  ]) {
+    const src = readFileSync(`src/brand/${f}`, "utf8");
+    assert.doesNotMatch(
+      src,
+      /wa\.me/,
+      `${f} must not build wa.me links directly`,
+    );
+    assert.doesNotMatch(src, /9715\d{8}/, `${f} must not hardcode the number`);
+  }
+});
+
+test("no public hero development placeholder remains", () => {
+  const src = readFileSync("src/brand/Experience.tsx", "utf8");
+  assert.doesNotMatch(src, /ORIGINAL ASSET PENDING/);
+  assert.doesNotMatch(src, /HERO FILM/);
+  // The media slot itself must survive so the approved film can drop in.
+  assert.match(src, /b-hero-media/);
+  assert.match(src, /b-hero-canvas/);
+});
+
+test("the Mastercard mark is the official unmodified Brand Center artwork", () => {
+  const svg = readFileSync("public/payments/mastercard.svg", "utf8");
+  assert.match(svg, /viewBox="0 0 152\.4 108"/, "official viewBox altered");
+  for (const colour of ["#FF5F00", "#EB001B", "#F79E1B"])
+    assert.ok(svg.includes(colour), `official colour ${colour} missing`);
+  assert.equal(
+    Buffer.byteLength(svg),
+    981,
+    "file differs from the official artwork",
+  );
+  const chrome = readFileSync("src/brand/SiteChrome.tsx", "utf8");
+  // Intrinsic size must match the official 152.4:108 ratio, to avoid CLS.
+  assert.match(chrome, /width="45"\s*\n?\s*height="32"/);
+});
+
+test("payment marks are static, never reveal-gated", () => {
+  const chrome = readFileSync("src/brand/SiteChrome.tsx", "utf8");
+  const marks =
+    /export function PaymentMarks[\s\S]*?\n}/.exec(chrome)?.[0] ?? "";
+  assert.ok(marks, "PaymentMarks not found");
+  assert.doesNotMatch(
+    marks,
+    /data-reveal/,
+    "payment marks must not be reveal-gated",
+  );
+  for (const alt of ['alt="Visa"', 'alt="Mastercard"'])
+    assert.ok(marks.includes(alt), `${alt} missing`);
 });

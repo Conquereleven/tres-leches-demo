@@ -354,26 +354,58 @@
   width: 100%;
   object-fit: cover;
 }
-.brand-experience .b-hero-fallback {
+/* Hero panel used while the approved film is pending. Built entirely from the
+   brand palette — cream ground, blush and lavender light, gold ring motif — so
+   it reads as an intentional editorial surface rather than a missing asset.
+   No image request, no animation, nothing that delays the hero CTAs. */
+.brand-experience .b-hero-canvas {
   position: absolute;
   inset: 0;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-direction: column;
-  padding: 2rem 6%;
-  gap: 1rem;
+  background:
+    radial-gradient(
+      78% 96% at 76% 22%,
+      var(--brand-blush) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      70% 84% at 22% 86%,
+      var(--brand-lavender-light) 0%,
+      transparent 64%
+    ),
+    radial-gradient(60% 70% at 58% 54%, var(--surface-paper) 0%, transparent 72%),
+    linear-gradient(
+      142deg,
+      var(--surface-paper) 0%,
+      var(--surface-primary) 100%
+    );
 }
-.brand-experience .b-hero-fallback .b-logo {
-  align-self: flex-end;
-  margin: auto 2vw auto 0;
-  width: 200px;
+/* Concentric gold rings, echoing the soaking rings on a Tres Leches plate. */
+.brand-experience .b-hero-canvas::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-radial-gradient(
+    circle at 74% 38%,
+    transparent 0 46px,
+    #a28d5b2e 46px 47px,
+    transparent 47px 94px
+  );
+  -webkit-mask-image: radial-gradient(
+    64% 72% at 74% 38%,
+    #000 0%,
+    transparent 78%
+  );
+  mask-image: radial-gradient(64% 72% at 74% 38%, #000 0%, transparent 78%);
 }
-.brand-experience .b-hero-fallback > .b-caption {
-  align-self: flex-end;
-  max-width: 30ch;
-  text-align: right;
+@media (max-width: 899px) {
+  .brand-experience .b-hero-canvas::after {
+    background: repeating-radial-gradient(
+      circle at 62% 42%,
+      transparent 0 30px,
+      #a28d5b2e 30px 31px,
+      transparent 31px 62px
+    );
+  }
 }
 .brand-experience .b-hero-copy {
   z-index: 1;
@@ -1041,23 +1073,25 @@
   top: -50px;
   animation: b-orbit 2.4s var(--ease) both;
 }
+/* Hero entrance. Short, restrained delays: the headline and both CTAs are
+   present and usable within ~0.4s, so nothing waits on the intro. */
 .brand-experience .b-hero-copy > * {
   animation: b-reveal var(--reveal) var(--ease) both;
-  animation-delay: 2.5s;
+  animation-delay: 60ms;
 }
 .brand-experience .b-hero-copy h1 span:first-child {
   animation: b-reveal var(--reveal) var(--ease) both;
-  animation-delay: 2.5s;
+  animation-delay: 60ms;
 }
 .brand-experience .b-hero-copy h1 span:last-child {
   animation: b-reveal var(--reveal) var(--ease) both;
-  animation-delay: 2.7s;
+  animation-delay: 180ms;
 }
 .brand-experience .b-hero-copy > p:not(.b-label) {
-  animation-delay: 2.9s;
+  animation-delay: 280ms;
 }
 .brand-experience .b-hero-copy > .b-story-link {
-  animation-delay: 3.1s;
+  animation-delay: 380ms;
 }
 .brand-experience.b-entered .b-hero-copy > * {
   animation-delay: 0s;
@@ -1813,8 +1847,10 @@ a.b-return {
   width: auto;
   height: 20px;
 }
+/* The official Mastercard Symbol artboard includes the required clear space,
+   so it is set taller than Visa to match it optically. */
 .brand-experience .b-payments li img[alt="Mastercard"] {
-  height: 26px;
+  height: 32px;
 }
 .brand-experience .b-footer .b-payments .b-caption {
   font-size: var(--caption);

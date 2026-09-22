@@ -53,7 +53,12 @@ test("brand content is approved, heritage fixed, no fabricated catalog or testim
     if (a.src) assert.ok(existsSync("public" + a.src));
 });
 test("WhatsApp only accepts verified international destinations and safely encodes inquiry", () => {
-  assert.equal(destinations.whatsapp, null);
+  // Confirmed ordering number (22 September 2026); see src/brand/content.ts.
+  assert.equal(destinations.whatsapp, "+971521683319");
+  assert.equal(
+    whatsappUrl(destinations.whatsapp, "hi"),
+    "https://wa.me/971521683319?text=hi",
+  );
   for (const n of [null, "", "javascript:alert(1)", "971 123", "+00000000"])
     assert.equal(whatsappUrl(n, "hello"), null);
   assert.equal(
