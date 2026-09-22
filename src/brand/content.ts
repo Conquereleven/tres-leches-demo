@@ -46,7 +46,19 @@ export type Product = {
   image: Asset;
   status: "pending" | "available" | "out-of-stock";
   description: string | null;
+  /**
+   * Price in fils, matching the Commerce OS catalog convention
+   * (`CatalogItem.priceFils`): 100 fils to the dirham. `null` until the owner has
+   * confirmed a price; the card then shows no price rather than guessing.
+   */
+  priceFils: number | null;
 };
+
+/** Formats a stored fils price for display, e.g. 2500 -> "AED 25". */
+export function formatAed(priceFils: number): string {
+  const aed = priceFils / 100;
+  return `AED ${Number.isInteger(aed) ? aed : aed.toFixed(2)}`;
+}
 export const slots = (category: string, count: number): Product[] =>
   Array.from({ length: count }, (_, i) => ({
     id: `${category}-${i + 1}`,
@@ -57,10 +69,32 @@ export const slots = (category: string, count: number): Product[] =>
     ),
     status: "pending",
     description: null,
+    priceFils: null,
   }));
+/**
+ * Confirmed by the owner 22 September 2026: the first product approved for
+ * public listing. Name, price and availability are the owner's; the
+ * description is a plain statement of what the product is, with no marketing
+ * claims, ingredients or promises attached.
+ */
+const panDeMuerto: Product = {
+  id: "pan-de-muerto",
+  name: "Pan de Muerto",
+  /**
+   * No approved photograph yet, so the card renders the brand media panel
+   * rather than stand-in artwork. Supplying a real photo is a one-file swap:
+   * drop it in public/assets/ and set `src` to its path.
+   */
+  image: pending("pan-de-muerto", "Pan de Muerto"),
+  status: "available",
+  description: "Traditional Mexican sweet bread, baked fresh in Dubai.",
+  priceFils: 2500,
+};
+
 export const collections = {
   featured: slots("Featured cake", 3),
-  bakery: slots("Bakery item", 3),
+  /** One confirmed product; no empty slots padding the section. */
+  bakery: [panDeMuerto],
   jars: slots("Cake jar", 3),
   custom: slots("Custom cake category", 3),
 };
@@ -124,9 +158,9 @@ export function whatsappUrl(
   return `https://wa.me/${number.replace(/^\+/, "")}?text=${encodeURIComponent(message)}`;
 }
 export function productInquiry(product: Product): string | null {
-  return product.name && product.status === "available"
-    ? `Hello 3L, I’d like to order ${product.name}.`
-    : null;
+  if (!product.name || product.status !== "available") return null;
+  const price = product.priceFils ? ` (${formatAed(product.priceFils)})` : "";
+  return `Hello 3L, I’d like to order ${product.name}${price}.`;
 }
 export type NewsletterProvider = {
   subscribe(

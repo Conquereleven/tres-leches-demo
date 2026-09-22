@@ -2292,3 +2292,25 @@ a.b-return {
     transform: none !important;
   }
 }
+
+/* Product name, price and description under the selected product image. */
+.brand-experience .b-product-meta {
+  margin-top: 1.25rem;
+}
+.brand-experience .b-product-meta h3 {
+  font-family: var(--display-font);
+  font-size: var(--heading);
+  line-height: 1.1;
+  margin: 0;
+}
+.brand-experience .b-product-meta .b-price {
+  font-size: var(--body);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--text-primary);
+  margin: 0.4rem 0 0;
+}
+.brand-experience .b-product-meta .b-caption {
+  margin: 0.5rem 0 0;
+  max-width: 38ch;
+}

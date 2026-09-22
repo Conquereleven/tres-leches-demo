@@ -11,17 +11,40 @@ import {
   visibleTestimonials,
   validateNewsletter,
   newsletterProvider,
+  formatAed,
 } from "../../src/brand/content";
 test("brand content is approved, heritage fixed, no fabricated catalog or testimonials", () => {
   assert.equal(approved.heritage, "MEXICO CITY SINCE 1982");
   assert.equal(collections.featured.length, 3);
+  // A product may only be listed once the owner has confirmed it. Anything
+  // named must be fully specified — image, available status and a price —
+  // and everything else must stay an unlisted, unorderable slot.
   for (const collection of Object.values(collections))
     for (const p of collection) {
-      assert.equal(p.name, null);
-      assert.equal(p.image.src, null);
-      assert.equal(p.status, "pending");
-      assert.equal(productInquiry(p), null);
+      if (p.name) {
+        // A photograph is optional — the card falls back to the brand media
+        // panel — but the commercial facts must all be present.
+        assert.equal(p.status, "available");
+        assert.ok(
+          typeof p.priceFils === "number" && p.priceFils > 0,
+          `${p.id} listed without a price`,
+        );
+        assert.match(productInquiry(p)!, new RegExp(`order ${p.name}`));
+      } else {
+        assert.equal(p.image.src, null);
+        assert.equal(p.status, "pending");
+        assert.equal(p.priceFils, null);
+        assert.equal(productInquiry(p), null);
+      }
     }
+  // The one confirmed listing, exactly as the owner approved it.
+  const listed = Object.values(collections)
+    .flat()
+    .filter((p) => p.name);
+  assert.equal(listed.length, 1);
+  assert.equal(listed[0]!.name, "Pan de Muerto");
+  assert.equal(listed[0]!.priceFils, 2500);
+  assert.equal(formatAed(listed[0]!.priceFils!), "AED 25");
   assert.deepEqual(
     visibleTestimonials([
       {
@@ -47,10 +70,21 @@ test("brand content is approved, heritage fixed, no fabricated catalog or testim
     readFileSync("index.html", "utf8");
   assert.doesNotMatch(
     source,
-    /1992|aggregateRating|streetAddress|Al Quoz|Valentina|AED\s*\d/,
+    /1992|aggregateRating|streetAddress|Al Quoz|Valentina/,
   );
+  // Prices may appear, but only the owner-confirmed one: this catches any
+  // other amount being introduced into customer-facing brand content.
+  for (const amount of source.match(/AED\s*\d[\d.,]*/g) ?? [])
+    assert.equal(
+      amount.replace(/\s+/g, " "),
+      "AED 25",
+      `unapproved price: ${amount}`,
+    );
   for (const a of Object.values(assets))
     if (a.src) assert.ok(existsSync("public" + a.src));
+  // Every listed product's image must actually exist on disk.
+  for (const p of Object.values(collections).flat())
+    if (p.image.src) assert.ok(existsSync("public" + p.image.src), p.image.src);
 });
 test("WhatsApp only accepts verified international destinations and safely encodes inquiry", () => {
   // Confirmed ordering number (22 September 2026); see src/brand/content.ts.

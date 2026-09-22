@@ -13,6 +13,7 @@ import {
   newsletterProvider,
   validateNewsletter,
   productInquiry,
+  formatAed,
   type Product,
 } from "./content";
 import {
@@ -125,9 +126,11 @@ function ProductExperience({
                 <span>
                   {p.status === "out-of-stock"
                     ? "OUT OF STOCK"
-                    : selected === i
-                      ? "Selected"
-                      : "Select"}
+                    : p.priceFils
+                      ? formatAed(p.priceFils)
+                      : selected === i
+                        ? "Selected"
+                        : "Select"}
                 </span>
               </button>
             ))}
@@ -145,13 +148,25 @@ function ProductExperience({
                 : "Hello 3L, could you share your current collection?")
             }
           >
-            {cta}
+            {/* Once a real product is selected the action names it, rather
+                than inviting the customer to browse a category. */}
+            {product.name ? `ORDER ${product.name.toUpperCase()}` : cta}
           </WhatsAppCTA>
         )}
       </div>
       <div className="b-selected-product" aria-live="polite">
         <ImageFrame key={product.id} asset={product.image} />
-        {product.name && <p className="b-caption">{product.name}</p>}
+        {product.name && (
+          <div className="b-product-meta">
+            <h3>{product.name}</h3>
+            {product.priceFils && (
+              <p className="b-price">{formatAed(product.priceFils)}</p>
+            )}
+            {product.description && (
+              <p className="b-caption">{product.description}</p>
+            )}
+          </div>
+        )}
       </div>
     </Section>
   );
