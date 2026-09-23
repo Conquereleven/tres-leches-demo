@@ -160,6 +160,104 @@ export class PaymenntProvider implements PaymentProvider {
       throw new ProviderFailure("unknown", false);
     return this.getCheckout(found.checkoutId);
   }
+  async createTokenPayment(input: {
+    token: string;
+    paymentId: string;
+    orderId: string;
+    amountFils: number;
+    quantity: number;
+    unitPriceFils: number;
+    feeFils: number;
+    customer: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      phone: string;
+    };
+    returnUrl: string;
+  }) {
+    const value = await this.request("/payment/debit", {
+      source: { type: "TOKEN", token: input.token, storeCardDetails: false },
+      checkoutDetails: {
+        requestId: input.paymentId,
+        orderId: input.orderId,
+        amount: input.amountFils / 100,
+        currency: "AED",
+        returnUrl: input.returnUrl,
+        customer: input.customer,
+        items: [
+          {
+            name: "Pan de Muerto",
+            sku: "pan-de-muerto",
+            quantity: input.quantity,
+            unitprice: input.unitPriceFils / 100,
+            linetotal: (input.quantity * input.unitPriceFils) / 100,
+          },
+        ],
+        totals: {
+          subtotal: (input.quantity * input.unitPriceFils) / 100,
+          tax: 0,
+          shipping: input.feeFils / 100,
+        },
+      },
+    });
+    return this.normalizePayment(value);
+  }
+  async getPayment(id: string) {
+    const result = this.normalizePayment(
+      await this.request(`/payment/${encodeURIComponent(id)}`),
+    );
+    if (result.id !== id) throw new ProviderFailure("unknown", false);
+    return result;
+  }
+  private normalizePayment(value: unknown) {
+    const parsed = z
+      .object({
+        id: z.string().min(1),
+        amount: z.number().positive(),
+        currency: z.literal("AED"),
+        status: z.enum([
+          "CAPTURED",
+          "REDIRECT",
+          "FAILED",
+          "REJECTED",
+          "VOIDED",
+          "AUTHORIZED",
+          "UNSUPPORTED",
+          "REVERSED",
+          "PARTIALLY_REVERSED",
+          "CHARGEBACK",
+        ]),
+        redirectUrl: z.string().url().optional(),
+        checkoutDetails: z.unknown(),
+      })
+      .parse(value);
+    const checkout = normalizeCheckout(parsed.checkoutDetails);
+    if (
+      Math.round(parsed.amount * 100) !== checkout.amountFils ||
+      parsed.currency !== checkout.currency
+    )
+      throw new ProviderFailure("unknown", false);
+    if (parsed.status === "CAPTURED" && checkout.status !== "paid")
+      throw new ProviderFailure("unknown", false);
+    if (parsed.status === "REDIRECT") {
+      const url = new URL(parsed.redirectUrl ?? "https://invalid.local");
+      if (
+        url.origin !== "https://pay.test.paymennt.com" ||
+        !url.pathname.startsWith("/frames/redirect/payment/") ||
+        url.username ||
+        url.password
+      )
+        throw new ProviderFailure("unknown", false);
+    }
+    return {
+      id: parsed.id,
+      status: parsed.status,
+      checkout,
+      redirectUrl:
+        parsed.status === "REDIRECT" ? parsed.redirectUrl : undefined,
+    };
+  }
   async registerWebhook(address: string) {
     const url = new URL(address);
     if (url.protocol !== "https:" || url.username || url.password)

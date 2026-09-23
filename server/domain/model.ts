@@ -120,6 +120,7 @@ export type Order = {
   audit: Audit[];
 };
 export type Payment = {
+  directAttempt?: "ready" | "submitted" | "resolved" | "unknown";
   id: string;
   orderId: string;
   amountFils: number;

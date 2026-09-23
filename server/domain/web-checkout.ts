@@ -73,6 +73,7 @@ export async function createWebCheckout(
   service: CommerceService,
   raw: unknown,
   key: string,
+  embedded = false,
 ): Promise<WebCheckoutResult> {
   const input = webCheckoutSchema.parse(raw),
     receiptKey = digest(keySchema.parse(key));
@@ -132,6 +133,15 @@ export async function createWebCheckout(
         "Customer selected delivery zone; address retained for fulfillment",
     });
     order = command("requestPayment", order);
+    if (embedded)
+      service.store.write((s) => {
+        const payment = s.payments.find((p) => p.orderId === order.id)!;
+        payment.directAttempt = "ready";
+        // Reuse the existing payment record; no hosted-link job can race token submission.
+        s.jobs = s.jobs.filter(
+          (j) => !(j.kind === "payment" && j.entityId === payment.id),
+        );
+      });
     service.store.write((s) => {
       s.webCheckouts ??= {};
       s.webCheckouts[receiptKey] = {
@@ -142,6 +152,6 @@ export async function createWebCheckout(
     });
   });
   // Concurrent calls share the same durable payment job; unknown sends are not retried blindly.
-  await service.drain();
+  if (!embedded) await service.drain();
   return readWebCheckoutStatus(service, key);
 }

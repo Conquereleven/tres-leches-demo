@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { PaymentFrame } from "./PaymentFrame";
+import { useEffect, useState, useRef } from "react";
 import { Button, Input, Select, WhatsAppCTA } from "./primitives";
 import { formatAed, productInquiry, type Product } from "./content";
 type Config = {
   enabled: boolean;
+  publicKey?: string | null;
   mode: string;
   product: { id: string; name: string; priceFils: number } | null;
   zones: {
@@ -63,6 +65,46 @@ export function ProductCheckout({
     [phone, setPhone] = useState(""),
     [address, setAddress] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [email, setEmail] = useState("");
+  const [cardValid, setCardValid] = useState(false);
+  const submitCard = useRef<(() => void) | null>(null);
+  const inFlight = useRef(false);
+  const pending = useRef<{ key: string; orderId: string } | null>(null);
+  const [confirmed, setConfirmed] = useState<Status | null>(null);
+  async function tokenized(token: string) {
+    const checkout = pending.current;
+    if (!checkout || !inFlight.current) return;
+    pending.current = null;
+    try {
+      const result = await post<Status>("/api/checkout/token", {
+        ...checkout,
+        token,
+        email,
+      });
+      token = "";
+      if (result.paymentStatus === "paid" && result.status === "Confirmed")
+        setConfirmed(result);
+      else if (result.url) window.location.assign(result.url);
+      else window.location.assign("/checkout/return");
+    } catch {
+      setError(
+        "We could not confirm the result. Check your existing payment before trying again.",
+      );
+    } finally {
+      token = "";
+      inFlight.current = false;
+      setBusy(false);
+    }
+  }
+  function tokenizationFailed() {
+    pending.current = null;
+    inFlight.current = false;
+    setBusy(false);
+    setCardValid(false);
+    setError(
+      "Card details could not be validated. Please check them and try again, or order via WhatsApp.",
+    );
+  }
   useEffect(() => {
     let active = true;
     setLoading(true);
@@ -115,13 +157,16 @@ export function ProductCheckout({
       : product.priceFils;
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!quote?.eligible || busy) return;
+    if (
+      !quote?.eligible ||
+      inFlight.current ||
+      !cardValid ||
+      !submitCard.current
+    )
+      return;
+    inFlight.current = true;
     setBusy(true);
     setError("");
-    // The existing /checkout/link API has no documented returnUrl. Keep 3L's
-    // status page in this tab and use a separate hosted checkout tab.
-    const hostedTab = window.open("about:blank", "_blank");
-    if (hostedTab) hostedTab.opener = null;
     const input = {
       productId: product.id,
       quantity,
@@ -138,21 +183,37 @@ export function ProductCheckout({
         saved?.fingerprint === fingerprint ? saved.key : crypto.randomUUID();
       sessionStorage.setItem(sessionKey, JSON.stringify({ key, fingerprint }));
       setSubmitted(true);
-      const result = await post<Status>("/api/checkout", input, key);
-      if (result.url && hostedTab) hostedTab.location.replace(result.url);
-      else hostedTab?.close();
-      window.location.assign("/checkout/return");
+      let result = await post<Status>("/api/checkout/prepare", input, key);
+      if (["failed", "cancelled", "expired"].includes(result.paymentStatus))
+        result = await post<Status>("/api/checkout/retry", { key });
+      if (result.paymentStatus === "paid") {
+        setConfirmed(result);
+        inFlight.current = false;
+        setBusy(false);
+        return;
+      }
+      pending.current = { key, orderId: result.orderId };
+      submitCard.current();
     } catch (e) {
-      hostedTab?.close();
+      inFlight.current = false;
+      setBusy(false);
       setError(
         e instanceof Error
           ? e.message
           : "Unable to create checkout. Retry the same request safely.",
       );
-    } finally {
-      setBusy(false);
     }
   }
+  if (confirmed)
+    return (
+      <div className="b-direct-checkout" role="status">
+        <h2>PAYMENT CONFIRMED</h2>
+        <p>ORDER CONFIRMED</p>
+        <p>
+          {confirmed.orderId} · {formatAed(confirmed.amountFils)}
+        </p>
+      </div>
+    );
   return (
     <div className="b-direct-checkout">
       <label>
@@ -176,7 +237,7 @@ export function ProductCheckout({
       )}
       {loading ? (
         <p role="status">Checking payment availability…</p>
-      ) : config?.enabled ? (
+      ) : config?.enabled && config.publicKey ? (
         <form onSubmit={submit}>
           <p className="b-caption">
             TEST CHECKOUT — use only Paymennt’s approved test card.
@@ -266,12 +327,34 @@ export function ProductCheckout({
               onChange={(e) => setAddress(e.target.value)}
             />
           </label>
-          <Button type="submit" disabled={busy || !quote?.eligible}>
+          <label>
+            Email
+            <Input
+              required
+              type="email"
+              autoComplete="email"
+              value={email}
+              disabled={busy}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </label>
+          <h3>PAYMENT</h3>
+          <PaymentFrame
+            publicKey={config.publicKey}
+            valid={setCardValid}
+            token={(token) => {
+              void tokenized(token);
+            }}
+            failure={tokenizationFailed}
+            submitRef={submitCard}
+          />
+          <Button
+            type="submit"
+            disabled={busy || !quote?.eligible || !cardValid}
+          >
             {busy
-              ? "PREPARING SECURE PAYMENT…"
-              : submitted
-                ? "RETRY SAME CHECKOUT"
-                : "PAY SECURELY"}
+              ? "PROCESSING PAYMENT…"
+              : `PAY ${formatAed(quote?.totalFils ?? 0)} SECURELY`}
           </Button>
           {submitted && (
             <a className="b-link" href="/checkout/return">
@@ -279,10 +362,9 @@ export function ProductCheckout({
             </a>
           )}
           <p className="b-caption">
-            Paymennt opens in a new tab. Return here to check your payment. Card
-            details are entered only on Paymennt. By continuing you accept our{" "}
-            <a href="/terms">terms</a> and <a href="/privacy">privacy policy</a>
-            .
+            Card details are securely handled by our payment provider. By
+            continuing you accept our <a href="/terms">terms</a> and{" "}
+            <a href="/privacy">privacy policy</a>.
           </p>
         </form>
       ) : (
@@ -318,7 +400,7 @@ export function CheckoutReturn() {
           throw Error(
             "This browser has no checkout session. Please contact 3L if you need help with your order.",
           );
-        const data = await post<Status>("/api/checkout/status", {
+        const data = await post<Status>("/api/checkout/reconcile", {
           key: saved.key,
         });
         if (!active) return;
@@ -367,8 +449,8 @@ export function CheckoutReturn() {
       </h1>
       <p role="status">
         {paid
-          ? "Your payment has been verified. Thank you."
-          : "Returning from the payment page does not confirm payment. We are waiting for verified confirmation."}
+          ? "ORDER CONFIRMED. Your payment has been verified. Thank you."
+          : "We are checking your payment securely. Your order will be confirmed once payment is verified."}
       </p>
       {result && (
         <p>

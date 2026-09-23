@@ -894,7 +894,7 @@ export class CommerceService {
       this.reconciling.delete(paymentId);
     }
   }
-  private applyCheckout(
+  applyCheckout(
     paymentId: string,
     checkout: AuthoritativeCheckout,
     actor: string,

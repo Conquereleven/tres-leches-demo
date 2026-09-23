@@ -39,6 +39,21 @@ const provider = new PaymenntProvider(
     if (init?.method === "POST") {
       const body = JSON.parse(String(init.body));
       const id = randomUUID();
+      if (String(url).endsWith("/payment/debit"))
+        return Response.json({
+          success: true,
+          result: {
+            id,
+            status: "CAPTURED",
+            amount: body.checkoutDetails.amount,
+            currency: "AED",
+            checkoutDetails: {
+              ...body.checkoutDetails,
+              id: "fixture-checkout",
+              status: "PAID",
+            },
+          },
+        });
       checkouts.set(id, {
         ...body,
         id,

@@ -30,6 +30,7 @@ async function harness(offline = false) {
       env: {
         ...process.env,
         ...e,
+        PAYMENNT_PUBLIC_KEY: "pk_test_public_fixture",
         DB_PATH: join(dir, "store.sqlite"),
         API_PORT: offline ? "3157" : "3156",
         PORT: offline ? "3157" : "3156",
@@ -72,6 +73,8 @@ test("public checkout HTTP, signatures, authoritative settlement and untrusted r
       });
     const config = await (await fetch(h.base + "/api/checkout/config")).json();
     assert.equal(config.enabled, true);
+    assert.equal(config.publicKey, "pk_test_public_fixture");
+    assert.equal(JSON.stringify(config).includes("fixture-secret"), false);
     assert.equal(config.product.priceFils, 2500);
     assert.equal(JSON.stringify(config).includes("fixture-key"), false);
     const input = {
@@ -170,6 +173,19 @@ test("production offline public checkout cannot create a payment", async () => {
     assert.equal(
       (await (await fetch(h.base + "/api/checkout/config")).json()).enabled,
       false,
+    );
+    assert.equal(
+      (await (await fetch(h.base + "/api/checkout/config")).json()).publicKey,
+      null,
+    );
+    assert.equal(
+      (
+        await fetch(h.base + "/api/checkout/token", {
+          method: "POST",
+          body: "{}",
+        })
+      ).status,
+      503,
     );
     assert.equal(
       (await fetch(h.base + "/api/checkout", { method: "POST", body: "{}" }))

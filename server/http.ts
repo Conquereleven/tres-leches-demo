@@ -1,4 +1,9 @@
 import {
+  retryEmbeddedPayment,
+  submitEmbeddedPayment,
+  reconcileEmbeddedPayment,
+} from "./domain/embedded-checkout";
+import {
   createWebCheckout,
   quoteWebCheckout,
   readWebCheckoutStatus,
@@ -57,7 +62,7 @@ export const customerPages = [
   "/contact",
 ] as const;
 const customerCsp =
-  "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; script-src 'self'; frame-ancestors 'none'";
+  "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; script-src 'self' https://pay.paymennt.com; frame-src https://pay.test.paymennt.com; frame-ancestors 'none'";
 export async function startServer(
   overrides: {
     initial?: ReturnType<typeof seed>;
@@ -268,6 +273,9 @@ export async function startServer(
             return json(res, 200, {
               enabled: enabled && !!product,
               mode: enabled ? "test" : "offline",
+              publicKey: enabled
+                ? (process.env.PAYMENNT_PUBLIC_KEY ?? null)
+                : null,
               product: product
                 ? {
                     id: product.id,
@@ -304,6 +312,39 @@ export async function startServer(
           )
             throw new DomainError(415, "JSON required");
           const body = parse(await rawBody(req));
+          if (
+            path === "/api/checkout/retry" ||
+            path === "/api/checkout/token" ||
+            path === "/api/checkout/prepare" ||
+            path === "/api/checkout/reconcile"
+          ) {
+            if (!process.env.PAYMENNT_PUBLIC_KEY)
+              throw new DomainError(503, "Embedded payment unavailable");
+            if (path === "/api/checkout/retry") {
+              const { key } = z.object({ key: z.uuid() }).strict().parse(body);
+              return json(res, 200, await retryEmbeddedPayment(service, key));
+            }
+            if (path === "/api/checkout/token")
+              return json(
+                res,
+                200,
+                await submitEmbeddedPayment(service, body, origin),
+              );
+            if (path === "/api/checkout/reconcile") {
+              const { key } = z.object({ key: z.uuid() }).strict().parse(body);
+              return json(
+                res,
+                200,
+                await reconcileEmbeddedPayment(service, key),
+              );
+            }
+            const key = z.uuid().parse(req.headers["idempotency-key"]);
+            return json(
+              res,
+              200,
+              await createWebCheckout(service, body, key, true),
+            );
+          }
           if (path === "/api/checkout/quote")
             return json(res, 200, quoteWebCheckout(service, body));
           if (path === "/api/checkout/status") {
