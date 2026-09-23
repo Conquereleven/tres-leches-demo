@@ -2,8 +2,9 @@ import { ProviderFailure } from "../adapters/failure";
 /** Tokens are request-scoped only. A durable claim precedes the provider call. */
 import { z } from "zod";
 import { PaymenntProvider } from "../adapters/paymennt";
+import { safeLog } from "../observability";
 import type { CommerceService } from "./service";
-import { requireThat } from "./model";
+import { DomainError, requireThat, type Payment } from "./model";
 import {
   readWebCheckoutStatus,
   quoteWebCheckout,
@@ -24,6 +25,60 @@ function owned(service: CommerceService, key: string) {
   const payment = s.payments.find((p) => p.id === order.paymentId)!;
 
   return { order, payment, s };
+}
+type StoredDiagnostic = NonNullable<Payment["providerDiagnostics"]>[number];
+function persistDiagnostic(
+  service: CommerceService,
+  paymentId: string,
+  diagnostic: Omit<StoredDiagnostic, "orderId" | "requestId" | "at">,
+) {
+  service.store.write((state) => {
+    const payment = state.payments.find((p) => p.id === paymentId)!;
+    payment.providerDiagnostics ??= [];
+    payment.providerDiagnostics.push({
+      orderId: payment.orderId,
+      requestId: payment.id,
+      at: new Date().toISOString(),
+      ...diagnostic,
+    });
+  });
+  safeLog("payment.provider", {
+    code: diagnostic.classification,
+    status: diagnostic.providerHttpStatus,
+    latencyMs: diagnostic.latencyMs,
+  });
+}
+function failureResponse(error: ProviderFailure) {
+  const classification = error.diagnostic?.classification;
+  if (
+    classification === "PROVIDER_HTTP_ERROR" &&
+    error.httpStatus != null &&
+    error.httpStatus < 500
+  )
+    return new DomainError(
+      422,
+      "Payment could not be processed. Please check your details or try again.",
+      "PAYMENT_PROVIDER_REJECTED",
+    );
+  if (classification === "PROVIDER_PAYMENT_REJECTED")
+    return new DomainError(
+      422,
+      "Payment could not be processed. Please check your details or try again.",
+      "PAYMENT_PROVIDER_REJECTED",
+    );
+  if (classification === "PROVIDER_MALFORMED_RESPONSE")
+    return new DomainError(
+      502,
+      "The payment result could not be verified. Your order is held for review.",
+      "PAYMENT_PROVIDER_INVALID_RESPONSE",
+    );
+  return new DomainError(
+    503,
+    "The payment result could not be verified. Your order is held for review.",
+    classification === "PROVIDER_TIMEOUT"
+      ? "PAYMENT_PROVIDER_TIMEOUT"
+      : "PAYMENT_PROVIDER_UNAVAILABLE",
+  );
 }
 export async function submitEmbeddedPayment(
   service: CommerceService,
@@ -102,13 +157,19 @@ export async function submitEmbeddedPayment(
       },
       returnUrl: new URL("/checkout/return", origin).href,
     });
-    requireThat(
-      result.checkout.requestId === payment.id &&
-        result.checkout.orderId === order.id &&
-        result.checkout.amountFils === payment.amountFils,
-      "Provider result mismatch",
-      409,
-    );
+    if (
+      result.checkout.requestId !== payment.id ||
+      result.checkout.orderId !== order.id ||
+      result.checkout.amountFils !== payment.amountFils
+    )
+      throw new ProviderFailure("unknown", false, undefined, undefined, {
+        classification: "PROVIDER_MALFORMED_RESPONSE",
+        endpointClass: "payment/debit",
+        providerPaymentId: result.id,
+        providerStatus: result.status,
+        redirectUrlPresent: Boolean(result.redirectUrl),
+        latencyMs: result.diagnostic.latencyMs,
+      });
     service.store.transaction(() => {
       service.store.write((state) => {
         const p = state.payments.find((p) => p.id === payment.id)!;
@@ -117,8 +178,21 @@ export async function submitEmbeddedPayment(
         p.providerCheckoutId = result.checkout.checkoutId;
         p.directAttempt = "resolved";
         p.url = result.redirectUrl;
+        p.providerDiagnostics ??= [];
+        p.providerDiagnostics.push({
+          orderId: order.id,
+          requestId: payment.id,
+          at: new Date().toISOString(),
+          attemptState: "resolved",
+          ...result.diagnostic,
+        });
       });
       service.applyCheckout(payment.id, result.checkout, WEB_ACTOR.id);
+    });
+    safeLog("payment.provider", {
+      code: result.diagnostic.classification,
+      status: result.diagnostic.providerHttpStatus,
+      latencyMs: result.diagnostic.latencyMs,
     });
     return readWebCheckoutStatus(service, input.key);
   } catch (error) {
@@ -135,9 +209,32 @@ export async function submitEmbeddedPayment(
         action: `${category}; payment held for reconciliation`,
       });
     });
-    // No blind retry: an interrupted request could have charged successfully.
-    throw new Error(
-      "Payment result could not be confirmed. Check this order before trying another payment.",
+    if (error instanceof ProviderFailure) {
+      const diagnostic = error.diagnostic ?? {
+        classification: "PROVIDER_MALFORMED_RESPONSE" as const,
+        endpointClass: "payment/debit" as const,
+        redirectUrlPresent: false,
+        latencyMs: 0,
+      };
+      persistDiagnostic(service, payment.id, {
+        ...diagnostic,
+        providerHttpStatus: error.httpStatus,
+        attemptState: "unknown",
+      });
+      // No blind retry: even a rejected-looking response is held until it is auditable.
+      throw failureResponse(error);
+    }
+    persistDiagnostic(service, payment.id, {
+      classification: "PROVIDER_MALFORMED_RESPONSE",
+      endpointClass: "payment/debit",
+      redirectUrlPresent: false,
+      latencyMs: 0,
+      attemptState: "unknown",
+    });
+    throw new DomainError(
+      502,
+      "The payment result could not be verified. Your order is held for review.",
+      "PAYMENT_PROVIDER_INVALID_RESPONSE",
     );
   }
 }
@@ -154,34 +251,31 @@ export async function reconcileEmbeddedPayment(
   if (!payment.directAttempt) {
     await service.reconcile(payment.id, WEB_ACTOR);
   } else if (payment.transactionId) {
-    const result = await service.payment.getPayment(payment.transactionId);
-    service.applyCheckout(payment.id, result.checkout, WEB_ACTOR.id);
-  } else if (
-    payment.directAttempt === "unknown" ||
-    payment.directAttempt === "submitted"
-  ) {
-    const checkout = await service.payment.findCheckout(payment.id);
-    if (checkout) {
-      requireThat(
-        checkout.requestId === payment.id &&
-          checkout.orderId === payment.orderId &&
-          checkout.amountFils === payment.amountFils &&
-          checkout.currency === payment.currency,
-        "Recovered checkout mismatch",
-        409,
-      );
-      service.store.transaction(() => {
-        service.store.write((state) => {
-          const p = state.payments.find((p) => p.id === payment.id)!;
-          p.providerReference = checkout.checkoutId;
-          p.providerCheckoutId = checkout.checkoutId;
-          p.directAttempt = "resolved";
-        });
-        service.applyCheckout(payment.id, checkout, WEB_ACTOR.id);
+    try {
+      const result = await service.payment.getPayment(payment.transactionId);
+      persistDiagnostic(service, payment.id, {
+        ...result.diagnostic,
+        attemptState: "resolved",
       });
+      service.applyCheckout(payment.id, result.checkout, WEB_ACTOR.id);
+    } catch (error) {
+      if (!(error instanceof ProviderFailure)) throw error;
+      const diagnostic = error.diagnostic ?? {
+        classification: "PROVIDER_MALFORMED_RESPONSE" as const,
+        endpointClass: "payment/get" as const,
+        redirectUrlPresent: false,
+        latencyMs: 0,
+      };
+      persistDiagnostic(service, payment.id, {
+        ...diagnostic,
+        providerHttpStatus: error.httpStatus,
+        attemptState: "unknown",
+      });
+      throw failureResponse(error);
     }
-  } else if (payment.providerReference)
-    await service.reconcile(payment.id, WEB_ACTOR);
+  }
+  // Direct payments without a persisted paymentId stay frozen. The documented
+  // API has no payment search-by-requestId; hosted /checkout recovery is invalid here.
   return readWebCheckoutStatus(service, key);
 }
 

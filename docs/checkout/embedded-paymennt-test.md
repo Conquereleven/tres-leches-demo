@@ -8,6 +8,14 @@ A verified CAPTURED response with matching checkout identity, AED amount and PAI
 
 An explicit retry is accepted only after authoritative failed/cancelled/expired status. It reuses the order and creates a new payment record through the existing command, with the hosted-link outbox entry removed inside the same transaction. An uncertain attempt is not eligible for this retry.
 
+## Direct-payment contract and diagnostics
+
+The direct request follows the Paymennt Merchant API v2 contract reviewed on 2026-09-23: `POST /payment/debit`, JSON content type, server-only `X-Paymennt-Api-Key` and `X-Paymennt-Api-Secret` headers, a `TOKEN` source containing the Frames token, and `checkoutDetails` containing the unique request/order references, AED decimal amount, customer name/email/international phone, line items, totals and HTTPS return URL. The provider response is a payment resource. Its payment ID is persisted immediately and every authoritative redirect return uses `GET /payment/{paymentId}`. Hosted checkout lookup remains confined to hosted checkout flows; direct payments never recover through `/checkout?requestId=...`.
+
+Every completed direct provider call records only an allowlisted diagnostic: internal order and request IDs, endpoint class, HTTP status, sanitized provider code/message, payment ID/status when present, redirect presence, timestamp, elapsed milliseconds and attempt state. Malformed responses, timeouts, HTTP errors and semantic rejections have distinct classifications. Tokens, credentials, card data, provider headers and raw responses are never stored or returned. Ambiguous attempts remain frozen for manual review and cannot be submitted again.
+
+The incident order `TL-3F1B638D` and request `0cf06149-d433-4ad4-abb0-f50674d9ddf5` predate diagnostic preservation. They remain frozen as an unknown direct attempt and must not be retried or reset. A future explicitly approved TEST attempt must use a fresh order/request ID and realistic synthetic contact data with a valid-format international UAE phone and a non-reserved email domain.
+
 CSP permits the official `https://pay.paymennt.com` script and `https://pay.test.paymennt.com` frame, with no broad frame wildcard. An additional message boundary rejects events outside the exact TEST frame origin/source. API credentials and webhook keys remain server-only. The existing browser session stores the order capability/details, never the payment token or card data.
 
 ## Configuration / activation

@@ -7,6 +7,7 @@ export function safeLog(
     | "outbox.attempt"
     | "outbox.failed"
     | "reconciliation.complete"
+    | "payment.provider"
     | "webhook.accepted"
     | "worker.failed",
   fields: {
@@ -14,6 +15,8 @@ export function safeLog(
     attempt?: number;
     kind?: string;
     count?: number;
+    code?: string;
+    latencyMs?: number;
   } = {},
 ) {
   if (process.env.SAFE_LOGS === "true")

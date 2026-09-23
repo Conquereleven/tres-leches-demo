@@ -749,22 +749,30 @@ export async function startServer(
       });
       res.end(req.method === "HEAD" ? undefined : readFileSync(file));
     } catch (error) {
-      json(
-        res,
+      const status =
         error instanceof DomainError
           ? error.status
           : error instanceof ZodError
             ? 400
-            : 500,
-        {
-          error:
-            error instanceof DomainError
-              ? error.message
-              : error instanceof ZodError
-                ? "Datos inválidos; revisa los campos"
-                : "No se pudo completar la acción. Intenta nuevamente.",
-        },
-      );
+            : 500;
+      const message =
+        error instanceof DomainError
+          ? error.message
+          : error instanceof ZodError
+            ? "Datos inválidos; revisa los campos"
+            : "No se pudo completar la acción. Intenta nuevamente.";
+      json(res, status, {
+        ok: false,
+        code:
+          error instanceof DomainError && error.publicCode
+            ? error.publicCode
+            : error instanceof ZodError
+              ? "INVALID_REQUEST"
+              : "INTERNAL_ERROR",
+        message,
+        // Compatibility for existing operations clients; contains the same safe text.
+        error: message,
+      });
     }
   });
   const backupTimer = backups

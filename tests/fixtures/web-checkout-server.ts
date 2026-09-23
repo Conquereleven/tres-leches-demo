@@ -24,7 +24,12 @@ process.env.PAYMENNT_WEBHOOK_SECRET_FILE = secretFile;
 let status = "PENDING";
 const checkouts = new Map<string, Record<string, unknown>>();
 process.on("message", (value) => {
-  if (value === "PAID" || value === "FAILED" || value === "CANCELLED") {
+  if (
+    value === "PAID" ||
+    value === "FAILED" ||
+    value === "CANCELLED" ||
+    value === "HTTP_400"
+  ) {
     status = value;
     process.send?.("updated");
   }
@@ -39,7 +44,16 @@ const provider = new PaymenntProvider(
     if (init?.method === "POST") {
       const body = JSON.parse(String(init.body));
       const id = randomUUID();
-      if (String(url).endsWith("/payment/debit"))
+      if (String(url).endsWith("/payment/debit")) {
+        if (status === "HTTP_400")
+          return Response.json(
+            {
+              success: false,
+              code: "CUSTOMER_INVALID",
+              error: "Customer details could not be validated",
+            },
+            { status: 400 },
+          );
         return Response.json({
           success: true,
           result: {
@@ -54,6 +68,7 @@ const provider = new PaymenntProvider(
             },
           },
         });
+      }
       checkouts.set(id, {
         ...body,
         id,

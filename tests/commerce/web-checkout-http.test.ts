@@ -167,6 +167,61 @@ test("public checkout HTTP, signatures, authoritative settlement and untrusted r
     await h.close();
   }
 });
+test("direct provider rejection returns a structured safe storefront error", async () => {
+  const h = await harness();
+  try {
+    const post = (path: string, data: unknown, key?: string) =>
+      fetch(h.base + path, {
+        method: "POST",
+        headers: {
+          Origin: h.base,
+          "Content-Type": "application/json",
+          ...(key ? { "Idempotency-Key": key } : {}),
+        },
+        body: JSON.stringify(data),
+      });
+    await new Promise<void>((resolve) => {
+      h.child.once("message", () => resolve());
+      h.child.send("HTTP_400");
+    });
+    const key = randomUUID();
+    const prepared = await (
+      await post(
+        "/api/checkout/prepare",
+        {
+          productId: "pan-de-muerto",
+          quantity: 2,
+          zoneId: "jlt-cluster-c",
+          customer: "UAT Reviewer",
+          phone: "971501234567",
+          address: "UAT only, JLT Cluster C",
+        },
+        key,
+      )
+    ).json();
+    const response = await post("/api/checkout/token", {
+      key,
+      orderId: prepared.orderId,
+      email: "uat@tests.invalid",
+      token: "ptk_test_httpfixtureonly",
+    });
+    assert.equal(response.status, 422);
+    const body = await response.json();
+    assert.deepEqual(
+      { ok: body.ok, code: body.code, message: body.message },
+      {
+        ok: false,
+        code: "PAYMENT_PROVIDER_REJECTED",
+        message:
+          "Payment could not be processed. Please check your details or try again.",
+      },
+    );
+    assert.equal(JSON.stringify(body).includes("CUSTOMER_INVALID"), false);
+    assert.equal(JSON.stringify(body).includes("ptk_"), false);
+  } finally {
+    await h.close();
+  }
+});
 test("production offline public checkout cannot create a payment", async () => {
   const h = await harness(true);
   try {

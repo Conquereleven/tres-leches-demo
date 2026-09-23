@@ -121,6 +121,27 @@ export type Order = {
 };
 export type Payment = {
   directAttempt?: "ready" | "submitted" | "resolved" | "unknown";
+  providerDiagnostics?: Array<{
+    orderId: string;
+    requestId: string;
+    endpointClass: "payment/debit" | "payment/get" | "other";
+    classification:
+      | "PROVIDER_RESPONSE_ACCEPTED"
+      | "PROVIDER_HTTP_ERROR"
+      | "PROVIDER_PAYMENT_REJECTED"
+      | "PROVIDER_TIMEOUT"
+      | "PROVIDER_NETWORK_ERROR"
+      | "PROVIDER_MALFORMED_RESPONSE";
+    providerHttpStatus?: number;
+    safeProviderCode?: string;
+    safeProviderMessage?: string;
+    providerPaymentId?: string;
+    providerStatus?: string;
+    redirectUrlPresent: boolean;
+    at: string;
+    latencyMs: number;
+    attemptState: "submitted" | "resolved" | "unknown";
+  }>;
   id: string;
   orderId: string;
   amountFils: number;
@@ -226,6 +247,7 @@ export class DomainError extends Error {
   constructor(
     public status: number,
     message: string,
+    public publicCode?: string,
   ) {
     super(message);
   }

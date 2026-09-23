@@ -51,6 +51,45 @@ export function normalizeCheckout(value: unknown): AuthoritativeCheckout {
     url: c.redirectUrl,
   };
 }
+
+type EndpointClass = "payment/debit" | "payment/get" | "other";
+const endpointClass = (path: string): EndpointClass =>
+  path === "/payment/debit"
+    ? "payment/debit"
+    : path.startsWith("/payment/")
+      ? "payment/get"
+      : "other";
+const safeProviderText = (value: unknown) => {
+  if (typeof value !== "string") return undefined;
+  const cleaned = value
+    .replace(/[\u0000-\u001f\u007f]/g, " ")
+    .replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, "[redacted]")
+    .replace(/\b(?:bearer|basic)\s+[A-Za-z0-9._~+\/-]+=*\b/gi, "[redacted]")
+    .replace(/\b(?:ptk|pk|sk)_[A-Za-z0-9_-]+\b/gi, "[redacted]")
+    .replace(/\b\+?\d[\d -]{7,18}\d\b/g, "[redacted]")
+    .replace(/\s+/g, " ")
+    .trim();
+  return cleaned ? cleaned.slice(0, 200) : undefined;
+};
+const safeErrorFields = (value: unknown) => {
+  const object =
+    value && typeof value === "object"
+      ? (value as Record<string, unknown>)
+      : {};
+  return {
+    safeProviderCode: safeProviderText(object.code ?? object.errorCode),
+    safeProviderMessage: safeProviderText(object.error ?? object.message),
+    providerPaymentId: safeProviderText(
+      (object.result as Record<string, unknown> | undefined)?.id,
+    ),
+    providerStatus: safeProviderText(
+      (object.result as Record<string, unknown> | undefined)?.status,
+    ),
+    redirectUrlPresent: Boolean(
+      (object.result as Record<string, unknown> | undefined)?.redirectUrl,
+    ),
+  };
+};
 export class PaymenntProvider implements PaymentProvider {
   readonly idempotentCreate = false; // A unique requestId is NOT a documented idempotent POST guarantee.
   readonly capabilities = { cancel: false, resend: true };
@@ -77,7 +116,9 @@ export class PaymenntProvider implements PaymentProvider {
     // TL-25 Support contract implemented; a missing registered key still fails closed.
     this.verifier = verifier ?? new PaymenntNotificationVerifier();
   }
-  private async request(path: string, body?: unknown) {
+  private async performRequest(path: string, body?: unknown) {
+    const started = performance.now();
+    const endpoint = endpointClass(path);
     let response: Response;
     try {
       response = await this.fetcher(this.base + path, {
@@ -91,23 +132,94 @@ export class PaymenntProvider implements PaymentProvider {
         },
         ...(body ? { body: JSON.stringify(body) } : {}),
       });
-    } catch {
-      throw new ProviderFailure("unknown", !body);
+    } catch (error) {
+      const timeout =
+        error instanceof Error &&
+        (error.name === "TimeoutError" || error.name === "AbortError");
+      throw new ProviderFailure("unknown", !body, undefined, undefined, {
+        classification: timeout ? "PROVIDER_TIMEOUT" : "PROVIDER_NETWORK_ERROR",
+        endpointClass: endpoint,
+        redirectUrlPresent: false,
+        latencyMs: Math.round(performance.now() - started),
+      });
     }
+    const latencyMs = Math.round(performance.now() - started);
+    let decoded: unknown;
+    try {
+      decoded = JSON.parse(await response.text());
+    } catch {
+      if (!response.ok)
+        throw new ProviderFailure(
+          response.status >= 500 ? "unknown" : "rejected",
+          response.status === 429 || response.status >= 500,
+          undefined,
+          response.status,
+          {
+            classification: "PROVIDER_HTTP_ERROR",
+            endpointClass: endpoint,
+            redirectUrlPresent: false,
+            latencyMs,
+          },
+        );
+      throw new ProviderFailure("unknown", !body, undefined, response.status, {
+        classification: "PROVIDER_MALFORMED_RESPONSE",
+        endpointClass: endpoint,
+        redirectUrlPresent: false,
+        latencyMs,
+      });
+    }
+    const safe = safeErrorFields(decoded);
     if (!response.ok)
       throw new ProviderFailure(
         response.status >= 500 ? "unknown" : "rejected",
         response.status === 429 || response.status >= 500,
         undefined,
         response.status,
+        {
+          classification: "PROVIDER_HTTP_ERROR",
+          endpointClass: endpoint,
+          ...safe,
+          latencyMs,
+        },
       );
-    try {
-      return z
-        .object({ success: z.literal(true), result: z.unknown() })
-        .parse(await response.json()).result;
-    } catch {
-      throw new ProviderFailure("unknown", !body);
-    }
+    const wrapper = z
+      .object({
+        success: z.boolean(),
+        result: z.unknown().optional(),
+        error: z.unknown().optional(),
+        message: z.unknown().optional(),
+        code: z.unknown().optional(),
+      })
+      .safeParse(decoded);
+    if (!wrapper.success)
+      throw new ProviderFailure("unknown", !body, undefined, response.status, {
+        classification: "PROVIDER_MALFORMED_RESPONSE",
+        endpointClass: endpoint,
+        ...safe,
+        latencyMs,
+      });
+    if (!wrapper.data.success)
+      throw new ProviderFailure("rejected", false, undefined, response.status, {
+        classification: "PROVIDER_PAYMENT_REJECTED",
+        endpointClass: endpoint,
+        ...safe,
+        latencyMs,
+      });
+    if (wrapper.data.result === undefined)
+      throw new ProviderFailure("unknown", !body, undefined, response.status, {
+        classification: "PROVIDER_MALFORMED_RESPONSE",
+        endpointClass: endpoint,
+        ...safe,
+        latencyMs,
+      });
+    return {
+      result: wrapper.data.result,
+      httpStatus: response.status,
+      latencyMs,
+    };
+  }
+  private async request(path: string, body?: unknown) {
+    return (await this.performRequest(path, body)).result;
   }
   async createPaymentLink(
     input: Parameters<PaymentProvider["createPaymentLink"]>[0],
@@ -178,7 +290,7 @@ export class PaymenntProvider implements PaymentProvider {
     };
     returnUrl: string;
   }) {
-    const value = await this.request("/payment/debit", {
+    const response = await this.performRequest("/payment/debit", {
       source: { type: "TOKEN", token: input.token, storeCardDetails: false },
       checkoutDetails: {
         requestId: input.paymentId,
@@ -203,14 +315,87 @@ export class PaymenntProvider implements PaymentProvider {
         },
       },
     });
-    return this.normalizePayment(value);
+    try {
+      const payment = this.normalizePayment(response.result);
+      return {
+        ...payment,
+        diagnostic: {
+          classification: [
+            "FAILED",
+            "REJECTED",
+            "VOIDED",
+            "UNSUPPORTED",
+          ].includes(payment.status)
+            ? ("PROVIDER_PAYMENT_REJECTED" as const)
+            : ("PROVIDER_RESPONSE_ACCEPTED" as const),
+          endpointClass: "payment/debit" as const,
+          providerHttpStatus: response.httpStatus,
+          providerPaymentId: payment.id,
+          providerStatus: payment.status,
+          redirectUrlPresent: Boolean(payment.redirectUrl),
+          latencyMs: response.latencyMs,
+        },
+      };
+    } catch (error) {
+      if (error instanceof ProviderFailure && error.diagnostic) throw error;
+      const safe = safeErrorFields({ result: response.result });
+      throw new ProviderFailure(
+        "unknown",
+        false,
+        undefined,
+        response.httpStatus,
+        {
+          classification: "PROVIDER_MALFORMED_RESPONSE",
+          endpointClass: "payment/debit",
+          ...safe,
+          latencyMs: response.latencyMs,
+        },
+      );
+    }
   }
   async getPayment(id: string) {
-    const result = this.normalizePayment(
-      await this.request(`/payment/${encodeURIComponent(id)}`),
+    const response = await this.performRequest(
+      `/payment/${encodeURIComponent(id)}`,
     );
+    let result;
+    try {
+      result = this.normalizePayment(response.result);
+    } catch (error) {
+      if (error instanceof ProviderFailure && error.diagnostic) throw error;
+      const safe = safeErrorFields({ result: response.result });
+      throw new ProviderFailure(
+        "unknown",
+        false,
+        undefined,
+        response.httpStatus,
+        {
+          classification: "PROVIDER_MALFORMED_RESPONSE",
+          endpointClass: "payment/get",
+          ...safe,
+          latencyMs: response.latencyMs,
+        },
+      );
+    }
     if (result.id !== id) throw new ProviderFailure("unknown", false);
-    return result;
+    return {
+      ...result,
+      diagnostic: {
+        classification: [
+          "FAILED",
+          "REJECTED",
+          "VOIDED",
+          "UNSUPPORTED",
+        ].includes(result.status)
+          ? ("PROVIDER_PAYMENT_REJECTED" as const)
+          : ("PROVIDER_RESPONSE_ACCEPTED" as const),
+        endpointClass: "payment/get" as const,
+        providerHttpStatus: response.httpStatus,
+        providerPaymentId: result.id,
+        providerStatus: result.status,
+        redirectUrlPresent: Boolean(result.redirectUrl),
+        latencyMs: response.latencyMs,
+      },
+    };
   }
   private normalizePayment(value: unknown) {
     const parsed = z

@@ -43,7 +43,9 @@ async function post<T>(path: string, body: unknown, key?: string): Promise<T> {
   });
   const data = await res.json();
   if (!res.ok)
-    throw new Error(data.error ?? "Unable to continue. Please try again.");
+    throw new Error(
+      data.message ?? data.error ?? "Unable to continue. Please try again.",
+    );
   return data;
 }
 const sessionKey = "3l-checkout";
