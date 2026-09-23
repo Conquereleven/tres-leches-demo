@@ -291,6 +291,11 @@ export async function startServer(
           if (!isolatedTest && !meta && path === "/api/webhooks/whatsapp")
             throw new DomainError(503, "BLOCKED — EXTERNAL CREDENTIALS");
           if (meta && path === "/api/webhooks/whatsapp") {
+            // Inbound authenticity needs the app secret. Without it the
+            // payload cannot be proven to come from Meta, so it is refused
+            // rather than processed unsigned.
+            if (!meta.verifier)
+              throw new DomainError(503, "WEBHOOK NOT CONFIGURED");
             if (
               !meta.verifier.verify(
                 raw,

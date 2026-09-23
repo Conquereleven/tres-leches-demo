@@ -6,6 +6,8 @@ import { join } from "node:path";
 import { runtimeConfig, activationConfig } from "../../server/config";
 import { Store } from "../../server/db/store";
 import { stagingEnv } from "../fixtures/staging";
+import { MetaWhatsAppProvider } from "../../server/adapters/meta";
+import { ProviderFailure } from "../../server/adapters/failure";
 function env() {
   const value: NodeJS.ProcessEnv = {
     ...stagingEnv("/private/tmp/production-contract"),
@@ -200,4 +202,126 @@ test("production HTTP clean boot, auth, admin readiness and PORT binding", async
     });
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+const WA1 = JSON.stringify([
+  {
+    id: "wa1",
+    label: "Pasteleria 3L Dubai",
+    phone: "+971585943319",
+    phoneNumberId: "767195727350479",
+    wabaId: "926440084538581",
+  },
+]);
+const VERIFY = "server-only-verify-token-at-least-24-characters";
+const SECRET = "server-only-app-secret-at-least-24-characters";
+
+test("webhook verification needs only the verify token, never the access token", () => {
+  // Capability A: Meta must be able to complete hub.challenge before any
+  // Graph credential exists.
+  const activation = activationConfig({
+    ...env(),
+    META_OUTBOUND_ENABLED: "false",
+    META_VERIFY_TOKEN: VERIFY,
+    META_GRAPH_VERSION: "v26.0",
+  });
+  assert.ok(activation.meta, "meta must mount on the verify token alone");
+  assert.equal(activation.meta?.token, undefined);
+  assert.equal(activation.meta?.appSecret, undefined);
+  const provider = new MetaWhatsAppProvider(activation.meta!);
+  assert.equal(provider.outboundReady, false);
+  assert.equal(provider.inboundReady, false);
+  assert.equal(
+    provider.challenge(
+      new URLSearchParams({
+        "hub.mode": "subscribe",
+        "hub.verify_token": VERIFY,
+        "hub.challenge": "test-value",
+      }),
+    ),
+    "test-value",
+  );
+  // A wrong token must never echo the challenge back.
+  assert.equal(
+    provider.challenge(
+      new URLSearchParams({
+        "hub.mode": "subscribe",
+        "hub.verify_token": "wrong",
+        "hub.challenge": "test-value",
+      }),
+    ),
+    null,
+  );
+});
+
+test("without an app secret there is no verifier, so unsigned inbound cannot be accepted", () => {
+  const activation = activationConfig({
+    ...env(),
+    META_OUTBOUND_ENABLED: "false",
+    META_VERIFY_TOKEN: VERIFY,
+    META_GRAPH_VERSION: "v26.0",
+    META_NUMBERS_JSON: WA1,
+  });
+  const provider = new MetaWhatsAppProvider(activation.meta!);
+  assert.equal(provider.verifier, null);
+  assert.equal(provider.inboundReady, false);
+});
+
+test("the app secret enables signed inbound while outbound stays unavailable", () => {
+  const activation = activationConfig({
+    ...env(),
+    META_OUTBOUND_ENABLED: "false",
+    META_VERIFY_TOKEN: VERIFY,
+    META_APP_SECRET: SECRET,
+    META_GRAPH_VERSION: "v26.0",
+    META_NUMBERS_JSON: WA1,
+  });
+  const provider = new MetaWhatsAppProvider(activation.meta!);
+  assert.ok(provider.verifier);
+  assert.equal(provider.inboundReady, true);
+  assert.equal(provider.outboundReady, false);
+  assert.equal(activation.paymennt, undefined);
+});
+
+test("Graph calls fail closed without an access token", async () => {
+  const provider = new MetaWhatsAppProvider({
+    verifyToken: VERIFY,
+    appSecret: SECRET,
+    version: "v26.0",
+    numbers: JSON.parse(WA1),
+  });
+  const notConfigured = (e: unknown) => {
+    assert.ok(e instanceof ProviderFailure);
+    assert.equal(e.code, "NOT_CONFIGURED");
+    assert.equal(e.certainty, "rejected");
+    assert.equal(e.retryable, false);
+    return true;
+  };
+  await assert.rejects(provider.validateConfiguration(), notConfigured);
+  await assert.rejects(
+    provider.send({
+      sourceNumberId: "wa1",
+      sourcePhoneNumber: "+971585943319",
+      recipient: "+971500000000",
+      text: "must not send",
+      idempotencyKey: "k",
+    }),
+    notConfigured,
+  );
+});
+
+test("enabling outbound without the full credential set is refused", () => {
+  assert.throws(
+    () =>
+      activationConfig({
+        ...env(),
+        META_OUTBOUND_ENABLED: "true",
+        META_VERIFY_TOKEN: VERIFY,
+        META_APP_SECRET: SECRET,
+        META_GRAPH_VERSION: "v26.0",
+        META_NUMBERS_JSON: WA1,
+      }),
+    /outbound/i,
+    "no access token means outbound must not activate",
+  );
 });

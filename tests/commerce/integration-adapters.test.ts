@@ -341,14 +341,11 @@ test("Meta normalizes a batch, GPS and unsupported messages; verifies challenge 
   );
   assert.equal(meta.challenge(new URLSearchParams()), null);
   const encoded = JSON.stringify(raw);
-  assert.equal(
-    meta.verifier.verify(encoded, meta.verifier.sign(encoded)),
-    true,
-  );
-  assert.equal(
-    meta.verifier.verify(encoded + " ", meta.verifier.sign(encoded)),
-    false,
-  );
+  // An app secret is configured in this fixture, so the verifier exists.
+  const verifier = meta.verifier!;
+  assert.ok(verifier, "app secret configured means a verifier is available");
+  assert.equal(verifier.verify(encoded, verifier.sign(encoded)), true);
+  assert.equal(verifier.verify(encoded + " ", verifier.sign(encoded)), false);
 });
 test("Mapbox requests permanent AE results; canonical evidence never supplies commercial prices", async () => {
   const provider = new MapboxGeoProvider("fixture", async (url) => {

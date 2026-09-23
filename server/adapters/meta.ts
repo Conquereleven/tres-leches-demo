@@ -67,29 +67,58 @@ const payload = z.object({
     }),
   ),
 });
+/**
+ * Meta WhatsApp integration, split into three independent capabilities so that
+ * receiving messages never depends on credentials it does not need:
+ *
+ *   1. Webhook verification (GET hub.challenge) — needs only `verifyToken`.
+ *   2. Inbound authenticity (POST)             — additionally needs `appSecret`
+ *                                                 and configured `numbers`.
+ *   3. Graph API / outbound                    — additionally needs `token`.
+ *
+ * A missing credential disables only its own capability. It never silently
+ * downgrades another: without an app secret the POST route rejects rather than
+ * accepting unsigned payloads, and without a token outbound fails closed.
+ */
 export class MetaWhatsAppProvider implements WhatsAppProvider {
   readonly idempotentSend = false;
-  readonly verifier: HmacVerifier;
+  /** Null when no app secret is configured; POST must then be refused. */
+  readonly verifier: HmacVerifier | null;
   readonly numbers: MetaNumber[];
   constructor(
     private config: {
-      token: string;
-      appSecret: string;
+      token?: string;
+      appSecret?: string;
       version: string;
       verifyToken: string;
-      numbers: MetaNumber[];
+      numbers?: MetaNumber[];
       paymentTemplate?: { name: string; language: string };
     },
     private fetcher: typeof fetch = fetch,
   ) {
-    this.numbers = metaNumbersSchema.parse(config.numbers);
-    if (
-      !config.token ||
-      !/^v\d+\.0$/.test(config.version) ||
-      config.verifyToken.length < 24
-    )
+    // Numbers are only required to process inbound payloads, so an empty list
+    // is valid while the app is still being verified with Meta.
+    this.numbers = config.numbers?.length
+      ? metaNumbersSchema.parse(config.numbers)
+      : [];
+    if (!/^v\d+\.0$/.test(config.version) || config.verifyToken.length < 24)
       throw new Error("Meta configuration required");
-    this.verifier = new HmacVerifier(config.appSecret);
+    this.verifier = config.appSecret
+      ? new HmacVerifier(config.appSecret)
+      : null;
+  }
+  /** Signed inbound payloads can be authenticated and attributed to a number. */
+  get inboundReady() {
+    return !!this.verifier && this.numbers.length > 0;
+  }
+  /** Graph API calls (validation and outbound sending) are possible. */
+  get outboundReady() {
+    return !!this.config.token;
+  }
+  private requireToken() {
+    if (!this.config.token)
+      throw new ProviderFailure("rejected", false, "NOT_CONFIGURED");
+    return this.config.token;
   }
   challenge(params: URLSearchParams): string | null {
     return params.get("hub.mode") === "subscribe" &&
@@ -156,6 +185,7 @@ export class MetaWhatsAppProvider implements WhatsAppProvider {
     return result;
   }
   async validateConfiguration() {
+    const token = this.requireToken();
     for (const n of this.numbers) {
       let response: Response;
       try {
@@ -165,7 +195,7 @@ export class MetaWhatsAppProvider implements WhatsAppProvider {
             method: "GET",
             redirect: "error",
             signal: AbortSignal.timeout(8000),
-            headers: { Authorization: `Bearer ${this.config.token}` },
+            headers: { Authorization: `Bearer ${token}` },
           },
         );
       } catch {
@@ -180,6 +210,7 @@ export class MetaWhatsAppProvider implements WhatsAppProvider {
     }
   }
   async send(input: Parameters<WhatsAppProvider["send"]>[0]) {
+    const token = this.requireToken();
     const n = this.numbers.find(
       (n) =>
         n.id === input.sourceNumberId && n.phone === input.sourcePhoneNumber,
@@ -235,7 +266,7 @@ export class MetaWhatsAppProvider implements WhatsAppProvider {
           redirect: "error",
           signal: AbortSignal.timeout(8000),
           headers: {
-            Authorization: `Bearer ${this.config.token}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(body),

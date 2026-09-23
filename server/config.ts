@@ -153,30 +153,37 @@ export function runtimeConfig(env: NodeJS.ProcessEnv) {
 export function activationConfig(env: NodeJS.ProcessEnv) {
   const externalProvidersEnabled =
     env.PROVIDER_MODE === "test" || env.INTEGRATION_MODE === "true";
-  const meta =
-    env.META_ACCESS_TOKEN
-      ? {
-          token: env.META_ACCESS_TOKEN,
-          appSecret: z.string().min(24).parse(env.META_APP_SECRET),
-          verifyToken: z.string().min(24).parse(env.META_VERIFY_TOKEN),
-          version: z
-            .string()
-            .regex(/^v\d+\.0$/)
-            .parse(env.META_GRAPH_VERSION),
-          numbers: metaNumbersSchema.parse(
-            JSON.parse(env.META_NUMBERS_JSON ?? "[]"),
-          ),
-          paymentTemplate: env.META_PAYMENT_TEMPLATE_JSON
-            ? z
-                .object({
-                  name: z.string().regex(/^[a-z0-9_]+$/),
-                  language: z.string().min(2).max(10),
-                })
-                .strict()
-                .parse(JSON.parse(env.META_PAYMENT_TEMPLATE_JSON))
-            : undefined,
-        }
-      : undefined;
+  // Meta activates per capability, not all-or-nothing. The verify token alone
+  // is enough to mount the webhook and answer Meta's hub.challenge; the app
+  // secret adds signed inbound; the access token adds Graph API and outbound.
+  // Receiving a message must never require a credential used only for sending.
+  const rawNumbers = JSON.parse(env.META_NUMBERS_JSON ?? "[]") as unknown;
+  const meta = env.META_VERIFY_TOKEN
+    ? {
+        token: env.META_ACCESS_TOKEN || undefined,
+        appSecret: env.META_APP_SECRET
+          ? z.string().min(24).parse(env.META_APP_SECRET)
+          : undefined,
+        verifyToken: z.string().min(24).parse(env.META_VERIFY_TOKEN),
+        version: z
+          .string()
+          .regex(/^v\d+\.0$/)
+          .parse(env.META_GRAPH_VERSION),
+        numbers:
+          Array.isArray(rawNumbers) && rawNumbers.length
+            ? metaNumbersSchema.parse(rawNumbers)
+            : [],
+        paymentTemplate: env.META_PAYMENT_TEMPLATE_JSON
+          ? z
+              .object({
+                name: z.string().regex(/^[a-z0-9_]+$/),
+                language: z.string().min(2).max(10),
+              })
+              .strict()
+              .parse(JSON.parse(env.META_PAYMENT_TEMPLATE_JSON))
+          : undefined,
+      }
+    : undefined;
   const paymennt =
     externalProvidersEnabled && env.PAYMENNT_API_KEY
       ? {
@@ -191,7 +198,11 @@ export function activationConfig(env: NodeJS.ProcessEnv) {
       : undefined;
   if (geoToken && env.MAPBOX_PERMANENT_ENABLED !== "true")
     throw new Error("Mapbox permanent geocoding entitlement required");
-  if (env.META_OUTBOUND_ENABLED === "true" && !meta)
+  // Outbound needs the full set: a mounted webhook is not enough to send.
+  if (
+    env.META_OUTBOUND_ENABLED === "true" &&
+    !(meta?.token && meta.appSecret && meta.numbers.length)
+  )
     throw new Error("Meta outbound requires all origin number configuration");
   return { meta, paymennt, geoToken };
 }
