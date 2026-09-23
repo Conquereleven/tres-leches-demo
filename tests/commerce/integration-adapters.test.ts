@@ -11,6 +11,7 @@ import {
 } from "../../server/adapters/paymennt";
 import {
   MetaWhatsAppProvider,
+  metaNumbersSchema,
   type MetaNumber,
 } from "../../server/adapters/meta";
 import { MapboxGeoProvider } from "../../server/adapters/mapbox";
@@ -240,6 +241,16 @@ const numbers: MetaNumber[] = [1, 2, 3].map((n) => ({
   phoneNumberId: String(n),
   wabaId: "100",
 }));
+test("Meta permits phased WA1 activation without synthetic WA2/WA3 mappings", () => {
+  assert.deepEqual(metaNumbersSchema.parse([numbers[0]]), [numbers[0]]);
+  assert.throws(() => metaNumbersSchema.parse([]));
+  assert.throws(() =>
+    metaNumbersSchema.parse([
+      numbers[0],
+      { ...numbers[1], phone: numbers[0]!.phone },
+    ]),
+  );
+});
 const metaConfig = {
   token: "fixture-token",
   appSecret: "fixture-secret-at-least-24-characters",

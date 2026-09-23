@@ -151,10 +151,10 @@ export function runtimeConfig(env: NodeJS.ProcessEnv) {
 
 /** Independent groups allow Meta activation before payment credentials arrive. */
 export function activationConfig(env: NodeJS.ProcessEnv) {
-  const enabled =
+  const externalProvidersEnabled =
     env.PROVIDER_MODE === "test" || env.INTEGRATION_MODE === "true";
   const meta =
-    enabled && env.META_ACCESS_TOKEN
+    env.META_ACCESS_TOKEN
       ? {
           token: env.META_ACCESS_TOKEN,
           appSecret: z.string().min(24).parse(env.META_APP_SECRET),
@@ -178,7 +178,7 @@ export function activationConfig(env: NodeJS.ProcessEnv) {
         }
       : undefined;
   const paymennt =
-    enabled && env.PAYMENNT_API_KEY
+    externalProvidersEnabled && env.PAYMENNT_API_KEY
       ? {
           apiKey: env.PAYMENNT_API_KEY,
           apiSecret: z.string().min(1).parse(env.PAYMENNT_API_SECRET),
@@ -186,7 +186,9 @@ export function activationConfig(env: NodeJS.ProcessEnv) {
         }
       : undefined;
   const geoToken =
-    enabled && env.MAPBOX_ACCESS_TOKEN ? env.MAPBOX_ACCESS_TOKEN : undefined;
+    externalProvidersEnabled && env.MAPBOX_ACCESS_TOKEN
+      ? env.MAPBOX_ACCESS_TOKEN
+      : undefined;
   if (geoToken && env.MAPBOX_PERMANENT_ENABLED !== "true")
     throw new Error("Mapbox permanent geocoding entitlement required");
   if (env.META_OUTBOUND_ENABLED === "true" && !meta)

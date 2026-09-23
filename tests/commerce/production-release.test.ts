@@ -29,6 +29,32 @@ test("production release boots only with secure offline configuration", () => {
     geoToken: undefined,
   });
 });
+test("production accepts one inbound Meta origin while outbound and payments stay offline", () => {
+  const e = {
+    ...env(),
+    META_OUTBOUND_ENABLED: "false",
+    META_ACCESS_TOKEN: "server-only-token",
+    META_APP_SECRET: "server-only-app-secret-at-least-24-characters",
+    META_VERIFY_TOKEN: "server-only-verify-token-at-least-24-characters",
+    META_GRAPH_VERSION: "v99.0",
+    META_NUMBERS_JSON: JSON.stringify([
+      {
+        id: "wa1",
+        label: "Pasteleria 3L Dubai",
+        phone: "+971585943319",
+        phoneNumberId: "767195727350479",
+        wabaId: "926440084538581",
+      },
+    ]),
+  };
+  assert.equal(runtimeConfig(e).environment, "production");
+  const activation = activationConfig(e);
+  assert.equal(activation.meta?.numbers.length, 1);
+  assert.equal(activation.meta?.numbers[0]?.id, "wa1");
+  assert.equal(activation.paymennt, undefined);
+  assert.equal(activation.geoToken, undefined);
+  assert.equal(e.META_OUTBOUND_ENABLED, "false");
+});
 for (const [key, value] of Object.entries({
   PROVIDER_MODE: "test",
   META_OUTBOUND_ENABLED: "true",

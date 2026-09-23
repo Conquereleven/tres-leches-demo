@@ -13,11 +13,14 @@ export const metaNumbersSchema = z
       wabaId: z.string().regex(/^[0-9]+$/),
     }),
   )
-  .length(3)
+  .min(1)
+  .max(3)
   .refine(
     (ns) =>
-      new Set(ns.map((n) => n.id)).size === 3 &&
-      new Set(ns.map((n) => n.phoneNumberId)).size === 3,
+      new Set(ns.map((n) => n.id)).size === ns.length &&
+      new Set(ns.map((n) => n.phoneNumberId)).size === ns.length &&
+      new Set(ns.map((n) => n.phone)).size === ns.length,
+    "Configured WhatsApp origins must be unique",
   );
 export type MetaNumber = z.infer<typeof metaNumbersSchema>[number];
 const incoming = z.object({
