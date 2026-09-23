@@ -7,6 +7,7 @@ export class ProviderFailure extends Error {
       | "NOT_CONFIGURED"
       | "PAYMENT_TEMPLATE_REQUIRED"
       | "ORIGIN_NOT_CONFIGURED",
+    public readonly httpStatus?: number,
   ) {
     super(
       certainty === "rejected"

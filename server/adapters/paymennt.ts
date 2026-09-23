@@ -98,6 +98,8 @@ export class PaymenntProvider implements PaymentProvider {
       throw new ProviderFailure(
         response.status >= 500 ? "unknown" : "rejected",
         response.status === 429 || response.status >= 500,
+        undefined,
+        response.status,
       );
     try {
       return z

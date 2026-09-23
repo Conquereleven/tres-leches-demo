@@ -30,6 +30,7 @@ type Status = {
   amountFils: number;
   currency: string;
   url: string | null;
+  actionRequired?: "review_payment" | "complete_payment" | null;
 };
 async function post<T>(path: string, body: unknown, key?: string): Promise<T> {
   const res = await fetch(path, {
@@ -413,6 +414,7 @@ export function CheckoutReturn() {
             "authorized",
             "pending_confirmation",
           ].includes(data.paymentStatus) &&
+          !data.actionRequired &&
           attempts++ < 30
         )
           timer = setTimeout(poll, 4000);
@@ -437,25 +439,34 @@ export function CheckoutReturn() {
       "Delivered",
     ].includes(result.status);
   return (
-    <main className="b-checkout-return">
+    <main className="brand-experience b-checkout-return">
       <a href="/">Pastelerías 3L</a>
       <h1>
         {paid
           ? "PAYMENT CONFIRMED"
-          : result &&
-              ["failed", "cancelled", "expired"].includes(result.paymentStatus)
-            ? "PAYMENT NOT COMPLETED"
-            : "Checking payment status…"}
+          : result?.actionRequired === "review_payment"
+            ? "PAYMENT NOT CONFIRMED"
+            : result?.actionRequired === "complete_payment"
+              ? "PAYMENT NOT SUBMITTED"
+              : result &&
+                  ["failed", "cancelled", "expired"].includes(
+                    result.paymentStatus,
+                  )
+                ? "PAYMENT NOT COMPLETED"
+                : "Checking payment status…"}
       </h1>
       <p role="status">
         {paid
           ? "ORDER CONFIRMED. Your payment has been verified. Thank you."
-          : "We are checking your payment securely. Your order will be confirmed once payment is verified."}
+          : result?.actionRequired === "review_payment"
+            ? "We could not verify the payment result. Your order has been saved. Please contact 3L with the order number below before making another payment."
+            : result?.actionRequired === "complete_payment"
+              ? "Your order has been saved, but payment has not been submitted. Return to checkout to complete it."
+              : "We are checking your payment securely. Your order will be confirmed once payment is verified."}
       </p>
       {result && (
         <p>
-          Order {result.orderId} · {formatAed(result.amountFils)} ·{" "}
-          {result.paymentStatus}
+          Order {result.orderId} · {formatAed(result.amountFils)}
         </p>
       )}
       {error && <p role="alert">{error}</p>}

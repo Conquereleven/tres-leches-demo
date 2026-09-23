@@ -1,3 +1,4 @@
+import { ProviderFailure } from "../adapters/failure";
 /** Tokens are request-scoped only. A durable claim precedes the provider call. */
 import { z } from "zod";
 import { PaymenntProvider } from "../adapters/paymennt";
@@ -120,10 +121,19 @@ export async function submitEmbeddedPayment(
       service.applyCheckout(payment.id, result.checkout, WEB_ACTOR.id);
     });
     return readWebCheckoutStatus(service, input.key);
-  } catch {
+  } catch (error) {
     service.store.write((state) => {
       const p = state.payments.find((p) => p.id === payment.id)!;
       if (p.directAttempt === "submitted") p.directAttempt = "unknown";
+      const category =
+        error instanceof ProviderFailure
+          ? `Provider ${error.certainty}${error.httpStatus ? ` HTTP ${error.httpStatus}` : ""}`
+          : "Provider response could not be verified";
+      p.timeline.push({
+        at: new Date().toISOString(),
+        actor: WEB_ACTOR.id,
+        action: `${category}; payment held for reconciliation`,
+      });
     });
     // No blind retry: an interrupted request could have charged successfully.
     throw new Error(

@@ -7,7 +7,10 @@ import { CommerceService } from "../../server/domain/service";
 import { PaymenntProvider } from "../../server/adapters/paymennt";
 import { DisabledWhatsAppProvider } from "../../server/adapters/blocked";
 import { validateCatalog } from "../../server/domain/catalog";
-import { createWebCheckout } from "../../server/domain/web-checkout";
+import {
+  createWebCheckout,
+  readWebCheckoutStatus,
+} from "../../server/domain/web-checkout";
 import {
   submitEmbeddedPayment,
   reconcileEmbeddedPayment,
@@ -38,6 +41,8 @@ function fixture(initial = "CAPTURED") {
     async (url, options) => {
       if (options?.method === "POST") {
         posts++;
+        if (status === "NETWORK_UNKNOWN")
+          throw new Error("fixture transport interruption");
         assert.match(String(url), /\/payment\/debit$/);
         const body = JSON.parse(String(options.body));
         assert.equal(body.checkoutDetails.amount, 50);
@@ -229,6 +234,32 @@ test("explicit retry of authoritative failure keeps order and creates one new at
     assert.equal(retry.orderId, order.orderId);
     assert.equal(retry.paymentStatus, "creating");
     assert.equal(f.store.read().jobs.length, 0);
+  } finally {
+    f.store.close();
+  }
+});
+
+test("uncertain direct result exposes a review hold and never debits again", async () => {
+  const f = fixture("NETWORK_UNKNOWN");
+  const key = randomUUID();
+  try {
+    const order = await createWebCheckout(f.service, input, key, true);
+    assert.equal(order.actionRequired, "complete_payment");
+    const body = {
+      key,
+      orderId: order.orderId,
+      email: "uat@example.invalid",
+      token: "ptk_test_fixturetokenonly",
+    };
+    await assert.rejects(
+      submitEmbeddedPayment(f.service, body, "https://test.example"),
+    );
+    const status = readWebCheckoutStatus(f.service, key);
+    assert.equal(status.actionRequired, "review_payment");
+    assert.notEqual(status.paymentStatus, "paid");
+    await submitEmbeddedPayment(f.service, body, "https://test.example");
+    assert.equal(f.counts().posts, 1);
+    assert.ok(!JSON.stringify(f.store.read()).includes(body.token));
   } finally {
     f.store.close();
   }

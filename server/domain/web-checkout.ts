@@ -48,6 +48,7 @@ export type WebCheckoutResult = {
   amountFils: number;
   currency: string;
   url: string | null;
+  actionRequired: "review_payment" | "complete_payment" | null;
 };
 /** The unguessable UUID capability is kept in the browser session, never a phone-based lookup. */
 export function readWebCheckoutStatus(
@@ -65,6 +66,14 @@ export function readWebCheckoutStatus(
     paymentStatus: payment.status,
     amountFils: payment.amountFils,
     currency: payment.currency,
+    actionRequired:
+      payment.directAttempt === "unknown" ||
+      (payment.directAttempt === "submitted" &&
+        Date.now() - Date.parse(payment.updatedAt) > 30000)
+        ? "review_payment"
+        : payment.directAttempt === "ready"
+          ? "complete_payment"
+          : null,
     url: payment.status === "pending" ? (payment.url ?? null) : null,
   };
 }
