@@ -37,7 +37,7 @@ import {
   DisabledWhatsAppProvider,
   UnconfiguredPaymentProvider,
 } from "./adapters/blocked";
-import { PaymenntProvider } from "./adapters/paymennt";
+import { PAYMENNT_FRAMES, PaymenntProvider } from "./adapters/paymennt";
 import { MetaWhatsAppProvider } from "./adapters/meta";
 import { MapboxGeoProvider } from "./adapters/mapbox";
 import { GeocodingAdapter } from "./adapters/geo";
@@ -319,6 +319,13 @@ export async function startServer(
               dates: { min: today, max: addDays(today, MAX_BOOKING_DAYS) },
               publicKey: enabled
                 ? (process.env.PAYMENNT_PUBLIC_KEY ?? null)
+                : null,
+              frame: enabled
+                ? PAYMENNT_FRAMES[
+                    process.env.PAYMENNT_ENVIRONMENT === "live"
+                      ? "live"
+                      : "test"
+                  ]
                 : null,
               product: product
                 ? {
@@ -755,6 +762,8 @@ export async function startServer(
         !existsSync(candidate) &&
         ![
           "/",
+          "/cart",
+          "/checkout",
           "/checkout/return",
           "/operations/inbox",
           "/operations/orders",

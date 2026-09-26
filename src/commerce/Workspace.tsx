@@ -22,7 +22,11 @@ export function CommerceWorkspace() {
     [search, setSearch] = useState(""),
     [unread, setUnread] = useState(false),
     [agent, setAgent] = useState("all"),
-    [status, setStatus] = useState("all");
+    [status, setStatus] = useState("all"),
+    [orderFilter, setOrderFilter] = useState<OrderFilter>("paid"),
+    [focusOrder, setFocusOrder] = useState(
+      () => new URLSearchParams(location.search).get("order") ?? "",
+    );
   useEffect(() => {
     const sync = () => setView(location.pathname.split("/")[2] || "inbox");
     window.addEventListener("popstate", sync);
@@ -88,6 +92,9 @@ export function CommerceWorkspace() {
     orders = data.orders.filter((o) => o.conversationId === selected);
   const shown = data.conversations.filter(
     (c) =>
+      // Website orders have no chat to answer; they live on the orders board,
+      // and only become actionable once paid.
+      c.sourceNumberId !== "web" &&
       (filter === "all" || c.sourceNumberId === filter) &&
       (!unread || c.unread) &&
       (agent === "all" ||
@@ -320,47 +327,94 @@ export function CommerceWorkspace() {
           </div>
         ) : (
           <div className="co-board">
-            {data.orders
-              .filter(
-                (o) =>
-                  view === "orders" ||
-                  (view === "production"
-                    ? ["Confirmed", "Production", "Ready"]
-                    : ["Ready", "Out for Delivery", "Delivered"]
-                  ).includes(o.state),
-              )
-              .map((o) => (
-                <article key={o.id} className="co-board-card">
-                  <header className="ops-order-summary">
-                    <div className="co-row">
-                      <span className="co-state">{o.state}</span>
-                      <strong>{money(o.quote?.totalFils)}</strong>
+            {view === "orders" && (
+              <div
+                className="ops-order-filters"
+                role="group"
+                aria-label="Filtrar pedidos"
+              >
+                {focusOrder ? (
+                  <button
+                    className="co-link"
+                    onClick={() => {
+                      setFocusOrder("");
+                      history.replaceState({}, "", "/operations/orders");
+                    }}
+                  >
+                    ← Ver todos los pedidos
+                  </button>
+                ) : (
+                  ORDER_FILTERS.map(([id, label]) => (
+                    <button
+                      key={id}
+                      aria-pressed={orderFilter === id}
+                      onClick={() => setOrderFilter(id)}
+                    >
+                      {label} ·{" "}
+                      {data.orders.filter((o) => matchesFilter(o, id)).length}
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+            {boardOrders(data, view, orderFilter, focusOrder).map((o) => (
+              <article key={o.id} className="co-board-card">
+                <header className="ops-order-summary">
+                  <div className="co-row">
+                    <span className="co-state">{stateLabel(o.state)}</span>
+                    <strong>{money(o.quote?.totalFils)}</strong>
+                  </div>
+                  <h2>
+                    {data.conversations.find((c) => c.id === o.conversationId)
+                      ?.customer ?? "Cliente"}
+                  </h2>
+                  <p>{o.id}</p>
+                  <dl>
+                    <div>
+                      <dt>Pago</dt>
+                      <dd>
+                        {paymentLabel(
+                          data.payments.find((p) => p.id === o.paymentId)
+                            ?.status,
+                        )}
+                      </dd>
                     </div>
-                    <h2>
-                      {data.conversations.find((c) => c.id === o.conversationId)
-                        ?.customer ?? "Cliente"}
-                    </h2>
-                    <p>{o.id}</p>
-                    <dl>
+                    <div>
+                      <dt>Zona</dt>
+                      <dd>{o.quote?.zoneName ?? "Ubicación pendiente"}</dd>
+                    </div>
+                    {o.delivery && (
                       <div>
-                        <dt>Pago</dt>
+                        <dt>Entrega</dt>
                         <dd>
-                          {data.payments.find((p) => p.id === o.paymentId)
-                            ?.status ?? "Sin solicitud"}
+                          {o.delivery.date} · {o.delivery.slot}
                         </dd>
                       </div>
-                      <div>
-                        <dt>Zona</dt>
-                        <dd>{o.quote?.zoneName ?? "Ubicación pendiente"}</dd>
-                      </div>
-                    </dl>
-                    {o.audit.at(-1)?.at && (
-                      <small>
-                        Última actividad ·{" "}
-                        {new Date(o.audit.at(-1)!.at).toLocaleString()}
-                      </small>
                     )}
-                  </header>
+                    {isWeb(data, o) && (
+                      <div>
+                        <dt>Aviso WhatsApp</dt>
+                        <dd>{notificationLabel(data, o.id)}</dd>
+                      </div>
+                    )}
+                    <div>
+                      <dt>Origen</dt>
+                      <dd>{isWeb(data, o) ? "Web" : "WhatsApp"}</dd>
+                    </div>
+                  </dl>
+                  {o.audit.at(-1)?.at && (
+                    <small>
+                      Última actividad ·{" "}
+                      {new Date(o.audit.at(-1)!.at).toLocaleString()}
+                    </small>
+                  )}
+                </header>
+                {isWeb(data, o) ? (
+                  <p className="co-muted">
+                    {data.conversations.find((c) => c.id === o.conversationId)
+                      ?.phone ?? ""}
+                  </p>
+                ) : (
                   <button
                     className="co-link"
                     onClick={() => {
@@ -373,20 +427,14 @@ export function CommerceWorkspace() {
                       .find((c) => c.id === o.conversationId)
                       ?.sourceNumberId.toUpperCase()}
                   </button>
-                  <details className="ops-order-details">
-                    <summary>Ver pedido y seguimiento</summary>
-                    <OrderPanel order={o} data={data} run={run} />
-                  </details>
-                </article>
-              ))}
-            {data.orders.filter(
-              (o) =>
-                view === "orders" ||
-                (view === "production"
-                  ? ["Confirmed", "Production", "Ready"]
-                  : ["Ready", "Out for Delivery", "Delivered"]
-                ).includes(o.state),
-            ).length === 0 && (
+                )}
+                <details className="ops-order-details">
+                  <summary>Ver pedido y seguimiento</summary>
+                  <OrderPanel order={o} data={data} run={run} />
+                </details>
+              </article>
+            ))}
+            {boardOrders(data, view, orderFilter, focusOrder).length === 0 && (
               <div className="ops-board-empty">
                 <span className="ops-empty-icon">
                   {view === "production" ? (
@@ -1363,4 +1411,118 @@ function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
       </ol>
     </section>
   );
+}
+
+type OrderFilter =
+  "paid" | "today" | "upcoming" | "preparing" | "delivery" | "awaiting" | "all";
+const ORDER_FILTERS: [OrderFilter, string][] = [
+  ["paid", "Pagados"],
+  ["today", "Hoy"],
+  ["upcoming", "Próximos"],
+  ["preparing", "En preparación"],
+  ["delivery", "Entrega"],
+  ["awaiting", "Esperando pago"],
+  ["all", "Todos"],
+];
+/** Paid and actionable: confirmed onwards, never cancelled. */
+const ACTIONABLE = [
+  "Paid",
+  "Confirmed",
+  "Production",
+  "Ready",
+  "Out for Delivery",
+  "Delivered",
+];
+const dubaiDate = () =>
+  new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Dubai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+function matchesFilter(o: Data["orders"][number], f: OrderFilter) {
+  const today = dubaiDate();
+  switch (f) {
+    case "paid":
+      return ACTIONABLE.includes(o.state) && o.state !== "Delivered";
+    case "today":
+      return ACTIONABLE.includes(o.state) && o.delivery?.date === today;
+    case "upcoming":
+      return (
+        ACTIONABLE.includes(o.state) &&
+        o.state !== "Delivered" &&
+        !!o.delivery &&
+        o.delivery.date > today
+      );
+    case "preparing":
+      return ["Confirmed", "Production"].includes(o.state);
+    case "delivery":
+      return ["Ready", "Out for Delivery"].includes(o.state);
+    case "awaiting":
+      return o.state === "Awaiting Payment";
+    default:
+      return true;
+  }
+}
+function boardOrders(
+  data: Data,
+  view: string,
+  filter: OrderFilter,
+  focus: string,
+) {
+  if (focus) return data.orders.filter((o) => o.id === focus);
+  const list =
+    view === "orders"
+      ? data.orders.filter((o) => matchesFilter(o, filter))
+      : data.orders.filter((o) =>
+          (view === "production"
+            ? ["Confirmed", "Production", "Ready"]
+            : ["Ready", "Out for Delivery", "Delivered"]
+          ).includes(o.state),
+        );
+  // Soonest delivery first, then most recent activity.
+  return [...list].sort(
+    (a, b) =>
+      (a.delivery?.date ?? "9999").localeCompare(b.delivery?.date ?? "9999") ||
+      (b.audit.at(-1)?.at ?? "").localeCompare(a.audit.at(-1)?.at ?? ""),
+  );
+}
+const PAYMENT_LABELS: Record<string, string> = {
+  creating: "Creando enlace",
+  pending: "Esperando pago",
+  authorized: "Autorizado",
+  pending_confirmation: "Confirmando",
+  paid: "Pagado",
+  failed: "Fallido",
+  expired: "Expirado",
+  cancelled: "Cancelado",
+  refunded: "Reembolsado",
+  partially_refunded: "Reembolso parcial",
+  chargeback: "Contracargo",
+};
+function paymentLabel(status?: string) {
+  return status ? (PAYMENT_LABELS[status] ?? status) : "Sin solicitud";
+}
+const STATE_LABELS: Record<string, string> = {
+  "Awaiting Payment": "Esperando pago",
+  Paid: "Pagado",
+  Confirmed: "Confirmado",
+  Production: "En preparación",
+  Ready: "Listo",
+  "Out for Delivery": "En camino",
+  Delivered: "Entregado",
+  Cancelled: "Cancelado",
+};
+const stateLabel = (s: string) => STATE_LABELS[s] ?? s;
+const isWeb = (data: Data, o: Data["orders"][number]) =>
+  data.conversations.find((c) => c.id === o.conversationId)?.sourceNumberId ===
+  "web";
+function notificationLabel(data: Data, orderId: string) {
+  const n = data.operationsNotifications?.find((n) => n.orderId === orderId);
+  if (!n) return "—";
+  if (n.status === "sent") return "Enviado";
+  if (n.status === "failed") return "Error de envío · revisar";
+  return data.operationsOutboundEnabled
+    ? "Pendiente de envío"
+    : "Pendiente · WhatsApp desactivado";
 }

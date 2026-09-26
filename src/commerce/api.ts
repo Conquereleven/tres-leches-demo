@@ -5,6 +5,7 @@ import type {
   Payment,
   DeliveryZone,
   Job,
+  OperationsNotification,
 } from "../../server/domain/model";
 export type Workspace = {
   ai?: {
@@ -50,6 +51,9 @@ export type Workspace = {
   orders: Order[];
   payments: Payment[];
   jobs: Job[];
+  /** Paid-order alerts for the team; queued even while outbound is off. */
+  operationsNotifications?: OperationsNotification[];
+  operationsOutboundEnabled?: boolean;
 };
 export async function api<T>(
   path: string,

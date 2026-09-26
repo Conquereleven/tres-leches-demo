@@ -8,6 +8,7 @@ import {
   policyRoutes,
 } from "./business";
 import { Logo, Modal, SectionLabel, WhatsAppCTA } from "./primitives";
+import { CartLink } from "./CartLink";
 
 /**
  * Card acceptance marks. Locally hosted; no endorsement is implied.
@@ -182,6 +183,7 @@ export function SiteHeader({
           <a href="/contact">CONTACT</a>
           <WhatsAppCTA unavailable={onContactUnavailable} />
         </nav>
+        <CartLink />
         <WhatsAppCTA className="b-mobile-wa" unavailable={onContactUnavailable}>
           ORDER
         </WhatsAppCTA>

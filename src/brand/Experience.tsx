@@ -1,4 +1,5 @@
-import { ProductCheckout } from "./Checkout";
+import { AddToCart } from "./Shop";
+import { CartLink } from "./CartLink";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { ArrowDown, ArrowUpRight, List, Play } from "@phosphor-icons/react";
 import {
@@ -137,8 +138,27 @@ function ProductExperience({
             ))}
           </div>
         )}
-        {product.id === "pan-de-muerto" && product.status === "available" ? (
-          <ProductCheckout product={product} unavailable={unavailable} />
+        {product.status === "available" && product.name ? (
+          <>
+            <AddToCart
+              productId={product.id}
+              fallback={
+                <WhatsAppCTA
+                  unavailable={unavailable}
+                  message={message ?? undefined}
+                >
+                  {product.name ? `ORDER ${product.name.toUpperCase()}` : cta}
+                </WhatsAppCTA>
+              }
+            />
+            <WhatsAppCTA
+              className="b-secondary-wa"
+              unavailable={unavailable}
+              message={message ?? undefined}
+            >
+              ORDER VIA WHATSAPP
+            </WhatsAppCTA>
+          </>
         ) : product.status === "out-of-stock" ? (
           <Button disabled>OUT OF STOCK</Button>
         ) : (
@@ -348,6 +368,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
           <a href="#dubai">CONTACT</a>
           <WhatsAppCTA unavailable={contact} />
         </nav>
+        <CartLink />
         <WhatsAppCTA className="b-mobile-wa" unavailable={contact}>
           ORDER
         </WhatsAppCTA>

@@ -606,3 +606,26 @@
 .commerce button.primary {
   background: #b84608;
 }
+
+/* Orders board filters */
+.ops-order-filters {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.ops-order-filters button[aria-pressed] {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: none;
+  padding: 0.45rem 0.9rem;
+  min-height: 36px;
+  cursor: pointer;
+  font: inherit;
+  opacity: 0.7;
+}
+.ops-order-filters button[aria-pressed="true"] {
+  opacity: 1;
+  font-weight: 600;
+}

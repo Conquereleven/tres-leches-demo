@@ -7,6 +7,20 @@ import type { PaymentProvider, WebhookVerifier } from "./providers";
 import type { Payment } from "../domain/model";
 
 // Official contract: https://docs.paymennt.com/openapi/paymennt.yaml
+
+/**
+ * Card-frame environment per Paymennt environment. TEST is the documented and
+ * verified pair. LIVE is deliberately unset until Paymennt confirms the LIVE
+ * frame origin with the LIVE keys; while it is null the storefront cannot
+ * offer card payment in LIVE, rather than guessing an origin.
+ */
+export const PAYMENNT_FRAMES: Record<
+  "test" | "live",
+  { mode: "TEST" | "LIVE"; origin: string } | null
+> = {
+  test: { mode: "TEST", origin: "https://pay.test.paymennt.com" },
+  live: null,
+};
 const checkoutSchema = z.object({
   id: z.string().min(1),
   requestId: z.string().min(1),

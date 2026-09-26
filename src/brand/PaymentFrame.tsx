@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 type Frames = {
-  modes: { TEST: string };
+  modes: { TEST: string; LIVE?: string };
   init(options: {
     publicKey: string;
     selector: string;
@@ -13,7 +13,10 @@ type Frames = {
 };
 declare const PaymenntJS: Frames;
 let loading: Promise<void> | undefined;
-function loadFrames() {
+/** The only frame origin whose messages are trusted; set from server config. */
+let trustedOrigin = "";
+function loadFrames(origin: string) {
+  trustedOrigin = origin;
   loading ??= new Promise<void>((resolve, reject) => {
     // Tighten the SDK's message boundary to the exact TEST origin and frame.
     window.addEventListener("message", (event) => {
@@ -27,7 +30,8 @@ function loadFrames() {
           '[id="3l-card-frame"] iframe',
         );
         if (
-          event.origin !== "https://pay.test.paymennt.com" ||
+          !trustedOrigin ||
+          event.origin !== trustedOrigin ||
           event.source !== frame?.contentWindow
         )
           event.stopImmediatePropagation();
@@ -47,6 +51,9 @@ function loadFrames() {
 }
 export function PaymentFrame(props: {
   publicKey: string;
+  /** Frame environment and origin come from the server, never hard-coded. */
+  mode: "TEST" | "LIVE";
+  origin: string;
   valid: (value: boolean) => void;
   token: (value: string) => void;
   failure: () => void;
@@ -59,13 +66,16 @@ export function PaymentFrame(props: {
   useEffect(() => {
     let active = true;
     const container = document.getElementById("3l-card-frame")!;
-    void loadFrames()
+    void loadFrames(props.origin)
       .then(() => {
         if (!active) return;
         PaymenntJS.init({
           publicKey: props.publicKey,
           selector: '[id="3l-card-frame"]',
-          mode: PaymenntJS.modes.TEST,
+          mode:
+            props.mode === "LIVE" && PaymenntJS.modes.LIVE
+              ? PaymenntJS.modes.LIVE
+              : PaymenntJS.modes.TEST,
           onValidationUpdate: (data) => {
             if (active) current.current.valid(data.valid === true);
           },
@@ -88,6 +98,6 @@ export function PaymentFrame(props: {
       current.current.submitRef.current = null;
       container.replaceChildren();
     };
-  }, [props.publicKey]);
+  }, [props.publicKey, props.mode, props.origin]);
   return <div id="3l-card-frame" style={{ height: 160, width: "100%" }} />;
 }

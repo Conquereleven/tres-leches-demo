@@ -1,62 +1,117 @@
 import { test, expect } from "@playwright/test";
-test("quantity, confirmed quote, hosted handoff, pending return and WhatsApp fallback", async ({
+
+const ORIGIN = "http://127.0.0.1:3189";
+const tomorrow = () =>
+  new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+
+test("cart → delivery → details → review → payment step", async ({
   page,
   context,
 }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
+  // The payment frame is served by the provider; it is stubbed so the test
+  // never reaches the network and no card data is ever entered.
   await context.route("https://pay.test.paymennt.com/**", (r) =>
-    r.fulfill({
-      body: "Hosted TEST provider fixture",
-      contentType: "text/html",
-    }),
+    r.fulfill({ body: "", contentType: "application/javascript" }),
   );
+
   await page.goto("/#bakery");
-  await page
-    .getByLabel("Delivery zone", { exact: true })
-    .selectOption("jlt-cluster-c");
+  await page.getByRole("button", { name: /Increase quantity/ }).click();
+  await page.getByRole("button", { name: "ADD TO CART · AED 50" }).click();
   await expect(
-    page.getByRole("button", { name: "PAY SECURELY", exact: true }),
-  ).toBeDisabled();
-  await expect(
-    page.getByText("Your order is below the delivery minimum.", {
-      exact: false,
-    }),
+    page.getByRole("link", { name: /2 in your cart/ }),
   ).toBeVisible();
-  await page.getByRole("spinbutton", { name: "Quantity" }).fill("2");
-  await page
-    .getByRole("textbox", { name: "Name", exact: true })
-    .fill("UAT reviewer");
-  await page
-    .getByRole("textbox", { name: "Phone including country code" })
-    .fill("0000000000");
-  await page
-    .getByRole("textbox", { name: "Building, apartment and delivery address" })
-    .fill("UAT building, apartment 1");
-  await expect(page.locator(".b-direct-checkout")).toContainText(
-    "Total: AED 50",
-  );
-  await expect(page.locator(".b-direct-checkout")).toContainText(
-    "Delivery: FREE",
-  );
+
+  await page.goto("/cart");
+  await expect(page.locator("main")).toContainText("AED 50");
+  await page.getByRole("link", { name: "CONTINUE TO DELIVERY" }).click();
+
+  await expect(page).toHaveURL(/\/checkout$/);
+  await page.getByLabel("Delivery area").selectOption("__missing");
   await expect(
-    page.getByRole("link", { name: "ORDER VIA WHATSAPP", exact: true }),
-  ).toHaveAttribute("href", /wa.me\/971521683319.*Quantity%3A%202/);
-  const popup = context.waitForEvent("page");
-  await page.getByRole("button", { name: "PAY SECURELY", exact: true }).click();
-  const hosted = await popup;
-  await expect(hosted).toHaveURL(/pay.test.paymennt.com\/checkout\//);
-  await expect(page).toHaveURL(/checkout\/return$/);
-  await expect(page.getByRole("heading")).toHaveText(
-    "Checking payment status…",
+    page.getByText("Online delivery isn't available for your area yet."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
+  ).toBeDisabled();
+
+  await page.getByLabel("Delivery area").selectOption("jlt-cluster-c");
+  await expect(page.locator(".b-shop-form")).toContainText("Free");
+  await page
+    .getByLabel("Street address and community")
+    .fill("Jumeirah Lakes Towers, Cluster C");
+  await page.getByLabel("Building or villa").fill("UAT Tower");
+  await page.getByLabel("Delivery date").fill(tomorrow());
+  await page.getByLabel("Preferred delivery time").fill("Afternoon");
+  await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
+
+  await page.getByLabel("Full name").fill("UAT reviewer");
+  await page.getByLabel("Mobile number").fill("04 000 0000");
+  await page.getByRole("button", { name: "REVIEW ORDER" }).click();
+  await expect(page.getByRole("alert")).toHaveText(
+    "Please enter a valid UAE mobile number.",
   );
-  await expect(page.getByText(/AED 50 · pending/)).toBeVisible();
-  await page.goto("/checkout/return?status=paid");
-  await expect(page.getByRole("heading")).not.toHaveText("PAYMENT CONFIRMED");
+  await page.getByLabel("Mobile number").fill("050 000 0000");
+  await page.getByRole("button", { name: "REVIEW ORDER" }).click();
+
+  const review = page.getByRole("region", { name: "Order review" });
+  await expect(review).toContainText("Pan de Muerto");
+  await expect(review).toContainText("× 2");
+  await expect(review).toContainText("UAT Tower");
+  await expect(
+    page.getByRole("button", { name: "PAY AED 50", exact: true }),
+  ).toBeDisabled();
+
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
   expect(errors).toEqual([]);
+});
+
+test("confirmation comes from the server, never from the URL", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/checkout/return?status=paid");
+  await expect(page.getByRole("heading", { name: "Thank you" })).toHaveCount(0);
+
+  const key = crypto.randomUUID();
+  const prepared = await request.post("/api/checkout/prepare", {
+    headers: { "Idempotency-Key": key, Origin: ORIGIN },
+    data: {
+      lines: [{ productId: "pan-de-muerto", quantity: 2 }],
+      delivery: {
+        zoneId: "jlt-cluster-c",
+        address: "Jumeirah Lakes Towers, Cluster C",
+        building: "UAT Tower",
+        date: tomorrow(),
+        slot: "Afternoon",
+      },
+      customer: { name: "UAT reviewer", phone: "0500000000" },
+    },
+  });
+  expect(prepared.status(), await prepared.text()).toBe(200);
+  const { orderId, amountFils } = await prepared.json();
+  expect(amountFils).toBe(5000);
+  const paid = await request.post("/api/checkout/token", {
+    headers: { Origin: ORIGIN },
+    data: {
+      key,
+      orderId,
+      token: "ptk_test_fixture_local_only",
+      email: "uat@example.com",
+    },
+  });
+  expect((await paid.json()).paymentStatus).toBe("paid");
+
+  await page.evaluate((k) => {
+    sessionStorage.setItem("3l-checkout", JSON.stringify({ key: k }));
+  }, key);
+  await page.goto("/checkout/return");
+  await expect(page.getByRole("heading", { name: "Thank you" })).toBeVisible();
+  await expect(page.locator("main")).toContainText(orderId);
+  await expect(page.locator("main")).toContainText("AED 50");
 });

@@ -1530,9 +1530,13 @@
     width: 100%;
     margin: 0;
   }
-  .brand-experience .b-product-copy > .b-button {
+  .brand-experience .b-product-copy > .b-button,
+  .brand-experience .b-product-copy > .b-add-to-cart {
     order: 4;
     width: 100%;
+  }
+  .brand-experience .b-product-copy > .b-add-to-cart .b-button {
+    flex: 1;
   }
   .brand-experience .b-selected-product .b-image-frame {
     aspect-ratio: 1.1;
@@ -2315,10 +2319,384 @@ a.b-return {
   max-width: 38ch;
 }
 
-.b-direct-checkout { display:grid; gap:16px; max-width:480px; }
-.b-direct-checkout form { display:grid; gap:16px; }
-.b-direct-checkout label { display:grid; gap:8px; font-size:14px; }
-.b-direct-checkout .b-input { width:100%; min-width:0; box-sizing:border-box; }
-.b-direct-checkout button:disabled { opacity:.5; cursor:not-allowed; }
-.b-checkout-return { max-width:650px; margin:60px auto; padding:24px; }
-.b-checkout-return h1 { font-size:clamp(24px,5vw,40px); overflow-wrap:anywhere; }
+.b-direct-checkout {
+  display: grid;
+  gap: 16px;
+  max-width: 480px;
+}
+.b-direct-checkout form {
+  display: grid;
+  gap: 16px;
+}
+.b-direct-checkout label {
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+}
+.b-direct-checkout .b-input {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.b-direct-checkout button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.b-checkout-return {
+  max-width: 650px;
+  margin: 60px auto;
+  padding: 24px;
+}
+.b-checkout-return h1 {
+  font-size: clamp(24px, 5vw, 40px);
+  overflow-wrap: anywhere;
+}
+
+/* ─── Online store: cart, checkout, confirmation ──────────────────────────
+   Uses the existing 3L tokens only. Mobile-first; a single readable column
+   that widens slightly on larger screens. */
+.brand-experience .b-shop-main {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-2) var(--space-6);
+}
+.brand-experience .b-shop-main > h1 {
+  font-family: var(--display-font);
+  font-size: var(--display-md);
+  line-height: 1.05;
+  margin: var(--space-3) 0 var(--space-3);
+}
+.brand-experience .b-shop-main h2 {
+  font-size: var(--body-small);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: var(--space-4) 0 var(--space-1);
+}
+.brand-experience .b-shop-progress {
+  display: flex;
+  gap: 0.25rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: var(--caption);
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+  overflow-x: auto;
+}
+.brand-experience .b-shop-progress li {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+  padding-right: 0.5rem;
+}
+.brand-experience .b-shop-progress li + li::before {
+  content: "";
+  width: 1rem;
+  height: 1px;
+  background: var(--border-subtle);
+  margin-right: 0.35rem;
+}
+.brand-experience .b-shop-progress li span {
+  display: inline-grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  border: var(--border);
+  font-size: 0.7rem;
+}
+.brand-experience .b-shop-progress li.current {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.brand-experience .b-shop-progress li.current span,
+.brand-experience .b-shop-progress li.done span {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  color: var(--surface-paper);
+}
+@media (max-width: 599px) {
+  .brand-experience .b-shop-progress li:not(.current) {
+    font-size: 0;
+  }
+  .brand-experience .b-shop-progress li:not(.current) span {
+    font-size: 0.7rem;
+  }
+}
+.brand-experience .b-shop-panel,
+.brand-experience .b-shop-confirmation,
+.brand-experience .b-shop-review {
+  background: var(--surface-paper);
+  border: var(--border);
+  border-radius: var(--radius-panel);
+  padding: var(--space-3);
+  display: grid;
+  gap: var(--space-2);
+}
+.brand-experience .b-shop-review {
+  gap: 0.25rem;
+  margin-bottom: var(--space-3);
+}
+.brand-experience .b-shop-review h2:first-child {
+  margin-top: 0;
+}
+.brand-experience .b-shop-notice {
+  background: var(--accent-rose);
+  border-radius: 0.75rem;
+  padding: var(--space-2);
+  margin: var(--space-2) 0;
+  display: grid;
+  gap: var(--space-1);
+}
+.brand-experience .b-shop-badge {
+  font-size: var(--caption);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.brand-experience .b-shop-form {
+  display: grid;
+  gap: var(--space-2);
+}
+.brand-experience .b-shop-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.brand-experience .b-shop-form label {
+  display: grid;
+  gap: 0.35rem;
+  font-size: var(--body-small);
+  font-weight: 600;
+}
+.brand-experience .b-shop-form .b-input {
+  font-weight: 400;
+  width: 100%;
+  min-height: 48px;
+}
+.brand-experience .b-shop-form textarea.b-input {
+  min-height: 5rem;
+  resize: vertical;
+}
+.brand-experience .b-optional {
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+.brand-experience .b-shop-row {
+  display: grid;
+  gap: var(--space-2);
+}
+@media (min-width: 600px) {
+  .brand-experience .b-shop-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.brand-experience .b-shop-form .b-check {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  font-weight: 400;
+  gap: 0.75rem;
+}
+.brand-experience .b-shop-form .b-check input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.1rem;
+}
+.brand-experience .b-shop-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.brand-experience .b-shop-actions .b-button {
+  flex: 1 1 16rem;
+}
+.brand-experience .b-button.b-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.brand-experience .b-cart-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+.brand-experience .b-cart-items li {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: var(--space-2) 0;
+  border-bottom: var(--border);
+}
+.brand-experience .b-cart-items li > div:first-child {
+  display: grid;
+  gap: 0.2rem;
+}
+.brand-experience .b-cart-line {
+  font-weight: 600;
+  min-width: 5.5rem;
+  text-align: right;
+}
+.brand-experience .b-cart-remove {
+  background: none;
+  border: 0;
+  padding: 0.5rem;
+  min-width: 44px;
+  min-height: 44px;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+.brand-experience .b-qty {
+  display: inline-flex;
+  align-items: center;
+  border: var(--border);
+  border-radius: var(--radius-button);
+  background: var(--surface-paper);
+}
+.brand-experience .b-qty button {
+  background: none;
+  border: 0;
+  min-width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+.brand-experience .b-qty button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.brand-experience .b-qty output {
+  min-width: 1.75rem;
+  text-align: center;
+  font-weight: 600;
+}
+.brand-experience .b-shop-totals,
+.brand-experience .b-shop-receipt {
+  display: grid;
+  gap: 0.5rem;
+  margin: var(--space-2) 0 0;
+}
+.brand-experience .b-shop-totals > div,
+.brand-experience .b-shop-receipt > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+.brand-experience .b-shop-totals dd,
+.brand-experience .b-shop-receipt dd {
+  margin: 0;
+  text-align: right;
+}
+.brand-experience .b-shop-receipt ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.brand-experience .b-shop-grand {
+  border-top: var(--border);
+  padding-top: 0.5rem;
+  font-weight: 700;
+  font-size: var(--body);
+}
+.brand-experience .b-add-to-cart {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.brand-experience .b-add-to-cart .b-link {
+  flex-basis: 100%;
+}
+.brand-experience .b-secondary-wa {
+  background: none;
+  color: var(--text-primary);
+  margin-top: 0.75rem;
+}
+.brand-experience .b-cart-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 44px;
+  padding: 0 0.75rem;
+  border: var(--border);
+  border-radius: var(--radius-button);
+  background: var(--surface-paper);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--caption);
+}
+.b-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+@media (max-width: 599px) {
+  .brand-experience .b-cart-items li {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "name remove" "qty total";
+  }
+  .brand-experience .b-cart-items li > div:first-child {
+    grid-area: name;
+  }
+  .brand-experience .b-cart-items .b-qty {
+    grid-area: qty;
+    justify-self: start;
+  }
+  .brand-experience .b-cart-line {
+    grid-area: total;
+  }
+  .brand-experience .b-cart-remove {
+    grid-area: remove;
+  }
+}
+/* With items in the cart, the cart is the primary header action on mobile;
+   WhatsApp stays in the menu, the floating button and the footer. */
+@media (max-width: 899px) {
+  .brand-experience .b-header:has(.b-cart-link) .b-mobile-wa {
+    display: none;
+  }
+  .brand-experience .b-header .b-cart-link {
+    justify-self: end;
+    padding: 0 0.7rem;
+  }
+}
+.brand-experience .b-shop-form label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.3rem;
+}
+.brand-experience .b-shop-form label > .b-input {
+  flex: 1 1 100%;
+}
+.brand-experience .b-shop-form label.b-check {
+  display: grid;
+}
+.brand-experience .b-shop-progress {
+  scrollbar-width: none;
+}
+.brand-experience .b-shop-progress::-webkit-scrollbar {
+  display: none;
+}
+@media (max-width: 599px) {
+  .brand-experience .b-shop-progress li + li::before {
+    width: 0.6rem;
+  }
+  .brand-experience .b-shop-progress li {
+    padding-right: 0.25rem;
+  }
+}

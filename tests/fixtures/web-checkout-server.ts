@@ -34,6 +34,7 @@ process.on("message", (value) => {
     process.send?.("updated");
   }
 });
+const debits = new Map<string, unknown>();
 const initial = seed();
 initial.catalog = validateCatalog(
   JSON.parse(readFileSync("data-imports/pan-de-muerto.json", "utf8")),
@@ -54,6 +55,18 @@ const provider = new PaymenntProvider(
             },
             { status: 400 },
           );
+        const debit = {
+          id,
+          status: "CAPTURED",
+          amount: body.checkoutDetails.amount,
+          currency: "AED",
+          checkoutDetails: {
+            ...body.checkoutDetails,
+            id: "fixture-checkout",
+            status: "PAID",
+          },
+        };
+        debits.set(id, debit);
         return Response.json({
           success: true,
           result: {
@@ -80,6 +93,8 @@ const provider = new PaymenntProvider(
       });
     }
     const id = String(url).split("/").at(-1)!;
+    if (debits.has(id))
+      return Response.json({ success: true, result: debits.get(id) });
     return Response.json({
       success: true,
       result: { ...checkouts.get(id), status },
