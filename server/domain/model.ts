@@ -117,7 +117,42 @@ export type Order = {
   quote: Quote | null;
   paymentId?: string;
   manualZoneId?: string;
+  /** Captured by the website checkout; absent for WhatsApp-built orders. */
+  delivery?: DeliveryDetails;
+  customerDetails?: { email?: string; instructions?: string };
+  /** Set exactly once, when the order first becomes paid. */
+  paidAt?: string;
   audit: Audit[];
+};
+export type DeliveryDetails = {
+  zoneId: string;
+  address: string;
+  building: string;
+  unit?: string;
+  /** Customer-requested date, YYYY-MM-DD in Asia/Dubai. */
+  date: string;
+  /** A configured slot label, or the customer's stated preference. */
+  slot: string;
+  notes?: string;
+};
+/**
+ * Operations notification outbox. Rows are created only by ORDER_PAID and are
+ * delivered by a dispatcher that is a hard no-op while outbound is disabled.
+ */
+export type OperationsNotification = {
+  id: string;
+  event: "ORDER_PAID";
+  kind: "notify_operations_whatsapp";
+  orderId: string;
+  paymentId: string;
+  recipient: { name: string; phone: string };
+  message: string;
+  status: "pending-whatsapp-delivery" | "sent" | "failed";
+  attempts: number;
+  createdAt: string;
+  sentAt?: string;
+  providerId?: string;
+  lastError?: string;
 };
 export type Payment = {
   directAttempt?: "ready" | "submitted" | "resolved" | "unknown";
@@ -210,6 +245,7 @@ export type NotificationReceipt = {
   attempts: number;
 };
 export type State = {
+  operationsNotifications?: OperationsNotification[];
   webCheckouts?: Record<
     string,
     { inputHash: string; orderId: string; createdAt: string }

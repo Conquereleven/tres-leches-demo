@@ -279,8 +279,12 @@ export class PaymenntProvider implements PaymentProvider {
     paymentId: string;
     orderId: string;
     amountFils: number;
-    quantity: number;
-    unitPriceFils: number;
+    items: {
+      sku: string;
+      name: string;
+      quantity: number;
+      unitPriceFils: number;
+    }[];
     feeFils: number;
     customer: {
       firstName: string;
@@ -299,17 +303,19 @@ export class PaymenntProvider implements PaymentProvider {
         currency: "AED",
         returnUrl: input.returnUrl,
         customer: input.customer,
-        items: [
-          {
-            name: "Pan de Muerto",
-            sku: "pan-de-muerto",
-            quantity: input.quantity,
-            unitprice: input.unitPriceFils / 100,
-            linetotal: (input.quantity * input.unitPriceFils) / 100,
-          },
-        ],
+        items: input.items.map((i) => ({
+          name: i.name,
+          sku: i.sku,
+          quantity: i.quantity,
+          unitprice: i.unitPriceFils / 100,
+          linetotal: (i.quantity * i.unitPriceFils) / 100,
+        })),
         totals: {
-          subtotal: (input.quantity * input.unitPriceFils) / 100,
+          subtotal:
+            input.items.reduce(
+              (sum, i) => sum + i.quantity * i.unitPriceFils,
+              0,
+            ) / 100,
           tax: 0,
           shipping: input.feeFils / 100,
         },

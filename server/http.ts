@@ -4,6 +4,10 @@ import {
   reconcileEmbeddedPayment,
 } from "./domain/embedded-checkout";
 import {
+  addDays,
+  configuredSlots,
+  dubaiToday,
+  MAX_BOOKING_DAYS,
   createWebCheckout,
   quoteWebCheckout,
   readWebCheckoutStatus,
@@ -53,6 +57,10 @@ import {
   locationSchema,
 } from "./domain/model";
 import { HmacVerifier } from "./adapters/providers";
+import {
+  createWhatsAppOperationsNotifier,
+  dispatchOperationsNotifications,
+} from "./domain/notifications";
 /** Public customer policy/contact routes; keep in sync with src/brand/business.ts. */
 export const customerPages = [
   "/terms",
@@ -190,6 +198,28 @@ export async function startServer(
   const sessions = new Map<string, { actor: Actor; expires: number }>();
   const limiter = new Map<string, { count: number; until: number }>();
   const origin = process.env.APP_ORIGIN ?? "http://127.0.0.1:5173";
+  service.operationsOrigin = origin;
+  // Paid-order alerts for the team. Built now, delivered only when outbound is
+  // explicitly enabled, Meta can send, and an approved template is configured.
+  const operationsOutboundEnabled =
+    process.env.META_OUTBOUND_ENABLED === "true" && !!meta?.outboundReady;
+  const operationsTemplate = process.env.OPERATIONS_WHATSAPP_TEMPLATE_JSON
+    ? z
+        .object({
+          name: z.string().regex(/^[a-z0-9_]+$/),
+          language: z.string().min(2).max(10),
+        })
+        .strict()
+        .parse(JSON.parse(process.env.OPERATIONS_WHATSAPP_TEMPLATE_JSON))
+    : null;
+  const operationsNotifier =
+    operationsOutboundEnabled && meta && operationsTemplate && meta.numbers[0]
+      ? createWhatsAppOperationsNotifier(
+          meta,
+          { id: meta.numbers[0].id, phone: meta.numbers[0].phone },
+          operationsTemplate,
+        )
+      : null;
   function actor(req: http.IncomingMessage): Actor {
     if (!production && !integration && !staging)
       return { id: "liza", role: "admin" };
@@ -270,9 +300,23 @@ export async function startServer(
                 p.active !== false &&
                 p.availability !== "unavailable",
             );
+            const products = (s.catalog ?? [])
+              .filter(
+                (p) => p.active !== false && p.availability !== "unavailable",
+              )
+              .map((p) => ({
+                id: p.id,
+                name: p.name,
+                priceFils: p.priceFils,
+                description: p.description ?? null,
+              }));
+            const today = dubaiToday();
             return json(res, 200, {
-              enabled: enabled && !!product,
+              enabled: enabled && products.length > 0,
               mode: enabled ? "test" : "offline",
+              products,
+              slots: configuredSlots(),
+              dates: { min: today, max: addDays(today, MAX_BOOKING_DAYS) },
               publicKey: enabled
                 ? (process.env.PAYMENNT_PUBLIC_KEY ?? null)
                 : null,
@@ -619,6 +663,8 @@ export async function startServer(
             conversations: s.conversations,
             orders: s.orders,
             payments: s.payments,
+            operationsNotifications: s.operationsNotifications ?? [],
+            operationsOutboundEnabled,
             readiness:
               staging && current.role === "admin"
                 ? readiness.snapshot()
@@ -797,6 +843,12 @@ export async function startServer(
     working = true;
     void service
       .drain()
+      .then(() =>
+        dispatchOperationsNotifications(store, {
+          outboundEnabled: operationsOutboundEnabled,
+          notifier: operationsNotifier,
+        }),
+      )
       .catch(() => {
         safeLog("worker.failed");
       })

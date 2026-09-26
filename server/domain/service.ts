@@ -27,6 +27,7 @@ import {
   paymentEventSchema,
 } from "./commands";
 import { type GeoService, quoteOrder } from "./zones";
+import { recordOrderPaid } from "./notifications";
 import { transition } from "./workflow";
 import { Store } from "../db/store";
 import {
@@ -99,6 +100,8 @@ export class CommerceService {
     public operationalNumbers = numbers,
     public agentIds = ["liza", "andrea"],
   ) {}
+  /** Public site origin, used only to build internal links in team alerts. */
+  operationsOrigin?: string;
   private async bounded<T>(work: Promise<T>): Promise<T> {
     let timer: ReturnType<typeof setTimeout> | undefined;
     try {
@@ -979,6 +982,12 @@ export class CommerceService {
         ) {
           transition(o, "Paid", actor);
           transition(o, "Confirmed", actor);
+          o.paidAt = p.paidAt;
+          // ORDER_PAID: the only place a paid-order alert is queued. This
+          // branch runs once per payment (paidAt guard) and only when the
+          // order was genuinely awaiting this payment; recordOrderPaid is
+          // additionally idempotent per order.
+          recordOrderPaid(s, o, p, this.operationsOrigin);
         } else
           p.timeline.push({
             ...at(),

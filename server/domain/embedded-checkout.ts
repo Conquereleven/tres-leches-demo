@@ -106,14 +106,14 @@ export async function submitEmbeddedPayment(
     409,
   );
   requireThat(
-    order.lines.length === 1 && order.lines[0]!.productId === "pan-de-muerto",
-    "Invalid checkout product",
+    order.lines.length >= 1 && !!order.manualZoneId,
+    "Invalid checkout",
     409,
   );
-  const quantity = order.lines[0]!.quantity;
+  // Re-price from the current catalog and zone rule: the charged amount must
+  // still equal the payment created at checkout, or nothing is charged.
   const quote = quoteWebCheckout(service, {
-    productId: "pan-de-muerto",
-    quantity,
+    lines: order.lines,
     zoneId: order.manualZoneId,
   });
   requireThat(
@@ -123,7 +123,15 @@ export async function submitEmbeddedPayment(
     "Order changed; contact 3L before paying",
     409,
   );
-  const product = s.catalog!.find((p) => p.id === "pan-de-muerto")!;
+  const items = order.lines.map((l) => {
+    const product = s.catalog!.find((p) => p.id === l.productId)!;
+    return {
+      sku: product.id,
+      name: product.name,
+      quantity: l.quantity,
+      unitPriceFils: product.priceFils,
+    };
+  });
   const customer = s.conversations.find((c) => c.id === order.conversationId)!;
   service.store.write((state) => {
     const current = state.payments.find((p) => p.id === payment.id)!;
@@ -146,8 +154,7 @@ export async function submitEmbeddedPayment(
       paymentId: payment.id,
       orderId: order.id,
       amountFils: payment.amountFils,
-      quantity,
-      unitPriceFils: product.priceFils,
+      items,
       feeFils: quote.feeFils!,
       customer: {
         firstName: names[0]!,
