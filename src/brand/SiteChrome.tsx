@@ -182,8 +182,9 @@ export function SiteHeader({
           <a href="/delivery-policy">DELIVERY</a>
           <a href="/contact">CONTACT</a>
           <WhatsAppCTA unavailable={onContactUnavailable} />
+          <CartLink placement="desktop" />
         </nav>
-        <CartLink />
+        <CartLink placement="mobile" />
         <WhatsAppCTA className="b-mobile-wa" unavailable={onContactUnavailable}>
           ORDER
         </WhatsAppCTA>

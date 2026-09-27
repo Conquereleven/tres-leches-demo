@@ -2700,3 +2700,14 @@ a.b-return {
     padding-right: 0.25rem;
   }
 }
+/* One cart link per breakpoint: in the right nav on desktop, in the grid on mobile. */
+@media (min-width: 900px) {
+  .brand-experience .b-cart-mobile {
+    display: none;
+  }
+}
+@media (max-width: 899px) {
+  .brand-experience .b-cart-desktop {
+    display: none;
+  }
+}

@@ -2,14 +2,14 @@ import { ShoppingBag } from "@phosphor-icons/react";
 import { cartCount, useCart, useCheckoutConfig } from "./cart";
 
 /** Header cart link; hidden until online ordering is live and the cart has items. */
-export function CartLink() {
+export function CartLink({ placement }: { placement: "desktop" | "mobile" }) {
   const lines = useCart();
   const { config } = useCheckoutConfig();
   const count = cartCount(lines);
   if (!config?.enabled || count === 0) return null;
   return (
     <a
-      className="b-cart-link"
+      className={`b-cart-link b-cart-${placement}`}
       href="/cart"
       aria-label={`Cart, ${count} item${count === 1 ? "" : "s"}`}
     >

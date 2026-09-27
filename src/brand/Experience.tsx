@@ -367,8 +367,9 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
           <a href="#community">JOURNAL</a>
           <a href="#dubai">CONTACT</a>
           <WhatsAppCTA unavailable={contact} />
+          <CartLink placement="desktop" />
         </nav>
-        <CartLink />
+        <CartLink placement="mobile" />
         <WhatsAppCTA className="b-mobile-wa" unavailable={contact}>
           ORDER
         </WhatsAppCTA>
