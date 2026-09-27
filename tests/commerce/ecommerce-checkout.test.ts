@@ -251,11 +251,15 @@ test("checkout rejects invalid customer and delivery details", () => {
   assert.throws(
     bad((c) => ({ ...c, delivery: { ...c.delivery, building: "" } })),
   );
-  // Email and instructions are optional.
+  // Email is required (payment receipt); instructions are optional.
+  const noEmail = structuredClone(cart()) as {
+    customer: Record<string, unknown>;
+  };
+  delete noEmail.customer.email;
+  assert.throws(() => normalizeCheckout(noEmail));
   const optional = structuredClone(cart()) as {
     customer: Record<string, unknown>;
   };
-  delete optional.customer.email;
   delete optional.customer.instructions;
   assert.doesNotThrow(() => normalizeCheckout(optional));
 });

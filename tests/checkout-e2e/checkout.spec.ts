@@ -47,6 +47,7 @@ test("cart → delivery → details → review → payment step", async ({
   await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
 
   await page.getByLabel("Full name").fill("UAT reviewer");
+  await page.getByLabel("Email for payment receipt").fill("uat@example.com");
   await page.getByLabel("Mobile number").fill("04 000 0000");
   await page.getByRole("button", { name: "REVIEW ORDER" }).click();
   await expect(page.getByRole("alert")).toHaveText(
@@ -90,7 +91,11 @@ test("confirmation comes from the server, never from the URL", async ({
         date: tomorrow(),
         slot: "Afternoon",
       },
-      customer: { name: "UAT reviewer", phone: "0500000000" },
+      customer: {
+        name: "UAT reviewer",
+        phone: "0500000000",
+        email: "uat@example.com",
+      },
     },
   });
   expect(prepared.status(), await prepared.text()).toBe(200);

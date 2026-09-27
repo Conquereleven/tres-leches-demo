@@ -744,8 +744,9 @@ export function CheckoutPage() {
             A UAE mobile number, so our driver can reach you.
           </p>
           <label>
-            Email <span className="b-optional">(optional)</span>
+            Email for payment receipt
             <Input
+              required
               type="email"
               autoComplete="email"
               maxLength={254}
@@ -805,7 +806,6 @@ function PaymentStep({
   back: () => void;
 }) {
   const [reviewed, setReviewed] = useState(false);
-  const [email, setEmail] = useState(customer.email ?? "");
   const [cardValid, setCardValid] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -822,7 +822,6 @@ function PaymentStep({
     },
     customer: {
       ...customer,
-      email: customer.email || undefined,
       instructions: customer.instructions || undefined,
     },
   };
@@ -835,7 +834,7 @@ function PaymentStep({
       const result = await post<Status>("/api/checkout/token", {
         ...checkout,
         token,
-        email,
+        email: customer.email,
       });
       if (result.paymentStatus === "paid") {
         cart.clear();
@@ -948,18 +947,6 @@ function PaymentStep({
               <a href="/refund-policy">refund policy</a> and{" "}
               <a href="/privacy">privacy policy</a>.
             </span>
-          </label>
-          <label>
-            Email for your receipt
-            <Input
-              required
-              type="email"
-              autoComplete="email"
-              maxLength={254}
-              value={email}
-              disabled={busy}
-              onChange={(e) => setEmail(e.target.value)}
-            />
           </label>
           {config.publicKey && config.frame ? (
             <PaymentFrame

@@ -131,7 +131,8 @@ export const cartCheckoutSchema = z
       .object({
         name: z.string().trim().min(2).max(100),
         phone: uaeMobile,
-        email: z.email().max(254).optional(),
+        // Required: Paymennt's token payment needs it for the receipt.
+        email: z.email().max(254),
         instructions: z.string().trim().max(500).optional(),
       })
       .strict(),
