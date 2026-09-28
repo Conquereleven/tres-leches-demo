@@ -7,11 +7,42 @@
  * they are entered in Paymennt's secure frame and exchanged for a token.
  */
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Minus, Plus, Trash } from "@phosphor-icons/react";
+import {
+  ArrowLeft,
+  CaretDown,
+  Check,
+  CheckCircle,
+  HourglassMedium,
+  LockSimple,
+  Minus,
+  Plus,
+  ShieldCheck,
+  Trash,
+  WarningCircle,
+} from "@phosphor-icons/react";
+import "./brand.css";
+import "./checkout.css";
 import { PaymentFrame } from "./PaymentFrame";
-import { Button, Input, Select, Textarea, WhatsAppCTA } from "./primitives";
-import { formatAed } from "./content";
-import { SiteFooter, SiteHeader } from "./SiteChrome";
+import {
+  Button,
+  Input,
+  Logo,
+  Select,
+  Textarea,
+  WhatsAppCTA,
+} from "./primitives";
+import { collections, formatAed } from "./content";
+import { SiteFooter } from "./SiteChrome";
+import {
+  FULFILMENT_STEPS,
+  PAID_STATES,
+  firstName,
+  fulfilmentStep,
+  paymentStateOf,
+  paymentStateOfError,
+  stateCopy,
+  type CustomerPaymentState,
+} from "./checkout-states";
 import {
   cart,
   cartSubtotalFils,
@@ -195,31 +226,81 @@ const longDate = (iso?: string) =>
       })
     : "";
 
+/** Owner-approved photograph for a catalog product, when one exists. */
+function productImage(productId: string) {
+  const image = Object.values(collections)
+    .flat()
+    .find((p) => p.id === productId)?.image;
+  return image?.src ? image : null;
+}
+function Thumb({ productId, name }: { productId: string; name: string }) {
+  const image = productImage(productId);
+  return image ? (
+    <img
+      className="b-co-thumb"
+      src={image.src!}
+      alt=""
+      width={72}
+      height={72}
+      loading="lazy"
+      decoding="async"
+    />
+  ) : (
+    <span className="b-co-thumb b-co-thumb-empty" aria-hidden>
+      {name.slice(0, 1)}
+    </span>
+  );
+}
+
 const STEPS = ["Cart", "Delivery", "Details", "Payment", "Confirmation"];
 function Progress({ step }: { step: number }) {
   return (
-    <ol className="b-shop-progress" aria-label="Checkout progress">
-      {STEPS.map((label, i) => (
-        <li
-          key={label}
-          className={i < step ? "done" : i === step ? "current" : undefined}
-          aria-current={i === step ? "step" : undefined}
-        >
-          <span aria-hidden>{i + 1}</span>
-          {label}
-        </li>
-      ))}
-    </ol>
+    <nav className="b-co-progress" aria-label="Checkout progress">
+      <p className="b-co-progress-count" aria-hidden>
+        Step {step + 1} of {STEPS.length} · <strong>{STEPS[step]}</strong>
+      </p>
+      <ol>
+        {STEPS.map((label, i) => (
+          <li
+            key={label}
+            className={i < step ? "done" : i === step ? "current" : undefined}
+            aria-current={i === step ? "step" : undefined}
+          >
+            <span className="b-co-dot" aria-hidden>
+              {i < step ? <Check weight="bold" /> : i + 1}
+            </span>
+            <span className="b-co-step-label">{label}</span>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
+}
+/** Checkout keeps its own compact header: logo, a secure-checkout cue, no menu. */
+function CheckoutHeader() {
+  return (
+    <header className="b-co-header">
+      <a href="/" className="b-co-logo" aria-label="Pastelerías 3L · Home">
+        <Logo />
+      </a>
+      <p className="b-co-secure">
+        <LockSimple aria-hidden weight="bold" />
+        Secure checkout
+      </p>
+    </header>
   );
 }
 function ShopShell({
   step,
   title,
   children,
+  bare,
 }: {
   step: number;
   title: string;
   children: ReactNode;
+  /** Confirmation and status pages render their own heading. */
+  bare?: boolean;
 }) {
   const toContact = () => {
     location.href = "/contact";
@@ -229,10 +310,10 @@ function ShopShell({
       <a className="b-skip" href="#main-content">
         Skip to content
       </a>
-      <SiteHeader onContactUnavailable={toContact} />
+      <CheckoutHeader />
       <main id="main-content" className="b-shop-main">
         <Progress step={step} />
-        <h1>{title}</h1>
+        {!bare && <h1>{title}</h1>}
         {children}
       </main>
       <SiteFooter onContactUnavailable={toContact} />
@@ -264,7 +345,7 @@ function Totals({
             : fee != null
               ? formatAed(fee)
               : feePending
-                ? "Choose your area"
+                ? "Calculated at delivery"
                 : "—"}
         </dd>
       </div>
@@ -275,6 +356,116 @@ function Totals({
         </div>
       )}
     </dl>
+  );
+}
+function Card({
+  title,
+  headingRef,
+  action,
+  children,
+  className = "",
+}: {
+  title: string;
+  headingRef?: React.Ref<HTMLHeadingElement>;
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <section className={`b-co-card ${className}`}>
+      <header>
+        <h2 ref={headingRef} tabIndex={headingRef ? -1 : undefined}>
+          {title}
+        </h2>
+        {action}
+      </header>
+      {children}
+    </section>
+  );
+}
+/**
+ * Order summary. A sticky side column on desktop; on mobile a collapsed bar
+ * showing the total that expands to the full breakdown.
+ */
+function OrderSummary({
+  lines,
+  config,
+  subtotal,
+  fee,
+  total,
+  feePending,
+  children,
+}: {
+  lines: CartLine[];
+  config: CheckoutConfig;
+  subtotal: number;
+  fee: number | null;
+  total: number | null;
+  feePending?: boolean;
+  children?: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const count = lines.reduce((n, l) => n + l.quantity, 0);
+  return (
+    <aside className="b-co-summary" aria-label="Order summary">
+      <button
+        type="button"
+        className="b-co-summary-toggle"
+        aria-expanded={open}
+        aria-controls="b-co-summary-body"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span>
+          {open ? "Hide" : "Show"} order summary
+          <CaretDown aria-hidden weight="bold" />
+        </span>
+        <strong>{formatAed(total ?? subtotal)}</strong>
+      </button>
+      <div
+        id="b-co-summary-body"
+        className="b-co-summary-body"
+        data-open={open}
+      >
+        <h2>
+          Your order{" "}
+          <span className="b-caption">
+            {count} item{count === 1 ? "" : "s"}
+          </span>
+        </h2>
+        <ul className="b-co-summary-items">
+          {lines.map((l) => {
+            const p = config.products.find((p) => p.id === l.productId);
+            if (!p) return null;
+            return (
+              <li key={l.productId}>
+                <span className="b-co-thumb-wrap">
+                  <Thumb productId={p.id} name={p.name} />
+                  <span className="b-co-thumb-qty" aria-hidden>
+                    {l.quantity}
+                  </span>
+                </span>
+                <span>
+                  <strong>{p.name}</strong>
+                  <span className="b-caption">
+                    {formatAed(p.priceFils)} × {l.quantity}
+                  </span>
+                </span>
+                <span className="b-co-money">
+                  {formatAed(p.priceFils * l.quantity)}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+        <Totals
+          subtotal={subtotal}
+          fee={fee}
+          total={total}
+          feePending={feePending}
+        />
+        {children}
+      </div>
+    </aside>
   );
 }
 function Unavailable({ retry }: { retry?: () => void }) {
@@ -295,6 +486,16 @@ function Unavailable({ retry }: { retry?: () => void }) {
           Try again
         </button>
       )}
+    </div>
+  );
+}
+function EmptyCart() {
+  return (
+    <div className="b-shop-panel b-co-empty">
+      <p>Your cart is empty.</p>
+      <a className="b-button" href="/#bakery">
+        BROWSE THE COLLECTION
+      </a>
     </div>
   );
 }
@@ -368,75 +569,69 @@ export function AddToCart({
 function CartItems({
   lines,
   config,
-  editable,
 }: {
   lines: CartLine[];
   config: CheckoutConfig;
-  editable: boolean;
 }) {
   return (
-    <ul className="b-cart-items">
+    <ul className="b-co-items">
       {lines.map((l) => {
         const p = config.products.find((p) => p.id === l.productId);
         if (!p)
           return (
             <li key={l.productId} className="b-cart-unavailable">
               <span>This item is no longer available.</span>
-              {editable && (
-                <button
-                  className="b-link"
-                  onClick={() => cart.remove(l.productId)}
-                >
-                  Remove
-                </button>
-              )}
+              <button
+                className="b-link"
+                onClick={() => cart.remove(l.productId)}
+              >
+                Remove
+              </button>
             </li>
           );
         return (
-          <li key={l.productId}>
-            <div>
+          <li key={l.productId} className="b-co-item">
+            <Thumb productId={p.id} name={p.name} />
+            <div className="b-co-item-copy">
               <strong>{p.name}</strong>
+              {p.description && (
+                <span className="b-caption">{p.description}</span>
+              )}
               <span className="b-caption">{formatAed(p.priceFils)} each</span>
             </div>
-            {editable ? (
-              <div
-                className="b-qty"
-                role="group"
-                aria-label={`${p.name} quantity`}
-              >
-                <button
-                  type="button"
-                  aria-label={`Decrease ${p.name}`}
-                  onClick={() => cart.set(l.productId, l.quantity - 1)}
-                >
-                  <Minus aria-hidden />
-                </button>
-                <output>{l.quantity}</output>
-                <button
-                  type="button"
-                  aria-label={`Increase ${p.name}`}
-                  disabled={l.quantity >= MAX_QTY}
-                  onClick={() => cart.set(l.productId, l.quantity + 1)}
-                >
-                  <Plus aria-hidden />
-                </button>
-              </div>
-            ) : (
-              <span>× {l.quantity}</span>
-            )}
-            <span className="b-cart-line">
-              {formatAed(p.priceFils * l.quantity)}
-            </span>
-            {editable && (
+            <div
+              className="b-qty"
+              role="group"
+              aria-label={`${p.name} quantity`}
+            >
               <button
                 type="button"
-                className="b-cart-remove"
-                aria-label={`Remove ${p.name}`}
-                onClick={() => cart.remove(l.productId)}
+                aria-label={`Decrease ${p.name}`}
+                onClick={() => cart.set(l.productId, l.quantity - 1)}
               >
-                <Trash aria-hidden />
+                <Minus aria-hidden />
               </button>
-            )}
+              <output>{l.quantity}</output>
+              <button
+                type="button"
+                aria-label={`Increase ${p.name}`}
+                disabled={l.quantity >= MAX_QTY}
+                onClick={() => cart.set(l.productId, l.quantity + 1)}
+              >
+                <Plus aria-hidden />
+              </button>
+            </div>
+            <span className="b-co-money b-co-item-total">
+              {formatAed(p.priceFils * l.quantity)}
+            </span>
+            <button
+              type="button"
+              className="b-cart-remove"
+              aria-label={`Remove ${p.name}`}
+              onClick={() => cart.remove(l.productId)}
+            >
+              <Trash aria-hidden />
+            </button>
           </li>
         );
       })}
@@ -466,36 +661,42 @@ export function CartPage() {
   return (
     <ShopShell step={0} title="Your cart">
       {lines.length === 0 ? (
-        <div className="b-shop-panel">
-          <p>Your cart is empty.</p>
-          <a className="b-button" href="/#bakery">
-            BROWSE THE COLLECTION
-          </a>
-        </div>
+        <EmptyCart />
       ) : (
-        <>
-          <CartItems lines={lines} config={config} editable />
-          <Totals subtotal={subtotal} fee={null} total={null} feePending />
-          <p className="b-caption">
-            Delivery charges and minimum order values depend on your area and
-            are confirmed in the next step.
-          </p>
-          <div className="b-shop-actions">
-            <a
-              className={`b-button ${known.length ? "" : "b-disabled"}`}
-              aria-disabled={!known.length}
-              href={known.length ? "/checkout" : undefined}
-            >
-              CONTINUE TO DELIVERY
-            </a>
-            <a className="b-link" href="/#bakery">
-              Continue shopping
-            </a>
-            <button className="b-link" onClick={() => cart.clear()}>
-              Clear cart
-            </button>
+        <div className="b-co-layout">
+          <div className="b-co-main">
+            <CartItems lines={lines} config={config} />
+            <div className="b-co-inline-links">
+              <a className="b-link" href="/#bakery">
+                <ArrowLeft aria-hidden /> Continue shopping
+              </a>
+              <button className="b-link" onClick={() => cart.clear()}>
+                Clear cart
+              </button>
+            </div>
           </div>
-        </>
+          <aside className="b-co-summary b-co-summary-static">
+            <div className="b-co-summary-body" data-open>
+              <h2>Order total</h2>
+              <Totals subtotal={subtotal} fee={null} total={null} feePending />
+              <p className="b-caption">
+                Delivery charges and minimum order values depend on your area
+                and are confirmed in the next step.
+              </p>
+              <a
+                className={`b-button b-co-cta ${known.length ? "" : "b-disabled"}`}
+                aria-disabled={!known.length}
+                href={known.length ? "/checkout" : undefined}
+              >
+                CONTINUE TO DELIVERY
+              </a>
+              <p className="b-co-assurance">
+                <ShieldCheck aria-hidden /> Secure card payment · Visa and
+                Mastercard
+              </p>
+            </div>
+          </aside>
+        </div>
       )}
     </ShopShell>
   );
@@ -569,12 +770,7 @@ export function CheckoutPage() {
   if (!cartLines.length)
     return (
       <ShopShell step={1} title="Checkout">
-        <div className="b-shop-panel">
-          <p>Your cart is empty.</p>
-          <a className="b-button" href="/#bakery">
-            BROWSE THE COLLECTION
-          </a>
-        </div>
+        <EmptyCart />
       </ShopShell>
     );
 
@@ -592,173 +788,195 @@ export function CheckoutPage() {
     setError("");
     setCustomer((c) => ({ ...c, [k]: v }));
   };
+  const summary = (
+    <OrderSummary
+      key={step}
+      lines={cartLines}
+      config={config}
+      subtotal={quote?.subtotalFils ?? subtotal}
+      fee={quote?.feeFils ?? null}
+      total={quote?.eligible ? quote.totalFils : null}
+      feePending={!quote}
+    />
+  );
 
   if (step === 1)
     return (
       <ShopShell step={1} title="Delivery">
-        <form
-          className="b-shop-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!quote?.eligible) return;
-            setStep(2);
-          }}
-        >
-          <h2 ref={heading} tabIndex={-1} className="b-visually-hidden">
-            Delivery details
-          </h2>
-          <label>
-            Delivery area
-            <Select
-              required
-              value={areaMissing ? "__missing" : (delivery.zoneId ?? "")}
-              onChange={(e) => {
-                const v = e.target.value;
-                setAreaMissing(v === "__missing");
-                set("zoneId", v === "__missing" ? "" : v);
-              }}
-            >
-              <option value="">Choose your area</option>
-              {config.zones.map((z) => (
-                <option key={z.id} value={z.id}>
-                  {z.name}
-                  {z.deliveryFeeAed === 0 ? " — free delivery" : ""}
-                </option>
-              ))}
-              <option value="__missing">My area isn't listed</option>
-            </Select>
-          </label>
-          {areaMissing && (
-            <div className="b-shop-notice" role="status">
-              <p>
-                Online delivery isn't available for your area yet. Our team can
-                still help you on WhatsApp.
-              </p>
-              <WhatsAppCTA
-                unavailable={() => (location.href = "/contact")}
-                message="Hello 3L, I'd like to order for delivery to my area."
-              >
-                ORDER VIA WHATSAPP
-              </WhatsAppCTA>
-            </div>
-          )}
-          {quote && (
-            <div aria-live="polite">
-              <Totals
-                subtotal={quote.subtotalFils}
-                fee={quote.feeFils}
-                total={quote.eligible ? quote.totalFils : null}
-              />
-              {!quote.eligible && (
-                <p className="b-shop-notice" role="status">
-                  {quote.minimumMet === false && quote.minOrderAed != null
-                    ? `The minimum order for ${quote.zoneName ?? "this area"} is ${formatAed(minFils)}. Add ${formatAed(Math.max(0, minFils - quote.subtotalFils))} more to continue.`
-                    : "Online delivery isn't available for this area yet."}{" "}
-                  {quote.minimumMet === false && (
-                    <a className="b-link" href="/cart">
-                      Edit cart
-                    </a>
-                  )}
-                </p>
-              )}
-            </div>
-          )}
-          <fieldset disabled={areaMissing}>
-            <label>
-              Street address and community
-              <Input
-                required
-                minLength={5}
-                maxLength={300}
-                autoComplete="street-address"
-                value={delivery.address ?? ""}
-                onChange={(e) => set("address", e.target.value)}
-              />
-            </label>
-            <div className="b-shop-row">
+        <div className="b-co-layout">
+          {summary}
+          <form
+            className="b-shop-form b-co-main"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!quote?.eligible) return;
+              setStep(2);
+            }}
+          >
+            <Card title="Delivery details" headingRef={heading}>
               <label>
-                Building or villa
-                <Input
+                Delivery area
+                <Select
                   required
-                  maxLength={120}
-                  value={delivery.building ?? ""}
-                  onChange={(e) => set("building", e.target.value)}
-                />
+                  value={areaMissing ? "__missing" : (delivery.zoneId ?? "")}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setAreaMissing(v === "__missing");
+                    set("zoneId", v === "__missing" ? "" : v);
+                  }}
+                >
+                  <option value="">Choose your area</option>
+                  {config.zones.map((z) => (
+                    <option key={z.id} value={z.id}>
+                      {z.name}
+                      {z.deliveryFeeAed === 0 ? " — free delivery" : ""}
+                    </option>
+                  ))}
+                  <option value="__missing">My area isn't listed</option>
+                </Select>
               </label>
-              <label>
-                Apartment or unit <span className="b-optional">(optional)</span>
-                <Input
-                  maxLength={40}
-                  value={delivery.unit ?? ""}
-                  onChange={(e) => set("unit", e.target.value)}
-                />
-              </label>
-            </div>
-            <div className="b-shop-row">
-              <label>
-                Delivery date
-                <Input
-                  required
-                  type="date"
-                  min={config.dates.min}
-                  max={config.dates.max}
-                  value={delivery.date ?? ""}
-                  onChange={(e) => set("date", e.target.value)}
-                />
-              </label>
-              {config.slots.length ? (
-                <label>
-                  Delivery time
-                  <Select
-                    required
-                    value={delivery.slot ?? ""}
-                    onChange={(e) => set("slot", e.target.value)}
+              {areaMissing && (
+                <div className="b-shop-notice" role="status">
+                  <p>
+                    Online delivery isn't available for your area yet. Our team
+                    can still help you on WhatsApp.
+                  </p>
+                  <WhatsAppCTA
+                    unavailable={() => (location.href = "/contact")}
+                    message="Hello 3L, I'd like to order for delivery to my area."
                   >
-                    <option value="">Choose a time</option>
-                    {config.slots.map((s) => (
-                      <option key={s}>{s}</option>
-                    ))}
-                  </Select>
-                </label>
-              ) : (
+                    ORDER VIA WHATSAPP
+                  </WhatsAppCTA>
+                </div>
+              )}
+              {quote && (
+                <div aria-live="polite">
+                  {quote.eligible ? (
+                    <p className="b-co-fee">
+                      <span>Delivery to {quote.zoneName ?? "your area"}</span>
+                      <strong>
+                        {quote.feeFils === 0
+                          ? "Free"
+                          : formatAed(quote.feeFils ?? 0)}
+                      </strong>
+                    </p>
+                  ) : (
+                    <p className="b-shop-notice" role="status">
+                      {quote.minimumMet === false && quote.minOrderAed != null
+                        ? `The minimum order for ${quote.zoneName ?? "this area"} is ${formatAed(minFils)}. Add ${formatAed(Math.max(0, minFils - quote.subtotalFils))} more to continue.`
+                        : "Online delivery isn't available for this area yet."}{" "}
+                      {quote.minimumMet === false && (
+                        <a className="b-link" href="/cart">
+                          Edit cart
+                        </a>
+                      )}
+                    </p>
+                  )}
+                </div>
+              )}
+              <fieldset disabled={areaMissing}>
                 <label>
-                  Preferred delivery time
+                  Street address and community
                   <Input
                     required
-                    maxLength={60}
-                    placeholder="e.g. afternoon, after 4 pm"
-                    value={delivery.slot ?? ""}
-                    onChange={(e) => set("slot", e.target.value)}
+                    minLength={5}
+                    maxLength={300}
+                    autoComplete="street-address"
+                    value={delivery.address ?? ""}
+                    onChange={(e) => set("address", e.target.value)}
                   />
                 </label>
-              )}
+                <div className="b-shop-row">
+                  <label>
+                    Building or villa
+                    <Input
+                      required
+                      maxLength={120}
+                      value={delivery.building ?? ""}
+                      onChange={(e) => set("building", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Apartment or unit{" "}
+                    <span className="b-optional">(optional)</span>
+                    <Input
+                      maxLength={40}
+                      value={delivery.unit ?? ""}
+                      onChange={(e) => set("unit", e.target.value)}
+                    />
+                  </label>
+                </div>
+                <div className="b-shop-row">
+                  <label>
+                    Delivery date
+                    <Input
+                      required
+                      type="date"
+                      min={config.dates.min}
+                      max={config.dates.max}
+                      value={delivery.date ?? ""}
+                      onChange={(e) => set("date", e.target.value)}
+                    />
+                  </label>
+                  {config.slots.length ? (
+                    <label>
+                      Delivery time
+                      <Select
+                        required
+                        value={delivery.slot ?? ""}
+                        onChange={(e) => set("slot", e.target.value)}
+                      >
+                        <option value="">Choose a time</option>
+                        {config.slots.map((s) => (
+                          <option key={s}>{s}</option>
+                        ))}
+                      </Select>
+                    </label>
+                  ) : (
+                    <label>
+                      Preferred delivery time
+                      <Input
+                        required
+                        maxLength={60}
+                        placeholder="e.g. afternoon, after 4 pm"
+                        value={delivery.slot ?? ""}
+                        onChange={(e) => set("slot", e.target.value)}
+                      />
+                    </label>
+                  )}
+                </div>
+                {!config.slots.length && (
+                  <p className="b-caption">
+                    Our team confirms the exact delivery time with you.
+                  </p>
+                )}
+                <label>
+                  Delivery notes <span className="b-optional">(optional)</span>
+                  <Textarea
+                    rows={3}
+                    maxLength={500}
+                    placeholder="Gate code, landmark, who will receive it"
+                    value={delivery.notes ?? ""}
+                    onChange={(e) => set("notes", e.target.value)}
+                  />
+                </label>
+              </fieldset>
+            </Card>
+            {error && <p role="alert">{error}</p>}
+            <div className="b-shop-actions">
+              <Button
+                type="submit"
+                className="b-co-cta"
+                disabled={!quote?.eligible || areaMissing}
+              >
+                CONTINUE TO DETAILS
+              </Button>
+              <a className="b-link" href="/cart">
+                <ArrowLeft aria-hidden /> Back to cart
+              </a>
             </div>
-            {!config.slots.length && (
-              <p className="b-caption">
-                Our team confirms the exact delivery time with you.
-              </p>
-            )}
-            <label>
-              Delivery notes <span className="b-optional">(optional)</span>
-              <Textarea
-                rows={3}
-                maxLength={500}
-                placeholder="Gate code, landmark, who will receive it"
-                value={delivery.notes ?? ""}
-                onChange={(e) => set("notes", e.target.value)}
-              />
-            </label>
-          </fieldset>
-          {error && <p role="alert">{error}</p>}
-          <div className="b-shop-actions">
-            <Button type="submit" disabled={!quote?.eligible || areaMissing}>
-              CONTINUE TO DETAILS
-            </Button>
-            <a className="b-link" href="/cart">
-              Back to cart
-            </a>
-          </div>
-        </form>
+          </form>
+        </div>
       </ShopShell>
     );
 
@@ -766,160 +984,184 @@ export function CheckoutPage() {
     const phoneOk = !!normalizeUaeMobile(customer.phone ?? "");
     return (
       <ShopShell step={2} title="Your details">
-        <form
-          className="b-shop-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!phoneOk) {
-              setError("Please enter a valid UAE mobile number.");
-              return;
-            }
-            if (!billingComplete(billing)) {
-              setError("Please complete your billing address.");
-              return;
-            }
-            setStep(3);
-          }}
-        >
-          <h2 ref={heading} tabIndex={-1} className="b-visually-hidden">
-            Contact details
-          </h2>
-          <label>
-            Full name
-            <Input
-              required
-              minLength={2}
-              maxLength={100}
-              autoComplete="name"
-              value={customer.name ?? ""}
-              onChange={(e) => setC("name", e.target.value)}
-            />
-          </label>
-          <label>
-            Mobile number
-            <Input
-              required
-              type="tel"
-              inputMode="tel"
-              autoComplete="tel"
-              placeholder="05X XXX XXXX"
-              aria-invalid={!!customer.phone && !phoneOk}
-              aria-describedby="b-phone-help"
-              value={customer.phone ?? ""}
-              onChange={(e) => setC("phone", e.target.value)}
-            />
-          </label>
-          <p id="b-phone-help" className="b-caption">
-            A UAE mobile number, so our driver can reach you.
-          </p>
-          <label>
-            Email for payment receipt
-            <Input
-              required
-              type="email"
-              autoComplete="email"
-              maxLength={254}
-              value={customer.email ?? ""}
-              onChange={(e) => setC("email", e.target.value)}
-            />
-          </label>
-          <label className="b-check">
-            <input
-              type="checkbox"
-              checked={billing.sameAsDelivery}
-              onChange={(e) => setB("sameAsDelivery", e.target.checked)}
-            />
-            <span>Billing address is the same as delivery address</span>
-          </label>
-          {!billing.sameAsDelivery && (
-            <fieldset className="b-shop-billing">
-              <legend>Billing address</legend>
+        <div className="b-co-layout">
+          {summary}
+          <form
+            className="b-shop-form b-co-main"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (!phoneOk) {
+                setError("Please enter a valid UAE mobile number.");
+                return;
+              }
+              if (!billingComplete(billing)) {
+                setError("Please complete your billing address.");
+                return;
+              }
+              setStep(3);
+            }}
+          >
+            <Card title="Contact details" headingRef={heading}>
               <label>
-                Name on billing address
+                Full name
                 <Input
                   required
+                  minLength={2}
                   maxLength={100}
-                  autoComplete="billing name"
-                  value={billing.name ?? ""}
-                  onChange={(e) => setB("name", e.target.value)}
-                />
-              </label>
-              <label>
-                Address line 1
-                <Input
-                  required
-                  maxLength={200}
-                  autoComplete="billing address-line1"
-                  value={billing.address1 ?? ""}
-                  onChange={(e) => setB("address1", e.target.value)}
-                />
-              </label>
-              <label>
-                Address line 2 <span className="b-optional">(optional)</span>
-                <Input
-                  maxLength={300}
-                  autoComplete="billing address-line2"
-                  value={billing.address2 ?? ""}
-                  onChange={(e) => setB("address2", e.target.value)}
+                  autoComplete="name"
+                  value={customer.name ?? ""}
+                  onChange={(e) => setC("name", e.target.value)}
                 />
               </label>
               <div className="b-shop-row">
                 <label>
-                  City
+                  Mobile number
                   <Input
                     required
-                    maxLength={100}
-                    autoComplete="billing address-level2"
-                    value={billing.city ?? ""}
-                    onChange={(e) => setB("city", e.target.value)}
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    placeholder="05X XXX XXXX"
+                    aria-invalid={!!customer.phone && !phoneOk}
+                    aria-describedby="b-phone-help"
+                    value={customer.phone ?? ""}
+                    onChange={(e) => setC("phone", e.target.value)}
                   />
                 </label>
                 <label>
-                  Postal code <span className="b-optional">(optional)</span>
+                  Email for payment receipt
                   <Input
-                    maxLength={20}
-                    autoComplete="billing postal-code"
-                    value={billing.zip ?? ""}
-                    onChange={(e) => setB("zip", e.target.value)}
+                    required
+                    type="email"
+                    autoComplete="email"
+                    maxLength={254}
+                    value={customer.email ?? ""}
+                    onChange={(e) => setC("email", e.target.value)}
                   />
                 </label>
               </div>
+              <p id="b-phone-help" className="b-caption">
+                A UAE mobile number, so our driver can reach you.
+              </p>
               <label>
-                Country
-                <Select
-                  required
-                  autoComplete="billing country"
-                  value={billing.country ?? ""}
-                  onChange={(e) => setB("country", e.target.value)}
-                >
-                  <option value="">Choose a country</option>
-                  {COUNTRIES.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.name}
-                    </option>
-                  ))}
-                </Select>
+                Special instructions{" "}
+                <span className="b-optional">(optional)</span>
+                <Textarea
+                  rows={3}
+                  maxLength={500}
+                  placeholder="A message for the cake, allergies to mention, anything we should know"
+                  value={customer.instructions ?? ""}
+                  onChange={(e) => setC("instructions", e.target.value)}
+                />
               </label>
-            </fieldset>
-          )}
-          <label>
-            Special instructions <span className="b-optional">(optional)</span>
-            <Textarea
-              rows={3}
-              maxLength={500}
-              placeholder="A message for the cake, allergies to mention, anything we should know"
-              value={customer.instructions ?? ""}
-              onChange={(e) => setC("instructions", e.target.value)}
-            />
-          </label>
-          {error && <p role="alert">{error}</p>}
-          <div className="b-shop-actions">
-            <Button type="submit">REVIEW ORDER</Button>
-            <button type="button" className="b-link" onClick={() => setStep(1)}>
-              Back to delivery
-            </button>
-          </div>
-        </form>
+            </Card>
+            <Card title="Billing address">
+              <label className="b-check b-co-toggle">
+                <input
+                  type="checkbox"
+                  checked={billing.sameAsDelivery}
+                  onChange={(e) => setB("sameAsDelivery", e.target.checked)}
+                />
+                <span>Billing address is the same as delivery address</span>
+              </label>
+              {billing.sameAsDelivery ? (
+                <p className="b-caption b-co-address-preview">
+                  {billingLines(
+                    billing,
+                    delivery as Delivery,
+                    customer.name ?? "",
+                  )
+                    .filter(Boolean)
+                    .join(", ")}
+                </p>
+              ) : (
+                <fieldset className="b-shop-billing">
+                  <legend className="b-visually-hidden">Billing address</legend>
+                  <label>
+                    Name on billing address
+                    <Input
+                      required
+                      maxLength={100}
+                      autoComplete="billing name"
+                      value={billing.name ?? ""}
+                      onChange={(e) => setB("name", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Address line 1
+                    <Input
+                      required
+                      maxLength={200}
+                      autoComplete="billing address-line1"
+                      value={billing.address1 ?? ""}
+                      onChange={(e) => setB("address1", e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Address line 2{" "}
+                    <span className="b-optional">(optional)</span>
+                    <Input
+                      maxLength={300}
+                      autoComplete="billing address-line2"
+                      value={billing.address2 ?? ""}
+                      onChange={(e) => setB("address2", e.target.value)}
+                    />
+                  </label>
+                  <div className="b-shop-row">
+                    <label>
+                      City
+                      <Input
+                        required
+                        maxLength={100}
+                        autoComplete="billing address-level2"
+                        value={billing.city ?? ""}
+                        onChange={(e) => setB("city", e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      Postal code <span className="b-optional">(optional)</span>
+                      <Input
+                        maxLength={20}
+                        autoComplete="billing postal-code"
+                        value={billing.zip ?? ""}
+                        onChange={(e) => setB("zip", e.target.value)}
+                      />
+                    </label>
+                  </div>
+                  <label>
+                    Country
+                    <Select
+                      required
+                      autoComplete="billing country"
+                      value={billing.country ?? ""}
+                      onChange={(e) => setB("country", e.target.value)}
+                    >
+                      <option value="">Choose a country</option>
+                      {COUNTRIES.map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </Select>
+                  </label>
+                </fieldset>
+              )}
+            </Card>
+            {error && <p role="alert">{error}</p>}
+            <div className="b-shop-actions">
+              <Button type="submit" className="b-co-cta">
+                REVIEW ORDER
+              </Button>
+              <button
+                type="button"
+                className="b-link"
+                onClick={() => setStep(1)}
+              >
+                <ArrowLeft aria-hidden /> Back to delivery
+              </button>
+            </div>
+          </form>
+        </div>
       </ShopShell>
     );
   }
@@ -934,6 +1176,7 @@ export function CheckoutPage() {
       quote={quote}
       subtotal={subtotal}
       back={() => setStep(2)}
+      backToDelivery={() => setStep(1)}
     />
   );
 }
@@ -965,6 +1208,65 @@ async function heldCheckout(): Promise<Status | null> {
     : null;
 }
 
+/** Accepted card marks: the official, unmodified files on white tiles. */
+function CardMarks() {
+  return (
+    <ul className="b-co-marks" aria-label="Accepted cards">
+      <li>
+        <img src="/payments/visa.svg" alt="Visa" width="40" height="24" />
+      </li>
+      <li>
+        <img
+          src="/payments/mastercard.svg"
+          alt="Mastercard"
+          width="34"
+          height="24"
+        />
+      </li>
+    </ul>
+  );
+}
+/** A customer payment state as a calm, self-contained panel. */
+function StateNotice({
+  state,
+  title,
+  message,
+  detail,
+  children,
+}: {
+  state: CustomerPaymentState;
+  title?: string;
+  message: string;
+  detail?: string;
+  children?: ReactNode;
+}) {
+  const Icon =
+    state === "PAID"
+      ? CheckCircle
+      : state === "DECLINED" || state === "FAILED"
+        ? WarningCircle
+        : state === "HELD_FOR_REVIEW"
+          ? HourglassMedium
+          : ShieldCheck;
+  return (
+    <div className={`b-co-state b-co-state-${state.toLowerCase()}`}>
+      <span className="b-co-state-icon" aria-hidden>
+        {state === "PROCESSING" || state === "3DS_REDIRECT" ? (
+          <span className="b-co-spinner" />
+        ) : (
+          <Icon weight="duotone" />
+        )}
+      </span>
+      <div>
+        {title && <p className="b-co-state-title">{title}</p>}
+        <p>{message}</p>
+        {detail && <p className="b-co-state-detail">{detail}</p>}
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function PaymentStep({
   config,
   lines,
@@ -973,6 +1275,7 @@ function PaymentStep({
   billing,
   quote,
   back,
+  backToDelivery,
 }: {
   config: CheckoutConfig;
   lines: CartLine[];
@@ -982,6 +1285,7 @@ function PaymentStep({
   quote: Quote | null;
   subtotal: number;
   back: () => void;
+  backToDelivery: () => void;
 }) {
   const [reviewed, setReviewed] = useState(false);
   const [held, setHeld] = useState<Status | null>(null);
@@ -992,6 +1296,8 @@ function PaymentStep({
   }, []);
   const [cardValid, setCardValid] = useState(false);
   const [busy, setBusy] = useState(false);
+  /** Set just before the page navigates away, so the button stays locked. */
+  const [leaving, setLeaving] = useState<CustomerPaymentState | null>(null);
   const [error, setError] = useState("");
   const submitCard = useRef<(() => void) | null>(null);
   const inFlight = useRef(false);
@@ -1033,9 +1339,15 @@ function PaymentStep({
       });
       if (result.paymentStatus === "paid") {
         cart.clear();
+        setLeaving("PAID");
         location.assign("/checkout/return");
-      } else if (result.url) location.assign(result.url);
-      else location.assign("/checkout/return");
+      } else if (result.url) {
+        setLeaving("3DS_REDIRECT");
+        location.assign(result.url);
+      } else {
+        setLeaving("PROCESSING");
+        location.assign("/checkout/return");
+      }
     } catch (e) {
       setError(
         e instanceof Error
@@ -1078,10 +1390,12 @@ function PaymentStep({
         result = await post<Status>("/api/checkout/retry", { key });
       if (result.paymentStatus === "paid") {
         cart.clear();
+        setLeaving("PAID");
         location.assign("/checkout/return");
         return;
       }
       if (result.actionRequired === "review_payment") {
+        setLeaving("HELD_FOR_REVIEW");
         location.assign("/checkout/return");
         return;
       }
@@ -1094,142 +1408,239 @@ function PaymentStep({
     }
   }
   const total = quote?.eligible ? quote.totalFils : null;
+  const locked = busy || !!leaving;
+  const issue = error ? paymentStateOfError(error) : null;
+  const edit = (onClick: () => void, label: string) => (
+    <button
+      type="button"
+      className="b-co-edit"
+      onClick={onClick}
+      aria-label={label}
+    >
+      Edit
+    </button>
+  );
   return (
     <ShopShell step={3} title="Review and pay">
-      <section className="b-shop-review" aria-label="Order review">
-        <h2>Your order</h2>
-        <CartItems lines={lines} config={config} editable={false} />
-        <Totals
+      <div className="b-co-layout">
+        <OrderSummary
+          lines={lines}
+          config={config}
           subtotal={quote?.subtotalFils ?? 0}
           fee={quote?.feeFils ?? null}
           total={total}
         />
-        <h2>Delivery</h2>
-        <p>
-          {longDate(delivery.date)} · {delivery.slot}
-          <br />
-          {[
-            delivery.unit && `Unit ${delivery.unit}`,
-            delivery.building,
-            delivery.address,
-            zone?.name,
-          ]
-            .filter(Boolean)
-            .join(", ")}
-          {delivery.notes && (
-            <>
-              <br />
-              <span className="b-caption">{delivery.notes}</span>
-            </>
-          )}
-        </p>
-        <h2>Contact</h2>
-        <p>
-          {customer.name} ·{" "}
-          {normalizeUaeMobile(customer.phone) ?? customer.phone}
-          {customer.email && <> · {customer.email}</>}
-        </p>
-        <h2>Billing address</h2>
-        <p>
-          {billing.sameAsDelivery && (
-            <>
-              <span className="b-caption">Same as delivery address</span>
-              <br />
-            </>
-          )}
-          {billingLines(billing, delivery, customer.name)
-            .filter(Boolean)
-            .join(", ")}
-        </p>
-        <button type="button" className="b-link" onClick={back}>
-          Edit details
-        </button>
-      </section>
-      {held ? (
-        <div className="b-shop-notice" role="alert">
-          <p>
-            {held.paymentStatus === "paid"
-              ? `Order ${held.orderId} from this visit is already paid.`
-              : `We're still checking the payment for order ${held.orderId}. Please don't pay again — we'll confirm it, or contact us with your order number.`}
-          </p>
-          <a className="b-button" href="/checkout/return">
-            {held.paymentStatus === "paid"
-              ? "VIEW CONFIRMATION"
-              : "CHECK PAYMENT STATUS"}
-          </a>
-        </div>
-      ) : total == null ? (
-        <p className="b-shop-notice" role="alert">
-          Your order can no longer be delivered as chosen. Please go back and
-          review your delivery area.
-        </p>
-      ) : (
-        <form className="b-shop-form" onSubmit={pay}>
-          <h2>Payment</h2>
-          <label className="b-check">
-            <input
-              type="checkbox"
-              checked={reviewed}
-              onChange={(e) => setReviewed(e.target.checked)}
-            />
-            <span>
-              I've reviewed my order, delivery details and total, and I accept
-              the <a href="/terms">terms</a>,{" "}
-              <a href="/refund-policy">refund policy</a> and{" "}
-              <a href="/privacy">privacy policy</a>.
-            </span>
-          </label>
-          {config.publicKey && config.frame ? (
-            <PaymentFrame
-              publicKey={config.publicKey}
-              mode={config.frame.mode}
-              origin={config.frame.origin}
-              valid={setCardValid}
-              token={(t) => void tokenized(t)}
-              failure={() => {
-                pending.current = null;
-                inFlight.current = false;
-                setBusy(false);
-                setCardValid(false);
-                setError(
-                  "Your card details couldn't be verified. Please check them and try again.",
-                );
-              }}
-              submitRef={submitCard}
-            />
-          ) : (
-            <Unavailable />
-          )}
-          <Button type="submit" disabled={busy || !reviewed || !cardValid}>
-            {busy ? "PROCESSING PAYMENT…" : `PAY ${formatAed(total)}`}
-          </Button>
-          <p className="b-caption">
-            Your card details are entered in a secure payment form and are never
-            seen or stored by 3L.
-          </p>
-          {error && (
-            <p role="alert">
-              {error}{" "}
-              <a className="b-link" href="/checkout/return">
-                Check payment status
+        <div className="b-co-main">
+          <section className="b-co-card b-co-review" aria-label="Order review">
+            <div className="b-co-review-row">
+              <h2>Your order</h2>
+              <ul className="b-co-review-items">
+                {lines.map((l) => {
+                  const p = config.products.find((p) => p.id === l.productId);
+                  return p ? (
+                    <li key={l.productId}>
+                      {p.name} <span className="b-caption">× {l.quantity}</span>
+                    </li>
+                  ) : null;
+                })}
+              </ul>
+            </div>
+            <div className="b-co-review-row">
+              <h2>Delivery</h2>
+              <p>
+                {longDate(delivery.date)} · {delivery.slot}
+                <br />
+                {[
+                  delivery.unit && `Unit ${delivery.unit}`,
+                  delivery.building,
+                  delivery.address,
+                  zone?.name,
+                ]
+                  .filter(Boolean)
+                  .join(", ")}
+                {delivery.notes && (
+                  <>
+                    <br />
+                    <span className="b-caption">{delivery.notes}</span>
+                  </>
+                )}
+              </p>
+              {edit(backToDelivery, "Edit delivery")}
+            </div>
+            <div className="b-co-review-row">
+              <h2>Contact</h2>
+              <p>
+                {customer.name} ·{" "}
+                {normalizeUaeMobile(customer.phone) ?? customer.phone}
+                {customer.email && (
+                  <>
+                    <br />
+                    {customer.email}
+                  </>
+                )}
+              </p>
+              {edit(back, "Edit contact details")}
+            </div>
+            <div className="b-co-review-row">
+              <h2>Billing address</h2>
+              <p>
+                {billing.sameAsDelivery && (
+                  <>
+                    <span className="b-caption">Same as delivery address</span>
+                    <br />
+                  </>
+                )}
+                {billingLines(billing, delivery, customer.name)
+                  .filter(Boolean)
+                  .join(", ")}
+              </p>
+              {edit(back, "Edit billing address")}
+            </div>
+          </section>
+          {held ? (
+            <div className="b-co-card" role="alert">
+              {held.paymentStatus === "paid" ? (
+                <StateNotice
+                  state="PAID"
+                  title="This order is already paid"
+                  message={`Order ${held.orderId} from this visit is already paid.`}
+                />
+              ) : (
+                <StateNotice
+                  state="HELD_FOR_REVIEW"
+                  {...stateCopy("HELD_FOR_REVIEW")}
+                  detail={`Order ${held.orderId}. We'll confirm it, or contact us with your order number.`}
+                />
+              )}
+              <a className="b-button b-co-cta" href="/checkout/return">
+                {held.paymentStatus === "paid"
+                  ? "VIEW CONFIRMATION"
+                  : "CHECK PAYMENT STATUS"}
               </a>
+            </div>
+          ) : total == null ? (
+            <p className="b-shop-notice" role="alert">
+              Your order can no longer be delivered as chosen. Please go back
+              and review your delivery area.
             </p>
+          ) : (
+            <form
+              className="b-shop-form b-co-card b-co-payment"
+              onSubmit={pay}
+              aria-busy={locked}
+            >
+              <header>
+                <h2>Payment</h2>
+                <CardMarks />
+              </header>
+              {config.publicKey && config.frame ? (
+                <div className="b-co-frame" data-locked={locked}>
+                  <PaymentFrame
+                    publicKey={config.publicKey}
+                    mode={config.frame.mode}
+                    origin={config.frame.origin}
+                    valid={setCardValid}
+                    token={(t) => void tokenized(t)}
+                    failure={() => {
+                      pending.current = null;
+                      inFlight.current = false;
+                      setBusy(false);
+                      setCardValid(false);
+                      setError(
+                        "Your card details couldn't be verified. Please check them and try again.",
+                      );
+                    }}
+                    submitRef={submitCard}
+                  />
+                </div>
+              ) : (
+                <Unavailable />
+              )}
+              <label className="b-check">
+                <input
+                  type="checkbox"
+                  checked={reviewed}
+                  disabled={locked}
+                  onChange={(e) => setReviewed(e.target.checked)}
+                />
+                <span>
+                  I've reviewed my order, delivery details and total, and I
+                  accept the <a href="/terms">terms</a>,{" "}
+                  <a href="/refund-policy">refund policy</a> and{" "}
+                  <a href="/privacy">privacy policy</a>.
+                </span>
+              </label>
+              {locked && (
+                <div role="status" aria-live="polite">
+                  <StateNotice
+                    state={leaving ?? "PROCESSING"}
+                    {...(leaving === "3DS_REDIRECT"
+                      ? stateCopy("3DS_REDIRECT")
+                      : leaving === "HELD_FOR_REVIEW"
+                        ? stateCopy("HELD_FOR_REVIEW")
+                        : {
+                            title: "Processing your payment…",
+                            message:
+                              "Please don't close or refresh this page, or pay again.",
+                          })}
+                  />
+                </div>
+              )}
+              {error && (
+                <div role="alert">
+                  {issue ? (
+                    <StateNotice
+                      state={issue}
+                      {...stateCopy(issue)}
+                      detail={issue === "DECLINED" ? error : undefined}
+                    >
+                      {issue === "HELD_FOR_REVIEW" && (
+                        <a className="b-link" href="/checkout/return">
+                          Check payment status
+                        </a>
+                      )}
+                    </StateNotice>
+                  ) : (
+                    <p className="b-co-error">
+                      {error}{" "}
+                      <a className="b-link" href="/checkout/return">
+                        Check payment status
+                      </a>
+                    </p>
+                  )}
+                </div>
+              )}
+              {issue !== "HELD_FOR_REVIEW" && (
+                <Button
+                  type="submit"
+                  className="b-co-cta b-co-pay"
+                  disabled={locked || !reviewed || !cardValid}
+                >
+                  {locked ? (
+                    <>
+                      <span className="b-co-spinner" aria-hidden />
+                      PROCESSING…
+                    </>
+                  ) : (
+                    `PAY ${formatAed(total)}`
+                  )}
+                </Button>
+              )}
+              <p className="b-co-assurance">
+                <LockSimple aria-hidden weight="bold" />
+                Your card details are entered in a secure payment form and are
+                never seen or stored by 3L.
+              </p>
+            </form>
           )}
-        </form>
-      )}
+        </div>
+      </div>
     </ShopShell>
   );
 }
 
 // ── Confirmation ─────────────────────────────────────────────────────────
 
-const PAID_STATES = [
-  "Confirmed",
-  "Production",
-  "Ready",
-  "Out for Delivery",
-  "Delivered",
-];
 /**
  * Confirmation and 3DS return. The URL carries no authority: status always
  * comes from the server's reconciled record, which asks the provider directly.
@@ -1292,121 +1703,248 @@ export function CheckoutReturn() {
     };
   }, [revision]);
 
-  const paid =
-    result?.paymentStatus === "paid" && PAID_STATES.includes(result.status);
-  const failed =
-    !!result &&
-    ["failed", "cancelled", "expired"].includes(result.paymentStatus);
-  const review = result?.actionRequired === "review_payment";
-  const s = result?.summary;
-  const title = paid
-    ? "Thank you"
-    : review
-      ? "We're checking your payment"
-      : failed
-        ? "Payment not completed"
-        : "Confirming your payment…";
+  const state = result ? paymentStateOf(result) : null;
+  if (result && state === "PAID") return <Confirmation result={result} />;
+  const copy = state
+    ? stateCopy(state, result?.paymentStatus)
+    : error
+      ? {
+          title: "We couldn't load your payment",
+          message: "Please check again in a moment, or contact us.",
+        }
+      : stateCopy("PROCESSING");
   return (
-    <ShopShell step={paid ? 4 : 3} title={title}>
-      <div className="b-shop-confirmation" role="status" aria-live="polite">
-        {paid ? (
-          <>
-            <p className="b-shop-badge">Order confirmed · Payment confirmed</p>
-            <p>
-              We've received your order and payment. You don't need to message
-              us — our team is preparing it for you.
-            </p>
-          </>
-        ) : review ? (
-          <p>
-            Your order is saved but we couldn't verify the payment yet. Please
-            don't pay again. Contact us with your order number and we'll check
-            it for you.
-          </p>
-        ) : failed ? (
-          <p>
-            Your payment didn't go through and you haven't been charged for this
-            attempt. You can try again from your cart.
-          </p>
-        ) : (
-          <p>This only takes a moment. Please keep this page open.</p>
-        )}
-      </div>
-      {result && (
-        <dl className="b-shop-receipt">
-          <div>
-            <dt>Order number</dt>
-            <dd>{result.orderId}</dd>
-          </div>
-          <div>
-            <dt>{paid ? "Paid" : "Amount"}</dt>
-            <dd>{formatAed(result.amountFils)}</dd>
-          </div>
-          {s?.delivery && (
-            <>
-              <div>
-                <dt>Delivery</dt>
-                <dd>
-                  {longDate(s.delivery.date)} · {s.delivery.slot}
-                </dd>
-              </div>
-              <div>
-                <dt>Address</dt>
-                <dd>
-                  {[
-                    s.delivery.unit && `Unit ${s.delivery.unit}`,
-                    s.delivery.building,
-                    s.delivery.address,
-                    s.delivery.zoneName,
-                  ]
-                    .filter(Boolean)
-                    .join(", ")}
-                </dd>
-              </div>
-            </>
-          )}
-          {s && (
+    <ShopShell step={3} title={copy.title} bare>
+      <div className="b-co-status">
+        <h1>{copy.title}</h1>
+        <div role="status" aria-live="polite">
+          <StateNotice
+            state={state ?? (error ? "FAILED" : "PROCESSING")}
+            message={copy.message}
+            detail={copy.detail}
+          />
+        </div>
+        {result && (
+          <dl className="b-shop-receipt">
             <div>
-              <dt>Items</dt>
-              <dd>
-                <ul>
-                  {s.items.map((i) => (
-                    <li key={i.productId}>
-                      {i.quantity} × {i.name} · {formatAed(i.lineFils)}
-                    </li>
-                  ))}
-                  <li>
-                    Delivery · {s.feeFils === 0 ? "Free" : formatAed(s.feeFils)}
-                  </li>
-                </ul>
-              </dd>
+              <dt>Order number</dt>
+              <dd>{result.orderId}</dd>
             </div>
+            <div>
+              <dt>Amount</dt>
+              <dd>{formatAed(result.amountFils)}</dd>
+            </div>
+          </dl>
+        )}
+        {error && <p role="alert">{error}</p>}
+        <div className="b-shop-actions">
+          {state === "3DS_REDIRECT" && result?.url && (
+            <a className="b-button b-co-cta" href={result.url}>
+              CONTINUE PAYMENT
+            </a>
           )}
-        </dl>
-      )}
-      {error && <p role="alert">{error}</p>}
-      <div className="b-shop-actions">
-        {result?.url && !paid && (
-          <a className="b-button" href={result.url}>
-            CONTINUE PAYMENT
-          </a>
-        )}
-        {failed && (
-          <a className="b-button" href="/checkout">
-            TRY AGAIN
-          </a>
-        )}
-        {!paid && !failed && (
-          <Button onClick={() => setRevision((n) => n + 1)}>CHECK AGAIN</Button>
-        )}
-        {paid && (
-          <a className="b-button" href="/">
+          {(state === "DECLINED" || state === "FAILED") && (
+            <a className="b-button b-co-cta" href="/checkout">
+              TRY AGAIN
+            </a>
+          )}
+          {state === "READY" && (
+            <a className="b-button b-co-cta" href="/checkout">
+              RETURN TO CHECKOUT
+            </a>
+          )}
+          {(state === "PROCESSING" ||
+            state === "HELD_FOR_REVIEW" ||
+            (!state && error)) && (
+            <Button
+              className="b-co-cta"
+              onClick={() => setRevision((n) => n + 1)}
+            >
+              CHECK AGAIN
+            </Button>
+          )}
+          <SupportLink orderId={result?.orderId} />
+        </div>
+      </div>
+    </ShopShell>
+  );
+}
+
+/** Secondary help route: Liza's support WhatsApp. Never required to order. */
+function SupportLink({ orderId }: { orderId?: string }) {
+  return (
+    <WhatsAppCTA
+      className="b-co-support"
+      unavailable={() => (location.href = "/contact")}
+      message={
+        orderId
+          ? `Hello 3L, I have a question about my order ${orderId}.`
+          : "Hello 3L, I have a question about my order."
+      }
+    >
+      Contact Pastelerías 3L
+    </WhatsAppCTA>
+  );
+}
+
+/** Shown only for an authoritative, reconciled PAID order (see paymentStateOf). */
+function Confirmation({ result }: { result: Status }) {
+  const s = result.summary;
+  const name = firstName(s?.customerName);
+  const progress = fulfilmentStep(result.status);
+  const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => heading.current?.focus(), []);
+  return (
+    <ShopShell step={4} title="Thank you" bare>
+      <div className="b-co-confirm">
+        <header className="b-co-confirm-hero">
+          <span className="b-co-confirm-mark" aria-hidden>
+            <Check weight="bold" />
+          </span>
+          <h1 ref={heading} tabIndex={-1}>
+            Thank you{name ? `, ${name}` : ""}
+          </h1>
+          <p className="b-co-confirm-lede" role="status">
+            Your order is confirmed
+          </p>
+          <dl className="b-co-confirm-keys">
+            <div>
+              <dt>Order</dt>
+              <dd>{result.orderId}</dd>
+            </div>
+            <div>
+              <dt>Paid</dt>
+              <dd>{formatAed(result.amountFils)}</dd>
+            </div>
+          </dl>
+        </header>
+
+        <div className="b-co-confirm-grid">
+          {s && (
+            <section className="b-co-card" aria-labelledby="b-conf-order">
+              <header>
+                <h2 id="b-conf-order">Order</h2>
+              </header>
+              <ul className="b-co-summary-items">
+                {s.items.map((i) => (
+                  <li key={i.productId}>
+                    <span className="b-co-thumb-wrap">
+                      <Thumb productId={i.productId} name={i.name} />
+                      <span className="b-co-thumb-qty" aria-hidden>
+                        {i.quantity}
+                      </span>
+                    </span>
+                    <span>
+                      <strong>{i.name}</strong>
+                      <span className="b-caption">Quantity {i.quantity}</span>
+                    </span>
+                    <span className="b-co-money">{formatAed(i.lineFils)}</span>
+                  </li>
+                ))}
+              </ul>
+              <Totals
+                subtotal={s.subtotalFils}
+                fee={s.feeFils}
+                total={result.amountFils}
+              />
+            </section>
+          )}
+          {s?.delivery && (
+            <section className="b-co-card" aria-labelledby="b-conf-delivery">
+              <header>
+                <h2 id="b-conf-delivery">Delivery</h2>
+              </header>
+              <dl className="b-shop-receipt b-co-facts">
+                {s.delivery.zoneName && (
+                  <div>
+                    <dt>Zone</dt>
+                    <dd>{s.delivery.zoneName}</dd>
+                  </div>
+                )}
+                <div>
+                  <dt>Address</dt>
+                  <dd>
+                    {[
+                      s.delivery.unit && `Unit ${s.delivery.unit}`,
+                      s.delivery.building,
+                      s.delivery.address,
+                    ]
+                      .filter(Boolean)
+                      .join(", ")}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Date</dt>
+                  <dd>{longDate(s.delivery.date)}</dd>
+                </div>
+                <div>
+                  <dt>Preferred time</dt>
+                  <dd>{s.delivery.slot}</dd>
+                </div>
+              </dl>
+            </section>
+          )}
+          <section className="b-co-card" aria-labelledby="b-conf-payment">
+            <header>
+              <h2 id="b-conf-payment">Payment</h2>
+            </header>
+            <dl className="b-shop-receipt b-co-facts">
+              <div>
+                <dt>Status</dt>
+                <dd className="b-co-paid">
+                  Paid <Check aria-label="confirmed" weight="bold" />
+                </dd>
+              </div>
+              <div>
+                <dt>Amount</dt>
+                <dd>{formatAed(result.amountFils)}</dd>
+              </div>
+              <div>
+                <dt>Method</dt>
+                <dd>Card</dd>
+              </div>
+              <div>
+                <dt>Reference</dt>
+                <dd>{result.orderId}</dd>
+              </div>
+            </dl>
+          </section>
+          <section
+            className="b-co-card b-co-next"
+            aria-labelledby="b-conf-next"
+          >
+            <header>
+              <h2 id="b-conf-next">What happens next</h2>
+            </header>
+            <ol className="b-co-timeline">
+              {FULFILMENT_STEPS.map((label, i) => (
+                <li
+                  key={label}
+                  className={
+                    i < progress ? "done" : i === progress ? "current" : ""
+                  }
+                  aria-current={i === progress ? "step" : undefined}
+                >
+                  <span className="b-co-dot" aria-hidden>
+                    {i <= progress ? <Check weight="bold" /> : i + 1}
+                  </span>
+                  {label}
+                </li>
+              ))}
+            </ol>
+            <p className="b-caption">
+              You don't need to message us — our team is preparing your order
+              and will contact you if anything about the delivery needs
+              confirming.
+            </p>
+          </section>
+        </div>
+        <div className="b-shop-actions b-co-confirm-actions">
+          <a className="b-button b-co-cta" href="/">
             BACK TO 3L
           </a>
-        )}
-        <a className="b-link" href="/contact">
-          Contact 3L
-        </a>
+          <SupportLink orderId={result.orderId} />
+        </div>
       </div>
     </ShopShell>
   );

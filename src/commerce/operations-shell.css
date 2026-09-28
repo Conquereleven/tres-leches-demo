@@ -828,3 +828,330 @@
   background: #fffefa;
   border-top: 1px solid var(--line);
 }
+
+/* ─── Orders board: what to prepare, when it is due, whether it is paid ─── */
+.ops-orders {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+.ops-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (min-width: 1024px) {
+  .ops-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+.ops-metric {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "icon label" "value value" "hint hint";
+  align-items: center;
+  gap: 4px 10px;
+  padding: 14px 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  min-width: 0;
+}
+.ops-metric-icon {
+  grid-area: icon;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: #f1edf4;
+  color: #635572;
+  font-size: 17px;
+}
+.ops-metric p {
+  grid-area: label;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #625c64;
+}
+.ops-metric strong {
+  grid-area: value;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.ops-metric small {
+  grid-area: hint;
+  color: #7a7279;
+  font-size: 11px;
+}
+.ops-board-controls {
+  display: grid;
+  gap: 10px;
+}
+.ops-views {
+  display: inline-flex;
+  justify-self: start;
+  max-width: 100%;
+  padding: 4px;
+  gap: 4px;
+  background: #efece8;
+  border-radius: 11px;
+  overflow-x: auto;
+}
+.ops-shell .ops-views button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 0;
+  background: transparent;
+  color: #5d565e;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ops-shell .ops-views button[aria-pressed="true"] {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 1px 4px #332f3514;
+}
+.ops-views button span {
+  min-width: 22px;
+  padding: 1px 7px;
+  border-radius: 20px;
+  background: #e3dee6;
+  font-size: 11px;
+}
+.ops-chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.ops-shell .ops-chips button {
+  flex: none;
+  padding: 0 12px;
+  min-height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--paper);
+  color: #5d565e;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ops-shell .ops-chips button[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+.ops-order-list {
+  grid-column: 1 / -1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+}
+.ops-order-card {
+  display: grid;
+  gap: 12px;
+  height: 100%;
+  padding: 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 4px solid #d8d3d8;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #3c2f4108;
+  min-width: 0;
+}
+.ops-order-card[data-payment="paid"] {
+  border-left-color: #4f7a4a;
+}
+.ops-order-card[data-payment="review"] {
+  border-left-color: #a28d5b;
+}
+.ops-order-card[data-state="Delivered"] {
+  opacity: 0.78;
+}
+.ops-oc-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.ops-pay {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: #eeebe7;
+  color: #5d565e;
+}
+.ops-pay-paid {
+  background: #e3eedf;
+  color: #2f5a2b;
+}
+.ops-pay-paid svg {
+  font-size: 14px;
+}
+.ops-pay-review {
+  background: #f4ecd8;
+  color: #6b5620;
+}
+.ops-pay-issue {
+  background: #f6e1e0;
+  color: #8a3b3b;
+}
+.ops-oc-state {
+  font-size: 12px;
+  font-weight: 600;
+  color: #635572;
+}
+.ops-oc-total {
+  margin-left: auto;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.ops-oc-who h3 {
+  margin: 0;
+  font-size: 17px;
+}
+.ops-oc-who p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: #7a7279;
+  overflow-wrap: anywhere;
+}
+.ops-oc-lines {
+  list-style: none;
+  margin: 0;
+  padding: 10px 12px;
+  display: grid;
+  gap: 4px;
+  background: #f7f5f1;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.ops-oc-lines b {
+  display: inline-block;
+  min-width: 28px;
+  font-size: 15px;
+  color: var(--ink);
+}
+.ops-oc-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 0;
+}
+.ops-oc-meta > div {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.ops-oc-meta dt {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #7a7279;
+}
+.ops-oc-meta dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.ops-oc-meta [data-tone="today"] dd {
+  color: #635572;
+}
+.ops-oc-meta [data-tone="late"] dd {
+  color: #8a3b3b;
+}
+.ops-oc-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3px;
+}
+.ops-oc-steps li {
+  padding-top: 6px;
+  border-top: 3px solid #e4e0dc;
+  font-size: 10px;
+  font-weight: 600;
+  color: #9a9299;
+  overflow-wrap: anywhere;
+}
+.ops-oc-steps li.done {
+  border-top-color: #a4b49a;
+  color: #5d6f55;
+}
+.ops-oc-steps li.current {
+  border-top-color: #635572;
+  color: var(--ink);
+}
+.ops-oc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.ops-shell .ops-oc-actions button.primary {
+  flex: 1 1 auto;
+  min-height: 44px;
+  font-size: 13px;
+}
+.ops-oc-actions .co-muted {
+  margin: 0;
+  font-size: 12px;
+}
+.ops-order-card .ops-order-details {
+  margin: 0;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+.ops-unpaid {
+  padding: 12px 16px;
+  background: #f1efeb;
+  border: 1px dashed #d8d3d8;
+  border-radius: 12px;
+}
+.ops-unpaid summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  min-height: 32px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ops-unpaid summary small {
+  font-weight: 500;
+  color: #7a7279;
+}
+.ops-unpaid .ops-order-list {
+  margin-top: 12px;
+}
+.ops-unpaid .ops-order-card {
+  opacity: 0.85;
+}
+.ops-orders .ops-board-empty {
+  min-height: 260px;
+  padding: 50px 25px;
+}
