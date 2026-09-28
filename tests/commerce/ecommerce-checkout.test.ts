@@ -49,6 +49,8 @@ const cart = (quantity = 2, zoneId = "jlt-cluster-c") => ({
     email: "customer@example.com",
     instructions: "Birthday — no candles",
   },
+  billing: { sameAsDelivery: true } as
+    { sameAsDelivery: true } | Record<string, unknown>,
 });
 
 function fixture(initial = "CAPTURED") {

@@ -21,6 +21,24 @@ export const PAYMENNT_FRAMES: Record<
   test: { mode: "TEST", origin: "https://pay.test.paymennt.com" },
   live: null,
 };
+/**
+ * Paymennt `CheckoutAddress` (openapi: required name, address1, city, country;
+ * country is ISO 3166-1 alpha-2/alpha-3). `/payment/debit` rejects a request
+ * whose `checkoutDetails.billingAddress` is null, so a token payment can only be
+ * built from addresses that pass this schema.
+ */
+export const paymenntAddressSchema = z
+  .object({
+    name: z.string().trim().min(1).max(100),
+    address1: z.string().trim().min(1).max(200),
+    address2: z.string().trim().min(1).max(300).optional(),
+    city: z.string().trim().min(1).max(100),
+    state: z.string().trim().min(1).max(100).optional(),
+    zip: z.string().trim().min(1).max(20).optional(),
+    country: z.string().regex(/^[A-Z]{2,3}$/),
+  })
+  .strict();
+export type PaymenntAddress = z.infer<typeof paymenntAddressSchema>;
 const checkoutSchema = z.object({
   id: z.string().min(1),
   requestId: z.string().min(1),
@@ -306,8 +324,14 @@ export class PaymenntProvider implements PaymentProvider {
       email: string;
       phone: string;
     };
+    billingAddress: PaymenntAddress;
+    deliveryAddress: PaymenntAddress;
     returnUrl: string;
   }) {
+    // Validated before any request: a debit is never sent with a null,
+    // missing or partial billing or delivery address.
+    const billingAddress = paymenntAddressSchema.parse(input.billingAddress);
+    const deliveryAddress = paymenntAddressSchema.parse(input.deliveryAddress);
     const response = await this.performRequest("/payment/debit", {
       source: { type: "TOKEN", token: input.token, storeCardDetails: false },
       checkoutDetails: {
@@ -317,6 +341,8 @@ export class PaymenntProvider implements PaymentProvider {
         currency: "AED",
         returnUrl: input.returnUrl,
         customer: input.customer,
+        billingAddress,
+        deliveryAddress,
         items: input.items.map((i) => ({
           name: i.name,
           sku: i.sku,

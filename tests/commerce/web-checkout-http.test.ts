@@ -189,12 +189,20 @@ test("direct provider rejection returns a structured safe storefront error", asy
       await post(
         "/api/checkout/prepare",
         {
-          productId: "pan-de-muerto",
-          quantity: 2,
-          zoneId: "jlt-cluster-c",
-          customer: "UAT Reviewer",
-          phone: "971501234567",
-          address: "UAT only, JLT Cluster C",
+          lines: [{ productId: "pan-de-muerto", quantity: 2 }],
+          delivery: {
+            zoneId: "jlt-cluster-c",
+            address: "UAT only, JLT Cluster C",
+            building: "UAT Tower",
+            date: new Date(Date.now() + 86_400_000).toISOString().slice(0, 10),
+            slot: "Afternoon",
+          },
+          customer: {
+            name: "UAT Reviewer",
+            phone: "0501234567",
+            email: "uat@example.com",
+          },
+          billing: { sameAsDelivery: true },
         },
         key,
       )

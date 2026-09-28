@@ -4,6 +4,7 @@ import { z } from "zod";
 import { PaymenntProvider } from "../adapters/paymennt";
 import { safeLog } from "../observability";
 import type { CommerceService } from "./service";
+import { orderBillingAddress, toPaymenntDeliveryAddress } from "./billing";
 import { DomainError, requireThat, type Payment } from "./model";
 import {
   readWebCheckoutStatus,
@@ -133,6 +134,18 @@ export async function submitEmbeddedPayment(
     };
   });
   const customer = s.conversations.find((c) => c.id === order.conversationId)!;
+  // Both addresses are resolved and validated before the attempt is claimed:
+  // an incomplete address fails here, with no provider call and nothing held.
+  requireThat(
+    order.delivery,
+    "Please complete your delivery and billing details.",
+    409,
+  );
+  const billingAddress = orderBillingAddress(order.billing);
+  const deliveryAddress = toPaymenntDeliveryAddress(
+    customer.customer,
+    order.delivery,
+  );
   service.store.write((state) => {
     const current = state.payments.find((p) => p.id === payment.id)!;
     requireThat(
@@ -162,6 +175,8 @@ export async function submitEmbeddedPayment(
         email: input.email,
         phone: customer.phone,
       },
+      billingAddress,
+      deliveryAddress,
       returnUrl: new URL("/checkout/return", origin).href,
     });
     if (

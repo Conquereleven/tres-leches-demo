@@ -120,6 +120,8 @@ export type Order = {
   /** Captured by the website checkout; absent for WhatsApp-built orders. */
   delivery?: DeliveryDetails;
   customerDetails?: { email?: string; instructions?: string };
+  /** Billing address confirmed by the customer, exactly as sent to Paymennt. */
+  billing?: import("./billing").OrderBilling;
   /** Set exactly once, when the order first becomes paid. */
   paidAt?: string;
   audit: Audit[];

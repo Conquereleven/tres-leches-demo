@@ -8,7 +8,9 @@ import { PaymenntProvider } from "../../server/adapters/paymennt";
 import { DisabledWhatsAppProvider } from "../../server/adapters/blocked";
 import { validateCatalog } from "../../server/domain/catalog";
 import {
+  addDays,
   createWebCheckout,
+  dubaiToday,
   readWebCheckoutStatus,
 } from "../../server/domain/web-checkout";
 import {
@@ -18,12 +20,20 @@ import {
   retryEmbeddedPayment,
 } from "../../server/domain/embedded-checkout";
 const input = {
-  productId: "pan-de-muerto",
-  quantity: 2,
-  zoneId: "jlt-cluster-c",
-  customer: "UAT Reviewer",
-  phone: "0000000000",
-  address: "UAT JLT Cluster C",
+  lines: [{ productId: "pan-de-muerto", quantity: 2 }],
+  delivery: {
+    zoneId: "jlt-cluster-c",
+    address: "UAT JLT Cluster C",
+    building: "UAT Tower",
+    date: addDays(dubaiToday(), 1),
+    slot: "Afternoon",
+  },
+  customer: {
+    name: "UAT Reviewer",
+    phone: "0500000000",
+    email: "uat@example.com",
+  },
+  billing: { sameAsDelivery: true },
 };
 function fixture(initial = "CAPTURED") {
   const store = new Store(":memory:", "test");

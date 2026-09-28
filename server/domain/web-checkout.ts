@@ -1,5 +1,10 @@
 /** Public entry into the existing catalog/quote/command/outbox/payment domain. */
 import { z } from "zod";
+import {
+  billingInputSchema,
+  toPaymenntBillingAddress,
+  type OrderBilling,
+} from "./billing";
 import type { CommerceService } from "./service";
 import {
   requireThat,
@@ -136,6 +141,7 @@ export const cartCheckoutSchema = z
         instructions: z.string().trim().max(500).optional(),
       })
       .strict(),
+    billing: billingInputSchema,
   })
   .strict();
 export type CartCheckoutInput = z.infer<typeof cartCheckoutSchema>;
@@ -148,6 +154,7 @@ type Normalized = {
   address: string;
   delivery?: DeliveryDetails;
   details?: Order["customerDetails"];
+  billing?: OrderBilling;
 };
 export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
   const cart = cartCheckoutSchema.safeParse(raw);
@@ -181,6 +188,13 @@ export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
       address: fullAddress,
       delivery: { ...delivery },
       details: { email: customer.email, instructions: customer.instructions },
+      // Resolved and validated now, so an order can never exist with a billing
+      // address Paymennt would reject.
+      billing: toPaymenntBillingAddress({
+        billing: cart.data.billing,
+        name: customer.name,
+        delivery,
+      }),
     };
   }
   // Fall back to the legacy shape only when the body is not attempting the
@@ -309,6 +323,13 @@ export async function createWebCheckout(
 ): Promise<WebCheckoutResult> {
   const input = normalizeCheckout(raw),
     receiptKey = digest(keySchema.parse(key));
+  // Direct card payments need the full checkout: delivery details and a
+  // confirmed billing address. The legacy single-product shape cannot pay.
+  requireThat(
+    !embedded || (input.delivery && input.billing),
+    "Please complete your delivery and billing details.",
+    422,
+  );
   const inputHash = digest(JSON.stringify(input));
   service.store.transaction(() => {
     const previous = service.store.read().webCheckouts?.[receiptKey];
@@ -369,6 +390,7 @@ export async function createWebCheckout(
         o.address = input.address;
         o.delivery = input.delivery;
         o.customerDetails = input.details;
+        o.billing = input.billing;
       });
     order = command("requestPayment", order);
     if (embedded)

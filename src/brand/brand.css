@@ -2711,3 +2711,16 @@ a.b-return {
     display: none;
   }
 }
+.brand-experience .b-shop-form fieldset.b-shop-billing {
+  padding-top: var(--space-2);
+  border-top: var(--border);
+}
+.brand-experience .b-shop-billing legend {
+  float: left;
+  width: 100%;
+  margin-bottom: var(--space-1);
+  font-size: var(--caption);
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}

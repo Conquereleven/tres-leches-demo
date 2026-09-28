@@ -71,6 +71,58 @@ type Customer = {
   email?: string;
   instructions?: string;
 };
+type Billing = {
+  sameAsDelivery: boolean;
+  name?: string;
+  address1?: string;
+  address2?: string;
+  city?: string;
+  zip?: string;
+  country?: string;
+};
+/** 3L delivers only within Dubai; a delivery address is in Dubai, UAE. */
+const SERVICE_AREA = { city: "Dubai", country: "AE" };
+/** ISO 3166-1 alpha-2 codes; names come from the browser, in English. */
+const COUNTRY_CODES =
+  "AD AE AF AG AI AL AM AO AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GT GU GW GY HK HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW".split(
+    " ",
+  );
+function countryName(code: string) {
+  try {
+    return new Intl.DisplayNames(["en"], { type: "region" }).of(code) ?? code;
+  } catch {
+    return code;
+  }
+}
+const COUNTRIES = COUNTRY_CODES.map((code) => ({
+  code,
+  name: countryName(code),
+})).sort((a, b) =>
+  a.code === "AE" ? -1 : b.code === "AE" ? 1 : a.name.localeCompare(b.name),
+);
+/** The billing address exactly as it will be sent, for the review screen. */
+function billingLines(billing: Billing, delivery: Delivery, name: string) {
+  return billing.sameAsDelivery
+    ? [
+        name,
+        delivery.unit && `Unit ${delivery.unit}`,
+        delivery.building,
+        delivery.address,
+        SERVICE_AREA.city,
+        countryName(SERVICE_AREA.country),
+      ]
+    : [
+        billing.name,
+        billing.address1,
+        billing.address2,
+        billing.city,
+        billing.zip,
+        billing.country && countryName(billing.country),
+      ];
+}
+const billingComplete = (b: Billing) =>
+  b.sameAsDelivery ||
+  !!(b.name?.trim() && b.address1?.trim() && b.city?.trim() && b.country);
 
 async function post<T>(path: string, body: unknown, key?: string): Promise<T> {
   const res = await fetch(path, {
@@ -114,6 +166,7 @@ const DRAFT = "3l-checkout-draft";
 function loadDraft(): {
   delivery?: Partial<Delivery>;
   customer?: Partial<Customer>;
+  billing?: Billing;
 } {
   try {
     return JSON.parse(sessionStorage.getItem(DRAFT) ?? "{}");
@@ -124,6 +177,7 @@ function loadDraft(): {
 function saveDraft(draft: {
   delivery?: Partial<Delivery>;
   customer?: Partial<Customer>;
+  billing?: Billing;
 }) {
   try {
     sessionStorage.setItem(DRAFT, JSON.stringify(draft));
@@ -460,6 +514,10 @@ export function CheckoutPage() {
   const [customer, setCustomer] = useState<Partial<Customer>>(
     draft.customer ?? {},
   );
+  // Default: billing address is the same as the delivery address.
+  const [billing, setBilling] = useState<Billing>(
+    draft.billing ?? { sameAsDelivery: true },
+  );
   const [areaMissing, setAreaMissing] = useState(false);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [error, setError] = useState("");
@@ -472,7 +530,10 @@ export function CheckoutPage() {
     [lines, config],
   );
 
-  useEffect(() => saveDraft({ delivery, customer }), [delivery, customer]);
+  useEffect(
+    () => saveDraft({ delivery, customer, billing }),
+    [delivery, customer, billing],
+  );
   useEffect(() => {
     heading.current?.focus();
     window.scrollTo({ top: 0 });
@@ -522,6 +583,10 @@ export function CheckoutPage() {
   const set = <K extends keyof Delivery>(k: K, v: Delivery[K]) => {
     setError("");
     setDelivery((d) => ({ ...d, [k]: v }));
+  };
+  const setB = <K extends keyof Billing>(k: K, v: Billing[K]) => {
+    setError("");
+    setBilling((b) => ({ ...b, [k]: v }));
   };
   const setC = <K extends keyof Customer>(k: K, v: Customer[K]) => {
     setError("");
@@ -709,6 +774,10 @@ export function CheckoutPage() {
               setError("Please enter a valid UAE mobile number.");
               return;
             }
+            if (!billingComplete(billing)) {
+              setError("Please complete your billing address.");
+              return;
+            }
             setStep(3);
           }}
         >
@@ -754,6 +823,85 @@ export function CheckoutPage() {
               onChange={(e) => setC("email", e.target.value)}
             />
           </label>
+          <label className="b-check">
+            <input
+              type="checkbox"
+              checked={billing.sameAsDelivery}
+              onChange={(e) => setB("sameAsDelivery", e.target.checked)}
+            />
+            <span>Billing address is the same as delivery address</span>
+          </label>
+          {!billing.sameAsDelivery && (
+            <fieldset className="b-shop-billing">
+              <legend>Billing address</legend>
+              <label>
+                Name on billing address
+                <Input
+                  required
+                  maxLength={100}
+                  autoComplete="billing name"
+                  value={billing.name ?? ""}
+                  onChange={(e) => setB("name", e.target.value)}
+                />
+              </label>
+              <label>
+                Address line 1
+                <Input
+                  required
+                  maxLength={200}
+                  autoComplete="billing address-line1"
+                  value={billing.address1 ?? ""}
+                  onChange={(e) => setB("address1", e.target.value)}
+                />
+              </label>
+              <label>
+                Address line 2 <span className="b-optional">(optional)</span>
+                <Input
+                  maxLength={300}
+                  autoComplete="billing address-line2"
+                  value={billing.address2 ?? ""}
+                  onChange={(e) => setB("address2", e.target.value)}
+                />
+              </label>
+              <div className="b-shop-row">
+                <label>
+                  City
+                  <Input
+                    required
+                    maxLength={100}
+                    autoComplete="billing address-level2"
+                    value={billing.city ?? ""}
+                    onChange={(e) => setB("city", e.target.value)}
+                  />
+                </label>
+                <label>
+                  Postal code <span className="b-optional">(optional)</span>
+                  <Input
+                    maxLength={20}
+                    autoComplete="billing postal-code"
+                    value={billing.zip ?? ""}
+                    onChange={(e) => setB("zip", e.target.value)}
+                  />
+                </label>
+              </div>
+              <label>
+                Country
+                <Select
+                  required
+                  autoComplete="billing country"
+                  value={billing.country ?? ""}
+                  onChange={(e) => setB("country", e.target.value)}
+                >
+                  <option value="">Choose a country</option>
+                  {COUNTRIES.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.name}
+                    </option>
+                  ))}
+                </Select>
+              </label>
+            </fieldset>
+          )}
           <label>
             Special instructions <span className="b-optional">(optional)</span>
             <Textarea
@@ -782,6 +930,7 @@ export function CheckoutPage() {
       lines={cartLines}
       delivery={delivery as Delivery}
       customer={customer as Customer}
+      billing={billing}
       quote={quote}
       subtotal={subtotal}
       back={() => setStep(2)}
@@ -789,11 +938,39 @@ export function CheckoutPage() {
   );
 }
 
+/**
+ * A checkout from this browser session that is paid, or whose payment is held
+ * for review, must never lead to a second charge: the customer is sent to its
+ * status instead of starting a new order.
+ */
+async function heldCheckout(): Promise<Status | null> {
+  let saved: { key?: string } | null = null;
+  try {
+    saved = JSON.parse(sessionStorage.getItem(CAPABILITY) ?? "null");
+  } catch {
+    return null;
+  }
+  if (!saved?.key) return null;
+  const res = await fetch("/api/checkout/status", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ key: saved.key }),
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error("Unable to check your previous payment.");
+  const status = (await res.json()) as Status;
+  return status.actionRequired === "review_payment" ||
+    status.paymentStatus === "paid"
+    ? status
+    : null;
+}
+
 function PaymentStep({
   config,
   lines,
   delivery,
   customer,
+  billing,
   quote,
   back,
 }: {
@@ -801,11 +978,18 @@ function PaymentStep({
   lines: CartLine[];
   delivery: Delivery;
   customer: Customer;
+  billing: Billing;
   quote: Quote | null;
   subtotal: number;
   back: () => void;
 }) {
   const [reviewed, setReviewed] = useState(false);
+  const [held, setHeld] = useState<Status | null>(null);
+  useEffect(() => {
+    heldCheckout()
+      .then(setHeld)
+      .catch(() => undefined);
+  }, []);
   const [cardValid, setCardValid] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -824,6 +1008,17 @@ function PaymentStep({
       ...customer,
       instructions: customer.instructions || undefined,
     },
+    billing: billing.sameAsDelivery
+      ? { sameAsDelivery: true }
+      : {
+          sameAsDelivery: false,
+          name: billing.name,
+          address1: billing.address1,
+          address2: billing.address2 || undefined,
+          city: billing.city,
+          zip: billing.zip || undefined,
+          country: billing.country,
+        },
   };
 
   async function tokenized(token: string) {
@@ -864,6 +1059,17 @@ function PaymentStep({
       // Same details → same idempotency key → the same order and payment.
       const fingerprint = JSON.stringify(body);
       const saved = JSON.parse(sessionStorage.getItem(CAPABILITY) ?? "null");
+      if (saved?.key && saved.fingerprint !== fingerprint) {
+        // Changed details would open a new order; never while an earlier
+        // payment from this session is paid or held for review.
+        const previous = await heldCheckout();
+        if (previous) {
+          setHeld(previous);
+          inFlight.current = false;
+          setBusy(false);
+          return;
+        }
+      }
       const key =
         saved?.fingerprint === fingerprint ? saved.key : crypto.randomUUID();
       sessionStorage.setItem(CAPABILITY, JSON.stringify({ key, fingerprint }));
@@ -923,11 +1129,36 @@ function PaymentStep({
           {normalizeUaeMobile(customer.phone) ?? customer.phone}
           {customer.email && <> · {customer.email}</>}
         </p>
+        <h2>Billing address</h2>
+        <p>
+          {billing.sameAsDelivery && (
+            <>
+              <span className="b-caption">Same as delivery address</span>
+              <br />
+            </>
+          )}
+          {billingLines(billing, delivery, customer.name)
+            .filter(Boolean)
+            .join(", ")}
+        </p>
         <button type="button" className="b-link" onClick={back}>
           Edit details
         </button>
       </section>
-      {total == null ? (
+      {held ? (
+        <div className="b-shop-notice" role="alert">
+          <p>
+            {held.paymentStatus === "paid"
+              ? `Order ${held.orderId} from this visit is already paid.`
+              : `We're still checking the payment for order ${held.orderId}. Please don't pay again — we'll confirm it, or contact us with your order number.`}
+          </p>
+          <a className="b-button" href="/checkout/return">
+            {held.paymentStatus === "paid"
+              ? "VIEW CONFIRMATION"
+              : "CHECK PAYMENT STATUS"}
+          </a>
+        </div>
+      ) : total == null ? (
         <p className="b-shop-notice" role="alert">
           Your order can no longer be delivered as chosen. Please go back and
           review your delivery area.

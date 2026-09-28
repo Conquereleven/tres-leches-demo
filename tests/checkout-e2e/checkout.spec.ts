@@ -54,12 +54,30 @@ test("cart → delivery → details → review → payment step", async ({
     "Please enter a valid UAE mobile number.",
   );
   await page.getByLabel("Mobile number").fill("050 000 0000");
+
+  // Billing defaults to the delivery address; unticking requires its fields.
+  const same = page.getByLabel(
+    "Billing address is the same as delivery address",
+  );
+  await expect(same).toBeChecked();
+  await same.uncheck();
+  await expect(page.getByLabel("Address line 1")).toBeVisible();
+  await page.getByRole("button", { name: "REVIEW ORDER" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Contact details" }),
+  ).toBeAttached();
+  await same.check();
+  await expect(page.getByLabel("Address line 1")).toHaveCount(0);
   await page.getByRole("button", { name: "REVIEW ORDER" }).click();
 
   const review = page.getByRole("region", { name: "Order review" });
   await expect(review).toContainText("Pan de Muerto");
   await expect(review).toContainText("× 2");
   await expect(review).toContainText("UAT Tower");
+  await expect(review).toContainText("Same as delivery address");
+  await expect(review).toContainText(
+    "UAT reviewer, UAT Tower, Jumeirah Lakes Towers, Cluster C, Dubai, United Arab Emirates",
+  );
   await expect(
     page.getByRole("button", { name: "PAY AED 50", exact: true }),
   ).toBeDisabled();
@@ -96,6 +114,7 @@ test("confirmation comes from the server, never from the URL", async ({
         phone: "0500000000",
         email: "uat@example.com",
       },
+      billing: { sameAsDelivery: true },
     },
   });
   expect(prepared.status(), await prepared.text()).toBe(200);
@@ -119,4 +138,76 @@ test("confirmation comes from the server, never from the URL", async ({
   await expect(page.getByRole("heading", { name: "Thank you" })).toBeVisible();
   await expect(page.locator("main")).toContainText(orderId);
   await expect(page.locator("main")).toContainText("AED 50");
+});
+
+test("a paid checkout in this session cannot be paid again", async ({
+  page,
+  request,
+  context,
+}) => {
+  await context.route("https://pay.test.paymennt.com/**", (r) =>
+    r.fulfill({ body: "", contentType: "application/javascript" }),
+  );
+  const key = crypto.randomUUID();
+  const delivery = {
+    zoneId: "jlt-cluster-c",
+    address: "Jumeirah Lakes Towers, Cluster C",
+    building: "UAT Tower",
+    date: tomorrow(),
+    slot: "Afternoon",
+  };
+  const customer = {
+    name: "UAT reviewer",
+    phone: "0500000000",
+    email: "uat@example.com",
+  };
+  const prepared = await request.post("/api/checkout/prepare", {
+    headers: { "Idempotency-Key": key, Origin: ORIGIN },
+    data: {
+      lines: [{ productId: "pan-de-muerto", quantity: 2 }],
+      delivery,
+      customer,
+      billing: { sameAsDelivery: true },
+    },
+  });
+  const { orderId } = await prepared.json();
+  await request.post("/api/checkout/token", {
+    headers: { Origin: ORIGIN },
+    data: {
+      key,
+      orderId,
+      token: "ptk_test_fixture_local_only",
+      email: customer.email,
+    },
+  });
+  // Same session, cart refilled with different details.
+  await page.goto("/");
+  await page.evaluate(
+    ([k, d, c]) => {
+      sessionStorage.setItem(
+        "3l-checkout",
+        JSON.stringify({ key: k, fingerprint: "earlier" }),
+      );
+      sessionStorage.setItem(
+        "3l-checkout-draft",
+        JSON.stringify({
+          delivery: { ...d, building: "Other Tower" },
+          customer: c,
+          billing: { sameAsDelivery: true },
+        }),
+      );
+      localStorage.setItem(
+        "3l-cart",
+        JSON.stringify([{ productId: "pan-de-muerto", quantity: 2 }]),
+      );
+    },
+    [key, delivery, customer] as const,
+  );
+  await page.goto("/checkout");
+  await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
+  await page.getByRole("button", { name: "REVIEW ORDER" }).click();
+  await expect(page.getByRole("alert")).toContainText(
+    `Order ${orderId} from this visit is already paid.`,
+  );
+  await expect(page.getByRole("button", { name: /^PAY / })).toHaveCount(0);
 });
