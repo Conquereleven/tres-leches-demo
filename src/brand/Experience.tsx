@@ -1,7 +1,13 @@
 import { AddToCart } from "./Shop";
-import { CartLink } from "./CartLink";
+import { cartCount, useCart } from "./cart";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { ArrowDown, ArrowUpRight, List, Play } from "@phosphor-icons/react";
+import {
+  ArrowDown,
+  ArrowUpRight,
+  Handbag,
+  List,
+  WhatsappLogo,
+} from "@phosphor-icons/react";
 import {
   approved,
   assets,
@@ -14,7 +20,6 @@ import {
   testimonials,
   newsletterProvider,
   validateNewsletter,
-  productInquiry,
   formatAed,
   type Product,
 } from "./content";
@@ -45,6 +50,7 @@ type DialogKind =
   | "faq"
   | "promotion"
   | "menu"
+  | "product"
   | null;
 const doors = [
   ["01", "CAKE JARS", "jars"],
@@ -90,18 +96,17 @@ function ProductExperience({
   id,
   title,
   products,
-  unavailable,
   cta,
+  onView,
 }: {
   id: string;
   title: string;
   products: Product[];
-  unavailable: () => void;
   cta: string;
+  onView?: () => void;
 }) {
   const [selected, setSelected] = useState(0);
   const product = products[selected]!;
-  const message = productInquiry(product);
   // A selector is only meaningful once products have confirmed names. Until
   // then the section keeps its heading, artwork and ordering CTA, and simply
   // does not offer a list of unnamed items.
@@ -139,46 +144,37 @@ function ProductExperience({
           </div>
         )}
         {product.status === "available" && product.name ? (
-          <>
+          <div className="b-product-actions">
+            {onView && (
+              <Button className="b-button-secondary" onClick={onView}>
+                VIEW DETAILS
+              </Button>
+            )}
             <AddToCart
               productId={product.id}
               fallback={
-                <WhatsAppCTA
-                  unavailable={unavailable}
-                  message={message ?? undefined}
-                >
-                  {product.name ? `ORDER ${product.name.toUpperCase()}` : cta}
-                </WhatsAppCTA>
+                <TextLink href="/contact">CONTACT 3L</TextLink>
               }
             />
-            <WhatsAppCTA
-              className="b-secondary-wa"
-              unavailable={unavailable}
-              message={message ?? undefined}
-            >
-              ORDER VIA WHATSAPP
-            </WhatsAppCTA>
-          </>
+          </div>
         ) : product.status === "out-of-stock" ? (
           <Button disabled>OUT OF STOCK</Button>
         ) : (
-          <WhatsAppCTA
-            unavailable={unavailable}
-            message={
-              message ??
-              (id === "custom"
-                ? "Hello 3L, I’d like to enquire about a custom cake."
-                : "Hello 3L, could you share your current collection?")
-            }
-          >
-            {/* Once a real product is selected the action names it, rather
-                than inviting the customer to browse a category. */}
-            {product.name ? `ORDER ${product.name.toUpperCase()}` : cta}
-          </WhatsAppCTA>
+          <TextLink href="/contact">{cta}</TextLink>
         )}
       </div>
       <div className="b-selected-product" aria-live="polite">
-        <ImageFrame key={product.id} asset={product.image} />
+        {product.name && onView ? (
+          <button
+            className="b-product-image-button"
+            onClick={onView}
+            aria-label={`View ${product.name}`}
+          >
+            <ImageFrame key={product.id} asset={product.image} />
+          </button>
+        ) : (
+          <ImageFrame key={product.id} asset={product.image} />
+        )}
         {product.name && (
           <div className="b-product-meta">
             <h3>{product.name}</h3>
@@ -285,6 +281,9 @@ const promotionReady = Boolean(
 
 export function BrandExperience({ onManage }: { onManage: () => void }) {
   const voices = visibleTestimonials(testimonials);
+  const cartLines = useCart();
+  const cartItems = cartCount(cartLines);
+  const panDeMuerto = collections.bakery[0]!;
   const root = useRef<HTMLDivElement>(null);
   useMotion(root);
   const [dialog, setDialog] = useState<DialogKind>(null),
@@ -366,13 +365,18 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
         <nav className="b-nav-right" aria-label="Contact">
           <a href="#community">JOURNAL</a>
           <a href="#dubai">CONTACT</a>
-          <WhatsAppCTA unavailable={contact} />
-          <CartLink placement="desktop" />
+          <a className="b-header-cart" href="/cart">
+            CART <span>{cartItems}</span>
+          </a>
         </nav>
-        <CartLink placement="mobile" />
-        <WhatsAppCTA className="b-mobile-wa" unavailable={contact}>
-          ORDER
-        </WhatsAppCTA>
+        <a
+          className="b-mobile-cart"
+          href="/cart"
+          aria-label={`Cart, ${cartItems} item${cartItems === 1 ? "" : "s"}`}
+        >
+          <Handbag aria-hidden />
+          <span>{cartItems}</span>
+        </a>
       </header>
       <main id="main-content">
         <section id="home" className="b-hero" aria-label="3L Dubai">
@@ -400,29 +404,33 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
                 fetchPriority="high"
                 decoding="async"
               />
+            ) : panDeMuerto.image.src ? (
+              <img
+                className="b-hero-poster"
+                src={panDeMuerto.image.src}
+                alt={panDeMuerto.image.alt}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+              />
             ) : (
-              /* Brand-system hero panel shown until the approved film or
-                 photography is supplied. Pure CSS, no network request, and
-                 purely decorative — the headline and CTAs above carry all
-                 meaning. Dropping a real asset into assets.hero/assets.poster
-                 replaces this without touching the hero layout. */
               <div className="b-hero-canvas" aria-hidden="true" />
             )}
           </div>
           <div className="b-hero-copy">
             <SectionLabel>MEXICO CITY / SINCE 1982</SectionLabel>
             <h1>
-              <span>SOAKED IN</span>
-              <span>TRADITION.</span>
+              <span>PAN DE</span>
+              <span>MUERTO.</span>
             </h1>
-            <p>{approved.hero}</p>
-            <button className="b-story-link" onClick={() => setDialog("story")}>
-              <Play aria-hidden />
-              WATCH OUR STORY
-            </button>
+            <p>{panDeMuerto.description}</p>
+            <Button onClick={() => setDialog("product")}>
+              SHOP NOW
+              <ArrowUpRight aria-hidden />
+            </Button>
           </div>
           <div className="b-hero-note">
-            <p>{approved.micro}</p>
+            <p>{formatAed(panDeMuerto.priceFils!)}</p>
             <a href="#bridge" aria-label="Explore the 3L story">
               <ArrowDown aria-hidden />
             </a>
@@ -438,22 +446,31 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
           <Rule />
         </Section>
         <Section id="collection" className="b-collection">
-          <SectionLabel>THE FEATURED COLLECTION</SectionLabel>
+          <SectionLabel>BEST SELLERS</SectionLabel>
           <div className="b-featured" data-reveal-group>
-            {collections.featured.map((p) => (
-              /* Without a confirmed product name the tile stays purely
-                 visual — a brand panel under the section heading — rather
-                 than announcing that data is missing. */
-              <article key={p.id}>
-                <ImageFrame asset={p.image} />
-                {p.name && <h3>{p.name}</h3>}
-              </article>
-            ))}
+            <article className="b-featured-product">
+              <button onClick={() => setDialog("product")}>
+                <ImageFrame asset={panDeMuerto.image} />
+                <span className="b-featured-meta">
+                  <span>
+                    <strong>{panDeMuerto.name}</strong>
+                    <small>{panDeMuerto.description}</small>
+                  </span>
+                  <strong>{formatAed(panDeMuerto.priceFils!)}</strong>
+                </span>
+              </button>
+            </article>
+            <div className="b-seasonal-note">
+              <SectionLabel>SEASONAL</SectionLabel>
+              <EditorialHeading>
+                A MEXICAN TRADITION, NOW IN DUBAI.
+              </EditorialHeading>
+              <p>{approved.hero}</p>
+              <Button onClick={() => setDialog("product")}>
+                DISCOVER THE SEASON
+              </Button>
+            </div>
           </div>
-          <Button onClick={() => setDialog("collection")}>
-            VIEW ALL CAKES
-            <ArrowUpRight aria-hidden />
-          </Button>
         </Section>
         <Section id="tradition" className="b-tradition">
           <PatternSurface>
@@ -538,22 +555,20 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
           id="bakery"
           title="BAKERY"
           products={collections.bakery}
-          unavailable={contact}
           cta="EXPLORE BAKERY"
+          onView={() => setDialog("product")}
         />
         <ProductExperience
           id="jars"
           title="CAKE JARS"
           products={collections.jars}
-          unavailable={contact}
-          cta="ORDER THIS JAR"
+          cta="CONTACT 3L"
         />
         <ProductExperience
           id="custom"
           title="CUSTOM CAKES"
           products={collections.custom}
-          unavailable={contact}
-          cta="REQUEST A CUSTOM CAKE"
+          cta="CONTACT 3L"
         />
         <Section id="occasions" className="b-occasions">
           <div>
@@ -583,12 +598,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               <p className="b-caption">{occasions[occasion]}</p>
             </div>
           </div>
-          <WhatsAppCTA
-            unavailable={contact}
-            message={`Hello 3L, I’d like to enquire about a cake for ${occasions[occasion]!.toLowerCase()}.`}
-          >
-            REQUEST A CAKE
-          </WhatsAppCTA>
+          <TextLink href="/contact">REQUEST A CAKE</TextLink>
         </Section>
         {/* Only verified, permissioned customer quotes appear here. With none
             approved the section is omitted rather than shown as empty slots. */}
@@ -620,7 +630,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               FOLLOW OUR JOURNEY
             </TextLink>
           ) : (
-            <WhatsAppCTA unavailable={contact}>SAY HELLO</WhatsAppCTA>
+            <TextLink href="/contact">CONTACT 3L</TextLink>
           )}
         </Section>
         {/* The promotion block renders only when a real, approved offer
@@ -652,7 +662,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               closer to you.
             </h3>
             <p>{approved.dubai}</p>
-            <WhatsAppCTA unavailable={contact}>ORDER NOW</WhatsAppCTA>
+            <TextLink href="#bakery">SHOP BAKERY</TextLink>
             <OrderAcknowledgement />
           </div>
           <ImageFrame asset={assets.dubai} />
@@ -670,19 +680,23 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
         onManage={onManage}
       />
       <WhatsAppCTA
-        className="b-floating-order"
-        ariaLabel="Order on WhatsApp"
+        className="b-support-wa"
+        ariaLabel="WhatsApp support"
         unavailable={contact}
+        message="Hello 3L, I need help with the online store."
       >
-        ORDER
+        <WhatsappLogo aria-hidden />
+        <span>Need help?</span>
       </WhatsAppCTA>
       {dialog && (
         <Modal
           title={
             dialog === "menu"
               ? "EXPLORE 3L"
+              : dialog === "product"
+                ? "PAN DE MUERTO"
               : dialog === "contact"
-                ? "ORDER WITH 3L"
+                ? "CONTACT 3L"
                 : dialog === "story"
                   ? "THE 3L STORY"
                   : dialog === "collection"
@@ -698,7 +712,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
           {dialog === "menu" ? (
             <nav className="b-modal-nav" aria-label="Mobile navigation">
               {navigation}
-              <button onClick={contact}>ORDER ON WHATSAPP</button>
+              <a href="/cart">CART ({cartItems})</a>
               {policyRoutes.map((r) => (
                 <a key={r.path} href={r.path}>
                   {r.label.toUpperCase()}
@@ -706,6 +720,21 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               ))}
               <button onClick={onManage}>Gestión</button>
             </nav>
+          ) : dialog === "product" ? (
+            <div className="b-product-dialog">
+              <ImageFrame asset={panDeMuerto.image} />
+              <div>
+                <SectionLabel>SEASONAL BAKERY</SectionLabel>
+                <p className="b-dialog-price">
+                  {formatAed(panDeMuerto.priceFils!)}
+                </p>
+                <p>{panDeMuerto.description}</p>
+                <AddToCart
+                  productId={panDeMuerto.id}
+                  fallback={<TextLink href="/contact">CONTACT 3L</TextLink>}
+                />
+              </div>
+            </div>
           ) : dialog === "contact" ? (
             <>
               {contactChannels().length ? (
@@ -736,15 +765,10 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
           ) : dialog === "collection" ? (
             <>
               <p>
-                Message us and our team will share the cakes available today,
-                with prices in AED.
+                Contact our team for the cakes available today, with prices in
+                AED.
               </p>
-              <WhatsAppCTA
-                unavailable={contact}
-                message="Hello 3L, could you share your current collection?"
-              >
-                ASK FOR TODAY’S COLLECTION
-              </WhatsAppCTA>
+              <TextLink href="/contact">ASK FOR TODAY’S COLLECTION</TextLink>
               <TextLink href="#jars">EXPLORE CAKE JARS</TextLink>
             </>
           ) : dialog === "social" ? (
@@ -780,7 +804,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               <ImageFrame asset={assets.promotion} />
               {promotion.message && <p>{promotion.message}</p>}
               {promotion.cta && (
-                <WhatsAppCTA unavailable={contact}>{promotion.cta}</WhatsAppCTA>
+                <TextLink href="#bakery">{promotion.cta}</TextLink>
               )}
             </>
           )}
