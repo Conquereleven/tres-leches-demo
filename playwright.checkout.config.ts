@@ -12,7 +12,7 @@ export default defineConfig({
     viewport: { width: 390, height: 844 },
   },
   webServer: {
-    command: `DB_PATH=${dir}/state.sqlite PAYMENNT_PUBLIC_KEY=pk_test_fixture_local API_PORT=3189 PORT=3189 APP_ORIGIN=http://127.0.0.1:3189 node --import tsx tests/fixtures/web-checkout-server.ts`,
+    command: `CATALOG_FIXTURE=legacy DB_PATH=${dir}/state.sqlite PAYMENNT_PUBLIC_KEY=pk_test_fixture_local API_PORT=3189 PORT=3189 APP_ORIGIN=http://127.0.0.1:3189 node --import tsx tests/fixtures/web-checkout-server.ts`,
     url: "http://127.0.0.1:3189",
     reuseExistingServer: false,
   },

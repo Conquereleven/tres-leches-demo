@@ -30,6 +30,7 @@ async function harness(offline = false) {
       env: {
         ...process.env,
         ...e,
+        CATALOG_FIXTURE: "legacy",
         PAYMENNT_PUBLIC_KEY: "pk_test_public_fixture",
         DB_PATH: join(dir, "store.sqlite"),
         API_PORT: offline ? "3157" : "3156",

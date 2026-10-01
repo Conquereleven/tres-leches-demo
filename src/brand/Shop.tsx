@@ -1,3 +1,4 @@
+import { menuFamilyForSku } from "./menu";
 /**
  * The 3L online store: cart → delivery → details → payment → confirmation.
  *
@@ -231,7 +232,8 @@ function productImage(productId: string) {
   const image = Object.values(collections)
     .flat()
     .find((p) => p.id === productId)?.image;
-  return image?.src ? image : null;
+  const family = menuFamilyForSku(productId);
+  return image?.src ? image : family?.image ? { src: family.image } : null;
 }
 function Thumb({ productId, name }: { productId: string; name: string }) {
   const image = productImage(productId);

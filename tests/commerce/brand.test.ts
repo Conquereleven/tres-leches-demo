@@ -29,7 +29,7 @@ test("brand content is approved, heritage fixed, no fabricated catalog or testim
           typeof p.priceFils === "number" && p.priceFils > 0,
           `${p.id} listed without a price`,
         );
-        assert.match(productInquiry(p)!, new RegExp(`order ${p.name}`));
+        assert.ok(productInquiry(p)!.includes(`order ${p.name}`));
       } else {
         assert.equal(p.image.src, null);
         assert.equal(p.status, "pending");
@@ -37,14 +37,17 @@ test("brand content is approved, heritage fixed, no fabricated catalog or testim
         assert.equal(productInquiry(p), null);
       }
     }
-  // The one confirmed listing, exactly as the owner approved it.
+  // Current approved Pan de Muerto and jar options populate legacy content views.
   const listed = Object.values(collections)
     .flat()
     .filter((p) => p.name);
-  assert.equal(listed.length, 1);
-  assert.equal(listed[0]!.name, "Pan de Muerto");
-  assert.equal(listed[0]!.priceFils, 2500);
-  assert.equal(formatAed(listed[0]!.priceFils!), "AED 25");
+  assert.equal(listed.length, 58);
+  assert.equal(
+    listed[0]!.name,
+    "Pan de Muerto tradicional · Azúcar · Mini · 40 g",
+  );
+  assert.equal(listed[0]!.priceFils, 1100);
+  assert.equal(formatAed(listed[0]!.priceFils!), "AED 11");
   assert.deepEqual(
     visibleTestimonials([
       {

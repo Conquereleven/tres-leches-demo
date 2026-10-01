@@ -1,0 +1,1667 @@
+{
+  "categories": [
+    {
+      "id": "cakes",
+      "name": "Tres Leches Cakes"
+    },
+    {
+      "id": "jars",
+      "name": "Cake Jars"
+    },
+    {
+      "id": "bakery",
+      "name": "Panadería Mexicana",
+      "image": "/brand/menu/bakery.webp"
+    },
+    {
+      "id": "pan",
+      "name": "Pan de Muerto"
+    },
+    {
+      "id": "conchas",
+      "name": "Conchas"
+    },
+    {
+      "id": "specialities",
+      "name": "Other Specialities",
+      "image": "/brand/menu/specialities.webp"
+    },
+    {
+      "id": "seasonal",
+      "name": "Seasonal"
+    },
+    {
+      "id": "extras",
+      "name": "Extras"
+    }
+  ],
+  "families": [
+    {
+      "id": "pan-de-muerto-traditional",
+      "category": "pan",
+      "name": "Pan de Muerto tradicional",
+      "options": [
+        {
+          "id": "pan-de-muerto-traditional-azucar-mini-40-g",
+          "variant": "Azúcar",
+          "size": "Mini · 40 g",
+          "priceFils": 1100
+        },
+        {
+          "id": "pan-de-muerto-traditional-azucar-individual-70-g",
+          "variant": "Azúcar",
+          "size": "Individual · 70 g",
+          "priceFils": 1300
+        },
+        {
+          "id": "pan-de-muerto-traditional-ajonjoli-mini-40-g",
+          "variant": "Ajonjolí",
+          "size": "Mini · 40 g",
+          "priceFils": 1100
+        },
+        {
+          "id": "pan-de-muerto-traditional-ajonjoli-individual-70-g",
+          "variant": "Ajonjolí",
+          "size": "Individual · 70 g",
+          "priceFils": 1300
+        }
+      ],
+      "image": "/brand/menu/pan-traditional.webp",
+      "advanceOrder": false,
+      "source": "IMG-P",
+      "pack": false
+    },
+    {
+      "id": "pan-de-muerto-filled",
+      "category": "pan",
+      "name": "Pan de Muerto relleno",
+      "options": [
+        {
+          "id": "pan-de-muerto-filled-crema-diplomatica-vainilla-mini",
+          "variant": "Crema diplomática (vainilla)",
+          "size": "Mini",
+          "priceFils": 1800
+        },
+        {
+          "id": "pan-de-muerto-filled-crema-diplomatica-vainilla-individual",
+          "variant": "Crema diplomática (vainilla)",
+          "size": "Individual",
+          "priceFils": 2100
+        },
+        {
+          "id": "pan-de-muerto-filled-chocolate-mini",
+          "variant": "Chocolate",
+          "size": "Mini",
+          "priceFils": 1800
+        },
+        {
+          "id": "pan-de-muerto-filled-chocolate-individual",
+          "variant": "Chocolate",
+          "size": "Individual",
+          "priceFils": 2100
+        },
+        {
+          "id": "pan-de-muerto-filled-mascarpone-y-cajeta-mini",
+          "variant": "Mascarpone y cajeta",
+          "size": "Mini",
+          "priceFils": 1800
+        },
+        {
+          "id": "pan-de-muerto-filled-mascarpone-y-cajeta-individual",
+          "variant": "Mascarpone y cajeta",
+          "size": "Individual",
+          "priceFils": 2100
+        },
+        {
+          "id": "pan-de-muerto-filled-mascarpone-y-fresas-mini",
+          "variant": "Mascarpone y fresas",
+          "size": "Mini",
+          "priceFils": 1800
+        },
+        {
+          "id": "pan-de-muerto-filled-mascarpone-y-fresas-individual",
+          "variant": "Mascarpone y fresas",
+          "size": "Individual",
+          "priceFils": 2100
+        }
+      ],
+      "image": "/brand/menu/pan-filled.webp",
+      "advanceOrder": false,
+      "source": "IMG-P",
+      "pack": false
+    },
+    {
+      "id": "pan-de-muerto-traditional-pack",
+      "category": "pan",
+      "name": "Pan de Muerto · Pack tradicional",
+      "options": [
+        {
+          "id": "pan-de-muerto-traditional-pack-6-mini",
+          "variant": "",
+          "size": "6 mini",
+          "priceFils": 6000
+        },
+        {
+          "id": "pan-de-muerto-traditional-pack-12-mini",
+          "variant": "",
+          "size": "12 mini",
+          "priceFils": 11500
+        },
+        {
+          "id": "pan-de-muerto-traditional-pack-6-individuales",
+          "variant": "",
+          "size": "6 individuales",
+          "priceFils": 7200
+        },
+        {
+          "id": "pan-de-muerto-traditional-pack-12-individuales",
+          "variant": "",
+          "size": "12 individuales",
+          "priceFils": 14000
+        }
+      ],
+      "image": "/brand/menu/pan-pack.webp",
+      "advanceOrder": false,
+      "source": "IMG-P",
+      "pack": true
+    },
+    {
+      "id": "pan-de-muerto-filled-pack",
+      "category": "pan",
+      "name": "Pan de Muerto · Pack relleno",
+      "options": [
+        {
+          "id": "pan-de-muerto-filled-pack-6-mini",
+          "variant": "",
+          "size": "6 mini",
+          "priceFils": 10000
+        },
+        {
+          "id": "pan-de-muerto-filled-pack-12-mini",
+          "variant": "",
+          "size": "12 mini",
+          "priceFils": 19000
+        },
+        {
+          "id": "pan-de-muerto-filled-pack-6-individuales",
+          "variant": "",
+          "size": "6 individuales",
+          "priceFils": 12000
+        },
+        {
+          "id": "pan-de-muerto-filled-pack-12-individuales",
+          "variant": "",
+          "size": "12 individuales",
+          "priceFils": 23500
+        }
+      ],
+      "image": "/brand/menu/pan-pack.webp",
+      "advanceOrder": false,
+      "source": "IMG-P",
+      "pack": true
+    },
+    {
+      "id": "conchas-traditional",
+      "category": "conchas",
+      "name": "Conchas tradicional",
+      "options": [
+        {
+          "id": "conchas-traditional-vainilla-mini-40-g",
+          "variant": "Vainilla",
+          "size": "Mini · 40 g",
+          "priceFils": 1100
+        },
+        {
+          "id": "conchas-traditional-vainilla-individual-70-g",
+          "variant": "Vainilla",
+          "size": "Individual · 70 g",
+          "priceFils": 1300
+        },
+        {
+          "id": "conchas-traditional-chocolate-mini-40-g",
+          "variant": "Chocolate",
+          "size": "Mini · 40 g",
+          "priceFils": 1100
+        },
+        {
+          "id": "conchas-traditional-chocolate-individual-70-g",
+          "variant": "Chocolate",
+          "size": "Individual · 70 g",
+          "priceFils": 1300
+        },
+        {
+          "id": "conchas-traditional-pistache-mini-40-g",
+          "variant": "Pistache",
+          "size": "Mini · 40 g",
+          "priceFils": 1100
+        },
+        {
+          "id": "conchas-traditional-pistache-individual-70-g",
+          "variant": "Pistache",
+          "size": "Individual · 70 g",
+          "priceFils": 1300
+        },
+        {
+          "id": "conchas-traditional-tricolor-mini-40-g",
+          "variant": "Tricolor",
+          "size": "Mini · 40 g",
+          "priceFils": 1100
+        },
+        {
+          "id": "conchas-traditional-tricolor-individual-70-g",
+          "variant": "Tricolor",
+          "size": "Individual · 70 g",
+          "priceFils": 1300
+        }
+      ],
+      "image": "/brand/menu/conchas-traditional.webp",
+      "advanceOrder": false,
+      "source": "IMG-C",
+      "pack": false
+    },
+    {
+      "id": "conchas-filled",
+      "category": "conchas",
+      "name": "Conchas rellenas",
+      "options": [
+        {
+          "id": "conchas-filled-crema-diplomatica-vainilla-mini",
+          "variant": "Crema diplomática (vainilla)",
+          "size": "Mini",
+          "priceFils": 1800
+        },
+        {
+          "id": "conchas-filled-crema-diplomatica-vainilla-individual",
+          "variant": "Crema diplomática (vainilla)",
+          "size": "Individual",
+          "priceFils": 2100
+        },
+        {
+          "id": "conchas-filled-chocolate-mini",
+          "variant": "Chocolate",
+          "size": "Mini",
+          "priceFils": 1800
+        },
+        {
+          "id": "conchas-filled-chocolate-individual",
+          "variant": "Chocolate",
+          "size": "Individual",
+          "priceFils": 2100
+        },
+        {
+          "id": "conchas-filled-mascarpone-y-cajeta-mini",
+          "variant": "Mascarpone y cajeta",
+          "size": "Mini",
+          "priceFils": 1800
+        },
+        {
+          "id": "conchas-filled-mascarpone-y-cajeta-individual",
+          "variant": "Mascarpone y cajeta",
+          "size": "Individual",
+          "priceFils": 2100
+        },
+        {
+          "id": "conchas-filled-mascarpone-y-fresas-mini",
+          "variant": "Mascarpone y fresas",
+          "size": "Mini",
+          "priceFils": 1800
+        },
+        {
+          "id": "conchas-filled-mascarpone-y-fresas-individual",
+          "variant": "Mascarpone y fresas",
+          "size": "Individual",
+          "priceFils": 2100
+        }
+      ],
+      "image": "/brand/menu/conchas-filled.webp",
+      "advanceOrder": false,
+      "source": "IMG-C",
+      "pack": false
+    },
+    {
+      "id": "conchas-traditional-pack",
+      "category": "conchas",
+      "name": "Conchas · Pack tradicional",
+      "options": [
+        {
+          "id": "conchas-traditional-pack-6-mini",
+          "variant": "",
+          "size": "6 mini",
+          "priceFils": 6000
+        },
+        {
+          "id": "conchas-traditional-pack-12-mini",
+          "variant": "",
+          "size": "12 mini",
+          "priceFils": 11500
+        },
+        {
+          "id": "conchas-traditional-pack-6-individuales",
+          "variant": "",
+          "size": "6 individuales",
+          "priceFils": 7200
+        },
+        {
+          "id": "conchas-traditional-pack-12-individuales",
+          "variant": "",
+          "size": "12 individuales",
+          "priceFils": 14000
+        }
+      ],
+      "image": "/brand/menu/conchas-pack.webp",
+      "advanceOrder": false,
+      "source": "IMG-C",
+      "pack": true
+    },
+    {
+      "id": "conchas-filled-pack",
+      "category": "conchas",
+      "name": "Conchas · Pack relleno",
+      "options": [
+        {
+          "id": "conchas-filled-pack-6-mini",
+          "variant": "",
+          "size": "6 mini",
+          "priceFils": 10000
+        },
+        {
+          "id": "conchas-filled-pack-12-mini",
+          "variant": "",
+          "size": "12 mini",
+          "priceFils": 19000
+        },
+        {
+          "id": "conchas-filled-pack-6-individuales",
+          "variant": "",
+          "size": "6 individuales",
+          "priceFils": 12000
+        },
+        {
+          "id": "conchas-filled-pack-12-individuales",
+          "variant": "",
+          "size": "12 individuales",
+          "priceFils": 23500
+        }
+      ],
+      "image": "/brand/menu/conchas-pack.webp",
+      "advanceOrder": false,
+      "source": "IMG-C",
+      "pack": true
+    },
+    {
+      "id": "tres-leches",
+      "category": "cakes",
+      "name": "3 Leches Cake",
+      "options": [
+        {
+          "id": "tres-leches-vanilla-strawberry-13-personas",
+          "variant": "Vanilla Strawberry",
+          "size": "1–3 personas",
+          "priceFils": 7500
+        },
+        {
+          "id": "tres-leches-vanilla-strawberry-68-personas",
+          "variant": "Vanilla Strawberry",
+          "size": "6–8 personas",
+          "priceFils": 21000
+        },
+        {
+          "id": "tres-leches-vanilla-strawberry-1416-personas",
+          "variant": "Vanilla Strawberry",
+          "size": "14–16 personas",
+          "priceFils": 34000
+        },
+        {
+          "id": "tres-leches-classic-13-personas",
+          "variant": "Classic",
+          "size": "1–3 personas",
+          "priceFils": 7500
+        },
+        {
+          "id": "tres-leches-classic-68-personas",
+          "variant": "Classic",
+          "size": "6–8 personas",
+          "priceFils": 21000
+        },
+        {
+          "id": "tres-leches-classic-1416-personas",
+          "variant": "Classic",
+          "size": "14–16 personas",
+          "priceFils": 34000
+        },
+        {
+          "id": "tres-leches-nutella-13-personas",
+          "variant": "Nutella",
+          "size": "1–3 personas",
+          "priceFils": 7500
+        },
+        {
+          "id": "tres-leches-nutella-68-personas",
+          "variant": "Nutella",
+          "size": "6–8 personas",
+          "priceFils": 21000
+        },
+        {
+          "id": "tres-leches-nutella-1416-personas",
+          "variant": "Nutella",
+          "size": "14–16 personas",
+          "priceFils": 34000
+        },
+        {
+          "id": "tres-leches-caffe-latte-13-personas",
+          "variant": "Caffe Latte",
+          "size": "1–3 personas",
+          "priceFils": 7500
+        },
+        {
+          "id": "tres-leches-caffe-latte-68-personas",
+          "variant": "Caffe Latte",
+          "size": "6–8 personas",
+          "priceFils": 21000
+        },
+        {
+          "id": "tres-leches-caffe-latte-1416-personas",
+          "variant": "Caffe Latte",
+          "size": "14–16 personas",
+          "priceFils": 34000
+        },
+        {
+          "id": "tres-leches-coconut-13-personas",
+          "variant": "Coconut",
+          "size": "1–3 personas",
+          "priceFils": 7500
+        },
+        {
+          "id": "tres-leches-coconut-68-personas",
+          "variant": "Coconut",
+          "size": "6–8 personas",
+          "priceFils": 21000
+        },
+        {
+          "id": "tres-leches-coconut-1416-personas",
+          "variant": "Coconut",
+          "size": "14–16 personas",
+          "priceFils": 34000
+        },
+        {
+          "id": "tres-leches-confetti-13-personas",
+          "variant": "Confetti",
+          "size": "1–3 personas",
+          "priceFils": 7500
+        },
+        {
+          "id": "tres-leches-confetti-68-personas",
+          "variant": "Confetti",
+          "size": "6–8 personas",
+          "priceFils": 21000
+        },
+        {
+          "id": "tres-leches-confetti-1416-personas",
+          "variant": "Confetti",
+          "size": "14–16 personas",
+          "priceFils": 34000
+        },
+        {
+          "id": "tres-leches-lotus-13-personas",
+          "variant": "Lotus",
+          "size": "1–3 personas",
+          "priceFils": 7500
+        },
+        {
+          "id": "tres-leches-lotus-68-personas",
+          "variant": "Lotus",
+          "size": "6–8 personas",
+          "priceFils": 21000
+        },
+        {
+          "id": "tres-leches-lotus-1416-personas",
+          "variant": "Lotus",
+          "size": "14–16 personas",
+          "priceFils": 34000
+        },
+        {
+          "id": "tres-leches-m-ms-13-personas",
+          "variant": "M&Ms",
+          "size": "1–3 personas",
+          "priceFils": 7500
+        },
+        {
+          "id": "tres-leches-m-ms-68-personas",
+          "variant": "M&Ms",
+          "size": "6–8 personas",
+          "priceFils": 21000
+        },
+        {
+          "id": "tres-leches-m-ms-1416-personas",
+          "variant": "M&Ms",
+          "size": "14–16 personas",
+          "priceFils": 34000
+        },
+        {
+          "id": "tres-leches-oreo-13-personas",
+          "variant": "Oreo",
+          "size": "1–3 personas",
+          "priceFils": 7500
+        },
+        {
+          "id": "tres-leches-oreo-68-personas",
+          "variant": "Oreo",
+          "size": "6–8 personas",
+          "priceFils": 21000
+        },
+        {
+          "id": "tres-leches-oreo-1416-personas",
+          "variant": "Oreo",
+          "size": "14–16 personas",
+          "priceFils": 34000
+        }
+      ],
+      "image": "/brand/menu/cakes.webp",
+      "advanceOrder": false,
+      "source": "PDF p.1",
+      "pack": false
+    },
+    {
+      "id": "tres-leches-premium",
+      "category": "cakes",
+      "name": "3 Leches Cake",
+      "options": [
+        {
+          "id": "tres-leches-premium-dulce-de-leche-13-personas",
+          "variant": "Dulce de Leche",
+          "size": "1–3 personas",
+          "priceFils": 8500
+        },
+        {
+          "id": "tres-leches-premium-dulce-de-leche-68-personas",
+          "variant": "Dulce de Leche",
+          "size": "6–8 personas",
+          "priceFils": 23000
+        },
+        {
+          "id": "tres-leches-premium-dulce-de-leche-1416-personas",
+          "variant": "Dulce de Leche",
+          "size": "14–16 personas",
+          "priceFils": 38000
+        },
+        {
+          "id": "tres-leches-premium-tiramisu-13-personas",
+          "variant": "Tiramisu",
+          "size": "1–3 personas",
+          "priceFils": 8500
+        },
+        {
+          "id": "tres-leches-premium-tiramisu-68-personas",
+          "variant": "Tiramisu",
+          "size": "6–8 personas",
+          "priceFils": 23000
+        },
+        {
+          "id": "tres-leches-premium-tiramisu-1416-personas",
+          "variant": "Tiramisu",
+          "size": "14–16 personas",
+          "priceFils": 38000
+        }
+      ],
+      "image": "/brand/menu/cakes.webp",
+      "advanceOrder": false,
+      "source": "PDF p.1",
+      "pack": false
+    },
+    {
+      "id": "tres-leches-mango",
+      "category": "cakes",
+      "name": "3 Leches Cake",
+      "options": [
+        {
+          "id": "tres-leches-mango-mango-13-personas",
+          "variant": "Mango",
+          "size": "1–3 personas",
+          "priceFils": 8500
+        },
+        {
+          "id": "tres-leches-mango-mango-68-personas",
+          "variant": "Mango",
+          "size": "6–8 personas",
+          "priceFils": 23000
+        },
+        {
+          "id": "tres-leches-mango-mango-1416-personas",
+          "variant": "Mango",
+          "size": "14–16 personas",
+          "priceFils": 38000
+        }
+      ],
+      "image": "/brand/menu/cakes.webp",
+      "advanceOrder": true,
+      "source": "PDF p.1",
+      "pack": false
+    },
+    {
+      "id": "special-flavours-cake",
+      "category": "cakes",
+      "name": "Special Flavours 3 Leches Cake",
+      "options": [
+        {
+          "id": "special-flavours-cake-berries-mini",
+          "variant": "Berries",
+          "size": "Mini",
+          "priceFils": 9500
+        },
+        {
+          "id": "special-flavours-cake-berries-small",
+          "variant": "Berries",
+          "size": "Small",
+          "priceFils": 26000
+        },
+        {
+          "id": "special-flavours-cake-berries-big",
+          "variant": "Berries",
+          "size": "Big",
+          "priceFils": 42000
+        },
+        {
+          "id": "special-flavours-cake-chocolate-mini",
+          "variant": "Chocolate",
+          "size": "Mini",
+          "priceFils": 9500
+        },
+        {
+          "id": "special-flavours-cake-chocolate-small",
+          "variant": "Chocolate",
+          "size": "Small",
+          "priceFils": 26000
+        },
+        {
+          "id": "special-flavours-cake-chocolate-big",
+          "variant": "Chocolate",
+          "size": "Big",
+          "priceFils": 42000
+        },
+        {
+          "id": "special-flavours-cake-half-rosettas-mini",
+          "variant": "Half Rosettas",
+          "size": "Mini",
+          "priceFils": 9500
+        },
+        {
+          "id": "special-flavours-cake-half-rosettas-small",
+          "variant": "Half Rosettas",
+          "size": "Small",
+          "priceFils": 26000
+        },
+        {
+          "id": "special-flavours-cake-half-rosettas-big",
+          "variant": "Half Rosettas",
+          "size": "Big",
+          "priceFils": 42000
+        },
+        {
+          "id": "special-flavours-cake-matcha-mini",
+          "variant": "Matcha",
+          "size": "Mini",
+          "priceFils": 9500
+        },
+        {
+          "id": "special-flavours-cake-matcha-small",
+          "variant": "Matcha",
+          "size": "Small",
+          "priceFils": 26000
+        },
+        {
+          "id": "special-flavours-cake-matcha-big",
+          "variant": "Matcha",
+          "size": "Big",
+          "priceFils": 42000
+        },
+        {
+          "id": "special-flavours-cake-pistacchio-mini",
+          "variant": "Pistacchio",
+          "size": "Mini",
+          "priceFils": 9500
+        },
+        {
+          "id": "special-flavours-cake-pistacchio-small",
+          "variant": "Pistacchio",
+          "size": "Small",
+          "priceFils": 26000
+        },
+        {
+          "id": "special-flavours-cake-pistacchio-big",
+          "variant": "Pistacchio",
+          "size": "Big",
+          "priceFils": 42000
+        },
+        {
+          "id": "special-flavours-cake-raspberry-mini",
+          "variant": "Raspberry",
+          "size": "Mini",
+          "priceFils": 9500
+        },
+        {
+          "id": "special-flavours-cake-raspberry-small",
+          "variant": "Raspberry",
+          "size": "Small",
+          "priceFils": 26000
+        },
+        {
+          "id": "special-flavours-cake-raspberry-big",
+          "variant": "Raspberry",
+          "size": "Big",
+          "priceFils": 42000
+        },
+        {
+          "id": "special-flavours-cake-rosettas-mini",
+          "variant": "Rosettas",
+          "size": "Mini",
+          "priceFils": 9500
+        },
+        {
+          "id": "special-flavours-cake-rosettas-small",
+          "variant": "Rosettas",
+          "size": "Small",
+          "priceFils": 26000
+        },
+        {
+          "id": "special-flavours-cake-rosettas-big",
+          "variant": "Rosettas",
+          "size": "Big",
+          "priceFils": 42000
+        },
+        {
+          "id": "special-flavours-cake-saffron-mini",
+          "variant": "Saffron",
+          "size": "Mini",
+          "priceFils": 9500
+        },
+        {
+          "id": "special-flavours-cake-saffron-small",
+          "variant": "Saffron",
+          "size": "Small",
+          "priceFils": 26000
+        },
+        {
+          "id": "special-flavours-cake-saffron-big",
+          "variant": "Saffron",
+          "size": "Big",
+          "priceFils": 42000
+        }
+      ],
+      "image": "/brand/menu/special-cakes.webp",
+      "advanceOrder": false,
+      "source": "PDF p.1",
+      "pack": false
+    },
+    {
+      "id": "cake-jar",
+      "category": "jars",
+      "name": "3 Leches Cake Jar",
+      "options": [
+        {
+          "id": "cake-jar-classic-110-ml",
+          "variant": "Classic",
+          "size": "110 ml",
+          "priceFils": 3200
+        },
+        {
+          "id": "cake-jar-classic-200-ml",
+          "variant": "Classic",
+          "size": "200 ml",
+          "priceFils": 3500
+        },
+        {
+          "id": "cake-jar-vanilla-strawberry-110-ml",
+          "variant": "Vanilla Strawberry",
+          "size": "110 ml",
+          "priceFils": 3200
+        },
+        {
+          "id": "cake-jar-vanilla-strawberry-200-ml",
+          "variant": "Vanilla Strawberry",
+          "size": "200 ml",
+          "priceFils": 3500
+        },
+        {
+          "id": "cake-jar-nutella-110-ml",
+          "variant": "Nutella",
+          "size": "110 ml",
+          "priceFils": 3200
+        },
+        {
+          "id": "cake-jar-nutella-200-ml",
+          "variant": "Nutella",
+          "size": "200 ml",
+          "priceFils": 3500
+        },
+        {
+          "id": "cake-jar-lotus-110-ml",
+          "variant": "Lotus",
+          "size": "110 ml",
+          "priceFils": 3200
+        },
+        {
+          "id": "cake-jar-lotus-200-ml",
+          "variant": "Lotus",
+          "size": "200 ml",
+          "priceFils": 3500
+        },
+        {
+          "id": "cake-jar-caffe-latte-110-ml",
+          "variant": "Caffe Latte",
+          "size": "110 ml",
+          "priceFils": 3200
+        },
+        {
+          "id": "cake-jar-caffe-latte-200-ml",
+          "variant": "Caffe Latte",
+          "size": "200 ml",
+          "priceFils": 3500
+        },
+        {
+          "id": "cake-jar-coconut-110-ml",
+          "variant": "Coconut",
+          "size": "110 ml",
+          "priceFils": 3200
+        },
+        {
+          "id": "cake-jar-coconut-200-ml",
+          "variant": "Coconut",
+          "size": "200 ml",
+          "priceFils": 3500
+        },
+        {
+          "id": "cake-jar-oreo-cookies-and-cream-110-ml",
+          "variant": "Oreo (cookies and cream)",
+          "size": "110 ml",
+          "priceFils": 3200
+        },
+        {
+          "id": "cake-jar-oreo-cookies-and-cream-200-ml",
+          "variant": "Oreo (cookies and cream)",
+          "size": "200 ml",
+          "priceFils": 3500
+        },
+        {
+          "id": "cake-jar-confetti-110-ml",
+          "variant": "Confetti",
+          "size": "110 ml",
+          "priceFils": 3200
+        },
+        {
+          "id": "cake-jar-confetti-200-ml",
+          "variant": "Confetti",
+          "size": "200 ml",
+          "priceFils": 3500
+        },
+        {
+          "id": "cake-jar-m-ms-110-ml",
+          "variant": "M&Ms",
+          "size": "110 ml",
+          "priceFils": 3200
+        },
+        {
+          "id": "cake-jar-m-ms-200-ml",
+          "variant": "M&Ms",
+          "size": "200 ml",
+          "priceFils": 3500
+        }
+      ],
+      "image": "/brand/menu/jars.webp",
+      "advanceOrder": false,
+      "source": "PDF p.2",
+      "pack": false
+    },
+    {
+      "id": "cake-jar-premium",
+      "category": "jars",
+      "name": "3 Leches Cake Jar",
+      "options": [
+        {
+          "id": "cake-jar-premium-tiramisu-110-ml",
+          "variant": "Tiramisu",
+          "size": "110 ml",
+          "priceFils": 3500
+        },
+        {
+          "id": "cake-jar-premium-tiramisu-200-ml",
+          "variant": "Tiramisu",
+          "size": "200 ml",
+          "priceFils": 3800
+        },
+        {
+          "id": "cake-jar-premium-mango-110-ml",
+          "variant": "Mango",
+          "size": "110 ml",
+          "priceFils": 3500
+        },
+        {
+          "id": "cake-jar-premium-mango-200-ml",
+          "variant": "Mango",
+          "size": "200 ml",
+          "priceFils": 3800
+        },
+        {
+          "id": "cake-jar-premium-dulce-de-leche-110-ml",
+          "variant": "Dulce De Leche",
+          "size": "110 ml",
+          "priceFils": 3500
+        },
+        {
+          "id": "cake-jar-premium-dulce-de-leche-200-ml",
+          "variant": "Dulce De Leche",
+          "size": "200 ml",
+          "priceFils": 3800
+        }
+      ],
+      "image": "/brand/menu/jars.webp",
+      "advanceOrder": false,
+      "source": "PDF p.2",
+      "pack": false
+    },
+    {
+      "id": "cake-jar-bundle",
+      "category": "jars",
+      "name": "Cake Jar Bundle",
+      "options": [
+        {
+          "id": "cake-jar-bundle-4-200-ml",
+          "variant": "",
+          "size": "4 × 200 ml",
+          "priceFils": 13000
+        },
+        {
+          "id": "cake-jar-bundle-6-110-ml",
+          "variant": "",
+          "size": "6 × 110 ml",
+          "priceFils": 16000
+        }
+      ],
+      "image": "/brand/menu/jars.webp",
+      "advanceOrder": false,
+      "source": "PDF p.2",
+      "pack": true
+    },
+    {
+      "id": "special-flavours-jar",
+      "category": "jars",
+      "name": "Special Flavours Cake Jar",
+      "options": [
+        {
+          "id": "special-flavours-jar-raspberry-110-ml",
+          "variant": "Raspberry",
+          "size": "110 ml",
+          "priceFils": 3700
+        },
+        {
+          "id": "special-flavours-jar-raspberry-200-ml",
+          "variant": "Raspberry",
+          "size": "200 ml",
+          "priceFils": 3900
+        },
+        {
+          "id": "special-flavours-jar-saffron-110-ml",
+          "variant": "Saffron",
+          "size": "110 ml",
+          "priceFils": 3700
+        },
+        {
+          "id": "special-flavours-jar-saffron-200-ml",
+          "variant": "Saffron",
+          "size": "200 ml",
+          "priceFils": 3900
+        },
+        {
+          "id": "special-flavours-jar-pistacchio-110-ml",
+          "variant": "Pistacchio",
+          "size": "110 ml",
+          "priceFils": 3700
+        },
+        {
+          "id": "special-flavours-jar-pistacchio-200-ml",
+          "variant": "Pistacchio",
+          "size": "200 ml",
+          "priceFils": 3900
+        },
+        {
+          "id": "special-flavours-jar-matcha-110-ml",
+          "variant": "Matcha",
+          "size": "110 ml",
+          "priceFils": 3700
+        },
+        {
+          "id": "special-flavours-jar-matcha-200-ml",
+          "variant": "Matcha",
+          "size": "200 ml",
+          "priceFils": 3900
+        },
+        {
+          "id": "special-flavours-jar-chocolate-110-ml",
+          "variant": "Chocolate",
+          "size": "110 ml",
+          "priceFils": 3700
+        },
+        {
+          "id": "special-flavours-jar-chocolate-200-ml",
+          "variant": "Chocolate",
+          "size": "200 ml",
+          "priceFils": 3900
+        },
+        {
+          "id": "special-flavours-jar-berries-110-ml",
+          "variant": "Berries",
+          "size": "110 ml",
+          "priceFils": 3700
+        },
+        {
+          "id": "special-flavours-jar-berries-200-ml",
+          "variant": "Berries",
+          "size": "200 ml",
+          "priceFils": 3900
+        }
+      ],
+      "image": "/brand/menu/special-jars.webp",
+      "advanceOrder": false,
+      "source": "PDF p.2",
+      "pack": false
+    },
+    {
+      "id": "carrot-cake",
+      "category": "specialities",
+      "name": "Carrot Cake",
+      "options": [
+        {
+          "id": "carrot-cake-mono-portion",
+          "variant": "",
+          "size": "Mono portion",
+          "priceFils": 2500
+        },
+        {
+          "id": "carrot-cake-1012-personas",
+          "variant": "",
+          "size": "10–12 personas",
+          "priceFils": 23000
+        },
+        {
+          "id": "carrot-cake-6-piezas",
+          "variant": "",
+          "size": "6 piezas",
+          "priceFils": 14000
+        },
+        {
+          "id": "carrot-cake-12-piezas",
+          "variant": "",
+          "size": "12 piezas",
+          "priceFils": 27000
+        }
+      ],
+      "image": null,
+      "advanceOrder": false,
+      "source": "PDF p.3",
+      "pack": false
+    },
+    {
+      "id": "cheesecake",
+      "category": "specialities",
+      "name": "Cheesecake",
+      "options": [
+        {
+          "id": "cheesecake-mono-portion",
+          "variant": "",
+          "size": "Mono portion",
+          "priceFils": 3500
+        },
+        {
+          "id": "cheesecake-1012-personas",
+          "variant": "",
+          "size": "10–12 personas",
+          "priceFils": 32000
+        },
+        {
+          "id": "cheesecake-6-piezas",
+          "variant": "",
+          "size": "6 piezas",
+          "priceFils": 20000
+        },
+        {
+          "id": "cheesecake-12-piezas",
+          "variant": "",
+          "size": "12 piezas",
+          "priceFils": 38000
+        }
+      ],
+      "image": null,
+      "advanceOrder": false,
+      "source": "PDF p.3",
+      "pack": false
+    },
+    {
+      "id": "jelly-gelatina-fruits",
+      "category": "specialities",
+      "name": "Jelly (gelatina) fruits",
+      "options": [
+        {
+          "id": "jelly-gelatina-fruits-mono-portion",
+          "variant": "",
+          "size": "Mono portion",
+          "priceFils": 1800
+        },
+        {
+          "id": "jelly-gelatina-fruits-1012-personas",
+          "variant": "",
+          "size": "10–12 personas",
+          "priceFils": 21000
+        },
+        {
+          "id": "jelly-gelatina-fruits-6-piezas",
+          "variant": "",
+          "size": "6 piezas",
+          "priceFils": 10000
+        },
+        {
+          "id": "jelly-gelatina-fruits-12-piezas",
+          "variant": "",
+          "size": "12 piezas",
+          "priceFils": 19500
+        }
+      ],
+      "image": null,
+      "advanceOrder": true,
+      "source": "PDF p.3",
+      "pack": false
+    },
+    {
+      "id": "jelly-gelatina-dulce-de-leche",
+      "category": "specialities",
+      "name": "Jelly (gelatina) dulce de leche",
+      "options": [
+        {
+          "id": "jelly-gelatina-dulce-de-leche-mono-portion",
+          "variant": "",
+          "size": "Mono portion",
+          "priceFils": 2200
+        },
+        {
+          "id": "jelly-gelatina-dulce-de-leche-1012-personas",
+          "variant": "",
+          "size": "10–12 personas",
+          "priceFils": 23000
+        },
+        {
+          "id": "jelly-gelatina-dulce-de-leche-6-piezas",
+          "variant": "",
+          "size": "6 piezas",
+          "priceFils": 12500
+        },
+        {
+          "id": "jelly-gelatina-dulce-de-leche-12-piezas",
+          "variant": "",
+          "size": "12 piezas",
+          "priceFils": 24500
+        }
+      ],
+      "image": null,
+      "advanceOrder": true,
+      "source": "PDF p.3",
+      "pack": false
+    },
+    {
+      "id": "jelly-gelatina-yogurt-strawberry",
+      "category": "specialities",
+      "name": "Jelly (gelatina) yogurt strawberry",
+      "options": [
+        {
+          "id": "jelly-gelatina-yogurt-strawberry-mono-portion",
+          "variant": "",
+          "size": "Mono portion",
+          "priceFils": 3500
+        },
+        {
+          "id": "jelly-gelatina-yogurt-strawberry-1012-personas",
+          "variant": "",
+          "size": "10–12 personas",
+          "priceFils": 21000
+        },
+        {
+          "id": "jelly-gelatina-yogurt-strawberry-6-piezas",
+          "variant": "",
+          "size": "6 piezas",
+          "priceFils": 20000
+        },
+        {
+          "id": "jelly-gelatina-yogurt-strawberry-12-piezas",
+          "variant": "",
+          "size": "12 piezas",
+          "priceFils": 38000
+        }
+      ],
+      "image": null,
+      "advanceOrder": true,
+      "source": "PDF p.3",
+      "pack": false
+    },
+    {
+      "id": "orejas",
+      "category": "bakery",
+      "name": "Orejas",
+      "options": [
+        {
+          "id": "orejas-mini-60-g",
+          "variant": "",
+          "size": "Mini · 60 g",
+          "priceFils": 900
+        },
+        {
+          "id": "orejas-individual-100-g",
+          "variant": "",
+          "size": "Individual · 100 g",
+          "priceFils": 1100
+        },
+        {
+          "id": "orejas-6-mini-60-g-cada-uno",
+          "variant": "",
+          "size": "6 mini · 60 g cada uno",
+          "priceFils": 5000
+        },
+        {
+          "id": "orejas-12-mini-60-g-cada-uno",
+          "variant": "",
+          "size": "12 mini · 60 g cada uno",
+          "priceFils": 9500
+        },
+        {
+          "id": "orejas-6-individuales-100-g-cada-uno",
+          "variant": "",
+          "size": "6 individuales · 100 g cada uno",
+          "priceFils": 6000
+        },
+        {
+          "id": "orejas-12-individuales-100-g-cada-uno",
+          "variant": "",
+          "size": "12 individuales · 100 g cada uno",
+          "priceFils": 11500
+        }
+      ],
+      "image": null,
+      "advanceOrder": false,
+      "source": "PDF p.3",
+      "pack": false
+    },
+    {
+      "id": "bisquets",
+      "category": "bakery",
+      "name": "Bisquets",
+      "options": [
+        {
+          "id": "bisquets-mini-60-g",
+          "variant": "",
+          "size": "Mini · 60 g",
+          "priceFils": 900
+        },
+        {
+          "id": "bisquets-individual-100-g",
+          "variant": "",
+          "size": "Individual · 100 g",
+          "priceFils": 1100
+        },
+        {
+          "id": "bisquets-6-mini-60-g-cada-uno",
+          "variant": "",
+          "size": "6 mini · 60 g cada uno",
+          "priceFils": 5000
+        },
+        {
+          "id": "bisquets-12-mini-60-g-cada-uno",
+          "variant": "",
+          "size": "12 mini · 60 g cada uno",
+          "priceFils": 9500
+        },
+        {
+          "id": "bisquets-6-individuales-100-g-cada-uno",
+          "variant": "",
+          "size": "6 individuales · 100 g cada uno",
+          "priceFils": 6000
+        },
+        {
+          "id": "bisquets-12-individuales-100-g-cada-uno",
+          "variant": "",
+          "size": "12 individuales · 100 g cada uno",
+          "priceFils": 11500
+        }
+      ],
+      "image": null,
+      "advanceOrder": false,
+      "source": "PDF p.3",
+      "pack": false
+    },
+    {
+      "id": "croissant",
+      "category": "bakery",
+      "name": "Croissant",
+      "options": [
+        {
+          "id": "croissant-plain-mini-60-g",
+          "variant": "Plain",
+          "size": "Mini · 60 g",
+          "priceFils": 1200
+        },
+        {
+          "id": "croissant-plain-individual-100-g",
+          "variant": "Plain",
+          "size": "Individual · 100 g",
+          "priceFils": 1500
+        },
+        {
+          "id": "croissant-plain-6-mini-60-g-cada-uno",
+          "variant": "Plain",
+          "size": "6 mini · 60 g cada uno",
+          "priceFils": 7000
+        },
+        {
+          "id": "croissant-plain-12-mini-60-g-cada-uno",
+          "variant": "Plain",
+          "size": "12 mini · 60 g cada uno",
+          "priceFils": 13500
+        },
+        {
+          "id": "croissant-plain-6-individuales-100-g-cada-uno",
+          "variant": "Plain",
+          "size": "6 individuales · 100 g cada uno",
+          "priceFils": 8500
+        },
+        {
+          "id": "croissant-plain-12-individuales-100-g-cada-uno",
+          "variant": "Plain",
+          "size": "12 individuales · 100 g cada uno",
+          "priceFils": 16500
+        },
+        {
+          "id": "croissant-chocolate-mini-60-g",
+          "variant": "Chocolate",
+          "size": "Mini · 60 g",
+          "priceFils": 1200
+        },
+        {
+          "id": "croissant-chocolate-individual-100-g",
+          "variant": "Chocolate",
+          "size": "Individual · 100 g",
+          "priceFils": 1500
+        },
+        {
+          "id": "croissant-chocolate-6-mini-60-g-cada-uno",
+          "variant": "Chocolate",
+          "size": "6 mini · 60 g cada uno",
+          "priceFils": 7000
+        },
+        {
+          "id": "croissant-chocolate-12-mini-60-g-cada-uno",
+          "variant": "Chocolate",
+          "size": "12 mini · 60 g cada uno",
+          "priceFils": 13500
+        },
+        {
+          "id": "croissant-chocolate-6-individuales-100-g-cada-uno",
+          "variant": "Chocolate",
+          "size": "6 individuales · 100 g cada uno",
+          "priceFils": 8500
+        },
+        {
+          "id": "croissant-chocolate-12-individuales-100-g-cada-uno",
+          "variant": "Chocolate",
+          "size": "12 individuales · 100 g cada uno",
+          "priceFils": 16500
+        },
+        {
+          "id": "croissant-pistacchio-mini-60-g",
+          "variant": "Pistacchio",
+          "size": "Mini · 60 g",
+          "priceFils": 1200
+        },
+        {
+          "id": "croissant-pistacchio-individual-100-g",
+          "variant": "Pistacchio",
+          "size": "Individual · 100 g",
+          "priceFils": 1500
+        },
+        {
+          "id": "croissant-pistacchio-6-mini-60-g-cada-uno",
+          "variant": "Pistacchio",
+          "size": "6 mini · 60 g cada uno",
+          "priceFils": 7000
+        },
+        {
+          "id": "croissant-pistacchio-12-mini-60-g-cada-uno",
+          "variant": "Pistacchio",
+          "size": "12 mini · 60 g cada uno",
+          "priceFils": 13500
+        },
+        {
+          "id": "croissant-pistacchio-6-individuales-100-g-cada-uno",
+          "variant": "Pistacchio",
+          "size": "6 individuales · 100 g cada uno",
+          "priceFils": 8500
+        },
+        {
+          "id": "croissant-pistacchio-12-individuales-100-g-cada-uno",
+          "variant": "Pistacchio",
+          "size": "12 individuales · 100 g cada uno",
+          "priceFils": 16500
+        },
+        {
+          "id": "croissant-cherry-mini-60-g",
+          "variant": "Cherry",
+          "size": "Mini · 60 g",
+          "priceFils": 1200
+        },
+        {
+          "id": "croissant-cherry-individual-100-g",
+          "variant": "Cherry",
+          "size": "Individual · 100 g",
+          "priceFils": 1500
+        },
+        {
+          "id": "croissant-cherry-6-mini-60-g-cada-uno",
+          "variant": "Cherry",
+          "size": "6 mini · 60 g cada uno",
+          "priceFils": 7000
+        },
+        {
+          "id": "croissant-cherry-12-mini-60-g-cada-uno",
+          "variant": "Cherry",
+          "size": "12 mini · 60 g cada uno",
+          "priceFils": 13500
+        },
+        {
+          "id": "croissant-cherry-6-individuales-100-g-cada-uno",
+          "variant": "Cherry",
+          "size": "6 individuales · 100 g cada uno",
+          "priceFils": 8500
+        },
+        {
+          "id": "croissant-cherry-12-individuales-100-g-cada-uno",
+          "variant": "Cherry",
+          "size": "12 individuales · 100 g cada uno",
+          "priceFils": 16500
+        },
+        {
+          "id": "croissant-integral-mini-60-g",
+          "variant": "Integral",
+          "size": "Mini · 60 g",
+          "priceFils": 1200
+        },
+        {
+          "id": "croissant-integral-individual-100-g",
+          "variant": "Integral",
+          "size": "Individual · 100 g",
+          "priceFils": 1500
+        },
+        {
+          "id": "croissant-integral-6-mini-60-g-cada-uno",
+          "variant": "Integral",
+          "size": "6 mini · 60 g cada uno",
+          "priceFils": 7000
+        },
+        {
+          "id": "croissant-integral-12-mini-60-g-cada-uno",
+          "variant": "Integral",
+          "size": "12 mini · 60 g cada uno",
+          "priceFils": 13500
+        },
+        {
+          "id": "croissant-integral-6-individuales-100-g-cada-uno",
+          "variant": "Integral",
+          "size": "6 individuales · 100 g cada uno",
+          "priceFils": 8500
+        },
+        {
+          "id": "croissant-integral-12-individuales-100-g-cada-uno",
+          "variant": "Integral",
+          "size": "12 individuales · 100 g cada uno",
+          "priceFils": 16500
+        }
+      ],
+      "image": null,
+      "advanceOrder": false,
+      "source": "PDF p.3",
+      "pack": false
+    },
+    {
+      "id": "cubilete",
+      "category": "bakery",
+      "name": "Cubilete",
+      "options": [
+        {
+          "id": "cubilete-cream-individual-100-g",
+          "variant": "Cream",
+          "size": "Individual · 100 g",
+          "priceFils": 1300
+        },
+        {
+          "id": "cubilete-cream-6-individuales-100-g-cada-uno",
+          "variant": "Cream",
+          "size": "6 individuales · 100 g cada uno",
+          "priceFils": 7500
+        },
+        {
+          "id": "cubilete-cream-12-individuales-100-g-cada-uno",
+          "variant": "Cream",
+          "size": "12 individuales · 100 g cada uno",
+          "priceFils": 14500
+        },
+        {
+          "id": "cubilete-cheese-individual-100-g",
+          "variant": "Cheese",
+          "size": "Individual · 100 g",
+          "priceFils": 1300
+        },
+        {
+          "id": "cubilete-cheese-6-individuales-100-g-cada-uno",
+          "variant": "Cheese",
+          "size": "6 individuales · 100 g cada uno",
+          "priceFils": 7500
+        },
+        {
+          "id": "cubilete-cheese-12-individuales-100-g-cada-uno",
+          "variant": "Cheese",
+          "size": "12 individuales · 100 g cada uno",
+          "priceFils": 14500
+        }
+      ],
+      "image": null,
+      "advanceOrder": false,
+      "source": "PDF p.3",
+      "pack": false
+    },
+    {
+      "id": "rosca-de-reyes",
+      "category": "seasonal",
+      "name": "Rosca de Reyes (3 kings pastry)",
+      "options": [
+        {
+          "id": "rosca-de-reyes-mono-portion",
+          "variant": "",
+          "size": "Mono portion",
+          "priceFils": 3500
+        },
+        {
+          "id": "rosca-de-reyes-500-g",
+          "variant": "",
+          "size": "500 g",
+          "priceFils": 10000
+        },
+        {
+          "id": "rosca-de-reyes-1-kg",
+          "variant": "",
+          "size": "1 kg",
+          "priceFils": 16000
+        },
+        {
+          "id": "rosca-de-reyes-1-5-kg",
+          "variant": "",
+          "size": "1.5 kg",
+          "priceFils": 22000
+        }
+      ],
+      "image": null,
+      "advanceOrder": true,
+      "source": "PDF p.3",
+      "pack": false
+    },
+    {
+      "id": "milk",
+      "category": "extras",
+      "name": "Milk",
+      "options": [
+        {
+          "id": "milk-190-ml",
+          "variant": "",
+          "size": "190 ml",
+          "priceFils": 3000
+        },
+        {
+          "id": "milk-350-ml",
+          "variant": "",
+          "size": "350 ml",
+          "priceFils": 3500
+        }
+      ],
+      "image": null,
+      "advanceOrder": false,
+      "source": "PDF p.2",
+      "pack": false
+    },
+    {
+      "id": "cake-topper",
+      "category": "extras",
+      "name": "Cake Topper",
+      "options": [
+        {
+          "id": "cake-topper-",
+          "variant": "",
+          "size": "",
+          "priceFils": 2500
+        }
+      ],
+      "image": null,
+      "advanceOrder": false,
+      "source": "PDF p.2",
+      "pack": false
+    },
+    {
+      "id": "candles",
+      "category": "extras",
+      "name": "Candles",
+      "options": [
+        {
+          "id": "candles-",
+          "variant": "",
+          "size": "",
+          "priceFils": 2500
+        }
+      ],
+      "image": null,
+      "advanceOrder": false,
+      "source": "PDF p.2",
+      "pack": false
+    }
+  ]
+}

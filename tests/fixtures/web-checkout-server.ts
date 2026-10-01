@@ -37,7 +37,14 @@ process.on("message", (value) => {
 const debits = new Map<string, unknown>();
 const initial = seed();
 initial.catalog = validateCatalog(
-  JSON.parse(readFileSync("data-imports/pan-de-muerto.json", "utf8")),
+  JSON.parse(
+    readFileSync(
+      process.env.CATALOG_FIXTURE === "legacy"
+        ? "tests/fixtures/retired-pan-de-muerto.json"
+        : "data-imports/liza-current-menu.json",
+      "utf8",
+    ),
+  ),
 );
 const provider = new PaymenntProvider(
   { apiKey: "fixture-key", apiSecret: "fixture-secret", environment: "test" },

@@ -54,3 +54,10 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Approved operations styling: Montserrat UI, warm neutral surfaces, restrained lavender and taupe. No decorative headings for operational data; customer storefront unchanged.
 - UI-only scope: preserve providers, auth, domain logic, database, state machine and commercial rules. No fake catalog/conversations/metrics.
 - Branch feature/3l-premium-dashboard-shell stays local until Rodrigo reviews screenshots. No automatic production deployment or merge.
+
+## Approved current Liza menu (1 October 2026)
+- Canonical repository is `~/code/tres-leches-demo`. Preserve the approved public storefront direction.
+- `src/brand/menu-data.json` and `data-imports/liza-current-menu.json` contain the reviewed current menu; the old AED25 `pan-de-muerto` SKU is retired and exists only in historical test fixtures.
+- Latest Pan de Muerto/Conchas image menus override the older PDF. Packs have no invented assortment rules. Filled Conchas select size and filling only. Special cake sizes remain Mini / Small / Big.
+- Advance-order notices apply only to Mango Cake, gelatinas and Rosca. Do not change scheduling or payment logic to implement them.
+- Customer orders use product → cart → web checkout → Paymennt. WhatsApp remains support-only. No deploy without approval.

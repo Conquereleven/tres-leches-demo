@@ -1,3 +1,4 @@
+import { menuFamilies } from "./menu";
 /** Client-approved content only. Demo Commerce OS records never populate this manifest. */
 export type AssetStatus =
   "AVAILABLE" | "MISSING" | "PLACEHOLDER-DATA-SLOT" | "NEEDS-CLIENT-ASSET";
@@ -71,33 +72,43 @@ export const slots = (category: string, count: number): Product[] =>
     description: null,
     priceFils: null,
   }));
-/**
- * Confirmed by the owner 22 September 2026: the first product approved for
- * public listing. Name, price and availability are the owner's; the
- * description is a plain statement of what the product is, with no marketing
- * claims, ingredients or promises attached.
- */
-const panDeMuerto: Product = {
-  id: "pan-de-muerto",
-  name: "Pan de Muerto",
-  /** Owner-supplied product photograph, 22 September 2026. Stored unmodified. */
-  image: {
-    id: "pan-de-muerto",
-    alt: "Pan de Muerto — sugar-dusted Mexican sweet bread",
-    status: "AVAILABLE",
-    src: "/assets/pan-de-muerto.webp",
-    source: "Supplied by the owner, 22 September 2026",
-  },
-  status: "available",
-  description: "Traditional Mexican sweet bread, baked fresh in Dubai.",
-  priceFils: 2500,
-};
-
+/** Current Liza menu: each server-priced option has its own stable SKU. */
+export const menuProducts: Product[] = menuFamilies.flatMap((family) =>
+  family.options.map((option) => ({
+    id: option.id,
+    name: [family.name, option.variant, option.size]
+      .filter(Boolean)
+      .join(" · "),
+    image: {
+      id: family.id,
+      alt: `${family.name} family photography`,
+      status: family.image
+        ? ("AVAILABLE" as const)
+        : ("NEEDS-CLIENT-ASSET" as const),
+      src: family.image,
+      source: family.source,
+    },
+    status: "available" as const,
+    description: family.advanceOrder
+      ? "Order at least 24 hours in advance"
+      : null,
+    priceFils: option.priceFils,
+  })),
+);
 export const collections = {
   featured: slots("Featured cake", 3),
-  /** One confirmed product; no empty slots padding the section. */
-  bakery: [panDeMuerto],
-  jars: slots("Cake jar", 3),
+  bakery: menuProducts.filter(
+    (product) =>
+      menuFamilies.find((family) =>
+        family.options.some((option) => option.id === product.id),
+      )?.category === "pan",
+  ),
+  jars: menuProducts.filter(
+    (product) =>
+      menuFamilies.find((family) =>
+        family.options.some((option) => option.id === product.id),
+      )?.category === "jars",
+  ),
   custom: slots("Custom cake category", 3),
 };
 export const occasions = [
@@ -138,9 +149,9 @@ export const destinations: {
   privacy: string | null;
 } = {
   /**
-   * Official WhatsApp ordering number, confirmed by the owner 22 September
+   * Official WhatsApp support number, confirmed by the owner 22 September
    * 2026 (Liza). Stored unspaced so `whatsappUrl` produces wa.me/971521683319.
-   * This is the single source for every ORDER ON WHATSAPP control on the site.
+   * Support only; customer orders are placed through the web cart and checkout.
    */
   whatsapp: "+971521683319",
   instagram: null,

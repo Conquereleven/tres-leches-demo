@@ -16,13 +16,15 @@ test("cart → delivery → details → review → payment step", async ({
     r.fulfill({ body: "", contentType: "application/javascript" }),
   );
 
-  await page.goto("/#bakery");
-  await page.getByRole("button", { name: /Increase quantity/ }).click();
-  await page.getByRole("button", { name: "ADD TO CART · AED 50" }).click();
-  await expect(
-    page.getByRole("link", { name: /2 in your cart/ }),
-  ).toBeVisible();
-
+  // Preserve the original financial regression using its explicitly retired fixture.
+  // Current menu selectors and new SKUs are exercised in menu-e2e separately.
+  await page.goto("/");
+  await page.evaluate(() =>
+    localStorage.setItem(
+      "3l-cart",
+      JSON.stringify([{ productId: "pan-de-muerto", quantity: 2 }]),
+    ),
+  );
   await page.goto("/cart");
   await expect(page.locator("main")).toContainText("AED 50");
   await page.getByRole("link", { name: "CONTINUE TO DELIVERY" }).click();

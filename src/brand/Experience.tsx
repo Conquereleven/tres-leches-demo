@@ -1,4 +1,5 @@
-import { AddToCart } from "./Shop";
+import { MenuCatalog, MenuOptions } from "./MenuCatalog";
+import { menuFamilies } from "./menu";
 import { cartCount, useCart } from "./cart";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
@@ -21,7 +22,6 @@ import {
   newsletterProvider,
   validateNewsletter,
   formatAed,
-  type Product,
 } from "./content";
 import {
   Button,
@@ -91,104 +91,6 @@ function useMotion(root: React.RefObject<HTMLDivElement | null>) {
       vObserver.disconnect();
     };
   }, [root]);
-}
-function ProductExperience({
-  id,
-  title,
-  products,
-  cta,
-  onView,
-}: {
-  id: string;
-  title: string;
-  products: Product[];
-  cta: string;
-  onView?: () => void;
-}) {
-  const [selected, setSelected] = useState(0);
-  const product = products[selected]!;
-  // A selector is only meaningful once products have confirmed names. Until
-  // then the section keeps its heading, artwork and ordering CTA, and simply
-  // does not offer a list of unnamed items.
-  const named = products.filter((p) => p.name);
-  return (
-    <Section id={id} className={`b-product-experience b-${id}`}>
-      <div className="b-product-copy">
-        <SectionLabel>
-          {id === "custom" ? "THE 3L ATELIER" : "THE COLLECTION"}
-        </SectionLabel>
-        <EditorialHeading>{title}</EditorialHeading>
-        {named.length > 0 && (
-          <div className="b-product-list" aria-label={`${title} selection`}>
-            {products.map((p, i) => (
-              <button
-                key={p.id}
-                aria-pressed={selected === i}
-                onFocus={() => setSelected(i)}
-                onMouseEnter={() => setSelected(i)}
-                onClick={() => setSelected(i)}
-              >
-                <span className="b-label">0{i + 1}</span>
-                <span>{p.name}</span>
-                <span>
-                  {p.status === "out-of-stock"
-                    ? "OUT OF STOCK"
-                    : p.priceFils
-                      ? formatAed(p.priceFils)
-                      : selected === i
-                        ? "Selected"
-                        : "Select"}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
-        {product.status === "available" && product.name ? (
-          <div className="b-product-actions">
-            {onView && (
-              <Button className="b-button-secondary" onClick={onView}>
-                VIEW DETAILS
-              </Button>
-            )}
-            <AddToCart
-              productId={product.id}
-              fallback={
-                <TextLink href="/contact">CONTACT 3L</TextLink>
-              }
-            />
-          </div>
-        ) : product.status === "out-of-stock" ? (
-          <Button disabled>OUT OF STOCK</Button>
-        ) : (
-          <TextLink href="/contact">{cta}</TextLink>
-        )}
-      </div>
-      <div className="b-selected-product" aria-live="polite">
-        {product.name && onView ? (
-          <button
-            className="b-product-image-button"
-            onClick={onView}
-            aria-label={`View ${product.name}`}
-          >
-            <ImageFrame key={product.id} asset={product.image} />
-          </button>
-        ) : (
-          <ImageFrame key={product.id} asset={product.image} />
-        )}
-        {product.name && (
-          <div className="b-product-meta">
-            <h3>{product.name}</h3>
-            {product.priceFils && (
-              <p className="b-price">{formatAed(product.priceFils)}</p>
-            )}
-            {product.description && (
-              <p className="b-caption">{product.description}</p>
-            )}
-          </div>
-        )}
-      </div>
-    </Section>
-  );
 }
 function Newsletter() {
   const [email, setEmail] = useState(""),
@@ -283,7 +185,14 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
   const voices = visibleTestimonials(testimonials);
   const cartLines = useCart();
   const cartItems = cartCount(cartLines);
-  const panDeMuerto = collections.bakery[0]!;
+  const panDeMuerto = {
+    ...collections.bakery[0]!,
+    // Preserve the approved large family photograph; small flyer crops stay in cards.
+    image: {
+      ...collections.bakery[0]!.image,
+      src: "/assets/pan-de-muerto.webp",
+    },
+  };
   const root = useRef<HTMLDivElement>(null);
   useMotion(root);
   const [dialog, setDialog] = useState<DialogKind>(null),
@@ -329,7 +238,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
       <a href="#story" onClick={() => setDialog(null)}>
         OUR STORY
       </a>
-      <a href="#collection" onClick={() => setDialog(null)}>
+      <a href="#bakery" onClick={() => setDialog(null)}>
         MENU
       </a>
       <a href="#community" onClick={() => setDialog(null)}>
@@ -349,7 +258,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
       <header className={`b-header ${scrolled ? "b-scrolled" : ""}`}>
         <nav className="b-nav-left" aria-label="Primary">
           <a href="#story">OUR STORY</a>
-          <a href="#collection">MENU</a>
+          <a href="#bakery">MENU</a>
         </nav>
         <button
           className="b-menu"
@@ -423,14 +332,14 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               <span>PAN DE</span>
               <span>MUERTO.</span>
             </h1>
-            <p>{panDeMuerto.description}</p>
+            <p>Traditional Mexican sweet bread.</p>
             <Button onClick={() => setDialog("product")}>
               SHOP NOW
               <ArrowUpRight aria-hidden />
             </Button>
           </div>
           <div className="b-hero-note">
-            <p>{formatAed(panDeMuerto.priceFils!)}</p>
+            <p>FROM {formatAed(panDeMuerto.priceFils!)}</p>
             <a href="#bridge" aria-label="Explore the 3L story">
               <ArrowDown aria-hidden />
             </a>
@@ -453,10 +362,10 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
                 <ImageFrame asset={panDeMuerto.image} />
                 <span className="b-featured-meta">
                   <span>
-                    <strong>{panDeMuerto.name}</strong>
-                    <small>{panDeMuerto.description}</small>
+                    <strong>Pan de Muerto</strong>
+                    <small>Traditional and filled · Individual and packs</small>
                   </span>
-                  <strong>{formatAed(panDeMuerto.priceFils!)}</strong>
+                  <strong>From {formatAed(panDeMuerto.priceFils!)}</strong>
                 </span>
               </button>
             </article>
@@ -551,25 +460,17 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             ))}
           </div>
         </Section>
-        <ProductExperience
-          id="bakery"
-          title="BAKERY"
-          products={collections.bakery}
-          cta="EXPLORE BAKERY"
-          onView={() => setDialog("product")}
-        />
-        <ProductExperience
-          id="jars"
-          title="CAKE JARS"
-          products={collections.jars}
-          cta="CONTACT 3L"
-        />
-        <ProductExperience
-          id="custom"
-          title="CUSTOM CAKES"
-          products={collections.custom}
-          cta="CONTACT 3L"
-        />
+        <MenuCatalog />
+        <Section id="jars" className="b-family">
+          <SectionLabel>CAKE JARS</SectionLabel>
+          <EditorialHeading>A LITTLE SWEETNESS.</EditorialHeading>
+          <TextLink href="#bakery">EXPLORE THE MENU</TextLink>
+        </Section>
+        <Section id="custom" className="b-family">
+          <SectionLabel>THE 3L ATELIER</SectionLabel>
+          <EditorialHeading>CUSTOM CAKES</EditorialHeading>
+          <TextLink href="/contact">CONTACT 3L</TextLink>
+        </Section>
         <Section id="occasions" className="b-occasions">
           <div>
             <SectionLabel>MOMENTS TO REMEMBER</SectionLabel>
@@ -695,17 +596,17 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               ? "EXPLORE 3L"
               : dialog === "product"
                 ? "PAN DE MUERTO"
-              : dialog === "contact"
-                ? "CONTACT 3L"
-                : dialog === "story"
-                  ? "THE 3L STORY"
-                  : dialog === "collection"
-                    ? "THE CAKE COLLECTION"
-                    : dialog === "social"
-                      ? "FOLLOW OUR JOURNEY"
-                      : dialog === "faq"
-                        ? "YOUR QUESTIONS"
-                        : "A LITTLE DISCOVERY"
+                : dialog === "contact"
+                  ? "CONTACT 3L"
+                  : dialog === "story"
+                    ? "THE 3L STORY"
+                    : dialog === "collection"
+                      ? "THE CAKE COLLECTION"
+                      : dialog === "social"
+                        ? "FOLLOW OUR JOURNEY"
+                        : dialog === "faq"
+                          ? "YOUR QUESTIONS"
+                          : "A LITTLE DISCOVERY"
           }
           onClose={close}
         >
@@ -725,13 +626,10 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               <ImageFrame asset={panDeMuerto.image} />
               <div>
                 <SectionLabel>SEASONAL BAKERY</SectionLabel>
-                <p className="b-dialog-price">
-                  {formatAed(panDeMuerto.priceFils!)}
-                </p>
-                <p>{panDeMuerto.description}</p>
-                <AddToCart
-                  productId={panDeMuerto.id}
-                  fallback={<TextLink href="/contact">CONTACT 3L</TextLink>}
+                <MenuOptions
+                  family={menuFamilies.find(
+                    (family) => family.id === "pan-de-muerto-traditional",
+                  )!}
                 />
               </div>
             </div>

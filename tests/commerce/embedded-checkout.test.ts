@@ -39,7 +39,7 @@ function fixture(initial = "CAPTURED") {
   const store = new Store(":memory:", "test");
   store.write((s) => {
     s.catalog = validateCatalog(
-      JSON.parse(readFileSync("data-imports/pan-de-muerto.json", "utf8")),
+      JSON.parse(readFileSync("tests/fixtures/retired-pan-de-muerto.json", "utf8")),
     );
   });
   let posts = 0,

@@ -18,7 +18,7 @@ import {
 } from "../../server/domain/web-checkout";
 import { validateCatalog } from "../../server/domain/catalog";
 const catalog = validateCatalog(
-  JSON.parse(readFileSync("data-imports/pan-de-muerto.json", "utf8")),
+  JSON.parse(readFileSync("tests/fixtures/retired-pan-de-muerto.json", "utf8")),
 );
 const input = (quantity = 2) => ({
   productId: "pan-de-muerto",
