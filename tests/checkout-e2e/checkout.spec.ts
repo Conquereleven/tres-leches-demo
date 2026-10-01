@@ -89,6 +89,24 @@ test("cart → delivery → details → review → payment step", async ({
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+  await expect(page.locator("iframe")).toHaveCount(0);
+  await page.getByRole("checkbox", { name: /I've reviewed/ }).check();
+  await expect(
+    page.getByRole("button", { name: "PAY AED 50", exact: true }),
+  ).toBeEnabled();
+  await context.route("https://pay.test.paymennt.com/checkout/**", (r) =>
+    r.fulfill({
+      contentType: "text/html",
+      body: "<h1>Mock Paymennt TEST checkout</h1>",
+    }),
+  );
+  await page.getByRole("button", { name: "PAY AED 50", exact: true }).click();
+  await expect(page).toHaveURL(/^https:\/\/pay.test.paymennt.com\/checkout\//);
+  await page.goto(ORIGIN + "/checkout/return?status=paid");
+  await expect(page.getByRole("heading", { name: "Thank you" })).toHaveCount(0);
+  await expect(
+    page.getByRole("heading", { name: "Complete your payment" }),
+  ).toBeVisible();
   expect(errors).toEqual([]);
 });
 

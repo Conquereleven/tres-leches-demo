@@ -11,7 +11,8 @@ export type CustomerPaymentState =
   | "DECLINED"
   | "FAILED"
   | "HELD_FOR_REVIEW"
-  | "3DS_REDIRECT";
+  | "3DS_REDIRECT"
+  | "HOSTED_REDIRECT";
 
 /** Order states that follow an authoritative, reconciled payment. */
 export const PAID_STATES = [
@@ -25,6 +26,7 @@ export const PAID_STATES = [
 export type StatusLike = {
   status: string;
   paymentStatus: string;
+  paymentFlow?: "web";
   url?: string | null;
   actionRequired?: "review_payment" | "complete_payment" | null;
 };
@@ -35,7 +37,8 @@ export function paymentStateOf(s: StatusLike): CustomerPaymentState {
   if (s.actionRequired === "review_payment") return "HELD_FOR_REVIEW";
   if (s.paymentStatus === "failed") return "DECLINED";
   if (["cancelled", "expired"].includes(s.paymentStatus)) return "FAILED";
-  if (s.paymentStatus === "pending" && s.url) return "3DS_REDIRECT";
+  if (s.paymentStatus === "pending" && s.url)
+    return s.paymentFlow === "web" ? "HOSTED_REDIRECT" : "3DS_REDIRECT";
   if (s.actionRequired === "complete_payment") return "READY";
   return "PROCESSING";
 }
@@ -93,6 +96,12 @@ export function stateCopy(
           paymentStatus === "expired"
             ? "The payment session expired before it was completed."
             : "The payment was cancelled before it was completed.",
+      };
+    case "HOSTED_REDIRECT":
+      return {
+        title: "Complete your payment",
+        message:
+          "Payment has not been confirmed yet. Continue on Paymennt’s secure payment page, then return to check your order.",
       };
     case "3DS_REDIRECT":
       return {

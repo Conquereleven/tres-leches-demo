@@ -111,6 +111,8 @@ export function cartSubtotalFils(ls: CartLine[], products: CatalogEntry[]) {
 
 export type CheckoutConfig = {
   enabled: boolean;
+  catalogAvailable?: boolean;
+  paymentFlow?: "web";
   publicKey?: string | null;
   mode: string;
   /** Payment frame environment, decided server-side. Null when unavailable. */

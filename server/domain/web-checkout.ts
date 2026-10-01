@@ -256,6 +256,7 @@ export type WebCheckoutResult = {
   orderId: string;
   status: Order["state"];
   paymentStatus: string;
+  paymentFlow?: "web";
   amountFils: number;
   currency: string;
   url: string | null;
@@ -282,16 +283,21 @@ export function readWebCheckoutStatus(
     orderId: order.id,
     status: order.state,
     paymentStatus: payment.status,
+    ...(payment.checkoutFlow === "web" ? { paymentFlow: "web" as const } : {}),
     amountFils: payment.amountFils,
     currency: payment.currency,
     actionRequired:
-      payment.directAttempt === "unknown" ||
-      (payment.directAttempt === "submitted" &&
-        Date.now() - Date.parse(payment.updatedAt) > 30000)
+      payment.checkoutFlow === "web" &&
+      !payment.url &&
+      !["paid", "failed", "cancelled", "expired"].includes(payment.status)
         ? "review_payment"
-        : payment.directAttempt === "ready"
-          ? "complete_payment"
-          : null,
+        : payment.directAttempt === "unknown" ||
+            (payment.directAttempt === "submitted" &&
+              Date.now() - Date.parse(payment.updatedAt) > 30000)
+          ? "review_payment"
+          : payment.directAttempt === "ready"
+            ? "complete_payment"
+            : null,
     url: payment.status === "pending" ? (payment.url ?? null) : null,
     summary: {
       items: order.lines.map((l) => {
@@ -319,8 +325,19 @@ export async function createWebCheckout(
   service: CommerceService,
   raw: unknown,
   key: string,
-  embedded = false,
+  embedded: boolean | "web" = false,
+  origin?: string,
 ): Promise<WebCheckoutResult> {
+  if (embedded === "web") {
+    const url = new URL(origin ?? "");
+    requireThat(
+      url.protocol === "https:" ||
+        (url.protocol === "http:" &&
+          ["localhost", "127.0.0.1"].includes(url.hostname)),
+      "Invalid checkout origin",
+      503,
+    );
+  }
   const input = normalizeCheckout(raw),
     receiptKey = digest(keySchema.parse(key));
   // Direct card payments need the full checkout: delivery details and a
@@ -393,7 +410,13 @@ export async function createWebCheckout(
         o.billing = input.billing;
       });
     order = command("requestPayment", order);
-    if (embedded)
+    if (embedded === "web")
+      service.store.write((s) => {
+        const payment = s.payments.find((p) => p.orderId === order.id)!;
+        payment.checkoutFlow = "web";
+        payment.webReturnUrl = new URL("/checkout/return", origin).href;
+      });
+    if (embedded === true)
       service.store.write((s) => {
         const payment = s.payments.find((p) => p.orderId === order.id)!;
         payment.directAttempt = "ready";
@@ -412,6 +435,6 @@ export async function createWebCheckout(
     });
   });
   // Concurrent calls share the same durable payment job; unknown sends are not retried blindly.
-  if (!embedded) await service.drain();
+  if (embedded !== true) await service.drain();
   return readWebCheckoutStatus(service, key);
 }

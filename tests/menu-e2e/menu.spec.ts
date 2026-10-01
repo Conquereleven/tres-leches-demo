@@ -196,3 +196,35 @@ for (const width of [390, 1440]) {
     expect(paymentCalls).toEqual([]);
   });
 }
+
+test("catalog remains server-authoritative when payment activation is offline", async ({
+  page,
+}) => {
+  await page.route("**/api/checkout/config", async (route) => {
+    const response = await route.fetch();
+    const config = await response.json();
+    expect(config.products).toHaveLength(218);
+    await route.fulfill({
+      json: { ...config, enabled: false, mode: "offline" },
+    });
+  });
+  await page.goto("/#bakery");
+  for (const entry of menuCategories) {
+    await category(page, entry.name);
+    await expect(
+      page
+        .locator(".b-menu-grid button")
+        .filter({ hasText: "ADD TO CART" })
+        .first(),
+    ).toBeEnabled();
+  }
+  await page
+    .locator(".b-menu-grid button")
+    .filter({ hasText: "ADD TO CART" })
+    .first()
+    .click();
+  await page.goto("/cart");
+  await expect(
+    page.getByRole("link", { name: "CONTINUE TO DELIVERY" }),
+  ).toHaveAttribute("href", "/checkout");
+});

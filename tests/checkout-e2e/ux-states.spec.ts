@@ -4,7 +4,7 @@
  * provider is called and no payment is attempted.
  */
 import { test, expect, type Page } from "@playwright/test";
-import { FRAMES_STUB, status, workspace } from "../fixtures/ux-states";
+import { status, workspace } from "../fixtures/ux-states";
 
 const SHOTS = "work/qa/ux";
 const shot = (page: Page, name: string) =>
@@ -112,14 +112,11 @@ test.describe("customer payment states", () => {
 });
 
 test.describe("payment step", () => {
-  test.beforeEach(async ({ page, context }) => {
-    await context.route("https://pay.paymennt.com/**", (r) =>
-      r.fulfill({ body: FRAMES_STUB, contentType: "application/javascript" }),
-    );
+  test.beforeEach(async ({ page }) => {
     await page.route("**/api/checkout/status", (r) =>
       r.fulfill({ status: 404, json: {} }),
     );
-    await page.route("**/api/checkout/prepare", (r) =>
+    await page.route("**/api/checkout/web", (r) =>
       r.fulfill({
         json: status({
           orderId: "TL-FIXTURE1",
@@ -170,7 +167,8 @@ test.describe("payment step", () => {
     await page.setViewportSize({ width: 1440, height: 1000 });
     await shot(page, "checkout-payment-ready-1440");
     await page.setViewportSize({ width: 390, height: 844 });
-    // The stub never tokenises here, so the payment stays in flight.
+    // Hold the mocked web creation response; no provider request occurs.
+    await page.route("**/api/checkout/web", () => {});
     await pay.click();
     const locked = page.getByRole("button", { name: /PROCESSING/ });
     await expect(locked).toBeDisabled();
@@ -182,13 +180,7 @@ test.describe("payment step", () => {
   test("an unverifiable result is held and the pay button disappears", async ({
     page,
   }) => {
-    await page.addInitScript(() => {
-      (window as unknown as { __tokenize: boolean }).__tokenize = true;
-    });
-    await page.evaluate(() => {
-      (window as unknown as { __tokenize: boolean }).__tokenize = true;
-    });
-    await page.route("**/api/checkout/token", (r) =>
+    await page.route("**/api/checkout/web", (r) =>
       r.fulfill({
         status: 503,
         json: {
@@ -203,13 +195,10 @@ test.describe("payment step", () => {
     await shot(page, "checkout-held-390");
   });
 
-  test("a declined card shows the failure state and allows a new attempt", async ({
+  test("a rejected checkout creation shows a recoverable failure", async ({
     page,
   }) => {
-    await page.evaluate(() => {
-      (window as unknown as { __tokenize: boolean }).__tokenize = true;
-    });
-    await page.route("**/api/checkout/token", (r) =>
+    await page.route("**/api/checkout/web", (r) =>
       r.fulfill({
         status: 422,
         json: {

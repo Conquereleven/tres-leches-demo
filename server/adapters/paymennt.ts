@@ -306,6 +306,62 @@ export class PaymenntProvider implements PaymentProvider {
       throw new ProviderFailure("unknown", false);
     return this.getCheckout(found.checkoutId);
   }
+  async createWebPayment(
+    input: Omit<Parameters<PaymenntProvider["createTokenPayment"]>[0], "token">,
+  ) {
+    const billingAddress = paymenntAddressSchema.parse(input.billingAddress);
+    const deliveryAddress = paymenntAddressSchema.parse(input.deliveryAddress);
+    const checkout = normalizeCheckout(
+      await this.request("/checkout/web", {
+        requestId: input.paymentId,
+        orderId: input.orderId,
+        currency: "AED",
+        amount: input.amountFils / 100,
+        items: input.items.map((i) => ({
+          name: i.name,
+          sku: i.sku,
+          quantity: i.quantity,
+          unitprice: i.unitPriceFils / 100,
+          linetotal: (i.quantity * i.unitPriceFils) / 100,
+        })),
+        totals: {
+          subtotal:
+            input.items.reduce(
+              (sum, i) => sum + i.quantity * i.unitPriceFils,
+              0,
+            ) / 100,
+          tax: 0,
+          shipping: input.feeFils / 100,
+        },
+        customer: input.customer,
+        billingAddress,
+        deliveryAddress,
+        returnUrl: input.returnUrl,
+      }),
+    );
+    if (
+      checkout.requestId !== input.paymentId ||
+      checkout.orderId !== input.orderId ||
+      checkout.amountFils !== input.amountFils ||
+      checkout.currency !== "AED" ||
+      !checkout.url
+    )
+      throw new ProviderFailure("unknown", false);
+    const url = new URL(checkout.url);
+    if (
+      url.origin !== "https://pay.test.paymennt.com" ||
+      url.username ||
+      url.password
+    )
+      throw new ProviderFailure("unknown", false);
+    // Creation response is never authority for ORDER_PAID; reconciliation is GET-only.
+    return {
+      reference: checkout.checkoutId,
+      checkoutId: checkout.checkoutId,
+      url: checkout.url,
+      provider: "paymennt" as const,
+    };
+  }
   async createTokenPayment(input: {
     token: string;
     paymentId: string;

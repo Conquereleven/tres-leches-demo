@@ -4,8 +4,7 @@ import { menuFamilyForSku } from "./menu";
  *
  * Prices shown here are for display only. The server re-prices the cart from
  * the approved catalog and delivery zone at quote, at checkout creation and
- * again immediately before the card is charged. Card details never touch 3L:
- * they are entered in Paymennt's secure frame and exchanged for a token.
+ * again before checkout creation. Card details are entered only on Paymennt.
  */
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
@@ -23,7 +22,6 @@ import {
 } from "@phosphor-icons/react";
 import "./brand.css";
 import "./checkout.css";
-import { PaymentFrame } from "./PaymentFrame";
 import {
   Button,
   Input,
@@ -82,6 +80,7 @@ type Status = {
   orderId: string;
   status: string;
   paymentStatus: string;
+  paymentFlow?: "web";
   amountFils: number;
   currency: string;
   url: string | null;
@@ -519,9 +518,7 @@ export function AddToCart({
   const lines = useCart();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const product = config?.enabled
-    ? config.products.find((p) => p.id === productId)
-    : undefined;
+  const product = config?.products.find((p) => p.id === productId);
   if (loading) return <>{fallback}</>;
   if (!product) return <>{fallback}</>;
   const inCart = lines.find((l) => l.productId === productId)?.quantity ?? 0;
@@ -650,7 +647,7 @@ export function CartPage() {
         <p role="status">Loading your cart…</p>
       </ShopShell>
     );
-  if (!config?.enabled)
+  if (!config || !config.products.length)
     return (
       <ShopShell step={0} title="Your cart">
         <Unavailable retry={retry} />
@@ -1205,7 +1202,13 @@ async function heldCheckout(): Promise<Status | null> {
   if (!res.ok) throw new Error("Unable to check your previous payment.");
   const status = (await res.json()) as Status;
   return status.actionRequired === "review_payment" ||
-    status.paymentStatus === "paid"
+    [
+      "creating",
+      "pending",
+      "authorized",
+      "pending_confirmation",
+      "paid",
+    ].includes(status.paymentStatus)
     ? status
     : null;
 }
@@ -1296,14 +1299,11 @@ function PaymentStep({
       .then(setHeld)
       .catch(() => undefined);
   }, []);
-  const [cardValid, setCardValid] = useState(false);
   const [busy, setBusy] = useState(false);
   /** Set just before the page navigates away, so the button stays locked. */
   const [leaving, setLeaving] = useState<CustomerPaymentState | null>(null);
   const [error, setError] = useState("");
-  const submitCard = useRef<(() => void) | null>(null);
   const inFlight = useRef(false);
-  const pending = useRef<{ key: string; orderId: string } | null>(null);
   const zone = config.zones.find((z) => z.id === delivery.zoneId);
   const body = {
     lines,
@@ -1329,43 +1329,9 @@ function PaymentStep({
         },
   };
 
-  async function tokenized(token: string) {
-    const checkout = pending.current;
-    if (!checkout || !inFlight.current) return;
-    pending.current = null;
-    try {
-      const result = await post<Status>("/api/checkout/token", {
-        ...checkout,
-        token,
-        email: customer.email,
-      });
-      if (result.paymentStatus === "paid") {
-        cart.clear();
-        setLeaving("PAID");
-        location.assign("/checkout/return");
-      } else if (result.url) {
-        setLeaving("3DS_REDIRECT");
-        location.assign(result.url);
-      } else {
-        setLeaving("PROCESSING");
-        location.assign("/checkout/return");
-      }
-    } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : "We couldn't confirm your payment. Please don't pay again — check its status below.",
-      );
-    } finally {
-      token = "";
-      inFlight.current = false;
-      setBusy(false);
-    }
-  }
   async function pay(e: React.FormEvent) {
     e.preventDefault();
-    if (!reviewed || !cardValid || !submitCard.current || inFlight.current)
-      return;
+    if (!reviewed || inFlight.current) return;
     inFlight.current = true;
     setBusy(true);
     setError("");
@@ -1387,9 +1353,7 @@ function PaymentStep({
       const key =
         saved?.fingerprint === fingerprint ? saved.key : crypto.randomUUID();
       sessionStorage.setItem(CAPABILITY, JSON.stringify({ key, fingerprint }));
-      let result = await post<Status>("/api/checkout/prepare", body, key);
-      if (["failed", "cancelled", "expired"].includes(result.paymentStatus))
-        result = await post<Status>("/api/checkout/retry", { key });
+      const result = await post<Status>("/api/checkout/web", body, key);
       if (result.paymentStatus === "paid") {
         cart.clear();
         setLeaving("PAID");
@@ -1401,8 +1365,8 @@ function PaymentStep({
         location.assign("/checkout/return");
         return;
       }
-      pending.current = { key, orderId: result.orderId };
-      submitCard.current();
+      setLeaving("PROCESSING");
+      location.assign(result.url ?? "/checkout/return");
     } catch (err) {
       inFlight.current = false;
       setBusy(false);
@@ -1535,29 +1499,10 @@ function PaymentStep({
                 <h2>Payment</h2>
                 <CardMarks />
               </header>
-              {config.publicKey && config.frame ? (
-                <div className="b-co-frame" data-locked={locked}>
-                  <PaymentFrame
-                    publicKey={config.publicKey}
-                    mode={config.frame.mode}
-                    origin={config.frame.origin}
-                    valid={setCardValid}
-                    token={(t) => void tokenized(t)}
-                    failure={() => {
-                      pending.current = null;
-                      inFlight.current = false;
-                      setBusy(false);
-                      setCardValid(false);
-                      setError(
-                        "Your card details couldn't be verified. Please check them and try again.",
-                      );
-                    }}
-                    submitRef={submitCard}
-                  />
-                </div>
-              ) : (
-                <Unavailable />
-              )}
+              <p className="b-caption">
+                Continue to Paymennt’s secure payment page to complete your
+                order.
+              </p>
               <label className="b-check">
                 <input
                   type="checkbox"
@@ -1616,7 +1561,7 @@ function PaymentStep({
                 <Button
                   type="submit"
                   className="b-co-cta b-co-pay"
-                  disabled={locked || !reviewed || !cardValid}
+                  disabled={locked || !reviewed}
                 >
                   {locked ? (
                     <>
@@ -1630,8 +1575,8 @@ function PaymentStep({
               )}
               <p className="b-co-assurance">
                 <LockSimple aria-hidden weight="bold" />
-                Your card details are entered in a secure payment form and are
-                never seen or stored by 3L.
+                Your card details are entered on Paymennt and are never seen or
+                stored by 3L.
               </p>
             </form>
           )}
@@ -1740,11 +1685,12 @@ export function CheckoutReturn() {
         )}
         {error && <p role="alert">{error}</p>}
         <div className="b-shop-actions">
-          {state === "3DS_REDIRECT" && result?.url && (
-            <a className="b-button b-co-cta" href={result.url}>
-              CONTINUE PAYMENT
-            </a>
-          )}
+          {(state === "3DS_REDIRECT" || state === "HOSTED_REDIRECT") &&
+            result?.url && (
+              <a className="b-button b-co-cta" href={result.url}>
+                CONTINUE PAYMENT
+              </a>
+            )}
           {(state === "DECLINED" || state === "FAILED") && (
             <a className="b-button b-co-cta" href="/checkout">
               TRY AGAIN

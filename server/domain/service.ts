@@ -1,3 +1,5 @@
+import { PaymenntProvider } from "../adapters/paymennt";
+import { orderBillingAddress, toPaymenntDeliveryAddress } from "./billing";
 import {
   notificationIdentity,
   type PaymenntNotification,
@@ -826,6 +828,16 @@ export class CommerceService {
         "Checkout aún no encontrado; no se creará otro cobro automáticamente",
         409,
       );
+      if (p.checkoutFlow === "web" && checkout.url) {
+        const redirect = new URL(checkout.url);
+        requireThat(
+          redirect.origin === "https://pay.test.paymennt.com" &&
+            !redirect.username &&
+            !redirect.password,
+          "Untrusted checkout redirect",
+          502,
+        );
+      }
       if (!p.providerReference)
         this.store.write((s) => {
           const current = s.payments.find((x) => x.id === p.id)!;
@@ -1004,6 +1016,64 @@ export class CommerceService {
       return { status: p.status };
     });
   }
+  private async createHostedWebPayment(payment: Payment, snapshot: State) {
+    requireThat(
+      this.payment instanceof PaymenntProvider,
+      "Web checkout unavailable",
+      503,
+    );
+    const order = this.order(snapshot, payment.orderId);
+    const customer = this.conversation(snapshot, order.conversationId);
+    requireThat(
+      order.delivery && payment.webReturnUrl && order.customerDetails?.email,
+      "Complete delivery and billing details required",
+      409,
+    );
+    const quote = quoteOrder(
+      snapshot.zones,
+      order.lines,
+      undefined,
+      undefined,
+      this.geo,
+      order.manualZoneId,
+      snapshot.catalog ?? [],
+    );
+    requireThat(
+      quote.eligible &&
+        quote.totalFils === payment.amountFils &&
+        payment.currency === "AED",
+      "Order changed; checkout held for review",
+      409,
+    );
+    const names = customer.customer.trim().split(/\s+/);
+    return this.payment.createWebPayment({
+      paymentId: payment.id,
+      orderId: order.id,
+      amountFils: payment.amountFils,
+      feeFils: quote.feeFils!,
+      returnUrl: payment.webReturnUrl,
+      items: order.lines.map((line) => {
+        const product = snapshot.catalog!.find((p) => p.id === line.productId)!;
+        return {
+          sku: product.id,
+          name: product.name,
+          quantity: line.quantity,
+          unitPriceFils: product.priceFils,
+        };
+      }),
+      customer: {
+        firstName: names[0]!,
+        lastName: names.slice(1).join(" ") || names[0]!,
+        email: order.customerDetails.email,
+        phone: customer.phone,
+      },
+      billingAddress: orderBillingAddress(order.billing),
+      deliveryAddress: toPaymenntDeliveryAddress(
+        customer.customer,
+        order.delivery,
+      ),
+    });
+  }
   async drain() {
     await this.drainInbound();
     for (const receipt of (this.store.read().paymentNotifications ?? [])
@@ -1049,13 +1119,15 @@ export class CommerceService {
         if (claimed.kind === "payment") {
           const p = snapshot.payments.find((p) => p.id === claimed.entityId)!;
           const result = await this.bounded(
-            this.payment.createPaymentLink({
-              paymentId: p.id,
-              orderId: p.orderId,
-              amountFils: p.amountFils,
-              currency: p.currency,
-              idempotencyKey: p.id,
-            }),
+            p.checkoutFlow === "web"
+              ? this.createHostedWebPayment(p, snapshot)
+              : this.payment.createPaymentLink({
+                  paymentId: p.id,
+                  orderId: p.orderId,
+                  amountFils: p.amountFils,
+                  currency: p.currency,
+                  idempotencyKey: p.id,
+                }),
           );
           requireThat(
             new URL(result.url).protocol === "https:",

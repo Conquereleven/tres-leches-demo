@@ -157,6 +157,8 @@ export type OperationsNotification = {
   lastError?: string;
 };
 export type Payment = {
+  checkoutFlow?: "web";
+  webReturnUrl?: string;
   directAttempt?: "ready" | "submitted" | "resolved" | "unknown";
   providerDiagnostics?: Array<{
     orderId: string;

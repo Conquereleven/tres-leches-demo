@@ -26,8 +26,7 @@ export function MenuOptions({ family }: { family: MenuFamily }) {
   const serverProduct = config?.products.find(
     (product) => product.id === option.id,
   );
-  const ready =
-    config?.enabled && serverProduct?.priceFils === option.priceFils;
+  const ready = !!serverProduct && serverProduct.priceFils === option.priceFils;
   return (
     <div className="b-menu-options">
       <div className="b-menu-selectors">

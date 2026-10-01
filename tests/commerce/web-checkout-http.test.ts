@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID, createHmac } from "node:crypto";
 import { stagingEnv } from "../fixtures/staging";
-async function harness(offline = false) {
+async function harness(offline = false, publicKey = "pk_test_public_fixture") {
   const dir = mkdtempSync(join(tmpdir(), "web-http-"));
   const base = offline ? "http://127.0.0.1:3157" : "http://127.0.0.1:3156";
   const e: NodeJS.ProcessEnv = offline
@@ -31,7 +31,7 @@ async function harness(offline = false) {
         ...process.env,
         ...e,
         CATALOG_FIXTURE: "legacy",
-        PAYMENNT_PUBLIC_KEY: "pk_test_public_fixture",
+        PAYMENNT_PUBLIC_KEY: publicKey,
         DB_PATH: join(dir, "store.sqlite"),
         API_PORT: offline ? "3157" : "3156",
         PORT: offline ? "3157" : "3156",
@@ -256,6 +256,51 @@ test("production offline public checkout cannot create a payment", async () => {
         .status,
       503,
     );
+  } finally {
+    await h.close();
+  }
+});
+
+test("web checkout and GET reconciliation work without a browser tokenization key", async () => {
+  const h = await harness(false, "");
+  try {
+    const key = randomUUID();
+    const headers = {
+      "Content-Type": "application/json",
+      Origin: h.base,
+      "Idempotency-Key": key,
+    };
+    const response = await fetch(h.base + "/api/checkout/web", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({
+        lines: [{ productId: "pan-de-muerto", quantity: 2 }],
+        delivery: {
+          zoneId: "jlt-cluster-c",
+          address: "UAT address only",
+          building: "UAT Tower",
+          date: new Date(Date.now() + 86400000).toISOString().slice(0, 10),
+          slot: "Afternoon",
+        },
+        customer: {
+          name: "UAT Reviewer",
+          phone: "0500000000",
+          email: "uat@example.invalid",
+        },
+        billing: { sameAsDelivery: true },
+      }),
+    });
+    assert.equal(response.status, 200);
+    const checkout = await response.json();
+    assert.equal(checkout.paymentStatus, "pending");
+    assert.ok(checkout.url.startsWith("https://pay.test.paymennt.com/"));
+    const reconciled = await fetch(h.base + "/api/checkout/reconcile", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ key }),
+    });
+    assert.equal(reconciled.status, 200);
+    assert.equal((await reconciled.json()).paymentStatus, "pending");
   } finally {
     await h.close();
   }

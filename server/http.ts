@@ -313,6 +313,8 @@ export async function startServer(
             const today = dubaiToday();
             return json(res, 200, {
               enabled: enabled && products.length > 0,
+              catalogAvailable: products.length > 0,
+              paymentFlow: "web",
               mode: enabled ? "test" : "offline",
               products,
               slots: configuredSlots(),
@@ -352,7 +354,7 @@ export async function startServer(
           if (!enabled)
             throw new DomainError(
               503,
-              "Online payment is unavailable. Please order via WhatsApp.",
+              "Online payment is currently unavailable. Please try again later.",
             );
           if (req.method !== "POST")
             throw new DomainError(405, "Method not allowed");
@@ -369,7 +371,10 @@ export async function startServer(
             path === "/api/checkout/prepare" ||
             path === "/api/checkout/reconcile"
           ) {
-            if (!process.env.PAYMENNT_PUBLIC_KEY)
+            if (
+              path !== "/api/checkout/reconcile" &&
+              !process.env.PAYMENNT_PUBLIC_KEY
+            )
               throw new DomainError(503, "Embedded payment unavailable");
             if (path === "/api/checkout/retry") {
               const { key } = z.object({ key: z.uuid() }).strict().parse(body);
@@ -401,6 +406,14 @@ export async function startServer(
           if (path === "/api/checkout/status") {
             const { key } = z.object({ key: z.uuid() }).strict().parse(body);
             return json(res, 200, readWebCheckoutStatus(service, key));
+          }
+          if (path === "/api/checkout/web") {
+            const key = z.uuid().parse(req.headers["idempotency-key"]);
+            return json(
+              res,
+              200,
+              await createWebCheckout(service, body, key, "web", origin),
+            );
           }
           if (path === "/api/checkout") {
             const key = z.uuid().parse(req.headers["idempotency-key"]);
