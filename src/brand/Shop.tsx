@@ -490,7 +490,7 @@ function Unavailable({ retry }: { retry?: () => void }) {
         unavailable={() => (location.href = "/contact")}
         message="Hello 3L, I'd like to place an order."
       >
-        ORDER VIA WHATSAPP
+        ASK ABOUT COVERAGE
       </WhatsAppCTA>
       {retry && (
         <button className="b-link" onClick={retry}>
@@ -902,25 +902,31 @@ export function CheckoutPage() {
                       </p>
                       <WhatsAppCTA
                         unavailable={() => (location.href = "/contact")}
-                        message="Hello 3L, I'd like to order for delivery to my area."
+                        message="Hello 3L, could you help me check delivery coverage for my area?"
                       >
-                        ORDER VIA WHATSAPP
+                        ASK ABOUT COVERAGE
                       </WhatsAppCTA>
                     </div>
                   )}
                   {quote && (
                     <div aria-live="polite">
                       {quote.eligible ? (
-                        <p className="b-co-fee">
-                          <span>
-                            Delivery to {quote.zoneName ?? "your area"}
-                          </span>
-                          <strong>
-                            {quote.feeFils === 0
-                              ? "Free"
-                              : formatAed(quote.feeFils ?? 0)}
-                          </strong>
-                        </p>
+                        <>
+                          <p className="b-co-fee">
+                            <span>
+                              Delivery to {quote.zoneName ?? "your area"}
+                            </span>
+                            <strong>
+                              {quote.feeFils === 0
+                                ? "Free"
+                                : formatAed(quote.feeFils ?? 0)}
+                            </strong>
+                          </p>
+                          <p className="b-caption">
+                            Minimum order for {quote.zoneName} is{" "}
+                            {formatAed(minFils)}.
+                          </p>
+                        </>
                       ) : (
                         <p className="b-shop-notice" role="status">
                           {quote.minimumMet === false &&
@@ -1608,7 +1614,7 @@ function PaymentStep({
                   onChange={(e) => setReviewed(e.target.checked)}
                 />
                 <span>
-                  I've reviewed my order, delivery details and total, and I
+                  I've reviewed my order, fulfillment details and total, and I
                   accept the <a href="/terms">terms</a>,{" "}
                   <a href="/refund-policy">refund policy</a> and{" "}
                   <a href="/privacy">privacy policy</a>.
@@ -2003,7 +2009,7 @@ function Confirmation({ result }: { result: Status }) {
             </ol>
             <p className="b-caption">
               You don't need to message us — our team is preparing your order
-              and will contact you if anything about the delivery needs
+              and will contact you if anything about the fulfillment needs
               confirming.
             </p>
           </section>
