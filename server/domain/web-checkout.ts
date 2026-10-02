@@ -346,7 +346,43 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
     if (!record) return { key: randomUUID(), cartHash, changed: false };
     const order = snapshot.orders.find((o) => o.id === record.orderId)!;
     const payment = snapshot.payments.find((p) => p.id === order.paymentId)!;
-    // Older associations have no hash: replace them conservatively, never assume a match.
+    // Recover pre-release hashes from the frozen order, never today's prices.
+    if (!record.cartHash && order.quote && order.catalogSnapshot?.length) {
+      const frozenLines = order.lines.map((line) => {
+        const product = order.catalogSnapshot!.find(
+          (p) => p.id === line.productId,
+        );
+        return product
+          ? {
+              sku: line.productId,
+              quantity: line.quantity,
+              unitPriceFils: product.priceFils,
+            }
+          : null;
+      });
+      if (frozenLines.every((line) => line !== null)) {
+        record.cartHash = digest(
+          JSON.stringify({
+            lines: frozenLines.sort((a, b) => a!.sku.localeCompare(b!.sku)),
+            fulfillment: {
+              delivery: order.delivery ?? null,
+              pickup: order.pickup ?? null,
+            },
+            fulfillmentMethod: order.fulfillmentMethod ?? "delivery",
+            zoneId:
+              order.fulfillmentMethod === "pickup"
+                ? null
+                : (order.manualZoneId ?? order.delivery?.zoneId ?? null),
+            subtotalFils: order.quote.subtotalFils,
+            feeFils: order.quote.feeFils,
+            totalFils: order.quote.totalFils,
+          }),
+        );
+        service.store.write((s) => {
+          s.webCheckouts![digest(key)]!.cartHash = record.cartHash;
+        });
+      }
+    }
     if (!record.supersededAt && record.cartHash === cartHash)
       return {
         key,
@@ -354,6 +390,11 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
         changed: false,
         status: readWebCheckoutStatus(service, key),
       };
+    requireThat(
+      record.cartHash || payment.status !== "paid",
+      "The previous paid order must be reviewed before updating checkout.",
+      409,
+    );
     requireThat(
       !["authorized", "pending_confirmation"].includes(payment.status) &&
         payment.directAttempt !== "unknown" &&

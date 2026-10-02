@@ -353,3 +353,38 @@ test("late authoritative payment for superseded order stays on the original orde
     f.store.close();
   }
 });
+test("pre-release records recover the frozen hash without duplicating a paid order", async () => {
+  const f = fixture();
+  try {
+    const key = randomUUID();
+    const old = await createWebCheckout(
+      f.service,
+      f.input(),
+      key,
+      "web",
+      "https://fixture.invalid",
+    );
+    for (const checkout of f.checkouts.values()) checkout.status = "PAID";
+    await reconcileEmbeddedPayment(f.service, key);
+    f.store.write((s) => {
+      for (const receipt of Object.values(s.webCheckouts!))
+        delete receipt.cartHash;
+    });
+    const oldPayment = JSON.stringify(f.store.read().payments[0]);
+    const resume = resumeWebCheckout(f.service, { key, checkout: f.input() });
+    assert.equal(resume.key, key);
+    assert.equal(resume.changed, false);
+    assert.equal(resume.status?.orderId, old.orderId);
+    assert.equal(f.posts(), 1);
+    assert.equal(JSON.stringify(f.store.read().payments[0]), oldPayment);
+    f.store.write((s) => {
+      s.catalog![0]!.priceFils = 4000;
+    });
+    assert.equal(
+      resumeWebCheckout(f.service, { key, checkout: f.input() }).changed,
+      true,
+    );
+  } finally {
+    f.store.close();
+  }
+});
