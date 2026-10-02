@@ -63,6 +63,7 @@ function ready(f: ReturnType<typeof fixture>) {
     type: "updateZone",
     zone: {
       ...z,
+      freeDelivery: false,
       deliveryFeeAed: 10,
       review: "Test fixture, not a source rate",
     },
@@ -85,10 +86,10 @@ test("seed preserves every source band, explicit free delivery and unknown fees"
     [...new Set(zoneSeed.map((z) => z.minOrderAed))],
     [30, 50, 100, 150, 200, 250, 300],
   );
-  assert.equal(zoneSeed.filter((z) => z.freeDelivery).length, 3);
+  assert.equal(zoneSeed.filter((z) => z.freeDelivery).length, 93);
   for (const z of zoneSeed) zoneSchema.parse(z);
   assert.equal(zoneSeed.find((z) => z.name === "Remraam")?.minOrderAed, 300);
-  assert.equal(zoneSeed.find((z) => z.id === "jvc")?.deliveryFeeAed, null);
+  assert.equal(zoneSeed.find((z) => z.id === "jvc")?.deliveryFeeAed, 0);
   assert.equal(zoneSeed.find((z) => z.id === "jlt-cluster-b")?.minOrderAed, 30);
 });
 test("longest alias matching, case, word boundaries and ambiguous locations", () => {
@@ -150,7 +151,15 @@ test("minimum uses subtotal, fee never fills shortfall; null does not mean free"
     false,
   );
   assert.equal(
-    quoteOrder(zoneSeed, [{ productId: "tres", quantity: 1 }], "JVC").eligible,
+    quoteOrder(
+      zoneSeed.map((z) => ({
+        ...z,
+        deliveryFeeAed: null,
+        freeDelivery: false,
+      })),
+      [{ productId: "tres", quantity: 1 }],
+      "JVC",
+    ).eligible,
     false,
   );
 });
@@ -189,7 +198,10 @@ test("admin zone updates validated and RBAC enforced", () => {
     }),
   );
   assert.throws(() => f.cmd({ type: "updateZone", zone }, agent));
-  f.cmd({ type: "updateZone", zone: { ...zone, deliveryFeeAed: 9 } });
+  f.cmd({
+    type: "updateZone",
+    zone: { ...zone, freeDelivery: false, deliveryFeeAed: 9 },
+  });
   assert.throws(() => f.cmd({ type: "updateZone", zone }));
   f.store.close();
 });

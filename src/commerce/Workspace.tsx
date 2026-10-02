@@ -593,14 +593,16 @@ function OrderPanel({
   const next: Partial<Record<OrderState, OrderState>> = {
     Confirmed: "Production",
     Production: "Ready",
-    Ready: "Out for Delivery",
+    Ready: o.fulfillmentMethod === "pickup" ? "Delivered" : "Out for Delivery",
     "Out for Delivery": "Delivered",
   };
   return (
     <section className="co-order" data-testid="order-panel">
       <div className="co-row">
         <h3>{o.id}</h3>
-        <span className="co-state">{o.state}</span>
+        <span className="co-state">
+          {o.fulfillmentMethod === "pickup" ? "PICKUP" : "DELIVERY"} · {o.state}
+        </span>
       </div>
       {p?.provider === "paymennt" &&
         (owned || ["admin", "manager"].includes(data.actor.role)) && (
@@ -692,83 +694,97 @@ function OrderPanel({
             >
               Guardar producto
             </button>
-            <label>
-              Dirección / zona manual
-              <input
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                placeholder="Zona, edificio y apartamento"
-              />
-            </label>
-            <button
-              disabled={!address.trim()}
-              onClick={() =>
-                void run({
-                  type: "location",
-                  id: o.id,
-                  version: o.version,
-                  address,
-                })
-              }
-            >
-              Resolver dirección
-            </button>
-            <details>
-              <summary>Revisar y seleccionar zona</summary>
-              <p>
-                Confirma la ubicación con el cliente. La selección queda
-                registrada.
-              </p>
-              <label>
-                Zona confirmada
-                <select
-                  value={manualZone}
-                  onChange={(e) => setManualZone(e.target.value)}
+            {o.fulfillmentMethod !== "pickup" && (
+              <>
+                <label>
+                  Dirección / zona manual
+                  <input
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Zona, edificio y apartamento"
+                  />
+                </label>
+                <button
+                  disabled={!address.trim()}
+                  onClick={() =>
+                    void run({
+                      type: "location",
+                      id: o.id,
+                      version: o.version,
+                      address,
+                    })
+                  }
                 >
-                  <option value="">Seleccionar zona</option>
-                  {data.zones
-                    .filter((z) => z.active)
-                    .map((z) => (
-                      <option key={z.id} value={z.id}>
-                        {z.name}
-                      </option>
-                    ))}
-                </select>
-              </label>
-              <label>
-                Motivo de la selección
-                <input
-                  value={manualReason}
-                  onChange={(e) => setManualReason(e.target.value)}
-                />
-              </label>
-              <button
-                disabled={!manualZone || manualReason.trim().length < 5}
-                onClick={() =>
-                  void run({
-                    type: "manualZone",
-                    id: o.id,
-                    version: o.version,
-                    zoneId: manualZone,
-                    reason: manualReason,
-                  })
-                }
-              >
-                Confirmar zona manual
-              </button>
-            </details>
+                  Resolver dirección
+                </button>
+                <details>
+                  <summary>Revisar y seleccionar zona</summary>
+                  <p>
+                    Confirma la ubicación con el cliente. La selección queda
+                    registrada.
+                  </p>
+                  <label>
+                    Zona confirmada
+                    <select
+                      value={manualZone}
+                      onChange={(e) => setManualZone(e.target.value)}
+                    >
+                      <option value="">Seleccionar zona</option>
+                      {data.zones
+                        .filter((z) => z.active)
+                        .map((z) => (
+                          <option key={z.id} value={z.id}>
+                            {z.name}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                  <label>
+                    Motivo de la selección
+                    <input
+                      value={manualReason}
+                      onChange={(e) => setManualReason(e.target.value)}
+                    />
+                  </label>
+                  <button
+                    disabled={!manualZone || manualReason.trim().length < 5}
+                    onClick={() =>
+                      void run({
+                        type: "manualZone",
+                        id: o.id,
+                        version: o.version,
+                        zoneId: manualZone,
+                        reason: manualReason,
+                      })
+                    }
+                  >
+                    Confirmar zona manual
+                  </button>
+                </details>
+              </>
+            )}
           </>
         )}
         <div className={"co-quote " + (o.quote?.eligible ? "eligible" : "")}>
-          <b>{o.quote?.zoneName ?? "Ubicación pendiente"}</b>
+          <b>
+            {o.fulfillmentMethod === "pickup"
+              ? "Pickup · Pastelerías 3L"
+              : (o.quote?.zoneName ?? "Ubicación pendiente")}
+          </b>
           <p>
-            {o.location
-              ? `GPS ${o.location.lat}, ${o.location.lng}`
-              : (o.address ??
-                "Espera la ubicación del cliente o ingresa su dirección.")}
+            {o.fulfillmentMethod === "pickup"
+              ? `${o.pickup?.pickupDate} · ${o.pickup?.preferredTime}`
+              : o.location
+                ? `GPS ${o.location.lat}, ${o.location.lng}`
+                : (o.address ??
+                  "Espera la ubicación del cliente o ingresa su dirección.")}
           </p>
           <dl>
-            <dt>Mínimo de compra</dt>
+            <dt>
+              {o.fulfillmentMethod === "pickup"
+                ? "Mínimo de zona"
+                : "Mínimo de compra"}
+            </dt>
             <dd>
               {money(
                 o.quote?.minOrderAed == null ? null : o.quote.minOrderAed * 100,

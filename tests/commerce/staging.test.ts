@@ -111,7 +111,7 @@ test("TL18 fresh staging seed labels every record TEST and creates no payments o
     const path = join(dir, "staging.sqlite");
     const seed = stagingSeed(numbers, true);
     const store = new Store(path, "staging", seed);
-    assert.equal(store.read().zones.length, 91);
+    assert.equal(store.read().zones.length, 93);
     assert.equal(store.read().uatScenarios?.length, 10);
     for (const c of store.read().conversations) {
       assert.match(c.customer, /^TEST/);
@@ -357,11 +357,18 @@ test("TL18 no-go requests reject unknown zone, unknown fee and below minimum on 
         version: 0,
         lines: [{ productId: "pan", quantity: 1 }],
       });
+      if (scenario === "unknown-fee")
+        store.write((s) => {
+          const z = s.zones.find((z) => z.id === "jvc")!;
+          z.deliveryFeeAed = null;
+          z.freeDelivery = false;
+        });
       if (scenario === "below-minimum")
         command({
           type: "updateZone",
           zone: {
             ...store.read().zones.find((z) => z.id === "jvc")!,
+            freeDelivery: false,
             deliveryFeeAed: 10,
           },
         });

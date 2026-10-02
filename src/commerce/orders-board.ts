@@ -43,14 +43,14 @@ export const dubaiDate = (at: Date | string = new Date()) =>
     day: "2-digit",
   }).format(typeof at === "string" ? new Date(at) : at);
 
-type BoardOrder = Pick<Order, "state" | "delivery">;
+type BoardOrder = Pick<Order, "state" | "delivery" | "pickup">;
 
 /**
  * Today is the kitchen's working list: due today, overdue and still open, or
  * open without a delivery date. Upcoming is anything due after today.
  */
 export function matchesView(o: BoardOrder, view: BoardView, today: string) {
-  const date = o.delivery?.date;
+  const date = o.pickup?.pickupDate ?? o.delivery?.date;
   if (view === "upcoming") return !!date && date > today;
   if (view === "today")
     return o.state === "Delivered" ? date === today : !date || date <= today;

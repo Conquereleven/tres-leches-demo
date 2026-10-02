@@ -152,6 +152,7 @@ export class CommerceService {
       this.geo,
       o.manualZoneId,
       s.catalog ?? [],
+      o.fulfillmentMethod,
     );
   }
   private enqueue(s: State, kind: Job["kind"], entityId: string) {
@@ -365,6 +366,11 @@ export class CommerceService {
     this.owned(c, actor);
     if (cmd.type === "manualZone") {
       requireThat(
+        o.fulfillmentMethod !== "pickup",
+        "Pickup orders cannot have a delivery zone",
+        422,
+      );
+      requireThat(
         ["Building", "Awaiting Location", "Minimum Check"].includes(o.state),
         "Pedido bloqueado",
       );
@@ -411,6 +417,11 @@ export class CommerceService {
         o.lines = cmd.lines;
         o.catalogSnapshot = undefined;
       } else {
+        requireThat(
+          o.fulfillmentMethod !== "pickup",
+          "Pickup orders cannot have a delivery location",
+          422,
+        );
         o.manualZoneId = undefined;
         o.address = cmd.address;
         o.location = cmd.location;
@@ -421,7 +432,9 @@ export class CommerceService {
       this.quote(s, o);
       transition(
         o,
-        o.address || o.location ? "Minimum Check" : "Awaiting Location",
+        o.fulfillmentMethod === "pickup" || o.address || o.location
+          ? "Minimum Check"
+          : "Awaiting Location",
         actor.id,
       );
       return o;
@@ -1025,7 +1038,10 @@ export class CommerceService {
     const order = this.order(snapshot, payment.orderId);
     const customer = this.conversation(snapshot, order.conversationId);
     requireThat(
-      order.delivery && payment.webReturnUrl && order.customerDetails?.email,
+      (order.delivery ||
+        (order.fulfillmentMethod === "pickup" && order.pickup)) &&
+        payment.webReturnUrl &&
+        order.customerDetails?.email,
       "Complete delivery and billing details required",
       409,
     );
@@ -1037,6 +1053,7 @@ export class CommerceService {
       this.geo,
       order.manualZoneId,
       snapshot.catalog ?? [],
+      order.fulfillmentMethod,
     );
     requireThat(
       quote.eligible &&
@@ -1068,10 +1085,14 @@ export class CommerceService {
         phone: customer.phone,
       },
       billingAddress: orderBillingAddress(order.billing),
-      deliveryAddress: toPaymenntDeliveryAddress(
-        customer.customer,
-        order.delivery,
-      ),
+      ...(order.fulfillmentMethod === "pickup"
+        ? {}
+        : {
+            deliveryAddress: toPaymenntDeliveryAddress(
+              customer.customer,
+              order.delivery!,
+            ),
+          }),
     });
   }
   async drain() {

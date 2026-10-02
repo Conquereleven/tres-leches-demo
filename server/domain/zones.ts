@@ -6,7 +6,7 @@ import {
   catalog,
   type CatalogItem,
 } from "./model";
-// Transcribed from the supplied “MINIMUM ORDER FOR DELIVERY” image. Unknown fees stay null.
+// Approved October 2026: delivery is included for all supported zones.
 const bands: [number, string[]][] = [
   [
     30,
@@ -57,7 +57,8 @@ const bands: [number, string[]][] = [
       "INTERNET CITY",
       "MEDIA CITY",
       "BARSHA HEIGHTS",
-      "PALM JUMEIRAH (SHORELINE, GOLDEN MILE)",
+      "Palm Jumeirah - Shoreline",
+      "Palm Jumeirah - Golden Mile",
       "AL BARSHA 1",
       "KNOWLEDGE VILLAGE",
       "KNOWLEDGE PARK",
@@ -81,7 +82,8 @@ const bands: [number, string[]][] = [
       "AL SUFOUH 1",
       "UMM SUQEIM 3",
       "VICTORY HEIGHTS",
-      "PALM JUMEIRAH (WEST & EAST CRESCENT)",
+      "Palm Jumeirah - West Crescent",
+      "Palm Jumeirah - East Crescent",
       "STUDIO CITY",
     ],
   ],
@@ -141,28 +143,34 @@ const aliasMap: Record<string, string[]> = {
   "IMPZ (D.PRODUCTION CITY)": ["IMPZ", "Dubai Production City"],
   MARINA: ["Dubai Marina"],
   JBR: ["Jumeirah Beach Residence"],
-  "PALM JUMEIRAH (SHORELINE, GOLDEN MILE)": [
-    "Palm Jumeirah Shoreline",
-    "Golden Mile",
-  ],
-  "PALM JUMEIRAH (WEST & EAST CRESCENT)": [
-    "Palm Jumeirah West Crescent",
-    "Palm Jumeirah East Crescent",
-  ],
+  "Palm Jumeirah - Shoreline": ["Palm Jumeirah Shoreline"],
+  "Palm Jumeirah - Golden Mile": ["Golden Mile"],
+  "Palm Jumeirah - West Crescent": ["Palm Jumeirah West Crescent"],
+  "Palm Jumeirah - East Crescent": ["Palm Jumeirah East Crescent"],
+  DIP: ["Dubai Investments Park", "Dubai Investment Park"],
   MOTORCITY: ["Motor City"],
 };
 export const zoneSeed: DeliveryZone[] = bands.flatMap(([min, names]) =>
   names.map((name) => ({
     id: name === "Remraam" ? "remran" : normalize(name).replaceAll(" ", "-"),
-    name,
+    name:
+      name === "IMPZ (D.PRODUCTION CITY)"
+        ? "IMPZ / Dubai Production City"
+        : name.replace(/\b[A-Z][A-Z]+\b/g, (word) =>
+            ["JLT", "JVC", "JVT", "JBR", "JAFZA", "DIP", "DIFC", "D3"].includes(
+              word,
+            )
+              ? word
+              : word[0]! + word.slice(1).toLowerCase(),
+          ),
     aliases: aliasMap[name] ?? [],
     minOrderAed: min,
-    deliveryFeeAed: null,
-    freeDelivery: false,
+    deliveryFeeAed: 0,
+    freeDelivery: true,
     active: true,
     priority: 10,
     version: 0,
-    review: "Delivery fee not supplied; admin confirmation required.",
+    review: "Approved October 2026: delivery included once minimum reached.",
   })),
 );
 for (const cluster of ["B", "C", "D"])
@@ -274,6 +282,7 @@ export function quoteOrder(
   geo?: GeoService,
   manualZoneId?: string,
   products: CatalogItem[] = catalog,
+  fulfillmentMethod: "delivery" | "pickup" = "delivery",
 ): Quote {
   const validProducts = lines.every((l) =>
     products.some(
@@ -289,6 +298,23 @@ export function quoteOrder(
       (products.find((p) => p.id === l.productId)?.priceFils ?? 0) * l.quantity,
     0,
   );
+  if (fulfillmentMethod === "pickup")
+    return {
+      zoneId: null,
+      zoneName: null,
+      minOrderAed: null,
+      feeFils: 0,
+      subtotalFils,
+      totalFils: subtotalFils,
+      minimumMet: true,
+      eligible: validProducts && subtotalFils > 0,
+      reason:
+        validProducts && subtotalFils > 0
+          ? "Ready for pickup checkout"
+          : "Add available products",
+      resolutionCode: "RESOLVED",
+      zoneVersion: null,
+    };
   const zone = manualZoneId
     ? zones.find((z) => z.id === manualZoneId && z.active)
     : matchZone(zones, address, location, geo);
@@ -304,7 +330,7 @@ export function quoteOrder(
       : zone.minOrderAed == null || feeFils == null
         ? "Regla pendiente de revisión"
         : !minimumMet
-          ? "No cumple el mínimo"
+          ? `Minimum order for ${zone.name} is AED ${zone.minOrderAed}.`
           : !subtotalFils
             ? "Agrega productos"
             : "Listo para solicitar pago";

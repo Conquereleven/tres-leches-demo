@@ -57,7 +57,9 @@ function fixture(initial = "CAPTURED") {
   const store = new Store(":memory:", "test");
   store.write((s) => {
     s.catalog = validateCatalog(
-      JSON.parse(readFileSync("tests/fixtures/retired-pan-de-muerto.json", "utf8")),
+      JSON.parse(
+        readFileSync("tests/fixtures/retired-pan-de-muerto.json", "utf8"),
+      ),
     );
   });
   let posts = 0,
@@ -184,7 +186,7 @@ test("zone minimum is enforced: one Pan de Muerto (AED 25) is below AED 30", asy
     assert.equal(q.minimumMet, false);
     await assert.rejects(
       createWebCheckout(f.service, cart(1), randomUUID(), true),
-      /mínimo/,
+      /Minimum order/,
     );
     assert.equal(f.store.read().orders.length, 0);
   } finally {
@@ -195,6 +197,10 @@ test("zone minimum is enforced: one Pan de Muerto (AED 25) is below AED 30", asy
 test("a zone without a confirmed delivery fee blocks checkout, never a fabricated fee", async () => {
   const f = fixture();
   try {
+    f.store.write((s) => {
+      s.zones[0]!.deliveryFeeAed = null;
+      s.zones[0]!.freeDelivery = false;
+    });
     const unresolved = f.store
       .read()
       .zones.find((z) => z.active && z.deliveryFeeAed == null)!;

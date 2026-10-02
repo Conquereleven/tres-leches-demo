@@ -49,7 +49,8 @@ export function renderOrderPaidMessage(input: {
     .join("\n");
   const subtotal = order.quote?.subtotalFils ?? payment.amountFils;
   const delivery = order.quote?.feeFils ?? 0;
-  const d = order.delivery;
+  const pickup = order.fulfillmentMethod === "pickup";
+  const d = pickup ? undefined : order.delivery;
   const address = d
     ? [
         d.unit && `Unit ${d.unit}`,
@@ -75,15 +76,15 @@ export function renderOrderPaidMessage(input: {
     items,
     "",
     `Subtotal: AED ${aed(subtotal)}`,
-    `Delivery: AED ${aed(delivery)}`,
+    `${pickup ? "Pickup" : "Delivery"}: AED ${aed(delivery)}`,
     `Total paid: AED ${aed(payment.amountFils)}`,
     "",
-    "Delivery:",
-    d?.date ?? "—",
-    d?.slot ?? "—",
+    pickup ? "PICKUP:" : "DELIVERY:",
+    order.pickup?.pickupDate ?? d?.date ?? "—",
+    order.pickup?.preferredTime ?? d?.slot ?? "—",
     "",
     "Address:",
-    address,
+    pickup ? "Pickup at Pastelerías 3L" : address,
     "",
     "Notes:",
     notes || "—",

@@ -877,7 +877,7 @@ export const pages: Record<PolicyPath, Page> = {
       },
       {
         title: "Delivery charge",
-        text: `Free in ${freeDeliveryAreas.areas.join(", ")}. Elsewhere, any charge is included in the total on your payment link before you pay.`,
+        text: "Delivery is included once your supported zone’s minimum order is reached. No additional delivery fee.",
       },
       {
         title: "When",
@@ -908,10 +908,8 @@ export const pages: Record<PolicyPath, Page> = {
         title: "2. Delivery charges",
         body: (
           <p>
-            Delivery is free to {freeDeliveryAreas.areas.join(", ")}. For other
-            areas, our team confirms any delivery charge when you order. It is
-            always included in the total shown on your payment link, so you see
-            the full amount before paying.
+            Delivery is included once your supported zone’s minimum order is
+            reached. There is no additional delivery fee.
           </p>
         ),
       },

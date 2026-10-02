@@ -307,10 +307,15 @@ export class PaymenntProvider implements PaymentProvider {
     return this.getCheckout(found.checkoutId);
   }
   async createWebPayment(
-    input: Omit<Parameters<PaymenntProvider["createTokenPayment"]>[0], "token">,
+    input: Omit<
+      Parameters<PaymenntProvider["createTokenPayment"]>[0],
+      "token" | "deliveryAddress"
+    > & { deliveryAddress?: PaymenntAddress },
   ) {
     const billingAddress = paymenntAddressSchema.parse(input.billingAddress);
-    const deliveryAddress = paymenntAddressSchema.parse(input.deliveryAddress);
+    const deliveryAddress = input.deliveryAddress
+      ? paymenntAddressSchema.parse(input.deliveryAddress)
+      : undefined;
     const checkout = normalizeCheckout(
       await this.request("/checkout/web", {
         requestId: input.paymentId,
@@ -335,7 +340,7 @@ export class PaymenntProvider implements PaymentProvider {
         },
         customer: input.customer,
         billingAddress,
-        deliveryAddress,
+        ...(deliveryAddress ? { deliveryAddress } : {}),
         returnUrl: input.returnUrl,
       }),
     );

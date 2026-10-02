@@ -118,6 +118,8 @@ export type Order = {
   paymentId?: string;
   manualZoneId?: string;
   /** Captured by the website checkout; absent for WhatsApp-built orders. */
+  fulfillmentMethod?: "delivery" | "pickup";
+  pickup?: { pickupDate: string; preferredTime: string };
   delivery?: DeliveryDetails;
   customerDetails?: { email?: string; instructions?: string };
   /** Billing address confirmed by the customer, exactly as sent to Paymennt. */

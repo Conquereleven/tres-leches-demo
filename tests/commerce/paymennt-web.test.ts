@@ -283,3 +283,61 @@ for (const [name, overrides] of Object.entries({
     }
   });
 }
+
+test("pickup hosted checkout: no zone/minimum/shipping address; server pricing and authoritative reconciliation remain intact", async () => {
+  const f = fixture();
+  const key = randomUUID();
+  const pickupInput = {
+    fulfillmentMethod: "pickup",
+    lines: [{ productId: sku, quantity: 1 }],
+    pickup: {
+      pickupDate: addDays(dubaiToday(), 1),
+      preferredTime: "Afternoon",
+    },
+    customer: input.customer,
+    billing: {
+      sameAsDelivery: false,
+      name: "UAT Reviewer",
+      address1: "Billing fixture address",
+      city: "Dubai",
+      country: "AE",
+    },
+  };
+  try {
+    const result = await createWebCheckout(
+      f.service,
+      pickupInput,
+      key,
+      "web",
+      "https://test.example.invalid",
+    );
+    assert.equal(result.amountFils, 1100);
+    assert.equal(result.paymentStatus, "pending");
+    assert.deepEqual(result.summary?.pickup, pickupInput.pickup);
+    assert.equal(result.summary?.delivery, undefined);
+    assert.equal(f.body().deliveryAddress, undefined);
+    assert.deepEqual(f.body().totals, { subtotal: 11, tax: 0, shipping: 0 });
+    const order = f.store.read().orders[0]!;
+    assert.equal(order.fulfillmentMethod, "pickup");
+    assert.equal(order.quote?.zoneId, null);
+    assert.equal(order.manualZoneId, undefined);
+    assert.equal(order.delivery, undefined);
+    assert.equal(order.quote?.feeFils, 0);
+    assert.equal(order.state, "Awaiting Payment");
+    await createWebCheckout(
+      f.service,
+      pickupInput,
+      key,
+      "web",
+      "https://test.example.invalid",
+    );
+    assert.equal(f.counts().posts, 1);
+    f.status("PAID");
+    await reconcileEmbeddedPayment(f.service, key);
+    await reconcileEmbeddedPayment(f.service, key);
+    assert.equal(f.store.read().orders[0]!.state, "Confirmed");
+    assert.equal(f.store.read().operationsNotifications?.length, 1);
+  } finally {
+    f.store.close();
+  }
+});

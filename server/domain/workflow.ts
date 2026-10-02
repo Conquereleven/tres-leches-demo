@@ -20,7 +20,11 @@ export const transitions: Record<OrderState, readonly OrderState[]> = {
 };
 export function transition(order: Order, to: OrderState, actor: string) {
   requireThat(
-    transitions[order.state].includes(to),
+    order.fulfillmentMethod === "pickup" && order.state === "Ready"
+      ? to === "Delivered"
+      : to !== "Out for Delivery" || order.fulfillmentMethod !== "pickup"
+        ? transitions[order.state].includes(to)
+        : false,
     `Transición inválida: ${order.state} → ${to}`,
   );
   const from = order.state;

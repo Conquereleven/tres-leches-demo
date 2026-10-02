@@ -225,7 +225,7 @@ export function OrderCard({
   const c = customerOf(data, o);
   const payment = data.payments.find((p) => p.id === o.paymentId);
   const badge = paymentBadge(payment);
-  const due = dueLabel(o.delivery?.date, today);
+  const due = dueLabel(o.pickup?.pickupDate ?? o.delivery?.date, today);
   const web = c?.sourceNumberId === "web";
   const owned = !!c && c.assignedAgent === data.actor.id && c.status === "open";
   const canTake =
@@ -233,7 +233,10 @@ export function OrderCard({
     !owned &&
     c.status === "open" &&
     (!c.assignedAgent || ["admin", "manager"].includes(data.actor.role));
-  const next = NEXT_ACTION[o.state];
+  const next =
+    o.fulfillmentMethod === "pickup" && o.state === "Ready"
+      ? { to: "Delivered" as const, label: "Confirmar recogida" }
+      : NEXT_ACTION[o.state];
   const step = fulfilmentIndex(o.state);
   const assignee = data.agents.find((a) => a.id === c?.assignedAgent)?.name;
   return (
@@ -257,7 +260,8 @@ export function OrderCard({
       <div className="ops-oc-who">
         <h3>{c?.customer ?? "Cliente"}</h3>
         <p>
-          {o.id} · {web ? "Web" : (c?.sourceNumberId.toUpperCase() ?? "")}
+          {o.id} · {o.fulfillmentMethod === "pickup" ? "PICKUP" : "DELIVERY"} ·{" "}
+          {web ? "Web" : (c?.sourceNumberId.toUpperCase() ?? "")}
           {c?.phone && <> · {c.phone}</>}
         </p>
       </div>
@@ -273,7 +277,8 @@ export function OrderCard({
       <dl className="ops-oc-meta">
         <div data-tone={o.state === "Delivered" ? "none" : due.tone}>
           <dt>
-            <CalendarBlank aria-hidden /> Entrega
+            <CalendarBlank aria-hidden />{" "}
+            {o.fulfillmentMethod === "pickup" ? "Pickup" : "Entrega"}
           </dt>
           <dd>
             {o.state === "Delivered" && due.tone === "late"
@@ -281,19 +286,24 @@ export function OrderCard({
               : due.label}
           </dd>
         </div>
-        {o.delivery?.slot && (
+        {(o.pickup?.preferredTime || o.delivery?.slot) && (
           <div>
             <dt>
               <Clock aria-hidden /> Hora
             </dt>
-            <dd>{o.delivery.slot}</dd>
+            <dd>{o.pickup?.preferredTime ?? o.delivery?.slot}</dd>
           </div>
         )}
         <div>
           <dt>
-            <MapPin aria-hidden /> Zona
+            <MapPin aria-hidden />{" "}
+            {o.fulfillmentMethod === "pickup" ? "Pickup" : "Zona"}
           </dt>
-          <dd>{o.quote?.zoneName ?? "Ubicación pendiente"}</dd>
+          <dd>
+            {o.fulfillmentMethod === "pickup"
+              ? "Pastelerías 3L · Recoger en tienda"
+              : (o.quote?.zoneName ?? "Ubicación pendiente")}
+          </dd>
         </div>
       </dl>
 

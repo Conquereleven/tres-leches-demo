@@ -13,6 +13,7 @@ import {
   type Order,
 } from "./model";
 import { quoteOrder } from "./zones";
+import { transition } from "./workflow";
 import { createHash, randomUUID } from "node:crypto";
 export const WEB_ACTOR: Actor = { id: "web-checkout", role: "operator" };
 export const WEB_SOURCE = "web";
@@ -98,7 +99,15 @@ export const webQuoteSchema = z
   })
   .strict();
 export const cartQuoteSchema = z
-  .object({ lines, zoneId: z.string().min(1).max(100) })
+  .object({
+    lines,
+    zoneId: z.string().min(1).max(100).optional(),
+    fulfillmentMethod: z.enum(["delivery", "pickup"]).optional(),
+  })
+  .refine(
+    (v) => (v.fulfillmentMethod === "pickup" ? !v.zoneId : !!v.zoneId),
+    "Choose a delivery zone or pickup",
+  )
   .strict();
 
 /** Legacy single-product checkout shape, kept for existing clients. */
@@ -121,6 +130,7 @@ export const webCheckoutSchema = webQuoteSchema
 export const cartCheckoutSchema = z
   .object({
     lines,
+    fulfillmentMethod: z.literal("delivery").optional(),
     delivery: z
       .object({
         zoneId: z.string().min(1).max(100),
@@ -144,11 +154,25 @@ export const cartCheckoutSchema = z
     billing: billingInputSchema,
   })
   .strict();
+const pickupCheckoutSchema = cartCheckoutSchema
+  .omit({ delivery: true })
+  .extend({
+    fulfillmentMethod: z.literal("pickup"),
+    pickup: z
+      .object({
+        pickupDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+        preferredTime: z.string().trim().min(1).max(60),
+      })
+      .strict(),
+  })
+  .strict();
 export type CartCheckoutInput = z.infer<typeof cartCheckoutSchema>;
 
 type Normalized = {
   lines: { productId: string; quantity: number }[];
-  zoneId: string;
+  zoneId?: string;
+  fulfillmentMethod?: "delivery" | "pickup";
+  pickup?: Order["pickup"];
   name: string;
   phone: string;
   address: string;
@@ -157,6 +181,55 @@ type Normalized = {
   billing?: OrderBilling;
 };
 export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
+  const pickup = pickupCheckoutSchema.safeParse(raw);
+  if (pickup.success) {
+    const data = pickup.data;
+    const today = dubaiToday();
+    requireThat(
+      data.pickup.pickupDate >= today &&
+        data.pickup.pickupDate <= addDays(today, MAX_BOOKING_DAYS) &&
+        new Date(`${data.pickup.pickupDate}T00:00:00Z`)
+          .toISOString()
+          .slice(0, 10) === data.pickup.pickupDate,
+      "Choose a valid pickup date from today onwards",
+      422,
+    );
+    const slots = configuredSlots(env);
+    requireThat(
+      !slots.length || slots.includes(data.pickup.preferredTime),
+      "Choose an available pickup time",
+      422,
+    );
+    requireThat(
+      !data.billing.sameAsDelivery,
+      "Pickup requires a separate billing address",
+      422,
+    );
+    return {
+      lines: data.lines,
+      fulfillmentMethod: "pickup",
+      pickup: data.pickup,
+      name: data.customer.name,
+      phone: data.customer.phone,
+      address: "",
+      details: {
+        email: data.customer.email,
+        instructions: data.customer.instructions,
+      },
+      billing: toPaymenntBillingAddress({
+        billing: data.billing,
+        name: data.customer.name,
+        delivery: undefined,
+      }),
+    };
+  }
+  if (
+    raw &&
+    typeof raw === "object" &&
+    "fulfillmentMethod" in raw &&
+    raw.fulfillmentMethod === "pickup"
+  )
+    throw pickup.error;
   const cart = cartCheckoutSchema.safeParse(raw);
   if (cart.success) {
     const { delivery, customer } = cart.data;
@@ -182,6 +255,9 @@ export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
       .join(", ");
     return {
       lines: cart.data.lines,
+      ...(cart.data.fulfillmentMethod
+        ? { fulfillmentMethod: cart.data.fulfillmentMethod }
+        : {}),
       zoneId: delivery.zoneId,
       name: customer.name,
       phone: customer.phone,
@@ -227,16 +303,23 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
         };
       })();
   const s = service.store.read();
+  const method =
+    "fulfillmentMethod" in input ? input.fulfillmentMethod : undefined;
   const zone = s.zones.find((z) => z.id === input.zoneId && z.active);
-  requireThat(zone, "Delivery zone is not supported", 400);
+  requireThat(
+    method === "pickup" || zone,
+    "Delivery zone is not supported",
+    400,
+  );
   return quoteOrder(
     s.zones,
     input.lines,
     undefined,
     undefined,
     service.geo,
-    zone.id,
+    zone?.id,
     s.catalog ?? [],
+    method,
   );
 }
 
@@ -249,6 +332,8 @@ export type WebCheckoutSummary = {
   }[];
   subtotalFils: number;
   feeFils: number;
+  fulfillmentMethod?: "delivery" | "pickup";
+  pickup?: Order["pickup"];
   delivery?: DeliveryDetails & { zoneName?: string };
   customerName?: string;
 };
@@ -311,9 +396,12 @@ export function readWebCheckoutStatus(
       }),
       subtotalFils: order.quote?.subtotalFils ?? 0,
       feeFils: order.quote?.feeFils ?? 0,
-      delivery: order.delivery
-        ? { ...order.delivery, zoneName: zone?.name }
-        : undefined,
+      fulfillmentMethod: order.fulfillmentMethod ?? "delivery",
+      pickup: order.pickup,
+      delivery:
+        order.fulfillmentMethod !== "pickup" && order.delivery
+          ? { ...order.delivery, zoneName: zone?.name }
+          : undefined,
       customerName: s.conversations.find((c) => c.id === order.conversationId)
         ?.customer,
     },
@@ -343,7 +431,7 @@ export async function createWebCheckout(
   // Direct card payments need the full checkout: delivery details and a
   // confirmed billing address. The legacy single-product shape cannot pay.
   requireThat(
-    !embedded || (input.delivery && input.billing),
+    !embedded || ((input.delivery || input.pickup) && input.billing),
     "Please complete your delivery and billing details.",
     422,
   );
@@ -360,7 +448,9 @@ export async function createWebCheckout(
     }
     const quote = quoteWebCheckout(service, {
       lines: input.lines,
-      zoneId: input.zoneId,
+      ...(input.fulfillmentMethod === "pickup"
+        ? { fulfillmentMethod: "pickup" }
+        : { zoneId: input.zoneId }),
     });
     requireThat(quote.eligible, quote.reason, 422);
     // A checkout owns its own conversation: knowing a phone cannot seize an
@@ -396,15 +486,23 @@ export async function createWebCheckout(
       ) as Step;
     let order = command("createOrder", { id: conversationId, version: 0 });
     order = command("editOrder", order, { lines: input.lines });
-    order = command("manualZone", order, {
-      zoneId: input.zoneId,
-      reason:
-        "Customer selected delivery zone; address retained for fulfillment",
-    });
-    if (input.delivery)
+    if (input.fulfillmentMethod !== "pickup")
+      order = command("manualZone", order, {
+        zoneId: input.zoneId,
+        reason:
+          "Customer selected delivery zone; address retained for fulfillment",
+      });
+    if (input.delivery || input.pickup)
       service.store.write((s) => {
         const o = s.orders.find((o) => o.id === order.id)!;
-        o.address = input.address;
+        o.fulfillmentMethod = input.fulfillmentMethod ?? "delivery";
+        o.pickup = input.pickup;
+        if (input.pickup) {
+          o.address = undefined;
+          o.manualZoneId = undefined;
+          transition(o, "Minimum Check", WEB_ACTOR.id);
+          order = { id: o.id, version: o.version };
+        } else o.address = input.address;
         o.delivery = input.delivery;
         o.customerDetails = input.details;
         o.billing = input.billing;

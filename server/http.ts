@@ -1,3 +1,4 @@
+import { applyApprovedDeliveryRules } from "./domain/delivery-rules";
 import {
   retryEmbeddedPayment,
   submitEmbeddedPayment,
@@ -126,6 +127,8 @@ export async function startServer(
       )
     : undefined;
   if (backups) await backups.run();
+  // TEST-only activation. Production keeps its database unchanged until approved.
+  if (staging) await applyApprovedDeliveryRules(store, staging.BACKUP_DIR);
   const meta =
     overrides.whatsapp instanceof MetaWhatsAppProvider
       ? overrides.whatsapp

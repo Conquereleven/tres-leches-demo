@@ -23,7 +23,7 @@ test("TL24 operational initialization is empty; GPS has no synthetic fallback", 
       catalog,
     ])
       assert.equal(records.length, 0);
-    assert.equal(s.zones.find((z) => z.id === "jvc")?.deliveryFeeAed, null);
+    assert.equal(s.zones.find((z) => z.id === "jvc")?.deliveryFeeAed, 0);
     assert.equal(
       matchZone(s.zones, undefined, { lat: 25.0657, lng: 55.2089 }),
       null,

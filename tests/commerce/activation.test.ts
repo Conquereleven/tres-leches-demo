@@ -229,7 +229,7 @@ test("TL25 commercial facts and legacy alias preserve unknown fees", () => {
   }
   assert.equal(matchZone(zoneSeed, "REMRAN")!.name, "Remraam");
   assert.equal(matchZone(zoneSeed, "Remraam")!.minOrderAed, 300);
-  assert.equal(matchZone(zoneSeed, "Remraam")!.deliveryFeeAed, null);
+  assert.equal(matchZone(zoneSeed, "Remraam")!.deliveryFeeAed, 0);
 });
 const catalog = {
   version: 1,

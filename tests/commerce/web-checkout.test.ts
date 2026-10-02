@@ -109,7 +109,7 @@ test("quantity 1 rejects minimum atomically, leaving no draft or payment", async
   try {
     await assert.rejects(
       createWebCheckout(f.service, input(1), randomUUID()),
-      /mínimo/,
+      /Minimum order/,
     );
     assert.equal(f.store.read().orders.length, 0);
     assert.equal(f.store.read().conversations.length, 0);
@@ -153,6 +153,10 @@ test("unknown product, missing catalog and unresolved fee zones fail closed", as
         randomUUID(),
       ),
     );
+    f.store.write((s) => {
+      s.zones[0]!.deliveryFeeAed = null;
+      s.zones[0]!.freeDelivery = false;
+    });
     const unknownFee = f.store
       .read()
       .zones.find((z) => z.deliveryFeeAed === null)!;

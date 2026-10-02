@@ -153,7 +153,10 @@ function commerce() {
     lines: [{ productId: "tres", quantity: 1 }],
   });
   const zone = store.read().zones.find((z) => z.id === "jvc")!;
-  command({ type: "updateZone", zone: { ...zone, deliveryFeeAed: 10 } });
+  command({
+    type: "updateZone",
+    zone: { ...zone, freeDelivery: false, deliveryFeeAed: 10 },
+  });
   command({
     type: "manualZone",
     id: o.id,
@@ -372,7 +375,11 @@ test("Mapbox requests permanent AE results; canonical evidence never supplies co
   assert.equal(matchZone(zoneSeed, undefined, point, geo)?.id, "jvc");
   assert.equal(
     quoteOrder(
-      zoneSeed,
+      zoneSeed.map((z) => ({
+        ...z,
+        deliveryFeeAed: null,
+        freeDelivery: false,
+      })),
       [{ productId: "tres", quantity: 1 }],
       undefined,
       point,
@@ -404,7 +411,7 @@ test("online SQLite backup restores uncheckpointed records and command receipts"
     const restored = new Store(join(dir, "backup.sqlite"));
     try {
       assert.equal(restored.read().commands.fixture?.hash, "durable");
-      assert.equal(restored.read().zones.length, 91);
+      assert.equal(restored.read().zones.length, 93);
     } finally {
       restored.close();
     }
@@ -570,7 +577,7 @@ test("integration store never promotes demo records and starts with zero fictiti
     const integration = new Store(join(dir, "integration.sqlite"), false);
     try {
       assert.equal(integration.read().conversations.length, 0);
-      assert.equal(integration.read().zones.length, 91);
+      assert.equal(integration.read().zones.length, 93);
     } finally {
       integration.close();
     }
@@ -701,6 +708,7 @@ test("official-adapter HTTP fixtures: WA2 inbound → GPS → Paymennt link thro
       type: "updateZone",
       zone: {
         ...store.read().zones.find((z) => z.id === "jvc")!,
+        freeDelivery: false,
         deliveryFeeAed: 10,
       },
     });

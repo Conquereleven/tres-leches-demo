@@ -1,3 +1,4 @@
+import { business } from "./business";
 import { menuFamilyForSku } from "./menu";
 /**
  * The 3L online store: cart → delivery → details → payment → confirmation.
@@ -73,6 +74,8 @@ type Summary = {
   }[];
   subtotalFils: number;
   feeFils: number;
+  fulfillmentMethod?: "delivery" | "pickup";
+  pickup?: { pickupDate: string; preferredTime: string };
   delivery?: Delivery & { zoneName?: string };
   customerName?: string;
 };
@@ -195,6 +198,7 @@ export function normalizeUaeMobile(raw: string) {
 const CAPABILITY = "3l-checkout";
 const DRAFT = "3l-checkout-draft";
 function loadDraft(): {
+  fulfillmentMethod?: "delivery" | "pickup";
   delivery?: Partial<Delivery>;
   customer?: Partial<Customer>;
   billing?: Billing;
@@ -206,6 +210,7 @@ function loadDraft(): {
   }
 }
 function saveDraft(draft: {
+  fulfillmentMethod?: "delivery" | "pickup";
   delivery?: Partial<Delivery>;
   customer?: Partial<Customer>;
   billing?: Billing;
@@ -253,7 +258,7 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
   );
 }
 
-const STEPS = ["Cart", "Delivery", "Details", "Payment", "Confirmation"];
+const STEPS = ["Cart", "Fulfillment", "Details", "Payment", "Confirmation"];
 function Progress({ step }: { step: number }) {
   return (
     <nav className="b-co-progress" aria-label="Checkout progress">
@@ -326,11 +331,13 @@ function Totals({
   fee,
   total,
   feePending,
+  fulfillmentMethod = "delivery",
 }: {
   subtotal: number;
   fee: number | null;
   total: number | null;
   feePending?: boolean;
+  fulfillmentMethod?: "delivery" | "pickup";
 }) {
   return (
     <dl className="b-shop-totals">
@@ -339,7 +346,7 @@ function Totals({
         <dd>{formatAed(subtotal)}</dd>
       </div>
       <div>
-        <dt>Delivery</dt>
+        <dt>{fulfillmentMethod === "pickup" ? "Pickup" : "Delivery"}</dt>
         <dd>
           {fee === 0
             ? "Free"
@@ -395,6 +402,7 @@ function OrderSummary({
   fee,
   total,
   feePending,
+  fulfillmentMethod = "delivery",
   children,
 }: {
   lines: CartLine[];
@@ -404,6 +412,7 @@ function OrderSummary({
   total: number | null;
   feePending?: boolean;
   children?: ReactNode;
+  fulfillmentMethod?: "delivery" | "pickup";
 }) {
   const [open, setOpen] = useState(false);
   const count = lines.reduce((n, l) => n + l.quantity, 0);
@@ -462,6 +471,7 @@ function OrderSummary({
           subtotal={subtotal}
           fee={fee}
           total={total}
+          fulfillmentMethod={fulfillmentMethod}
           feePending={feePending}
         />
         {children}
@@ -679,7 +689,7 @@ export function CartPage() {
               <h2>Order total</h2>
               <Totals subtotal={subtotal} fee={null} total={null} feePending />
               <p className="b-caption">
-                Delivery charges and minimum order values depend on your area
+                Delivery is included once your area’s minimum order is reached
                 and are confirmed in the next step.
               </p>
               <a
@@ -708,6 +718,10 @@ export function CheckoutPage() {
   const { config, loading, retry } = useCheckoutConfig();
   const draft = useMemo(loadDraft, []);
   const [step, setStep] = useState(1);
+  const [fulfillmentMethod, setFulfillmentMethod] = useState<
+    "delivery" | "pickup"
+  >(draft.fulfillmentMethod ?? "delivery");
+  const pickup = fulfillmentMethod === "pickup";
   const [delivery, setDelivery] = useState<Partial<Delivery>>(
     draft.delivery ?? {},
   );
@@ -731,8 +745,8 @@ export function CheckoutPage() {
   );
 
   useEffect(
-    () => saveDraft({ delivery, customer, billing }),
-    [delivery, customer, billing],
+    () => saveDraft({ fulfillmentMethod, delivery, customer, billing }),
+    [fulfillmentMethod, delivery, customer, billing],
   );
   useEffect(() => {
     heading.current?.focus();
@@ -742,17 +756,20 @@ export function CheckoutPage() {
   useEffect(() => {
     let active = true;
     setQuote(null);
-    if (!config?.enabled || !delivery.zoneId || !cartLines.length) return;
+    if (!config?.enabled || (!pickup && !delivery.zoneId) || !cartLines.length)
+      return;
     post<Quote>("/api/checkout/quote", {
       lines: cartLines,
-      zoneId: delivery.zoneId,
+      ...(pickup
+        ? { fulfillmentMethod: "pickup" }
+        : { zoneId: delivery.zoneId }),
     })
       .then((q) => active && setQuote(q))
       .catch((e: Error) => active && setError(e.message));
     return () => {
       active = false;
     };
-  }, [delivery.zoneId, cartLines, config]);
+  }, [delivery.zoneId, cartLines, config, pickup]);
 
   if (loading)
     return (
@@ -790,6 +807,7 @@ export function CheckoutPage() {
   const summary = (
     <OrderSummary
       key={step}
+      fulfillmentMethod={fulfillmentMethod}
       lines={cartLines}
       config={config}
       subtotal={quote?.subtotalFils ?? subtotal}
@@ -801,7 +819,7 @@ export function CheckoutPage() {
 
   if (step === 1)
     return (
-      <ShopShell step={1} title="Delivery">
+      <ShopShell step={1} title="Delivery or pickup">
         <div className="b-co-layout">
           {summary}
           <form
@@ -812,102 +830,153 @@ export function CheckoutPage() {
               setStep(2);
             }}
           >
-            <Card title="Delivery details" headingRef={heading}>
-              <label>
-                Delivery area
-                <Select
-                  required
-                  value={areaMissing ? "__missing" : (delivery.zoneId ?? "")}
-                  onChange={(e) => {
-                    const v = e.target.value;
-                    setAreaMissing(v === "__missing");
-                    set("zoneId", v === "__missing" ? "" : v);
-                  }}
-                >
-                  <option value="">Choose your area</option>
-                  {config.zones.map((z) => (
-                    <option key={z.id} value={z.id}>
-                      {z.name}
-                      {z.deliveryFeeAed === 0 ? " — free delivery" : ""}
-                    </option>
-                  ))}
-                  <option value="__missing">My area isn't listed</option>
-                </Select>
-              </label>
-              {areaMissing && (
-                <div className="b-shop-notice" role="status">
+            <Card
+              title={pickup ? "Pickup details" : "Delivery details"}
+              headingRef={heading}
+            >
+              <fieldset className="b-fulfillment-choice">
+                <legend>How would you like your order?</legend>
+                {(["delivery", "pickup"] as const).map((method) => (
+                  <label key={method}>
+                    <input
+                      type="radio"
+                      name="fulfillment"
+                      checked={fulfillmentMethod === method}
+                      onChange={() => {
+                        setFulfillmentMethod(method);
+                        setAreaMissing(false);
+                        setError("");
+                        setQuote(null);
+                        if (method === "pickup")
+                          setBilling((b) => ({ ...b, sameAsDelivery: false }));
+                      }}
+                    />
+                    {method === "pickup" ? "PICKUP" : "DELIVERY"}
+                  </label>
+                ))}
+              </fieldset>
+              {pickup ? (
+                <div className="b-co-billing-preview">
+                  <strong>Pickup · {business.tradingName}</strong>
+                  <p>{business.address}</p>
                   <p>
-                    Online delivery isn't available for your area yet. Our team
-                    can still help you on WhatsApp.
+                    Your order will be ready for pickup at the selected date and
+                    time.
                   </p>
-                  <WhatsAppCTA
-                    unavailable={() => (location.href = "/contact")}
-                    message="Hello 3L, I'd like to order for delivery to my area."
-                  >
-                    ORDER VIA WHATSAPP
-                  </WhatsAppCTA>
                 </div>
+              ) : (
+                <p className="b-caption">
+                  Delivery — Included once minimum order is reached
+                </p>
               )}
-              {quote && (
-                <div aria-live="polite">
-                  {quote.eligible ? (
-                    <p className="b-co-fee">
-                      <span>Delivery to {quote.zoneName ?? "your area"}</span>
-                      <strong>
-                        {quote.feeFils === 0
-                          ? "Free"
-                          : formatAed(quote.feeFils ?? 0)}
-                      </strong>
-                    </p>
-                  ) : (
-                    <p className="b-shop-notice" role="status">
-                      {quote.minimumMet === false && quote.minOrderAed != null
-                        ? `The minimum order for ${quote.zoneName ?? "this area"} is ${formatAed(minFils)}. Add ${formatAed(Math.max(0, minFils - quote.subtotalFils))} more to continue.`
-                        : "Online delivery isn't available for this area yet."}{" "}
-                      {quote.minimumMet === false && (
-                        <a className="b-link" href="/cart">
-                          Edit cart
-                        </a>
-                      )}
-                    </p>
-                  )}
-                </div>
-              )}
-              <fieldset disabled={areaMissing}>
-                <label>
-                  Street address and community
-                  <Input
-                    required
-                    minLength={5}
-                    maxLength={300}
-                    autoComplete="street-address"
-                    value={delivery.address ?? ""}
-                    onChange={(e) => set("address", e.target.value)}
-                  />
-                </label>
-                <div className="b-shop-row">
+              {!pickup && (
+                <>
                   <label>
-                    Building or villa
-                    <Input
+                    Delivery area
+                    <Select
                       required
-                      maxLength={120}
-                      value={delivery.building ?? ""}
-                      onChange={(e) => set("building", e.target.value)}
-                    />
+                      value={
+                        areaMissing ? "__missing" : (delivery.zoneId ?? "")
+                      }
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setAreaMissing(v === "__missing");
+                        set("zoneId", v === "__missing" ? "" : v);
+                      }}
+                    >
+                      <option value="">Choose your area</option>
+                      {config.zones.map((z) => (
+                        <option key={z.id} value={z.id}>
+                          {z.name}
+                          {z.deliveryFeeAed === 0 ? " — free delivery" : ""}
+                        </option>
+                      ))}
+                      <option value="__missing">My area isn't listed</option>
+                    </Select>
                   </label>
-                  <label>
-                    Apartment or unit{" "}
-                    <span className="b-optional">(optional)</span>
-                    <Input
-                      maxLength={40}
-                      value={delivery.unit ?? ""}
-                      onChange={(e) => set("unit", e.target.value)}
-                    />
-                  </label>
-                </div>
+                  {areaMissing && (
+                    <div className="b-shop-notice" role="status">
+                      <p>
+                        Online delivery isn't available for your area yet. Our
+                        team can still help you on WhatsApp.
+                      </p>
+                      <WhatsAppCTA
+                        unavailable={() => (location.href = "/contact")}
+                        message="Hello 3L, I'd like to order for delivery to my area."
+                      >
+                        ORDER VIA WHATSAPP
+                      </WhatsAppCTA>
+                    </div>
+                  )}
+                  {quote && (
+                    <div aria-live="polite">
+                      {quote.eligible ? (
+                        <p className="b-co-fee">
+                          <span>
+                            Delivery to {quote.zoneName ?? "your area"}
+                          </span>
+                          <strong>
+                            {quote.feeFils === 0
+                              ? "Free"
+                              : formatAed(quote.feeFils ?? 0)}
+                          </strong>
+                        </p>
+                      ) : (
+                        <p className="b-shop-notice" role="status">
+                          {quote.minimumMet === false &&
+                          quote.minOrderAed != null
+                            ? `The minimum order for ${quote.zoneName ?? "this area"} is ${formatAed(minFils)}. Add ${formatAed(Math.max(0, minFils - quote.subtotalFils))} more to continue.`
+                            : "Online delivery isn't available for this area yet."}{" "}
+                          {quote.minimumMet === false && (
+                            <a className="b-link" href="/cart">
+                              Edit cart
+                            </a>
+                          )}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+              <fieldset disabled={!pickup && areaMissing}>
+                {!pickup && (
+                  <>
+                    <label>
+                      Street address and community
+                      <Input
+                        required
+                        minLength={5}
+                        maxLength={300}
+                        autoComplete="street-address"
+                        value={delivery.address ?? ""}
+                        onChange={(e) => set("address", e.target.value)}
+                      />
+                    </label>
+                    <div className="b-shop-row">
+                      <label>
+                        Building or villa
+                        <Input
+                          required
+                          maxLength={120}
+                          value={delivery.building ?? ""}
+                          onChange={(e) => set("building", e.target.value)}
+                        />
+                      </label>
+                      <label>
+                        Apartment or unit{" "}
+                        <span className="b-optional">(optional)</span>
+                        <Input
+                          maxLength={40}
+                          value={delivery.unit ?? ""}
+                          onChange={(e) => set("unit", e.target.value)}
+                        />
+                      </label>
+                    </div>
+                  </>
+                )}
                 <div className="b-shop-row">
                   <label>
-                    Delivery date
+                    {pickup ? "Pickup date" : "Delivery date"}
                     <Input
                       required
                       type="date"
@@ -919,7 +988,7 @@ export function CheckoutPage() {
                   </label>
                   {config.slots.length ? (
                     <label>
-                      Delivery time
+                      {pickup ? "Pickup time" : "Delivery time"}
                       <Select
                         required
                         value={delivery.slot ?? ""}
@@ -933,7 +1002,9 @@ export function CheckoutPage() {
                     </label>
                   ) : (
                     <label>
-                      Preferred delivery time
+                      {pickup
+                        ? "Preferred pickup time"
+                        : "Preferred delivery time"}
                       <Input
                         required
                         maxLength={60}
@@ -946,19 +1017,22 @@ export function CheckoutPage() {
                 </div>
                 {!config.slots.length && (
                   <p className="b-caption">
-                    Our team confirms the exact delivery time with you.
+                    Our team confirms the preferred time with you.
                   </p>
                 )}
-                <label>
-                  Delivery notes <span className="b-optional">(optional)</span>
-                  <Textarea
-                    rows={3}
-                    maxLength={500}
-                    placeholder="Gate code, landmark, who will receive it"
-                    value={delivery.notes ?? ""}
-                    onChange={(e) => set("notes", e.target.value)}
-                  />
-                </label>
+                {!pickup && (
+                  <label>
+                    Delivery notes{" "}
+                    <span className="b-optional">(optional)</span>
+                    <Textarea
+                      rows={3}
+                      maxLength={500}
+                      placeholder="Gate code, landmark, who will receive it"
+                      value={delivery.notes ?? ""}
+                      onChange={(e) => set("notes", e.target.value)}
+                    />
+                  </label>
+                )}
               </fieldset>
             </Card>
             {error && <p role="alert">{error}</p>}
@@ -966,7 +1040,7 @@ export function CheckoutPage() {
               <Button
                 type="submit"
                 className="b-co-cta"
-                disabled={!quote?.eligible || areaMissing}
+                disabled={!quote?.eligible || (!pickup && areaMissing)}
               >
                 CONTINUE TO DETAILS
               </Button>
@@ -1040,7 +1114,7 @@ export function CheckoutPage() {
                 </label>
               </div>
               <p id="b-phone-help" className="b-caption">
-                A UAE mobile number, so our driver can reach you.
+                A UAE mobile number, so our team can reach you.
               </p>
               <label>
                 Special instructions{" "}
@@ -1055,14 +1129,23 @@ export function CheckoutPage() {
               </label>
             </Card>
             <Card title="Billing address">
-              <label className="b-check b-co-toggle">
-                <input
-                  type="checkbox"
-                  checked={billing.sameAsDelivery}
-                  onChange={(e) => setB("sameAsDelivery", e.target.checked)}
-                />
-                <span>Billing address is the same as delivery address</span>
-              </label>
+              {!pickup && (
+                <label className="b-check b-co-toggle">
+                  <input
+                    type="checkbox"
+                    checked={!pickup && billing.sameAsDelivery}
+                    disabled={pickup}
+                    onChange={(e) => setB("sameAsDelivery", e.target.checked)}
+                  />
+                  <span>Billing address is the same as delivery address</span>
+                </label>
+              )}
+              {pickup && (
+                <p className="b-caption">
+                  Your billing address is required for payment. No delivery
+                  address is needed.
+                </p>
+              )}
               {billing.sameAsDelivery ? (
                 <p className="b-caption b-co-address-preview">
                   {billingLines(
@@ -1169,6 +1252,7 @@ export function CheckoutPage() {
     <PaymentStep
       config={config}
       lines={cartLines}
+      fulfillmentMethod={fulfillmentMethod}
       delivery={delivery as Delivery}
       customer={customer as Customer}
       billing={billing}
@@ -1273,6 +1357,7 @@ function StateNotice({
 }
 
 function PaymentStep({
+  fulfillmentMethod,
   config,
   lines,
   delivery,
@@ -1282,6 +1367,7 @@ function PaymentStep({
   back,
   backToDelivery,
 }: {
+  fulfillmentMethod: "delivery" | "pickup";
   config: CheckoutConfig;
   lines: CartLine[];
   delivery: Delivery;
@@ -1304,14 +1390,22 @@ function PaymentStep({
   const [leaving, setLeaving] = useState<CustomerPaymentState | null>(null);
   const [error, setError] = useState("");
   const inFlight = useRef(false);
-  const zone = config.zones.find((z) => z.id === delivery.zoneId);
+  const pickup = fulfillmentMethod === "pickup";
+  const zone = pickup
+    ? undefined
+    : config.zones.find((z) => z.id === delivery.zoneId);
   const body = {
     lines,
-    delivery: {
-      ...delivery,
-      unit: delivery.unit || undefined,
-      notes: delivery.notes || undefined,
-    },
+    fulfillmentMethod,
+    ...(pickup
+      ? { pickup: { pickupDate: delivery.date, preferredTime: delivery.slot } }
+      : {
+          delivery: {
+            ...delivery,
+            unit: delivery.unit || undefined,
+            notes: delivery.notes || undefined,
+          },
+        }),
     customer: {
       ...customer,
       instructions: customer.instructions || undefined,
@@ -1392,6 +1486,7 @@ function PaymentStep({
         <OrderSummary
           lines={lines}
           config={config}
+          fulfillmentMethod={fulfillmentMethod}
           subtotal={quote?.subtotalFils ?? 0}
           fee={quote?.feeFils ?? null}
           total={total}
@@ -1412,26 +1507,28 @@ function PaymentStep({
               </ul>
             </div>
             <div className="b-co-review-row">
-              <h2>Delivery</h2>
+              <h2>{pickup ? "Pickup" : "Delivery"}</h2>
               <p>
                 {longDate(delivery.date)} · {delivery.slot}
                 <br />
-                {[
-                  delivery.unit && `Unit ${delivery.unit}`,
-                  delivery.building,
-                  delivery.address,
-                  zone?.name,
-                ]
-                  .filter(Boolean)
-                  .join(", ")}
-                {delivery.notes && (
+                {pickup
+                  ? `${business.tradingName} · ${business.address}`
+                  : [
+                      delivery.unit && `Unit ${delivery.unit}`,
+                      delivery.building,
+                      delivery.address,
+                      zone?.name,
+                    ]
+                      .filter(Boolean)
+                      .join(", ")}
+                {!pickup && delivery.notes && (
                   <>
                     <br />
                     <span className="b-caption">{delivery.notes}</span>
                   </>
                 )}
               </p>
-              {edit(backToDelivery, "Edit delivery")}
+              {edit(backToDelivery, pickup ? "Edit pickup" : "Edit delivery")}
             </div>
             <div className="b-co-review-row">
               <h2>Contact</h2>
@@ -1739,7 +1836,10 @@ function SupportLink({ orderId }: { orderId?: string }) {
 function Confirmation({ result }: { result: Status }) {
   const s = result.summary;
   const name = firstName(s?.customerName);
-  const progress = fulfilmentStep(result.status);
+  const progress =
+    result.summary?.fulfillmentMethod === "pickup" && result.status === "Ready"
+      ? 2
+      : fulfilmentStep(result.status);
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => heading.current?.focus(), []);
   return (
@@ -1792,9 +1892,27 @@ function Confirmation({ result }: { result: Status }) {
               </ul>
               <Totals
                 subtotal={s.subtotalFils}
+                fulfillmentMethod={s.fulfillmentMethod}
                 fee={s.feeFils}
                 total={result.amountFils}
               />
+            </section>
+          )}
+          {s?.pickup && (
+            <section className="b-co-card">
+              <h2>Pickup</h2>
+              <p>
+                {business.tradingName}
+                <br />
+                {business.address}
+              </p>
+              <p>
+                {longDate(s.pickup.pickupDate)} · {s.pickup.preferredTime}
+              </p>
+              <p>
+                Your order will be ready for pickup at the selected date and
+                time.
+              </p>
             </section>
           )}
           {s?.delivery && (
@@ -1865,7 +1983,10 @@ function Confirmation({ result }: { result: Status }) {
               <h2 id="b-conf-next">What happens next</h2>
             </header>
             <ol className="b-co-timeline">
-              {FULFILMENT_STEPS.map((label, i) => (
+              {(s?.fulfillmentMethod === "pickup"
+                ? ["Confirmed", "Preparing", "Ready for pickup", "Collected"]
+                : FULFILMENT_STEPS
+              ).map((label, i) => (
                 <li
                   key={label}
                   className={
