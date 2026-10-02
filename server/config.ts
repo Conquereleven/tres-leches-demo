@@ -84,7 +84,7 @@ export function runtimeConfig(env: NodeJS.ProcessEnv) {
     );
   if (environment === "production") {
     if (
-      env.PROVIDER_MODE !== "offline" ||
+      !["offline", "live"].includes(env.PROVIDER_MODE ?? "") ||
       env.META_OUTBOUND_ENABLED !== "false" ||
       env.AI_ENABLED !== "false" ||
       env.AI_AGENT_DEFAULT_MODE !== "copilot" ||
@@ -96,8 +96,27 @@ export function runtimeConfig(env: NodeJS.ProcessEnv) {
         "Production provider activation disabled; offline copilot configuration required",
       );
   }
-  if (env.PAYMENNT_ENVIRONMENT && env.PAYMENNT_ENVIRONMENT !== "test")
-    throw new Error("Paymennt live activation is disabled");
+  if (
+    env.PAYMENNT_ENVIRONMENT &&
+    !["test", "live"].includes(env.PAYMENNT_ENVIRONMENT)
+  )
+    throw new Error("Invalid Paymennt environment");
+  if (env.PROVIDER_MODE === "live" || env.PAYMENNT_ENVIRONMENT === "live") {
+    if (
+      environment !== "production" ||
+      env.PROVIDER_MODE !== "live" ||
+      env.PAYMENNT_ENVIRONMENT !== "live" ||
+      env.APP_ORIGIN !== "https://www.3ldubai.ae" ||
+      !env.PAYMENNT_API_KEY ||
+      !env.PAYMENNT_API_SECRET ||
+      !env.PAYMENNT_WEBHOOK_SECRET_FILE
+    )
+      throw new Error(
+        "LIVE requires explicit provider configuration in canonical Production",
+      );
+  }
+  if (environment === "production" && env.PROVIDER_MODE === "test")
+    throw new Error("Production cannot use TEST credentials");
   if (
     env.META_OUTBOUND_ENABLED === "true" &&
     !(env.PROVIDER_MODE === "test" || env.INTEGRATION_MODE === "true")
@@ -123,8 +142,8 @@ export function runtimeConfig(env: NodeJS.ProcessEnv) {
       SESSION_SECURE: z.literal("true"),
       SAFE_LOGS: z.literal("true"),
       WEBHOOK_SECRET: z.string().min(24),
-      PROVIDER_MODE: z.enum(["offline", "test"]),
-      PAYMENNT_ENVIRONMENT: z.literal("test"),
+      PROVIDER_MODE: z.enum(["offline", "test", "live"]),
+      PAYMENNT_ENVIRONMENT: z.enum(["test", "live"]),
       META_OUTBOUND_ENABLED: z.enum(["false", "true"]),
       OPERATOR_USERS_JSON: z.string().min(2),
       STAGING_SEED: z.literal("empty"),
@@ -184,12 +203,24 @@ export function activationConfig(env: NodeJS.ProcessEnv) {
           : undefined,
       }
     : undefined;
+  const paymentEnabled =
+    externalProvidersEnabled || env.PROVIDER_MODE === "live";
+  if (
+    env.PROVIDER_MODE === "live" &&
+    (env.APP_ENV !== "production" ||
+      env.PAYMENNT_ENVIRONMENT !== "live" ||
+      env.APP_ORIGIN !== "https://www.3ldubai.ae")
+  )
+    throw new Error("Invalid LIVE environment pairing");
+  if (externalProvidersEnabled && env.PAYMENNT_ENVIRONMENT === "live")
+    throw new Error("TEST cannot use LIVE credentials");
   const paymennt =
-    externalProvidersEnabled && env.PAYMENNT_API_KEY
+    paymentEnabled && env.PAYMENNT_API_KEY
       ? {
           apiKey: env.PAYMENNT_API_KEY,
           apiSecret: z.string().min(1).parse(env.PAYMENNT_API_SECRET),
-          environment: "test" as const,
+          environment: (env.PROVIDER_MODE === "live" ? "live" : "test") as
+            "test" | "live",
         }
       : undefined;
   const geoToken =

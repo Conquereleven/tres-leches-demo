@@ -1,0 +1,13 @@
+# Controlled Paymennt LIVE release
+
+LIVE uses APP_ENV=production, PROVIDER_MODE=live, PAYMENNT_ENVIRONMENT=live and APP_ORIGIN=https://www.3ldubai.ae. TEST remains staging/test and uses its separate Railway credentials and volume. Mixed mode/environment combinations fail closed. Offline Production rollback remains supported. Meta outbound and AI production gates remain unchanged.
+
+Fixed official hosts: TEST https://api.test.paymennt.com/mer/v2.0; LIVE https://api.paymennt.com/mer/v2.0. Hosted redirects are environment-bound (TEST pay.test.paymennt.com, LIVE pay.paymennt.com). Production routes only hosted /checkout/web; browser token/debit/prepare/retry paths are unavailable in LIVE. Public config exposes neither credentials, public key nor frame metadata. No query parameter confirms paid; authoritative GET, amount/currency/provider-reference verification and once-only ORDER_PAID remain mandatory.
+
+Before changing service configuration, execute registration inside the existing Production container with process-local LIVE overrides, using the Production environment credentials. Create /data/secrets mode0700; use /data/secrets/paymennt-live-webhook.json mode0600. Registration has exclusive durable intent, one POST /webhooks, exact callback validation and atomic/fsynced file replacement. If registration is uncertain, stop and recover with Paymennt; do not retry. Never print the file or returned hmacKey. Registration logs only the non-secret ID and callback.
+
+Validate the file with loadWebhookSecret and exact callback https://www.3ldubai.ae/api/webhooks/payment. Only then configure PAYMENNT_WEBHOOK_SECRET_FILE and LIVE mode/environment with --skip-deploys, followed by deployment of the validated commit. Preserve the existing Production volume and release-production database. Check there is no pre-existing pending provider work before activation. Record a verified SQLite backup and hashes of orders/payments/history. Approved delivery-rule migration takes its own backup and updates only zones plus its marker; frozen quotes/orders/payments are not repriced.
+
+Post-deployment checks are GET-only: /, /cart, /checkout, /api/checkout/config, /api/health. Do not automatically create checkouts or enter cards. Joel manually performs the first LIVE purchase at https://www.3ldubai.ae after health validation. HMAC verification remains raw bytes + Base64 HMAC-SHA256, X-PointCheckout-Hmac-Sha256. No synthetic webhook with the real secret is permitted.
+
+Rollback: restore the recorded prior deployment and its prior non-secret offline/test configuration; preserve the secret file and database. Never restore a database backup over current paid orders. Pending financial work requires review before any later activation.

@@ -154,7 +154,7 @@ export const destinations: {
    * Support only; customer orders are placed through the web cart and checkout.
    */
   whatsapp: "+971521683319",
-  instagram: null,
+  instagram: "https://www.instagram.com/3ldubai/",
   tiktok: null,
   privacy: null,
 };

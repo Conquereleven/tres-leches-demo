@@ -223,23 +223,24 @@ export type ContactChannel = {
   value: string;
   href: string;
 };
-export function contactChannels(): ContactChannel[] {
+export function contactChannels({
+  contactPage = false,
+}: { contactPage?: boolean } = {}): ContactChannel[] {
   const channels: ContactChannel[] = [];
-  const wa = whatsappUrl(
-    business.whatsapp,
-    "Hello 3L, I have a question about my order.",
-  );
-  if (wa && business.whatsapp)
+  // Contact-page orders line is distinct from the unchanged floating support line.
+  const phone = contactPage ? "+971585943319" : business.whatsapp;
+  const wa = whatsappUrl(phone, "Hello 3L, I have a question about my order.");
+  if (wa && phone)
     channels.push({
       kind: "whatsapp",
       label: "WhatsApp — orders",
-      value: formatUaePhone(business.whatsapp),
+      value: formatUaePhone(phone),
       href: wa,
     });
   for (const contact of business.supportContacts)
     channels.push({
       kind: "phone",
-      label: contact.name,
+      label: contactPage && contact.name === "Liza" ? "La Liza" : contact.name,
       value: contact.phone,
       href: phoneHref(contact.phone),
     });

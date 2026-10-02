@@ -38,7 +38,7 @@ import {
   DisabledWhatsAppProvider,
   UnconfiguredPaymentProvider,
 } from "./adapters/blocked";
-import { PAYMENNT_FRAMES, PaymenntProvider } from "./adapters/paymennt";
+import { PaymenntProvider } from "./adapters/paymennt";
 import { MetaWhatsAppProvider } from "./adapters/meta";
 import { MapboxGeoProvider } from "./adapters/mapbox";
 import { GeocodingAdapter } from "./adapters/geo";
@@ -128,7 +128,11 @@ export async function startServer(
     : undefined;
   if (backups) await backups.run();
   // TEST-only activation. Production keeps its database unchanged until approved.
-  if (staging) await applyApprovedDeliveryRules(store, staging.BACKUP_DIR);
+  if (
+    staging &&
+    (runtime.environment === "staging" || process.env.PROVIDER_MODE === "live")
+  )
+    await applyApprovedDeliveryRules(store, staging.BACKUP_DIR);
   const meta =
     overrides.whatsapp instanceof MetaWhatsAppProvider
       ? overrides.whatsapp
@@ -138,6 +142,12 @@ export async function startServer(
   const webhookSecret = loadWebhookSecret(
     process.env.PAYMENNT_WEBHOOK_SECRET_FILE,
   );
+  if (
+    activation.paymennt?.environment === "live" &&
+    (!webhookSecret ||
+      webhookSecret.address !== "https://www.3ldubai.ae/api/webhooks/payment")
+  )
+    throw new Error("LIVE webhook configuration invalid");
   const paymentVerifier = new PaymenntNotificationVerifier(
     webhookSecret?.hmacKey,
   );
@@ -292,6 +302,9 @@ export async function startServer(
             ((runtime.environment === "staging" &&
               process.env.PROVIDER_MODE === "test" &&
               !!paymennt) ||
+              (runtime.environment === "production" &&
+                process.env.PROVIDER_MODE === "live" &&
+                paymennt?.environment === "live") ||
               (isolatedTest &&
                 overrides.payment instanceof PaymenntProvider)) &&
             !!webhookSecret;
@@ -318,20 +331,12 @@ export async function startServer(
               enabled: enabled && products.length > 0,
               catalogAvailable: products.length > 0,
               paymentFlow: "web",
-              mode: enabled ? "test" : "offline",
+              mode: enabled ? (paymennt?.environment ?? "test") : "offline",
               products,
               slots: configuredSlots(),
               dates: { min: today, max: addDays(today, MAX_BOOKING_DAYS) },
-              publicKey: enabled
-                ? (process.env.PAYMENNT_PUBLIC_KEY ?? null)
-                : null,
-              frame: enabled
-                ? PAYMENNT_FRAMES[
-                    process.env.PAYMENNT_ENVIRONMENT === "live"
-                      ? "live"
-                      : "test"
-                  ]
-                : null,
+              publicKey: null,
+              frame: null,
               product: product
                 ? {
                     id: product.id,
@@ -368,6 +373,19 @@ export async function startServer(
           )
             throw new DomainError(415, "JSON required");
           const body = parse(await rawBody(req));
+          if (
+            paymennt?.environment === "live" &&
+            [
+              "/api/checkout/token",
+              "/api/checkout/prepare",
+              "/api/checkout/retry",
+              "/api/checkout",
+            ].includes(path)
+          )
+            throw new DomainError(
+              403,
+              "LIVE supports hosted web checkout only",
+            );
           if (
             path === "/api/checkout/retry" ||
             path === "/api/checkout/token" ||
@@ -429,7 +447,9 @@ export async function startServer(
             ok: true,
             environment: runtime.environment,
             mode:
-              runtime.environment === "production" ? "offline" : "integration",
+              runtime.environment === "production"
+                ? process.env.PROVIDER_MODE
+                : "integration",
             revision: process.env.BUILD_SOURCE_SHA ?? "unknown",
           });
         if (req.method === "GET" && path === "/api/ready") {

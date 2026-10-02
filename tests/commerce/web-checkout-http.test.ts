@@ -74,7 +74,7 @@ test("public checkout HTTP, signatures, authoritative settlement and untrusted r
       });
     const config = await (await fetch(h.base + "/api/checkout/config")).json();
     assert.equal(config.enabled, true);
-    assert.equal(config.publicKey, "pk_test_public_fixture");
+    assert.equal(config.publicKey, null);
     assert.equal(JSON.stringify(config).includes("fixture-secret"), false);
     assert.equal(config.product.priceFils, 2500);
     assert.equal(JSON.stringify(config).includes("fixture-key"), false);

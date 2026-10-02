@@ -69,7 +69,7 @@ export class Readiness {
         this.fresh("paymennt") ??
         check(
           !!this.paymennt,
-          "TEST credentials: " +
+          `${this.paymennt?.environment.toUpperCase() ?? "Paymennt"} credentials: ` +
             yes(this.paymennt) +
             "; API connectivity: not yet verified",
         ),

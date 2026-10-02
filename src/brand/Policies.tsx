@@ -43,8 +43,8 @@ const cutoff = cancellationCutoffHours;
 const refundPct = cancellationRefundPercent;
 const feePct = cancellationFeePercent;
 
-function ContactDetails() {
-  const channels = contactChannels();
+function ContactDetails({ contactPage = false }: { contactPage?: boolean }) {
+  const channels = contactChannels({ contactPage });
   return (
     <>
       {channels.length > 0 && (
@@ -1041,7 +1041,7 @@ export const pages: Record<PolicyPath, Page> = {
       {
         id: "contact-channels",
         title: "Customer care",
-        body: <ContactDetails />,
+        body: <ContactDetails contactPage />,
       },
       {
         id: "order-help",

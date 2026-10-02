@@ -844,7 +844,8 @@ export class CommerceService {
       if (p.checkoutFlow === "web" && checkout.url) {
         const redirect = new URL(checkout.url);
         requireThat(
-          redirect.origin === "https://pay.test.paymennt.com" &&
+          this.payment instanceof PaymenntProvider &&
+            this.payment.isHostedRedirect(checkout.url) &&
             !redirect.username &&
             !redirect.password,
           "Untrusted checkout redirect",

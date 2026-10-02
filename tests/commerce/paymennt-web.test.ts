@@ -37,6 +37,7 @@ const input = {
 function fixture(
   unknown = false,
   responseOverrides: Record<string, unknown> = {},
+  environment: "test" | "live" = "test",
 ) {
   const store = new Store(":memory:", "test");
   store.write((s) => {
@@ -49,17 +50,21 @@ function fixture(
   let status = "PENDING";
   let body: Record<string, unknown> = {};
   const provider = new PaymenntProvider(
-    { apiKey: "fixture", apiSecret: "fixture", environment: "test" },
+    { apiKey: "fixture", apiSecret: "fixture", environment },
     async (url, init) => {
       assert.ok(
         String(url).startsWith(
-          "https://api.test.paymennt.com/mer/v2.0/checkout",
+          environment === "live"
+            ? "https://api.paymennt.com/mer/v2.0/checkout"
+            : "https://api.test.paymennt.com/mer/v2.0/checkout",
         ),
       );
       if (init?.method === "POST") {
         assert.equal(
           String(url),
-          "https://api.test.paymennt.com/mer/v2.0/checkout/web",
+          environment === "live"
+            ? "https://api.paymennt.com/mer/v2.0/checkout/web"
+            : "https://api.test.paymennt.com/mer/v2.0/checkout/web",
         );
         posts++;
         body = JSON.parse(String(init.body));
@@ -70,7 +75,10 @@ function fixture(
             ...body,
             id: "checkout-fixture",
             status: "PAID",
-            redirectUrl: "https://pay.test.paymennt.com/checkout/fixture",
+            redirectUrl:
+              environment === "live"
+                ? "https://pay.paymennt.com/checkout/fixture"
+                : "https://pay.test.paymennt.com/checkout/fixture",
             ...responseOverrides,
           },
         });
@@ -86,7 +94,10 @@ function fixture(
                 ...body,
                 id: "checkout-fixture",
                 status,
-                redirectUrl: "https://pay.test.paymennt.com/checkout/fixture",
+                redirectUrl:
+                  environment === "live"
+                    ? "https://pay.paymennt.com/checkout/fixture"
+                    : "https://pay.test.paymennt.com/checkout/fixture",
               },
             ],
           },
@@ -97,7 +108,10 @@ function fixture(
           ...body,
           id: "checkout-fixture",
           status,
-          redirectUrl: "https://pay.test.paymennt.com/checkout/fixture",
+          redirectUrl:
+            environment === "live"
+              ? "https://pay.paymennt.com/checkout/fixture"
+              : "https://pay.test.paymennt.com/checkout/fixture",
         },
       });
     },
@@ -337,6 +351,40 @@ test("pickup hosted checkout: no zone/minimum/shipping address; server pricing a
     await reconcileEmbeddedPayment(f.service, key);
     assert.equal(f.store.read().orders[0]!.state, "Confirmed");
     assert.equal(f.store.read().operationsNotifications?.length, 1);
+  } finally {
+    f.store.close();
+  }
+});
+
+test("LIVE hosted mock routes exclusively to LIVE; authoritative repeated GET confirms once", async () => {
+  const f = fixture(false, {}, "live");
+  const key = randomUUID();
+  try {
+    const result = await createWebCheckout(
+      f.service,
+      input,
+      key,
+      "web",
+      "https://www.3ldubai.ae",
+    );
+    assert.equal(result.url, "https://pay.paymennt.com/checkout/fixture");
+    assert.equal(result.paymentStatus, "pending");
+    assert.equal(f.body().returnUrl, "https://www.3ldubai.ae/checkout/return");
+    await createWebCheckout(
+      f.service,
+      input,
+      key,
+      "web",
+      "https://www.3ldubai.ae",
+    );
+    f.status("PAID");
+    await reconcileEmbeddedPayment(f.service, key);
+    await reconcileEmbeddedPayment(f.service, key);
+    assert.equal(f.counts().posts, 1);
+    assert.equal(f.store.read().orders.length, 1);
+    assert.equal(f.store.read().payments.length, 1);
+    assert.equal(f.store.read().operationsNotifications?.length, 1);
+    assert.equal(readWebCheckoutStatus(f.service, key).status, "Confirmed");
   } finally {
     f.store.close();
   }

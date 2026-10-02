@@ -137,8 +137,8 @@ export class PaymenntProvider implements PaymentProvider {
     private fetcher: typeof fetch = fetch,
     verifier?: WebhookVerifier,
   ) {
-    if (config.environment !== "test")
-      throw new Error("Live Paymennt disabled pending approved release");
+    if (!["test", "live"].includes(config.environment))
+      throw new Error("Explicit Paymennt environment required");
     if (!config.apiKey || !config.apiSecret)
       throw new Error("Paymennt credentials required");
     this.base =
@@ -306,6 +306,24 @@ export class PaymenntProvider implements PaymentProvider {
       throw new ProviderFailure("unknown", false);
     return this.getCheckout(found.checkoutId);
   }
+  get environment() {
+    return this.config.environment;
+  }
+  isHostedRedirect(raw: string) {
+    try {
+      const url = new URL(raw);
+      return (
+        url.origin ===
+          (this.config.environment === "live"
+            ? "https://pay.paymennt.com"
+            : "https://pay.test.paymennt.com") &&
+        !url.username &&
+        !url.password
+      );
+    } catch {
+      return false;
+    }
+  }
   async createWebPayment(
     input: Omit<
       Parameters<PaymenntProvider["createTokenPayment"]>[0],
@@ -353,11 +371,7 @@ export class PaymenntProvider implements PaymentProvider {
     )
       throw new ProviderFailure("unknown", false);
     const url = new URL(checkout.url);
-    if (
-      url.origin !== "https://pay.test.paymennt.com" ||
-      url.username ||
-      url.password
-    )
+    if (!this.isHostedRedirect(checkout.url) || url.username || url.password)
       throw new ProviderFailure("unknown", false);
     // Creation response is never authority for ORDER_PAID; reconciliation is GET-only.
     return {
@@ -389,6 +403,8 @@ export class PaymenntProvider implements PaymentProvider {
     deliveryAddress: PaymenntAddress;
     returnUrl: string;
   }) {
+    if (this.config.environment === "live")
+      throw new ProviderFailure("rejected", false);
     // Validated before any request: a debit is never sent with a null,
     // missing or partial billing or delivery address.
     const billingAddress = paymenntAddressSchema.parse(input.billingAddress);

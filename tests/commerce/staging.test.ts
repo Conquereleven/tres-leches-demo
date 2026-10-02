@@ -91,18 +91,19 @@ test("TL18 rejects insecure origins, excessive sessions, missing roles, duplicat
   );
   assert.throws(() => runtimeConfig({ ...env, DEMO_MODE: "true" }));
 });
-test("TL18 notification slot always rejects and Paymennt adapter itself refuses live mode", () => {
+test("notification rejects missing key; LIVE adapter uses explicit LIVE environment", () => {
   const verifier = new PaymenntNotificationVerifier();
   assert.equal(verifier.verify("{}", ""), false);
   assert.equal(verifier.status, "IMPLEMENTED");
-  assert.throws(
-    () =>
-      new PaymenntProvider({
-        apiKey: "fixture",
-        apiSecret: "fixture",
-        environment: "live",
-      }),
-    /disabled|explicit provider configuration/,
+  const live = new PaymenntProvider({
+    apiKey: "fixture",
+    apiSecret: "fixture",
+    environment: "live",
+  });
+  assert.equal(live.environment, "live");
+  assert.equal(
+    live.isHostedRedirect("https://pay.test.paymennt.com/checkout/fixture"),
+    false,
   );
 });
 test("TL18 fresh staging seed labels every record TEST and creates no payments or jobs", () => {

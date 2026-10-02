@@ -8,12 +8,16 @@ import { PaymenntProvider } from "../server/adapters/paymennt";
 let fd: number | undefined;
 try {
   process.umask(0o077);
-  if (
-    process.argv[2] !== "register" ||
-    process.env.APP_ENV !== "staging" ||
-    process.env.PAYMENNT_ENVIRONMENT !== "test"
-  )
-    throw new Error();
+  const live =
+    process.env.APP_ENV === "production" &&
+    process.env.PAYMENNT_ENVIRONMENT === "live" &&
+    process.env.PROVIDER_MODE === "live" &&
+    process.env.APP_ORIGIN === "https://www.3ldubai.ae";
+  const test =
+    process.env.APP_ENV === "staging" &&
+    process.env.PAYMENNT_ENVIRONMENT === "test" &&
+    process.env.PROVIDER_MODE === "test";
+  if (process.argv[2] !== "register" || !(live || test)) throw new Error();
   const file = process.env.PAYMENNT_WEBHOOK_SECRET_FILE;
   const origin = new URL(process.env.APP_ORIGIN ?? "");
   if (
@@ -25,8 +29,10 @@ try {
   const provider = new PaymenntProvider({
     apiKey: process.env.PAYMENNT_API_KEY ?? "",
     apiSecret: process.env.PAYMENNT_API_SECRET ?? "",
-    environment: "test",
+    environment: live ? "live" : "test",
   });
+  if (live && file !== "/data/secrets/paymennt-live-webhook.json")
+    throw new Error();
   // Exclusive durable intent prevents accidental second registration even after timeout/crash.
   privateSecretPath(file);
   fd = openSync(file, "wx", 0o600);
@@ -53,7 +59,13 @@ try {
   } finally {
     closeSync(parent);
   }
-  console.log("WEBHOOK CONFIGURED");
+  console.log(
+    JSON.stringify({
+      status: "WEBHOOK CONFIGURED",
+      id: secret.id,
+      address: secret.address,
+    }),
+  );
 } catch {
   console.error(
     "WEBHOOK NOT CONFIGURED. Inspect private registration state; never retry an uncertain registration blindly.",

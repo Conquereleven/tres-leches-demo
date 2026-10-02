@@ -522,7 +522,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
           </Section>
         )}
         <Section id="community" className="b-community">
-          <SectionLabel>@3L.DUBAI</SectionLabel>
+          <SectionLabel>@3ldubai</SectionLabel>
           <EditorialHeading>MORE THAN A CAKE.</EditorialHeading>
           <p>A community that makes everything sweeter.</p>
           <ImageFrame asset={assets.social} />
@@ -671,7 +671,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             </>
           ) : dialog === "social" ? (
             <>
-              <p>@3L.DUBAI</p>
+              <p>@3ldubai</p>
               {/* Reachable only when a profile is configured; the entry
                   points are hidden otherwise, so there is no empty state. */}
               <nav className="b-modal-nav" aria-label="Social profiles">
