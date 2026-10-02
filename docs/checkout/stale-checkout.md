@@ -1,0 +1,15 @@
+# Cart-bound website checkout
+
+The previous browser session guard treated every pending/paid checkout as a global hold. Editing the cart therefore led to the earlier order and amount. The UI now validates the current cart with POST /api/checkout/resume before showing a saved payment and again before creating one.
+
+The server persists SHA256 over sorted canonical SKU/quantity/current catalog price lines, subtotal, delivery fee, total, zone, fulfillment method and normalized delivery/pickup details. SKU identity includes approved size/flavour. Browser amounts and hashes are never financial authority. Each checkout keeps its original input hash plus its cart hash. Older records without a cart hash are conservatively replaced, never assumed identical.
+
+On mismatch, a SQLite transaction records a replacement capability per canonical hash. The unpaid association and payment receive supersededAt; the order and payment timeline retain audit evidence. Financial status, provider id, amount, order history and provider objects remain intact. Unsent local payment jobs are removed; processing/unknown/authorized payments require verification instead of blind replacement. No provider cancel/charge call is made during validation. Superseded capabilities cannot return a payment URL, create another checkout with that key, resend a link or submit legacy tokens. Authoritative reconciliation and late signed notifications still apply to their original payment; they never attach to the replacement order.
+
+Paid orders/payments are not modified. A different cart starts a separate order. Identical current carts reuse their unpaid checkout. Duplicate resume requests share a durable replacement key, and duplicate creation requests share the existing domain/outbox receipt. Changing a price, SKU/variant, quantity, delivery rule or fulfillment details invalidates the previous context.
+
+Browser storage holds only cart SKU/quantity in localStorage and checkout capability/input fingerprint in sessionStorage. It preserves recovery references until server validation replaces them; no cache reset or manual action is needed. Current cart totals remain visible during validation; payment is disabled while checking.
+
+Verification uses an isolated SQLite database and an in-process Paymennt mock. Browser evidence: work/qa/stale-checkout/{150-to-375,36-to-108}-{390,1440}.png. Unit tests cover canonical sort, quantity/product/variant/price/fulfillment changes, paid immutability, preserved unpaid audit, stale URL suppression, repeat creation and uncertain-payment protection. The test-only AED36 SKU is confined to the local fixture harness.
+
+Release scope: paymennt-test only. Do not deploy Production without approval. Do not enter a card or complete a real payment for this validation. Production credentials, Meta, delivery rules and catalog data are unchanged.

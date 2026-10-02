@@ -490,7 +490,10 @@ export class CommerceService {
     if (cmd.type === "resendPayment") {
       const p = s.payments.find((p) => p.id === o.paymentId);
       requireThat(
-        p?.url && p.status === "pending" && o.state === "Awaiting Payment",
+        p?.url &&
+          !p.supersededAt &&
+          p.status === "pending" &&
+          o.state === "Awaiting Payment",
         "No hay un enlace pendiente",
       );
       requireThat(
@@ -1031,6 +1034,7 @@ export class CommerceService {
     });
   }
   private async createHostedWebPayment(payment: Payment, snapshot: State) {
+    requireThat(!payment.supersededAt, "Checkout superseded", 409);
     requireThat(
       this.payment instanceof PaymenntProvider,
       "Web checkout unavailable",

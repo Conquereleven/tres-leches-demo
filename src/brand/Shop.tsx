@@ -1270,12 +1270,8 @@ export function CheckoutPage() {
   );
 }
 
-/**
- * A checkout from this browser session that is paid, or whose payment is held
- * for review, must never lead to a second charge: the customer is sent to its
- * status instead of starting a new order.
- */
-async function heldCheckout(): Promise<Status | null> {
+/** Resolve this cart on the server before reusing a session checkout. */
+async function heldCheckout(checkout: unknown): Promise<Status | null> {
   let saved: { key?: string } | null = null;
   try {
     saved = JSON.parse(sessionStorage.getItem(CAPABILITY) ?? "null");
@@ -1283,14 +1279,20 @@ async function heldCheckout(): Promise<Status | null> {
     return null;
   }
   if (!saved?.key) return null;
-  const res = await fetch("/api/checkout/status", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ key: saved.key }),
-  });
-  if (res.status === 404) return null;
-  if (!res.ok) throw new Error("Unable to check your previous payment.");
-  const status = (await res.json()) as Status;
+  const result = await post<{
+    key: string;
+    cartHash: string;
+    changed: boolean;
+    status?: Status;
+  }>("/api/checkout/resume", { key: saved.key, checkout });
+  if (!result.status) {
+    sessionStorage.setItem(
+      CAPABILITY,
+      JSON.stringify({ key: result.key, cartHash: result.cartHash }),
+    );
+    return null;
+  }
+  const status = result.status;
   return status.actionRequired === "review_payment" ||
     [
       "creating",
@@ -1386,11 +1388,7 @@ function PaymentStep({
 }) {
   const [reviewed, setReviewed] = useState(false);
   const [held, setHeld] = useState<Status | null>(null);
-  useEffect(() => {
-    heldCheckout()
-      .then(setHeld)
-      .catch(() => undefined);
-  }, []);
+  const [checkingPrevious, setCheckingPrevious] = useState(true);
   const [busy, setBusy] = useState(false);
   /** Set just before the page navigates away, so the button stays locked. */
   const [leaving, setLeaving] = useState<CustomerPaymentState | null>(null);
@@ -1429,29 +1427,50 @@ function PaymentStep({
         },
   };
 
+  const cartContext = JSON.stringify(body);
+  useEffect(() => {
+    let active = true;
+    setCheckingPrevious(true);
+    setHeld(null);
+    void heldCheckout(JSON.parse(cartContext))
+      .then((previous) => {
+        if (active) setHeld(previous);
+      })
+      .catch((err: unknown) => {
+        if (active)
+          setError(
+            err instanceof Error ? err.message : "Unable to verify checkout.",
+          );
+      })
+      .finally(() => {
+        if (active) setCheckingPrevious(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [cartContext]);
+
   async function pay(e: React.FormEvent) {
     e.preventDefault();
-    if (!reviewed || inFlight.current) return;
+    if (!reviewed || inFlight.current || checkingPrevious) return;
     inFlight.current = true;
     setBusy(true);
     setError("");
     try {
       // Same details → same idempotency key → the same order and payment.
       const fingerprint = JSON.stringify(body);
-      const saved = JSON.parse(sessionStorage.getItem(CAPABILITY) ?? "null");
-      if (saved?.key && saved.fingerprint !== fingerprint) {
-        // Changed details would open a new order; never while an earlier
-        // payment from this session is paid or held for review.
-        const previous = await heldCheckout();
-        if (previous) {
-          setHeld(previous);
-          inFlight.current = false;
-          setBusy(false);
-          return;
-        }
+      const previous = await heldCheckout(body);
+      if (previous) {
+        setHeld(previous);
+        inFlight.current = false;
+        setBusy(false);
+        return;
       }
+      const saved = JSON.parse(sessionStorage.getItem(CAPABILITY) ?? "null");
       const key =
-        saved?.fingerprint === fingerprint ? saved.key : crypto.randomUUID();
+        saved?.key && (!saved.fingerprint || saved.fingerprint === fingerprint)
+          ? saved.key
+          : crypto.randomUUID();
       sessionStorage.setItem(CAPABILITY, JSON.stringify({ key, fingerprint }));
       const result = await post<Status>("/api/checkout/web", body, key);
       if (result.paymentStatus === "paid") {
@@ -1474,7 +1493,7 @@ function PaymentStep({
     }
   }
   const total = quote?.eligible ? quote.totalFils : null;
-  const locked = busy || !!leaving;
+  const locked = busy || !!leaving || checkingPrevious;
   const issue = error ? paymentStateOfError(error) : null;
   const edit = (onClick: () => void, label: string) => (
     <button

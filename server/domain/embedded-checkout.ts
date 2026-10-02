@@ -94,6 +94,7 @@ export async function submitEmbeddedPayment(
   );
   const provider = service.payment;
   const { order, payment, s } = owned(service, input.key);
+  requireThat(!payment.supersededAt, "Checkout superseded", 409);
   requireThat(
     order.id === input.orderId && payment.directAttempt,
     "Checkout mismatch",
@@ -308,6 +309,7 @@ export async function retryEmbeddedPayment(
 ) {
   await reconcileEmbeddedPayment(service, key);
   const { order, payment } = owned(service, key);
+  requireThat(!payment.supersededAt, "Checkout superseded", 409);
   requireThat(
     payment.directAttempt &&
       ["failed", "cancelled", "expired"].includes(payment.status),

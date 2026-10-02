@@ -159,6 +159,7 @@ export type OperationsNotification = {
   lastError?: string;
 };
 export type Payment = {
+  supersededAt?: string;
   checkoutFlow?: "web";
   webReturnUrl?: string;
   directAttempt?: "ready" | "submitted" | "resolved" | "unknown";
@@ -254,7 +255,14 @@ export type State = {
   operationsNotifications?: OperationsNotification[];
   webCheckouts?: Record<
     string,
-    { inputHash: string; orderId: string; createdAt: string }
+    {
+      inputHash: string;
+      orderId: string;
+      createdAt: string;
+      cartHash?: string;
+      supersededAt?: string;
+      replacements?: Record<string, string>;
+    }
   >;
   ai?: import("../agents/model").AgentData;
   catalog?: CatalogItem[];

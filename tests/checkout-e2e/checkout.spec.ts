@@ -200,7 +200,7 @@ test("a paid checkout in this session cannot be paid again", async ({
       email: customer.email,
     },
   });
-  // Same session, cart refilled with different details.
+  // Same cart and fulfillment must keep the paid order protected.
   await page.goto("/");
   await page.evaluate(
     ([k, d, c]) => {
@@ -211,7 +211,7 @@ test("a paid checkout in this session cannot be paid again", async ({
       sessionStorage.setItem(
         "3l-checkout-draft",
         JSON.stringify({
-          delivery: { ...d, building: "Other Tower" },
+          delivery: d,
           customer: c,
           billing: { sameAsDelivery: true },
         }),

@@ -289,6 +289,122 @@ export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
 const digest = (s: string) => createHash("sha256").update(s).digest("hex");
 const keySchema = z.uuid();
 
+/** SKU ids encode the approved size/flavour; prices are always read from the catalog. */
+export function canonicalCartHash(
+  service: CommerceService,
+  raw: unknown,
+  fulfillment?: unknown,
+) {
+  const cart = cartQuoteSchema.parse(raw);
+  const quote = quoteWebCheckout(service, cart);
+  requireThat(quote.eligible, quote.reason, 422);
+  const catalog = service.store.read().catalog ?? [];
+  const priced = cart.lines
+    .map((line) => {
+      const product = catalog.find((p) => p.id === line.productId);
+      requireThat(product?.active, "Product unavailable", 422);
+      return {
+        sku: line.productId,
+        quantity: line.quantity,
+        unitPriceFils: product.priceFils,
+      };
+    })
+    .sort((a, b) => a.sku.localeCompare(b.sku));
+  return digest(
+    JSON.stringify({
+      lines: priced,
+      fulfillment: fulfillment ?? null,
+      fulfillmentMethod: cart.fulfillmentMethod ?? "delivery",
+      zoneId: cart.zoneId ?? null,
+      subtotalFils: quote.subtotalFils,
+      feeFils: quote.feeFils,
+      totalFils: quote.totalFils,
+    }),
+  );
+}
+
+/** Validate before resuming, atomically retiring only the local payable association. */
+export function resumeWebCheckout(service: CommerceService, raw: unknown) {
+  const { key, checkout } = z
+    .object({ key: z.uuid(), checkout: z.unknown() })
+    .strict()
+    .parse(raw);
+  return service.store.transaction(() => {
+    const input = normalizeCheckout(checkout);
+    const cartHash = canonicalCartHash(
+      service,
+      {
+        lines: input.lines,
+        ...(input.fulfillmentMethod === "pickup"
+          ? { fulfillmentMethod: "pickup" }
+          : { zoneId: input.zoneId }),
+      },
+      { delivery: input.delivery ?? null, pickup: input.pickup ?? null },
+    );
+    const snapshot = service.store.read();
+    const record = snapshot.webCheckouts?.[digest(key)];
+    if (!record) return { key: randomUUID(), cartHash, changed: false };
+    const order = snapshot.orders.find((o) => o.id === record.orderId)!;
+    const payment = snapshot.payments.find((p) => p.id === order.paymentId)!;
+    // Older associations have no hash: replace them conservatively, never assume a match.
+    if (!record.supersededAt && record.cartHash === cartHash)
+      return {
+        key,
+        cartHash,
+        changed: false,
+        status: readWebCheckoutStatus(service, key),
+      };
+    requireThat(
+      !["authorized", "pending_confirmation"].includes(payment.status) &&
+        payment.directAttempt !== "unknown" &&
+        payment.directAttempt !== "submitted" &&
+        !snapshot.jobs.some(
+          (j) =>
+            j.kind === "payment" &&
+            j.entityId === payment.id &&
+            ["processing", "unknown"].includes(j.status),
+        ),
+      "The previous payment must be verified before updating checkout.",
+      409,
+    );
+    let nextKey = record.replacements?.[cartHash];
+    service.store.write((s) => {
+      const previous = s.webCheckouts![digest(key)]!;
+      previous.replacements ??= {};
+      nextKey ??= randomUUID();
+      previous.replacements[cartHash] = nextKey!;
+      if (payment.status !== "paid" && !previous.supersededAt) {
+        const at = new Date().toISOString();
+        previous.supersededAt = at;
+        const p = s.payments.find((p) => p.id === payment.id)!;
+        p.supersededAt = at;
+        p.timeline.push({
+          at,
+          actor: WEB_ACTOR.id,
+          action:
+            "Checkout superseded after cart change; financial status preserved",
+        });
+        s.orders
+          .find((o) => o.id === order.id)!
+          .audit.push({
+            at,
+            actor: WEB_ACTOR.id,
+            action: "Website checkout superseded after cart change",
+          });
+        s.jobs = s.jobs.filter(
+          (j) =>
+            !(
+              j.kind === "payment" &&
+              j.entityId === payment.id &&
+              j.status === "pending"
+            ),
+        );
+      }
+    });
+    return { key: nextKey!, cartHash, changed: true };
+  });
+}
+
 /** Server-side quote for a cart. The browser never supplies a price. */
 export function quoteWebCheckout(service: CommerceService, raw: unknown) {
   const cart = cartQuoteSchema.safeParse(raw);
@@ -338,6 +454,8 @@ export type WebCheckoutSummary = {
   customerName?: string;
 };
 export type WebCheckoutResult = {
+  cartHash?: string;
+  superseded?: boolean;
   orderId: string;
   status: Order["state"];
   paymentStatus: string;
@@ -365,16 +483,19 @@ export function readWebCheckoutStatus(
     (z) => z.id === (order.delivery?.zoneId ?? order.manualZoneId),
   );
   return {
+    cartHash: record?.cartHash,
+    superseded: !!record?.supersededAt,
     orderId: order.id,
     status: order.state,
     paymentStatus: payment.status,
     ...(payment.checkoutFlow === "web" ? { paymentFlow: "web" as const } : {}),
     amountFils: payment.amountFils,
     currency: payment.currency,
-    actionRequired:
-      payment.checkoutFlow === "web" &&
-      !payment.url &&
-      !["paid", "failed", "cancelled", "expired"].includes(payment.status)
+    actionRequired: record?.supersededAt
+      ? "review_payment"
+      : payment.checkoutFlow === "web" &&
+          !payment.url &&
+          !["paid", "failed", "cancelled", "expired"].includes(payment.status)
         ? "review_payment"
         : payment.directAttempt === "unknown" ||
             (payment.directAttempt === "submitted" &&
@@ -383,7 +504,10 @@ export function readWebCheckoutStatus(
           : payment.directAttempt === "ready"
             ? "complete_payment"
             : null,
-    url: payment.status === "pending" ? (payment.url ?? null) : null,
+    url:
+      !record?.supersededAt && payment.status === "pending"
+        ? (payment.url ?? null)
+        : null,
     summary: {
       items: order.lines.map((l) => {
         const p = catalog.find((c) => c.id === l.productId);
@@ -437,8 +561,23 @@ export async function createWebCheckout(
   );
   const inputHash = digest(JSON.stringify(input));
   service.store.transaction(() => {
+    const cartHash = canonicalCartHash(
+      service,
+      {
+        lines: input.lines,
+        ...(input.fulfillmentMethod === "pickup"
+          ? { fulfillmentMethod: "pickup" }
+          : { zoneId: input.zoneId }),
+      },
+      { delivery: input.delivery ?? null, pickup: input.pickup ?? null },
+    );
     const previous = service.store.read().webCheckouts?.[receiptKey];
     if (previous) {
+      requireThat(
+        !previous.supersededAt && previous.cartHash === cartHash,
+        "Cart changed; checkout key already used with different details",
+        409,
+      );
       requireThat(
         previous.inputHash === inputHash,
         "Checkout key already used with different details",
@@ -526,6 +665,7 @@ export async function createWebCheckout(
     service.store.write((s) => {
       s.webCheckouts ??= {};
       s.webCheckouts[receiptKey] = {
+        cartHash,
         inputHash,
         orderId: order.id,
         createdAt: new Date().toISOString(),

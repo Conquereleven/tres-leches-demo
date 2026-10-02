@@ -46,6 +46,14 @@ initial.catalog = validateCatalog(
     ),
   ),
 );
+if (process.env.CATALOG_FIXTURE === "legacy")
+  initial.catalog.push({
+    id: "fixture-36",
+    name: "Fixture Bakery",
+    priceFils: 3600,
+    active: true,
+    availability: "available",
+  });
 const provider = new PaymenntProvider(
   { apiKey: "fixture-key", apiSecret: "fixture-secret", environment: "test" },
   async (url, init) => {
