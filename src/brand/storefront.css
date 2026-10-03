@@ -1648,3 +1648,148 @@ html[lang="ar"]
     margin-inline-start: auto;
   }
 }
+/* Arabic typography applies to all public page roots, including compact checkout. */
+html[lang="ar"] :is(.brand-experience, .b-shop-shell) {
+  font-family: "Geeza Pro", Tahoma, "Noto Sans Arabic", Arial, sans-serif;
+}
+html[lang="ar"]
+  :is(.brand-experience, .b-shop-shell)
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    p,
+    label,
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    .b-label,
+    .b-heading
+  ) {
+  font-family: "Geeza Pro", Tahoma, "Noto Sans Arabic", Arial, sans-serif;
+  letter-spacing: normal;
+}
+html[lang="ar"] :is(h1, h2, h3, h4) {
+  line-height: 1.5;
+}
+[dir="rtl"] .b-directional {
+  transform: scaleX(-1);
+}
+[dir="rtl"] :is(.b-co-progress, .b-co-timeline, .b-how-guide ol) {
+  direction: rtl;
+}
+[dir="rtl"] :is(.b-co-card, .b-menu-options, .b-footer, .b-shop-form) {
+  text-align: start;
+}
+.b-menu-options :is(h4, .b-button),
+.b-language-control {
+  overflow-wrap: anywhere;
+}
+.brand-experience .b-footer .b-logo {
+  max-width: 100%;
+  height: auto;
+}
+.b-mobile-language {
+  display: none;
+}
+@media (max-width: 899px) {
+  .brand-experience .b-header {
+    height: auto;
+    min-height: 80px;
+    grid-template-columns: 44px minmax(100px, 1fr) auto;
+  }
+  .b-mobile-language {
+    display: flex;
+    grid-column: 2;
+    grid-row: 2;
+    justify-content: center;
+  }
+  .brand-experience .b-header .b-home {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: center;
+  }
+  .brand-experience .b-header .b-cart-mobile {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    max-width: 110px;
+  }
+}
+@media (max-width: 899px) {
+  .brand-experience .b-header .b-nav-left,
+  .brand-experience .b-header .b-nav-right {
+    display: none;
+  }
+  .brand-experience .b-header .b-menu {
+    display: flex;
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .brand-experience .b-header .b-cart-mobile {
+    display: inline-flex;
+  }
+  .brand-experience .b-header .b-logo {
+    width: 150px;
+    max-width: 100%;
+    height: auto;
+  }
+}
+@media (max-width: 899px) {
+  .brand-experience.ref-home .b-header {
+    display: grid;
+    height: auto;
+    min-height: 80px;
+    grid-template-columns: 44px minmax(100px, 1fr) auto;
+    padding: 8px 16px;
+    gap: 8px;
+  }
+  .brand-experience.ref-home .b-header .b-nav-left,
+  .brand-experience.ref-home .b-header .b-nav-right {
+    display: none;
+  }
+  .brand-experience.ref-home .b-header .b-menu {
+    display: flex;
+  }
+  .brand-experience.ref-home .b-header .b-cart-mobile {
+    display: inline-flex;
+  }
+  .brand-experience.ref-home .b-header .b-logo {
+    width: 150px;
+    height: auto;
+  }
+}
+
+/* The compact language row stays inside the header after scrolling. */
+@media (max-width: 899px) {
+  .brand-experience .b-header.b-scrolled,
+  .brand-experience.ref-home .b-header.b-scrolled {
+    height: auto;
+    min-height: 112px;
+    padding-block: 8px;
+  }
+}
+@media (max-width: 899px) {
+  .brand-experience .b-header.b-scrolled,
+  .brand-experience.ref-home .b-header.b-scrolled {
+    max-height: none;
+    grid-template-rows: minmax(44px, auto) minmax(44px, auto);
+    row-gap: 4px;
+  }
+  .brand-experience .b-header .b-logo,
+  .brand-experience.ref-home .b-header .b-logo {
+    max-height: none;
+    padding: 0;
+    transform: none;
+  }
+}
+/* Native dialog navigation inherits logical text alignment in every locale. */
+.b-modal .b-modal-nav :is(a, button) {
+  text-align: start;
+}
