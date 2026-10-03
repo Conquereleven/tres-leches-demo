@@ -1,3 +1,58 @@
+# Non-Google closure pass — 3 October 2026
+
+**Verdict: NOT READY FOR GOOGLE LIVE QA.** Non-Google local closure is validated. Google-specific integration remains paused by explicit instruction. No cloud/account/billing/API/key activity, production deployment, merge or real payment in this pass.
+
+Canonical repo: `/Users/rodrigom./code/tres-leches-demo`; branch `feature/3l-master-delivery-storefront`; inherited HEAD `8dc00f1e7d352ca7bc7399b34d7a7193d6005d1e`. Implementation commit: `b7ceeb7abc53213d0182c378f7ae0ce425cbc595`. Documentation commit/final HEAD are recorded in the handoff; Git is clean after those commits.
+
+## What this pass closes
+
+|Requirement|Result / evidence|
+|---|---|
+|Freeze / no cloud work|Preserved pending provider abstraction, selection component, address reference/schema, edit invalidation, coverage/minimum boundaries and fixtures. No keys required for build. Google SDK was not previously implemented; no claim of Google mocks or live results.|
+|Homepage|Fresh reference/local captures at 390/768/1440, same viewport, images/reveal sections loaded. Taller mobile food crop and 54×36 logo source box adjusted against measured reference. Abril/Montserrat retained. Cream/gold direction retained; no new redesign. Reference WhatsApp-order button, placeholder sections and low-contrast/motion behavior are not copied.|
+|Menu/options|8 menu browser tests; server-authoritative catalog/SKU/price matching, category navigation, family images, selectors and Add to Cart. Homepage has three highlights rather than the entire catalog.|
+|Variants / persistence|Real catalog fixture Pan Pistachio + Chocolate covering survives selectors→cart→checkout→saved order→dashboard→tracking. Half Dozen/Dozen and Oct15–Nov15 individual rules remain; highest-price default and no invented pack mixing.|
+|Cart|Quantity +/−, removal, clear cancel/accept, subtotal and minimum recalculation, floating cart and empty states tested.|
+|Checkout|12 closure browser tests +19 checkout scenarios: thumbnails, chosen variants, customer details, date/time, pickup and mocked payment lifecycle. No card entry or real charge.|
+|Delivery|Exact approved outer polygon; same-day prohibited, ≥12h notice, approved three windows, JLT A–D AED30/Downtown AED300, forged cheap area corrected/rejected, no separate fee, total=subtotal.|
+|Address unavailable|Typed-only/edited addresses cannot pass; empty lookup, HTTP503 and network failure recover to pickup. Unresolved community preserves geographic selection but blocks pricing/checkout. No repeated search treats unresolved evidence as free text. Production registry exposes only explicit public searchable entries; private entries are excluded.|
+|WhatsApp|Support-only `https://wa.me/971585943319`; left fixed button, cart on right, overlap/browser assertions pass. No operational provider or Meta changes.|
+|How to order|Copy explains unavailable verification → contact/pickup; it does not claim live Google availability. Existing product→cart→web checkout→Paymennt journey retained.|
+|Dashboard/tracking|Original suite12/12: auth/protected routes, variant detail, lifecycle, statuses, tracking and responsive navigation. No new statuses.|
+|I18n|564 extracted customer-copy entries; language selection/persistence, RTL and English fallback tested. No final Arabic translation invented.|
+|Brand/media|Official existing identity/source assets preserved; interior lilac retained. No generated food. Precise client media checklist: `media-handoff.md`.|
+|Apple Pay / Meta / MCP|Existing offline activation gates and application preparation preserved; external activation remains separate.|
+|Security/regression|354 domain/unit/HTTP tests, no changed production DB/config, historical orders/payment records not accessed or rewritten. Existing payment adapters/state machine unchanged; checkout schema only adds address proof input.|
+|Test tooling|Separate Playwright output folders prevent concurrent suites deleting each other's traces. Initial ENOENT artifact collision fixed; final full reruns pass.|
+
+## Final validation — MOCK/LOCAL VERIFIED
+
+- Unit/domain/integration: **354 passed**, 0 failed/skipped.
+- Original browser (including production-build no-JavaScript case): **12 passed**, 0 skipped.
+- Checkout browser: **19 passed**.
+- Menu browser/accessibility: **8 passed**.
+- Closure browser: **12 passed** (390/768/1440 selection/edit/unresolved and network/empty/unavailable recovery).
+- Sites/packaging: **4 passed**; required client/server/hosting output exists.
+- **Total: 409 passed.** Typecheck/lint/build PASS. Dependency audit **0 vulnerabilities**.
+- Secret scan: **281 scanned files, 0 findings** (source plus client bundle, heuristic; no real credential introduced). Automated Google/API/provider calls are not required for CI.
+- Fresh browser flows and screenshot set cover home, menu, inline product, cart, checkout, instructions, RTL, dashboard, tracking and coverage rejection. Console/overflow/accessibility assertions pass on the tested surfaces; no claim of universal accessibility certification.
+
+Validation logs: `/tmp/3l-closure-{unit,original,checkout,menu,browser,sites,types,lint,build,audit,secrets}.log`.
+Screenshots: `work/qa/closure/` (see `closure-screenshots.md`); current reference/local manual comparisons `/tmp/3l-nongoogle-visual/compare-{390,768,1440}.png`. Final adjusted mobile captures in that directory. Screenshots use synthetic fixture data only.
+
+## Honest remaining work
+
+- Other locally solvable non-Google work: none found in this scoped validation. No speculative visual/media/translation content added.
+- **Paused Google-specific code, not just credential setup:** Maps JS loader/CSP, Places New Autocomplete Data adapter/session lifecycle, selected Place fields/state and independent server-verification boundary. Current implementation is trusted registry selection. Therefore a credential alone is insufficient for live Google QA; this snapshot cannot truthfully earn READY FOR GOOGLE LIVE QA.
+- Client inputs: client-owned Google project/billing/keys, approved Arabic copy, missing licensed product photography, support email/hours and documented policy decisions still null in `business.ts`. Approved coverage and current prices require no new guess.
+- External tasks: Apple Pay merchant eligibility/UAT, Meta approval/number onboarding, remote MCP transport/OAuth/client setup. No activation attempted.
+- No live Google QA performed; no aliases added based on fabricated results. **LIVE GOOGLE QA PENDING**.
+- Resume point and exact account/API/referrer workflow: [google-places-resume.md](google-places-resume.md). Production remains untouched.
+
+---
+
+## Historical reports below — superseded by current closure status above
+
 # 3L master sprint — closure pass and final delivery coverage
 
 Date: 2026-10-03, Asia/Dubai. Canonical repository: `/Users/rodrigom./code/tres-leches-demo`. Branch: `feature/3l-master-delivery-storefront`. Starting HEAD: `8b596f0ca788a30185d84a1b29d00c56492c81f9`.
