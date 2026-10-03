@@ -1,3 +1,5 @@
+> Historical baseline audit. Superseded by [delivery-report.md](delivery-report.md) and the final approved GeoJSON closure.
+
 # Phase A — audit of f471a0802d85a39cf105c6e8cbb75499147d5e7f
 
 Performed 2026-10-03, Asia/Dubai. BEFORE map foundation changes. No code or visual fixes during Phase A. Baseline tests freshly rerun. All zone data below are repository seed/local fixture configuration; Production DB was not inspected or modified.

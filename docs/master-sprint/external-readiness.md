@@ -2,11 +2,11 @@
 
 No deployment, provider activation, production data import or account connection is included.
 
-## Approved delivery geography — precise data pending
+## Approved delivery geography — outer perimeter complete
 
-The owner supplied the approved visual coverage screenshot on 2026-10-03: main dotted coverage minus the red-marked exclusion. The screenshot does not supply precise geographic coordinates. Decision B: safe architecture prepared, activation NEEDS BUSINESS INPUT.
+The supplied final GeoJSON supersedes the earlier screenshot. The bundled default `server/data/delivery/approved-coverage.json` preserves all 37 positions exactly, one closed Polygon ring, no holes or exclusions. Source and provenance are tracked; no boundary was redrawn. Exterior edges are included deterministically. Server-owned verified coordinates are checked before minimums and checkout; forged client flags/areas cannot bypass this.
 
-`DELIVERY_COVERAGE_FILE` now supports reviewed primary/exclusion GeoJSON; `DELIVERY_VERIFIED_ADDRESSES_FILE` binds exact address/building to trusted coordinates. Coverage runs before exactly one active pricing-zone polygon and minimum. Missing data fail closed; pickup remains available. No live settings or geography were modified. See [coverage-configuration.md](coverage-configuration.md) for exact schema, edge behavior, limits and required inputs. No forward geocoder, paid map service or production polygons were added. Existing reverse geocoding does not validate arbitrary typed website addresses.
+The outer perimeter does not geocode an address or subdivide tariff areas. Real verified address/building coordinates (or an approved website forward geocoder) and reviewed internal tariff polygons keyed to zone IDs remain NEEDS BUSINESS INPUT. Unknown delivery addresses fail closed; pickup remains available. No paid geocoder, production configuration or geographic tariff data was added. Existing operational reverse geocoding does not validate arbitrary typed website addresses. See [coverage-configuration.md](coverage-configuration.md).
 
 ## Catalog
 
@@ -16,7 +16,7 @@ Existing 218 option prices are preserved. Owner approved equal base-size pricing
 
 The original identity PDF at its previously supplied Downloads path is unavailable. Existing `docs/brand/implementation.md` records the prior inspection; official Abril Fatface/Montserrat and local approved marks take priority over the reference site's Playfair font. Reference imagery provenance is recorded in `public/brand/reference/provenance.json`. No generated food imagery.
 
-Arabic is a switchable RTL foundation with navigation resources. Catalog, scheduling guidance, errors and legal/payment text still require approved Arabic copy and complete translation QA. English sensitive copy is retained; this is not a claim of a complete Arabic storefront.
+Arabic has URL/storage locale persistence, RTL layout, an extracted 562-entry English/template inventory and six existing navigation translations. English fallback text uses bidirectional isolation; selector values remain canonical independent of visible translations. No new Arabic business copy was generated. Catalog, scheduling guidance, errors and legal/payment text still require approved Arabic copy and complete translation QA. English sensitive copy is retained; this is not a claim of a complete Arabic storefront.
 
 ## Apple Pay
 
