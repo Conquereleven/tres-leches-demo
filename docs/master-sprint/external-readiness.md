@@ -2,13 +2,11 @@
 
 No deployment, provider activation, production data import or account connection is included.
 
-## Approved delivery geography — pending business delivery after sprint
+## Approved delivery geography — precise data pending
 
-The owner confirmed on 2026-10-03 that approved geography exists and will be supplied after this sprint. Website delivery intentionally fails closed without verified address coordinates and approved active zone polygons. Pickup remains available. A dropdown or an address containing an area name is never evidence of actual location.
+The owner supplied the approved visual coverage screenshot on 2026-10-03: main dotted coverage minus the red-marked exclusion. The screenshot does not supply precise geographic coordinates. Decision B: safe architecture prepared, activation NEEDS BUSINESS INPUT.
 
-`DELIVERY_VERIFIED_ADDRESSES_FILE` is an optional private server file. Schema: array of `{address, building, location: {lat, lng}}`. Do not commit customer addresses. Existing zone polygon data must be reviewed against the approved map. Exact normalized address/building pairs resolve only when coordinates fall in exactly one active polygon. Missing, ambiguous and out-of-coverage addresses are rejected before payment creation. The existing GeoService boundary can be replaced with an approved forward geocoder; no paid geocoder was activated. A polygon map alone does not geocode arbitrary typed addresses: provide verified address coordinates or approve a real geocoder integration.
-
-Before activation: validate map format and coverage, load approved polygons through existing zone administration, mount the private registry (or approve the geocoder adapter), test known inside/outside/border addresses and forged cheaper-area submissions. Do not seed invented geography.
+`DELIVERY_COVERAGE_FILE` now supports reviewed primary/exclusion GeoJSON; `DELIVERY_VERIFIED_ADDRESSES_FILE` binds exact address/building to trusted coordinates. Coverage runs before exactly one active pricing-zone polygon and minimum. Missing data fail closed; pickup remains available. No live settings or geography were modified. See [coverage-configuration.md](coverage-configuration.md) for exact schema, edge behavior, limits and required inputs. No forward geocoder, paid map service or production polygons were added. Existing reverse geocoding does not validate arbitrary typed website addresses.
 
 ## Catalog
 
