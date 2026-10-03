@@ -1,0 +1,12 @@
+# Preserve approved originals in Git; deploy their browser derivatives only.
+/tests/fixtures/legacy-visuals/
+/public/brand/reference/hero-soaking.mp4
+/public/brand/reference/mexico-dubai.png
+/public/brand/reference/cake-particles.png
+/public/brand/reference/rose-paper.png
+/public/brand/reference/beige-paper.png
+/public/brand/reference/flower.png
+/public/brand/reference/vanilla.png
+/public/brand/reference/tape.png
+/public/brand/reference/love.png
+/public/brand/reference/journey.svg
