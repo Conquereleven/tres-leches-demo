@@ -3,6 +3,7 @@ import {
   loadDeliveryCoverage,
   checkDeliveryCoverage,
 } from "./delivery-coverage";
+import { RegistryAddressProvider } from "../adapters/website-address";
 import { readFileSync } from "node:fs";
 import { locationSchema, requireThat } from "./model";
 import { contains, type GeoService } from "./zones";
@@ -24,6 +25,7 @@ const registrySchema = z
         building: z.string().min(1).max(120),
         location: locationSchema,
         // Trusted structured evidence, never copied from the customer-selected area.
+        searchable: z.boolean().default(false),
         community: z.string().trim().min(1).max(120).optional(),
         cluster: z.string().trim().min(1).max(30).optional(),
       })
@@ -38,6 +40,7 @@ export function attachVerifiedAddresses(
   geo: GeoService,
   file: string | undefined,
   coverageFile?: string,
+  selectionRequired = false,
 ): GeoService {
   const coverage = loadDeliveryCoverage(coverageFile);
   const entries = file
@@ -49,10 +52,13 @@ export function attachVerifiedAddresses(
   );
   if (new Set(keys).size !== keys.length)
     throw new Error("Duplicate verified delivery address");
+  const addressProvider = new RegistryAddressProvider(entries);
   return {
+    addressProvider,
+    selectionRequired,
     prepare: geo.prepare?.bind(geo),
     resolve: geo.resolve.bind(geo),
-    resolveAddress(address, building, zones) {
+    resolveAddress(address, building, zones, addressRef) {
       const entry = entries.find(
         (e) =>
           normalizeVerifiedAddress(e.address) ===
@@ -60,7 +66,12 @@ export function attachVerifiedAddresses(
           normalizeVerifiedAddress(e.building) ===
             normalizeVerifiedAddress(building),
       );
-      if (!entry) return null;
+      if (
+        !entry ||
+        (selectionRequired &&
+          (!addressRef || addressProvider.retrieve(addressRef) !== entry))
+      )
+        return null;
       const eligibility = checkDeliveryCoverage(entry.location, coverage);
       if (eligibility.code === "NOT_CONFIGURED") return null;
       requireThat(
@@ -87,12 +98,18 @@ export function attachVerifiedAddresses(
 }
 export function authoritativeAddress(
   service: CommerceService,
-  input: { zoneId: string; address: string; building: string },
+  input: {
+    zoneId: string;
+    address: string;
+    building: string;
+    addressRef?: string;
+  },
 ) {
   const resolved = service.geo.resolveAddress?.(
     input.address,
     input.building,
     service.store.read().zones,
+    input.addressRef,
   );
   requireThat(
     resolved,

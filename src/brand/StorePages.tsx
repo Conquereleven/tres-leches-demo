@@ -51,7 +51,8 @@ export function HowToOrder() {
           <li>
             <CustomerCopy>
               Choose delivery or pickup. Delivery requires a verified address in
-              a supported area.
+              a supported area. If verification is unavailable, choose pickup or
+              contact 3L for help.
             </CustomerCopy>
           </li>
           <li>

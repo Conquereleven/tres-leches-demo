@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { defineConfig } from "@playwright/test";
 export default defineConfig({
+  outputDir: "test-results/original",
   testDir: "tests/e2e",
   workers: 1,
   fullyParallel: false,

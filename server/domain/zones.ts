@@ -200,10 +200,13 @@ export function publicDeliveryAreas(zones: DeliveryZone[]) {
     }));
 }
 export interface GeoService {
+  addressProvider?: import("../adapters/website-address").WebsiteAddressProvider;
+  selectionRequired?: boolean;
   resolveAddress?(
     address: string,
     building: string,
     zones: DeliveryZone[],
+    addressRef?: string,
   ): { zoneId: string } | null;
   prepare?(location: Location): Promise<void>;
   resolve(

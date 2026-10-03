@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 const dir = mkdtempSync(join(tmpdir(), "3l-checkout-e2e-"));
 export default defineConfig({
+  outputDir: "test-results/checkout",
   testDir: "tests/checkout-e2e",
   workers: 1,
   use: {

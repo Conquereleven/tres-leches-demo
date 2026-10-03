@@ -92,6 +92,9 @@ export async function startServer(
   const isolatedTest = process.env.APP_ENV === "test";
   if (!isolatedTest && Object.keys(overrides).length)
     throw new Error("Runtime overrides require isolated test environment");
+  z.enum(["registry", "disabled"]).parse(
+    process.env.WEBSITE_ADDRESS_PROVIDER ?? "registry",
+  );
   const runtime = runtimeConfig(process.env);
   const staging = runtime.staging;
   if (staging) process.umask(0o077);
@@ -181,8 +184,11 @@ export async function startServer(
   if (!overrides.geo)
     service.geo = attachVerifiedAddresses(
       service.geo,
-      process.env.DELIVERY_VERIFIED_ADDRESSES_FILE,
+      process.env.WEBSITE_ADDRESS_PROVIDER === "disabled"
+        ? undefined
+        : process.env.DELIVERY_VERIFIED_ADDRESSES_FILE,
       process.env.DELIVERY_COVERAGE_FILE,
+      true,
     );
   const users = usersSchema.parse(
     JSON.parse(process.env.OPERATOR_USERS_JSON ?? "[]"),
@@ -355,6 +361,7 @@ export async function startServer(
                 min: addDays(today, 1),
                 max: addDays(today, MAX_BOOKING_DAYS),
               },
+              addressVerificationRequired: !!service.geo.selectionRequired,
               publicKey: null,
               frame: null,
               product: product
@@ -367,7 +374,7 @@ export async function startServer(
               zones: publicDeliveryAreas(s.zones),
             });
           }
-          if (!enabled)
+          if (!enabled && !path.startsWith("/api/checkout/address"))
             throw new DomainError(
               503,
               "Online payment is currently unavailable. Please try again later.",
@@ -430,12 +437,61 @@ export async function startServer(
               await createWebCheckout(service, body, key, true),
             );
           }
+          if (path === "/api/checkout/address/suggestions") {
+            const { query } = z
+              .object({ query: z.string().trim().min(3).max(200) })
+              .strict()
+              .parse(body);
+            return json(res, 200, {
+              suggestions:
+                (await service.geo.addressProvider?.suggest(query)) ?? [],
+            });
+          }
+          if (path === "/api/checkout/address/select") {
+            const { id } = z
+              .object({ id: z.string().regex(/^[a-f0-9]{64}$/) })
+              .strict()
+              .parse(body);
+            const entry = service.geo.addressProvider?.retrieve(id);
+            if (!entry)
+              throw new DomainError(
+                422,
+                "Select a verified address suggestion.",
+              );
+            const resolved = service.geo.resolveAddress?.(
+              entry.address,
+              entry.building,
+              service.store.read().zones,
+              id,
+            );
+            return json(res, 200, {
+              address: entry.address,
+              building: entry.building,
+              addressRef: id,
+              status: resolved ? "VERIFIED" : "COMMUNITY_UNRESOLVED",
+              ...(resolved
+                ? {
+                    zoneId: resolved.zoneId,
+                    ...(() => {
+                      const zone = service.store
+                        .read()
+                        .zones.find((z) => z.id === resolved.zoneId)!;
+                      return { name: zone.name, minOrderAed: zone.minOrderAed };
+                    })(),
+                  }
+                : {}),
+            });
+          }
           if (path === "/api/checkout/address") {
             const input = z
               .object({
                 zoneId: z.string().max(100),
                 address: z.string().min(5).max(300),
                 building: z.string().min(1).max(120),
+                addressRef: z
+                  .string()
+                  .regex(/^[a-f0-9]{64}$/)
+                  .optional(),
               })
               .strict()
               .parse(body);

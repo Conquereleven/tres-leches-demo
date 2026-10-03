@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 const dir = mkdtempSync(join(tmpdir(), "3l-menu-e2e-"));
 export default defineConfig({
+  outputDir: "test-results/menu",
   testDir: "tests/menu-e2e",
   workers: 1,
   timeout: 60000,

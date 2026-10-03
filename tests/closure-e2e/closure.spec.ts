@@ -51,11 +51,16 @@ test("actual Pan variants persist selector → cart → checkout → database �
   await expect(page.locator("main")).toContainText("Chocolate covering");
   await expect(page.locator("main")).toContainText("AED 34");
   await page.getByRole("link", { name: "CONTINUE TO DELIVERY" }).click();
-  await page.getByLabel("Delivery area").selectOption("jlt-cluster-c");
+
   await page
     .getByLabel("Street address and community")
     .fill("Approved coverage fixture");
-  await page.getByLabel("Building or villa").fill("Fixture Tower");
+  await page
+    .getByRole("button", {
+      name: "Approved coverage fixture · Fixture Tower",
+      exact: true,
+    })
+    .click();
   await page.getByLabel("Delivery date").fill("2026-10-22");
   await page
     .getByRole("combobox", { name: "Delivery time", exact: true })
@@ -181,6 +186,14 @@ test("approved coverage rejects forged HTTP area, client flags and changed addre
     zoneId: "jlt-cluster-c",
     address: "Outside coverage fixture",
     building: "Fixture Tower",
+    addressRef: (
+      await (
+        await request.post("/api/checkout/address/suggestions", {
+          headers,
+          data: { query: "Outside coverage fixture" },
+        })
+      ).json()
+    ).suggestions[0].id,
   };
   const outside = await request.post("/api/checkout/address", {
     headers,
@@ -204,7 +217,19 @@ test("approved coverage rejects forged HTTP area, client flags and changed addre
   ).toBe(400);
   const valid = await request.post("/api/checkout/address", {
     headers,
-    data: { ...body, address: "Approved coverage fixture", zoneId: "downtown" },
+    data: {
+      ...body,
+      address: "Approved coverage fixture",
+      zoneId: "downtown",
+      addressRef: (
+        await (
+          await request.post("/api/checkout/address/suggestions", {
+            headers,
+            data: { query: "Approved coverage fixture" },
+          })
+        ).json()
+      ).suggestions[0].id,
+    },
   });
   expect((await valid.json()).zoneId).toBe("jlt-cluster-c");
   const corrected = await request.post("/api/checkout/address", {
@@ -213,6 +238,14 @@ test("approved coverage rejects forged HTTP area, client flags and changed addre
       address: "Downtown coverage fixture",
       building: "Fixture Tower",
       zoneId: "marina",
+      addressRef: (
+        await (
+          await request.post("/api/checkout/address/suggestions", {
+            headers,
+            data: { query: "Downtown coverage fixture" },
+          })
+        ).json()
+      ).suggestions[0].id,
     },
   });
   expect(corrected.ok()).toBe(true);
@@ -401,16 +434,23 @@ test("coverage rejection is recoverable through pickup in the customer workspace
 }) => {
   await addVariants(page);
   await page.goto("/checkout");
-  await page.getByLabel("Delivery area").selectOption("jlt-cluster-c");
+
   await page
     .getByLabel("Street address and community")
     .fill("Outside coverage fixture");
-  await page.getByLabel("Building or villa").fill("Fixture Tower");
+  await page
+    .getByRole("button", {
+      name: "Outside coverage fixture · Fixture Tower",
+      exact: true,
+    })
+    .click();
   await page.getByLabel("Delivery date").fill("2026-10-22");
   await page
     .getByRole("combobox", { name: "Delivery time", exact: true })
     .selectOption("4:00 PM – 9:00 PM");
-  await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
+  await expect(
+    page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
+  ).toBeDisabled();
   await expect(page.getByRole("alert")).toContainText(
     "This address is outside our current delivery coverage area.",
   );
@@ -436,14 +476,31 @@ test("minimum quote recalculates and elapsed server clock disables stale deliver
   await page.clock.install();
   await addVariants(page);
   await page.goto("/checkout");
-  await page.getByLabel("Delivery area").selectOption("jvc");
+  await page
+    .getByLabel("Street address and community")
+    .fill("JVC coverage fixture");
+  await page
+    .getByRole("button", {
+      name: "JVC coverage fixture · Fixture Tower",
+      exact: true,
+    })
+    .click();
   await expect(page.locator("main")).toContainText(
     "Add AED 66 more to continue.",
   );
   await expect(
     page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
   ).toBeDisabled();
-  await page.getByLabel("Delivery area").selectOption("jlt-cluster-c");
+
+  await page
+    .getByLabel("Street address and community")
+    .fill("Approved coverage fixture");
+  await page
+    .getByRole("button", {
+      name: "Approved coverage fixture · Fixture Tower",
+      exact: true,
+    })
+    .click();
   await expect(page.locator("main")).not.toContainText(
     "Add AED 66 more to continue.",
   );
@@ -475,4 +532,124 @@ test("minimum quote recalculates and elapsed server clock disables stale deliver
     await expect(
       time.getByRole("option", { name, exact: true }),
     ).toHaveJSProperty("disabled", true);
+});
+for (const width of [390, 768, 1440])
+  test(`address selection, invalidation and unresolved community ${width}`, async ({
+    page,
+    request,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await addVariants(page);
+    await page.goto("/checkout");
+    const input = page.getByLabel("Street address and community");
+    await input.fill("Approved coverage fixture");
+    await expect(
+      page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
+    ).toBeDisabled();
+    await page
+      .getByRole("button", {
+        name: "Approved coverage fixture · Fixture Tower",
+        exact: true,
+      })
+      .click();
+    await expect(page.getByTestId("address-verification-state")).toHaveText(
+      "Verified address",
+    );
+    await expect(page.locator("main")).toContainText("Minimum order: AED 30");
+    await input.fill("Approved coverage fixture changed");
+    await expect(page.getByTestId("address-verification-state")).toContainText(
+      "Unverified",
+    );
+    await expect(
+      page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
+    ).toBeDisabled();
+    await input.fill("Downtown coverage fixture");
+    await page
+      .getByRole("button", {
+        name: "Downtown coverage fixture · Fixture Tower",
+        exact: true,
+      })
+      .click();
+    await expect(page.locator("main")).toContainText(
+      "Add AED 266 more to continue.",
+    );
+    await input.fill("Unresolved coverage fixture");
+    await page
+      .getByRole("button", {
+        name: "Unresolved coverage fixture · Fixture Tower",
+        exact: true,
+      })
+      .click();
+    await expect(page.locator("main")).toContainText(
+      "Coverage verified. We could not determine your delivery area.",
+    );
+    await expect(
+      page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
+    ).toBeDisabled();
+    await page.screenshot({
+      path: `${shots}/address-unresolved-${width}.png`,
+      fullPage: true,
+    });
+    await page.getByRole("radio", { name: "PICKUP", exact: true }).check();
+    await page.getByLabel("Pickup date").fill("2026-10-22");
+    await page
+      .getByRole("combobox", { name: "Pickup time", exact: true })
+      .selectOption("4:00 PM – 9:00 PM");
+    await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
+    await expect(page.getByLabel("Full name")).toBeVisible();
+    void request;
+  });
+
+// Local verification boundary only: this is NOT live Google QA.
+test("unavailable verification, empty suggestions and network failure preserve pickup", async ({
+  page,
+}) => {
+  await addVariants(page);
+  await page.goto("/checkout");
+  await page.route("**/api/checkout/address/suggestions", (route) =>
+    route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({
+        error:
+          "Address verification is unavailable. Try again or choose pickup.",
+      }),
+    }),
+  );
+  const input = page.getByLabel("Street address and community");
+  await input.fill("Dubai unavailable");
+  await expect(page.getByRole("alert")).toContainText(
+    "verification is unavailable",
+  );
+  await expect(
+    page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
+  ).toBeDisabled();
+  await page.unroute("**/api/checkout/address/suggestions");
+  await page.route("**/api/checkout/address/suggestions", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ suggestions: [] }),
+    }),
+  );
+  await input.fill("Dubai no results");
+  await expect(page.getByTestId("address-verification-state")).toContainText(
+    "No verified address suggestions",
+  );
+  await page.unroute("**/api/checkout/address/suggestions");
+  await page.route("**/api/checkout/address/suggestions", (route) =>
+    route.abort(),
+  );
+  await input.fill("Dubai network unavailable");
+  await expect(page.getByRole("alert")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
+  ).toBeDisabled();
+  await page.getByRole("radio", { name: "PICKUP", exact: true }).check();
+  await page.getByLabel("Pickup date").fill("2026-10-22");
+  await page
+    .getByRole("combobox", { name: "Pickup time", exact: true })
+    .selectOption("4:00 PM – 9:00 PM");
+  await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
+  await expect(page.getByLabel("Full name")).toBeVisible();
 });

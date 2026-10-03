@@ -129,6 +129,7 @@ export type Order = {
   audit: Audit[];
 };
 export type DeliveryDetails = {
+  addressRef?: string;
   zoneId: string;
   address: string;
   building: string;

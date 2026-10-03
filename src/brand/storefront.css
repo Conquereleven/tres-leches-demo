@@ -852,8 +852,8 @@
     letter-spacing: 0.06em;
   }
   .brand-experience.ref-home .b-header .b-logo {
-    width: 44px;
-    height: 30px;
+    width: 54px;
+    height: 36px;
   }
   .ref-hero {
     height: 58vh;
@@ -913,8 +913,8 @@
 }
 @media (max-width: 640px) {
   .brand-experience.ref-home .b-header .b-logo {
-    width: 44px;
-    height: 30px;
+    width: 54px;
+    height: 36px;
   }
   .brand-experience.ref-home .ref-hero h1 {
     font-size: 46.8px;
@@ -1155,4 +1155,13 @@
   background: #ce8c9c;
   border-color: #ce8c9c;
   color: #34231d;
+}
+.b-address-suggestions { display: grid; gap: 8px; }
+.b-address-suggestions button { text-align: start; min-height: 48px; padding: 12px; background: var(--b-cream, #faf5ed); color: #34231d; border: 1px solid #b6a99a; }
+
+/* Measured mobile reference: retain the taller food crop without changing checkout. */
+@media (max-width: 640px) {
+  .ref-home .ref-hero video {
+    aspect-ratio: 15 / 16;
+  }
 }

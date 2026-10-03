@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 const dir = mkdtempSync(join(tmpdir(), "3l-closure-e2e-"));
 export default defineConfig({
+  outputDir: "test-results/closure",
   testDir: "tests/closure-e2e",
   workers: 1,
   timeout: 60000,

@@ -136,6 +136,7 @@ export const cartCheckoutSchema = z
         zoneId: z.string().min(1).max(100),
         address: z.string().trim().min(5).max(300),
         building: z.string().trim().min(1).max(120),
+        addressRef: z.string().regex(/^[a-f0-9]{64}$/).optional(),
         unit: z.string().trim().max(40).optional(),
         date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
         slot: z.string().trim().min(1).max(60),

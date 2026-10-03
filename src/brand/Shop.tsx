@@ -1,3 +1,4 @@
+import { AddressAutocomplete } from "./AddressAutocomplete";
 import { CustomerCopy } from "./localization";
 import { useCheckoutNow } from "./cart";
 import { validWindow, leadHours } from "../../shared/commerce-policy";
@@ -96,6 +97,7 @@ type Status = {
   summary?: Summary;
 };
 type Delivery = {
+  addressRef?: string;
   zoneId: string;
   address: string;
   building: string;
@@ -845,7 +847,14 @@ export function CheckoutPage() {
   const set = <K extends keyof Delivery>(k: K, v: Delivery[K]) => {
     setError("");
     if (["address", "building", "zoneId"].includes(k)) setAddressNotice("");
-    setDelivery((d) => ({ ...d, [k]: v }));
+    setDelivery((d) => ({
+      ...d,
+      ...(config?.addressVerificationRequired &&
+      ["address", "building"].includes(k)
+        ? { addressRef: undefined, zoneId: "" }
+        : {}),
+      [k]: v,
+    }));
   };
   const setB = <K extends keyof Billing>(k: K, v: Billing[K]) => {
     setError("");
@@ -903,6 +912,7 @@ export function CheckoutPage() {
                   zoneId: delivery.zoneId,
                   address: delivery.address,
                   building: delivery.building,
+                  addressRef: delivery.addressRef,
                 },
               )
                 .then((result) => {
@@ -973,6 +983,7 @@ export function CheckoutPage() {
                     <CustomerCopy>Delivery area</CustomerCopy>{" "}
                     <Select
                       required
+                      disabled={config.addressVerificationRequired}
                       value={
                         areaMissing ? "__missing" : (delivery.zoneId ?? "")
                       }
@@ -1047,14 +1058,37 @@ export function CheckoutPage() {
                   <>
                     <label>
                       <CustomerCopy>Street address and community</CustomerCopy>{" "}
-                      <Input
-                        required
-                        minLength={5}
-                        maxLength={300}
-                        autoComplete="street-address"
-                        value={delivery.address ?? ""}
-                        onChange={(e) => set("address", e.target.value)}
-                      />
+                      {config.addressVerificationRequired ? (
+                        <AddressAutocomplete
+                          value={delivery.address ?? ""}
+                          verified={!!delivery.addressRef}
+                          onChange={(value) => set("address", value)}
+                          onSelected={(result) => {
+                            setError("");
+                            setAddressNotice(
+                              result.status === "VERIFIED"
+                                ? `Verified address. Delivery area: ${result.name}. Minimum order: AED ${result.minOrderAed}.`
+                                : "Coverage verified. We could not determine your delivery area. Contact 3L or choose pickup.",
+                            );
+                            setDelivery((d) => ({
+                              ...d,
+                              address: result.address,
+                              building: result.building,
+                              addressRef: result.addressRef,
+                              zoneId: result.zoneId ?? "",
+                            }));
+                          }}
+                        />
+                      ) : (
+                        <Input
+                          required
+                          minLength={5}
+                          maxLength={300}
+                          autoComplete="street-address"
+                          value={delivery.address ?? ""}
+                          onChange={(e) => set("address", e.target.value)}
+                        />
+                      )}
                     </label>
                     <div className="b-shop-row">
                       <label>
@@ -1183,7 +1217,13 @@ export function CheckoutPage() {
               <Button
                 type="submit"
                 className="b-co-cta"
-                disabled={!quote?.eligible || (!pickup && areaMissing)}
+                disabled={
+                  !quote?.eligible ||
+                  (!pickup &&
+                    (areaMissing ||
+                      (config.addressVerificationRequired &&
+                        !delivery.addressRef)))
+                }
               >
                 <CustomerCopy>
                   {addressBusy ? "VERIFYING ADDRESS…" : "CONTINUE TO DETAILS"}

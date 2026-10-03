@@ -138,12 +138,28 @@ if (process.env.COVERAGE_FIXTURE === "approved") {
     registry,
     JSON.stringify([
       {
+        searchable: true,
+        address: "JVC coverage fixture",
+        building: "Fixture Tower",
+        location: { lat: 25.1, lng: 55.25 },
+        community: "JVC",
+      },
+      {
+        searchable: true,
+        address: "Unresolved coverage fixture",
+        building: "Fixture Tower",
+        location: { lat: 25.1, lng: 55.25 },
+        community: "Unlisted community",
+      },
+      {
+        searchable: true,
         address: "Downtown coverage fixture",
         building: "Fixture Tower",
         location: { lat: 25.1, lng: 55.25 },
         community: "Downtown Dubai",
       },
       {
+        searchable: true,
         address: "Approved coverage fixture",
         building: "Fixture Tower",
         location: { lat: 25.1, lng: 55.25 },
@@ -151,6 +167,7 @@ if (process.env.COVERAGE_FIXTURE === "approved") {
         cluster: "C",
       },
       {
+        searchable: true,
         address: "Outside coverage fixture",
         building: "Fixture Tower",
         location: { lat: 25.45, lng: 55.4 },
@@ -159,6 +176,11 @@ if (process.env.COVERAGE_FIXTURE === "approved") {
       },
     ]),
   );
-  geo = attachVerifiedAddresses({ resolve: () => null }, registry);
+  geo = attachVerifiedAddresses(
+    { resolve: () => null },
+    registry,
+    undefined,
+    true,
+  );
 }
 await startServer({ initial, payment: provider, geo });
