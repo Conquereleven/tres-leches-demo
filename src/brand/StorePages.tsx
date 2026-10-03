@@ -1,3 +1,4 @@
+import { useCheckoutConfig } from "./cart";
 import { CustomerCopy } from "./localization";
 import { MenuCatalog } from "./MenuCatalog";
 import { SiteHeader, SiteFooter, FloatingShopping } from "./SiteChrome";
@@ -28,6 +29,7 @@ export function MenuPage() {
 }
 export function HowToOrder() {
   const { t } = useLanguage();
+  const { config } = useCheckoutConfig();
   return (
     <div className="brand-experience b-entered b-how-page">
       <SiteHeader onContactUnavailable={contact} />
@@ -50,16 +52,16 @@ export function HowToOrder() {
           </li>
           <li>
             <CustomerCopy>
-              Choose delivery or pickup. Delivery requires a verified address in
-              a supported area. If verification is unavailable, choose pickup or
-              contact 3L for help.
+              {config?.addressVerificationRequired
+                ? "Choose delivery or pickup. Delivery requires a verified address in a supported area. If verification is unavailable, choose pickup or contact 3L for help."
+                : "Choose delivery or pickup. For delivery, enter your address and select your community. Our team will review the address manually."}
             </CustomerCopy>
           </li>
           <li>
             <CustomerCopy>
-              Confirm the area detected from your verified address, review its
-              minimum order and add items if needed. Delivery is included once
-              the minimum is met.
+              {config?.addressVerificationRequired
+                ? "Confirm the area detected from your verified address, review its minimum order and add items if needed. Delivery is included once the minimum is met."
+                : "Review the minimum order for your selected community and add items if needed. Delivery is included once the minimum is met."}
             </CustomerCopy>
           </li>
           <li>

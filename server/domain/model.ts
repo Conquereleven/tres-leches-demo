@@ -129,6 +129,8 @@ export type Order = {
   audit: Audit[];
 };
 export type DeliveryDetails = {
+  /** Server-owned evidence; never accepted from checkout input. */
+  addressVerification?: "UNVERIFIED" | "VERIFIED";
   addressRef?: string;
   zoneId: string;
   address: string;

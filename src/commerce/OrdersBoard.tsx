@@ -274,6 +274,12 @@ export function OrderCard({
         ))}
       </ul>
 
+      {o.delivery?.addressVerification === "UNVERIFIED" && (
+        <p role="status" className="ops-address-review">
+          <strong>ADDRESS NOT VERIFIED</strong> · Revisión manual de dirección
+          requerida
+        </p>
+      )}
       <dl className="ops-oc-meta">
         <div data-tone={o.state === "Delivered" ? "none" : due.tone}>
           <dt>

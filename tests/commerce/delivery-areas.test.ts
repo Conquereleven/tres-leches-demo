@@ -174,6 +174,7 @@ function fixture() {
     new UnconfiguredPaymentProvider(),
     geo,
   );
+  service.deliveryAddressMode = "google";
   store.write((s) => {
     s.catalog = [
       { id: "fixture", name: "Fixture", priceFils: 3800, active: true },
@@ -250,11 +251,12 @@ test("cheaper selected community cannot create/resume a checkout or change store
     const before = f.store.read();
     await assert.rejects(
       createWebCheckout(f.service, checkout, randomUUID()),
-      /selected area/,
+      /Minimum order/,
     );
+    // Resume derives a fresh capability/hash from the canonical community.
     assert.throws(
       () => resumeWebCheckout(f.service, { key: randomUUID(), checkout }),
-      /selected area/,
+      /Minimum order/,
     );
     await assert.rejects(
       createWebCheckout(

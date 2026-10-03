@@ -1,3 +1,4 @@
+import { ResponsiveMedia, selectedMedia } from "./media";
 import { AddressAutocomplete } from "./AddressAutocomplete";
 import { CustomerCopy } from "./localization";
 import { useCheckoutNow } from "./cart";
@@ -248,6 +249,19 @@ function productImage(productId: string) {
 }
 function Thumb({ productId, name }: { productId: string; name: string }) {
   const image = productImage(productId);
+  const family = menuFamilyForSku(productId);
+  const option = family?.options.find((o) => o.id === productId);
+  if (family && option && selectedMedia(family.id, option.variant, option.size))
+    return (
+      <ResponsiveMedia
+        family={family.id}
+        variant={option.variant}
+        size={option.size}
+        alt=""
+        className="b-co-thumb"
+        sizes="72px"
+      />
+    );
   return image ? (
     <img
       className="b-co-thumb"
@@ -1226,7 +1240,11 @@ export function CheckoutPage() {
                 }
               >
                 <CustomerCopy>
-                  {addressBusy ? "VERIFYING ADDRESS…" : "CONTINUE TO DETAILS"}
+                  {addressBusy
+                    ? config.addressVerificationRequired
+                      ? "VERIFYING ADDRESS…"
+                      : "CHECKING DELIVERY AREA…"
+                    : "CONTINUE TO DETAILS"}
                 </CustomerCopy>
               </Button>
               <a className="b-link" href="/cart">

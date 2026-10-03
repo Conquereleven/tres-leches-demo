@@ -1,3 +1,4 @@
+import { approvedMedia, ResponsiveMedia as ApprovedImage } from "./media";
 import {
   useEffect,
   useRef,
@@ -125,6 +126,18 @@ export function ResponsiveMedia({
   asset: Asset;
   eager?: boolean;
 }) {
+  const record = approvedMedia.find((a) =>
+    a.derivatives.some((d) => d.src === asset.src),
+  );
+  if (record?.family)
+    return (
+      <ApprovedImage
+        family={record.family}
+        variant={record.variant ?? ""}
+        size={record.size ?? undefined}
+        alt={asset.alt}
+      />
+    );
   return asset.src ? (
     <img
       src={asset.src}

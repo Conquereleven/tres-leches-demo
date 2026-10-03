@@ -199,6 +199,7 @@ test("zone minimum is enforced: one Pan de Muerto (AED 25) is below AED 30", asy
 test("a zone without a confirmed minimum blocks checkout", async () => {
   const f = fixture();
   try {
+    f.service.deliveryAddressMode = "legacy";
     f.store.write((s) => {
       s.zones[0]!.minOrderAed = null;
       s.zones[0]!.freeDelivery = false;

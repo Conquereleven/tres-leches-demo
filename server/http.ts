@@ -95,6 +95,9 @@ export async function startServer(
   z.enum(["registry", "disabled"]).parse(
     process.env.WEBSITE_ADDRESS_PROVIDER ?? "registry",
   );
+  const deliveryAddressMode = z
+    .enum(["legacy", "google"])
+    .parse(process.env.DELIVERY_ADDRESS_MODE ?? "legacy");
   const runtime = runtimeConfig(process.env);
   const staging = runtime.staging;
   if (staging) process.umask(0o077);
@@ -181,6 +184,7 @@ export async function startServer(
     10000,
     overrides.operationalNumbers ?? stagingAliases,
   );
+  service.deliveryAddressMode = deliveryAddressMode;
   if (!overrides.geo)
     service.geo = attachVerifiedAddresses(
       service.geo,
@@ -361,7 +365,8 @@ export async function startServer(
                 min: addDays(today, 1),
                 max: addDays(today, MAX_BOOKING_DAYS),
               },
-              addressVerificationRequired: !!service.geo.selectionRequired,
+              deliveryAddressMode,
+              addressVerificationRequired: deliveryAddressMode === "google",
               publicKey: null,
               frame: null,
               product: product

@@ -183,4 +183,6 @@ if (process.env.COVERAGE_FIXTURE === "approved") {
     true,
   );
 }
+process.env.DELIVERY_ADDRESS_MODE ??=
+  process.env.COVERAGE_FIXTURE === "approved" ? "google" : "legacy";
 await startServer({ initial, payment: provider, geo });

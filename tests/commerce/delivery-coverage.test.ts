@@ -253,12 +253,12 @@ test("coverage: actual far address selects AED300; forged cheap zone rejected in
         "web",
         "https://fixture.example.invalid",
       ),
-      /does not belong/,
+      /Minimum order/,
     );
     assert.throws(
       () =>
         resumeWebCheckout(f.service, { key: randomUUID(), checkout: input }),
-      /does not belong/,
+      /Minimum order/,
     );
     await assert.rejects(
       createWebCheckout(

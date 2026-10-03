@@ -1,3 +1,4 @@
+import { ResponsiveMedia, selectedMedia } from "./media";
 import { CustomerCopy } from "./localization";
 import { useLanguage } from "./localization";
 import { availableSku } from "../../shared/commerce-policy";
@@ -48,6 +49,26 @@ export function MenuOptions({ family }: { family: MenuFamily }) {
   const ready = !!serverProduct && serverProduct.priceFils === option.priceFils;
   return (
     <div className="b-menu-options">
+      {family.image ||
+      selectedMedia(family.id, selected.variant, selected.size) ? (
+        <figure className="b-menu-photo">
+          <ResponsiveMedia
+            family={family.id}
+            variant={selected.variant}
+            size={selected.size}
+            fallback={family.image}
+            alt={
+              selectedMedia(family.id, selected.variant, selected.size)
+                ? `${family.name} · ${selected.variant}`
+                : `${family.name} family photograph`
+            }
+          />
+        </figure>
+      ) : (
+        <div className="b-menu-no-photo">
+          <span>3L</span>
+        </div>
+      )}
       <div className="b-menu-selectors">
         {variants.length > 1 && (
           <label htmlFor={`${labelId}-variant`}>
@@ -181,10 +202,18 @@ export function MenuCatalog() {
       </h3>
       {"image" in current && current.image && (
         <figure className="b-menu-category-photo">
-          <img
-            src={current.image}
-            alt={`${current.name} category photography from Liza’s menu`}
-          />
+          {current.id === "jars" ? (
+            <ResponsiveMedia
+              family="cake-jar-bundle"
+              variant=""
+              alt="3L cake jars in branded packaging · family photograph"
+            />
+          ) : (
+            <img
+              src={current.image}
+              alt={`${current.name} category photography from Liza’s menu`}
+            />
+          )}
           <figcaption>
             <CustomerCopy>Category photograph</CustomerCopy>
           </figcaption>
@@ -200,24 +229,6 @@ export function MenuCatalog() {
               aria-label={family.name}
               data-menu-family={family.id}
             >
-              {family.image ? (
-                <figure className="b-menu-photo">
-                  <img
-                    src={family.image}
-                    alt={`${family.name} family photography from Liza’s menu`}
-                    loading="lazy"
-                  />
-                  <figcaption>
-                    <CustomerCopy>Family photograph</CustomerCopy>
-                  </figcaption>
-                </figure>
-              ) : (
-                <div className="b-menu-no-photo">
-                  <span>
-                    <CustomerCopy>3L</CustomerCopy>
-                  </span>
-                </div>
-              )}
               <h4>
                 <CustomerCopy>{family.name}</CustomerCopy>
               </h4>

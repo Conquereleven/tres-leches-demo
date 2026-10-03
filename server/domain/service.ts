@@ -42,6 +42,7 @@ const hash = (v: unknown) =>
 const at = () => ({ at: now() });
 export class CommerceService {
   agentAutomationAllowed = false;
+  deliveryAddressMode: "legacy" | "google" = "google";
   enqueueAgentReply(runId: string) {
     return this.store.write((s) => {
       const run = s.ai?.runs.find((r) => r.id === runId);

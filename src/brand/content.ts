@@ -1,3 +1,4 @@
+import { selectedMedia } from "./media";
 import { menuFamilies } from "./menu";
 /** Client-approved content only. Demo Commerce OS records never populate this manifest. */
 export type AssetStatus =
@@ -29,8 +30,21 @@ export const assets = {
   circleNegative: mark("circle-negative", "Pastelerías 3L"),
   icon: mark("icon", "3L"),
   stars: mark("stars", ""),
-  hero: pending("hero", "Approved Tres Leches soaking film"),
-  poster: pending("hero-poster", "Tres Leches soaking film poster"),
+  hero: {
+    id: "hero",
+    status: "AVAILABLE",
+    src: "/brand/approved/packaging-720.mp4",
+    alt: "Liza packaging a 3L cake",
+    source:
+      "Client-approved cake packaging .MP4, Drive 16SCtemsc6Q3tDhvXIk73K17p2FPk-P5x",
+  } as Asset,
+  poster: {
+    id: "hero-poster",
+    status: "AVAILABLE",
+    src: "/brand/approved/packaging-poster.webp",
+    alt: "3L cake in its branded box",
+    source: "Frame from client-approved packaging film",
+  } as Asset,
   pattern: pending("pattern", "Original 3L pattern"),
   ticker: pending("ticker", "Original 3L illustrated motifs"),
   alicia: pending("alicia", "Approved portrait of Alicia"),
@@ -82,10 +96,14 @@ export const menuProducts: Product[] = menuFamilies.flatMap((family) =>
     image: {
       id: family.id,
       alt: `${family.name} family photography`,
-      status: family.image
-        ? ("AVAILABLE" as const)
-        : ("NEEDS-CLIENT-ASSET" as const),
-      src: family.image,
+      status:
+        selectedMedia(family.id, option.variant, option.size) || family.image
+          ? ("AVAILABLE" as const)
+          : ("NEEDS-CLIENT-ASSET" as const),
+      src:
+        selectedMedia(family.id, option.variant, option.size)?.derivatives.find(
+          (d) => d.format === "webp" && d.width === 640,
+        )?.src ?? family.image,
       source: family.source,
     },
     status: "available" as const,

@@ -653,3 +653,81 @@ test("unavailable verification, empty suggestions and network failure preserve p
   await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
   await expect(page.getByLabel("Full name")).toBeVisible();
 });
+
+test("pickup golden path completes mock reconciliation, confirmation, tracking and operations without delivery verification", async ({
+  page,
+  context,
+  request,
+}) => {
+  mkdirSync(shots, { recursive: true });
+  await context.route("https://pay.test.paymennt.com/**", (r) =>
+    r.fulfill({
+      contentType: "text/html",
+      body: "<h1>Fixture hosted payment</h1>",
+    }),
+  );
+  await addVariants(page);
+  await page.goto("/cart");
+  await page.getByRole("link", { name: "CONTINUE TO DELIVERY" }).click();
+  await page.getByRole("radio", { name: "PICKUP", exact: true }).check();
+  await page.getByLabel("Pickup date").fill("2026-10-22");
+  await page
+    .getByRole("combobox", { name: "Pickup time", exact: true })
+    .selectOption("4:00 PM – 9:00 PM");
+  await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
+  await page.getByLabel("Full name").fill("Pickup Fixture");
+  await page
+    .getByLabel("Email for payment receipt")
+    .fill("fixture@example.invalid");
+  await page.getByLabel("Mobile number").fill("0500000000");
+  await page.getByLabel("Name on billing address").fill("Pickup Fixture");
+  await page
+    .getByLabel("Address line 1", { exact: true })
+    .fill("Fixture billing street");
+  await page.getByLabel("City", { exact: true }).fill("Dubai");
+  await page.getByRole("combobox", { name: /^Country/ }).selectOption("AE");
+  await page.getByRole("button", { name: "REVIEW ORDER" }).click();
+  await expect(
+    page.getByRole("region", { name: "Order review" }),
+  ).toContainText("Pickup");
+  await page.getByRole("checkbox", { name: /I've reviewed/ }).check();
+  await page.getByRole("button", { name: "PAY AED 34", exact: true }).click();
+  await expect(page).toHaveURL(/pay.test.paymennt.com/);
+  await page.goto("http://127.0.0.1:3198/checkout/return");
+  await expect(page.getByRole("heading", { name: /Thank you/ })).toBeVisible();
+  const capability = await page.evaluate(() =>
+    JSON.parse(sessionStorage.getItem("3l-checkout")!),
+  );
+  const result = await (
+    await request.post("/api/checkout/status", {
+      data: { key: capability.key },
+      headers: { origin: "http://127.0.0.1:3198" },
+    })
+  ).json();
+  expect(result.status).toBe("Confirmed");
+  expect(result.summary.fulfillmentMethod).toBe("pickup");
+  for (const width of [390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.screenshot({
+      path: `${shots}/pickup-confirmation-${width}.png`,
+      fullPage: true,
+    });
+  }
+  const saved = await (await request.get("/api/workspace")).json();
+  const order = saved.orders.find(
+    (o: { id: string }) => o.id === result.orderId,
+  );
+  expect(order.fulfillmentMethod).toBe("pickup");
+  expect(order.delivery).toBeUndefined();
+  expect(order.quote.feeFils).toBe(0);
+  expect(order.state).toBe("Confirmed");
+  await page.goto("/operations/orders");
+  await page.getByRole("button", { name: /^Todos los pedidos/ }).click();
+  await expect(
+    page.getByRole("article", { name: `Pedido ${result.orderId}` }),
+  ).toContainText("Recoger en tienda");
+  await page.screenshot({
+    path: `${shots}/pickup-dashboard-1440.png`,
+    fullPage: true,
+  });
+});

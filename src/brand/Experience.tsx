@@ -1,3 +1,4 @@
+import { ResponsiveMedia } from "./media";
 import { CustomerCopy } from "./localization";
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play, ArrowRight, Star } from "@phosphor-icons/react";
@@ -10,9 +11,29 @@ const media = (name: string) => `/brand/reference/${name}`;
 export function BrandExperience({ onManage }: { onManage: () => void }) {
   const video = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
+  const [allowMotion, setAllowMotion] = useState(false);
   useEffect(() => {
     const element = video.current;
     if (!element) return;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const connection = (
+      navigator as Navigator & {
+        connection?: { saveData?: boolean; effectiveType?: string };
+      }
+    ).connection;
+    const permitted =
+      !motion.matches &&
+      !connection?.saveData &&
+      !["slow-2g", "2g"].includes(connection?.effectiveType ?? "");
+    setAllowMotion(permitted);
+    const onMotion = () => {
+      if (motion.matches) {
+        element.pause();
+        setPlaying(false);
+        setAllowMotion(false);
+      }
+    };
+    motion.addEventListener("change", onMotion);
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry?.isIntersecting) {
         element.pause();
@@ -20,8 +41,16 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
       }
     });
     observer.observe(element);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      motion.removeEventListener("change", onMotion);
+    };
   }, []);
+  useEffect(() => {
+    if (!allowMotion || !video.current) return;
+    video.current.load();
+    void video.current.play().catch(() => setPlaying(false));
+  }, [allowMotion]);
   return (
     <div className="brand-experience b-entered ref-home">
       <a className="b-skip" href="#main-content">
@@ -37,14 +66,32 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
         <section className="ref-hero" aria-label="Hero">
           <video
             ref={video}
-            poster={media("hero-poster.jpg")}
+            width={540}
+            height={960}
+            aria-label="Liza packaging a 3L cake"
+            poster="/brand/approved/packaging-poster.webp"
+            autoPlay={allowMotion}
+            onPlay={() => setPlaying(true)}
+            onPause={() => setPlaying(false)}
             muted
             playsInline
             loop
             preload="none"
             onError={() => setPlaying(false)}
           >
-            <source src={media("hero-soaking.mp4")} type="video/mp4" />
+            {allowMotion && (
+              <>
+                <source
+                  src="/brand/approved/packaging-540.mp4"
+                  type="video/mp4"
+                  media="(max-width: 640px)"
+                />
+                <source
+                  src="/brand/approved/packaging-720.mp4"
+                  type="video/mp4"
+                />
+              </>
+            )}
           </video>
           <p className="ref-micro">
             <CustomerCopy>{approved.micro}</CustomerCopy>
@@ -65,11 +112,13 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
                 if (playing) {
                   video.current.pause();
                   setPlaying(false);
-                } else
+                } else {
+                  setAllowMotion(true);
                   void video.current
                     .play()
                     .then(() => setPlaying(true))
                     .catch(() => setPlaying(false));
+                }
               }}
             >
               {playing ? <Pause aria-hidden /> : <Play aria-hidden />}{" "}
@@ -91,7 +140,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
           <div className="ref-city ref-mexico">
             <span className="ref-city-crop">
               <img
-                src={media("mexico-dubai.png")}
+                src={"/brand/approved/editorial-mexico-dubai.webp"}
                 alt="Mexico City cathedral, the brand’s 1982 origin"
                 loading="lazy"
               />
@@ -101,12 +150,12 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             </span>
           </div>
           <div className="ref-journey" aria-hidden="true">
-            <img src={media("journey.svg")} alt="" />
+            <img src={"/brand/approved/editorial-journey.svg"} alt="" />
           </div>
           <div className="ref-city ref-dubai">
             <span className="ref-city-crop">
               <img
-                src={media("mexico-dubai.png")}
+                src={"/brand/approved/editorial-mexico-dubai.webp"}
                 alt="Dubai skyline, where the tradition continues"
                 loading="lazy"
               />
@@ -147,12 +196,22 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               ["saffron", "SAFFRON"],
             ].map(([id, label]) => (
               <a key={id} href="/menu?category=cakes">
-                <img
-                  src={media(`${id}.webp`)}
-                  alt={label}
-                  loading="lazy"
-                  width="384"
-                  height="384"
+                <ResponsiveMedia
+                  family={
+                    id === "dulce"
+                      ? "tres-leches-premium"
+                      : id === "mango"
+                        ? "tres-leches-mango"
+                        : "special-flavours-cake"
+                  }
+                  variant={
+                    id === "dulce"
+                      ? "Dulce de Leche"
+                      : id === "mango"
+                        ? "Mango"
+                        : "Saffron"
+                  }
+                  alt={label!}
                 />
                 <span>{label}</span>
               </a>
@@ -191,7 +250,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
           <div className="ref-slices">
             <img
               className="ref-particles"
-              src={media("cake-particles.png")}
+              src={"/brand/approved/editorial-cake-particles.webp"}
               alt=""
               loading="lazy"
             />
@@ -219,13 +278,13 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
           <div className="ref-collage">
             <img
               className="ref-paper"
-              src={media("rose-paper.png")}
+              src={"/brand/approved/editorial-rose-paper.webp"}
               alt=""
               loading="lazy"
             />
             <img
               className="ref-beige"
-              src={media("beige-paper.png")}
+              src={"/brand/approved/editorial-beige-paper.webp"}
               alt=""
               loading="lazy"
             />
@@ -237,25 +296,25 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             />
             <img
               className="ref-flower"
-              src={media("flower.png")}
+              src={"/brand/approved/editorial-flower.webp"}
               alt=""
               loading="lazy"
             />
             <img
               className="ref-vanilla"
-              src={media("vanilla.png")}
+              src={"/brand/approved/editorial-vanilla.webp"}
               alt=""
               loading="lazy"
             />
             <img
               className="ref-tape"
-              src={media("tape.png")}
+              src={"/brand/approved/editorial-tape.webp"}
               alt=""
               loading="lazy"
             />
             <img
               className="ref-love"
-              src={media("love.png")}
+              src={"/brand/approved/editorial-love.webp"}
               alt="Nuestra historia también huele a amor"
               loading="lazy"
             />

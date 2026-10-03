@@ -64,7 +64,9 @@ function fixture() {
   const store = new Store(":memory:", "test");
   store.write((s) => {
     s.catalog = validateCatalog(
-      JSON.parse(readFileSync("tests/fixtures/retired-pan-de-muerto.json", "utf8")),
+      JSON.parse(
+        readFileSync("tests/fixtures/retired-pan-de-muerto.json", "utf8"),
+      ),
     );
   });
   const debits: Body[] = [];
@@ -230,7 +232,10 @@ test("a separate billing address is sent as entered; delivery stays intact", asy
     country: "AE",
   });
   const stored = f.store.read().orders.find((o) => o.id === order.orderId)!;
-  assert.deepEqual(stored.delivery, delivery);
+  assert.deepEqual(stored.delivery, {
+    ...delivery,
+    addressVerification: "VERIFIED",
+  });
   assert.equal(stored.billing?.sameAsDelivery, false);
 });
 

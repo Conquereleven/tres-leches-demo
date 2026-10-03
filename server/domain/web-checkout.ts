@@ -136,7 +136,10 @@ export const cartCheckoutSchema = z
         zoneId: z.string().min(1).max(100),
         address: z.string().trim().min(5).max(300),
         building: z.string().trim().min(1).max(120),
-        addressRef: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+        addressRef: z
+          .string()
+          .regex(/^[a-f0-9]{64}$/)
+          .optional(),
         unit: z.string().trim().max(40).optional(),
         date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
         slot: z.string().trim().min(1).max(60),
@@ -346,11 +349,10 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
     const input = normalizeCheckout(checkout);
     if (input.delivery) {
       const zone = authoritativeAddress(service, input.delivery);
-      requireThat(
-        zone.id === input.zoneId,
-        "Delivery address does not belong to the selected area. Review the correct minimum.",
-        422,
-      );
+      input.zoneId = zone.id;
+      input.delivery.zoneId = zone.id;
+      input.delivery.addressVerification =
+        service.deliveryAddressMode === "legacy" ? "UNVERIFIED" : "VERIFIED";
     }
     const cartHash = canonicalCartHash(
       service,
@@ -628,11 +630,10 @@ export async function createWebCheckout(
   );
   if (input.delivery) {
     const zone = authoritativeAddress(service, input.delivery);
-    requireThat(
-      zone.id === input.zoneId,
-      "Delivery address does not belong to the selected area. Review the correct minimum.",
-      422,
-    );
+    input.zoneId = zone.id;
+    input.delivery.zoneId = zone.id;
+    input.delivery.addressVerification =
+      service.deliveryAddressMode === "legacy" ? "UNVERIFIED" : "VERIFIED";
   }
   const inputHash = digest(JSON.stringify(input));
   service.store.transaction(() => {

@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { writeFileSync, mkdirSync } from "node:fs";
 const widths = [320, 375, 390, 430, 768, 1024, 1280, 1440];
 const sections = [
   ".ref-hero",
@@ -92,12 +92,12 @@ test("current navigation, mobile modal keyboard and dedicated catalog route", as
 test("unavailable video never blocks the poster, content or catalog", async ({
   page,
 }) => {
-  await page.route("**/hero-soaking.mp4", (r) => r.abort());
+  await page.route(/\/packaging-.*\.(mp4|webm)$/, (r) => r.abort());
   await page.goto("/");
   await expect(page.locator(".b-preloader")).toHaveCount(0);
   await expect(page.locator(".ref-hero video")).toHaveAttribute(
     "poster",
-    "/brand/reference/hero-poster.jpg",
+    "/brand/approved/packaging-poster.webp",
   );
   await page
     .getByRole("button", { name: "Watch our story", exact: true })
@@ -158,9 +158,10 @@ test("current storefront layout stability and local fonts", async ({
 }) => {
   mkdirSync("work/qa/brand", { recursive: true });
   await page.addInitScript(() => {
-    const metrics = { cls: 0 };
-    (window as Window & { brandMetrics?: { cls: number } }).brandMetrics =
-      metrics;
+    const metrics = { cls: 0, lcp: 0 };
+    (
+      window as Window & { brandMetrics?: { cls: number; lcp?: number } }
+    ).brandMetrics = metrics;
     new PerformanceObserver((list) => {
       for (const e of list.getEntries()) {
         const shift = e as PerformanceEntry & {
@@ -170,14 +171,42 @@ test("current storefront layout stability and local fonts", async ({
         if (!shift.hadRecentInput) metrics.cls += shift.value;
       }
     }).observe({ type: "layout-shift", buffered: true });
+    new PerformanceObserver((list) => {
+      for (const e of list.getEntries()) metrics.lcp = e.startTime;
+    }).observe({ type: "largest-contentful-paint", buffered: true });
   });
-  await page.goto("/");
+  const production = process.env.RELEASE_QA_ORIGIN;
+  if (production && production !== "https://www.3ldubai.ae")
+    throw new Error("Unexpected release QA target");
+  await page.goto(production ?? "/");
   await page.evaluate(() => document.fonts.ready);
+  await page.waitForFunction(
+    () => (document.querySelector("video")?.readyState ?? 0) >= 2,
+  );
+  await page.evaluate(
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve)),
+      ),
+  );
   const result = await page.evaluate(() => ({
-    cls: (window as Window & { brandMetrics?: { cls: number } }).brandMetrics
-      ?.cls,
+    cls: (window as Window & { brandMetrics?: { cls: number; lcp?: number } })
+      .brandMetrics?.cls,
+    lcp: (window as Window & { brandMetrics?: { lcp?: number } }).brandMetrics
+      ?.lcp,
+    transferredBytes: performance
+      .getEntriesByType("resource")
+      .reduce(
+        (sum, e) => sum + (e as PerformanceResourceTiming).transferSize,
+        0,
+      ),
+    videoSource: document.querySelector("video")?.currentSrc,
     font: document.fonts.check('16px "3L Abril"'),
   }));
+  writeFileSync(
+    `work/qa/brand/performance-${production ? "production" : "local"}.json`,
+    JSON.stringify(result, null, 2),
+  );
   expect(result.cls).toBeLessThan(0.1);
   expect(result.font).toBe(true);
 });

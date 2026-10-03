@@ -225,8 +225,8 @@ test("no public hero development placeholder remains", () => {
   assert.doesNotMatch(src, /ORIGINAL ASSET PENDING/);
   assert.doesNotMatch(src, /HERO FILM/);
   // The media slot itself must survive so the approved film can drop in.
-  assert.match(src, /hero-soaking.mp4/);
-  assert.match(src, /hero-poster.jpg/);
+  assert.match(src, /packaging-720.mp4/);
+  assert.match(src, /packaging-poster.webp/);
 });
 
 test("the Mastercard mark is the official unmodified Brand Center artwork", () => {

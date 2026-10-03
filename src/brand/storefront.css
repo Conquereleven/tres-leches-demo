@@ -1156,12 +1156,93 @@
   border-color: #ce8c9c;
   color: #34231d;
 }
-.b-address-suggestions { display: grid; gap: 8px; }
-.b-address-suggestions button { text-align: start; min-height: 48px; padding: 12px; background: var(--b-cream, #faf5ed); color: #34231d; border: 1px solid #b6a99a; }
+.b-address-suggestions {
+  display: grid;
+  gap: 8px;
+}
+.b-address-suggestions button {
+  text-align: start;
+  min-height: 48px;
+  padding: 12px;
+  background: var(--b-cream, #faf5ed);
+  color: #34231d;
+  border: 1px solid #b6a99a;
+}
 
 /* Measured mobile reference: retain the taller food crop without changing checkout. */
 @media (max-width: 640px) {
   .ref-home .ref-hero video {
     aspect-ratio: 15 / 16;
+  }
+}
+/* Approved vertical packaging film: keep the full frame and baked-in caption. */
+.ref-home .ref-hero {
+  background: #f6efe3;
+  min-height: 640px;
+}
+.ref-home .ref-hero video {
+  inset: 0 8% 0 auto;
+  width: auto;
+  max-width: 52%;
+  height: 100%;
+  aspect-ratio: 9 / 16;
+  object-fit: contain;
+  object-position: center;
+}
+.ref-home .ref-hero::after {
+  background: none;
+}
+.ref-home .ref-hero-copy {
+  color: #33241a;
+  max-width: 42%;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+.brand-experience.ref-home .ref-hero h1,
+.brand-experience.ref-home .ref-hero-copy > p,
+.ref-home .ref-heritage,
+.ref-home .ref-watch {
+  color: #33241a;
+}
+.ref-home .ref-micro {
+  display: none;
+}
+.ref-home .ref-cakes picture {
+  display: block;
+}
+.ref-home .ref-cakes img {
+  object-fit: contain;
+  border-radius: 0;
+}
+.b-menu-photo picture {
+  display: block;
+  width: 100%;
+}
+.b-menu-photo img {
+  object-fit: contain;
+}
+@media (max-width: 640px) {
+  .ref-home .ref-hero {
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .ref-home .ref-hero video {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    aspect-ratio: 9 / 16;
+  }
+  .ref-home .ref-hero-copy {
+    position: relative;
+    inset: auto;
+    transform: none;
+    max-width: none;
+    padding: 32px 24px;
   }
 }

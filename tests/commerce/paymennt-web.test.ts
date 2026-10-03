@@ -391,3 +391,106 @@ test("LIVE hosted mock routes exclusively to LIVE; authoritative repeated GET co
     f.store.close();
   }
 });
+
+test("legacy accepts manual address/area, enforces minimum without fees and marks order for manual review", async () => {
+  const f = fixture();
+  f.service.deliveryAddressMode = "legacy";
+  try {
+    const raw = {
+      ...input,
+      delivery: {
+        ...input.delivery,
+        address: "Manual customer street",
+        building: "Manual Tower",
+        zoneId: "marina",
+      },
+    };
+    const r = await createWebCheckout(
+      f.service,
+      raw,
+      randomUUID(),
+      "web",
+      "https://fixture.example.invalid",
+    );
+    const order = f.store.read().orders.find((o) => o.id === r.orderId)!;
+    assert.equal(order.delivery?.address, raw.delivery.address);
+    assert.equal(order.delivery?.zoneId, "marina");
+    assert.equal(order.delivery?.addressVerification, "UNVERIFIED");
+    assert.equal(order.quote?.feeFils, 0);
+    assert.equal(order.quote?.totalFils, order.quote?.subtotalFils);
+    const before = f.counts();
+    await assert.rejects(
+      createWebCheckout(
+        f.service,
+        { ...raw, lines: [{ productId: sku, quantity: 1 }] },
+        randomUUID(),
+        "web",
+        "https://fixture.example.invalid",
+      ),
+      /Minimum order/,
+    );
+    assert.deepEqual(f.counts(), before);
+    await assert.rejects(
+      createWebCheckout(
+        f.service,
+        { ...raw, delivery: { ...raw.delivery, zoneId: "unknown-area" } },
+        randomUUID(),
+        "web",
+        "https://fixture.example.invalid",
+      ),
+      /available delivery area/,
+    );
+  } finally {
+    f.store.close();
+  }
+});
+
+test("google overrides manipulated area with trusted community and never falls back to manual", async () => {
+  const f = fixture();
+  f.service.deliveryAddressMode = "google";
+  try {
+    const raw = {
+      ...input,
+      lines: [
+        { productId: sku, quantity: 20 },
+        { productId: "conchas-filled-chocolate-mini", quantity: 6 },
+      ],
+      delivery: {
+        ...input.delivery,
+        address: "Verified Downtown fixture",
+        zoneId: "jlt-cluster-c",
+      },
+    };
+    const r = await createWebCheckout(
+      f.service,
+      raw,
+      randomUUID(),
+      "web",
+      "https://fixture.example.invalid",
+    );
+    const order = f.store.read().orders.find((o) => o.id === r.orderId)!;
+    assert.equal(order.delivery?.zoneId, "downtown");
+    assert.equal(order.delivery?.addressVerification, "VERIFIED");
+    assert.equal(order.quote?.minOrderAed, 300);
+    const before = f.counts();
+    await assert.rejects(
+      createWebCheckout(
+        f.service,
+        {
+          ...raw,
+          delivery: {
+            ...raw.delivery,
+            address: "Unknown manually typed address",
+          },
+        },
+        randomUUID(),
+        "web",
+        "https://fixture.example.invalid",
+      ),
+      /could not verify/,
+    );
+    assert.deepEqual(f.counts(), before);
+  } finally {
+    f.store.close();
+  }
+});

@@ -179,6 +179,7 @@ test("authoritative geographic registry cannot be bypassed by area IDs, keywords
       new UnconfiguredPaymentProvider(),
       geo,
     );
+    service.deliveryAddressMode = "google";
     assert.equal(
       authoritativeAddress(service, {
         zoneId: "cheap",
@@ -243,6 +244,7 @@ test("unknown delivery blocks both creation and resume before any mutation", asy
       new DisabledWhatsAppProvider(),
       new UnconfiguredPaymentProvider(),
     );
+    service.deliveryAddressMode = "google";
     const future = new Date();
     future.setUTCDate(future.getUTCDate() + 2);
     const checkout = {

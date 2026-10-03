@@ -2,12 +2,21 @@
 
 Status: PAUSED BY USER. LIVE GOOGLE QA PENDING. No Google activity during this closure pass.
 
+## Production review amendment
+
+Google is ON HOLD UNTIL CLIENT GOOGLE ACCOUNT SETUP. The current release defaults
+`DELIVERY_ADDRESS_MODE=legacy`: manual address + chosen active community, enforced
+minimum, zero fee and server-owned UNVERIFIED/manual-review status. Delivery works
+without Google. All fail-closed verification statements below describe `google`
+mode; switching to google is explicit and never silently falls back to legacy.
+The provider/coverage/community architecture and Monday checklist remain intact.
+
 ## Exact freeze point
 
 Branch `feature/3l-master-delivery-storefront`, inherited HEAD `8dc00f1e7d352ca7bc7399b34d7a7193d6005d1e`.
 Preserved `WebsiteAddressProvider`, registry selection boundary, `AddressAutocomplete`, addressRef binding/invalidation, approved outer GeoJSON, deterministic community/minimum resolver and isolated tests. This is **registry/local verification**, not an implemented Maps JavaScript / Places New SDK adapter. No Google mocks are claimed: tests mock the application address API and use server-owned fixtures.
 
-The current application builds without a Google key. With no approved registry file, typed delivery addresses remain unverified and delivery checkout is blocked. Pickup stays available. `WEBSITE_ADDRESS_PROVIDER=disabled` also prevents loading the registry. Do not seed test addresses into runtime or mark free text verified.
+The frozen Google strategy builds without a Google key. In google mode, with no approved registry file, typed delivery addresses remain unverified and delivery checkout is blocked. Pickup stays available. `WEBSITE_ADDRESS_PROVIDER=disabled` also prevents loading the registry. Do not seed test addresses into runtime or mark free text verified.
 
 Before the pause, Google Cloud CLI 587.0.0 was installed; a provisional project `tres-leches-dubai-web-20261003` (3L Dubai Web) was created under the developer's account. No active billing account was available, no Maps APIs enabled and no key created. This is not assumed to be the client's production project. Do not automatically reuse it or delete it.
 

@@ -105,6 +105,13 @@ export function authoritativeAddress(
     addressRef?: string;
   },
 ) {
+  if (service.deliveryAddressMode === "legacy") {
+    const zone = service.store
+      .read()
+      .zones.find((z) => z.active && z.id === input.zoneId);
+    requireThat(zone, "Choose an available delivery area", 422);
+    return zone;
+  }
   const resolved = service.geo.resolveAddress?.(
     input.address,
     input.building,
