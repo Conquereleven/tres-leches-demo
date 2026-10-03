@@ -57,8 +57,22 @@ for (const file of readdirSync(root).filter(
     ts.ScriptKind.TSX,
   );
   const add = (value, n) => {
-    value = value.replace(/\s+/g, " ").trim();
-    if (!/[a-z][a-z]+ [a-z]/i.test(value)) return;
+    value = value
+      .replaceAll("&amp;amp;", "&")
+      .replaceAll("&amp;", "&")
+      .replace(/\s+/g, " ")
+      .trim();
+    const visibleProperty =
+      ts.isJsxText(n) ||
+      (ts.isPropertyAssignment(n.parent) &&
+        ["title", "label", "description", "placeholder", "alt"].includes(
+          n.parent.name.getText(ast),
+        ));
+    if (
+      !/[a-z][a-z]+ [a-z]/i.test(value) &&
+      !(visibleProperty && /[A-Za-z]/.test(value))
+    )
+      return;
     let p = n;
     while (p && !ts.isJsxElement(p)) {
       if (ts.isJsxAttribute(p) && technicalNames.has(p.name.getText(ast)))
@@ -95,6 +109,7 @@ for (const file of readdirSync(root).filter(
       const tag = ts.isJsxElement(parent)
         ? parent.openingElement.tagName.getText(ast)
         : "";
+      if (tag === "CustomerCopy") add(n.text, n);
       if (tag !== "CustomerCopy" && /[A-Za-z]/.test(n.text))
         unresolved.push({
           file,

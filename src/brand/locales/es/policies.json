@@ -74,7 +74,6 @@
   "copy_506ff394621596dd": "Política de privacidad",
   "copy_e279be6a104b9442": "¿Tienes preguntas sobre un pedido, un pastel personalizado o la entrega? Estamos aquí para ayudarte.",
   "copy_3950d87bc06e7118": "Puedes enviar tus preguntas sobre esta política o un pedido a nuestro equipo de atención al cliente. Incluye la referencia del pedido si la tienes.",
-  "copy_fbe540e30e2afbd7": "Política de reembolso y cancelación",
   "copy_5a5b2eaf7cadfc46": "Comparte tu ubicación de entrega, preferiblemente un pin de WhatsApp, para confirmar la zona y su pedido mínimo.",
   "copy_ac576a66d4563e60": "Ir al contenido",
   "copy_b5f911af1f6fa508": "Algunos proveedores pueden procesar datos fuera de Emiratos. También podemos revelar información cuando lo exige la ley o una autoridad competente.",
@@ -172,5 +171,19 @@
   "copy_89f5fce3f22109a7": "— si se activa, ofrece herramientas de IA para ayudar al equipo a preparar respuestas. Nuestro equipo sigue siendo responsable de pedidos, pagos, reembolsos y cancelaciones.",
   "copy_e9f5387a744a5e44": "Un pedido confirmado puede cancelarse hasta {0} horas antes de la entrega programada. Reembolsamos el {1}% del importe pagado y retenemos el {2}% como comisión de cancelación y gestión. Si faltan menos de {3} horas para la entrega programada, el pedido no puede cancelarse y no es reembolsable.",
   "copy_df5a74a6246c5d87": "Puedes cancelar un pedido pagado hasta {0} horas antes de la entrega programada. Si recibimos tu solicitud dentro de ese plazo, reembolsamos el {1}% del importe pagado y retenemos el {2}% como comisión de cancelación y gestión.",
-  "copy_f772d231ea8be70f": "En los casos 1 a 3, reembolsamos el importe pagado por los artículos afectados. En el caso 4, reembolsamos el {0}% del importe pagado y retenemos el {1}% como comisión de cancelación y gestión."
+  "copy_f772d231ea8be70f": "En los casos 1 a 3, reembolsamos el importe pagado por los artículos afectados. En el caso 4, reembolsamos el {0}% del importe pagado y retenemos el {1}% como comisión de cancelación y gestión.",
+  "copy_10165100312b7cf8": "5. Precios",
+  "copy_6ef94cbb490e38ca": "6. Pago",
+  "copy_bbddc193854aadbd": "9. Entrega",
+  "copy_b5951106037cd7bd": "6. Retrasos",
+  "copy_ce59116024f7f4a6": "Liza",
+  "copy_94e845ec0ca1b698": "La Liza",
+  "copy_3e1b9033ce6712e6": "Sebastiano",
+  "copy_d4c0ceeb4af172c4": "Golositalia store",
+  "copy_fd88a39ccd452838": "5. Comunicaciones comerciales",
+  "copy_65b9245af385233e": "7. Seguridad",
+  "copy_1daaa38f33cd860e": "Dónde",
+  "copy_cf9c7aa24a26aac4": "Cuándo",
+  "copy_77537b7394c94fe0": "Este sitio web y nuestro servicio de pedidos son operados por {0}.",
+  "copy_61e3edce64875b0f": "{0} es la marca comercial de {1}."
 }

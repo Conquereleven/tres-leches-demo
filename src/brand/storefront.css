@@ -1793,3 +1793,10 @@ html[lang="ar"] :is(h1, h2, h3, h4) {
 .b-modal .b-modal-nav :is(a, button) {
   text-align: start;
 }
+/* Outrank legacy CSS even when bundler ordering changes. */
+html[dir="rtl"] .b-modal .b-modal-nav {
+  direction: rtl;
+}
+html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
+  text-align: start;
+}

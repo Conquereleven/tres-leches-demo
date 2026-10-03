@@ -75,11 +75,11 @@ export function OrderAcknowledgement() {
     <p className="b-acknowledgement">
       <CustomerCopy>By placing an order you agree to our</CustomerCopy>{" "}
       <a href="/terms">
-        <CustomerCopy>Terms &amp;amp; Conditions</CustomerCopy>
+        <CustomerCopy>Terms &amp; Conditions</CustomerCopy>
       </a>{" "}
       <CustomerCopy>and acknowledge our</CustomerCopy>{" "}
       <a href="/refund-policy">
-        <CustomerCopy>Refund &amp;amp; Cancellation</CustomerCopy>
+        <CustomerCopy>Refund &amp; Cancellation</CustomerCopy>
       </a>
       ,{" "}
       <a href="/delivery-policy">

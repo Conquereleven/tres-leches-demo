@@ -46,6 +46,14 @@ const refundPct = cancellationRefundPercent;
 const feePct = cancellationFeePercent;
 
 function ContactDetails({ contactPage = false }: { contactPage?: boolean }) {
+  const { text: localize, language } = useCustomerLanguage();
+  const contactHref = (href: string, kind: string) => {
+    if (kind !== "whatsapp" || language === "en") return href;
+    const url = new URL(href);
+    const message = url.searchParams.get("text");
+    if (message) url.searchParams.set("text", localize(message));
+    return url.toString();
+  };
   const channels = contactChannels({ contactPage });
   return (
     <>
@@ -57,12 +65,12 @@ function ContactDetails({ contactPage = false }: { contactPage?: boolean }) {
                 <CustomerCopy>{c.label}</CustomerCopy>
               </span>
               <a
-                href={c.href}
+                href={contactHref(c.href, c.kind)}
                 {...(c.kind === "whatsapp"
                   ? { target: "_blank", rel: "noopener noreferrer" }
                   : {})}
               >
-                {c.value}
+                <bdi dir="ltr">{c.value}</bdi>
               </a>
             </li>
           ))}
@@ -74,7 +82,9 @@ function ContactDetails({ contactPage = false }: { contactPage?: boolean }) {
             {" "}
             <CustomerCopy>Business</CustomerCopy>{" "}
           </dt>
-          <dd>{legalEntityLabel()}</dd>
+          <dd>
+            <CustomerCopy>{legalEntityLabel()}</CustomerCopy>
+          </dd>
         </div>
         {business.tradeLicence && (
           <div>
@@ -212,7 +222,9 @@ export const pages: Record<PolicyPath, Page> = {
         <CustomerCopy>
           These terms apply when you use this website or order from
         </CustomerCopy>{" "}
-        <strong>{legalEntityLabel()}</strong>{" "}
+        <strong>
+          <CustomerCopy>{legalEntityLabel()}</CustomerCopy>
+        </strong>{" "}
         <CustomerCopy>
           . Please read them before placing an order.
         </CustomerCopy>{" "}
@@ -225,28 +237,20 @@ export const pages: Record<PolicyPath, Page> = {
         body: (
           <>
             <p>
-              {" "}
-              <CustomerCopy>
-                This website and our ordering service are operated by
-              </CustomerCopy>{" "}
-              <strong>{business.legalName ?? business.tradingName}</strong>
-              {business.legalName ? (
+              <CustomerCopy>{`This website and our ordering service are operated by ${business.legalName ?? business.tradingName}.`}</CustomerCopy>{" "}
+              {business.legalName && (
                 <>
-                  {" "}
-                  <CustomerCopy>
-                    , the legal entity behind the
-                  </CustomerCopy>{" "}
-                  <strong>{business.tradingName}</strong>{" "}
-                  <CustomerCopy>brand</CustomerCopy>{" "}
+                  <CustomerCopy>{`${business.tradingName} is the customer-facing brand of ${business.legalName}.`}</CustomerCopy>{" "}
                 </>
-              ) : null}
-              {business.tradeLicence
-                ? ` (trade licence ${business.tradeLicence})`
-                : ""}
-              .{" "}
-              {business.address
-                ? `Our business address is ${business.address}.`
-                : `We are based in ${business.city}, ${business.country}.`}
+              )}
+              {business.tradeLicence && (
+                <CustomerCopy>{` (trade licence ${business.tradeLicence})`}</CustomerCopy>
+              )}{" "}
+              <CustomerCopy>
+                {business.address
+                  ? `Our business address is ${business.address}.`
+                  : `We are based in ${business.city}, ${business.country}.`}
+              </CustomerCopy>
             </p>
             <p>
               {" "}
@@ -589,7 +593,7 @@ export const pages: Record<PolicyPath, Page> = {
       <p>
         {" "}
         <CustomerCopy>This policy explains what information</CustomerCopy>{" "}
-        {legalEntityLabel()}{" "}
+        <CustomerCopy>{legalEntityLabel()}</CustomerCopy>{" "}
         <CustomerCopy>
           collects when you visit this website or order from us, how we use it,
           and the choices you have.
@@ -616,8 +620,9 @@ export const pages: Record<PolicyPath, Page> = {
         title: "1. Who is responsible for your information",
         body: (
           <p>
-            {legalEntityLabel()} <CustomerCopy>, based in</CustomerCopy>{" "}
-            {business.city}, {business.country}{" "}
+            <CustomerCopy>{legalEntityLabel()}</CustomerCopy>{" "}
+            <CustomerCopy>, based in</CustomerCopy> {business.city},{" "}
+            {business.country}{" "}
             <CustomerCopy>
               , is responsible for the personal information described in this
               policy. You can reach us using the details at the end of this
@@ -1547,7 +1552,7 @@ export const pages: Record<PolicyPath, Page> = {
 };
 
 export function PolicyPage({ path }: { path: PolicyPath }) {
-  const { text: localize } = useCustomerLanguage();
+  const { text: localize, language } = useCustomerLanguage();
 
   const page = pages[path];
   useEffect(() => {
@@ -1577,7 +1582,15 @@ export function PolicyPage({ path }: { path: PolicyPath }) {
             <p className="b-caption">
               {" "}
               <CustomerCopy>Last updated</CustomerCopy>{" "}
-              {business.policiesUpdated} · {legalEntityLabel()}
+              {new Date(
+                `${business.policiesUpdated} 12:00:00 UTC`,
+              ).toLocaleDateString(language === "en" ? "en-GB" : language, {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+                timeZone: "UTC",
+              })}{" "}
+              · <CustomerCopy>{legalEntityLabel()}</CustomerCopy>
             </p>
           )}
         </header>

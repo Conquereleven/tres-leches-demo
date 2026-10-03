@@ -83,6 +83,15 @@ for (const locale of ["en", "es", "ar"] as const)
           .getByRole("button", { name: copy("Open menu", locale), exact: true })
           .click();
         await shot("mobile-navigation");
+        if (locale === "ar") {
+          await expect(page.locator(".b-modal .b-modal-nav")).toHaveCSS(
+            "direction",
+            "rtl",
+          );
+          await expect(
+            page.locator(".b-modal .b-modal-nav a").first(),
+          ).toHaveCSS("text-align", "start");
+        }
         await page
           .getByRole("button", {
             name: copy("Close dialog", locale),
@@ -431,4 +440,32 @@ test("multiple SKUs, option identities and fulfillment draft survive every langu
   await expect(
     page.getByLabel("Street address and community", { exact: true }),
   ).toHaveValue("Persistent Fixture Street");
+});
+
+test("all public policies and contact localize without changing cancellation amounts", async ({
+  page,
+}) => {
+  for (const locale of ["en", "es", "ar"] as const) {
+    for (const route of [
+      "/terms",
+      "/privacy",
+      "/refund-policy",
+      "/delivery-policy",
+      "/contact",
+    ]) {
+      await page.goto(`${route}?lang=${locale}`);
+      await expect(page.locator("html")).toHaveAttribute("lang", locale);
+      const text = await page.locator("main").innerText();
+      expect(text).not.toMatch(/Traducción pendiente|الترجمة قيد الإعداد/);
+      if (route === "/terms" || route === "/refund-policy") {
+        expect(text).toContain("90%");
+        expect(text).toContain("10%");
+        expect(text).toContain("12");
+      }
+      if (locale !== "en")
+        expect(text).not.toMatch(
+          /Please order early|If the delivery still cannot|A confirmed order may/,
+        );
+    }
+  }
 });
