@@ -63,8 +63,8 @@ function ready(f: ReturnType<typeof fixture>) {
     type: "updateZone",
     zone: {
       ...z,
-      freeDelivery: false,
-      deliveryFeeAed: 10,
+      freeDelivery: true,
+      deliveryFeeAed: 0,
       review: "Test fixture, not a source rate",
     },
   });
@@ -86,7 +86,7 @@ test("seed preserves every source band, explicit free delivery and unknown fees"
     [...new Set(zoneSeed.map((z) => z.minOrderAed))],
     [30, 50, 100, 150, 200, 250, 300],
   );
-  assert.equal(zoneSeed.filter((z) => z.freeDelivery).length, 93);
+  assert.equal(zoneSeed.filter((z) => z.freeDelivery).length, 94);
   for (const z of zoneSeed) zoneSchema.parse(z);
   assert.equal(zoneSeed.find((z) => z.name === "Remraam")?.minOrderAed, 300);
   assert.equal(zoneSeed.find((z) => z.id === "jvc")?.deliveryFeeAed, 0);
@@ -128,7 +128,7 @@ test("GPS mock recognizes only exact fixture; polygons include edges and respect
     null,
   );
 });
-test("minimum uses subtotal, fee never fills shortfall; null does not mean free", () => {
+test("minimum uses subtotal; legacy fee data never adds a charge", () => {
   let z: DeliveryZone = {
     ...zoneSeed.find((z) => z.id === "jvc")!,
     deliveryFeeAed: 60,
@@ -136,7 +136,7 @@ test("minimum uses subtotal, fee never fills shortfall; null does not mean free"
   const q = quoteOrder([z], [{ productId: "pan", quantity: 1 }], "JVC");
   assert.equal(q.minimumMet, false);
   assert.equal(q.eligible, false);
-  assert.equal(q.totalFils, 12800);
+  assert.equal(q.totalFils, 6800);
   z = { ...z, freeDelivery: true, deliveryFeeAed: 0, minOrderAed: 68 };
   assert.equal(
     quoteOrder([z], [{ productId: "pan", quantity: 1 }], "JVC").eligible,
@@ -160,7 +160,7 @@ test("minimum uses subtotal, fee never fills shortfall; null does not mean free"
       [{ productId: "tres", quantity: 1 }],
       "JVC",
     ).eligible,
-    false,
+    true,
   );
 });
 test("version and assignment prevent simultaneous responses; command receipts reject key reuse", () => {
@@ -198,10 +198,15 @@ test("admin zone updates validated and RBAC enforced", () => {
     }),
   );
   assert.throws(() => f.cmd({ type: "updateZone", zone }, agent));
-  f.cmd({
-    type: "updateZone",
-    zone: { ...zone, freeDelivery: false, deliveryFeeAed: 9 },
-  });
+  assert.throws(
+    () =>
+      f.cmd({
+        type: "updateZone",
+        zone: { ...zone, freeDelivery: false, deliveryFeeAed: 9 },
+      }),
+    /no separate charge/,
+  );
+  f.cmd({ type: "updateZone", zone: { ...zone, minOrderAed: 50 } });
   assert.throws(() => f.cmd({ type: "updateZone", zone }));
   f.store.close();
 });
@@ -226,13 +231,13 @@ test("golden path: WA2 → order → GPS → minimum → payment → confirmed �
     seed().conversations[1]!.sourcePhoneNumber,
   );
   const p = f.store.read().payments[0]!;
-  assert.equal(p.amountFils, 13000);
+  assert.equal(p.amountFils, 12000);
   const event = {
     eventId: "paid-1",
     reference: p.providerReference,
     transactionId: "tx-1",
     status: "paid",
-    amountFils: 13000,
+    amountFils: 12000,
     currency: "AED",
   };
   f.service.paymentWebhook(event);

@@ -15,10 +15,8 @@ test("WA2 operational golden path, responsive and console", async ({
   await page
     .getByRole("button", { name: "Zonas y tarifas", exact: true })
     .click();
-  await page
-    .getByRole("checkbox", { name: "Free delivery", exact: true })
-    .uncheck();
-  await page.getByLabel("Tarifa AED", { exact: true }).fill("10");
+  await page.getByLabel("Mínimo AED", { exact: true }).fill("100");
+  await expect(page.getByLabel("Tarifa AED", { exact: true })).toHaveCount(0);
   await page
     .getByRole("button", { name: "Guardar regla", exact: true })
     .click();
@@ -50,7 +48,7 @@ test("WA2 operational golden path, responsive and console", async ({
   });
   await page.getByRole("button", { name: "Actualizar", exact: true }).click();
   await expect(page.locator(".co-state")).toContainText("Minimum Check");
-  await expect(page.locator(".co-quote")).toContainText("AED 130.00");
+  await expect(page.locator(".co-quote")).toContainText("AED 120.00");
   await page
     .getByRole("button", { name: "Request Payment", exact: true })
     .click();

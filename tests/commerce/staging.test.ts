@@ -112,7 +112,7 @@ test("TL18 fresh staging seed labels every record TEST and creates no payments o
     const path = join(dir, "staging.sqlite");
     const seed = stagingSeed(numbers, true);
     const store = new Store(path, "staging", seed);
-    assert.equal(store.read().zones.length, 93);
+    assert.equal(store.read().zones.length, 94);
     assert.equal(store.read().uatScenarios?.length, 10);
     for (const c of store.read().conversations) {
       assert.match(c.customer, /^TEST/);
@@ -334,8 +334,8 @@ test("TL18 test and development databases cannot be interchanged", () => {
     rmSync(dir, { recursive: true, force: true });
   }
 });
-test("TL18 no-go requests reject unknown zone, unknown fee and below minimum on server", () => {
-  for (const scenario of ["unknown-zone", "unknown-fee", "below-minimum"]) {
+test("TL18 no-go requests reject unknown zone, unknown minimum and below minimum on server", () => {
+  for (const scenario of ["unknown-zone", "unknown-minimum", "below-minimum"]) {
     const store = new Store(":memory:", "staging", stagingSeed(numbers, true));
     const service = new CommerceService(
       store,
@@ -358,10 +358,10 @@ test("TL18 no-go requests reject unknown zone, unknown fee and below minimum on 
         version: 0,
         lines: [{ productId: "pan", quantity: 1 }],
       });
-      if (scenario === "unknown-fee")
+      if (scenario === "unknown-minimum")
         store.write((s) => {
           const z = s.zones.find((z) => z.id === "jvc")!;
-          z.deliveryFeeAed = null;
+          z.minOrderAed = null;
           z.freeDelivery = false;
         });
       if (scenario === "below-minimum")
@@ -369,8 +369,8 @@ test("TL18 no-go requests reject unknown zone, unknown fee and below minimum on 
           type: "updateZone",
           zone: {
             ...store.read().zones.find((z) => z.id === "jvc")!,
-            freeDelivery: false,
-            deliveryFeeAed: 10,
+            freeDelivery: true,
+            deliveryFeeAed: 0,
           },
         });
       command({

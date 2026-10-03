@@ -137,8 +137,8 @@ export const normalize = (v: string) =>
     .trim();
 const aliasMap: Record<string, string[]> = {
   Remraam: ["REMRAN"],
-  JVC: ["Jumeirah Village Circle"],
-  JVT: ["Jumeirah Village Triangle"],
+  JVC: ["Jumeirah Village Circle", "Jumeirah Village Circle (JVC)"],
+  JVT: ["Jumeirah Village Triangle", "Jumeirah Village Triangle (JVT)"],
   "JUMEIRAH ISLAND": ["Jumeirah Islands"],
   "IMPZ (D.PRODUCTION CITY)": ["IMPZ", "Dubai Production City"],
   MARINA: ["Dubai Marina"],
@@ -149,6 +149,7 @@ const aliasMap: Record<string, string[]> = {
   "Palm Jumeirah - East Crescent": ["Palm Jumeirah East Crescent"],
   DIP: ["Dubai Investments Park", "Dubai Investment Park"],
   MOTORCITY: ["Motor City"],
+  DOWNTOWN: ["Downtown Dubai"],
 };
 export const zoneSeed: DeliveryZone[] = bands.flatMap(([min, names]) =>
   names.map((name) => ({
@@ -173,19 +174,31 @@ export const zoneSeed: DeliveryZone[] = bands.flatMap(([min, names]) =>
     review: "Approved October 2026: delivery included once minimum reached.",
   })),
 );
-for (const cluster of ["B", "C", "D"])
+for (const cluster of ["A", "B", "C", "D"])
   zoneSeed.push({
     id: `jlt-cluster-${cluster.toLowerCase()}`,
     name: `JLT Cluster ${cluster}`,
-    aliases: [],
+    aliases: [`Jumeirah Lakes Towers Cluster ${cluster}`],
     minOrderAed: 30,
     deliveryFeeAed: 0,
     freeDelivery: true,
     active: true,
     priority: 20,
     version: 0,
-    review: "TL-25 confirmed: minimum 30 AED and free delivery.",
+    review:
+      "Approved business update: minimum AED 30; no separate delivery charge.",
   });
+/** Public area options depend only on confirmed minimums, not obsolete fee metadata. */
+export function publicDeliveryAreas(zones: DeliveryZone[]) {
+  return zones
+    .filter((z) => z.active && z.minOrderAed != null)
+    .map((z) => ({
+      id: z.id,
+      name: z.name,
+      minOrderAed: z.minOrderAed,
+      deliveryFeeAed: 0 as const, // Retained wire compatibility; never a separate charge.
+    }));
+}
 export interface GeoService {
   resolveAddress?(
     address: string,
@@ -323,8 +336,9 @@ export function quoteOrder(
   const zone = manualZoneId
     ? zones.find((z) => z.id === manualZoneId && z.active)
     : matchZone(zones, address, location, geo);
-  const feeFils =
-    zone?.deliveryFeeAed == null ? null : Math.round(zone.deliveryFeeAed * 100);
+  // Compatibility field only: logistics are absorbed by the area minimum.
+  // Historical persisted quotes are never rewritten. New quotes cannot charge delivery.
+  const feeFils = 0;
   const minimumMet =
     zone?.minOrderAed != null &&
     subtotalFils >= Math.round(zone.minOrderAed * 100);
@@ -332,7 +346,7 @@ export function quoteOrder(
     ? "Producto no disponible en el catálogo aprobado"
     : !zone
       ? "Fuera de cobertura o ubicación ambigua"
-      : zone.minOrderAed == null || feeFils == null
+      : zone.minOrderAed == null
         ? "Regla pendiente de revisión"
         : !minimumMet
           ? `Minimum order for ${zone.name} is AED ${zone.minOrderAed}.`
@@ -346,14 +360,9 @@ export function quoteOrder(
     minOrderAed: zone?.minOrderAed ?? null,
     feeFils,
     subtotalFils,
-    totalFils: feeFils === null ? null : subtotalFils + feeFils,
+    totalFils: subtotalFils,
     minimumMet,
-    eligible:
-      validProducts &&
-      !!zone &&
-      minimumMet &&
-      feeFils !== null &&
-      subtotalFils > 0,
+    eligible: validProducts && !!zone && minimumMet && subtotalFils > 0,
     reason,
     zoneVersion: zone?.version ?? null,
   };

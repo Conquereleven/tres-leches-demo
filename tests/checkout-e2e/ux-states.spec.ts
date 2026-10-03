@@ -155,7 +155,8 @@ test.describe("payment step", () => {
     await page.goto("/cart");
     await shot(page, "cart-390");
     await page.getByRole("link", { name: "CONTINUE TO DELIVERY" }).click();
-    await expect(page.locator(".b-co-fee")).toContainText("Free");
+    await expect(page.locator(".b-co-fee")).toHaveCount(0);
+    await expect(page.locator(".b-shop-totals")).not.toContainText("Delivery");
     await shot(page, "checkout-delivery-390");
     await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
     await page.getByRole("button", { name: "REVIEW ORDER" }).click();

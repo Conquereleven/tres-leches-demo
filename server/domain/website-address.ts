@@ -6,6 +6,7 @@ import {
 import { readFileSync } from "node:fs";
 import { locationSchema, requireThat } from "./model";
 import { contains, type GeoService } from "./zones";
+import { resolveVerifiedCommunity } from "./delivery-areas";
 import type { CommerceService } from "./service";
 /** Server-owned registry binds a complete verified address to actual coordinates.
  * Not a customer-selectable area, keyword match, or client latitude override. */
@@ -22,8 +23,15 @@ const registrySchema = z
         address: z.string().min(5).max(300),
         building: z.string().min(1).max(120),
         location: locationSchema,
+        // Trusted structured evidence, never copied from the customer-selected area.
+        community: z.string().trim().min(1).max(120).optional(),
+        cluster: z.string().trim().min(1).max(30).optional(),
       })
-      .strict(),
+      .strict()
+      .refine(
+        (entry) => !entry.cluster || !!entry.community,
+        "Cluster requires community",
+      ),
   )
   .max(10000);
 export function attachVerifiedAddresses(
@@ -60,6 +68,15 @@ export function attachVerifiedAddresses(
         "This address is outside our current delivery coverage area.",
         422,
       );
+      if (entry.community) {
+        const zone = resolveVerifiedCommunity(
+          zones,
+          entry.community,
+          entry.cluster,
+        );
+        // Explicit unknown/ambiguous evidence must never fall back to a polygon.
+        return zone ? { zoneId: zone.id } : null;
+      }
       const matches = zones.filter(
         (z) => z.active && z.polygon && contains(entry.location, z.polygon),
       );

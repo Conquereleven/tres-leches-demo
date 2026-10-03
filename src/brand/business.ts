@@ -197,10 +197,10 @@ export const deliveryBands: DeliveryBand[] = [
     ],
   },
 ];
-/** Confirmed in TL-25: JLT Clusters B, C and D — AED 30 minimum, free delivery. */
+/** Approved business update: JLT Clusters A, B, C and D — AED 30 minimum, free delivery. */
 export const freeDeliveryAreas = {
   minOrderAed: 30,
-  areas: ["JLT Clusters B, C and D"],
+  areas: ["JLT Clusters A, B, C and D"],
 };
 
 export const legalEntityLabel = () =>

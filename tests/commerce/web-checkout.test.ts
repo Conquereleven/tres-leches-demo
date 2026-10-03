@@ -81,7 +81,7 @@ test("canonical product, authoritative JLT zone, quantity 2 = AED 50 and zero de
     assert.equal(z.minOrderAed, 30);
     assert.equal(z.deliveryFeeAed, 0);
     assert.equal(z.freeDelivery, true);
-    assert.match(z.review!, /confirmed/);
+    assert.match(z.review!, /Approved business/);
     const q = quoteWebCheckout(f.service, {
       productId: "pan-de-muerto",
       quantity: 2,
@@ -143,7 +143,7 @@ for (const [name, value] of Object.entries({
       f.store.close();
     }
   });
-test("unknown product, missing catalog and unresolved fee zones fail closed", async () => {
+test("unknown product, missing catalog and unresolved minimum zones fail closed", async () => {
   const f = fixture();
   try {
     await assert.rejects(
@@ -154,12 +154,12 @@ test("unknown product, missing catalog and unresolved fee zones fail closed", as
       ),
     );
     f.store.write((s) => {
-      s.zones[0]!.deliveryFeeAed = null;
+      s.zones[0]!.minOrderAed = null;
       s.zones[0]!.freeDelivery = false;
     });
     const unknownFee = f.store
       .read()
-      .zones.find((z) => z.deliveryFeeAed === null)!;
+      .zones.find((z) => z.minOrderAed === null)!;
     await assert.rejects(
       createWebCheckout(
         f.service,

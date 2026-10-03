@@ -138,14 +138,24 @@ if (process.env.COVERAGE_FIXTURE === "approved") {
     registry,
     JSON.stringify([
       {
+        address: "Downtown coverage fixture",
+        building: "Fixture Tower",
+        location: { lat: 25.1, lng: 55.25 },
+        community: "Downtown Dubai",
+      },
+      {
         address: "Approved coverage fixture",
         building: "Fixture Tower",
         location: { lat: 25.1, lng: 55.25 },
+        community: "Jumeirah Lakes Towers",
+        cluster: "C",
       },
       {
         address: "Outside coverage fixture",
         building: "Fixture Tower",
         location: { lat: 25.45, lng: 55.4 },
+        community: "JLT",
+        cluster: "C",
       },
     ]),
   );

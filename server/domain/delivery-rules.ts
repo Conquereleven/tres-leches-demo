@@ -3,7 +3,7 @@ import { zoneSeed } from "./zones";
 import { join } from "node:path";
 import { mkdirSync, chmodSync } from "node:fs";
 import { randomUUID } from "node:crypto";
-const marker = "migration:approved-delivery-pickup-2026-10";
+const marker = "migration:approved-community-minimum-only-2026-10";
 /** One-time rules update. Backup precedes the only mutation; orders/payments are never rewritten. */
 export async function applyApprovedDeliveryRules(
   store: Store,

@@ -70,6 +70,7 @@ test("actual Pan variants persist selector → cart → checkout → database �
   await expect(
     page.getByRole("region", { name: "Order review" }),
   ).toContainText("Chocolate covering");
+  await expect(page.locator(".b-shop-totals")).not.toContainText("Delivery");
   await page.getByRole("checkbox", { name: /I've reviewed/ }).check();
   await page.getByRole("button", { name: "PAY AED 34", exact: true }).click();
   await expect(page).toHaveURL(/pay.test.paymennt.com/);
@@ -206,6 +207,30 @@ test("approved coverage rejects forged HTTP area, client flags and changed addre
     data: { ...body, address: "Approved coverage fixture", zoneId: "downtown" },
   });
   expect((await valid.json()).zoneId).toBe("jlt-cluster-c");
+  const corrected = await request.post("/api/checkout/address", {
+    headers,
+    data: {
+      address: "Downtown coverage fixture",
+      building: "Fixture Tower",
+      zoneId: "marina",
+    },
+  });
+  expect(corrected.ok()).toBe(true);
+  expect(await corrected.json()).toMatchObject({
+    zoneId: "downtown",
+    minOrderAed: 300,
+    corrected: true,
+  });
+  const forgedCommunity = await request.post("/api/checkout/address", {
+    headers,
+    data: {
+      address: "Downtown coverage fixture",
+      building: "Fixture Tower",
+      zoneId: "marina",
+      community: "Marina",
+    },
+  });
+  expect(forgedCommunity.status()).toBe(400);
 });
 for (const width of [390, 768, 1440])
   test(`locale persistence, RTL, public screenshots and console at ${width}`, async ({

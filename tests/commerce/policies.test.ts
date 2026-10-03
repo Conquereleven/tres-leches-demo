@@ -91,7 +91,13 @@ test("published delivery minimums stay identical to the operational zone seed", 
     area.replace(/\(.*?\)/g, "").split(/,| and /).length;
   const seedBands = new Map<number, number>();
   for (const z of zoneSeed.filter(
-    (z) => !["jlt-cluster-b", "jlt-cluster-c", "jlt-cluster-d"].includes(z.id),
+    (z) =>
+      ![
+        "jlt-cluster-a",
+        "jlt-cluster-b",
+        "jlt-cluster-c",
+        "jlt-cluster-d",
+      ].includes(z.id),
   ))
     seedBands.set(z.minOrderAed!, (seedBands.get(z.minOrderAed!) ?? 0) + 1);
   assert.deepEqual(
@@ -104,7 +110,12 @@ test("published delivery minimums stay identical to the operational zone seed", 
     seedBands,
   );
   const free = zoneSeed.filter((z) =>
-    ["jlt-cluster-b", "jlt-cluster-c", "jlt-cluster-d"].includes(z.id),
+    [
+      "jlt-cluster-a",
+      "jlt-cluster-b",
+      "jlt-cluster-c",
+      "jlt-cluster-d",
+    ].includes(z.id),
   );
   assert.equal(free.length, count(freeDeliveryAreas.areas[0]!));
   assert.ok(

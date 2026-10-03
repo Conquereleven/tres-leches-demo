@@ -226,6 +226,11 @@ export class CommerceService {
         "Solo administradores pueden editar zonas",
         403,
       );
+      requireThat(
+        cmd.zone.deliveryFeeAed === 0 && cmd.zone.freeDelivery,
+        "Delivery has no separate charge; edit only the area minimum",
+        422,
+      );
       const index = s.zones.findIndex((z) => z.id === cmd.zone.id);
       requireThat(index >= 0, "Zona no encontrada", 404);
       this.version(s.zones[index]!, cmd.zone.version);

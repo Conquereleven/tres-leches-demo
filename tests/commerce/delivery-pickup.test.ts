@@ -11,15 +11,15 @@ import {
   dubaiToday,
 } from "../../server/domain/web-checkout";
 
-test("93 approved zones, seven bands, no duplicates or unknown charges, useful aliases", () => {
-  assert.equal(zoneSeed.length, 93);
-  assert.equal(new Set(zoneSeed.map((z) => z.id)).size, 93);
-  assert.equal(new Set(zoneSeed.map((z) => z.name.toLowerCase())).size, 93);
+test("94 approved zones, seven bands, no duplicates or unknown charges, useful aliases", () => {
+  assert.equal(zoneSeed.length, 94);
+  assert.equal(new Set(zoneSeed.map((z) => z.id)).size, 94);
+  assert.equal(new Set(zoneSeed.map((z) => z.name.toLowerCase())).size, 94);
   assert.deepEqual(
     [30, 50, 100, 150, 200, 250, 300].map(
       (n) => zoneSeed.filter((z) => z.minOrderAed === n).length,
     ),
-    [17, 18, 11, 16, 9, 2, 20],
+    [18, 18, 11, 16, 9, 2, 20],
   );
   assert.ok(
     zoneSeed.every((z) => z.active && z.freeDelivery && z.deliveryFeeAed === 0),
@@ -65,7 +65,10 @@ test("pickup rejects delivery fields, forged totals, missing billing/date and in
   const valid = {
     fulfillmentMethod: "pickup",
     lines: [{ productId: "sku", quantity: 1 }],
-    pickup: { pickupDate: new Date(Date.now()+172800000).toISOString().slice(0,10), preferredTime: "4:00 PM – 9:00 PM" },
+    pickup: {
+      pickupDate: new Date(Date.now() + 172800000).toISOString().slice(0, 10),
+      preferredTime: "4:00 PM – 9:00 PM",
+    },
     customer: {
       name: "Fixture Reviewer",
       phone: "0500000000",
@@ -84,7 +87,9 @@ test("pickup rejects delivery fields, forged totals, missing billing/date and in
     { delivery: { zoneId: "marina" } },
     { amount: 1 },
     { billing: { sameAsDelivery: true } },
-    { pickup: { pickupDate: "2026-02-30", preferredTime: "4:00 PM – 9:00 PM" } },
+    {
+      pickup: { pickupDate: "2026-02-30", preferredTime: "4:00 PM – 9:00 PM" },
+    },
     { pickup: { pickupDate: dubaiToday(), preferredTime: "" } },
   ])
     assert.throws(() => normalizeCheckout({ ...valid, ...patch }));
@@ -94,6 +99,9 @@ test("rules migration is backed up, idempotent and preserves catalog/orders/paym
   const store = new Store(join(dir, "state.sqlite"), "test");
   try {
     store.write((s) => {
+      // Simulate an existing installation that already applied the prior migration.
+      s.events["migration:approved-delivery-pickup-2026-10"] = "resolved";
+      s.zones = s.zones.filter((z) => z.id !== "jlt-cluster-a");
       s.zones[0]!.deliveryFeeAed = null;
       s.zones[0]!.freeDelivery = false;
     });
@@ -114,7 +122,7 @@ test("rules migration is backed up, idempotent and preserves catalog/orders/paym
       "commands",
     ] as const)
       assert.deepEqual(after[field], before[field]);
-    assert.equal(after.zones.filter((z) => z.active).length, 93);
+    assert.equal(after.zones.filter((z) => z.active).length, 94);
     assert.ok(
       after.zones.filter((z) => z.active).every((z) => z.deliveryFeeAed === 0),
     );

@@ -792,12 +792,6 @@ function OrderPanel({
             </dd>
             <dt>Productos</dt>
             <dd>{money(o.quote?.subtotalFils)}</dd>
-            <dt>Entrega</dt>
-            <dd>
-              {o.quote?.feeFils === 0
-                ? "Free delivery"
-                : money(o.quote?.feeFils)}
-            </dd>
             <dt>Total</dt>
             <dd>{money(o.quote?.totalFils)}</dd>
           </dl>
@@ -954,8 +948,8 @@ function Zones({ data, run }: { data: Data; run: Run }) {
       <aside>
         <h2>Zonas de entrega</h2>
         <p>
-          Tabla original · {data.zones.length} reglas. Las tarifas no indicadas
-          requieren revisión.
+          Tabla aprobada · {data.zones.length} reglas de mínimo. Sin cargos de
+          entrega.
         </p>
         <label>
           Buscar zona
@@ -981,12 +975,7 @@ function Zones({ data, run }: { data: Data; run: Run }) {
                     : money(z.minOrderAed * 100)}
                 </b>
                 <small>
-                  {z.freeDelivery
-                    ? "Free delivery"
-                    : z.deliveryFeeAed === null
-                      ? "Tarifa pendiente"
-                      : money(z.deliveryFeeAed * 100)}{" "}
-                  · {z.active ? "Activa" : "Inactiva"}
+                  Sin cargo adicional · {z.active ? "Activa" : "Inactiva"}
                 </small>
               </button>
             ))}
@@ -1029,6 +1018,8 @@ function ZoneEditor({
             type: "updateZone",
             zone: {
               ...draft,
+              deliveryFeeAed: 0,
+              freeDelivery: true,
               aliases: draft.aliases.map((a) => a.trim()).filter(Boolean),
               polygon: parsed,
             },
@@ -1042,7 +1033,7 @@ function ZoneEditor({
     >
       <p className="eyebrow">REGLA CONFIGURABLE</p>
       <h2>{zone.name}</h2>
-      {(zone.minOrderAed == null || zone.deliveryFeeAed == null) && (
+      {zone.minOrderAed == null && (
         <p className="ops-rule-warning">
           Regla pendiente de revisión. Esta zona no permite solicitar el pago
           hasta confirmar los valores comerciales.
@@ -1083,38 +1074,11 @@ function ZoneEditor({
               }
             />
           </label>
-          <label>
-            Tarifa AED
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              disabled={draft.freeDelivery}
-              value={draft.deliveryFeeAed ?? ""}
-              onChange={(e) =>
-                setDraft({
-                  ...draft,
-                  deliveryFeeAed:
-                    e.target.value === "" ? null : Number(e.target.value),
-                })
-              }
-            />
-          </label>
         </div>
-        <label className="co-check">
-          <input
-            type="checkbox"
-            checked={draft.freeDelivery}
-            onChange={(e) =>
-              setDraft({
-                ...draft,
-                freeDelivery: e.target.checked,
-                deliveryFeeAed: e.target.checked ? 0 : null,
-              })
-            }
-          />
-          Free delivery
-        </label>
+        <p>
+          Sin cargos de entrega. La logística está incluida en el mínimo del
+          área.
+        </p>
         <label className="co-check">
           <input
             type="checkbox"

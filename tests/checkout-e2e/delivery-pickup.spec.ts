@@ -18,7 +18,7 @@ for (const width of [390, 1440]) {
     );
     await page.goto("/checkout");
     const area = page.getByLabel("Delivery area");
-    await expect(area.locator("option")).toHaveCount(95); //93 zones + prompt + out-of-coverage
+    await expect(area.locator("option")).toHaveCount(96); //94 zones + prompt + out-of-coverage
     await area.selectOption("marina");
     await expect(
       page.getByText(/The minimum order for Marina is AED 50/),

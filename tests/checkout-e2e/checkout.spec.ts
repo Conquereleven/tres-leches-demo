@@ -39,7 +39,10 @@ test("cart → delivery → details → review → payment step", async ({
   ).toBeDisabled();
 
   await page.getByLabel("Delivery area").selectOption("jlt-cluster-c");
-  await expect(page.locator(".b-shop-form")).toContainText("Free");
+  await expect(page.locator(".b-shop-form")).toContainText(
+    "Included once minimum order is reached",
+  );
+  await expect(page.locator(".b-shop-totals")).not.toContainText("Delivery");
   await page
     .getByLabel("Street address and community")
     .fill("Jumeirah Lakes Towers, Cluster C");

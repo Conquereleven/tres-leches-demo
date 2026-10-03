@@ -155,7 +155,7 @@ function commerce() {
   const zone = store.read().zones.find((z) => z.id === "jvc")!;
   command({
     type: "updateZone",
-    zone: { ...zone, freeDelivery: false, deliveryFeeAed: 10 },
+    zone: { ...zone, freeDelivery: true, deliveryFeeAed: 0 },
   });
   command({
     type: "manualZone",
@@ -193,6 +193,7 @@ test("authoritative reconciliation verifies amount/currency/references; notifica
     ]) {
       f.remote({
         ...fixture,
+        amount: p.amountFils / 100,
         requestId: p.id,
         orderId: p.orderId,
         status: "PAID",
@@ -203,6 +204,7 @@ test("authoritative reconciliation verifies amount/currency/references; notifica
     }
     f.remote({
       ...fixture,
+      amount: p.amountFils / 100,
       requestId: p.id,
       orderId: p.orderId,
       status: "AUTHORIZED",
@@ -385,7 +387,7 @@ test("Mapbox requests permanent AE results; canonical evidence never supplies co
       point,
       geo,
     ).eligible,
-    false,
+    true,
   );
   assert.equal(
     matchZone(
@@ -411,7 +413,7 @@ test("online SQLite backup restores uncheckpointed records and command receipts"
     const restored = new Store(join(dir, "backup.sqlite"));
     try {
       assert.equal(restored.read().commands.fixture?.hash, "durable");
-      assert.equal(restored.read().zones.length, 93);
+      assert.equal(restored.read().zones.length, 94);
     } finally {
       restored.close();
     }
@@ -577,7 +579,7 @@ test("integration store never promotes demo records and starts with zero fictiti
     const integration = new Store(join(dir, "integration.sqlite"), false);
     try {
       assert.equal(integration.read().conversations.length, 0);
-      assert.equal(integration.read().zones.length, 93);
+      assert.equal(integration.read().zones.length, 94);
     } finally {
       integration.close();
     }
@@ -708,8 +710,8 @@ test("official-adapter HTTP fixtures: WA2 inbound → GPS → Paymennt link thro
       type: "updateZone",
       zone: {
         ...store.read().zones.find((z) => z.id === "jvc")!,
-        freeDelivery: false,
-        deliveryFeeAed: 10,
+        freeDelivery: true,
+        deliveryFeeAed: 0,
       },
     });
     command({

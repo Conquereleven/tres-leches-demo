@@ -196,23 +196,23 @@ test("zone minimum is enforced: one Pan de Muerto (AED 25) is below AED 30", asy
   }
 });
 
-test("a zone without a confirmed delivery fee blocks checkout, never a fabricated fee", async () => {
+test("a zone without a confirmed minimum blocks checkout", async () => {
   const f = fixture();
   try {
     f.store.write((s) => {
-      s.zones[0]!.deliveryFeeAed = null;
+      s.zones[0]!.minOrderAed = null;
       s.zones[0]!.freeDelivery = false;
     });
     const unresolved = f.store
       .read()
-      .zones.find((z) => z.active && z.deliveryFeeAed == null)!;
-    assert.ok(unresolved, "seed has zones pending fee confirmation");
+      .zones.find((z) => z.active && z.minOrderAed == null)!;
+    assert.ok(unresolved, "fixture has a zone pending minimum confirmation");
     const q = quoteWebCheckout(f.service, {
       lines: [{ productId: "pan-de-muerto", quantity: 20 }],
       zoneId: unresolved.id,
     });
     assert.equal(q.eligible, false);
-    assert.equal(q.feeFils, null);
+    assert.equal(q.feeFils, 0);
     await assert.rejects(
       createWebCheckout(f.service, cart(20, unresolved.id), randomUUID(), true),
     );
@@ -297,9 +297,13 @@ test("the browser cannot supply a price, amount, fee, currency or status", () =>
 
 test("only approved delivery windows are enforced, obsolete configuration cannot override them", () => {
   const env = { DELIVERY_SLOTS_JSON: JSON.stringify(["10:00–13:00"]) };
-  const c = cart(); c.delivery.slot = "10:00–13:00";
+  const c = cart();
+  c.delivery.slot = "10:00–13:00";
   assert.throws(() => normalizeCheckout(c, env), /notice/);
-  assert.equal(normalizeCheckout(cart(), env).delivery?.slot, "4:00 PM – 9:00 PM");
+  assert.equal(
+    normalizeCheckout(cart(), env).delivery?.slot,
+    "4:00 PM – 9:00 PM",
+  );
 });
 
 // ── Order creation ───────────────────────────────────────────────────────

@@ -55,7 +55,7 @@ import { readFileSync, existsSync, statSync } from "node:fs";
 import { resolve, extname } from "node:path";
 import { z, ZodError } from "zod";
 import { Store, seed } from "./db/store";
-import { quoteOrder } from "./domain/zones";
+import { quoteOrder, publicDeliveryAreas } from "./domain/zones";
 import { commandSchema, inboundSchema } from "./domain/commands";
 import { CommerceService } from "./domain/service";
 import {
@@ -364,19 +364,7 @@ export async function startServer(
                     priceFils: product.priceFils,
                   }
                 : null,
-              zones: s.zones
-                .filter(
-                  (z) =>
-                    z.active &&
-                    z.minOrderAed != null &&
-                    z.deliveryFeeAed != null,
-                )
-                .map((z) => ({
-                  id: z.id,
-                  name: z.name,
-                  minOrderAed: z.minOrderAed,
-                  deliveryFeeAed: z.deliveryFeeAed,
-                })),
+              zones: publicDeliveryAreas(s.zones),
             });
           }
           if (!enabled)

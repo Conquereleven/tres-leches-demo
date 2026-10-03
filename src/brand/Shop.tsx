@@ -342,10 +342,7 @@ function ShopShell({
 }
 function Totals({
   subtotal,
-  fee,
   total,
-  feePending,
-  fulfillmentMethod = "delivery",
 }: {
   subtotal: number;
   fee: number | null;
@@ -361,24 +358,6 @@ function Totals({
         </dt>
         <dd>
           <CustomerCopy>{formatAed(subtotal)}</CustomerCopy>
-        </dd>
-      </div>
-      <div>
-        <dt>
-          <CustomerCopy>
-            {fulfillmentMethod === "pickup" ? "Pickup" : "Delivery"}
-          </CustomerCopy>
-        </dt>
-        <dd>
-          <CustomerCopy>
-            {fee === 0
-              ? "Free"
-              : fee != null
-                ? formatAed(fee)
-                : feePending
-                  ? "Calculated at delivery"
-                  : "—"}
-          </CustomerCopy>
         </dd>
       </div>
       {total != null && (
@@ -1011,9 +990,6 @@ export function CheckoutPage() {
                           <CustomerCopy>{z.name}</CustomerCopy>{" "}
                           <CustomerCopy>— Minimum AED</CustomerCopy>{" "}
                           {z.minOrderAed}
-                          <CustomerCopy>
-                            {z.deliveryFeeAed === 0 ? " — free delivery" : ""}
-                          </CustomerCopy>
                         </option>
                       ))}
                       <option value="__missing">
@@ -1041,21 +1017,6 @@ export function CheckoutPage() {
                     <div aria-live="polite">
                       {quote.eligible ? (
                         <>
-                          <p className="b-co-fee">
-                            <span>
-                              <CustomerCopy>Delivery to</CustomerCopy>{" "}
-                              <CustomerCopy>
-                                {quote.zoneName ?? "your area"}
-                              </CustomerCopy>
-                            </span>
-                            <strong>
-                              <CustomerCopy>
-                                {quote.feeFils === 0
-                                  ? "Free"
-                                  : formatAed(quote.feeFils ?? 0)}
-                              </CustomerCopy>
-                            </strong>
-                          </p>
                           <p className="b-caption">
                             <CustomerCopy>Minimum order for</CustomerCopy>{" "}
                             {quote.zoneName} <CustomerCopy>is</CustomerCopy>{" "}
