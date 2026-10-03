@@ -254,7 +254,7 @@ test("payment marks are static, never reveal-gated", () => {
     /data-reveal/,
     "payment marks must not be reveal-gated",
   );
-  for (const alt of ['alt="Visa"', 'alt="Mastercard"'])
+  for (const alt of ['alt={localize("Visa")}', 'alt={localize("Mastercard")}'])
     assert.ok(marks.includes(alt), `${alt} missing`);
 });
 

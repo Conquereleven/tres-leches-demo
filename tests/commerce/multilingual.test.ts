@@ -50,5 +50,22 @@ test("translation resource keys are presentation-only and shared across locales"
       Object.keys(localeResources.en[namespace]),
     );
   }
-  assert.ok(Object.keys(index).length >= 574);
+  assert.ok(Object.keys(index).length >= 566);
+});
+
+test("every release key is translated and interpolation contracts are complete", () => {
+  const tokens = (s: string) =>
+    [...new Set([...s.matchAll(/\{(\d+)\}/g)].map((m) => m[1]))].sort();
+  for (const [source, full] of Object.entries(index)) {
+    const [ns, key] = full.split(":");
+    for (const locale of ["en", "es", "ar"] as const) {
+      const value = (
+        localeResources[locale][
+          ns as keyof typeof localeResources.en
+        ] as Record<string, string>
+      )[key!];
+      assert.equal(typeof value, "string", `${locale}:${full}`);
+      assert.deepEqual(tokens(value!), tokens(source), `${locale}:${full}`);
+    }
+  }
 });

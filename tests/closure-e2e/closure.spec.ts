@@ -414,7 +414,7 @@ for (const width of [390, 768, 1440])
     });
     await page.goto("/menu?category=pan&lang=ar");
     await page
-      .getByRole("navigation", { name: "Menu categories" })
+      .getByRole("navigation", { name: "فئات القائمة" })
       .getByRole("button", { name: /Pan de Muerto/ })
       .click();
     const rtlFamily = page.locator(
@@ -423,12 +423,12 @@ for (const width of [390, 768, 1440])
     await rtlFamily.locator("select").first().selectOption("Mini");
     await expect(rtlFamily.locator("select").first()).toHaveValue("Mini");
     await page.goto("/checkout");
-    await page.getByLabel("Delivery date").fill("2026-10-22");
+    await page.getByLabel("تاريخ التوصيل").fill("2026-10-22");
     await page
-      .getByRole("combobox", { name: /Delivery time/ })
+      .getByRole("combobox", { name: /وقت التوصيل/ })
       .selectOption("4:00 PM – 9:00 PM");
     await expect(
-      page.getByRole("combobox", { name: /Delivery time/ }),
+      page.getByRole("combobox", { name: /وقت التوصيل/ }),
     ).toHaveValue("4:00 PM – 9:00 PM");
     await page.goto("/cart");
     await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
