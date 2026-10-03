@@ -18,7 +18,7 @@ import {
   readWebCheckoutStatus,
 } from "../../server/domain/web-checkout";
 import { reconcileEmbeddedPayment } from "../../server/domain/embedded-checkout";
-const sku = "conchas-traditional-vainilla-mini-40-g";
+const sku = "conchas-traditional-chocolate-mini-40-g";
 const input = {
   lines: [{ productId: sku, quantity: 6 }],
   delivery: {
@@ -453,7 +453,7 @@ test("google overrides manipulated area with trusted community and never falls b
       ...input,
       lines: [
         { productId: sku, quantity: 20 },
-        { productId: "conchas-filled-chocolate-mini", quantity: 6 },
+        { productId: "conchas-filled-pistache-mini", quantity: 6 },
       ],
       delivery: {
         ...input.delivery,
@@ -490,6 +490,56 @@ test("google overrides manipulated area with trusted community and never falls b
       /could not verify/,
     );
     assert.deepEqual(f.counts(), before);
+  } finally {
+    f.store.close();
+  }
+});
+
+test("UAT V2: optional WhatsApp and storefront identity persist without rewriting historical orders", async () => {
+  const f = fixture();
+  try {
+    await createWebCheckout(
+      f.service,
+      input,
+      randomUUID(),
+      "web",
+      "https://test.example.invalid",
+    );
+    const historical = JSON.stringify(f.store.read().orders[0]);
+    assert.equal(
+      f.store.read().orders[0]!.customerDetails?.whatsappNumber,
+      undefined,
+    );
+    await createWebCheckout(
+      f.service,
+      {
+        ...input,
+        customer: { ...input.customer, whatsappNumber: "+52 (55) 1234-5678" },
+      },
+      randomUUID(),
+      "web",
+      "https://test.example.invalid",
+    );
+    const order = f.store.read().orders[1]!;
+    assert.equal(order.customerDetails?.whatsappNumber, "+525512345678");
+    assert.equal(
+      order.storefrontProducts?.[sku],
+      "conchas-traditional--chocolate",
+    );
+    assert.equal(JSON.stringify(f.store.read().orders[0]), historical);
+    await assert.rejects(() =>
+      createWebCheckout(
+        f.service,
+        {
+          ...input,
+          customer: { ...input.customer, whatsappNumber: "5551234567" },
+        },
+        randomUUID(),
+        "web",
+        "https://test.example.invalid",
+      ),
+    );
+    assert.equal(f.counts().posts, 2);
   } finally {
     f.store.close();
   }

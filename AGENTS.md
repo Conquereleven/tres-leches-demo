@@ -61,3 +61,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Latest Pan de Muerto/Conchas image menus override the older PDF. Packs have no invented assortment rules. Filled Conchas select size and filling only. Special cake sizes remain Mini / Small / Big.
 - Advance-order notices apply only to Mango Cake, gelatinas and Rosca. Do not change scheduling or payment logic to implement them.
 - Customer orders use product → cart → web checkout → Paymennt. WhatsApp remains support-only. No deploy without approval.
+
+## Approved UAT patch V2 (3 October 2026)
+- Flavours are separate authored storefront products with stable slugs; sizes/packs retain authoritative SKU IDs. Retired concha SKUs remain historical, not purchasable. Traditional conchas: Chocolate only. Filled conchas: Pistache only, existing prices confirmed.
+- Customer approved maximum100 units per SKU; quantity supports direct integer entry. Pan singles season begins October3 through November15.
+- Full text header wordmark, linked homepage menu preview, accessible visual ordering guide, scroll-driven assembly of separate cake layers; no looping motion and reduced motion shows final composition.
+- Optional international WhatsApp contact is separate from required UAE operations mobile. Production remains legacy address mode; Google prepared but off.

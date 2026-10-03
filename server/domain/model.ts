@@ -121,7 +121,13 @@ export type Order = {
   fulfillmentMethod?: "delivery" | "pickup";
   pickup?: { pickupDate: string; preferredTime: string };
   delivery?: DeliveryDetails;
-  customerDetails?: { email?: string; instructions?: string };
+  customerDetails?: {
+    email?: string;
+    instructions?: string;
+    whatsappNumber?: string;
+  };
+  /** Server-owned storefront identity; historical records may omit it. */
+  storefrontProducts?: Record<string, string>;
   /** Billing address confirmed by the customer, exactly as sent to Paymennt. */
   billing?: import("./billing").OrderBilling;
   /** Set exactly once, when the order first becomes paid. */

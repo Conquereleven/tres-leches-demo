@@ -71,7 +71,7 @@ for (const [sku, initialQty, currentQty, oldAmount, amount] of [
     );
     await page.goto("/cart");
     await expect(page.locator("main")).toContainText(`AED ${amount}`);
-    await page.getByRole("link", { name: "CONTINUE TO DELIVERY" }).click();
+    await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
     await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
     await page.getByRole("button", { name: "REVIEW ORDER" }).click();
     await page.getByLabel(/I've reviewed my order/).check();

@@ -4,9 +4,11 @@ import { writeFileSync, mkdirSync } from "node:fs";
 const widths = [320, 375, 390, 430, 768, 1024, 1280, 1440];
 const sections = [
   ".ref-hero",
+  ".b-menu-preview.b-section",
   ".ref-bridge",
   ".ref-featured",
   ".ref-tradition",
+  ".b-how-guide.b-section",
   ".ref-family",
 ];
 test("current storefront responsive matrix, section integrity and console", async ({
@@ -31,7 +33,7 @@ test("current storefront responsive matrix, section integrity and console", asyn
     await page
       .locator("main > section")
       .evaluateAll((es) => es.map((e) => e.className)),
-  ).toEqual(sections.map((s) => s.slice(1)));
+  ).toEqual(sections.map((s) => s.slice(1).replaceAll(".", " ")));
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
     for (const selector of sections) {

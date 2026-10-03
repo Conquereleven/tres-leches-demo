@@ -2,27 +2,25 @@ import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync, writeFileSync } from "node:fs";
 const shots = "work/qa/closure";
 const family = (page: Page, id: string) =>
-  page.locator(`[data-menu-family="${id}"]`);
+  page.locator(`[data-menu-family="${id}"]`).first();
 async function addVariants(page: Page) {
   await page.goto("/menu?category=pan");
   await page
     .getByRole("navigation", { name: "Menu categories" })
     .getByRole("button", { name: "Pan de Muerto", exact: true })
     .click();
-  const filled = family(page, "pan-de-muerto-filled");
-  await filled
-    .getByRole("combobox", { name: "Filling", exact: true })
-    .selectOption("Pistachio");
+  const filled = page.locator(
+    '[data-product-id="pan-de-muerto-filled--pistachio"]',
+  );
   await filled
     .getByRole("combobox", { name: "Size / pack", exact: true })
     .selectOption("Individual");
   await filled
     .getByRole("button", { name: "ADD TO CART · AED 21", exact: true })
     .click();
-  const traditional = family(page, "pan-de-muerto-traditional");
-  await traditional
-    .getByRole("combobox", { name: "Flavour", exact: true })
-    .selectOption("Azúcar · Chocolate covering");
+  const traditional = page.locator(
+    '[data-product-id="pan-de-muerto-traditional--azucar-chocolate-covering"]',
+  );
   await traditional
     .getByRole("combobox", { name: "Size / pack", exact: true })
     .selectOption("Individual · 70 g");
@@ -50,7 +48,7 @@ test("actual Pan variants persist selector → cart → checkout → database �
   );
   await expect(page.locator("main")).toContainText("Chocolate covering");
   await expect(page.locator("main")).toContainText("AED 34");
-  await page.getByRole("link", { name: "CONTINUE TO DELIVERY" }).click();
+  await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
 
   await page
     .getByLabel("Street address and community")
@@ -71,6 +69,7 @@ test("actual Pan variants persist selector → cart → checkout → database �
     .getByLabel("Email for payment receipt")
     .fill("fixture@example.invalid");
   await page.getByLabel("Mobile number").fill("0500000000");
+  await page.getByLabel("WhatsApp number (optional)").fill("+52 55 1234 5678");
   await page.getByRole("button", { name: "REVIEW ORDER" }).click();
   await expect(
     page.getByRole("region", { name: "Order review" }),
@@ -101,6 +100,10 @@ test("actual Pan variants persist selector → cart → checkout → database �
   );
   const saved = await (await request.get("/api/workspace")).json();
   const order = saved.orders.find((o: { id: string }) => o.id === data.orderId);
+  expect(order.customerDetails.whatsappNumber).toBe("+525512345678");
+  expect(
+    order.storefrontProducts["pan-de-muerto-filled-pistachio-individual"],
+  ).toBe("pan-de-muerto-filled--pistachio");
   expect(order.lines.map((l: { productId: string }) => l.productId)).toEqual(
     data.summary.items.map((i: { productId: string }) => i.productId),
   );
@@ -125,6 +128,9 @@ test("actual Pan variants persist selector → cart → checkout → database �
   await page.goto("/operations/orders");
   await page.getByRole("button", { name: /^Todos los pedidos/ }).click();
   await expect(page.locator("main")).toContainText(data.orderId);
+  await expect(
+    page.getByRole("article", { name: `Pedido ${data.orderId}` }),
+  ).toContainText("+525512345678");
   await page
     .getByRole("article", { name: `Pedido ${data.orderId}` })
     .getByText("Ver pedido y seguimiento", { exact: true })
@@ -411,9 +417,11 @@ for (const width of [390, 768, 1440])
       .getByRole("navigation", { name: "Menu categories" })
       .getByRole("button", { name: /Pan de Muerto/ })
       .click();
-    const rtlFamily = family(page, "pan-de-muerto-filled");
-    await rtlFamily.locator("select").first().selectOption("Pistachio");
-    await expect(rtlFamily.locator("select").first()).toHaveValue("Pistachio");
+    const rtlFamily = page.locator(
+      '[data-product-id="pan-de-muerto-filled--pistachio"]',
+    );
+    await rtlFamily.locator("select").first().selectOption("Mini");
+    await expect(rtlFamily.locator("select").first()).toHaveValue("Mini");
     await page.goto("/checkout");
     await page.getByLabel("Delivery date").fill("2026-10-22");
     await page
@@ -668,7 +676,7 @@ test("pickup golden path completes mock reconciliation, confirmation, tracking a
   );
   await addVariants(page);
   await page.goto("/cart");
-  await page.getByRole("link", { name: "CONTINUE TO DELIVERY" }).click();
+  await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
   await page.getByRole("radio", { name: "PICKUP", exact: true }).check();
   await page.getByLabel("Pickup date").fill("2026-10-22");
   await page

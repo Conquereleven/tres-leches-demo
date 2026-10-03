@@ -1,9 +1,12 @@
 import {
   availableSku,
+  MAX_ITEM_QUANTITY,
   validWindow,
   leadHours,
   DELIVERY_WINDOWS,
 } from "../../shared/commerce-policy";
+import products from "../../shared/storefront-products.json";
+import { normalizeWhatsAppNumber } from "../../shared/contact";
 import { authoritativeAddress } from "./website-address";
 /** Public entry into the existing catalog/quote/command/outbox/payment domain. */
 import { z } from "zod";
@@ -78,7 +81,7 @@ export function configuredSlots(_env = process.env): string[] {
 const line = z
   .object({
     productId: z.string().min(1).max(100),
-    quantity: z.number().int().min(1).max(20),
+    quantity: z.number().int().min(1).max(MAX_ITEM_QUANTITY),
   })
   .strict();
 const lines = z
@@ -94,7 +97,7 @@ const lines = z
 export const webQuoteSchema = z
   .object({
     productId: z.string().min(1).max(100),
-    quantity: z.number().int().min(1).max(20),
+    quantity: z.number().int().min(1).max(MAX_ITEM_QUANTITY),
     zoneId: z.string().min(1).max(100),
   })
   .strict();
@@ -150,6 +153,20 @@ export const cartCheckoutSchema = z
       .object({
         name: z.string().trim().min(2).max(100),
         phone: uaeMobile,
+        whatsappNumber: z
+          .string()
+          .max(40)
+          .transform((v, ctx) => {
+            const normalized = normalizeWhatsAppNumber(v);
+            if (!normalized)
+              ctx.addIssue({
+                code: "custom",
+                message:
+                  "Use an international WhatsApp number including + country code",
+              });
+            return normalized ?? z.NEVER;
+          })
+          .optional(),
         // Required: Paymennt's token payment needs it for the receipt.
         email: z.email().max(254),
         instructions: z.string().trim().max(500).optional(),
@@ -224,6 +241,9 @@ export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
       address: "",
       details: {
         email: data.customer.email,
+        ...(data.customer.whatsappNumber
+          ? { whatsappNumber: data.customer.whatsappNumber }
+          : {}),
         instructions: data.customer.instructions,
       },
       billing: toPaymenntBillingAddress({
@@ -279,7 +299,13 @@ export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
       phone: customer.phone,
       address: fullAddress,
       delivery: { ...delivery },
-      details: { email: customer.email, instructions: customer.instructions },
+      details: {
+        email: customer.email,
+        instructions: customer.instructions,
+        ...(customer.whatsappNumber
+          ? { whatsappNumber: customer.whatsappNumber }
+          : {}),
+      },
       // Resolved and validated now, so an order can never exist with a billing
       // address Paymennt would reject.
       billing: toPaymenntBillingAddress({
@@ -720,6 +746,14 @@ export async function createWebCheckout(
         } else o.address = input.address;
         o.delivery = input.delivery;
         o.customerDetails = input.details;
+        o.storefrontProducts = Object.fromEntries(
+          input.lines.flatMap((line) => {
+            const product = products.find((p) =>
+              p.optionIds.includes(line.productId),
+            );
+            return product ? [[line.productId, product.id]] : [];
+          }),
+        );
         o.billing = input.billing;
       });
     order = command("requestPayment", order);

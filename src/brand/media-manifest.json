@@ -2996,5 +2996,700 @@
         "bytes": 199932
       }
     }
+  ],
+  "products": [
+    {
+      "productId": "pan-de-muerto-traditional--azucar",
+      "slug": "pan-de-muerto-traditional--azucar",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-traditional",
+      "variant": "Azúcar"
+    },
+    {
+      "productId": "pan-de-muerto-traditional--ajonjoli",
+      "slug": "pan-de-muerto-traditional--ajonjoli",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-traditional",
+      "variant": "Ajonjolí"
+    },
+    {
+      "productId": "pan-de-muerto-traditional--azucar-chocolate-covering",
+      "slug": "pan-de-muerto-traditional--azucar-chocolate-covering",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-traditional",
+      "variant": "Azúcar · Chocolate covering"
+    },
+    {
+      "productId": "pan-de-muerto-traditional--ajonjoli-chocolate-covering",
+      "slug": "pan-de-muerto-traditional--ajonjoli-chocolate-covering",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-traditional",
+      "variant": "Ajonjolí · Chocolate covering"
+    },
+    {
+      "productId": "pan-de-muerto-filled--crema-diplomatica-vainilla",
+      "slug": "pan-de-muerto-filled--crema-diplomatica-vainilla",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Crema diplomática (vainilla)"
+    },
+    {
+      "productId": "pan-de-muerto-filled--chocolate",
+      "slug": "pan-de-muerto-filled--chocolate",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Chocolate"
+    },
+    {
+      "productId": "pan-de-muerto-filled--mascarpone-y-cajeta",
+      "slug": "pan-de-muerto-filled--mascarpone-y-cajeta",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Mascarpone y cajeta"
+    },
+    {
+      "productId": "pan-de-muerto-filled--mascarpone-y-fresas",
+      "slug": "pan-de-muerto-filled--mascarpone-y-fresas",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Mascarpone y fresas"
+    },
+    {
+      "productId": "pan-de-muerto-filled--pistachio",
+      "slug": "pan-de-muerto-filled--pistachio",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Pistachio"
+    },
+    {
+      "productId": "pan-de-muerto-filled--crema-diplomatica-vainilla-chocolate-covering",
+      "slug": "pan-de-muerto-filled--crema-diplomatica-vainilla-chocolate-covering",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Crema diplomática (vainilla) · Chocolate covering"
+    },
+    {
+      "productId": "pan-de-muerto-filled--chocolate-chocolate-covering",
+      "slug": "pan-de-muerto-filled--chocolate-chocolate-covering",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Chocolate · Chocolate covering"
+    },
+    {
+      "productId": "pan-de-muerto-filled--mascarpone-y-cajeta-chocolate-covering",
+      "slug": "pan-de-muerto-filled--mascarpone-y-cajeta-chocolate-covering",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Mascarpone y cajeta · Chocolate covering"
+    },
+    {
+      "productId": "pan-de-muerto-filled--mascarpone-y-fresas-chocolate-covering",
+      "slug": "pan-de-muerto-filled--mascarpone-y-fresas-chocolate-covering",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Mascarpone y fresas · Chocolate covering"
+    },
+    {
+      "productId": "pan-de-muerto-filled--pistachio-chocolate-covering",
+      "slug": "pan-de-muerto-filled--pistachio-chocolate-covering",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Pistachio · Chocolate covering"
+    },
+    {
+      "productId": "pan-de-muerto-traditional-pack",
+      "slug": "pan-de-muerto-traditional-pack",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-traditional-pack",
+      "variant": ""
+    },
+    {
+      "productId": "pan-de-muerto-filled-pack",
+      "slug": "pan-de-muerto-filled-pack",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled-pack",
+      "variant": ""
+    },
+    {
+      "productId": "conchas-traditional--chocolate",
+      "slug": "conchas-traditional--chocolate",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "conchas-traditional",
+      "variant": "Chocolate"
+    },
+    {
+      "productId": "conchas-filled--pistache",
+      "slug": "conchas-filled--pistache",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "conchas-filled",
+      "variant": "Pistache"
+    },
+    {
+      "productId": "conchas-traditional-pack",
+      "slug": "conchas-traditional-pack",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "conchas-traditional-pack",
+      "variant": ""
+    },
+    {
+      "productId": "conchas-filled-pack",
+      "slug": "conchas-filled-pack",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "conchas-filled-pack",
+      "variant": ""
+    },
+    {
+      "productId": "tres-leches--vanilla-strawberry",
+      "slug": "tres-leches--vanilla-strawberry",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1SAFjwElHzkXtQfxLRSSxNpie7FTSO8YD",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Vanilla Strawberry"
+    },
+    {
+      "productId": "tres-leches--classic",
+      "slug": "tres-leches--classic",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1AQVsRpJ6v13GhTGJEICFDPK-vyq13DJO",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Classic"
+    },
+    {
+      "productId": "tres-leches--nutella",
+      "slug": "tres-leches--nutella",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1xZMi2wjmbPuK9-KQthnfv_K8AvRlLBXb",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Nutella"
+    },
+    {
+      "productId": "tres-leches--caffe-latte",
+      "slug": "tres-leches--caffe-latte",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1UOxCTO1a2wbHKtWGe7pB1Y9tvfDeU0sI",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Caffe Latte"
+    },
+    {
+      "productId": "tres-leches--coconut",
+      "slug": "tres-leches--coconut",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1OCd7HYnPsl_ZbjF4m1SvRDMWKDN7OftN",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Coconut"
+    },
+    {
+      "productId": "tres-leches--confetti",
+      "slug": "tres-leches--confetti",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1eJaF3IF79qvg_P-Jh0fFhb9mPsgqasv7",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Confetti"
+    },
+    {
+      "productId": "tres-leches--lotus",
+      "slug": "tres-leches--lotus",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1U_I7bIHh5eR1FELk61uKe4wTkLvZ6oPP",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Lotus"
+    },
+    {
+      "productId": "tres-leches--m-ms",
+      "slug": "tres-leches--m-ms",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1LIEZjzeslI-ZMpGYCfk8zqeGB5tqP7Xq",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "M&Ms"
+    },
+    {
+      "productId": "tres-leches--oreo",
+      "slug": "tres-leches--oreo",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1jI6gdcjCpMYgwG5mc-0J_om6s2j2RVDr",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Oreo"
+    },
+    {
+      "productId": "tres-leches-premium--dulce-de-leche",
+      "slug": "tres-leches-premium--dulce-de-leche",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1ZfXU_Gaeg4Rd3dPVmMZS6dsucnwVWraF",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches-premium",
+      "variant": "Dulce de Leche"
+    },
+    {
+      "productId": "tres-leches-premium--tiramisu",
+      "slug": "tres-leches-premium--tiramisu",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "tres-leches-premium",
+      "variant": "Tiramisu"
+    },
+    {
+      "productId": "tres-leches-mango--mango",
+      "slug": "tres-leches-mango--mango",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "17PHX1fgmJXdAsdA2HQKWkVW6kyg8rt_G",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches-mango",
+      "variant": "Mango"
+    },
+    {
+      "productId": "special-flavours-cake--berries",
+      "slug": "special-flavours-cake--berries",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Berries"
+    },
+    {
+      "productId": "special-flavours-cake--chocolate",
+      "slug": "special-flavours-cake--chocolate",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Chocolate"
+    },
+    {
+      "productId": "special-flavours-cake--half-rosettas",
+      "slug": "special-flavours-cake--half-rosettas",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Half Rosettas"
+    },
+    {
+      "productId": "special-flavours-cake--matcha",
+      "slug": "special-flavours-cake--matcha",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Matcha"
+    },
+    {
+      "productId": "special-flavours-cake--pistacchio",
+      "slug": "special-flavours-cake--pistacchio",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1Z4vZNR3PPsndURye2AfcD9CjoBfeeOF0",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Pistacchio"
+    },
+    {
+      "productId": "special-flavours-cake--raspberry",
+      "slug": "special-flavours-cake--raspberry",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1wtPk4YjUv5irLyHpbhaet_uPdD7uSt7A",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Raspberry"
+    },
+    {
+      "productId": "special-flavours-cake--rosettas",
+      "slug": "special-flavours-cake--rosettas",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1pJ9RvHUzcor5MlJcuAFh_-cnXC2MovUS",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Rosettas"
+    },
+    {
+      "productId": "special-flavours-cake--saffron",
+      "slug": "special-flavours-cake--saffron",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1uF3N2VrJvySMHYoYxaOVgUmVdcb4OPCG",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Saffron"
+    },
+    {
+      "productId": "cake-jar--classic",
+      "slug": "cake-jar--classic",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1IxsNrRhMch8ivpqeqLMuIgCcjmDeSJlG",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Classic"
+    },
+    {
+      "productId": "cake-jar--vanilla-strawberry",
+      "slug": "cake-jar--vanilla-strawberry",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1o85mQyi2C3FTp2IfS6tso4a2ovDA8p_J",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Vanilla Strawberry"
+    },
+    {
+      "productId": "cake-jar--nutella",
+      "slug": "cake-jar--nutella",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1X4G9m-4hMxBojkopCtvVQWBQUFQqsjpN",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Nutella"
+    },
+    {
+      "productId": "cake-jar--lotus",
+      "slug": "cake-jar--lotus",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1y9ANv6P_H2yn0Vq8JgusvrG1emc9xJNz",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Lotus"
+    },
+    {
+      "productId": "cake-jar--caffe-latte",
+      "slug": "cake-jar--caffe-latte",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1p_7FlK7hMBIsD0YyhWFWJH7Zk8xq1mUx",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Caffe Latte"
+    },
+    {
+      "productId": "cake-jar--coconut",
+      "slug": "cake-jar--coconut",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1mVJC2qORChL9HKG_uIJoP0oXA48gzop9",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Coconut"
+    },
+    {
+      "productId": "cake-jar--oreo-cookies-and-cream",
+      "slug": "cake-jar--oreo-cookies-and-cream",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1wdfmRu1s5GC_2U9CSj3MzSTqfpJyrCWQ",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Oreo (cookies and cream)"
+    },
+    {
+      "productId": "cake-jar--confetti",
+      "slug": "cake-jar--confetti",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1FWE_CNXVYg8gPwSQrv92wcJkd-hGuxSS",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Confetti"
+    },
+    {
+      "productId": "cake-jar--m-ms",
+      "slug": "cake-jar--m-ms",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1zzkmTomAqXw8nxY7lMBDPIen--oXhN8A",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "M&Ms"
+    },
+    {
+      "productId": "cake-jar-premium--tiramisu",
+      "slug": "cake-jar-premium--tiramisu",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "cake-jar-premium",
+      "variant": "Tiramisu"
+    },
+    {
+      "productId": "cake-jar-premium--mango",
+      "slug": "cake-jar-premium--mango",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1chQqCp9MWbFHP1xHoPJw_CZnF1mZNquI",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar-premium",
+      "variant": "Mango"
+    },
+    {
+      "productId": "cake-jar-premium--dulce-de-leche",
+      "slug": "cake-jar-premium--dulce-de-leche",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1eRoVXACLOyqsCtM6W1odO921Jv9MjAX8",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar-premium",
+      "variant": "Dulce De Leche"
+    },
+    {
+      "productId": "cake-jar-bundle",
+      "slug": "cake-jar-bundle",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1rTHqazck_5X9O-4bRbv48qCpS0QpnHiT",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar-bundle",
+      "variant": ""
+    },
+    {
+      "productId": "special-flavours-jar--raspberry",
+      "slug": "special-flavours-jar--raspberry",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1pTYRUW2Va5-wK8DM2jPlogEm2FdZPqf3",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-jar",
+      "variant": "Raspberry"
+    },
+    {
+      "productId": "special-flavours-jar--saffron",
+      "slug": "special-flavours-jar--saffron",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1L8XDW2YvTblEdLZ0IdmT3TSn-rAVv-Ma",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-jar",
+      "variant": "Saffron"
+    },
+    {
+      "productId": "special-flavours-jar--pistacchio",
+      "slug": "special-flavours-jar--pistacchio",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1AXQLq_TRNx-xI64rFutDFBMoBj0k6rOd",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-jar",
+      "variant": "Pistacchio"
+    },
+    {
+      "productId": "special-flavours-jar--matcha",
+      "slug": "special-flavours-jar--matcha",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-jar",
+      "variant": "Matcha"
+    },
+    {
+      "productId": "special-flavours-jar--chocolate",
+      "slug": "special-flavours-jar--chocolate",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-jar",
+      "variant": "Chocolate"
+    },
+    {
+      "productId": "special-flavours-jar--berries",
+      "slug": "special-flavours-jar--berries",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-jar",
+      "variant": "Berries"
+    },
+    {
+      "productId": "carrot-cake",
+      "slug": "carrot-cake",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "carrot-cake",
+      "variant": ""
+    },
+    {
+      "productId": "cheesecake",
+      "slug": "cheesecake",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "cheesecake",
+      "variant": ""
+    },
+    {
+      "productId": "jelly-gelatina-fruits",
+      "slug": "jelly-gelatina-fruits",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "jelly-gelatina-fruits",
+      "variant": ""
+    },
+    {
+      "productId": "jelly-gelatina-dulce-de-leche",
+      "slug": "jelly-gelatina-dulce-de-leche",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "jelly-gelatina-dulce-de-leche",
+      "variant": ""
+    },
+    {
+      "productId": "jelly-gelatina-yogurt-strawberry",
+      "slug": "jelly-gelatina-yogurt-strawberry",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1svsv4gUExatnLjoaenagvjym26Q_eKUQ",
+      "gallerySourceIds": [],
+      "familyId": "jelly-gelatina-yogurt-strawberry",
+      "variant": ""
+    },
+    {
+      "productId": "orejas",
+      "slug": "orejas",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "orejas",
+      "variant": ""
+    },
+    {
+      "productId": "bisquets",
+      "slug": "bisquets",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "bisquets",
+      "variant": ""
+    },
+    {
+      "productId": "croissant--plain",
+      "slug": "croissant--plain",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "croissant",
+      "variant": "Plain"
+    },
+    {
+      "productId": "croissant--chocolate",
+      "slug": "croissant--chocolate",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "croissant",
+      "variant": "Chocolate"
+    },
+    {
+      "productId": "croissant--pistacchio",
+      "slug": "croissant--pistacchio",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "croissant",
+      "variant": "Pistacchio"
+    },
+    {
+      "productId": "croissant--cherry",
+      "slug": "croissant--cherry",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "croissant",
+      "variant": "Cherry"
+    },
+    {
+      "productId": "croissant--integral",
+      "slug": "croissant--integral",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "croissant",
+      "variant": "Integral"
+    },
+    {
+      "productId": "cubilete--cream",
+      "slug": "cubilete--cream",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "cubilete",
+      "variant": "Cream"
+    },
+    {
+      "productId": "cubilete--cheese",
+      "slug": "cubilete--cheese",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "cubilete",
+      "variant": "Cheese"
+    },
+    {
+      "productId": "rosca-de-reyes",
+      "slug": "rosca-de-reyes",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "rosca-de-reyes",
+      "variant": ""
+    },
+    {
+      "productId": "milk",
+      "slug": "milk",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1Yh8wTTrCuJipMiDKmzFK8G4pMAeQxyaG",
+      "gallerySourceIds": [],
+      "familyId": "milk",
+      "variant": ""
+    },
+    {
+      "productId": "cake-topper",
+      "slug": "cake-topper",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1PPfBb0zDzygPb4o5oklRJZAy843rH75s",
+      "gallerySourceIds": [],
+      "familyId": "cake-topper",
+      "variant": ""
+    },
+    {
+      "productId": "candles",
+      "slug": "candles",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1-yxiwJ39gk3YJNHW8h6ALuZisG2NZ_qm",
+      "gallerySourceIds": [],
+      "familyId": "candles",
+      "variant": ""
+    }
   ]
 }

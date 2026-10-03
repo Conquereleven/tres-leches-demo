@@ -6,7 +6,8 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 export type CartLine = { productId: string; quantity: number };
-export const MAX_QTY = 20;
+import { MAX_ITEM_QUANTITY } from "../../shared/commerce-policy";
+export const MAX_QTY = MAX_ITEM_QUANTITY;
 const KEY = "3l-cart";
 
 let lines: CartLine[] = read();

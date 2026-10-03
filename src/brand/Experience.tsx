@@ -1,3 +1,5 @@
+import { useEditorialMotion } from "./useEditorialMotion";
+import { MenuPreview, HowToOrderGuide } from "./StorefrontGuide";
 import { ResponsiveMedia } from "./media";
 import { CustomerCopy } from "./localization";
 import { useEffect, useRef, useState } from "react";
@@ -9,6 +11,7 @@ import "./storefront.css";
 const media = (name: string) => `/brand/reference/${name}`;
 /** Approved reference composition; no unfinished reference scaffolds or catalog duplication. */
 export function BrandExperience({ onManage }: { onManage: () => void }) {
+  const editorial = useEditorialMotion();
   const video = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [allowMotion, setAllowMotion] = useState(false);
@@ -132,6 +135,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             </span>
           </div>
         </section>
+        <MenuPreview />
         <section id="story" className="ref-bridge">
           <h2>
             <CustomerCopy>More than a cake.</CustomerCopy> <br />
@@ -223,6 +227,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
           </a>
         </section>
         <section
+          ref={editorial}
           className="ref-tradition"
           aria-label="Tradition in every slice"
         >
@@ -274,6 +279,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             />
           </div>
         </section>
+        <HowToOrderGuide />
         <section id="family-story" className="ref-family">
           <div className="ref-collage">
             <img

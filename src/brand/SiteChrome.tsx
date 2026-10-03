@@ -214,6 +214,7 @@ export function SiteHeader({
   const [menu, setMenu] = useState(false);
   const { t } = useLanguage();
   void onContactUnavailable;
+  void home;
   return (
     <>
       <header className="b-header b-scrolled">
@@ -223,6 +224,9 @@ export function SiteHeader({
           </a>
           <a href="/menu">
             <CustomerCopy>{t("menu").toUpperCase()}</CustomerCopy>
+          </a>
+          <a href="/#how-to-order">
+            <CustomerCopy>HOW TO ORDER?</CustomerCopy>
           </a>
         </nav>
         <button
@@ -234,17 +238,7 @@ export function SiteHeader({
           <List aria-hidden />
         </button>
         <a href="/" className="b-home" aria-label="3L home">
-          {home ? (
-            <img
-              className="b-logo"
-              src="/brand/reference/mark.png"
-              alt="Pastelerías 3L"
-              width="72"
-              height="52"
-            />
-          ) : (
-            <Logo />
-          )}
+          <Logo />
         </a>
         <nav className="b-nav-right" aria-label="Contact">
           <a href="/#family-story">
@@ -267,6 +261,9 @@ export function SiteHeader({
             </a>
             <a href="/menu">
               <CustomerCopy>{t("menu").toUpperCase()}</CustomerCopy>
+            </a>
+            <a href="/#how-to-order" onClick={() => setMenu(false)}>
+              <CustomerCopy>HOW TO ORDER?</CustomerCopy>
             </a>
             {policyRoutes.map((r) => (
               <a key={r.path} href={r.path}>

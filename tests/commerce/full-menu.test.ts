@@ -11,9 +11,9 @@ import {
 const catalog = validateCatalog(
   JSON.parse(readFileSync("data-imports/liza-current-menu.json", "utf8")),
 );
-test("approved full menu has 234 unique authoritative SKUs and retires AED25 Pan de Muerto", () => {
-  assert.equal(catalog.length, 234);
-  assert.equal(new Set(catalog.map((item) => item.id)).size, 234);
+test("approved full menu has 236 unique authoritative SKUs and retires AED25 Pan de Muerto", () => {
+  assert.equal(catalog.length, 236);
+  assert.equal(new Set(catalog.map((item) => item.id)).size, 236);
   assert.equal(menuFamilies.length, 29);
   assert.equal(menuCategories.length, 8);
   assert.ok(!catalog.some((item) => item.id === "pan-de-muerto"));
@@ -24,7 +24,13 @@ test("approved full menu has 234 unique authoritative SKUs and retires AED25 Pan
       assert.equal(item.priceFils, option.priceFils);
       assert.equal(
         item.name,
-        [family.name, option.variant, option.size].filter(Boolean).join(" · "),
+        [
+          family.name,
+          family.id.startsWith("conchas-") ? "" : option.variant,
+          option.size,
+        ]
+          .filter(Boolean)
+          .join(" · "),
       );
       assert.equal(item.active, true);
       assert.equal(
@@ -53,13 +59,25 @@ test("latest images override old bakery prices and weights without inventing pac
       ["Individual · 70 g:1300", "Mini · 40 g:1100"],
     );
     assert.deepEqual(
-      [...new Set(filled.options.filter(option => !option.variant.includes("covering") && option.variant !== "Pistachio").map((option) => option.variant))],
       [
-        "Chocolate",
-        "Crema diplomática (vainilla)",
-        "Mascarpone y cajeta",
-        "Mascarpone y fresas",
+        ...new Set(
+          filled.options
+            .filter(
+              (option) =>
+                !option.variant.includes("covering") &&
+                option.variant !== "Pistachio",
+            )
+            .map((option) => option.variant),
+        ),
       ],
+      prefix === "conchas"
+        ? ["Pistache"]
+        : [
+            "Chocolate",
+            "Crema diplomática (vainilla)",
+            "Mascarpone y cajeta",
+            "Mascarpone y fresas",
+          ],
     );
     assert.deepEqual(
       [...new Set(filled.options.map((option) => option.priceFils))],
@@ -74,7 +92,7 @@ test("latest images override old bakery prices and weights without inventing pac
       )!;
       assert.deepEqual(
         pack.options.map((option) => option.priceFils),
-        [...prices].sort((a,b)=>b-a),
+        [...prices].sort((a, b) => b - a),
       );
       assert.ok(pack.options.every((option) => option.variant === ""));
     }

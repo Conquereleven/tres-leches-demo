@@ -10,7 +10,23 @@ export function selectedMedia(family: string, variant: string, size?: string) {
       (!a.size || a.size === size),
   );
 }
+export function selectedProductMedia(
+  productId: string | undefined,
+  family: string,
+  variant: string,
+  size?: string,
+) {
+  const primary = manifest.products.find(
+    (p) => p.productId === productId,
+  )?.primarySourceId;
+  return (
+    approvedMedia.find(
+      (a) => a.sourceId === primary && (!a.size || a.size === size),
+    ) ?? selectedMedia(family, variant, size)
+  );
+}
 export function ResponsiveMedia({
+  productId,
   family,
   variant,
   size,
@@ -19,6 +35,7 @@ export function ResponsiveMedia({
   className,
   sizes = "(max-width: 640px) 90vw, (max-width: 1000px) 45vw, 30vw",
 }: {
+  productId?: string;
   family: string;
   variant: string;
   size?: string;
@@ -27,7 +44,7 @@ export function ResponsiveMedia({
   className?: string;
   sizes?: string;
 }) {
-  const media = selectedMedia(family, variant, size);
+  const media = selectedProductMedia(productId, family, variant, size);
   if (!media)
     return fallback ? (
       <img

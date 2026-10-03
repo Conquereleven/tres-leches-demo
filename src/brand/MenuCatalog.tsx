@@ -1,6 +1,5 @@
-import { ResponsiveMedia, selectedMedia } from "./media";
+import { ResponsiveMedia, selectedProductMedia } from "./media";
 import { CustomerCopy } from "./localization";
-import { useLanguage } from "./localization";
 import { availableSku } from "../../shared/commerce-policy";
 import { useId, useState } from "react";
 import { AddToCart } from "./Shop";
@@ -8,236 +7,242 @@ import { useCheckoutConfig, useCheckoutNow } from "./cart";
 import { formatAed } from "./content";
 import {
   menuCategories,
-  menuFamilies,
-  selectMenuOption,
-  type MenuFamily,
+  storefrontProducts,
+  productFamily,
+  productHref,
+  type StorefrontProduct,
 } from "./menu";
+import manifest from "./media-manifest.json";
 
-export function MenuOptions({ family }: { family: MenuFamily }) {
-  const labelId = useId();
-  const { text } = useLanguage();
-  const [variant, setVariant] = useState(family.options[0]!.variant);
-  const [size, setSize] = useState(family.options[0]!.size);
+export function ProductOptions({
+  product,
+  detail = false,
+}: {
+  product: StorefrontProduct;
+  detail?: boolean;
+}) {
+  const family = productFamily(product),
+    labelId = useId();
+  const [sku, setSku] = useState(family.options[0]!.id);
   const { config, loading, retry } = useCheckoutConfig();
   const now = useCheckoutNow(config);
   const options = family.options.filter((o) => availableSku(o.id, now));
-  const variants = [...new Set(options.map((option) => option.variant))];
-  const sizes = [
-    ...new Set(
-      options
-        .filter((option) => option.variant === variant)
-        .map((option) => option.size),
-    ),
-  ];
-  const selectedVariant = variants.includes(variant) ? variant : variants[0];
-  const selected =
-    options.find((o) => o.variant === selectedVariant && o.size === size) ??
-    options.find((o) => o.variant === selectedVariant);
-  if (!selected)
-    return (
-      <p className="b-menu-advance">
-        <CustomerCopy>
-          Individual Pan de Muerto is available October 15–November 15. Half
-          Dozen and Dozen packs remain available year-round.
-        </CustomerCopy>
-      </p>
-    );
-  const option = selectMenuOption(family, selected.variant, selected.size);
-  const serverProduct = config?.products.find(
-    (product) => product.id === option.id,
+  const option = options.find((o) => o.id === sku) ?? options[0];
+  const display = option ?? family.options[0]!;
+  const media = selectedProductMedia(
+    product.id,
+    family.id,
+    product.variant,
+    display.size,
   );
-  const ready = !!serverProduct && serverProduct.priceFils === option.priceFils;
+  const serverProduct = config?.products.find((p) => p.id === option?.id);
+  const ready =
+    !!option && !!serverProduct && serverProduct.priceFils === option.priceFils;
+  const gallery = manifest.products.find((p) => p.productId === product.id)
+    ?.gallerySourceIds as string[] | undefined;
   return (
     <div className="b-menu-options">
-      {family.image ||
-      selectedMedia(family.id, selected.variant, selected.size) ? (
-        <figure className="b-menu-photo">
+      <figure className={`b-menu-photo ${media ? "" : "b-family-photo"}`}>
+        {media || family.image ? (
           <ResponsiveMedia
+            productId={product.id}
             family={family.id}
-            variant={selected.variant}
-            size={selected.size}
+            variant={product.variant}
+            size={display.size}
             fallback={family.image}
-            alt={
-              selectedMedia(family.id, selected.variant, selected.size)
-                ? `${family.name} · ${selected.variant}`
-                : `${family.name} family photograph`
-            }
+            alt={media ? product.title : `${family.name} · family photograph`}
           />
-        </figure>
+        ) : (
+          <div
+            className="b-menu-no-photo"
+            aria-label="Product photograph coming soon"
+          >
+            <span>3L</span>
+          </div>
+        )}
+      </figure>
+      {detail ? (
+        <h1 className="b-product-title">
+          <CustomerCopy>{product.title}</CustomerCopy>
+        </h1>
       ) : (
-        <div className="b-menu-no-photo">
-          <span>3L</span>
-        </div>
+        <h4>
+          <a href={productHref(product)}>
+            <CustomerCopy>{product.title}</CustomerCopy>
+          </a>
+        </h4>
       )}
-      <div className="b-menu-selectors">
-        {variants.length > 1 && (
-          <label htmlFor={`${labelId}-variant`}>
-            <CustomerCopy>
-              {text(family.id.includes("filled") ? "Filling" : "Flavour")}
-            </CustomerCopy>
-            <select
-              id={`${labelId}-variant`}
-              value={selected.variant}
-              onChange={(event) => setVariant(event.target.value)}
-            >
-              {variants.map((value) => (
-                <option key={value} value={value}>
-                  <CustomerCopy>
-                    {family.pack && /^(6|12) /.test(value)
-                      ? `${value.startsWith("6 ") ? "Half Dozen" : "Dozen"} · ${value}`
-                      : value}
-                  </CustomerCopy>
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        {sizes.length > 1 && (
-          <label htmlFor={`${labelId}-size`}>
-            <CustomerCopy>
-              {text(family.pack ? "Pack" : "Size / pack")}
-            </CustomerCopy>
-            <select
-              id={`${labelId}-size`}
-              value={selected.size}
-              onChange={(event) => setSize(event.target.value)}
-            >
-              {sizes.map((value) => (
-                <option key={value} value={value}>
-                  <CustomerCopy>
-                    {family.pack && /^(6|12) /.test(value)
-                      ? `${value.startsWith("6 ") ? "Half Dozen" : "Dozen"} · ${value}`
-                      : value}
-                  </CustomerCopy>
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-      </div>
-      <p className="b-menu-option-summary" aria-live="polite">
-        <CustomerCopy>
-          {[selected.variant, selected.size].filter(Boolean).join(" · ")}
-        </CustomerCopy>
-      </p>
       <p className="b-menu-price" aria-live="polite">
-        <CustomerCopy>{formatAed(option.priceFils)}</CustomerCopy>
+        {formatAed(display.priceFils)}
+      </p>
+      {options.length > 1 && (
+        <label className="b-menu-selectors" htmlFor={labelId}>
+          <CustomerCopy>{family.pack ? "Pack" : "Size / pack"}</CustomerCopy>
+          <select
+            id={labelId}
+            value={display.size}
+            onChange={(e) =>
+              setSku(options.find((o) => o.size === e.target.value)!.id)
+            }
+          >
+            {options.map((o) => (
+              <option key={o.id} value={o.size}>
+                {/^(6|12) /.test(o.size)
+                  ? `${o.size.startsWith("6 ") ? "Half Dozen" : "Dozen"} · `
+                  : ""}
+                {o.size}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      <p className="b-menu-option-summary" aria-live="polite">
+        {display.size}
       </p>
       {family.advanceOrder && (
         <p className="b-menu-advance">
           <CustomerCopy>Order at least 24 hours in advance</CustomerCopy>
         </p>
       )}
-      {ready ? (
+      {!option ? (
+        <p className="b-menu-advance">
+          <CustomerCopy>
+            Individual Pan de Muerto is available October 3–November 15. Half
+            Dozen and Dozen packs remain available year-round.
+          </CustomerCopy>
+        </p>
+      ) : ready ? (
         <AddToCart
           key={option.id}
           productId={option.id}
-          fallback={
-            <p>
-              <CustomerCopy>Online ordering is unavailable.</CustomerCopy>
-            </p>
-          }
+          fallback={<p>Online ordering is unavailable.</p>}
         />
       ) : (
-        <div className="b-menu-unavailable" role="status">
-          <button className="b-button" type="button" disabled>
-            <CustomerCopy>
-              {loading ? "LOADING…" : "ADD TO CART · UNAVAILABLE"}
-            </CustomerCopy>
+        <div role="status">
+          <button className="b-button" disabled>
+            {loading ? "LOADING…" : "ADD TO CART · UNAVAILABLE"}
           </button>
           {!loading && (
             <>
-              <p>
-                <CustomerCopy>
-                  Online ordering is unavailable for this option. Please try
-                  again later.
-                </CustomerCopy>
-              </p>
-              <button className="b-text-button" type="button" onClick={retry}>
-                <CustomerCopy>TRY AGAIN</CustomerCopy>
+              <p>Online ordering is unavailable for this option.</p>
+              <button className="b-text-button" onClick={retry}>
+                TRY AGAIN
               </button>
             </>
           )}
         </div>
       )}
+      {detail && !!gallery?.length && (
+        <div className="b-product-gallery" aria-label="Product gallery">
+          {gallery.map((id) => {
+            const asset = manifest.assets.find(
+              (a) => a.sourceId === id && a.status === "assigned",
+            );
+            return asset ? (
+              <img
+                key={id}
+                src={
+                  asset.derivatives.find(
+                    (d) => d.format === "webp" && d.width === 640,
+                  )?.src
+                }
+                alt={asset.alt}
+                loading="lazy"
+              />
+            ) : null;
+          })}
+        </div>
+      )}
     </div>
   );
 }
-
 export function MenuCatalog() {
-  const [category, setCategory] = useState(() => {
-    const value =
-      typeof location !== "undefined"
-        ? new URLSearchParams(location.search).get("category")
-        : null;
-    return menuCategories.some((c) => c.id === value) ? value! : "cakes";
-  });
-  const current = menuCategories.find((entry) => entry.id === category)!;
+  const params =
+    typeof location === "undefined"
+      ? new URLSearchParams()
+      : new URLSearchParams(location.search);
+  const [category, setCategory] = useState(() =>
+    menuCategories.some((c) => c.id === params.get("category"))
+      ? params.get("category")!
+      : "cakes",
+  );
+  const slug = params.get("product");
+  if (slug) {
+    const product = storefrontProducts.find((p) => p.slug === slug);
+    return (
+      <section className="b-product-page b-section" aria-label="Product detail">
+        <a
+          className="b-link"
+          href={
+            product
+              ? `/menu?category=${productFamily(product).category}`
+              : "/menu"
+          }
+        >
+          ← BACK TO MENU
+        </a>
+        {product ? (
+          <article
+            className="b-menu-card"
+            data-product-id={product.id}
+            data-menu-family={product.familyId}
+          >
+            <ProductOptions product={product} detail />
+          </article>
+        ) : (
+          <>
+            <h1>Product not found</h1>
+            <p>Please choose a product from the current menu.</p>
+          </>
+        )}
+      </section>
+    );
+  }
+  const current = menuCategories.find((c) => c.id === category)!;
   return (
     <section
       id="bakery"
       className="b-section b-full-menu"
       aria-label="Full menu"
     >
-      <p className="b-label">
-        <CustomerCopy>THE 3L MENU</CustomerCopy>
-      </p>
-      <h2 className="b-heading">
-        <CustomerCopy>FIND YOUR FAVOURITE.</CustomerCopy>
-      </h2>
+      <p className="b-label">THE 3L MENU</p>
+      <h2 className="b-heading">FIND YOUR FAVOURITE.</h2>
       <nav className="b-menu-categories" aria-label="Menu categories">
-        {menuCategories.map((entry) => (
+        {menuCategories.map((c) => (
           <button
-            key={entry.id}
+            key={c.id}
             type="button"
-            aria-pressed={category === entry.id}
-            onClick={() => setCategory(entry.id)}
+            aria-pressed={category === c.id}
+            onClick={() => {
+              setCategory(c.id);
+              history.replaceState({}, "", `/menu?category=${c.id}`);
+            }}
           >
-            <CustomerCopy>{entry.name}</CustomerCopy>
+            <CustomerCopy>{c.name}</CustomerCopy>
           </button>
         ))}
       </nav>
-      <h3 className="b-menu-category-heading">
+      <h3 id={`category-${category}`} className="b-menu-category-heading">
         <CustomerCopy>{current.name}</CustomerCopy>
       </h3>
-      {"image" in current && current.image && (
-        <figure className="b-menu-category-photo">
-          {current.id === "jars" ? (
-            <ResponsiveMedia
-              family="cake-jar-bundle"
-              variant=""
-              alt="3L cake jars in branded packaging · family photograph"
-            />
-          ) : (
-            <img
-              src={current.image}
-              alt={`${current.name} category photography from Liza’s menu`}
-            />
-          )}
-          <figcaption>
-            <CustomerCopy>Category photograph</CustomerCopy>
-          </figcaption>
-        </figure>
-      )}
       <div className="b-menu-grid">
-        {menuFamilies
-          .filter((family) => family.category === category)
-          .map((family) => (
+        {storefrontProducts
+          .filter((p) => productFamily(p).category === category)
+          .map((p) => (
             <article
               className="b-menu-card"
-              key={family.id}
-              aria-label={family.name}
-              data-menu-family={family.id}
+              key={p.id}
+              aria-label={p.title}
+              id={`product-${p.slug}`}
+              data-product-id={p.id}
+              data-menu-family={p.familyId}
             >
-              <h4>
-                <CustomerCopy>{family.name}</CustomerCopy>
-              </h4>
-              <MenuOptions family={family} />
+              <ProductOptions product={p} />
             </article>
           ))}
       </div>
       <a className="b-link" href="/cart">
-        <CustomerCopy>VIEW CART</CustomerCopy>
+        VIEW CART
       </a>
     </section>
   );

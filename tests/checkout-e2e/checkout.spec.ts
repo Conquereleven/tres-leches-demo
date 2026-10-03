@@ -27,7 +27,7 @@ test("cart → delivery → details → review → payment step", async ({
   );
   await page.goto("/cart");
   await expect(page.locator("main")).toContainText("AED 50");
-  await page.getByRole("link", { name: "CONTINUE TO DELIVERY" }).click();
+  await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
 
   await expect(page).toHaveURL(/\/checkout$/);
   await page.getByLabel("Delivery area").selectOption("__missing");

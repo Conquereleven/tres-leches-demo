@@ -1,4 +1,6 @@
-import { ResponsiveMedia, selectedMedia } from "./media";
+import { QuantityInput } from "./QuantityInput";
+import { normalizeWhatsAppNumber } from "../../shared/contact";
+import { ResponsiveMedia, selectedProductMedia } from "./media";
 import { AddressAutocomplete } from "./AddressAutocomplete";
 import { CustomerCopy } from "./localization";
 import { useCheckoutNow } from "./cart";
@@ -6,7 +8,7 @@ import { validWindow, leadHours } from "../../shared/commerce-policy";
 import { FloatingShopping } from "./SiteChrome";
 import "./storefront.css";
 import { business } from "./business";
-import { menuFamilyForSku } from "./menu";
+import { menuFamilyForSku, storefrontProductForSku } from "./menu";
 /**
  * The 3L online store: cart → delivery → details → payment → confirmation.
  *
@@ -108,6 +110,7 @@ type Delivery = {
   notes?: string;
 };
 type Customer = {
+  whatsappNumber?: string;
   name: string;
   phone: string;
   email?: string;
@@ -251,9 +254,19 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
   const image = productImage(productId);
   const family = menuFamilyForSku(productId);
   const option = family?.options.find((o) => o.id === productId);
-  if (family && option && selectedMedia(family.id, option.variant, option.size))
+  if (
+    family &&
+    option &&
+    selectedProductMedia(
+      storefrontProductForSku(productId)?.id,
+      family.id,
+      option.variant,
+      option.size,
+    )
+  )
     return (
       <ResponsiveMedia
+        productId={storefrontProductForSku(productId)?.id}
         family={family.id}
         variant={option.variant}
         size={option.size}
@@ -579,7 +592,12 @@ export function AddToCart({
         >
           <Minus aria-hidden />
         </button>
-        <output aria-live="polite">{quantity}</output>
+        <QuantityInput
+          value={quantity}
+          max={Math.max(1, MAX_QTY - inCart)}
+          label="Quantity"
+          onChange={setQuantity}
+        />
         <button
           type="button"
           aria-label="Increase quantity"
@@ -666,7 +684,12 @@ function CartItems({
               >
                 <Minus aria-hidden />
               </button>
-              <output>{l.quantity}</output>
+              <QuantityInput
+                value={l.quantity}
+                max={MAX_QTY}
+                label={`${p.name} quantity`}
+                onChange={(n) => cart.set(l.productId, n)}
+              />
               <button
                 type="button"
                 aria-label={`Increase ${p.name}`}
@@ -756,7 +779,7 @@ export function CartPage() {
                 aria-disabled={!known.length}
                 href={known.length ? "/checkout" : undefined}
               >
-                <CustomerCopy>CONTINUE TO DELIVERY</CustomerCopy>
+                <CustomerCopy>CONTINUE TO FULFILLMENT</CustomerCopy>
               </a>
               <p className="b-co-assurance">
                 <ShieldCheck aria-hidden />{" "}
@@ -1271,6 +1294,15 @@ export function CheckoutPage() {
                 setError("Please enter a valid UAE mobile number.");
                 return;
               }
+              if (
+                customer.whatsappNumber?.trim() &&
+                !normalizeWhatsAppNumber(customer.whatsappNumber)
+              ) {
+                setError(
+                  "Please include the country code in your WhatsApp number, for example +52.",
+                );
+                return;
+              }
               if (!billingComplete(billing)) {
                 setError("Please complete your billing address.");
                 return;
@@ -1320,6 +1352,25 @@ export function CheckoutPage() {
               <p id="b-phone-help" className="b-caption">
                 <CustomerCopy>
                   A UAE mobile number, so our team can reach you.
+                </CustomerCopy>
+              </p>
+              <label>
+                <CustomerCopy>WhatsApp number (optional)</CustomerCopy>
+                <Input
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="off"
+                  maxLength={40}
+                  placeholder="+52 55 1234 5678"
+                  aria-describedby="b-whatsapp-help"
+                  value={customer.whatsappNumber ?? ""}
+                  onChange={(e) => setC("whatsappNumber", e.target.value)}
+                />
+              </label>
+              <p id="b-whatsapp-help" className="b-caption">
+                <CustomerCopy>
+                  Add the WhatsApp number where we can contact you.
+                  International numbers are welcome.
                 </CustomerCopy>
               </p>
               <label>
@@ -1646,6 +1697,9 @@ function PaymentStep({
         }),
     customer: {
       ...customer,
+      whatsappNumber: customer.whatsappNumber?.trim()
+        ? (normalizeWhatsAppNumber(customer.whatsappNumber) ?? undefined)
+        : undefined,
       instructions: customer.instructions || undefined,
     },
     billing: billing.sameAsDelivery
@@ -1808,6 +1862,11 @@ function PaymentStep({
                 <CustomerCopy>
                   {normalizeUaeMobile(customer.phone) ?? customer.phone}
                 </CustomerCopy>
+                {customer.whatsappNumber && (
+                  <p>
+                    WhatsApp: {normalizeWhatsAppNumber(customer.whatsappNumber)}
+                  </p>
+                )}
                 {customer.email && (
                   <>
                     <br />

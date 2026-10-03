@@ -266,6 +266,18 @@ export function OrderCard({
         </p>
       </div>
 
+      {o.customerDetails?.whatsappNumber && (
+        <p className="ops-oc-whatsapp">
+          WhatsApp:{" "}
+          <a
+            href={`https://wa.me/${o.customerDetails.whatsappNumber.slice(1)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {o.customerDetails.whatsappNumber}
+          </a>
+        </p>
+      )}
       <ul className="ops-oc-lines" aria-label="Productos">
         {o.lines.map((l) => (
           <li key={l.productId}>

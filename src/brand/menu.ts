@@ -40,3 +40,20 @@ export function selectMenuOption(
   if (!option) throw new Error("Unsupported menu option");
   return option;
 }
+
+// Authored immutable identities; never derive URLs from mutable display names at runtime.
+import products from "../../shared/storefront-products.json";
+export const storefrontProducts = products;
+export type StorefrontProduct = (typeof products)[number];
+export function productFamily(product: StorefrontProduct): MenuFamily {
+  const family = menuFamilies.find((f) => f.id === product.familyId)!;
+  return {
+    ...family,
+    options: family.options.filter((o) => product.optionIds.includes(o.id)),
+  };
+}
+export const productHref = (product: StorefrontProduct) =>
+  `/menu?product=${encodeURIComponent(product.slug)}`;
+
+export const storefrontProductForSku = (sku: string) =>
+  storefrontProducts.find((p) => p.optionIds.includes(sku));

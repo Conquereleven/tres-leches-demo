@@ -7,7 +7,7 @@ const menuCategories: { id: string; name: string }[] = JSON.parse(
 
 const photos = "work/qa/master-sprint";
 const family = (page: Page, id: string) =>
-  page.locator(`[data-menu-family="${id}"]`);
+  page.locator(`[data-menu-family="${id}"]`).first();
 const category = async (page: Page, name: string) => {
   await page
     .getByRole("navigation", { name: "Menu categories" })
@@ -43,9 +43,11 @@ test("latest individual sizes, fillings and packs preserve their precise prices"
 }) => {
   await page.goto("/menu");
   await category(page, "Pan de Muerto");
-  await expect(family(page, "pan-de-muerto-traditional")).toContainText(
-    "October",
-  );
+  await expect(
+    family(page, "pan-de-muerto-traditional").getByRole("button", {
+      name: "ADD TO CART · AED 13",
+    }),
+  ).toBeEnabled();
   const pack = family(page, "pan-de-muerto-filled-pack");
   await expect(pack.locator("select")).toHaveCount(1);
   await pack
@@ -56,13 +58,12 @@ test("latest individual sizes, fillings and packs preserve their precise prices"
   ).toBeEnabled();
   await category(page, "Conchas");
   const concha = family(page, "conchas-filled");
-  await expect(concha.locator("select")).toHaveCount(2);
-  await concha.getByLabel("Filling").selectOption("Mascarpone y fresas");
+  await expect(concha.locator("select")).toHaveCount(1);
   await concha.getByLabel("Size / pack").selectOption("Individual");
   await concha.getByRole("button", { name: "ADD TO CART · AED 21" }).click();
   await page.goto("/cart");
   await expect(page.locator("main")).toContainText(
-    "Conchas rellenas · Mascarpone y fresas · Individual",
+    "Concha rellena de pistache · Individual",
   );
   await expect(page.locator("main")).toContainText("AED 21");
 });
@@ -89,7 +90,7 @@ test("multiple menu SKUs go through cart and existing web checkout with authorit
     .click();
   await page.goto("/cart");
   await expect(page.locator("main")).toContainText("AED 215");
-  await page.getByRole("link", { name: "CONTINUE TO DELIVERY" }).click();
+  await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
   await expect(page).toHaveURL(/\/checkout$/);
   await page.getByLabel("Delivery area").selectOption("jlt-cluster-c");
   await expect(page.locator("main")).toContainText("AED 215");
@@ -195,7 +196,7 @@ for (const width of [390, 768, 1440]) {
       .click();
     await page.goto("/cart");
     await shot("cart");
-    await page.getByRole("link", { name: "CONTINUE TO DELIVERY" }).click();
+    await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
     await shot("checkout");
     expect(errors).toEqual([]);
     expect(paymentCalls).toEqual([]);
@@ -230,6 +231,6 @@ test("catalog remains server-authoritative when payment activation is offline", 
     .click();
   await page.goto("/cart");
   await expect(
-    page.getByRole("link", { name: "CONTINUE TO DELIVERY" }),
+    page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }),
   ).toHaveAttribute("href", "/checkout");
 });

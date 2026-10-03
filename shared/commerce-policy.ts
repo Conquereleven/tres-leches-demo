@@ -1,4 +1,5 @@
 /** Approved Dubai business policy, shared by browser and authoritative server. */
+export const MAX_ITEM_QUANTITY = 100;
 export const BUSINESS_TIMEZONE = "Asia/Dubai";
 export const DELIVERY_WINDOWS = [
   { label: "8:00 AM – 1:00 PM", startHour: 8 },
@@ -6,7 +7,7 @@ export const DELIVERY_WINDOWS = [
   { label: "4:00 PM – 9:00 PM", startHour: 16 },
 ] as const;
 export const SEASONAL_RULES = [
-  { prefix: "pan-de-muerto-", exclude: "-pack-", start: "10-15", end: "11-15" },
+  { prefix: "pan-de-muerto-", exclude: "-pack-", start: "10-03", end: "11-15" },
 ];
 export function businessDate(now = new Date()) {
   return new Intl.DateTimeFormat("en-CA", {

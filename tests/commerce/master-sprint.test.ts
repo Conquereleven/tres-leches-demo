@@ -72,8 +72,8 @@ test("longer product lead time preserved; mango jars are not mango cakes", () =>
   assert.equal(leadHours(["cake-jar-premium-mango-110-ml"]), 12);
 });
 for (const [date, expected] of [
-  ["2026-10-14T19:59:59Z", false],
-  ["2026-10-14T20:00:00Z", true],
+  ["2026-10-02T19:59:59Z", false],
+  ["2026-10-02T20:00:00Z", true],
   ["2026-11-15T19:59:59Z", true],
   ["2026-11-15T20:00:00Z", false],
 ] as const)

@@ -17,9 +17,13 @@ export function MenuPage() {
       </a>
       <SiteHeader onContactUnavailable={contact} />
       <main id="main-content">
-        <h1 className="b-heading" style={{ textAlign: "center" }}>
-          <CustomerCopy>{t("menu")}</CustomerCopy>
-        </h1>
+        {!new URLSearchParams(
+          typeof location === "undefined" ? "" : location.search,
+        ).has("product") && (
+          <h1 className="b-heading" style={{ textAlign: "center" }}>
+            <CustomerCopy>{t("menu")}</CustomerCopy>
+          </h1>
+        )}
         <MenuCatalog />
       </main>
       <SiteFooter onContactUnavailable={contact} />

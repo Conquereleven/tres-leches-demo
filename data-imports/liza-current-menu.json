@@ -187,8 +187,8 @@
       "category": "Conchas",
       "description": "Conchas tradicional · Vainilla · Mini · 40 g",
       "priceAed": "11.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-traditional-vainilla-individual-70-g",
@@ -196,23 +196,23 @@
       "category": "Conchas",
       "description": "Conchas tradicional · Vainilla · Individual · 70 g",
       "priceAed": "13.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-traditional-chocolate-mini-40-g",
-      "name": "Conchas tradicional · Chocolate · Mini · 40 g",
+      "name": "Concha tradicional de chocolate · Mini · 40 g",
       "category": "Conchas",
-      "description": "Conchas tradicional · Chocolate · Mini · 40 g",
+      "description": "Concha tradicional de chocolate · Mini · 40 g",
       "priceAed": "11.00",
       "active": true,
       "availability": "available"
     },
     {
       "id": "conchas-traditional-chocolate-individual-70-g",
-      "name": "Conchas tradicional · Chocolate · Individual · 70 g",
+      "name": "Concha tradicional de chocolate · Individual · 70 g",
       "category": "Conchas",
-      "description": "Conchas tradicional · Chocolate · Individual · 70 g",
+      "description": "Concha tradicional de chocolate · Individual · 70 g",
       "priceAed": "13.00",
       "active": true,
       "availability": "available"
@@ -223,8 +223,8 @@
       "category": "Conchas",
       "description": "Conchas tradicional · Pistache · Mini · 40 g",
       "priceAed": "11.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-traditional-pistache-individual-70-g",
@@ -232,8 +232,8 @@
       "category": "Conchas",
       "description": "Conchas tradicional · Pistache · Individual · 70 g",
       "priceAed": "13.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-traditional-tricolor-mini-40-g",
@@ -241,8 +241,8 @@
       "category": "Conchas",
       "description": "Conchas tradicional · Tricolor · Mini · 40 g",
       "priceAed": "11.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-traditional-tricolor-individual-70-g",
@@ -250,8 +250,8 @@
       "category": "Conchas",
       "description": "Conchas tradicional · Tricolor · Individual · 70 g",
       "priceAed": "13.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-filled-crema-diplomatica-vainilla-mini",
@@ -259,8 +259,8 @@
       "category": "Conchas",
       "description": "Conchas rellenas · Crema diplomática (vainilla) · Mini",
       "priceAed": "18.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-filled-crema-diplomatica-vainilla-individual",
@@ -268,8 +268,8 @@
       "category": "Conchas",
       "description": "Conchas rellenas · Crema diplomática (vainilla) · Individual",
       "priceAed": "21.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-filled-chocolate-mini",
@@ -277,8 +277,8 @@
       "category": "Conchas",
       "description": "Conchas rellenas · Chocolate · Mini",
       "priceAed": "18.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-filled-chocolate-individual",
@@ -286,8 +286,8 @@
       "category": "Conchas",
       "description": "Conchas rellenas · Chocolate · Individual",
       "priceAed": "21.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-filled-mascarpone-y-cajeta-mini",
@@ -295,8 +295,8 @@
       "category": "Conchas",
       "description": "Conchas rellenas · Mascarpone y cajeta · Mini",
       "priceAed": "18.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-filled-mascarpone-y-cajeta-individual",
@@ -304,8 +304,8 @@
       "category": "Conchas",
       "description": "Conchas rellenas · Mascarpone y cajeta · Individual",
       "priceAed": "21.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-filled-mascarpone-y-fresas-mini",
@@ -313,8 +313,8 @@
       "category": "Conchas",
       "description": "Conchas rellenas · Mascarpone y fresas · Mini",
       "priceAed": "18.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-filled-mascarpone-y-fresas-individual",
@@ -322,77 +322,77 @@
       "category": "Conchas",
       "description": "Conchas rellenas · Mascarpone y fresas · Individual",
       "priceAed": "21.00",
-      "active": true,
-      "availability": "available"
+      "active": false,
+      "availability": "unavailable"
     },
     {
       "id": "conchas-traditional-pack-6-mini",
-      "name": "Conchas · Pack tradicional · 6 mini",
+      "name": "Concha tradicional de chocolate · Pack · 6 mini",
       "category": "Conchas",
-      "description": "Conchas · Pack tradicional · 6 mini",
+      "description": "Concha tradicional de chocolate · Pack · 6 mini",
       "priceAed": "60.00",
       "active": true,
       "availability": "available"
     },
     {
       "id": "conchas-traditional-pack-12-mini",
-      "name": "Conchas · Pack tradicional · 12 mini",
+      "name": "Concha tradicional de chocolate · Pack · 12 mini",
       "category": "Conchas",
-      "description": "Conchas · Pack tradicional · 12 mini",
+      "description": "Concha tradicional de chocolate · Pack · 12 mini",
       "priceAed": "115.00",
       "active": true,
       "availability": "available"
     },
     {
       "id": "conchas-traditional-pack-6-individuales",
-      "name": "Conchas · Pack tradicional · 6 individuales",
+      "name": "Concha tradicional de chocolate · Pack · 6 individuales",
       "category": "Conchas",
-      "description": "Conchas · Pack tradicional · 6 individuales",
+      "description": "Concha tradicional de chocolate · Pack · 6 individuales",
       "priceAed": "72.00",
       "active": true,
       "availability": "available"
     },
     {
       "id": "conchas-traditional-pack-12-individuales",
-      "name": "Conchas · Pack tradicional · 12 individuales",
+      "name": "Concha tradicional de chocolate · Pack · 12 individuales",
       "category": "Conchas",
-      "description": "Conchas · Pack tradicional · 12 individuales",
+      "description": "Concha tradicional de chocolate · Pack · 12 individuales",
       "priceAed": "140.00",
       "active": true,
       "availability": "available"
     },
     {
       "id": "conchas-filled-pack-6-mini",
-      "name": "Conchas · Pack relleno · 6 mini",
+      "name": "Concha rellena de pistache · Pack · 6 mini",
       "category": "Conchas",
-      "description": "Conchas · Pack relleno · 6 mini",
+      "description": "Concha rellena de pistache · Pack · 6 mini",
       "priceAed": "100.00",
       "active": true,
       "availability": "available"
     },
     {
       "id": "conchas-filled-pack-12-mini",
-      "name": "Conchas · Pack relleno · 12 mini",
+      "name": "Concha rellena de pistache · Pack · 12 mini",
       "category": "Conchas",
-      "description": "Conchas · Pack relleno · 12 mini",
+      "description": "Concha rellena de pistache · Pack · 12 mini",
       "priceAed": "190.00",
       "active": true,
       "availability": "available"
     },
     {
       "id": "conchas-filled-pack-6-individuales",
-      "name": "Conchas · Pack relleno · 6 individuales",
+      "name": "Concha rellena de pistache · Pack · 6 individuales",
       "category": "Conchas",
-      "description": "Conchas · Pack relleno · 6 individuales",
+      "description": "Concha rellena de pistache · Pack · 6 individuales",
       "priceAed": "120.00",
       "active": true,
       "availability": "available"
     },
     {
       "id": "conchas-filled-pack-12-individuales",
-      "name": "Conchas · Pack relleno · 12 individuales",
+      "name": "Concha rellena de pistache · Pack · 12 individuales",
       "category": "Conchas",
-      "description": "Conchas · Pack relleno · 12 individuales",
+      "description": "Concha rellena de pistache · Pack · 12 individuales",
       "priceAed": "235.00",
       "active": true,
       "availability": "available"
@@ -2103,6 +2103,24 @@
       "name": "Pan de Muerto relleno · Pistachio · Chocolate covering · Individual",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto relleno · Pistachio · Chocolate covering · Individual",
+      "priceAed": "21.00",
+      "active": true,
+      "availability": "available"
+    },
+    {
+      "id": "conchas-filled-pistache-mini",
+      "name": "Concha rellena de pistache · Mini",
+      "category": "Conchas",
+      "description": "Concha rellena de pistache · Mini",
+      "priceAed": "18.00",
+      "active": true,
+      "availability": "available"
+    },
+    {
+      "id": "conchas-filled-pistache-individual",
+      "name": "Concha rellena de pistache · Individual",
+      "category": "Conchas",
+      "description": "Concha rellena de pistache · Individual",
       "priceAed": "21.00",
       "active": true,
       "availability": "available"

@@ -1,5 +1,5 @@
-import { selectedMedia } from "./media";
-import { menuFamilies } from "./menu";
+import { selectedProductMedia } from "./media";
+import { menuFamilies, storefrontProductForSku } from "./menu";
 /** Client-approved content only. Demo Commerce OS records never populate this manifest. */
 export type AssetStatus =
   "AVAILABLE" | "MISSING" | "PLACEHOLDER-DATA-SLOT" | "NEEDS-CLIENT-ASSET";
@@ -90,20 +90,33 @@ export const slots = (category: string, count: number): Product[] =>
 export const menuProducts: Product[] = menuFamilies.flatMap((family) =>
   family.options.map((option) => ({
     id: option.id,
-    name: [family.name, option.variant, option.size]
+    name: [
+      family.name,
+      family.id.startsWith("conchas-") ? "" : option.variant,
+      option.size,
+    ]
       .filter(Boolean)
       .join(" · "),
     image: {
       id: family.id,
       alt: `${family.name} family photography`,
       status:
-        selectedMedia(family.id, option.variant, option.size) || family.image
+        selectedProductMedia(
+          storefrontProductForSku(option.id)?.id,
+          family.id,
+          option.variant,
+          option.size,
+        ) || family.image
           ? ("AVAILABLE" as const)
           : ("NEEDS-CLIENT-ASSET" as const),
       src:
-        selectedMedia(family.id, option.variant, option.size)?.derivatives.find(
-          (d) => d.format === "webp" && d.width === 640,
-        )?.src ?? family.image,
+        selectedProductMedia(
+          storefrontProductForSku(option.id)?.id,
+          family.id,
+          option.variant,
+          option.size,
+        )?.derivatives.find((d) => d.format === "webp" && d.width === 640)
+          ?.src ?? family.image,
       source: family.source,
     },
     status: "available" as const,
