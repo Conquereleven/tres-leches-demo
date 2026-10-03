@@ -6,7 +6,7 @@ No deployment, provider activation, production data import or account connection
 
 The supplied final GeoJSON supersedes the earlier screenshot. The bundled default `server/data/delivery/approved-coverage.json` preserves all 37 positions exactly, one closed Polygon ring, no holes or exclusions. Source and provenance are tracked; no boundary was redrawn. Exterior edges are included deterministically. Server-owned verified coordinates are checked before minimums and checkout; forged client flags/areas cannot bypass this.
 
-The outer perimeter does not geocode an address or subdivide tariff areas. Real verified address/building coordinates (or an approved website forward geocoder) and reviewed internal tariff polygons keyed to zone IDs remain NEEDS BUSINESS INPUT. Unknown delivery addresses fail closed; pickup remains available. No paid geocoder, production configuration or geographic tariff data was added. Existing operational reverse geocoding does not validate arbitrary typed website addresses. See [coverage-configuration.md](coverage-configuration.md).
+The outer perimeter does not geocode an address or subdivide tariff areas. Real verified address/building coordinates and structured community/cluster evidence (or an approved website address-verification provider) remain NEEDS BUSINESS INPUT. Internal tariff polygons are optional; community classification can replace them, with strict aliases and no fuzzy guessing. New quotes never add delivery charges; JLT A–D minimums are AED30. Unknown delivery addresses fail closed; pickup remains available. No paid geocoder, production configuration or geographic tariff data was added. Existing operational reverse geocoding does not validate arbitrary typed website addresses. See [coverage-configuration.md](coverage-configuration.md).
 
 ## Catalog
 
@@ -16,7 +16,7 @@ Existing 218 option prices are preserved. Owner approved equal base-size pricing
 
 The original identity PDF at its previously supplied Downloads path is unavailable. Existing `docs/brand/implementation.md` records the prior inspection; official Abril Fatface/Montserrat and local approved marks take priority over the reference site's Playfair font. Reference imagery provenance is recorded in `public/brand/reference/provenance.json`. No generated food imagery.
 
-Arabic has URL/storage locale persistence, RTL layout, an extracted 562-entry English/template inventory and six existing navigation translations. English fallback text uses bidirectional isolation; selector values remain canonical independent of visible translations. No new Arabic business copy was generated. Catalog, scheduling guidance, errors and legal/payment text still require approved Arabic copy and complete translation QA. English sensitive copy is retained; this is not a claim of a complete Arabic storefront.
+Arabic has URL/storage locale persistence, RTL layout, an extracted 557-entry English/template inventory and six existing navigation translations. English fallback text uses bidirectional isolation; selector values remain canonical independent of visible translations. No new Arabic business copy was generated. Catalog, scheduling guidance, errors and legal/payment text still require approved Arabic copy and complete translation QA. English sensitive copy is retained; this is not a claim of a complete Arabic storefront.
 
 ## Apple Pay
 
