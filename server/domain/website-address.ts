@@ -5,10 +5,16 @@ import {
 } from "./delivery-coverage";
 import { readFileSync } from "node:fs";
 import { locationSchema, requireThat } from "./model";
-import { contains, normalize, type GeoService } from "./zones";
+import { contains, type GeoService } from "./zones";
 import type { CommerceService } from "./service";
 /** Server-owned registry binds a complete verified address to actual coordinates.
  * Not a customer-selectable area, keyword match, or client latitude override. */
+export const normalizeVerifiedAddress = (value: string) =>
+  value
+    .normalize("NFKC")
+    .toLocaleLowerCase("en")
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
 const registrySchema = z
   .array(
     z
@@ -30,7 +36,8 @@ export function attachVerifiedAddresses(
     ? registrySchema.parse(JSON.parse(readFileSync(file, "utf8")))
     : [];
   const keys = entries.map(
-    (e) => `${normalize(e.address)}|${normalize(e.building)}`,
+    (e) =>
+      `${normalizeVerifiedAddress(e.address)}|${normalizeVerifiedAddress(e.building)}`,
   );
   if (new Set(keys).size !== keys.length)
     throw new Error("Duplicate verified delivery address");
@@ -40,8 +47,10 @@ export function attachVerifiedAddresses(
     resolveAddress(address, building, zones) {
       const entry = entries.find(
         (e) =>
-          normalize(e.address) === normalize(address) &&
-          normalize(e.building) === normalize(building),
+          normalizeVerifiedAddress(e.address) ===
+            normalizeVerifiedAddress(address) &&
+          normalizeVerifiedAddress(e.building) ===
+            normalizeVerifiedAddress(building),
       );
       if (!entry) return null;
       const eligibility = checkDeliveryCoverage(entry.location, coverage);

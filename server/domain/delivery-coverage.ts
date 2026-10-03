@@ -2,6 +2,7 @@ import { readFileSync, statSync } from "node:fs";
 import { z } from "zod";
 import type { Location } from "./model";
 import { contains } from "./zones";
+import approvedCoverage from "../data/delivery/approved-coverage.json";
 const position = z.tuple([
   z.number().finite().min(-180).max(180),
   z.number().finite().min(-90).max(90),
@@ -57,6 +58,7 @@ const ring = z
   .min(4)
   .max(1000)
   .refine((r) => {
+    if (r.length < 4) return false;
     const first = r[0]!,
       last = r.at(-1)!;
     if (first[0] !== last[0] || first[1] !== last[1]) return false;
@@ -133,9 +135,9 @@ export const deliveryCoverageSchema = z
       ctx.addIssue({ code: "custom", message: "Coverage IDs must be unique" });
   });
 export type DeliveryCoverage = z.infer<typeof deliveryCoverageSchema>;
-/** Private reviewed GeoJSON only. Absent configuration never means whole-Dubai coverage. */
+/** Approved outer boundary is bundled; a reviewed private file can override it. */
 export function loadDeliveryCoverage(file?: string): DeliveryCoverage | null {
-  if (!file) return null;
+  if (!file) return deliveryCoverageSchema.parse(approvedCoverage);
   if (statSync(file).size > 1024 * 1024)
     throw new Error("Coverage file exceeds 1 MiB");
   return deliveryCoverageSchema.parse(JSON.parse(readFileSync(file, "utf8")));

@@ -309,17 +309,17 @@ test("coverage: pickup remains available with billing address inside exclusion",
     f.close();
   }
 });
-test("coverage: absent config fails closed even for registered addresses", () => {
+test("coverage: approved default rejects registered points outside Dubai", () => {
   const f = fixture(false);
   try {
-    assert.equal(loadDeliveryCoverage(undefined), null);
+    assert.equal(loadDeliveryCoverage(undefined)!.features.length, 1);
     assert.equal(
       checkDeliveryCoverage({ lat: 1, lng: 1 }, null).code,
       "NOT_CONFIGURED",
     );
     assert.throws(
       () => authoritativeAddress(f.service, f.input().delivery),
-      /could not verify/,
+      /outside our current delivery coverage/,
     );
   } finally {
     f.close();
