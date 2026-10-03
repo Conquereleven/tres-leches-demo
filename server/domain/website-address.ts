@@ -1,4 +1,8 @@
 import { z } from "zod";
+import {
+  loadDeliveryCoverage,
+  checkDeliveryCoverage,
+} from "./delivery-coverage";
 import { readFileSync } from "node:fs";
 import { locationSchema, requireThat } from "./model";
 import { contains, normalize, type GeoService } from "./zones";
@@ -19,7 +23,9 @@ const registrySchema = z
 export function attachVerifiedAddresses(
   geo: GeoService,
   file: string | undefined,
+  coverageFile?: string,
 ): GeoService {
+  const coverage = loadDeliveryCoverage(coverageFile);
   const entries = file
     ? registrySchema.parse(JSON.parse(readFileSync(file, "utf8")))
     : [];
@@ -38,6 +44,13 @@ export function attachVerifiedAddresses(
           normalize(e.building) === normalize(building),
       );
       if (!entry) return null;
+      const eligibility = checkDeliveryCoverage(entry.location, coverage);
+      if (eligibility.code === "NOT_CONFIGURED") return null;
+      requireThat(
+        eligibility.eligible,
+        "This address is outside our current delivery coverage area.",
+        422,
+      );
       const matches = zones.filter(
         (z) => z.active && z.polygon && contains(entry.location, z.polygon),
       );

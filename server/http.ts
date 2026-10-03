@@ -182,6 +182,7 @@ export async function startServer(
     service.geo = attachVerifiedAddresses(
       service.geo,
       process.env.DELIVERY_VERIFIED_ADDRESSES_FILE,
+      process.env.DELIVERY_COVERAGE_FILE,
     );
   const users = usersSchema.parse(
     JSON.parse(process.env.OPERATOR_USERS_JSON ?? "[]"),

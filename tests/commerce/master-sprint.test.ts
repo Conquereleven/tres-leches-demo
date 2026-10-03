@@ -143,7 +143,36 @@ test("authoritative geographic registry cannot be bypassed by area IDs, keywords
         },
       ]),
     );
-    const geo = attachVerifiedAddresses({ resolve: () => null }, file);
+    const coverageFile = join(dir, "coverage.json");
+    writeFileSync(
+      coverageFile,
+      JSON.stringify({
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            properties: { id: "test-only", role: "primary" },
+            geometry: {
+              type: "Polygon",
+              coordinates: [
+                [
+                  [0, 0],
+                  [4, 0],
+                  [4, 4],
+                  [0, 4],
+                  [0, 0],
+                ],
+              ],
+            },
+          },
+        ],
+      }),
+    );
+    const geo = attachVerifiedAddresses(
+      { resolve: () => null },
+      file,
+      coverageFile,
+    );
     const service = new CommerceService(
       store,
       new DisabledWhatsAppProvider(),
