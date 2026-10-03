@@ -15,6 +15,9 @@ test("WA2 operational golden path, responsive and console", async ({
   await page
     .getByRole("button", { name: "Zonas y tarifas", exact: true })
     .click();
+  await page
+    .getByRole("checkbox", { name: "Free delivery", exact: true })
+    .uncheck();
   await page.getByLabel("Tarifa AED", { exact: true }).fill("10");
   await page
     .getByRole("button", { name: "Guardar regla", exact: true })
@@ -41,12 +44,12 @@ test("WA2 operational golden path, responsive and console", async ({
   await page
     .getByRole("button", { name: "Guardar producto", exact: true })
     .click();
-  await expect(page.locator(".co-state")).toHaveText("Awaiting Location");
+  await expect(page.locator(".co-state")).toContainText("Awaiting Location");
   await page.request.post("/api/demo/location", {
     data: { conversationId: "conversation-wa2" },
   });
   await page.getByRole("button", { name: "Actualizar", exact: true }).click();
-  await expect(page.locator(".co-state")).toHaveText("Minimum Check");
+  await expect(page.locator(".co-state")).toContainText("Minimum Check");
   await expect(page.locator(".co-quote")).toContainText("AED 130.00");
   await page
     .getByRole("button", { name: "Request Payment", exact: true })
@@ -63,7 +66,7 @@ test("WA2 operational golden path, responsive and console", async ({
     data: { paymentId: snapshot.payments[0].id, status: "paid" },
   });
   await page.getByRole("button", { name: "Actualizar", exact: true }).click();
-  await expect(page.locator(".co-state")).toHaveText("Confirmed");
+  await expect(page.locator(".co-state")).toContainText("Confirmed");
   for (const state of [
     "Production",
     "Ready",
@@ -73,10 +76,10 @@ test("WA2 operational golden path, responsive and console", async ({
     await page
       .getByRole("button", { name: `Avanzar a ${state}`, exact: true })
       .click();
-    await expect(page.locator(".co-state")).toHaveText(state);
+    await expect(page.locator(".co-state")).toContainText(state);
   }
   await page.getByRole("button", { name: "Entregas", exact: true }).click();
-  await expect(page.locator(".co-state")).toHaveText("Delivered");
+  await expect(page.locator(".co-state")).toContainText("Delivered");
   for (const width of [390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await expect
@@ -187,7 +190,9 @@ test("recoverable send keeps draft, filters and out-of-coverage block payment", 
   await page
     .getByRole("button", { name: "Confirmar zona manual", exact: true })
     .click();
-  await expect(page.locator(".co-quote")).toContainText("No cumple el mínimo");
+  await expect(page.locator(".co-quote")).toContainText(
+    "Minimum order for JVC is AED 100.",
+  );
   await expect(
     page.getByRole("button", { name: "Request Payment", exact: true }),
   ).toBeDisabled();

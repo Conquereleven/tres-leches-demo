@@ -1,3 +1,4 @@
+import { CustomerCopy } from "./localization";
 import { useState } from "react";
 import { List, ShoppingBag, WhatsappLogo } from "@phosphor-icons/react";
 import { approved, destinations, whatsappUrl } from "./content";
@@ -23,7 +24,7 @@ export function PaymentMarks() {
   return (
     <div className="b-payments">
       <p className="b-label" id="b-payments-label">
-        Secure payments
+        <CustomerCopy>Secure payments</CustomerCopy>
       </p>
       <ul aria-labelledby="b-payments-label">
         <li>
@@ -45,10 +46,16 @@ export function PaymentMarks() {
         </li>
       </ul>
       <p className="b-caption">
-        Card payments are processed on a secure page hosted by our payment
-        provider, {business.paymentProcessor}. {business.tradingName} does not
-        receive or store your full card details. Visa and Mastercard are
-        trademarks of their respective owners.
+        <CustomerCopy>
+          Card payments are processed on a secure page hosted by our payment
+          provider,
+        </CustomerCopy>{" "}
+        <CustomerCopy>{business.paymentProcessor}</CustomerCopy>.{" "}
+        <CustomerCopy>{business.tradingName}</CustomerCopy>{" "}
+        <CustomerCopy>
+          does not receive or store your full card details. Visa and Mastercard
+          are trademarks of their respective owners.
+        </CustomerCopy>
       </p>
     </div>
   );
@@ -58,11 +65,23 @@ export function PaymentMarks() {
 export function OrderAcknowledgement() {
   return (
     <p className="b-acknowledgement">
-      By placing an order you agree to our{" "}
-      <a href="/terms">Terms &amp; Conditions</a> and acknowledge our{" "}
-      <a href="/refund-policy">Refund &amp; Cancellation</a>,{" "}
-      <a href="/delivery-policy">Delivery</a> and <a href="/privacy">Privacy</a>{" "}
-      policies.
+      <CustomerCopy>By placing an order you agree to our</CustomerCopy>{" "}
+      <a href="/terms">
+        <CustomerCopy>Terms &amp;amp; Conditions</CustomerCopy>
+      </a>{" "}
+      <CustomerCopy>and acknowledge our</CustomerCopy>{" "}
+      <a href="/refund-policy">
+        <CustomerCopy>Refund &amp;amp; Cancellation</CustomerCopy>
+      </a>
+      ,{" "}
+      <a href="/delivery-policy">
+        <CustomerCopy>Delivery</CustomerCopy>
+      </a>{" "}
+      <CustomerCopy>and</CustomerCopy>{" "}
+      <a href="/privacy">
+        <CustomerCopy>Privacy</CustomerCopy>
+      </a>{" "}
+      <CustomerCopy>policies.</CustomerCopy>
     </p>
   );
 }
@@ -88,58 +107,85 @@ export function SiteFooter({
         <div>
           <Logo lazy />
           <p>
-            Cakes, jars, bakery
-            <br />
-            and so much more.
+            <CustomerCopy>Cakes, jars, bakery</CustomerCopy> <br />{" "}
+            <CustomerCopy>and so much more.</CustomerCopy>
           </p>
-          <SectionLabel>{approved.heritage}</SectionLabel>
+          <SectionLabel>
+            <CustomerCopy>{approved.heritage}</CustomerCopy>
+          </SectionLabel>
           <WhatsAppCTA unavailable={onContactUnavailable} />
         </div>
         <nav aria-label="Collections">
-          <a href="/#home">HOME</a>
-          <a href="/menu">CAKES</a>
-          <a href="/menu?category=jars">CAKE JARS</a>
-          <a href="/menu?category=bakery">BAKERY</a>
-          <a href="/menu?category=seasonal">SPECIAL OCCASIONS</a>
+          <a href="/#home">
+            <CustomerCopy>HOME</CustomerCopy>
+          </a>
+          <a href="/menu">
+            <CustomerCopy>CAKES</CustomerCopy>
+          </a>
+          <a href="/menu?category=jars">
+            <CustomerCopy>CAKE JARS</CustomerCopy>
+          </a>
+          <a href="/menu?category=bakery">
+            <CustomerCopy>BAKERY</CustomerCopy>
+          </a>
+          <a href="/menu?category=seasonal">
+            <CustomerCopy>SPECIAL OCCASIONS</CustomerCopy>
+          </a>
         </nav>
         <nav aria-label="Information">
-          <a href="/contact">CONTACT US</a>
-          {onFaq && <button onClick={onFaq}>FAQ</button>}
+          <a href="/contact">
+            <CustomerCopy>CONTACT US</CustomerCopy>
+          </a>
+          {onFaq && (
+            <button onClick={onFaq}>
+              <CustomerCopy>FAQ</CustomerCopy>
+            </button>
+          )}
           {onSocial && (
             <>
-              <button onClick={onSocial}>Instagram</button>
-              <button onClick={onSocial}>TikTok</button>
+              <button onClick={onSocial}>
+                <CustomerCopy>Instagram</CustomerCopy>
+              </button>
+              <button onClick={onSocial}>
+                <CustomerCopy>TikTok</CustomerCopy>
+              </button>
             </>
           )}
-          <WhatsAppCTA unavailable={onContactUnavailable}>WhatsApp</WhatsAppCTA>
+          <WhatsAppCTA unavailable={onContactUnavailable}>
+            <CustomerCopy>WhatsApp</CustomerCopy>
+          </WhatsAppCTA>
         </nav>
         <nav aria-label="Policies">
           {policyRoutes
             .filter((r) => r.path !== "/contact")
             .map((r) => (
               <a key={r.path} href={r.path}>
-                {r.label.toUpperCase()}
+                <CustomerCopy>{r.label.toUpperCase()}</CustomerCopy>
               </a>
             ))}
         </nav>
       </div>
       <PaymentMarks />
       <p className="b-closing">
-        SWEET PEOPLE.
-        <br />
-        BRIGHTER DAYS.
+        <CustomerCopy>SWEET PEOPLE.</CustomerCopy> <br />{" "}
+        <CustomerCopy>BRIGHTER DAYS.</CustomerCopy>
       </p>
       <div className="b-footer-bottom">
         <span>
-          © {new Date().getFullYear()} {legalEntityLabel()} ·{" "}
-          {business.address ?? `${business.city}, ${business.country}`}
+          © {new Date().getFullYear()}{" "}
+          <CustomerCopy>{legalEntityLabel()}</CustomerCopy> ·{" "}
+          <CustomerCopy>
+            {business.address ?? `${business.city}, ${business.country}`}
+          </CustomerCopy>
           {business.supportContacts.length > 0 && (
             <>
               {" · "}
               {business.supportContacts.map((c, i) => (
                 <span key={c.phone}>
                   {i > 0 && " · "}
-                  <a href={phoneHref(c.phone)}>{c.phone}</a>
+                  <a href={phoneHref(c.phone)}>
+                    <CustomerCopy>{c.phone}</CustomerCopy>
+                  </a>
                 </span>
               ))}
             </>
@@ -147,7 +193,9 @@ export function SiteFooter({
         </span>
         {onManage && (
           <div>
-            <button onClick={onManage}>Gestión</button>
+            <button onClick={onManage}>
+              <CustomerCopy>Gestión</CustomerCopy>
+            </button>
           </div>
         )}
       </div>
@@ -170,8 +218,12 @@ export function SiteHeader({
     <>
       <header className="b-header b-scrolled">
         <nav className="b-nav-left" aria-label="Primary">
-          <a href="/#story">{t("story").toUpperCase()}</a>
-          <a href="/menu">{t("menu").toUpperCase()}</a>
+          <a href="/#story">
+            <CustomerCopy>{t("story").toUpperCase()}</CustomerCopy>
+          </a>
+          <a href="/menu">
+            <CustomerCopy>{t("menu").toUpperCase()}</CustomerCopy>
+          </a>
         </nav>
         <button
           className="b-menu"
@@ -195,8 +247,12 @@ export function SiteHeader({
           )}
         </a>
         <nav className="b-nav-right" aria-label="Contact">
-          <a href="/#family-story">JOURNAL</a>
-          <a href="/contact">{t("contact").toUpperCase()}</a>
+          <a href="/#family-story">
+            <CustomerCopy>JOURNAL</CustomerCopy>
+          </a>
+          <a href="/contact">
+            <CustomerCopy>{t("contact").toUpperCase()}</CustomerCopy>
+          </a>
           <LanguageSwitcher />
           <CartLink placement="desktop" />
         </nav>
@@ -206,11 +262,15 @@ export function SiteHeader({
         <Modal title="EXPLORE 3L" onClose={() => setMenu(false)}>
           <nav className="b-modal-nav" aria-label="Mobile navigation">
             <LanguageSwitcher />
-            <a href="/">HOME</a>
-            <a href="/menu">{t("menu").toUpperCase()}</a>
+            <a href="/">
+              <CustomerCopy>HOME</CustomerCopy>
+            </a>
+            <a href="/menu">
+              <CustomerCopy>{t("menu").toUpperCase()}</CustomerCopy>
+            </a>
             {policyRoutes.map((r) => (
               <a key={r.path} href={r.path}>
-                {r.label.toUpperCase()}
+                <CustomerCopy>{r.label.toUpperCase()}</CustomerCopy>
               </a>
             ))}
           </nav>
@@ -222,6 +282,7 @@ export function SiteHeader({
 
 export function FloatingShopping() {
   const count = cartCount(useCart());
+  const { t, text } = useLanguage();
   const support = whatsappUrl(
     destinations.whatsapp,
     "Hello 3L, I need help with the online store.",
@@ -234,10 +295,12 @@ export function FloatingShopping() {
           href={support}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label="WhatsApp support"
+          aria-label={text("WhatsApp support")}
         >
           <WhatsappLogo aria-hidden />
-          <span>Need help?</span>
+          <span>
+            <CustomerCopy>{text("Need help?")}</CustomerCopy>
+          </span>
         </a>
       )}
       {count > 0 && (
@@ -247,7 +310,7 @@ export function FloatingShopping() {
           aria-label={`View cart, ${count} items`}
         >
           <ShoppingBag aria-hidden />
-          Cart ({count})
+          <CustomerCopy>{t("cart")}</CustomerCopy> ({count})
         </a>
       )}
     </>

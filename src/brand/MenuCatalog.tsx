@@ -1,7 +1,9 @@
+import { CustomerCopy } from "./localization";
+import { useLanguage } from "./localization";
 import { availableSku } from "../../shared/commerce-policy";
 import { useId, useState } from "react";
 import { AddToCart } from "./Shop";
-import { useCheckoutConfig } from "./cart";
+import { useCheckoutConfig, useCheckoutNow } from "./cart";
 import { formatAed } from "./content";
 import {
   menuCategories,
@@ -12,15 +14,12 @@ import {
 
 export function MenuOptions({ family }: { family: MenuFamily }) {
   const labelId = useId();
+  const { text } = useLanguage();
   const [variant, setVariant] = useState(family.options[0]!.variant);
   const [size, setSize] = useState(family.options[0]!.size);
   const { config, loading, retry } = useCheckoutConfig();
-  const options = family.options.filter((o) =>
-    availableSku(
-      o.id,
-      config?.serverNow ? new Date(config.serverNow) : new Date(),
-    ),
-  );
+  const now = useCheckoutNow(config);
+  const options = family.options.filter((o) => availableSku(o.id, now));
   const variants = [...new Set(options.map((option) => option.variant))];
   const sizes = [
     ...new Set(
@@ -36,8 +35,10 @@ export function MenuOptions({ family }: { family: MenuFamily }) {
   if (!selected)
     return (
       <p className="b-menu-advance">
-        Individual Pan de Muerto is available October 15–November 15. Half Dozen
-        and Dozen packs remain available year-round.
+        <CustomerCopy>
+          Individual Pan de Muerto is available October 15–November 15. Half
+          Dozen and Dozen packs remain available year-round.
+        </CustomerCopy>
       </p>
     );
   const option = selectMenuOption(family, selected.variant, selected.size);
@@ -50,7 +51,9 @@ export function MenuOptions({ family }: { family: MenuFamily }) {
       <div className="b-menu-selectors">
         {variants.length > 1 && (
           <label htmlFor={`${labelId}-variant`}>
-            {family.id.includes("filled") ? "Filling" : "Flavour"}
+            <CustomerCopy>
+              {text(family.id.includes("filled") ? "Filling" : "Flavour")}
+            </CustomerCopy>
             <select
               id={`${labelId}-variant`}
               value={selected.variant}
@@ -58,9 +61,11 @@ export function MenuOptions({ family }: { family: MenuFamily }) {
             >
               {variants.map((value) => (
                 <option key={value} value={value}>
-                  {family.pack && /^(6|12) /.test(value)
-                    ? `${value.startsWith("6 ") ? "Half Dozen" : "Dozen"} · ${value}`
-                    : value}
+                  <CustomerCopy>
+                    {family.pack && /^(6|12) /.test(value)
+                      ? `${value.startsWith("6 ") ? "Half Dozen" : "Dozen"} · ${value}`
+                      : value}
+                  </CustomerCopy>
                 </option>
               ))}
             </select>
@@ -68,7 +73,9 @@ export function MenuOptions({ family }: { family: MenuFamily }) {
         )}
         {sizes.length > 1 && (
           <label htmlFor={`${labelId}-size`}>
-            {family.pack ? "Pack" : "Size / pack"}
+            <CustomerCopy>
+              {text(family.pack ? "Pack" : "Size / pack")}
+            </CustomerCopy>
             <select
               id={`${labelId}-size`}
               value={selected.size}
@@ -76,9 +83,11 @@ export function MenuOptions({ family }: { family: MenuFamily }) {
             >
               {sizes.map((value) => (
                 <option key={value} value={value}>
-                  {family.pack && /^(6|12) /.test(value)
-                    ? `${value.startsWith("6 ") ? "Half Dozen" : "Dozen"} · ${value}`
-                    : value}
+                  <CustomerCopy>
+                    {family.pack && /^(6|12) /.test(value)
+                      ? `${value.startsWith("6 ") ? "Half Dozen" : "Dozen"} · ${value}`
+                      : value}
+                  </CustomerCopy>
                 </option>
               ))}
             </select>
@@ -86,33 +95,45 @@ export function MenuOptions({ family }: { family: MenuFamily }) {
         )}
       </div>
       <p className="b-menu-option-summary" aria-live="polite">
-        {[variant, size].filter(Boolean).join(" · ")}
+        <CustomerCopy>
+          {[selected.variant, selected.size].filter(Boolean).join(" · ")}
+        </CustomerCopy>
       </p>
       <p className="b-menu-price" aria-live="polite">
-        {formatAed(option.priceFils)}
+        <CustomerCopy>{formatAed(option.priceFils)}</CustomerCopy>
       </p>
       {family.advanceOrder && (
-        <p className="b-menu-advance">Order at least 24 hours in advance</p>
+        <p className="b-menu-advance">
+          <CustomerCopy>Order at least 24 hours in advance</CustomerCopy>
+        </p>
       )}
       {ready ? (
         <AddToCart
           key={option.id}
           productId={option.id}
-          fallback={<p>Online ordering is unavailable.</p>}
+          fallback={
+            <p>
+              <CustomerCopy>Online ordering is unavailable.</CustomerCopy>
+            </p>
+          }
         />
       ) : (
         <div className="b-menu-unavailable" role="status">
           <button className="b-button" type="button" disabled>
-            {loading ? "LOADING…" : "ADD TO CART · UNAVAILABLE"}
+            <CustomerCopy>
+              {loading ? "LOADING…" : "ADD TO CART · UNAVAILABLE"}
+            </CustomerCopy>
           </button>
           {!loading && (
             <>
               <p>
-                Online ordering is unavailable for this option. Please try again
-                later.
+                <CustomerCopy>
+                  Online ordering is unavailable for this option. Please try
+                  again later.
+                </CustomerCopy>
               </p>
               <button className="b-text-button" type="button" onClick={retry}>
-                TRY AGAIN
+                <CustomerCopy>TRY AGAIN</CustomerCopy>
               </button>
             </>
           )}
@@ -137,8 +158,12 @@ export function MenuCatalog() {
       className="b-section b-full-menu"
       aria-label="Full menu"
     >
-      <p className="b-label">THE 3L MENU</p>
-      <h2 className="b-heading">FIND YOUR FAVOURITE.</h2>
+      <p className="b-label">
+        <CustomerCopy>THE 3L MENU</CustomerCopy>
+      </p>
+      <h2 className="b-heading">
+        <CustomerCopy>FIND YOUR FAVOURITE.</CustomerCopy>
+      </h2>
       <nav className="b-menu-categories" aria-label="Menu categories">
         {menuCategories.map((entry) => (
           <button
@@ -147,18 +172,22 @@ export function MenuCatalog() {
             aria-pressed={category === entry.id}
             onClick={() => setCategory(entry.id)}
           >
-            {entry.name}
+            <CustomerCopy>{entry.name}</CustomerCopy>
           </button>
         ))}
       </nav>
-      <h3 className="b-menu-category-heading">{current.name}</h3>
+      <h3 className="b-menu-category-heading">
+        <CustomerCopy>{current.name}</CustomerCopy>
+      </h3>
       {"image" in current && current.image && (
         <figure className="b-menu-category-photo">
           <img
             src={current.image}
             alt={`${current.name} category photography from Liza’s menu`}
           />
-          <figcaption>Category photograph</figcaption>
+          <figcaption>
+            <CustomerCopy>Category photograph</CustomerCopy>
+          </figcaption>
         </figure>
       )}
       <div className="b-menu-grid">
@@ -178,20 +207,26 @@ export function MenuCatalog() {
                     alt={`${family.name} family photography from Liza’s menu`}
                     loading="lazy"
                   />
-                  <figcaption>Family photograph</figcaption>
+                  <figcaption>
+                    <CustomerCopy>Family photograph</CustomerCopy>
+                  </figcaption>
                 </figure>
               ) : (
                 <div className="b-menu-no-photo">
-                  <span>3L</span>
+                  <span>
+                    <CustomerCopy>3L</CustomerCopy>
+                  </span>
                 </div>
               )}
-              <h4>{family.name}</h4>
+              <h4>
+                <CustomerCopy>{family.name}</CustomerCopy>
+              </h4>
               <MenuOptions family={family} />
             </article>
           ))}
       </div>
       <a className="b-link" href="/cart">
-        VIEW CART
+        <CustomerCopy>VIEW CART</CustomerCopy>
       </a>
     </section>
   );

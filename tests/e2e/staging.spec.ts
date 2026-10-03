@@ -150,7 +150,7 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
       expect(clean[field]).toHaveLength(0);
     expect(
       clean.zones.find((z: { id: string }) => z.id === "jvc").deliveryFeeAed,
-    ).toBeNull();
+    ).toBe(0);
     expect(JSON.stringify(clean)).not.toMatch(
       /25\.0657|mock-pay-|TEST-CONVERSATION|50000100/,
     );

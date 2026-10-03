@@ -18,6 +18,11 @@
     "aacd8fbf4cf50aba": "love.png",
     "0498acb04ba62eb2": "flower.png",
     "bd3ca842a1886d5d": "vanilla.png",
-    "cd88051e8be9b638": "tape.png"
+    "cd88051e8be9b638": "tape.png",
+    "918aea34dc80fa8f": "cake-particles.png",
+    "4aba441f0a771e45": "pastry-whisk.png"
+  },
+  "derivedAssets": {
+    "journey.svg": "Exact source path and whisk, serialized as a local static decorative asset; no invented drawing"
   }
 }

@@ -1,3 +1,4 @@
+import { CustomerCopy } from "./localization";
 import { ShoppingBag } from "@phosphor-icons/react";
 import { cartCount, useCart, useCheckoutConfig } from "./cart";
 
@@ -14,7 +15,9 @@ export function CartLink({ placement }: { placement: "desktop" | "mobile" }) {
       aria-label={`Cart, ${count} item${count === 1 ? "" : "s"}`}
     >
       <ShoppingBag aria-hidden />
-      <span>CART ({count})</span>
+      <span>
+        <CustomerCopy>{`CART (${count})`}</CustomerCopy>
+      </span>
     </a>
   );
 }

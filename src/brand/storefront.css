@@ -198,7 +198,7 @@
   align-items: center;
   overflow: hidden;
 }
-.ref-tradition > div {
+.ref-tradition > .ref-panel {
   width: 50%;
   padding: 64px;
   background: #ce8c9c;
@@ -368,7 +368,7 @@
   .ref-tradition {
     padding: 80px 24px;
   }
-  .ref-tradition > div {
+  .ref-tradition > .ref-panel {
     padding: 36px;
   }
   .ref-family h2 {
@@ -450,7 +450,7 @@
     flex-direction: column;
     padding: 40px 24px 64px;
   }
-  .ref-tradition > div {
+  .ref-tradition > .ref-panel {
     width: 100%;
     padding: 32px;
   }
@@ -521,4 +521,638 @@
   height: 42px;
   max-height: 42px;
   transform: scale(3);
+}
+/* Closure pass: measured reference proportions; official 3L typefaces retained. */
+.brand-experience.ref-home .b-header .b-logo {
+  transform: scale(2.57);
+  width: 54px;
+  height: 36px;
+  max-height: 36px;
+}
+.brand-experience.ref-home .ref-hero h1 {
+  font-size: clamp(46.8px, calc(37px + 3.49vw), 87.2px);
+  line-height: 0.94;
+  margin: 0;
+}
+.ref-hero-copy > p {
+  max-width: 352px;
+  margin: 24px 0 0;
+  line-height: 1.225;
+}
+.ref-watch {
+  margin: 24px 0 0;
+  padding: 0 6px;
+  min-height: 46px;
+}
+.ref-heritage {
+  margin-top: 16px;
+  line-height: 1.25;
+}
+.ref-bridge {
+  padding: 128px 32px 116px;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 1.12fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: center;
+}
+.brand-experience.ref-home .ref-bridge h2 {
+  font-size: 56px;
+  line-height: 1.1;
+  margin: 0 auto 64px;
+  grid-column: 1/-1;
+}
+.ref-city {
+  aspect-ratio: auto;
+  overflow: visible;
+  min-width: 0;
+}
+.ref-city img {
+  position: relative;
+  width: 200%;
+  height: auto;
+  object-fit: contain;
+  top: auto;
+}
+.ref-city {
+  display: flex;
+  flex-direction: column;
+}
+.ref-city > img {
+  clip-path: inset(0 50% 0 0);
+}
+.ref-dubai > img {
+  left: -100%;
+  right: auto;
+  clip-path: inset(0 0 0 50%);
+}
+.ref-city-label {
+  margin-top: -2px;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  display: block;
+}
+.ref-city-label small {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  margin-top: 4px;
+}
+.ref-journey {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.ref-journey img {
+  width: 100%;
+  height: auto;
+}
+.ref-bridge > p {
+  max-width: 512px;
+  margin: 32px auto 0;
+  line-height: 1.7;
+}
+.ref-featured {
+  padding: 96px 32px 84px;
+}
+.ref-star {
+  width: 18px;
+  height: 18px;
+  color: #8a5a34;
+  margin: 0 auto 8px;
+  display: block;
+}
+.brand-experience.ref-home .ref-featured h2 {
+  font-size: 44px;
+  line-height: 1.12;
+  margin: 12px 0 12px;
+}
+.ref-featured > p:last-of-type {
+  font-size: 15px;
+  color: #8a5a34;
+  line-height: 1.225;
+}
+.ref-cakes {
+  gap: 48px;
+  margin: 96px auto 64px;
+}
+.ref-cakes a {
+  padding-top: 16px;
+  gap: 0;
+}
+.ref-cakes img {
+  aspect-ratio: 1.5;
+  object-fit: contain;
+  width: 100%;
+}
+.ref-cakes span {
+  font-size: 14px;
+  margin-top: 20px;
+}
+.ref-cakes span::before {
+  content: "";
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: #a28d5b;
+  margin: 0 auto 16px;
+}
+.brand-experience.ref-home .b-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 44px;
+  padding: 12px 32px;
+  font-size: 13px;
+}
+.ref-tradition {
+  padding: 48px 60px;
+  min-height: 0;
+  height: calc((100vw - 120px) * 0.60134 + 96px);
+}
+.ref-tradition > .ref-panel {
+  width: 50%;
+  padding: 32px 64px;
+  background: #bc7587;
+  flex-shrink: 0;
+  border-radius: 28px;
+  z-index: 1;
+}
+.brand-experience.ref-home .ref-tradition h2 {
+  font-size: clamp(32px, 3.49vw, 50.24px);
+  line-height: 1.06;
+  color: #fbf7ef;
+  margin: 0;
+}
+.ref-rule {
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: #33241a40;
+  margin: 24px 0 20px;
+}
+.ref-tradition p {
+  margin: 0;
+  line-height: 1.65;
+  max-width: 352px;
+}
+.brand-experience.ref-home .ref-tradition .b-link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  border: 0;
+  margin: 24px 0 0;
+  padding: 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.ref-cta-circle {
+  width: 48px !important;
+  height: 48px !important;
+  padding: 14px;
+  border: 1px solid #33241a50;
+  border-radius: 50%;
+}
+.ref-slices {
+  position: relative;
+  width: 54.1%;
+  height: 100%;
+  margin-left: -6%;
+  flex-shrink: 0;
+}
+.ref-slice {
+  position: absolute;
+  object-fit: contain;
+  height: auto !important;
+  margin: 0;
+}
+.ref-slice-one {
+  width: 73.7%;
+  right: -9.7%;
+  top: -3.5%;
+}
+.ref-slice-two {
+  width: 73.1%;
+  right: 37.8%;
+  top: 26.4%;
+  z-index: 2;
+}
+.ref-slice-three {
+  width: 78.4%;
+  right: -8.3%;
+  top: 54.3%;
+  bottom: auto;
+}
+.ref-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.ref-family {
+  padding: 96px 32px;
+  gap: 86px;
+  grid-template-columns: 1fr 1fr;
+}
+.ref-collage {
+  aspect-ratio: 0.8;
+}
+.ref-paper {
+  width: 76%;
+  left: 12%;
+  top: -5.5%;
+  transform: rotate(3deg);
+}
+.ref-beige {
+  width: 42%;
+  left: -2%;
+  top: 39%;
+  transform: rotate(-5deg);
+}
+.ref-alicia {
+  width: 62%;
+  top: 2%;
+  left: 4%;
+  padding: 14px 14px 20px;
+  transform: rotate(2deg);
+}
+.ref-flower {
+  width: 22%;
+  left: 1%;
+  top: 0;
+}
+.ref-love {
+  width: 33%;
+  top: 17%;
+  right: 1%;
+}
+.ref-vanilla {
+  width: 24%;
+  left: 31%;
+  top: 56%;
+  transform: rotate(-8deg);
+  z-index: 2;
+}
+.ref-liza {
+  width: 48%;
+  right: 6%;
+  bottom: 6%;
+  padding: 10px 10px 16px;
+  transform: rotate(2deg);
+}
+.ref-tape {
+  width: 20%;
+  right: 19%;
+  top: 49%;
+  z-index: 2;
+}
+.brand-experience.ref-home .ref-family h2 {
+  font-size: 44px;
+  line-height: 1.15;
+  margin: 0 0 32px;
+}
+.ref-family p {
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 0 0 24px;
+}
+.brand-experience.ref-home .ref-family .b-button {
+  background: #bc7587;
+  border-color: #dd8798;
+  padding: 16px 32px;
+  font-size: 15px;
+  text-transform: none;
+  letter-spacing: 0;
+  text-align: left;
+}
+@media (min-width: 641px) and (max-width: 899px) {
+  .brand-experience.ref-home .b-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 24px;
+    gap: 18px;
+  }
+  .brand-experience.ref-home .b-header .b-nav-left,
+  .brand-experience.ref-home .b-header .b-nav-right {
+    display: flex;
+    gap: 16px;
+  }
+  .brand-experience.ref-home .b-menu,
+  .brand-experience.ref-home .b-cart-mobile {
+    display: none;
+  }
+  .brand-experience.ref-home .b-header .b-home {
+    position: static;
+    transform: none;
+  }
+  .brand-experience.ref-home .b-header nav a {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+  .brand-experience.ref-home .b-header .b-logo {
+    width: 44px;
+    height: 30px;
+  }
+  .ref-hero {
+    height: 58vh;
+    min-height: 0;
+  }
+  .ref-hero-copy {
+    left: 24px;
+    bottom: 24px;
+  }
+  .ref-bridge {
+    padding: 96px 24px 84px;
+    grid-template-columns: 1fr 140px 1fr;
+  }
+  .brand-experience.ref-home .ref-bridge h2 {
+    font-size: 45.4px;
+  }
+  .ref-featured {
+    padding: 64px 24px 52px;
+  }
+  .brand-experience.ref-home .ref-featured h2 {
+    font-size: 36.288px;
+  }
+  .ref-cakes {
+    gap: 16px;
+  }
+  .ref-tradition {
+    height: 455.75px;
+    padding: 48px 32px;
+    align-items: flex-start;
+  }
+  .ref-tradition > .ref-panel {
+    width: 52.4%;
+    padding: 24px 48px;
+    margin-top: 16px;
+  }
+  .brand-experience.ref-home .ref-tradition h2 {
+    font-size: 39.488px;
+  }
+  .ref-slices {
+    width: 43%;
+    height: 337px;
+    margin-left: 4.5%;
+    margin-top: 11px;
+  }
+  .ref-family {
+    grid-template-columns: 1fr;
+    padding: 64px 24px;
+    gap: 46px;
+  }
+  .ref-collage {
+    width: min(600px, 100%);
+    margin: auto;
+  }
+  .brand-experience.ref-home .ref-family h2 {
+    font-size: 36.352px;
+  }
+}
+@media (max-width: 640px) {
+  .brand-experience.ref-home .b-header .b-logo {
+    width: 44px;
+    height: 30px;
+  }
+  .brand-experience.ref-home .ref-hero h1 {
+    font-size: 46.8px;
+  }
+  .ref-hero-copy {
+    padding: 32px 24px 64px;
+  }
+  .ref-bridge {
+    padding: 78px 24px 52px;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .ref-city {
+    width: 100%;
+  }
+  .ref-mexico {
+    grid-row: 1;
+  }
+  .brand-experience.ref-home .ref-bridge h2 {
+    grid-row: 2;
+    font-size: 28px;
+    line-height: 1.1;
+    margin: 24px 0;
+  }
+  .ref-journey {
+    grid-row: 3;
+    height: 290px;
+    transform: rotate(12deg);
+    padding: 0 8px;
+  }
+  .ref-dubai {
+    grid-row: 4;
+    margin-top: 30px;
+  }
+  .ref-bridge > p {
+    margin: 36px auto 0;
+  }
+  .ref-featured {
+    padding: 48px 24px 52px;
+  }
+  .brand-experience.ref-home .ref-featured h2 {
+    font-size: 28px;
+  }
+  .ref-cakes {
+    gap: 76px;
+    margin: 48px auto 76px;
+  }
+  .ref-cakes img {
+    max-width: none;
+    aspect-ratio: 1.5;
+  }
+  .ref-cakes span {
+    margin-top: 20px;
+  }
+  .ref-tradition {
+    height: 910px;
+    padding: 64px 16px;
+    display: block;
+  }
+  .ref-tradition > .ref-panel {
+    width: 100%;
+    padding: 24px 48px;
+    margin-top: 16px;
+  }
+  .brand-experience.ref-home .ref-tradition h2 {
+    font-size: 32px;
+  }
+  .ref-slices {
+    position: relative;
+    width: 100%;
+    height: 398px;
+    margin: 32px 0 0;
+  }
+  .ref-slice-one {
+    width: 73.7%;
+    right: -13%;
+    top: -6%;
+  }
+  .ref-slice-two {
+    width: 73.1%;
+    right: 40%;
+    top: 29%;
+  }
+  .ref-slice-three {
+    width: 78.4%;
+    right: -11%;
+    top: 59%;
+  }
+  .ref-family {
+    padding: 48px 16px;
+    gap: 64px;
+    grid-template-columns: 1fr;
+  }
+  .ref-collage {
+    width: 100%;
+  }
+  .brand-experience.ref-home .ref-family h2 {
+    font-size: 26px;
+    line-height: 1.15;
+  }
+  .brand-experience.ref-home .ref-family .b-button {
+    width: 100%;
+    white-space: normal;
+  }
+}
+
+.ref-city-crop {
+  display: block;
+  width: 100%;
+  aspect-ratio: 0.78125;
+  overflow: hidden;
+  position: relative;
+}
+.ref-city-crop img {
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 200%;
+  height: 100%;
+  max-width: none;
+  object-fit: fill;
+  clip-path: none;
+}
+.ref-dubai .ref-city-crop img {
+  left: -100%;
+}
+.ref-journey {
+  transform: none;
+}
+.ref-bridge {
+  overflow: hidden;
+}
+.brand-experience.ref-home .ref-watch {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+.brand-experience.ref-home .ref-hero-copy > p {
+  margin: 24px 0 0;
+  line-height: 1.225;
+}
+@media (max-width: 640px) {
+  .ref-journey {
+    padding: 0 8px;
+  }
+  .ref-family {
+    gap: 64px;
+  }
+  .ref-featured {
+    padding-bottom: 36px;
+  }
+}
+/* Locale layout is independent of untranslated business copy. Fixed support stays left. */
+[dir="rtl"] .b-menu-selectors,
+[dir="rtl"] .b-shop-form {
+  text-align: start;
+}
+[dir="rtl"] .b-co-actions,
+[dir="rtl"] .b-co-confirm-keys {
+  direction: rtl;
+}
+[dir="rtl"] .b-shop-form input[type="email"],
+[dir="rtl"] .b-shop-form input[type="tel"],
+[dir="rtl"] .b-shop-form input[type="date"] {
+  direction: ltr;
+  text-align: left;
+}
+[dir="rtl"] .b-cart-link {
+  direction: rtl;
+}
+.ref-home .ref-collage,
+.ref-home .ref-tradition,
+.ref-home .ref-bridge {
+  direction: ltr;
+}
+
+.brand-experience.ref-home .ref-city-crop img {
+  max-width: none;
+  right: auto;
+}
+.ref-slices {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  z-index: auto;
+}
+.brand-experience.ref-home .ref-cakes a {
+  gap: 0;
+}
+@media (max-width: 640px) {
+  .ref-cakes {
+    gap: 56px;
+    margin-bottom: 56px;
+  }
+  .ref-cakes a {
+    padding-top: 10px;
+  }
+  .ref-family {
+    padding-bottom: 138px;
+  }
+}
+@media (min-width: 641px) and (max-width: 899px) {
+  .ref-family {
+    padding-bottom: 142px;
+  }
+}
+
+.ref-family-copy {
+  width: 100%;
+  max-width: 544px;
+}
+.brand-experience.ref-home .ref-family p {
+  margin: 0 0 24px;
+  line-height: 1.7;
+}
+.ref-beige {
+  z-index: 1;
+}
+.ref-alicia {
+  transform: none;
+}
+.ref-tape {
+  transform: rotate(-25deg);
+}
+.ref-particles {
+  opacity: 0.24;
+}
+@media (max-width: 899px) {
+  .ref-tradition > .ref-panel {
+    margin-top: 0;
+  }
+  .ref-family-copy {
+    max-width: none;
+  }
+}
+
+/* Preserve blush CTAs with accessible dark copy. */
+.brand-experience.ref-home .ref-family .b-button {
+  background: #ce8c9c;
+  border-color: #ce8c9c;
+  color: #34231d;
 }

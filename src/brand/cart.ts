@@ -136,10 +136,16 @@ export type CheckoutConfig = {
   }[];
 };
 let configPromise: Promise<CheckoutConfig | null> | null = null;
+const receivedAt = new WeakMap<CheckoutConfig, number>();
 function loadConfig(force = false) {
   if (!configPromise || force)
     configPromise = fetch("/api/checkout/config")
-      .then((r) => (r.ok ? (r.json() as Promise<CheckoutConfig>) : null))
+      .then(async (r) => {
+        if (!r.ok) return null;
+        const config = (await r.json()) as CheckoutConfig;
+        receivedAt.set(config, Date.now());
+        return config;
+      })
       .catch(() => null);
   return configPromise;
 }
@@ -160,4 +166,35 @@ export function useCheckoutConfig() {
     };
   }, [attempt]);
   return { ...state, retry: () => setAttempt((n) => n + 1) };
+}
+
+/** Advance the server clock snapshot by elapsed local time; backend revalidates. */
+export function checkoutNow(config: CheckoutConfig | null) {
+  const timestamp = config?.serverNow
+    ? Date.parse(config.serverNow)
+    : Date.now();
+  return new Date(
+    timestamp +
+      Math.max(
+        0,
+        Date.now() -
+          (config ? (receivedAt.get(config) ?? Date.now()) : Date.now()),
+      ),
+  );
+}
+export function useCheckoutNow(config: CheckoutConfig | null) {
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => setTick((n) => n + 1), 30000);
+    const refresh = () => setTick((n) => n + 1);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, []);
+  void tick;
+  return checkoutNow(config);
 }

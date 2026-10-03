@@ -1,3 +1,5 @@
+import { CustomerCopy } from "./localization";
+import { useCheckoutNow } from "./cart";
 import { validWindow, leadHours } from "../../shared/commerce-policy";
 import { FloatingShopping } from "./SiteChrome";
 import "./storefront.css";
@@ -256,7 +258,7 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
     />
   ) : (
     <span className="b-co-thumb b-co-thumb-empty" aria-hidden>
-      {name.slice(0, 1)}
+      <CustomerCopy>{name.slice(0, 1)}</CustomerCopy>
     </span>
   );
 }
@@ -266,7 +268,9 @@ function Progress({ step }: { step: number }) {
   return (
     <nav className="b-co-progress" aria-label="Checkout progress">
       <p className="b-co-progress-count" aria-hidden>
-        Step {step + 1} of {STEPS.length} · <strong>{STEPS[step]}</strong>
+        <CustomerCopy>Step</CustomerCopy> {step + 1}{" "}
+        <CustomerCopy>of</CustomerCopy> {STEPS.length} ·{" "}
+        <strong>{STEPS[step]}</strong>
       </p>
       <ol>
         {STEPS.map((label, i) => (
@@ -278,7 +282,9 @@ function Progress({ step }: { step: number }) {
             <span className="b-co-dot" aria-hidden>
               {i < step ? <Check weight="bold" /> : i + 1}
             </span>
-            <span className="b-co-step-label">{label}</span>
+            <span className="b-co-step-label">
+              <CustomerCopy>{label}</CustomerCopy>
+            </span>
           </li>
         ))}
       </ol>
@@ -293,8 +299,8 @@ function CheckoutHeader() {
         <Logo />
       </a>
       <p className="b-co-secure">
-        <LockSimple aria-hidden weight="bold" />
-        Secure checkout
+        <LockSimple aria-hidden weight="bold" />{" "}
+        <CustomerCopy>Secure checkout</CustomerCopy>
       </p>
     </header>
   );
@@ -317,12 +323,16 @@ function ShopShell({
   return (
     <div className="brand-experience b-entered b-shop">
       <a className="b-skip" href="#main-content">
-        Skip to content
+        <CustomerCopy>Skip to content</CustomerCopy>
       </a>
       <CheckoutHeader />
       <main id="main-content" className="b-shop-main">
         <Progress step={step} />
-        {!bare && <h1>{title}</h1>}
+        {!bare && (
+          <h1>
+            <CustomerCopy>{title}</CustomerCopy>
+          </h1>
+        )}
         {children}
       </main>
       <SiteFooter onContactUnavailable={toContact} />
@@ -346,25 +356,39 @@ function Totals({
   return (
     <dl className="b-shop-totals">
       <div>
-        <dt>Subtotal</dt>
-        <dd>{formatAed(subtotal)}</dd>
+        <dt>
+          <CustomerCopy>Subtotal</CustomerCopy>
+        </dt>
+        <dd>
+          <CustomerCopy>{formatAed(subtotal)}</CustomerCopy>
+        </dd>
       </div>
       <div>
-        <dt>{fulfillmentMethod === "pickup" ? "Pickup" : "Delivery"}</dt>
+        <dt>
+          <CustomerCopy>
+            {fulfillmentMethod === "pickup" ? "Pickup" : "Delivery"}
+          </CustomerCopy>
+        </dt>
         <dd>
-          {fee === 0
-            ? "Free"
-            : fee != null
-              ? formatAed(fee)
-              : feePending
-                ? "Calculated at delivery"
-                : "—"}
+          <CustomerCopy>
+            {fee === 0
+              ? "Free"
+              : fee != null
+                ? formatAed(fee)
+                : feePending
+                  ? "Calculated at delivery"
+                  : "—"}
+          </CustomerCopy>
         </dd>
       </div>
       {total != null && (
         <div className="b-shop-grand">
-          <dt>Total</dt>
-          <dd>{formatAed(total)}</dd>
+          <dt>
+            <CustomerCopy>Total</CustomerCopy>
+          </dt>
+          <dd>
+            <CustomerCopy>{formatAed(total)}</CustomerCopy>
+          </dd>
         </div>
       )}
     </dl>
@@ -387,7 +411,7 @@ function Card({
     <section className={`b-co-card ${className}`}>
       <header>
         <h2 ref={headingRef} tabIndex={headingRef ? -1 : undefined}>
-          {title}
+          <CustomerCopy>{title}</CustomerCopy>
         </h2>
         {action}
       </header>
@@ -430,10 +454,13 @@ function OrderSummary({
         onClick={() => setOpen((o) => !o)}
       >
         <span>
-          {open ? "Hide" : "Show"} order summary
+          <CustomerCopy>{open ? "Hide" : "Show"}</CustomerCopy>{" "}
+          <CustomerCopy>order summary</CustomerCopy>{" "}
           <CaretDown aria-hidden weight="bold" />
         </span>
-        <strong>{formatAed(total ?? subtotal)}</strong>
+        <strong>
+          <CustomerCopy>{formatAed(total ?? subtotal)}</CustomerCopy>
+        </strong>
       </button>
       <div
         id="b-co-summary-body"
@@ -441,9 +468,10 @@ function OrderSummary({
         data-open={open}
       >
         <h2>
-          Your order{" "}
+          <CustomerCopy>Your order</CustomerCopy>{" "}
           <span className="b-caption">
-            {count} item{count === 1 ? "" : "s"}
+            {count} <CustomerCopy>item</CustomerCopy>
+            <CustomerCopy>{count === 1 ? "" : "s"}</CustomerCopy>
           </span>
         </h2>
         <ul className="b-co-summary-items">
@@ -459,13 +487,18 @@ function OrderSummary({
                   </span>
                 </span>
                 <span>
-                  <strong>{p.name}</strong>
+                  <strong>
+                    <CustomerCopy>{p.name}</CustomerCopy>
+                  </strong>
                   <span className="b-caption">
-                    {formatAed(p.priceFils)} × {l.quantity}
+                    <CustomerCopy>{formatAed(p.priceFils)}</CustomerCopy> ×{" "}
+                    {l.quantity}
                   </span>
                 </span>
                 <span className="b-co-money">
-                  {formatAed(p.priceFils * l.quantity)}
+                  <CustomerCopy>
+                    {formatAed(p.priceFils * l.quantity)}
+                  </CustomerCopy>
                 </span>
               </li>
             );
@@ -487,18 +520,20 @@ function Unavailable({ retry }: { retry?: () => void }) {
   return (
     <div className="b-shop-panel">
       <p>
-        Online ordering is not available right now. Our team is happy to take
-        your order on WhatsApp.
+        <CustomerCopy>
+          Online ordering is not available right now. Our team is happy to take
+          your order on WhatsApp.
+        </CustomerCopy>
       </p>
       <WhatsAppCTA
         unavailable={() => (location.href = "/contact")}
         message="Hello 3L, I'd like to place an order."
       >
-        ASK ABOUT COVERAGE
+        <CustomerCopy>ASK ABOUT COVERAGE</CustomerCopy>
       </WhatsAppCTA>
       {retry && (
         <button className="b-link" onClick={retry}>
-          Try again
+          <CustomerCopy>Try again</CustomerCopy>
         </button>
       )}
     </div>
@@ -507,9 +542,11 @@ function Unavailable({ retry }: { retry?: () => void }) {
 function EmptyCart() {
   return (
     <div className="b-shop-panel b-co-empty">
-      <p>Your cart is empty.</p>
+      <p>
+        <CustomerCopy>Your cart is empty.</CustomerCopy>
+      </p>
       <a className="b-button" href="/menu">
-        BROWSE THE COLLECTION
+        <CustomerCopy>BROWSE THE COLLECTION</CustomerCopy>
       </a>
     </div>
   );
@@ -566,11 +603,12 @@ export function AddToCart({
           setQuantity(1);
         }}
       >
-        ADD TO CART · {formatAed(product.priceFils * quantity)}
+        <CustomerCopy>ADD TO CART ·</CustomerCopy>{" "}
+        <CustomerCopy>{formatAed(product.priceFils * quantity)}</CustomerCopy>
       </Button>
       {(added || inCart > 0) && (
         <a className="b-link" href="/cart" aria-live="polite">
-          {inCart} in your cart · View cart
+          {inCart} <CustomerCopy>in your cart · View cart</CustomerCopy>
         </a>
       )}
     </div>
@@ -593,12 +631,14 @@ function CartItems({
         if (!p)
           return (
             <li key={l.productId} className="b-cart-unavailable">
-              <span>This item is no longer available.</span>
+              <span>
+                <CustomerCopy>This item is no longer available.</CustomerCopy>
+              </span>
               <button
                 className="b-link"
                 onClick={() => cart.remove(l.productId)}
               >
-                Remove
+                <CustomerCopy>Remove</CustomerCopy>
               </button>
             </li>
           );
@@ -606,11 +646,18 @@ function CartItems({
           <li key={l.productId} className="b-co-item">
             <Thumb productId={p.id} name={p.name} />
             <div className="b-co-item-copy">
-              <strong>{p.name}</strong>
+              <strong>
+                <CustomerCopy>{p.name}</CustomerCopy>
+              </strong>
               {p.description && (
-                <span className="b-caption">{p.description}</span>
+                <span className="b-caption">
+                  <CustomerCopy>{p.description}</CustomerCopy>
+                </span>
               )}
-              <span className="b-caption">{formatAed(p.priceFils)} each</span>
+              <span className="b-caption">
+                <CustomerCopy>{formatAed(p.priceFils)}</CustomerCopy>{" "}
+                <CustomerCopy>each</CustomerCopy>
+              </span>
             </div>
             <div
               className="b-qty"
@@ -635,7 +682,7 @@ function CartItems({
               </button>
             </div>
             <span className="b-co-money b-co-item-total">
-              {formatAed(p.priceFils * l.quantity)}
+              <CustomerCopy>{formatAed(p.priceFils * l.quantity)}</CustomerCopy>
             </span>
             <button
               type="button"
@@ -658,7 +705,9 @@ export function CartPage() {
   if (loading)
     return (
       <ShopShell step={0} title="Your cart">
-        <p role="status">Loading your cart…</p>
+        <p role="status">
+          <CustomerCopy>Loading your cart…</CustomerCopy>
+        </p>
       </ShopShell>
     );
   if (!config || !config.products.length)
@@ -681,7 +730,8 @@ export function CartPage() {
             <CartItems lines={lines} config={config} />
             <div className="b-co-inline-links">
               <a className="b-link" href="/menu">
-                <ArrowLeft aria-hidden /> Continue shopping
+                <ArrowLeft aria-hidden />{" "}
+                <CustomerCopy>Continue shopping</CustomerCopy>
               </a>
               <button
                 className="b-link"
@@ -690,28 +740,34 @@ export function CartPage() {
                     cart.clear();
                 }}
               >
-                Clear cart
+                <CustomerCopy>Clear cart</CustomerCopy>
               </button>
             </div>
           </div>
           <aside className="b-co-summary b-co-summary-static">
             <div className="b-co-summary-body" data-open>
-              <h2>Order total</h2>
+              <h2>
+                <CustomerCopy>Order total</CustomerCopy>
+              </h2>
               <Totals subtotal={subtotal} fee={null} total={null} feePending />
               <p className="b-caption">
-                Delivery is included once your area’s minimum order is reached
-                and are confirmed in the next step.
+                <CustomerCopy>
+                  Delivery is included once your area’s minimum order is
+                  reached. Your area and address are confirmed in the next step.
+                </CustomerCopy>
               </p>
               <a
                 className={`b-button b-co-cta ${known.length ? "" : "b-disabled"}`}
                 aria-disabled={!known.length}
                 href={known.length ? "/checkout" : undefined}
               >
-                CONTINUE TO DELIVERY
+                <CustomerCopy>CONTINUE TO DELIVERY</CustomerCopy>
               </a>
               <p className="b-co-assurance">
-                <ShieldCheck aria-hidden /> Secure card payment · Visa and
-                Mastercard
+                <ShieldCheck aria-hidden />{" "}
+                <CustomerCopy>
+                  Secure card payment · Visa and Mastercard
+                </CustomerCopy>
               </p>
             </div>
           </aside>
@@ -726,6 +782,7 @@ export function CartPage() {
 export function CheckoutPage() {
   const lines = useCart();
   const { config, loading, retry } = useCheckoutConfig();
+  const now = useCheckoutNow(config);
   const draft = useMemo(loadDraft, []);
   const [step, setStep] = useState(1);
   const [fulfillmentMethod, setFulfillmentMethod] = useState<
@@ -786,7 +843,9 @@ export function CheckoutPage() {
   if (loading)
     return (
       <ShopShell step={1} title="Checkout">
-        <p role="status">Preparing checkout…</p>
+        <p role="status">
+          <CustomerCopy>Preparing checkout…</CustomerCopy>
+        </p>
       </ShopShell>
     );
   if (!config?.enabled)
@@ -806,6 +865,7 @@ export function CheckoutPage() {
   const minFils = (quote?.minOrderAed ?? 0) * 100;
   const set = <K extends keyof Delivery>(k: K, v: Delivery[K]) => {
     setError("");
+    if (["address", "building", "zoneId"].includes(k)) setAddressNotice("");
     setDelivery((d) => ({ ...d, [k]: v }));
   };
   const setB = <K extends keyof Billing>(k: K, v: Billing[K]) => {
@@ -843,7 +903,7 @@ export function CheckoutPage() {
                 !validWindow(
                   delivery.date ?? "",
                   delivery.slot ?? "",
-                  new Date(config.serverNow ?? Date.now()),
+                  now,
                   leadHours(cartLines.map((l) => l.productId)),
                 )
               ) {
@@ -883,7 +943,9 @@ export function CheckoutPage() {
               headingRef={heading}
             >
               <fieldset className="b-fulfillment-choice">
-                <legend>How would you like your order?</legend>
+                <legend>
+                  <CustomerCopy>How would you like your order?</CustomerCopy>
+                </legend>
                 {(["delivery", "pickup"] as const).map((method) => (
                   <label key={method}>
                     <input
@@ -899,28 +961,37 @@ export function CheckoutPage() {
                           setBilling((b) => ({ ...b, sameAsDelivery: false }));
                       }}
                     />
-                    {method === "pickup" ? "PICKUP" : "DELIVERY"}
+                    <CustomerCopy>
+                      {method === "pickup" ? "PICKUP" : "DELIVERY"}
+                    </CustomerCopy>
                   </label>
                 ))}
               </fieldset>
               {pickup ? (
                 <div className="b-co-billing-preview">
-                  <strong>Pickup · {business.tradingName}</strong>
+                  <strong>
+                    <CustomerCopy>Pickup ·</CustomerCopy>{" "}
+                    <CustomerCopy>{business.tradingName}</CustomerCopy>
+                  </strong>
                   <p>{business.address}</p>
                   <p>
-                    Your order will be ready for pickup at the selected date and
-                    time.
+                    <CustomerCopy>
+                      Your order will be ready for pickup at the selected date
+                      and time.
+                    </CustomerCopy>
                   </p>
                 </div>
               ) : (
                 <p className="b-caption">
-                  Delivery — Included once minimum order is reached
+                  <CustomerCopy>
+                    Delivery — Included once minimum order is reached
+                  </CustomerCopy>
                 </p>
               )}
               {!pickup && (
                 <>
                   <label>
-                    Delivery area
+                    <CustomerCopy>Delivery area</CustomerCopy>{" "}
                     <Select
                       required
                       value={
@@ -932,27 +1003,37 @@ export function CheckoutPage() {
                         set("zoneId", v === "__missing" ? "" : v);
                       }}
                     >
-                      <option value="">Choose your area</option>
+                      <option value="">
+                        <CustomerCopy>Choose your area</CustomerCopy>
+                      </option>
                       {config.zones.map((z) => (
                         <option key={z.id} value={z.id}>
-                          {z.name} — Minimum AED {z.minOrderAed}
-                          {z.deliveryFeeAed === 0 ? " — free delivery" : ""}
+                          <CustomerCopy>{z.name}</CustomerCopy>{" "}
+                          <CustomerCopy>— Minimum AED</CustomerCopy>{" "}
+                          {z.minOrderAed}
+                          <CustomerCopy>
+                            {z.deliveryFeeAed === 0 ? " — free delivery" : ""}
+                          </CustomerCopy>
                         </option>
                       ))}
-                      <option value="__missing">My area isn't listed</option>
+                      <option value="__missing">
+                        <CustomerCopy>My area isn't listed</CustomerCopy>
+                      </option>
                     </Select>
                   </label>
                   {areaMissing && (
                     <div className="b-shop-notice" role="status">
                       <p>
-                        Online delivery isn't available for your area yet. Our
-                        team can still help you on WhatsApp.
+                        <CustomerCopy>
+                          Online delivery isn't available for your area yet. Our
+                          team can still help you on WhatsApp.
+                        </CustomerCopy>
                       </p>
                       <WhatsAppCTA
                         unavailable={() => (location.href = "/contact")}
                         message="Hello 3L, could you help me check delivery coverage for my area?"
                       >
-                        ASK ABOUT COVERAGE
+                        <CustomerCopy>ASK ABOUT COVERAGE</CustomerCopy>
                       </WhatsAppCTA>
                     </div>
                   )}
@@ -962,28 +1043,36 @@ export function CheckoutPage() {
                         <>
                           <p className="b-co-fee">
                             <span>
-                              Delivery to {quote.zoneName ?? "your area"}
+                              <CustomerCopy>Delivery to</CustomerCopy>{" "}
+                              <CustomerCopy>
+                                {quote.zoneName ?? "your area"}
+                              </CustomerCopy>
                             </span>
                             <strong>
-                              {quote.feeFils === 0
-                                ? "Free"
-                                : formatAed(quote.feeFils ?? 0)}
+                              <CustomerCopy>
+                                {quote.feeFils === 0
+                                  ? "Free"
+                                  : formatAed(quote.feeFils ?? 0)}
+                              </CustomerCopy>
                             </strong>
                           </p>
                           <p className="b-caption">
-                            Minimum order for {quote.zoneName} is{" "}
-                            {formatAed(minFils)}.
+                            <CustomerCopy>Minimum order for</CustomerCopy>{" "}
+                            {quote.zoneName} <CustomerCopy>is</CustomerCopy>{" "}
+                            <CustomerCopy>{formatAed(minFils)}</CustomerCopy>.
                           </p>
                         </>
                       ) : (
                         <p className="b-shop-notice" role="status">
-                          {quote.minimumMet === false &&
-                          quote.minOrderAed != null
-                            ? `The minimum order for ${quote.zoneName ?? "this area"} is ${formatAed(minFils)}. Add ${formatAed(Math.max(0, minFils - quote.subtotalFils))} more to continue.`
-                            : "Online delivery isn't available for this area yet."}{" "}
+                          <CustomerCopy>
+                            {quote.minimumMet === false &&
+                            quote.minOrderAed != null
+                              ? `The minimum order for ${quote.zoneName ?? "this area"} is ${formatAed(minFils)}. Add ${formatAed(Math.max(0, minFils - quote.subtotalFils))} more to continue.`
+                              : "Online delivery isn't available for this area yet."}
+                          </CustomerCopy>{" "}
                           {quote.minimumMet === false && (
                             <a className="b-link" href="/cart">
-                              Edit cart
+                              <CustomerCopy>Edit cart</CustomerCopy>
                             </a>
                           )}
                         </p>
@@ -996,7 +1085,7 @@ export function CheckoutPage() {
                 {!pickup && (
                   <>
                     <label>
-                      Street address and community
+                      <CustomerCopy>Street address and community</CustomerCopy>{" "}
                       <Input
                         required
                         minLength={5}
@@ -1008,7 +1097,7 @@ export function CheckoutPage() {
                     </label>
                     <div className="b-shop-row">
                       <label>
-                        Building or villa
+                        <CustomerCopy>Building or villa</CustomerCopy>{" "}
                         <Input
                           required
                           maxLength={120}
@@ -1017,8 +1106,10 @@ export function CheckoutPage() {
                         />
                       </label>
                       <label>
-                        Apartment or unit{" "}
-                        <span className="b-optional">(optional)</span>
+                        <CustomerCopy>Apartment or unit</CustomerCopy>{" "}
+                        <span className="b-optional">
+                          <CustomerCopy>(optional)</CustomerCopy>
+                        </span>
                         <Input
                           maxLength={40}
                           value={delivery.unit ?? ""}
@@ -1030,7 +1121,9 @@ export function CheckoutPage() {
                 )}
                 <div className="b-shop-row">
                   <label>
-                    {pickup ? "Pickup date" : "Delivery date"}
+                    <CustomerCopy>
+                      {pickup ? "Pickup date" : "Delivery date"}
+                    </CustomerCopy>
                     <Input
                       required
                       type="date"
@@ -1045,35 +1138,42 @@ export function CheckoutPage() {
                   </label>
                   {config.slots.length ? (
                     <label>
-                      {pickup ? "Pickup time" : "Delivery time"}
+                      <CustomerCopy>
+                        {pickup ? "Pickup time" : "Delivery time"}
+                      </CustomerCopy>
                       <Select
                         required
                         value={delivery.slot ?? ""}
                         onChange={(e) => set("slot", e.target.value)}
                       >
-                        <option value="">Choose a time</option>
+                        <option value="">
+                          <CustomerCopy>Choose a time</CustomerCopy>
+                        </option>
                         {config.slots.map((s) => (
                           <option
                             key={s}
+                            value={s}
                             disabled={
                               !validWindow(
                                 delivery.date ?? "",
                                 s,
-                                new Date(config.serverNow ?? Date.now()),
+                                now,
                                 leadHours(cartLines.map((l) => l.productId)),
                               )
                             }
                           >
-                            {s}
+                            <CustomerCopy>{s}</CustomerCopy>
                           </option>
                         ))}
                       </Select>
                     </label>
                   ) : (
                     <label>
-                      {pickup
-                        ? "Preferred pickup time"
-                        : "Preferred delivery time"}
+                      <CustomerCopy>
+                        {pickup
+                          ? "Preferred pickup time"
+                          : "Preferred delivery time"}
+                      </CustomerCopy>
                       <Input
                         required
                         maxLength={60}
@@ -1086,13 +1186,17 @@ export function CheckoutPage() {
                 </div>
                 {!config.slots.length && (
                   <p className="b-caption">
-                    Our team confirms the preferred time with you.
+                    <CustomerCopy>
+                      Our team confirms the preferred time with you.
+                    </CustomerCopy>
                   </p>
                 )}
                 {!pickup && (
                   <label>
-                    Delivery notes{" "}
-                    <span className="b-optional">(optional)</span>
+                    <CustomerCopy>Delivery notes</CustomerCopy>{" "}
+                    <span className="b-optional">
+                      <CustomerCopy>(optional)</CustomerCopy>
+                    </span>
                     <Textarea
                       rows={3}
                       maxLength={500}
@@ -1104,18 +1208,29 @@ export function CheckoutPage() {
                 )}
               </fieldset>
             </Card>
-            {error && <p role="alert">{error}</p>}
-            {addressNotice && <p role="status">{addressNotice}</p>}
+            {error && (
+              <p role="alert">
+                <CustomerCopy>{error}</CustomerCopy>
+              </p>
+            )}
+            {addressNotice && (
+              <p role="status">
+                <CustomerCopy>{addressNotice}</CustomerCopy>
+              </p>
+            )}
             <div className="b-shop-actions">
               <Button
                 type="submit"
                 className="b-co-cta"
                 disabled={!quote?.eligible || (!pickup && areaMissing)}
               >
-                {addressBusy ? "VERIFYING ADDRESS…" : "CONTINUE TO DETAILS"}
+                <CustomerCopy>
+                  {addressBusy ? "VERIFYING ADDRESS…" : "CONTINUE TO DETAILS"}
+                </CustomerCopy>
               </Button>
               <a className="b-link" href="/cart">
-                <ArrowLeft aria-hidden /> Back to cart
+                <ArrowLeft aria-hidden />{" "}
+                <CustomerCopy>Back to cart</CustomerCopy>
               </a>
             </div>
           </form>
@@ -1146,7 +1261,7 @@ export function CheckoutPage() {
           >
             <Card title="Contact details" headingRef={heading}>
               <label>
-                Full name
+                <CustomerCopy>Full name</CustomerCopy>{" "}
                 <Input
                   required
                   minLength={2}
@@ -1158,7 +1273,7 @@ export function CheckoutPage() {
               </label>
               <div className="b-shop-row">
                 <label>
-                  Mobile number
+                  <CustomerCopy>Mobile number</CustomerCopy>{" "}
                   <Input
                     required
                     type="tel"
@@ -1172,7 +1287,7 @@ export function CheckoutPage() {
                   />
                 </label>
                 <label>
-                  Email for payment receipt
+                  <CustomerCopy>Email for payment receipt</CustomerCopy>{" "}
                   <Input
                     required
                     type="email"
@@ -1184,11 +1299,15 @@ export function CheckoutPage() {
                 </label>
               </div>
               <p id="b-phone-help" className="b-caption">
-                A UAE mobile number, so our team can reach you.
+                <CustomerCopy>
+                  A UAE mobile number, so our team can reach you.
+                </CustomerCopy>
               </p>
               <label>
-                Special instructions{" "}
-                <span className="b-optional">(optional)</span>
+                <CustomerCopy>Special instructions</CustomerCopy>{" "}
+                <span className="b-optional">
+                  <CustomerCopy>(optional)</CustomerCopy>
+                </span>
                 <Textarea
                   rows={3}
                   maxLength={500}
@@ -1207,30 +1326,40 @@ export function CheckoutPage() {
                     disabled={pickup}
                     onChange={(e) => setB("sameAsDelivery", e.target.checked)}
                   />
-                  <span>Billing address is the same as delivery address</span>
+                  <span>
+                    <CustomerCopy>
+                      Billing address is the same as delivery address
+                    </CustomerCopy>
+                  </span>
                 </label>
               )}
               {pickup && (
                 <p className="b-caption">
-                  Your billing address is required for payment. No delivery
-                  address is needed.
+                  <CustomerCopy>
+                    Your billing address is required for payment. No delivery
+                    address is needed.
+                  </CustomerCopy>
                 </p>
               )}
               {billing.sameAsDelivery ? (
                 <p className="b-caption b-co-address-preview">
-                  {billingLines(
-                    billing,
-                    delivery as Delivery,
-                    customer.name ?? "",
-                  )
-                    .filter(Boolean)
-                    .join(", ")}
+                  <CustomerCopy>
+                    {billingLines(
+                      billing,
+                      delivery as Delivery,
+                      customer.name ?? "",
+                    )
+                      .filter(Boolean)
+                      .join(", ")}
+                  </CustomerCopy>
                 </p>
               ) : (
                 <fieldset className="b-shop-billing">
-                  <legend className="b-visually-hidden">Billing address</legend>
+                  <legend className="b-visually-hidden">
+                    <CustomerCopy>Billing address</CustomerCopy>
+                  </legend>
                   <label>
-                    Name on billing address
+                    <CustomerCopy>Name on billing address</CustomerCopy>{" "}
                     <Input
                       required
                       maxLength={100}
@@ -1240,7 +1369,7 @@ export function CheckoutPage() {
                     />
                   </label>
                   <label>
-                    Address line 1
+                    <CustomerCopy>Address line 1</CustomerCopy>{" "}
                     <Input
                       required
                       maxLength={200}
@@ -1250,8 +1379,10 @@ export function CheckoutPage() {
                     />
                   </label>
                   <label>
-                    Address line 2{" "}
-                    <span className="b-optional">(optional)</span>
+                    <CustomerCopy>Address line 2</CustomerCopy>{" "}
+                    <span className="b-optional">
+                      <CustomerCopy>(optional)</CustomerCopy>
+                    </span>
                     <Input
                       maxLength={300}
                       autoComplete="billing address-line2"
@@ -1261,7 +1392,7 @@ export function CheckoutPage() {
                   </label>
                   <div className="b-shop-row">
                     <label>
-                      City
+                      <CustomerCopy>City</CustomerCopy>{" "}
                       <Input
                         required
                         maxLength={100}
@@ -1271,7 +1402,10 @@ export function CheckoutPage() {
                       />
                     </label>
                     <label>
-                      Postal code <span className="b-optional">(optional)</span>
+                      <CustomerCopy>Postal code</CustomerCopy>{" "}
+                      <span className="b-optional">
+                        <CustomerCopy>(optional)</CustomerCopy>
+                      </span>
                       <Input
                         maxLength={20}
                         autoComplete="billing postal-code"
@@ -1281,17 +1415,19 @@ export function CheckoutPage() {
                     </label>
                   </div>
                   <label>
-                    Country
+                    <CustomerCopy>Country</CustomerCopy>{" "}
                     <Select
                       required
                       autoComplete="billing country"
                       value={billing.country ?? ""}
                       onChange={(e) => setB("country", e.target.value)}
                     >
-                      <option value="">Choose a country</option>
+                      <option value="">
+                        <CustomerCopy>Choose a country</CustomerCopy>
+                      </option>
                       {COUNTRIES.map((c) => (
                         <option key={c.code} value={c.code}>
-                          {c.name}
+                          <CustomerCopy>{c.name}</CustomerCopy>
                         </option>
                       ))}
                     </Select>
@@ -1299,17 +1435,22 @@ export function CheckoutPage() {
                 </fieldset>
               )}
             </Card>
-            {error && <p role="alert">{error}</p>}
+            {error && (
+              <p role="alert">
+                <CustomerCopy>{error}</CustomerCopy>
+              </p>
+            )}
             <div className="b-shop-actions">
               <Button type="submit" className="b-co-cta">
-                REVIEW ORDER
+                <CustomerCopy>REVIEW ORDER</CustomerCopy>
               </Button>
               <button
                 type="button"
                 className="b-link"
                 onClick={() => setStep(1)}
               >
-                <ArrowLeft aria-hidden /> Back to delivery
+                <ArrowLeft aria-hidden />{" "}
+                <CustomerCopy>Back to delivery</CustomerCopy>
               </button>
             </div>
           </form>
@@ -1419,9 +1560,19 @@ function StateNotice({
         )}
       </span>
       <div>
-        {title && <p className="b-co-state-title">{title}</p>}
-        <p>{message}</p>
-        {detail && <p className="b-co-state-detail">{detail}</p>}
+        {title && (
+          <p className="b-co-state-title">
+            <CustomerCopy>{title}</CustomerCopy>
+          </p>
+        )}
+        <p>
+          <CustomerCopy>{message}</CustomerCopy>
+        </p>
+        {detail && (
+          <p className="b-co-state-detail">
+            <CustomerCopy>{detail}</CustomerCopy>
+          </p>
+        )}
         {children}
       </div>
     </div>
@@ -1566,7 +1717,7 @@ function PaymentStep({
       onClick={onClick}
       aria-label={label}
     >
-      Edit
+      <CustomerCopy>Edit</CustomerCopy>
     </button>
   );
   return (
@@ -1583,47 +1734,61 @@ function PaymentStep({
         <div className="b-co-main">
           <section className="b-co-card b-co-review" aria-label="Order review">
             <div className="b-co-review-row">
-              <h2>Your order</h2>
+              <h2>
+                <CustomerCopy>Your order</CustomerCopy>
+              </h2>
               <ul className="b-co-review-items">
                 {lines.map((l) => {
                   const p = config.products.find((p) => p.id === l.productId);
                   return p ? (
                     <li key={l.productId}>
-                      {p.name} <span className="b-caption">× {l.quantity}</span>
+                      <CustomerCopy>{p.name}</CustomerCopy>{" "}
+                      <span className="b-caption">× {l.quantity}</span>
                     </li>
                   ) : null;
                 })}
               </ul>
             </div>
             <div className="b-co-review-row">
-              <h2>{pickup ? "Pickup" : "Delivery"}</h2>
+              <h2>
+                <CustomerCopy>{pickup ? "Pickup" : "Delivery"}</CustomerCopy>
+              </h2>
               <p>
-                {longDate(delivery.date)} · {delivery.slot}
+                <CustomerCopy>{longDate(delivery.date)}</CustomerCopy> ·{" "}
+                <CustomerCopy>{delivery.slot}</CustomerCopy>
                 <br />
-                {pickup
-                  ? `${business.tradingName} · ${business.address}`
-                  : [
-                      delivery.unit && `Unit ${delivery.unit}`,
-                      delivery.building,
-                      delivery.address,
-                      zone?.name,
-                    ]
-                      .filter(Boolean)
-                      .join(", ")}
+                <CustomerCopy>
+                  {pickup
+                    ? `${business.tradingName} · ${business.address}`
+                    : [
+                        delivery.unit && `Unit ${delivery.unit}`,
+                        delivery.building,
+                        delivery.address,
+                        zone?.name,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
+                </CustomerCopy>
                 {!pickup && delivery.notes && (
                   <>
                     <br />
-                    <span className="b-caption">{delivery.notes}</span>
+                    <span className="b-caption">
+                      <CustomerCopy>{delivery.notes}</CustomerCopy>
+                    </span>
                   </>
                 )}
               </p>
               {edit(backToDelivery, pickup ? "Edit pickup" : "Edit delivery")}
             </div>
             <div className="b-co-review-row">
-              <h2>Contact</h2>
+              <h2>
+                <CustomerCopy>Contact</CustomerCopy>
+              </h2>
               <p>
-                {customer.name} ·{" "}
-                {normalizeUaeMobile(customer.phone) ?? customer.phone}
+                <CustomerCopy>{customer.name}</CustomerCopy> ·{" "}
+                <CustomerCopy>
+                  {normalizeUaeMobile(customer.phone) ?? customer.phone}
+                </CustomerCopy>
                 {customer.email && (
                   <>
                     <br />
@@ -1634,17 +1799,23 @@ function PaymentStep({
               {edit(back, "Edit contact details")}
             </div>
             <div className="b-co-review-row">
-              <h2>Billing address</h2>
+              <h2>
+                <CustomerCopy>Billing address</CustomerCopy>
+              </h2>
               <p>
                 {billing.sameAsDelivery && (
                   <>
-                    <span className="b-caption">Same as delivery address</span>
+                    <span className="b-caption">
+                      <CustomerCopy>Same as delivery address</CustomerCopy>
+                    </span>
                     <br />
                   </>
                 )}
-                {billingLines(billing, delivery, customer.name)
-                  .filter(Boolean)
-                  .join(", ")}
+                <CustomerCopy>
+                  {billingLines(billing, delivery, customer.name)
+                    .filter(Boolean)
+                    .join(", ")}
+                </CustomerCopy>
               </p>
               {edit(back, "Edit billing address")}
             </div>
@@ -1665,15 +1836,19 @@ function PaymentStep({
                 />
               )}
               <a className="b-button b-co-cta" href="/checkout/return">
-                {held.paymentStatus === "paid"
-                  ? "VIEW CONFIRMATION"
-                  : "CHECK PAYMENT STATUS"}
+                <CustomerCopy>
+                  {held.paymentStatus === "paid"
+                    ? "VIEW CONFIRMATION"
+                    : "CHECK PAYMENT STATUS"}
+                </CustomerCopy>
               </a>
             </div>
           ) : total == null ? (
             <p className="b-shop-notice" role="alert">
-              Your order can no longer be delivered as chosen. Please go back
-              and review your delivery area.
+              <CustomerCopy>
+                Your order can no longer be delivered as chosen. Please go back
+                and review your delivery area.
+              </CustomerCopy>
             </p>
           ) : (
             <form
@@ -1682,12 +1857,16 @@ function PaymentStep({
               aria-busy={locked}
             >
               <header>
-                <h2>Payment</h2>
+                <h2>
+                  <CustomerCopy>Payment</CustomerCopy>
+                </h2>
                 <CardMarks />
               </header>
               <p className="b-caption">
-                Continue to Paymennt’s secure payment page to complete your
-                order.
+                <CustomerCopy>
+                  Continue to Paymennt’s secure payment page to complete your
+                  order.
+                </CustomerCopy>
               </p>
               <label className="b-check">
                 <input
@@ -1697,10 +1876,22 @@ function PaymentStep({
                   onChange={(e) => setReviewed(e.target.checked)}
                 />
                 <span>
-                  I've reviewed my order, fulfillment details and total, and I
-                  accept the <a href="/terms">terms</a>,{" "}
-                  <a href="/refund-policy">refund policy</a> and{" "}
-                  <a href="/privacy">privacy policy</a>.
+                  <CustomerCopy>
+                    I've reviewed my order, fulfillment details and total, and I
+                    accept the
+                  </CustomerCopy>{" "}
+                  <a href="/terms">
+                    <CustomerCopy>terms</CustomerCopy>
+                  </a>
+                  ,{" "}
+                  <a href="/refund-policy">
+                    <CustomerCopy>refund policy</CustomerCopy>
+                  </a>{" "}
+                  <CustomerCopy>and</CustomerCopy>{" "}
+                  <a href="/privacy">
+                    <CustomerCopy>privacy policy</CustomerCopy>
+                  </a>
+                  .
                 </span>
               </label>
               {locked && (
@@ -1729,15 +1920,15 @@ function PaymentStep({
                     >
                       {issue === "HELD_FOR_REVIEW" && (
                         <a className="b-link" href="/checkout/return">
-                          Check payment status
+                          <CustomerCopy>Check payment status</CustomerCopy>
                         </a>
                       )}
                     </StateNotice>
                   ) : (
                     <p className="b-co-error">
-                      {error}{" "}
+                      <CustomerCopy>{error}</CustomerCopy>{" "}
                       <a className="b-link" href="/checkout/return">
-                        Check payment status
+                        <CustomerCopy>Check payment status</CustomerCopy>
                       </a>
                     </p>
                   )}
@@ -1751,8 +1942,8 @@ function PaymentStep({
                 >
                   {locked ? (
                     <>
-                      <span className="b-co-spinner" aria-hidden />
-                      PROCESSING…
+                      <span className="b-co-spinner" aria-hidden />{" "}
+                      <CustomerCopy>PROCESSING…</CustomerCopy>
                     </>
                   ) : (
                     `PAY ${formatAed(total)}`
@@ -1760,9 +1951,11 @@ function PaymentStep({
                 </Button>
               )}
               <p className="b-co-assurance">
-                <LockSimple aria-hidden weight="bold" />
-                Your card details are entered on Paymennt and are never seen or
-                stored by 3L.
+                <LockSimple aria-hidden weight="bold" />{" "}
+                <CustomerCopy>
+                  Your card details are entered on Paymennt and are never seen
+                  or stored by 3L.
+                </CustomerCopy>
               </p>
             </form>
           )}
@@ -1849,7 +2042,9 @@ export function CheckoutReturn() {
   return (
     <ShopShell step={3} title={copy.title} bare>
       <div className="b-co-status">
-        <h1>{copy.title}</h1>
+        <h1>
+          <CustomerCopy>{copy.title}</CustomerCopy>
+        </h1>
         <div role="status" aria-live="polite">
           <StateNotice
             state={state ?? (error ? "FAILED" : "PROCESSING")}
@@ -1860,31 +2055,43 @@ export function CheckoutReturn() {
         {result && (
           <dl className="b-shop-receipt">
             <div>
-              <dt>Order number</dt>
-              <dd>{result.orderId}</dd>
+              <dt>
+                <CustomerCopy>Order number</CustomerCopy>
+              </dt>
+              <dd>
+                <CustomerCopy>{result.orderId}</CustomerCopy>
+              </dd>
             </div>
             <div>
-              <dt>Amount</dt>
-              <dd>{formatAed(result.amountFils)}</dd>
+              <dt>
+                <CustomerCopy>Amount</CustomerCopy>
+              </dt>
+              <dd>
+                <CustomerCopy>{formatAed(result.amountFils)}</CustomerCopy>
+              </dd>
             </div>
           </dl>
         )}
-        {error && <p role="alert">{error}</p>}
+        {error && (
+          <p role="alert">
+            <CustomerCopy>{error}</CustomerCopy>
+          </p>
+        )}
         <div className="b-shop-actions">
           {(state === "3DS_REDIRECT" || state === "HOSTED_REDIRECT") &&
             result?.url && (
               <a className="b-button b-co-cta" href={result.url}>
-                CONTINUE PAYMENT
+                <CustomerCopy>CONTINUE PAYMENT</CustomerCopy>
               </a>
             )}
           {(state === "DECLINED" || state === "FAILED") && (
             <a className="b-button b-co-cta" href="/checkout">
-              TRY AGAIN
+              <CustomerCopy>TRY AGAIN</CustomerCopy>
             </a>
           )}
           {state === "READY" && (
             <a className="b-button b-co-cta" href="/checkout">
-              RETURN TO CHECKOUT
+              <CustomerCopy>RETURN TO CHECKOUT</CustomerCopy>
             </a>
           )}
           {(state === "PROCESSING" ||
@@ -1894,7 +2101,7 @@ export function CheckoutReturn() {
               className="b-co-cta"
               onClick={() => setRevision((n) => n + 1)}
             >
-              CHECK AGAIN
+              <CustomerCopy>CHECK AGAIN</CustomerCopy>
             </Button>
           )}
           <SupportLink orderId={result?.orderId} />
@@ -1916,7 +2123,7 @@ function SupportLink({ orderId }: { orderId?: string }) {
           : "Hello 3L, I have a question about my order."
       }
     >
-      Contact Pastelerías 3L
+      <CustomerCopy>Contact Pastelerías 3L</CustomerCopy>
     </WhatsAppCTA>
   );
 }
@@ -1939,19 +2146,28 @@ function Confirmation({ result }: { result: Status }) {
             <Check weight="bold" />
           </span>
           <h1 ref={heading} tabIndex={-1}>
-            Thank you{name ? `, ${name}` : ""}
+            <CustomerCopy>Thank you</CustomerCopy>
+            <CustomerCopy>{name ? `, ${name}` : ""}</CustomerCopy>
           </h1>
           <p className="b-co-confirm-lede" role="status">
-            Your order is confirmed
+            <CustomerCopy>Your order is confirmed</CustomerCopy>
           </p>
           <dl className="b-co-confirm-keys">
             <div>
-              <dt>Order</dt>
-              <dd>{result.orderId}</dd>
+              <dt>
+                <CustomerCopy>Order</CustomerCopy>
+              </dt>
+              <dd>
+                <CustomerCopy>{result.orderId}</CustomerCopy>
+              </dd>
             </div>
             <div>
-              <dt>Paid</dt>
-              <dd>{formatAed(result.amountFils)}</dd>
+              <dt>
+                <CustomerCopy>Paid</CustomerCopy>
+              </dt>
+              <dd>
+                <CustomerCopy>{formatAed(result.amountFils)}</CustomerCopy>
+              </dd>
             </div>
           </dl>
         </header>
@@ -1960,7 +2176,9 @@ function Confirmation({ result }: { result: Status }) {
           {s && (
             <section className="b-co-card" aria-labelledby="b-conf-order">
               <header>
-                <h2 id="b-conf-order">Order</h2>
+                <h2 id="b-conf-order">
+                  <CustomerCopy>Order</CustomerCopy>
+                </h2>
               </header>
               <ul className="b-co-summary-items">
                 {s.items.map((i) => (
@@ -1972,10 +2190,16 @@ function Confirmation({ result }: { result: Status }) {
                       </span>
                     </span>
                     <span>
-                      <strong>{i.name}</strong>
-                      <span className="b-caption">Quantity {i.quantity}</span>
+                      <strong>
+                        <CustomerCopy>{i.name}</CustomerCopy>
+                      </strong>
+                      <span className="b-caption">
+                        <CustomerCopy>Quantity</CustomerCopy> {i.quantity}
+                      </span>
                     </span>
-                    <span className="b-co-money">{formatAed(i.lineFils)}</span>
+                    <span className="b-co-money">
+                      <CustomerCopy>{formatAed(i.lineFils)}</CustomerCopy>
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -1989,78 +2213,118 @@ function Confirmation({ result }: { result: Status }) {
           )}
           {s?.pickup && (
             <section className="b-co-card">
-              <h2>Pickup</h2>
+              <h2>
+                <CustomerCopy>Pickup</CustomerCopy>
+              </h2>
               <p>
-                {business.tradingName}
+                <CustomerCopy>{business.tradingName}</CustomerCopy>
                 <br />
                 {business.address}
               </p>
               <p>
-                {longDate(s.pickup.pickupDate)} · {s.pickup.preferredTime}
+                <CustomerCopy>{longDate(s.pickup.pickupDate)}</CustomerCopy> ·{" "}
+                <CustomerCopy>{s.pickup.preferredTime}</CustomerCopy>
               </p>
               <p>
-                Your order will be ready for pickup at the selected date and
-                time.
+                <CustomerCopy>
+                  Your order will be ready for pickup at the selected date and
+                  time.
+                </CustomerCopy>
               </p>
             </section>
           )}
           {s?.delivery && (
             <section className="b-co-card" aria-labelledby="b-conf-delivery">
               <header>
-                <h2 id="b-conf-delivery">Delivery</h2>
+                <h2 id="b-conf-delivery">
+                  <CustomerCopy>Delivery</CustomerCopy>
+                </h2>
               </header>
               <dl className="b-shop-receipt b-co-facts">
                 {s.delivery.zoneName && (
                   <div>
-                    <dt>Zone</dt>
-                    <dd>{s.delivery.zoneName}</dd>
+                    <dt>
+                      <CustomerCopy>Zone</CustomerCopy>
+                    </dt>
+                    <dd>
+                      <CustomerCopy>{s.delivery.zoneName}</CustomerCopy>
+                    </dd>
                   </div>
                 )}
                 <div>
-                  <dt>Address</dt>
+                  <dt>
+                    <CustomerCopy>Address</CustomerCopy>
+                  </dt>
                   <dd>
-                    {[
-                      s.delivery.unit && `Unit ${s.delivery.unit}`,
-                      s.delivery.building,
-                      s.delivery.address,
-                    ]
-                      .filter(Boolean)
-                      .join(", ")}
+                    <CustomerCopy>
+                      {[
+                        s.delivery.unit && `Unit ${s.delivery.unit}`,
+                        s.delivery.building,
+                        s.delivery.address,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </CustomerCopy>
                   </dd>
                 </div>
                 <div>
-                  <dt>Date</dt>
-                  <dd>{longDate(s.delivery.date)}</dd>
+                  <dt>
+                    <CustomerCopy>Date</CustomerCopy>
+                  </dt>
+                  <dd>
+                    <CustomerCopy>{longDate(s.delivery.date)}</CustomerCopy>
+                  </dd>
                 </div>
                 <div>
-                  <dt>Preferred time</dt>
-                  <dd>{s.delivery.slot}</dd>
+                  <dt>
+                    <CustomerCopy>Preferred time</CustomerCopy>
+                  </dt>
+                  <dd>
+                    <CustomerCopy>{s.delivery.slot}</CustomerCopy>
+                  </dd>
                 </div>
               </dl>
             </section>
           )}
           <section className="b-co-card" aria-labelledby="b-conf-payment">
             <header>
-              <h2 id="b-conf-payment">Payment</h2>
+              <h2 id="b-conf-payment">
+                <CustomerCopy>Payment</CustomerCopy>
+              </h2>
             </header>
             <dl className="b-shop-receipt b-co-facts">
               <div>
-                <dt>Status</dt>
+                <dt>
+                  <CustomerCopy>Status</CustomerCopy>
+                </dt>
                 <dd className="b-co-paid">
-                  Paid <Check aria-label="confirmed" weight="bold" />
+                  <CustomerCopy>Paid</CustomerCopy>{" "}
+                  <Check aria-label="confirmed" weight="bold" />
                 </dd>
               </div>
               <div>
-                <dt>Amount</dt>
-                <dd>{formatAed(result.amountFils)}</dd>
+                <dt>
+                  <CustomerCopy>Amount</CustomerCopy>
+                </dt>
+                <dd>
+                  <CustomerCopy>{formatAed(result.amountFils)}</CustomerCopy>
+                </dd>
               </div>
               <div>
-                <dt>Method</dt>
-                <dd>Card</dd>
+                <dt>
+                  <CustomerCopy>Method</CustomerCopy>
+                </dt>
+                <dd>
+                  <CustomerCopy>Card</CustomerCopy>
+                </dd>
               </div>
               <div>
-                <dt>Reference</dt>
-                <dd>{result.orderId}</dd>
+                <dt>
+                  <CustomerCopy>Reference</CustomerCopy>
+                </dt>
+                <dd>
+                  <CustomerCopy>{result.orderId}</CustomerCopy>
+                </dd>
               </div>
             </dl>
           </section>
@@ -2069,7 +2333,9 @@ function Confirmation({ result }: { result: Status }) {
             aria-labelledby="b-conf-next"
           >
             <header>
-              <h2 id="b-conf-next">What happens next</h2>
+              <h2 id="b-conf-next">
+                <CustomerCopy>What happens next</CustomerCopy>
+              </h2>
             </header>
             <ol className="b-co-timeline">
               {(s?.fulfillmentMethod === "pickup"
@@ -2086,20 +2352,22 @@ function Confirmation({ result }: { result: Status }) {
                   <span className="b-co-dot" aria-hidden>
                     {i <= progress ? <Check weight="bold" /> : i + 1}
                   </span>
-                  {label}
+                  <CustomerCopy>{label}</CustomerCopy>
                 </li>
               ))}
             </ol>
             <p className="b-caption">
-              You don't need to message us — our team is preparing your order
-              and will contact you if anything about the fulfillment needs
-              confirming.
+              <CustomerCopy>
+                You don't need to message us — our team is preparing your order
+                and will contact you if anything about the fulfillment needs
+                confirming.
+              </CustomerCopy>
             </p>
           </section>
         </div>
         <div className="b-shop-actions b-co-confirm-actions">
           <a className="b-button b-co-cta" href="/">
-            BACK TO 3L
+            <CustomerCopy>BACK TO 3L</CustomerCopy>
           </a>
           <SupportLink orderId={result.orderId} />
         </div>

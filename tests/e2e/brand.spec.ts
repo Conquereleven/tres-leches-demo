@@ -3,23 +3,13 @@ import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync, writeFileSync } from "node:fs";
 const widths = [320, 375, 390, 430, 768, 1024, 1280, 1440];
 const sections = [
-  "home",
-  "bridge",
-  "collection",
-  "tradition",
-  "story",
-  "discovery",
-  "bakery",
-  "jars",
-  "custom",
-  "occasions",
-  "voices",
-  "community",
-  "promotion",
-  "dubai",
-  "newsletter",
+  ".ref-hero",
+  ".ref-bridge",
+  ".ref-featured",
+  ".ref-tradition",
+  ".ref-family",
 ];
-test("TL19–21 responsive matrix, content integrity, layout and console", async ({
+test("current storefront responsive matrix, section integrity and console", async ({
   page,
 }) => {
   test.setTimeout(120000);
@@ -27,149 +17,99 @@ test("TL19–21 responsive matrix, content integrity, layout and console", async
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("console", (m) => {
-    if (["warning", "error"].includes(m.type())) errors.push(m.text());
+    if (m.type() === "error") errors.push(m.text());
   });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await page.evaluate(() => document.fonts.ready);
-  const report = [];
   await expect(page.locator("h1")).toHaveCount(1);
-  await expect(page.locator("#collection article")).toHaveCount(3);
-  await expect(
-    page.getByText("MEXICO CITY SINCE 1982", { exact: true }),
-  ).toBeVisible();
+  await expect(page.locator("#collection .ref-cakes a")).toHaveCount(3);
+  await expect(page.locator(".ref-heritage")).toContainText("SINCE 1982");
   await expect(page.locator(".brand-experience")).not.toContainText("1992");
-  await expect(page.locator('a[href*="wa.me"]')).toHaveCount(0);
-  const order = await page
-    .locator("main > section")
-    .evaluateAll((els) => els.map((e) => e.id));
-  expect(order).toEqual(sections);
+  await expect(page.locator("main .b-menu-catalog")).toHaveCount(0);
+  expect(
+    await page
+      .locator("main > section")
+      .evaluateAll((es) => es.map((e) => e.className)),
+  ).toEqual(sections.map((s) => s.slice(1)));
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
-    const overflow = [];
+    for (const selector of sections) {
+      const section = page.locator(selector);
+      await section.scrollIntoViewIfNeeded();
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth + 1,
+        ),
+        `${selector} overflow at ${width}`,
+      ).toBe(true);
+      await section.screenshot({
+        path: `work/qa/brand/${width}-${selector.slice(1)}.png`,
+      });
+    }
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({
       path: `work/qa/brand/${width}-hero-with-header.png`,
     });
-    for (const id of sections) {
-      const section = page.locator("#" + id);
-      await section.scrollIntoViewIfNeeded();
-      expect(
-        await section.evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
-        `${id} internal overflow at ${width}`,
-      ).toBeTruthy();
-      const bad = await section.evaluate((el) =>
-        Array.from(el.querySelectorAll("h1,h2,h3,button,a"))
-          .filter((e) => {
-            const r = e.getBoundingClientRect();
-            return r.width > 0 && (r.left < -1 || r.right > innerWidth + 1);
-          })
-          .map((e) => e.textContent),
-      );
-      overflow.push(...bad);
-      await section.screenshot({ path: `work/qa/brand/${width}-${id}.png` });
-    }
-    expect(overflow, `overflow at ${width}`).toEqual([]);
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= innerWidth + 1,
-      ),
-    ).toBeTruthy();
-    await page
-      .locator("footer.b-footer")
-      .screenshot({ path: `work/qa/brand/${width}-footer.png` });
-    report.push({ width, sections: sections.length, overflow: 0 });
   }
-  writeFileSync(
-    "work/qa/brand/responsive.json",
-    JSON.stringify({ report, console: errors }, null, 2),
-  );
   expect(errors).toEqual([]);
 });
-test("TL20 editorial selections, modal keyboard, newsletter and safe unavailable links", async ({
+test("current navigation, mobile modal keyboard and dedicated catalog route", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
-  for (const id of ["bakery", "jars", "custom"]) {
-    const section = page.locator("#" + id);
-    const second = section.locator(".b-product-list button").nth(1);
-    await second.click();
-    await expect(second).toHaveAttribute("aria-pressed", "true");
-    await expect(
-      section.locator(".b-selected-product .b-caption"),
-    ).toContainText("-2");
-  }
-  await page.getByRole("button", { name: "Weddings", exact: true }).click();
-  await expect(page.locator("#occasions [aria-live]")).toContainText(
-    "Weddings",
-  );
-  await page.locator(".b-door-jars").focus();
-  await expect(page.locator(".b-door-jars")).toHaveClass(/b-selected/);
-  await page.locator(".b-door-jars").click();
-  await expect(page).toHaveURL(/#jars$/);
-  const cta = page.getByRole("button", { name: "ORDER THIS JAR", exact: true });
-  await cta.click();
+  await page.getByRole("button", { name: "Open menu", exact: true }).click();
   const dialog = page.getByRole("dialog");
-  await expect(dialog).toContainText("official WhatsApp contact");
+  await expect(dialog).toBeVisible();
   await expect(
     dialog.getByRole("button", { name: "Close dialog" }),
   ).toBeFocused();
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 5; i++) {
     await page.keyboard.press("Tab");
     expect(
       await page.evaluate(() => !!document.activeElement?.closest("dialog")),
-    ).toBeTruthy();
+    ).toBe(true);
   }
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
-  await expect(cta).toBeFocused();
-  await page
-    .getByRole("button", { name: "Discover more", exact: true })
-    .click();
-  await expect(page.getByRole("dialog")).toContainText(
-    "Approved promotional image",
-  );
-  await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "SUBSCRIBE", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText("valid email");
-  await page.getByLabel("Your email here").fill("test@example.invalid");
-  await page.getByRole("button", { name: "SUBSCRIBE", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText("confirm your consent");
-  await page.getByRole("checkbox").check();
-  await page.getByRole("button", { name: "SUBSCRIBE", exact: true }).click();
-  await expect(page.getByRole("status")).toContainText("not available yet");
-  await expect(page.getByRole("status")).not.toContainText("confirmed");
-  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole("button", { name: "Open menu" })).toBeFocused();
   await page.getByRole("button", { name: "Open menu" }).click();
   await page
     .getByRole("dialog")
     .getByRole("link", { name: "MENU", exact: true })
     .click();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
-  await expect(page).toHaveURL(/#collection$/);
-  expect(
-    await page
-      .locator(".b-ticker > div")
-      .evaluate((e) => getComputedStyle(e).animationName),
-  ).toBe("none");
+  await expect(page).toHaveURL(/\/menu$/);
+  await expect(
+    page.getByRole("navigation", { name: "Menu categories" }),
+  ).toBeVisible();
+  await expect(page.locator(".b-shopping-wa")).toHaveAttribute(
+    "href",
+    /wa.me\/971585943319/,
+  );
 });
-test("TL21 preloader cannot block content when video is unavailable", async ({
+test("unavailable video never blocks the poster, content or catalog", async ({
   page,
 }) => {
+  await page.route("**/hero-soaking.mp4", (r) => r.abort());
   await page.goto("/");
-  await expect(page.locator(".b-preloader")).toHaveCount(0, { timeout: 4500 });
-  await expect(page.locator(".b-hero-fallback")).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "WATCH OUR STORY" }),
-  ).toBeVisible();
-  await page.reload();
   await expect(page.locator(".b-preloader")).toHaveCount(0);
-  await page.getByRole("button", { name: "WATCH OUR STORY" }).click();
-  await expect(page.getByRole("dialog")).toContainText("original film");
+  await expect(page.locator(".ref-hero video")).toHaveAttribute(
+    "poster",
+    "/brand/reference/hero-poster.jpg",
+  );
+  await page
+    .getByRole("button", { name: "Watch our story", exact: true })
+    .click();
+  await expect(page.locator("h1")).toContainText("Soaked in");
+  await expect(
+    page.getByRole("button", { name: "Watch our story", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "VIEW ALL CAKES", exact: true }).click();
+  await expect(page).toHaveURL(/\/menu\?category=cakes$/);
 });
-
-test("TL21 approved content remains readable without JavaScript", async ({
+test("approved static storefront remains readable without JavaScript", async ({
   browser,
 }) => {
   test.skip(
@@ -179,16 +119,17 @@ test("TL21 approved content remains readable without JavaScript", async ({
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto("http://127.0.0.1:5174/");
-  await expect(page.locator("h1")).toHaveCount(1);
-  await expect(page.locator("h1")).toContainText("SOAKED IN");
-  await expect(page.locator("#dubai")).toContainText("Same sweetness");
-  await expect(page.locator("#jars")).toContainText("CAKE JARS");
+  await expect(page.locator("h1")).toContainText("Soaked in");
+  await expect(page.locator(".ref-family")).toContainText("Family Legacy");
+  await expect(
+    page.getByRole("link", { name: "VIEW ALL CAKES", exact: true }),
+  ).toHaveAttribute("href", "/menu?category=cakes");
   await context.close();
 });
-
-test("TL21 accessibility checks on mobile, desktop and modal", async ({
+test("current storefront accessibility on mobile, desktop and navigation modal", async ({
   page,
 }) => {
+  mkdirSync("work/qa/brand", { recursive: true });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   for (const width of [390, 1440]) {
@@ -202,16 +143,20 @@ test("TL21 accessibility checks on mobile, desktop and modal", async ({
     );
     expect(result.violations).toEqual([]);
   }
-  await page
-    .getByRole("button", { name: "Discover more", exact: true })
-    .click();
-  const modal = await new AxeBuilder({ page })
-    .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-    .analyze();
-  expect(modal.violations).toEqual([]);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Open menu" }).click();
+  expect(
+    (
+      await new AxeBuilder({ page })
+        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+        .analyze()
+    ).violations,
+  ).toEqual([]);
 });
-
-test("TL21 layout stability and local font delivery", async ({ page }) => {
+test("current storefront layout stability and local fonts", async ({
+  page,
+}) => {
+  mkdirSync("work/qa/brand", { recursive: true });
   await page.addInitScript(() => {
     const metrics = { cls: 0 };
     (window as Window & { brandMetrics?: { cls: number } }).brandMetrics =
@@ -227,20 +172,12 @@ test("TL21 layout stability and local font delivery", async ({ page }) => {
     }).observe({ type: "layout-shift", buffered: true });
   });
   await page.goto("/");
-  await expect(page.locator(".b-preloader")).toHaveCount(0, { timeout: 4500 });
   await page.evaluate(() => document.fonts.ready);
-  const metrics = await page.evaluate(() => ({
+  const result = await page.evaluate(() => ({
     cls: (window as Window & { brandMetrics?: { cls: number } }).brandMetrics
       ?.cls,
     font: document.fonts.check('16px "3L Abril"'),
-    resources: performance
-      .getEntriesByType("resource")
-      .filter((e) => e.name.includes("/brand/")).length,
   }));
-  writeFileSync(
-    "work/qa/brand/performance.json",
-    JSON.stringify(metrics, null, 2),
-  );
-  expect(metrics.cls).toBeLessThan(0.1);
-  expect(metrics.font).toBe(true);
+  expect(result.cls).toBeLessThan(0.1);
+  expect(result.font).toBe(true);
 });

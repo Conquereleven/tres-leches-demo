@@ -1,3 +1,5 @@
+import { mock } from "node:test";
+import { attachVerifiedAddresses } from "../../server/domain/website-address";
 import { fixtureAddressGeo } from "./website-address";
 // Isolated UAT harness; never imported by the production server.
 import { startServer } from "../../server/http";
@@ -22,7 +24,12 @@ writeFileSync(
   { mode: 0o600 },
 );
 process.env.PAYMENNT_WEBHOOK_SECRET_FILE = secretFile;
-let status = "PENDING";
+if (process.env.FIXTURE_DATE)
+  mock.timers.enable({
+    apis: ["Date"],
+    now: new Date(process.env.FIXTURE_DATE),
+  });
+let status = process.env.FIXTURE_PAYMENT_STATUS ?? "PENDING";
 const checkouts = new Map<string, Record<string, unknown>>();
 process.on("message", (value) => {
   if (
@@ -117,4 +124,31 @@ const provider = new PaymenntProvider(
     });
   },
 );
-await startServer({ initial, payment: provider, geo: fixtureAddressGeo });
+let geo = fixtureAddressGeo;
+if (process.env.COVERAGE_FIXTURE === "approved") {
+  // Disposable test-only tariff rectangle. No production rate/boundary data is changed.
+  initial.zones.find((z) => z.id === "jlt-cluster-c")!.polygon = [
+    { lat: 24.8, lng: 55 },
+    { lat: 24.8, lng: 55.7 },
+    { lat: 25.6, lng: 55.7 },
+    { lat: 25.6, lng: 55 },
+  ];
+  const registry = join(dirname(process.env.DB_PATH!), "addresses.json");
+  writeFileSync(
+    registry,
+    JSON.stringify([
+      {
+        address: "Approved coverage fixture",
+        building: "Fixture Tower",
+        location: { lat: 25.1, lng: 55.25 },
+      },
+      {
+        address: "Outside coverage fixture",
+        building: "Fixture Tower",
+        location: { lat: 25.45, lng: 55.4 },
+      },
+    ]),
+  );
+  geo = attachVerifiedAddresses({ resolve: () => null }, registry);
+}
+await startServer({ initial, payment: provider, geo });

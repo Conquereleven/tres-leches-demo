@@ -1967,7 +1967,7 @@
       "id": "pan-de-muerto-filled-pistachio-mini",
       "name": "Pan de Muerto relleno · Pistachio · Mini",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto relleno · Chocolate · Mini",
+      "description": "Pan de Muerto relleno · Pistachio · Mini",
       "priceAed": "18.00",
       "active": true,
       "availability": "available"
@@ -1976,7 +1976,7 @@
       "id": "pan-de-muerto-filled-pistachio-individual",
       "name": "Pan de Muerto relleno · Pistachio · Individual",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto relleno · Chocolate · Individual",
+      "description": "Pan de Muerto relleno · Pistachio · Individual",
       "priceAed": "21.00",
       "active": true,
       "availability": "available"
@@ -1985,7 +1985,7 @@
       "id": "pan-de-muerto-traditional-azucar-mini-40-g-chocolate-covering",
       "name": "Pan de Muerto tradicional · Azúcar · Chocolate covering · Mini · 40 g",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto tradicional · Azúcar · Mini · 40 g",
+      "description": "Pan de Muerto tradicional · Azúcar · Chocolate covering · Mini · 40 g",
       "priceAed": "11.00",
       "active": true,
       "availability": "available"
@@ -1994,7 +1994,7 @@
       "id": "pan-de-muerto-traditional-azucar-individual-70-g-chocolate-covering",
       "name": "Pan de Muerto tradicional · Azúcar · Chocolate covering · Individual · 70 g",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto tradicional · Azúcar · Individual · 70 g",
+      "description": "Pan de Muerto tradicional · Azúcar · Chocolate covering · Individual · 70 g",
       "priceAed": "13.00",
       "active": true,
       "availability": "available"
@@ -2003,7 +2003,7 @@
       "id": "pan-de-muerto-traditional-ajonjoli-mini-40-g-chocolate-covering",
       "name": "Pan de Muerto tradicional · Ajonjolí · Chocolate covering · Mini · 40 g",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto tradicional · Ajonjolí · Mini · 40 g",
+      "description": "Pan de Muerto tradicional · Ajonjolí · Chocolate covering · Mini · 40 g",
       "priceAed": "11.00",
       "active": true,
       "availability": "available"
@@ -2012,7 +2012,7 @@
       "id": "pan-de-muerto-traditional-ajonjoli-individual-70-g-chocolate-covering",
       "name": "Pan de Muerto tradicional · Ajonjolí · Chocolate covering · Individual · 70 g",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto tradicional · Ajonjolí · Individual · 70 g",
+      "description": "Pan de Muerto tradicional · Ajonjolí · Chocolate covering · Individual · 70 g",
       "priceAed": "13.00",
       "active": true,
       "availability": "available"
@@ -2021,7 +2021,7 @@
       "id": "pan-de-muerto-filled-crema-diplomatica-vainilla-mini-chocolate-covering",
       "name": "Pan de Muerto relleno · Crema diplomática (vainilla) · Chocolate covering · Mini",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto relleno · Crema diplomática (vainilla) · Mini",
+      "description": "Pan de Muerto relleno · Crema diplomática (vainilla) · Chocolate covering · Mini",
       "priceAed": "18.00",
       "active": true,
       "availability": "available"
@@ -2030,7 +2030,7 @@
       "id": "pan-de-muerto-filled-crema-diplomatica-vainilla-individual-chocolate-covering",
       "name": "Pan de Muerto relleno · Crema diplomática (vainilla) · Chocolate covering · Individual",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto relleno · Crema diplomática (vainilla) · Individual",
+      "description": "Pan de Muerto relleno · Crema diplomática (vainilla) · Chocolate covering · Individual",
       "priceAed": "21.00",
       "active": true,
       "availability": "available"
@@ -2039,7 +2039,7 @@
       "id": "pan-de-muerto-filled-chocolate-mini-chocolate-covering",
       "name": "Pan de Muerto relleno · Chocolate · Chocolate covering · Mini",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto relleno · Chocolate · Mini",
+      "description": "Pan de Muerto relleno · Chocolate · Chocolate covering · Mini",
       "priceAed": "18.00",
       "active": true,
       "availability": "available"
@@ -2048,7 +2048,7 @@
       "id": "pan-de-muerto-filled-chocolate-individual-chocolate-covering",
       "name": "Pan de Muerto relleno · Chocolate · Chocolate covering · Individual",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto relleno · Chocolate · Individual",
+      "description": "Pan de Muerto relleno · Chocolate · Chocolate covering · Individual",
       "priceAed": "21.00",
       "active": true,
       "availability": "available"
@@ -2057,7 +2057,7 @@
       "id": "pan-de-muerto-filled-mascarpone-y-cajeta-mini-chocolate-covering",
       "name": "Pan de Muerto relleno · Mascarpone y cajeta · Chocolate covering · Mini",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto relleno · Mascarpone y cajeta · Mini",
+      "description": "Pan de Muerto relleno · Mascarpone y cajeta · Chocolate covering · Mini",
       "priceAed": "18.00",
       "active": true,
       "availability": "available"
@@ -2066,7 +2066,7 @@
       "id": "pan-de-muerto-filled-mascarpone-y-cajeta-individual-chocolate-covering",
       "name": "Pan de Muerto relleno · Mascarpone y cajeta · Chocolate covering · Individual",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto relleno · Mascarpone y cajeta · Individual",
+      "description": "Pan de Muerto relleno · Mascarpone y cajeta · Chocolate covering · Individual",
       "priceAed": "21.00",
       "active": true,
       "availability": "available"
@@ -2075,7 +2075,7 @@
       "id": "pan-de-muerto-filled-mascarpone-y-fresas-mini-chocolate-covering",
       "name": "Pan de Muerto relleno · Mascarpone y fresas · Chocolate covering · Mini",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto relleno · Mascarpone y fresas · Mini",
+      "description": "Pan de Muerto relleno · Mascarpone y fresas · Chocolate covering · Mini",
       "priceAed": "18.00",
       "active": true,
       "availability": "available"
@@ -2084,7 +2084,7 @@
       "id": "pan-de-muerto-filled-mascarpone-y-fresas-individual-chocolate-covering",
       "name": "Pan de Muerto relleno · Mascarpone y fresas · Chocolate covering · Individual",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto relleno · Mascarpone y fresas · Individual",
+      "description": "Pan de Muerto relleno · Mascarpone y fresas · Chocolate covering · Individual",
       "priceAed": "21.00",
       "active": true,
       "availability": "available"
@@ -2093,7 +2093,7 @@
       "id": "pan-de-muerto-filled-pistachio-mini-chocolate-covering",
       "name": "Pan de Muerto relleno · Pistachio · Chocolate covering · Mini",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto relleno · Chocolate · Mini",
+      "description": "Pan de Muerto relleno · Pistachio · Chocolate covering · Mini",
       "priceAed": "18.00",
       "active": true,
       "availability": "available"
@@ -2102,7 +2102,7 @@
       "id": "pan-de-muerto-filled-pistachio-individual-chocolate-covering",
       "name": "Pan de Muerto relleno · Pistachio · Chocolate covering · Individual",
       "category": "Pan de Muerto",
-      "description": "Pan de Muerto relleno · Chocolate · Individual",
+      "description": "Pan de Muerto relleno · Pistachio · Chocolate covering · Individual",
       "priceAed": "21.00",
       "active": true,
       "availability": "available"
