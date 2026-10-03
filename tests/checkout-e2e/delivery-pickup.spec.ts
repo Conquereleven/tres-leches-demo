@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 const tomorrow = () =>
-  new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  new Date(Date.now() + 172800000).toISOString().slice(0, 10);
 for (const width of [390, 1440]) {
   test(`delivery and pickup ${width}px: all zones, minima, separate billing and accurate totals`, async ({
     page,
@@ -53,7 +53,9 @@ for (const width of [390, 1440]) {
       page.locator("main").getByText(/Golositalia JLT/),
     ).toBeVisible();
     await page.getByLabel("Pickup date").fill(tomorrow());
-    await page.getByLabel("Preferred pickup time").fill("Afternoon");
+    await page
+      .getByRole("combobox", { name: "Pickup time", exact: true })
+      .selectOption("4:00 PM – 9:00 PM");
     await expect(
       page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
     ).toBeEnabled();

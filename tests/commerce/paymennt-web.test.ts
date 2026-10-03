@@ -1,3 +1,4 @@
+import { fixtureAddressGeo } from "../fixtures/website-address";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
@@ -17,15 +18,15 @@ import {
   readWebCheckoutStatus,
 } from "../../server/domain/web-checkout";
 import { reconcileEmbeddedPayment } from "../../server/domain/embedded-checkout";
-const sku = "pan-de-muerto-traditional-azucar-mini-40-g";
+const sku = "conchas-traditional-vainilla-mini-40-g";
 const input = {
   lines: [{ productId: sku, quantity: 6 }],
   delivery: {
     zoneId: "jlt-cluster-c",
     address: "UAT address only",
     building: "UAT Tower",
-    date: addDays(dubaiToday(), 1),
-    slot: "Afternoon",
+    date: addDays(dubaiToday(), 2),
+    slot: "4:00 PM – 9:00 PM",
   },
   customer: {
     name: "UAT Reviewer",
@@ -120,6 +121,7 @@ function fixture(
     store,
     new DisabledWhatsAppProvider(),
     provider,
+    fixtureAddressGeo,
   );
   return {
     store,
@@ -305,8 +307,8 @@ test("pickup hosted checkout: no zone/minimum/shipping address; server pricing a
     fulfillmentMethod: "pickup",
     lines: [{ productId: sku, quantity: 1 }],
     pickup: {
-      pickupDate: addDays(dubaiToday(), 1),
-      preferredTime: "Afternoon",
+      pickupDate: addDays(dubaiToday(), 2),
+      preferredTime: "4:00 PM – 9:00 PM",
     },
     customer: input.customer,
     billing: {

@@ -6,7 +6,7 @@ export function CartLink({ placement }: { placement: "desktop" | "mobile" }) {
   const lines = useCart();
   const { config } = useCheckoutConfig();
   const count = cartCount(lines);
-  if (!config?.enabled || count === 0) return null;
+  if (!config?.catalogAvailable && !config?.enabled) return null;
   return (
     <a
       className={`b-cart-link b-cart-${placement}`}
@@ -14,7 +14,7 @@ export function CartLink({ placement }: { placement: "desktop" | "mobile" }) {
       aria-label={`Cart, ${count} item${count === 1 ? "" : "s"}`}
     >
       <ShoppingBag aria-hidden />
-      <span>{count}</span>
+      <span>CART ({count})</span>
     </a>
   );
 }

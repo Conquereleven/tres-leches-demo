@@ -49,7 +49,7 @@ test.describe("customer payment states", () => {
     await expect(main).toContainText("Afternoon, after 4 pm");
     await expect(
       page.getByRole("link", { name: /Contact Pastelerías 3L/ }),
-    ).toHaveAttribute("href", /wa\.me\/971521683319/);
+    ).toHaveAttribute("href", /wa\.me\/971585943319/);
     expect(await noOverflow(page)).toBe(true);
     await shot(page, "paid-confirmation-390");
     await page.setViewportSize({ width: 1440, height: 1000 });
@@ -126,7 +126,9 @@ test.describe("payment step", () => {
     );
     await page.goto("/");
     await page.evaluate(() => {
-      const date = new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+      const date = new Date(Date.now() + 172_800_000)
+        .toISOString()
+        .slice(0, 10);
       localStorage.setItem(
         "3l-cart",
         JSON.stringify([{ productId: "pan-de-muerto", quantity: 2 }]),
@@ -139,7 +141,7 @@ test.describe("payment step", () => {
             address: "Jumeirah Lakes Towers, Cluster C",
             building: "Fixture Tower",
             date,
-            slot: "Afternoon",
+            slot: "4:00 PM – 9:00 PM",
           },
           customer: {
             name: "Layla Fixture",

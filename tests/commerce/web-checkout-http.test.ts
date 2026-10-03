@@ -195,8 +195,8 @@ test("direct provider rejection returns a structured safe storefront error", asy
             zoneId: "jlt-cluster-c",
             address: "UAT only, JLT Cluster C",
             building: "UAT Tower",
-            date: new Date(Date.now() + 86_400_000).toISOString().slice(0, 10),
-            slot: "Afternoon",
+            date: new Date(Date.now() + 172_800_000).toISOString().slice(0, 10),
+            slot: "4:00 PM – 9:00 PM",
           },
           customer: {
             name: "UAT Reviewer",
@@ -279,8 +279,8 @@ test("web checkout and GET reconciliation work without a browser tokenization ke
           zoneId: "jlt-cluster-c",
           address: "UAT address only",
           building: "UAT Tower",
-          date: new Date(Date.now() + 86400000).toISOString().slice(0, 10),
-          slot: "Afternoon",
+          date: new Date(Date.now() + 172800000).toISOString().slice(0, 10),
+          slot: "4:00 PM – 9:00 PM",
         },
         customer: {
           name: "UAT Reviewer",

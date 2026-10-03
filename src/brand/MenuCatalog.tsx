@@ -1,3 +1,4 @@
+import { availableSku } from "../../shared/commerce-policy";
 import { useId, useState } from "react";
 import { AddToCart } from "./Shop";
 import { useCheckoutConfig } from "./cart";
@@ -14,15 +15,32 @@ export function MenuOptions({ family }: { family: MenuFamily }) {
   const [variant, setVariant] = useState(family.options[0]!.variant);
   const [size, setSize] = useState(family.options[0]!.size);
   const { config, loading, retry } = useCheckoutConfig();
-  const variants = [...new Set(family.options.map((option) => option.variant))];
+  const options = family.options.filter((o) =>
+    availableSku(
+      o.id,
+      config?.serverNow ? new Date(config.serverNow) : new Date(),
+    ),
+  );
+  const variants = [...new Set(options.map((option) => option.variant))];
   const sizes = [
     ...new Set(
-      family.options
+      options
         .filter((option) => option.variant === variant)
         .map((option) => option.size),
     ),
   ];
-  const option = selectMenuOption(family, variant, size);
+  const selectedVariant = variants.includes(variant) ? variant : variants[0];
+  const selected =
+    options.find((o) => o.variant === selectedVariant && o.size === size) ??
+    options.find((o) => o.variant === selectedVariant);
+  if (!selected)
+    return (
+      <p className="b-menu-advance">
+        Individual Pan de Muerto is available October 15–November 15. Half Dozen
+        and Dozen packs remain available year-round.
+      </p>
+    );
+  const option = selectMenuOption(family, selected.variant, selected.size);
   const serverProduct = config?.products.find(
     (product) => product.id === option.id,
   );
@@ -35,11 +53,15 @@ export function MenuOptions({ family }: { family: MenuFamily }) {
             {family.id.includes("filled") ? "Filling" : "Flavour"}
             <select
               id={`${labelId}-variant`}
-              value={variant}
+              value={selected.variant}
               onChange={(event) => setVariant(event.target.value)}
             >
               {variants.map((value) => (
-                <option key={value}>{value}</option>
+                <option key={value} value={value}>
+                  {family.pack && /^(6|12) /.test(value)
+                    ? `${value.startsWith("6 ") ? "Half Dozen" : "Dozen"} · ${value}`
+                    : value}
+                </option>
               ))}
             </select>
           </label>
@@ -49,11 +71,15 @@ export function MenuOptions({ family }: { family: MenuFamily }) {
             {family.pack ? "Pack" : "Size / pack"}
             <select
               id={`${labelId}-size`}
-              value={size}
+              value={selected.size}
               onChange={(event) => setSize(event.target.value)}
             >
               {sizes.map((value) => (
-                <option key={value}>{value}</option>
+                <option key={value} value={value}>
+                  {family.pack && /^(6|12) /.test(value)
+                    ? `${value.startsWith("6 ") ? "Half Dozen" : "Dozen"} · ${value}`
+                    : value}
+                </option>
               ))}
             </select>
           </label>
@@ -97,7 +123,13 @@ export function MenuOptions({ family }: { family: MenuFamily }) {
 }
 
 export function MenuCatalog() {
-  const [category, setCategory] = useState("cakes");
+  const [category, setCategory] = useState(() => {
+    const value =
+      typeof location !== "undefined"
+        ? new URLSearchParams(location.search).get("category")
+        : null;
+    return menuCategories.some((c) => c.id === value) ? value! : "cakes";
+  });
   const current = menuCategories.find((entry) => entry.id === category)!;
   return (
     <section

@@ -1,3 +1,6 @@
+import { validWindow, leadHours } from "../../shared/commerce-policy";
+import { FloatingShopping } from "./SiteChrome";
+import "./storefront.css";
 import { business } from "./business";
 import { menuFamilyForSku } from "./menu";
 /**
@@ -323,6 +326,7 @@ function ShopShell({
         {children}
       </main>
       <SiteFooter onContactUnavailable={toContact} />
+      <FloatingShopping />
     </div>
   );
 }
@@ -504,7 +508,7 @@ function EmptyCart() {
   return (
     <div className="b-shop-panel b-co-empty">
       <p>Your cart is empty.</p>
-      <a className="b-button" href="/#bakery">
+      <a className="b-button" href="/menu">
         BROWSE THE COLLECTION
       </a>
     </div>
@@ -676,10 +680,16 @@ export function CartPage() {
           <div className="b-co-main">
             <CartItems lines={lines} config={config} />
             <div className="b-co-inline-links">
-              <a className="b-link" href="/#bakery">
+              <a className="b-link" href="/menu">
                 <ArrowLeft aria-hidden /> Continue shopping
               </a>
-              <button className="b-link" onClick={() => cart.clear()}>
+              <button
+                className="b-link"
+                onClick={() => {
+                  if (window.confirm("Remove all items from your cart?"))
+                    cart.clear();
+                }}
+              >
                 Clear cart
               </button>
             </div>
@@ -733,6 +743,8 @@ export function CheckoutPage() {
     draft.billing ?? { sameAsDelivery: true },
   );
   const [areaMissing, setAreaMissing] = useState(false);
+  const [addressBusy, setAddressBusy] = useState(false);
+  const [addressNotice, setAddressNotice] = useState("");
   const [quote, setQuote] = useState<Quote | null>(null);
   const [error, setError] = useState("");
   const heading = useRef<HTMLHeadingElement>(null);
@@ -826,8 +838,44 @@ export function CheckoutPage() {
             className="b-shop-form b-co-main"
             onSubmit={(e) => {
               e.preventDefault();
-              if (!quote?.eligible) return;
-              setStep(2);
+              if (!quote?.eligible || addressBusy) return;
+              if (
+                !validWindow(
+                  delivery.date ?? "",
+                  delivery.slot ?? "",
+                  new Date(config.serverNow ?? Date.now()),
+                  leadHours(cartLines.map((l) => l.productId)),
+                )
+              ) {
+                setError(
+                  "Choose a date from tomorrow and a window with enough advance notice.",
+                );
+                return;
+              }
+              if (pickup) {
+                setStep(2);
+                return;
+              }
+              setAddressBusy(true);
+              setError("");
+              void post<{ zoneId: string; name: string; corrected: boolean }>(
+                "/api/checkout/address",
+                {
+                  zoneId: delivery.zoneId,
+                  address: delivery.address,
+                  building: delivery.building,
+                },
+              )
+                .then((result) => {
+                  if (result.corrected) {
+                    setDelivery((d) => ({ ...d, zoneId: result.zoneId }));
+                    setAddressNotice(
+                      `We verified your address in ${result.name} and updated the area. Please review its minimum order.`,
+                    );
+                  } else setStep(2);
+                })
+                .catch((error: Error) => setError(error.message))
+                .finally(() => setAddressBusy(false));
             }}
           >
             <Card
@@ -887,7 +935,7 @@ export function CheckoutPage() {
                       <option value="">Choose your area</option>
                       {config.zones.map((z) => (
                         <option key={z.id} value={z.id}>
-                          {z.name}
+                          {z.name} — Minimum AED {z.minOrderAed}
                           {z.deliveryFeeAed === 0 ? " — free delivery" : ""}
                         </option>
                       ))}
@@ -989,7 +1037,10 @@ export function CheckoutPage() {
                       min={config.dates.min}
                       max={config.dates.max}
                       value={delivery.date ?? ""}
-                      onChange={(e) => set("date", e.target.value)}
+                      onChange={(e) => {
+                        set("date", e.target.value);
+                        set("slot", "");
+                      }}
                     />
                   </label>
                   {config.slots.length ? (
@@ -1002,7 +1053,19 @@ export function CheckoutPage() {
                       >
                         <option value="">Choose a time</option>
                         {config.slots.map((s) => (
-                          <option key={s}>{s}</option>
+                          <option
+                            key={s}
+                            disabled={
+                              !validWindow(
+                                delivery.date ?? "",
+                                s,
+                                new Date(config.serverNow ?? Date.now()),
+                                leadHours(cartLines.map((l) => l.productId)),
+                              )
+                            }
+                          >
+                            {s}
+                          </option>
                         ))}
                       </Select>
                     </label>
@@ -1042,13 +1105,14 @@ export function CheckoutPage() {
               </fieldset>
             </Card>
             {error && <p role="alert">{error}</p>}
+            {addressNotice && <p role="status">{addressNotice}</p>}
             <div className="b-shop-actions">
               <Button
                 type="submit"
                 className="b-co-cta"
                 disabled={!quote?.eligible || (!pickup && areaMissing)}
               >
-                CONTINUE TO DETAILS
+                {addressBusy ? "VERIFYING ADDRESS…" : "CONTINUE TO DETAILS"}
               </Button>
               <a className="b-link" href="/cart">
                 <ArrowLeft aria-hidden /> Back to cart

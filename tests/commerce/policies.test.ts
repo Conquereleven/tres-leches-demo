@@ -184,10 +184,10 @@ test("the cancellation rule is stated consistently and never called a tax", () =
 });
 
 test("the WhatsApp ordering number is configured and every CTA derives from it", () => {
-  assert.equal(business.whatsapp, "+971521683319");
+  assert.equal(business.whatsapp, "+971585943319");
   const url = whatsappUrl(business.whatsapp, "test");
   assert.ok(
-    url?.startsWith("https://wa.me/971521683319?text="),
+    url?.startsWith("https://wa.me/971585943319?text="),
     `bad url: ${url}`,
   );
   assert.ok(!pendingBusinessFacts().includes("business.whatsapp"));
@@ -214,8 +214,8 @@ test("no public hero development placeholder remains", () => {
   assert.doesNotMatch(src, /ORIGINAL ASSET PENDING/);
   assert.doesNotMatch(src, /HERO FILM/);
   // The media slot itself must survive so the approved film can drop in.
-  assert.match(src, /b-hero-media/);
-  assert.match(src, /b-hero-canvas/);
+  assert.match(src, /hero-soaking.mp4/);
+  assert.match(src, /hero-poster.jpg/);
 });
 
 test("the Mastercard mark is the official unmodified Brand Center artwork", () => {

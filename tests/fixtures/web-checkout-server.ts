@@ -1,3 +1,4 @@
+import { fixtureAddressGeo } from "./website-address";
 // Isolated UAT harness; never imported by the production server.
 import { startServer } from "../../server/http";
 import { seed } from "../../server/db/store";
@@ -116,4 +117,4 @@ const provider = new PaymenntProvider(
     });
   },
 );
-await startServer({ initial, payment: provider });
+await startServer({ initial, payment: provider, geo: fixtureAddressGeo });

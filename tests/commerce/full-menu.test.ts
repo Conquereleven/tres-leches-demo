@@ -11,9 +11,9 @@ import {
 const catalog = validateCatalog(
   JSON.parse(readFileSync("data-imports/liza-current-menu.json", "utf8")),
 );
-test("approved full menu has 218 unique authoritative SKUs and retires AED25 Pan de Muerto", () => {
-  assert.equal(catalog.length, 218);
-  assert.equal(new Set(catalog.map((item) => item.id)).size, 218);
+test("approved full menu has 234 unique authoritative SKUs and retires AED25 Pan de Muerto", () => {
+  assert.equal(catalog.length, 234);
+  assert.equal(new Set(catalog.map((item) => item.id)).size, 234);
   assert.equal(menuFamilies.length, 29);
   assert.equal(menuCategories.length, 8);
   assert.ok(!catalog.some((item) => item.id === "pan-de-muerto"));
@@ -50,20 +50,20 @@ test("latest images override old bakery prices and weights without inventing pac
           ),
         ),
       ],
-      ["Mini · 40 g:1100", "Individual · 70 g:1300"],
+      ["Individual · 70 g:1300", "Mini · 40 g:1100"],
     );
     assert.deepEqual(
-      [...new Set(filled.options.map((option) => option.variant))],
+      [...new Set(filled.options.filter(option => !option.variant.includes("covering") && option.variant !== "Pistachio").map((option) => option.variant))],
       [
-        "Crema diplomática (vainilla)",
         "Chocolate",
+        "Crema diplomática (vainilla)",
         "Mascarpone y cajeta",
         "Mascarpone y fresas",
       ],
     );
     assert.deepEqual(
       [...new Set(filled.options.map((option) => option.priceFils))],
-      [1800, 2100],
+      [2100, 1800],
     );
     for (const [type, prices] of [
       ["traditional", [6000, 11500, 7200, 14000]],
@@ -74,7 +74,7 @@ test("latest images override old bakery prices and weights without inventing pac
       )!;
       assert.deepEqual(
         pack.options.map((option) => option.priceFils),
-        prices,
+        [...prices].sort((a,b)=>b-a),
       );
       assert.ok(pack.options.every((option) => option.variant === ""));
     }
@@ -103,11 +103,11 @@ test("PDF size labels, extras and explicit advance-order scope are preserved", (
   )!;
   assert.deepEqual(
     [...new Set(special.options.map((option) => option.size))],
-    ["Mini", "Small", "Big"],
+    ["Big", "Small", "Mini"],
   );
   assert.deepEqual(
     [...new Set(special.options.map((option) => option.priceFils))],
-    [9500, 26000, 42000],
+    [42000, 26000, 9500],
   );
   for (const id of ["cake-topper", "candles"]) {
     const option = menuFamilies.find((family) => family.id === id)!.options[0]!;

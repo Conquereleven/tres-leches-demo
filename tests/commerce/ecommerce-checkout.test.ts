@@ -1,3 +1,4 @@
+import { fixtureAddressGeo } from "../fixtures/website-address";
 /**
  * Website-first ecommerce checkout: cart → delivery → customer → direct
  * payment → ORDER_PAID → operations notification (never sent while outbound
@@ -31,7 +32,7 @@ import {
   type OperationsNotifier,
 } from "../../server/domain/notifications";
 
-const tomorrow = () => addDays(dubaiToday(), 1);
+const tomorrow = () => addDays(dubaiToday(), 2);
 const cart = (quantity = 2, zoneId = "jlt-cluster-c") => ({
   lines: [{ productId: "pan-de-muerto", quantity }],
   delivery: {
@@ -40,7 +41,7 @@ const cart = (quantity = 2, zoneId = "jlt-cluster-c") => ({
     building: "Test Tower",
     unit: "1204",
     date: tomorrow(),
-    slot: "Afternoon",
+    slot: "4:00 PM – 9:00 PM",
     notes: "Call on arrival",
   },
   customer: {
@@ -100,6 +101,7 @@ function fixture(initial = "CAPTURED") {
     store,
     new DisabledWhatsAppProvider(),
     provider,
+    fixtureAddressGeo,
   );
   service.operationsOrigin = "https://3l.example";
   return {
@@ -293,14 +295,11 @@ test("the browser cannot supply a price, amount, fee, currency or status", () =>
   }
 });
 
-test("configured delivery slots are enforced; none are invented", () => {
+test("only approved delivery windows are enforced, obsolete configuration cannot override them", () => {
   const env = { DELIVERY_SLOTS_JSON: JSON.stringify(["10:00–13:00"]) };
-  assert.throws(() => normalizeCheckout(cart(), env), /delivery times/);
-  const c = cart();
-  c.delivery.slot = "10:00–13:00";
-  assert.equal(normalizeCheckout(c, env).delivery?.slot, "10:00–13:00");
-  // With nothing configured, the customer's stated preference is recorded.
-  assert.equal(normalizeCheckout(cart(), {}).delivery?.slot, "Afternoon");
+  const c = cart(); c.delivery.slot = "10:00–13:00";
+  assert.throws(() => normalizeCheckout(c, env), /notice/);
+  assert.equal(normalizeCheckout(cart(), env).delivery?.slot, "4:00 PM – 9:00 PM");
 });
 
 // ── Order creation ───────────────────────────────────────────────────────
@@ -366,7 +365,7 @@ test("CAPTURED confirms the order and queues exactly one alert for the team", as
       "Delivery: AED 0.00",
       "Total paid: AED 50.00",
       tomorrow(),
-      "Afternoon",
+      "4:00 PM – 9:00 PM",
       "Unit 1204, Test Tower, Jumeirah Lakes Towers, Cluster C",
       "Call on arrival",
       "Payment: PAID",

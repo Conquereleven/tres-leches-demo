@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { List } from "@phosphor-icons/react";
-import { approved } from "./content";
+import { List, ShoppingBag, WhatsappLogo } from "@phosphor-icons/react";
+import { approved, destinations, whatsappUrl } from "./content";
 import {
   business,
   legalEntityLabel,
@@ -9,6 +9,8 @@ import {
 } from "./business";
 import { Logo, Modal, SectionLabel, WhatsAppCTA } from "./primitives";
 import { CartLink } from "./CartLink";
+import { cartCount, useCart } from "./cart";
+import { LanguageSwitcher, useLanguage } from "./localization";
 
 /**
  * Card acceptance marks. Locally hosted; no endorsement is implied.
@@ -95,10 +97,10 @@ export function SiteFooter({
         </div>
         <nav aria-label="Collections">
           <a href="/#home">HOME</a>
-          <a href="/#collection">CAKES</a>
-          <a href="/#jars">CAKE JARS</a>
-          <a href="/#bakery">BAKERY</a>
-          <a href="/#occasions">SPECIAL OCCASIONS</a>
+          <a href="/menu">CAKES</a>
+          <a href="/menu?category=jars">CAKE JARS</a>
+          <a href="/menu?category=bakery">BAKERY</a>
+          <a href="/menu?category=seasonal">SPECIAL OCCASIONS</a>
         </nav>
         <nav aria-label="Information">
           <a href="/contact">CONTACT US</a>
@@ -155,17 +157,21 @@ export function SiteFooter({
 
 /** Header for standalone customer pages; mirrors the home header anatomy. */
 export function SiteHeader({
+  home = false,
   onContactUnavailable,
 }: {
+  home?: boolean;
   onContactUnavailable: () => void;
 }) {
   const [menu, setMenu] = useState(false);
+  const { t } = useLanguage();
+  void onContactUnavailable;
   return (
     <>
       <header className="b-header b-scrolled">
         <nav className="b-nav-left" aria-label="Primary">
-          <a href="/#story">OUR STORY</a>
-          <a href="/#collection">MENU</a>
+          <a href="/#story">{t("story").toUpperCase()}</a>
+          <a href="/menu">{t("menu").toUpperCase()}</a>
         </nav>
         <button
           className="b-menu"
@@ -176,24 +182,32 @@ export function SiteHeader({
           <List aria-hidden />
         </button>
         <a href="/" className="b-home" aria-label="3L home">
-          <Logo />
+          {home ? (
+            <img
+              className="b-logo"
+              src="/brand/reference/mark.png"
+              alt="Pastelerías 3L"
+              width="72"
+              height="52"
+            />
+          ) : (
+            <Logo />
+          )}
         </a>
         <nav className="b-nav-right" aria-label="Contact">
-          <a href="/delivery-policy">DELIVERY</a>
-          <a href="/contact">CONTACT</a>
-          <WhatsAppCTA unavailable={onContactUnavailable} />
+          <a href="/#family-story">JOURNAL</a>
+          <a href="/contact">{t("contact").toUpperCase()}</a>
+          <LanguageSwitcher />
           <CartLink placement="desktop" />
         </nav>
         <CartLink placement="mobile" />
-        <WhatsAppCTA className="b-mobile-wa" unavailable={onContactUnavailable}>
-          ORDER
-        </WhatsAppCTA>
       </header>
       {menu && (
         <Modal title="EXPLORE 3L" onClose={() => setMenu(false)}>
           <nav className="b-modal-nav" aria-label="Mobile navigation">
+            <LanguageSwitcher />
             <a href="/">HOME</a>
-            <a href="/#collection">MENU</a>
+            <a href="/menu">{t("menu").toUpperCase()}</a>
             {policyRoutes.map((r) => (
               <a key={r.path} href={r.path}>
                 {r.label.toUpperCase()}
@@ -201,6 +215,40 @@ export function SiteHeader({
             ))}
           </nav>
         </Modal>
+      )}
+    </>
+  );
+}
+
+export function FloatingShopping() {
+  const count = cartCount(useCart());
+  const support = whatsappUrl(
+    destinations.whatsapp,
+    "Hello 3L, I need help with the online store.",
+  );
+  return (
+    <>
+      {support && (
+        <a
+          className="b-shopping-wa"
+          href={support}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="WhatsApp support"
+        >
+          <WhatsappLogo aria-hidden />
+          <span>Need help?</span>
+        </a>
+      )}
+      {count > 0 && (
+        <a
+          className="b-floating-cart"
+          href="/cart"
+          aria-label={`View cart, ${count} items`}
+        >
+          <ShoppingBag aria-hidden />
+          Cart ({count})
+        </a>
       )}
     </>
   );

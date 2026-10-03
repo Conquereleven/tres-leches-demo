@@ -16,7 +16,12 @@ export type MenuFamily = {
   source: string;
   pack: boolean;
 };
-export const menuFamilies: MenuFamily[] = data.families;
+export const menuFamilies: MenuFamily[] = data.families.map((f) => ({
+  ...f,
+  options: [...f.options].sort(
+    (a, b) => b.priceFils - a.priceFils || a.id.localeCompare(b.id),
+  ),
+}));
 export const menuCategories = data.categories;
 export const menuFamilyForSku = (id: string) =>
   menuFamilies.find((family) =>

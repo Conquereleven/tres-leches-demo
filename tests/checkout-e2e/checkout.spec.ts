@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 const ORIGIN = "http://127.0.0.1:3189";
 const tomorrow = () =>
-  new Date(Date.now() + 86_400_000).toISOString().slice(0, 10);
+  new Date(Date.now() + 172_800_000).toISOString().slice(0, 10);
 
 test("cart → delivery → details → review → payment step", async ({
   page,
@@ -45,7 +45,9 @@ test("cart → delivery → details → review → payment step", async ({
     .fill("Jumeirah Lakes Towers, Cluster C");
   await page.getByLabel("Building or villa").fill("UAT Tower");
   await page.getByLabel("Delivery date").fill(tomorrow());
-  await page.getByLabel("Preferred delivery time").fill("Afternoon");
+  await page
+    .getByRole("combobox", { name: "Delivery time", exact: true })
+    .selectOption("4:00 PM – 9:00 PM");
   await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
 
   await page.getByLabel("Full name").fill("UAT reviewer");
@@ -127,7 +129,7 @@ test("confirmation comes from the server, never from the URL", async ({
         address: "Jumeirah Lakes Towers, Cluster C",
         building: "UAT Tower",
         date: tomorrow(),
-        slot: "Afternoon",
+        slot: "4:00 PM – 9:00 PM",
       },
       customer: {
         name: "UAT reviewer",
@@ -174,7 +176,7 @@ test("a paid checkout in this session cannot be paid again", async ({
     address: "Jumeirah Lakes Towers, Cluster C",
     building: "UAT Tower",
     date: tomorrow(),
-    slot: "Afternoon",
+    slot: "4:00 PM – 9:00 PM",
   };
   const customer = {
     name: "UAT reviewer",

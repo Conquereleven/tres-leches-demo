@@ -29,8 +29,8 @@ export function TextLink({
   );
 }
 export function WhatsAppCTA({
-  children = "ORDER ON WHATSAPP",
-  message = "Hello 3L, I’d like to place an order.",
+  children = "WHATSAPP SUPPORT",
+  message = "Hello 3L, I need help with the online store.",
   unavailable,
   className = "",
   ariaLabel,

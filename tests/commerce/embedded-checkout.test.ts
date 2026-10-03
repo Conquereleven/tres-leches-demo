@@ -1,3 +1,4 @@
+import { fixtureAddressGeo } from "../fixtures/website-address";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
@@ -25,8 +26,8 @@ const input = {
     zoneId: "jlt-cluster-c",
     address: "UAT JLT Cluster C",
     building: "UAT Tower",
-    date: addDays(dubaiToday(), 1),
-    slot: "Afternoon",
+    date: addDays(dubaiToday(), 2),
+    slot: "4:00 PM – 9:00 PM",
   },
   customer: {
     name: "UAT Reviewer",
@@ -114,6 +115,7 @@ function fixture(initial = "CAPTURED") {
     store,
     new DisabledWhatsAppProvider(),
     provider,
+    fixtureAddressGeo,
   );
   return {
     store,

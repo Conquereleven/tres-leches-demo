@@ -41,13 +41,13 @@ test("brand content is approved, heritage fixed, no fabricated catalog or testim
   const listed = Object.values(collections)
     .flat()
     .filter((p) => p.name);
-  assert.equal(listed.length, 58);
+  assert.equal(listed.length, 74);
   assert.equal(
     listed[0]!.name,
-    "Pan de Muerto tradicional · Azúcar · Mini · 40 g",
+    "Pan de Muerto tradicional · Ajonjolí · Individual · 70 g",
   );
-  assert.equal(listed[0]!.priceFils, 1100);
-  assert.equal(formatAed(listed[0]!.priceFils!), "AED 11");
+  assert.equal(listed[0]!.priceFils, 1300);
+  assert.equal(formatAed(listed[0]!.priceFils!), "AED 13");
   assert.deepEqual(
     visibleTestimonials([
       {
@@ -91,10 +91,10 @@ test("brand content is approved, heritage fixed, no fabricated catalog or testim
 });
 test("WhatsApp only accepts verified international destinations and safely encodes inquiry", () => {
   // Confirmed ordering number (22 September 2026); see src/brand/content.ts.
-  assert.equal(destinations.whatsapp, "+971521683319");
+  assert.equal(destinations.whatsapp, "+971585943319");
   assert.equal(
     whatsappUrl(destinations.whatsapp, "hi"),
-    "https://wa.me/971521683319?text=hi",
+    "https://wa.me/971585943319?text=hi",
   );
   for (const n of [null, "", "javascript:alert(1)", "971 123", "+00000000"])
     assert.equal(whatsappUrl(n, "hello"), null);

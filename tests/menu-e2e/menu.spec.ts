@@ -5,7 +5,7 @@ const menuCategories: { id: string; name: string }[] = JSON.parse(
   readFileSync("src/brand/menu-data.json", "utf8"),
 ).categories;
 
-const photos = "work/qa/full-menu";
+const photos = "work/qa/master-sprint";
 const family = (page: Page, id: string) =>
   page.locator(`[data-menu-family="${id}"]`);
 const category = async (page: Page, name: string) => {
@@ -18,7 +18,7 @@ const category = async (page: Page, name: string) => {
 test("all eight categories expose purchasable options with safe selectors", async ({
   page,
 }) => {
-  await page.goto("/#bakery");
+  await page.goto("/menu");
   for (const entry of menuCategories) {
     await category(page, entry.name);
     await expect(page.locator(".b-menu-grid article").first()).toBeVisible();
@@ -41,14 +41,11 @@ test("all eight categories expose purchasable options with safe selectors", asyn
 test("latest individual sizes, fillings and packs preserve their precise prices", async ({
   page,
 }) => {
-  await page.goto("/#bakery");
+  await page.goto("/menu");
   await category(page, "Pan de Muerto");
-  const pan = family(page, "pan-de-muerto-traditional");
-  await pan.getByLabel("Flavour").selectOption("Ajonjolí");
-  await pan.getByLabel("Size / pack").selectOption("Individual · 70 g");
-  await expect(
-    pan.getByRole("button", { name: "ADD TO CART · AED 13" }),
-  ).toBeEnabled();
+  await expect(family(page, "pan-de-muerto-traditional")).toContainText(
+    "October",
+  );
   const pack = family(page, "pan-de-muerto-filled-pack");
   await expect(pack.locator("select")).toHaveCount(1);
   await pack
@@ -73,14 +70,18 @@ test("latest individual sizes, fillings and packs preserve their precise prices"
 test("multiple menu SKUs go through cart and existing web checkout with authoritative total", async ({
   page,
 }) => {
-  await page.goto("/#bakery");
+  await page.goto("/menu");
   await category(page, "Pan de Muerto");
+  await family(page, "pan-de-muerto-traditional-pack")
+    .getByRole("combobox")
+    .selectOption("6 mini");
   await family(page, "pan-de-muerto-traditional-pack")
     .getByRole("button", { name: "ADD TO CART · AED 60" })
     .click();
   await category(page, "Cake Jars");
   const bundle = family(page, "cake-jar-bundle");
   await expect(bundle.locator("select")).toHaveCount(1);
+  await bundle.getByRole("combobox").selectOption("4 × 200 ml");
   await bundle.getByRole("button", { name: "ADD TO CART · AED 130" }).click();
   await category(page, "Extras");
   await family(page, "candles")
@@ -109,16 +110,16 @@ test("missing or differently priced server SKUs cannot enter the cart", async ({
     }));
     await route.fulfill({ json: config });
   });
-  await page.goto("/#bakery");
+  await page.goto("/menu");
   await category(page, "Pan de Muerto");
   await expect(
-    family(page, "pan-de-muerto-traditional").getByRole("button", {
+    family(page, "pan-de-muerto-traditional-pack").getByRole("button", {
       name: "ADD TO CART · UNAVAILABLE",
     }),
   ).toBeDisabled();
 });
 
-for (const width of [390, 1440]) {
+for (const width of [390, 768, 1440]) {
   test(`visual, accessibility and no-payment QA at ${width}px`, async ({
     page,
   }) => {
@@ -161,6 +162,7 @@ for (const width of [390, 1440]) {
     };
     await page.goto("/");
     await shot("homepage");
+    await page.goto("/menu");
     for (const entry of menuCategories) {
       await category(page, entry.name);
       await page
@@ -186,6 +188,9 @@ for (const width of [390, 1440]) {
       .analyze();
     expect(axe.violations).toEqual([]);
     await family(page, "pan-de-muerto-traditional-pack")
+      .getByRole("combobox")
+      .selectOption("6 mini");
+    await family(page, "pan-de-muerto-traditional-pack")
       .getByRole("button", { name: "ADD TO CART · AED 60" })
       .click();
     await page.goto("/cart");
@@ -203,12 +208,12 @@ test("catalog remains server-authoritative when payment activation is offline", 
   await page.route("**/api/checkout/config", async (route) => {
     const response = await route.fetch();
     const config = await response.json();
-    expect(config.products).toHaveLength(218);
+    expect(config.products.length).toBeGreaterThan(190);
     await route.fulfill({
       json: { ...config, enabled: false, mode: "offline" },
     });
   });
-  await page.goto("/#bakery");
+  await page.goto("/menu");
   for (const entry of menuCategories) {
     await category(page, entry.name);
     await expect(

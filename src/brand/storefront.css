@@ -1,0 +1,524 @@
+/* Reference composition measured at 1440/390. Official display font takes priority. */
+.brand-experience.ref-home {
+  --surface-primary: #f6efe3;
+  --text-primary: #33241a;
+  --text-secondary: #735a40;
+}
+.brand-experience.ref-home h1,
+.brand-experience.ref-home h2 {
+  font-family: var(--display-font);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+.brand-experience.ref-home .b-header {
+  position: sticky;
+  top: 0;
+  background: #f6efe3;
+  height: 77px;
+  padding: 16px 32px;
+  border-bottom: 1px solid #d6cdbc;
+  color: #33241a;
+}
+.brand-experience.ref-home .b-logo {
+  width: auto;
+  height: 42px;
+  object-fit: contain;
+}
+.ref-hero {
+  height: 68vh;
+  min-height: 460px;
+  max-height: 780px;
+  position: relative;
+  overflow: hidden;
+}
+.ref-hero video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  position: absolute;
+  inset: 0;
+}
+.ref-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(transparent 38%, #1e160f70);
+}
+.ref-micro {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  width: 240px;
+  text-align: right;
+  color: white;
+  font-size: 12px;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  z-index: 1;
+}
+.ref-hero-copy {
+  position: absolute;
+  left: 32px;
+  bottom: 32px;
+  color: #fffdf8;
+  z-index: 1;
+  max-width: 640px;
+}
+.ref-hero h1 {
+  font-size: clamp(64px, 6.1vw, 104px);
+  line-height: 0.94;
+  margin: 0 0 24px;
+}
+.ref-hero-copy > p {
+  max-width: 410px;
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+.ref-watch {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  font: 600 14px var(--body-font);
+  letter-spacing: 0.09em;
+  margin: 16px 0;
+}
+.ref-watch svg {
+  width: 44px;
+  height: 44px;
+  border: 1px solid;
+  border-radius: 50%;
+  padding: 12px;
+}
+.ref-heritage {
+  display: block;
+  font-size: 11px;
+  line-height: 1.2;
+  letter-spacing: 0.09em;
+  font-weight: 600;
+  margin-top: 22px;
+}
+.ref-bridge {
+  padding: 160px 32px 112px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  text-align: center;
+}
+.ref-bridge h2 {
+  grid-column: 1/-1;
+  font-size: 56px;
+  margin: 0 0 80px;
+}
+.ref-city {
+  overflow: hidden;
+  aspect-ratio: 1.38;
+  position: relative;
+}
+.ref-city img {
+  width: 210%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+}
+.ref-mexico img {
+  left: 0;
+}
+.ref-dubai img {
+  right: 0;
+}
+.ref-bridge > p {
+  grid-column: 1/-1;
+  max-width: 560px;
+  margin: 32px auto 0;
+  line-height: 1.7;
+}
+.ref-featured {
+  padding: 100px 32px;
+  text-align: center;
+}
+.ref-featured h2 {
+  font-size: 44px;
+  margin: 24px 0 12px;
+}
+.ref-featured > p {
+  margin: 0;
+}
+.ref-cakes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 64px;
+  max-width: 1340px;
+  margin: 96px auto 72px;
+}
+.ref-cakes a {
+  display: grid;
+  gap: 24px;
+  align-content: start;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.25s;
+}
+.ref-cakes a:hover {
+  transform: translateY(-6px);
+}
+.ref-cakes img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+.ref-cakes span {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+.brand-experience.ref-home .b-button {
+  background: #805b36;
+  border-color: #805b36;
+  color: #fffdf8;
+  text-decoration: none;
+  font-size: 13px;
+  padding: 12px 32px;
+  min-height: 46px;
+}
+.ref-tradition {
+  position: relative;
+  min-height: 890px;
+  padding: 140px 60px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+.ref-tradition > div {
+  width: 50%;
+  padding: 64px;
+  background: #ce8c9c;
+  border: 1px solid #b78185;
+  border-radius: 28px;
+  z-index: 1;
+  position: relative;
+}
+.ref-tradition h2 {
+  font-size: 52px;
+  color: #fffdf8;
+  margin: 0 0 32px;
+}
+.ref-tradition p {
+  max-width: 350px;
+  margin-bottom: 24px;
+}
+.ref-slice {
+  position: absolute;
+  width: 40%;
+  height: 45%;
+  object-fit: contain;
+}
+.ref-slice-one {
+  right: 0;
+  top: 0;
+}
+.ref-slice-two {
+  right: 16%;
+  top: 30%;
+  z-index: 2;
+}
+.ref-slice-three {
+  right: 0;
+  bottom: 0;
+}
+.ref-family {
+  padding: 120px 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 72px;
+  align-items: center;
+}
+.ref-family h2 {
+  font-size: 44px;
+  margin: 0 0 32px;
+}
+.ref-family p {
+  line-height: 1.75;
+  margin: 0 0 28px;
+}
+.ref-family .b-button {
+  background: #ce8c9c;
+  border-color: #ce8c9c;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.ref-collage {
+  aspect-ratio: 4/5;
+  position: relative;
+}
+.ref-collage img {
+  position: absolute;
+  object-fit: contain;
+  height: auto;
+}
+.ref-paper {
+  width: 75%;
+  top: 0;
+  left: 15%;
+}
+.ref-alicia {
+  width: 70%;
+  top: 3%;
+  left: 6%;
+  background: #fffdf8;
+  padding: 16px;
+  box-shadow: 0 10px 18px #33241a20;
+}
+.ref-flower {
+  width: 25%;
+  top: 0;
+  left: 0;
+}
+.ref-love {
+  width: 35%;
+  top: 25%;
+  right: 0;
+}
+.ref-liza {
+  width: 52%;
+  bottom: 0;
+  right: 0;
+  background: #fffdf8;
+  padding: 12px;
+  box-shadow: 0 10px 18px #33241a20;
+}
+.ref-order-link {
+  text-align: center;
+  padding: 24px 0 64px;
+}
+.b-shopping-wa,
+.b-floating-cart {
+  position: fixed;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 24;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fffdf8;
+  border: 1px solid #d6cdc1;
+  border-radius: 28px;
+  padding: 12px 18px;
+  color: #372c27;
+  text-decoration: none;
+  box-shadow: 0 2px 12px #372c2712;
+  font-size: 13px;
+  min-height: 48px;
+}
+.b-shopping-wa {
+  left: 20px;
+}
+.b-floating-cart {
+  right: 20px;
+}
+.b-shopping-wa svg,
+.b-floating-cart svg {
+  width: 22px;
+  height: 22px;
+}
+.b-menu-page {
+  background: var(--brand-lavender-light);
+}
+.b-menu-page main,
+.b-how-page main {
+  padding-top: 100px;
+  min-height: 60vh;
+}
+.b-how-page main {
+  max-width: 900px;
+  margin: auto;
+  padding: 120px 24px 80px;
+}
+.b-how-page li {
+  margin: 18px 0;
+}
+.b-language {
+  font: inherit;
+  font-size: 12px;
+  border: 0;
+  background: transparent;
+  min-height: 44px;
+  padding: 8px;
+  color: inherit;
+}
+[dir="rtl"] .b-shop-main,
+[dir="rtl"] .b-full-menu {
+  text-align: right;
+}
+@media (max-width: 899px) {
+  .ref-cakes {
+    gap: 24px;
+  }
+  .ref-family {
+    gap: 32px;
+  }
+  .ref-tradition {
+    padding: 80px 24px;
+  }
+  .ref-tradition > div {
+    padding: 36px;
+  }
+  .ref-family h2 {
+    font-size: 36px;
+  }
+}
+@media (max-width: 640px) {
+  .brand-experience.ref-home .b-header {
+    padding: 16px 24px;
+  }
+  .ref-hero {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .ref-hero video {
+    position: static;
+    aspect-ratio: 1;
+    width: 100%;
+    height: auto;
+    object-position: center 42%;
+  }
+  .ref-hero::after,
+  .ref-micro {
+    display: none;
+  }
+  .ref-hero-copy {
+    position: static;
+    color: #33241a;
+    padding: 32px 24px 64px;
+  }
+  .ref-hero h1 {
+    font-size: 48px;
+    line-height: 0.98;
+    margin-bottom: 24px;
+  }
+  .ref-hero-copy > p {
+    font-size: 16px;
+  }
+  .ref-heritage {
+    margin-top: 16px;
+  }
+  .ref-bridge {
+    grid-template-columns: 1fr;
+    padding: 80px 24px;
+    gap: 24px;
+  }
+  .ref-bridge h2 {
+    font-size: 34px;
+    grid-row: 2;
+    margin: 24px 0;
+  }
+  .ref-city {
+    aspect-ratio: 1.1;
+  }
+  .ref-dubai {
+    grid-row: 3;
+  }
+  .ref-featured {
+    padding: 64px 24px;
+  }
+  .ref-featured h2 {
+    font-size: 36px;
+  }
+  .ref-cakes {
+    grid-template-columns: 1fr;
+    gap: 56px;
+    margin: 56px auto;
+  }
+  .ref-cakes img {
+    max-width: 330px;
+    margin: auto;
+  }
+  .ref-tradition {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 24px 64px;
+  }
+  .ref-tradition > div {
+    width: 100%;
+    padding: 32px;
+  }
+  .ref-tradition h2 {
+    font-size: 38px;
+  }
+  .ref-slice {
+    position: relative;
+    width: 90%;
+    height: auto;
+    margin-top: -15px;
+  }
+  .ref-slice-one,
+  .ref-slice-two,
+  .ref-slice-three {
+    right: auto;
+    top: auto;
+    bottom: auto;
+  }
+  .ref-family {
+    grid-template-columns: 1fr;
+    padding: 72px 24px;
+    gap: 48px;
+  }
+  .ref-family h2 {
+    font-size: 36px;
+  }
+  .ref-family .b-button {
+    white-space: normal;
+    text-align: center;
+  }
+  .b-shopping-wa {
+    left: 12px;
+    padding: 12px;
+  }
+  .b-shopping-wa span {
+    display: none;
+  }
+  .b-floating-cart {
+    right: 12px;
+  }
+  .b-menu-page main {
+    padding-top: 80px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ref-cakes a {
+    transition: none;
+  }
+}
+
+.brand-experience.ref-home .ref-hero h1 {
+  color: inherit;
+}
+.brand-experience.ref-home .ref-watch svg {
+  width: 44px;
+  height: 44px;
+}
+
+.brand-experience.ref-home .b-header {
+  min-height: 77px;
+  max-height: 77px;
+  box-sizing: border-box;
+}
+.brand-experience.ref-home .b-header .b-logo {
+  width: 63px;
+  max-width: none;
+  height: 42px;
+  max-height: 42px;
+  transform: scale(3);
+}

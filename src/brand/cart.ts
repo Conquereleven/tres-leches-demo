@@ -51,6 +51,7 @@ if (typeof window !== "undefined")
 
 export const cart = {
   add(productId: string, quantity = 1) {
+    if (!productId || !Number.isInteger(quantity) || quantity < 1) return;
     const current = lines.find((l) => l.productId === productId);
     commit(
       current
@@ -63,6 +64,7 @@ export const cart = {
     );
   },
   set(productId: string, quantity: number) {
+    if (!Number.isInteger(quantity) || quantity < 0) return;
     commit(
       quantity < 1
         ? lines.filter((l) => l.productId !== productId)
@@ -78,6 +80,11 @@ export const cart = {
   },
   clear() {
     commit([]);
+    try {
+      sessionStorage.removeItem("3l-checkout-draft");
+    } catch {
+      /* Storage optional. Paid order capability remains available. */
+    }
   },
 };
 
@@ -120,6 +127,7 @@ export type CheckoutConfig = {
   products: CatalogEntry[];
   slots: string[];
   dates: { min: string; max: string };
+  serverNow?: string;
   zones: {
     id: string;
     name: string;

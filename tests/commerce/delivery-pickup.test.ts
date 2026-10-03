@@ -65,7 +65,7 @@ test("pickup rejects delivery fields, forged totals, missing billing/date and in
   const valid = {
     fulfillmentMethod: "pickup",
     lines: [{ productId: "sku", quantity: 1 }],
-    pickup: { pickupDate: dubaiToday(), preferredTime: "Afternoon" },
+    pickup: { pickupDate: new Date(Date.now()+172800000).toISOString().slice(0,10), preferredTime: "4:00 PM – 9:00 PM" },
     customer: {
       name: "Fixture Reviewer",
       phone: "0500000000",
@@ -84,7 +84,7 @@ test("pickup rejects delivery fields, forged totals, missing billing/date and in
     { delivery: { zoneId: "marina" } },
     { amount: 1 },
     { billing: { sameAsDelivery: true } },
-    { pickup: { pickupDate: "2026-02-30", preferredTime: "Afternoon" } },
+    { pickup: { pickupDate: "2026-02-30", preferredTime: "4:00 PM – 9:00 PM" } },
     { pickup: { pickupDate: dubaiToday(), preferredTime: "" } },
   ])
     assert.throws(() => normalizeCheckout({ ...valid, ...patch }));

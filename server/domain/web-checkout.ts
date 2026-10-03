@@ -1,3 +1,10 @@
+import {
+  availableSku,
+  validWindow,
+  leadHours,
+  DELIVERY_WINDOWS,
+} from "../../shared/commerce-policy";
+import { authoritativeAddress } from "./website-address";
 /** Public entry into the existing catalog/quote/command/outbox/payment domain. */
 import { z } from "zod";
 import {
@@ -64,15 +71,8 @@ export const MAX_BOOKING_DAYS = 60;
  * list is empty by default and the customer states a preferred time window
  * instead — slot labels are never invented here.
  */
-export function configuredSlots(env = process.env): string[] {
-  try {
-    return z
-      .array(z.string().trim().min(1).max(60))
-      .max(24)
-      .parse(JSON.parse(env.DELIVERY_SLOTS_JSON ?? "[]"));
-  } catch {
-    return [];
-  }
+export function configuredSlots(_env = process.env): string[] {
+  return DELIVERY_WINDOWS.map((w) => w.label);
 }
 
 const line = z
@@ -186,18 +186,24 @@ export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
     const data = pickup.data;
     const today = dubaiToday();
     requireThat(
-      data.pickup.pickupDate >= today &&
+      data.pickup.pickupDate > today &&
         data.pickup.pickupDate <= addDays(today, MAX_BOOKING_DAYS) &&
         new Date(`${data.pickup.pickupDate}T00:00:00Z`)
           .toISOString()
           .slice(0, 10) === data.pickup.pickupDate,
-      "Choose a valid pickup date from today onwards",
+      "Choose a valid pickup date from tomorrow onwards",
       422,
     );
     const slots = configuredSlots(env);
     requireThat(
-      !slots.length || slots.includes(data.pickup.preferredTime),
-      "Choose an available pickup time",
+      slots.includes(data.pickup.preferredTime) &&
+        validWindow(
+          data.pickup.pickupDate,
+          data.pickup.preferredTime,
+          new Date(),
+          leadHours(data.lines.map((l) => l.productId)),
+        ),
+      "Choose a pickup window with at least 12 hours notice (24 hours for advance-order items)",
       422,
     );
     requireThat(
@@ -235,15 +241,21 @@ export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
     const { delivery, customer } = cart.data;
     const today = dubaiToday();
     requireThat(
-      delivery.date >= today &&
+      delivery.date > today &&
         delivery.date <= addDays(today, MAX_BOOKING_DAYS),
-      "Choose a delivery date from today onwards",
+      "Choose a delivery date from tomorrow onwards",
       422,
     );
     const slots = configuredSlots(env);
     requireThat(
-      !slots.length || slots.includes(delivery.slot),
-      "Choose one of the available delivery times",
+      slots.includes(delivery.slot) &&
+        validWindow(
+          delivery.date,
+          delivery.slot,
+          new Date(),
+          leadHours(cart.data.lines.map((l) => l.productId)),
+        ),
+      "Choose a delivery window with at least 12 hours notice (24 hours for advance-order items)",
       422,
     );
     const fullAddress = [
@@ -331,6 +343,14 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
     .parse(raw);
   return service.store.transaction(() => {
     const input = normalizeCheckout(checkout);
+    if (input.delivery) {
+      const zone = authoritativeAddress(service, input.delivery);
+      requireThat(
+        zone.id === input.zoneId,
+        "Delivery address does not belong to the selected area. Review the correct minimum.",
+        422,
+      );
+    }
     const cartHash = canonicalCartHash(
       service,
       {
@@ -460,6 +480,11 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
         };
       })();
   const s = service.store.read();
+  requireThat(
+    input.lines.every((l) => availableSku(l.productId)),
+    "This product is outside its ordering season",
+    422,
+  );
   const method =
     "fulfillmentMethod" in input ? input.fulfillmentMethod : undefined;
   const zone = s.zones.find((z) => z.id === input.zoneId && z.active);
@@ -600,6 +625,14 @@ export async function createWebCheckout(
     "Please complete your delivery and billing details.",
     422,
   );
+  if (input.delivery) {
+    const zone = authoritativeAddress(service, input.delivery);
+    requireThat(
+      zone.id === input.zoneId,
+      "Delivery address does not belong to the selected area. Review the correct minimum.",
+      422,
+    );
+  }
   const inputHash = digest(JSON.stringify(input));
   service.store.transaction(() => {
     const cartHash = canonicalCartHash(

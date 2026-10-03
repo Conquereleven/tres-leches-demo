@@ -13,8 +13,8 @@ for (const [sku, initialQty, currentQty, oldAmount, amount] of [
       zoneId: "jlt-cluster-c",
       address: "Fixture address only",
       building: "Fixture Tower",
-      date: new Date(Date.now() + 86400000).toISOString().slice(0, 10),
-      slot: "Afternoon",
+      date: new Date(Date.now() + 172800000).toISOString().slice(0, 10),
+      slot: "4:00 PM – 9:00 PM",
     };
     const customer = {
       name: "Fixture Customer",

@@ -1,3 +1,4 @@
+import { fixtureAddressGeo } from "../fixtures/website-address";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
@@ -53,6 +54,7 @@ function fixture(price = 3600) {
     store,
     new DisabledWhatsAppProvider(),
     provider,
+    fixtureAddressGeo,
   );
   const input = (quantity = 1, sku = "sku-a") => ({
     lines: [{ productId: sku, quantity }],
@@ -60,8 +62,8 @@ function fixture(price = 3600) {
       zoneId: "jlt-cluster-c",
       address: "Fixture only address",
       building: "Fixture Tower",
-      date: addDays(dubaiToday(), 1),
-      slot: "Afternoon",
+      date: addDays(dubaiToday(), 2),
+      slot: "4:00 PM – 9:00 PM",
     },
     customer: {
       name: "Fixture Customer",

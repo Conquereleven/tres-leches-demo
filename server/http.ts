@@ -1,3 +1,9 @@
+import { mcpRead } from "./domain/mcp";
+import { availableSku } from "../shared/commerce-policy";
+import {
+  attachVerifiedAddresses,
+  authoritativeAddress,
+} from "./domain/website-address";
 import { applyApprovedDeliveryRules } from "./domain/delivery-rules";
 import {
   retryEmbeddedPayment,
@@ -172,6 +178,11 @@ export async function startServer(
     10000,
     overrides.operationalNumbers ?? stagingAliases,
   );
+  if (!overrides.geo)
+    service.geo = attachVerifiedAddresses(
+      service.geo,
+      process.env.DELIVERY_VERIFIED_ADDRESSES_FILE,
+    );
   const users = usersSchema.parse(
     JSON.parse(process.env.OPERATOR_USERS_JSON ?? "[]"),
   );
@@ -319,7 +330,10 @@ export async function startServer(
             );
             const products = (s.catalog ?? [])
               .filter(
-                (p) => p.active !== false && p.availability !== "unavailable",
+                (p) =>
+                  p.active !== false &&
+                  p.availability !== "unavailable" &&
+                  availableSku(p.id),
               )
               .map((p) => ({
                 id: p.id,
@@ -335,7 +349,11 @@ export async function startServer(
               mode: enabled ? (paymennt?.environment ?? "test") : "offline",
               products,
               slots: configuredSlots(),
-              dates: { min: today, max: addDays(today, MAX_BOOKING_DAYS) },
+              serverNow: new Date().toISOString(),
+              dates: {
+                min: addDays(today, 1),
+                max: addDays(today, MAX_BOOKING_DAYS),
+              },
               publicKey: null,
               frame: null,
               product: product
@@ -422,6 +440,23 @@ export async function startServer(
               200,
               await createWebCheckout(service, body, key, true),
             );
+          }
+          if (path === "/api/checkout/address") {
+            const input = z
+              .object({
+                zoneId: z.string().max(100),
+                address: z.string().min(5).max(300),
+                building: z.string().min(1).max(120),
+              })
+              .strict()
+              .parse(body);
+            const zone = authoritativeAddress(service, input);
+            return json(res, 200, {
+              zoneId: zone.id,
+              name: zone.name,
+              minOrderAed: zone.minOrderAed,
+              corrected: zone.id !== input.zoneId,
+            });
           }
           if (path === "/api/checkout/quote")
             return json(res, 200, quoteWebCheckout(service, body));
@@ -556,6 +591,23 @@ export async function startServer(
           return json(res, 200, { ok: true });
         }
         const current = actor(req);
+        if (path === "/api/mcp") {
+          if (process.env.MCP_ENABLED !== "true")
+            throw new DomainError(404, "Not found");
+          if (req.headers.origin !== origin)
+            throw new DomainError(403, "Origin rejected");
+          if (req.method !== "POST")
+            throw new DomainError(405, "Method not allowed");
+          if (
+            !(req.headers["content-type"] ?? "").startsWith("application/json")
+          )
+            throw new DomainError(415, "JSON required");
+          return json(
+            res,
+            200,
+            mcpRead(service, parse(await rawBody(req)), current),
+          );
+        }
         if (path === "/api/ai/knowledge" && req.method === "POST") {
           aiGateway.updateKnowledge(parse(await rawBody(req)), current);
           return json(res, 200, { ok: true });
@@ -703,7 +755,10 @@ export async function startServer(
             agents: users.map((u) => ({ id: u.id, name: u.id })),
             numbers: service.operationalNumbers,
             catalog: (s.catalog ?? []).filter(
-              (p) => p.active !== false && p.availability !== "unavailable",
+              (p) =>
+                p.active !== false &&
+                p.availability !== "unavailable" &&
+                availableSku(p.id),
             ),
             zones: s.zones,
             conversations: s.conversations,
@@ -801,6 +856,8 @@ export async function startServer(
         !existsSync(candidate) &&
         ![
           "/",
+          "/menu",
+          "/how-to-order",
           "/cart",
           "/checkout",
           "/checkout/return",

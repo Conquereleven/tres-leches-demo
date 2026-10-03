@@ -187,6 +187,11 @@ for (const cluster of ["B", "C", "D"])
     review: "TL-25 confirmed: minimum 30 AED and free delivery.",
   });
 export interface GeoService {
+  resolveAddress?(
+    address: string,
+    building: string,
+    zones: DeliveryZone[],
+  ): { zoneId: string } | null;
   prepare?(location: Location): Promise<void>;
   resolve(
     location: Location,

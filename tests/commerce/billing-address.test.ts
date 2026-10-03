@@ -1,3 +1,4 @@
+import { fixtureAddressGeo } from "../fixtures/website-address";
 /**
  * Regression for TEST order TL-903498EB: Paymennt answered /payment/debit with
  * HTTP 400 "Parameter checkoutDetails.billingAddress must not be null."
@@ -35,8 +36,8 @@ const delivery = {
   address: "Jumeirah Lakes Towers, Cluster C",
   building: "Test Tower",
   unit: "101",
-  date: addDays(dubaiToday(), 1),
-  slot: "Afternoon",
+  date: addDays(dubaiToday(), 2),
+  slot: "4:00 PM – 9:00 PM",
   notes: "Call on arrival",
 };
 const checkout = (billing?: unknown) => ({
@@ -105,6 +106,7 @@ function fixture() {
     store,
     new DisabledWhatsAppProvider(),
     provider,
+    fixtureAddressGeo,
   );
   return { store, service, provider, debits, gets: () => gets };
 }

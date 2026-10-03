@@ -153,7 +153,7 @@ export const destinations: {
    * 2026 (Liza). Stored unspaced so `whatsappUrl` produces wa.me/971521683319.
    * Support only; customer orders are placed through the web cart and checkout.
    */
-  whatsapp: "+971521683319",
+  whatsapp: "+971585943319",
   instagram: "https://www.instagram.com/3ldubai/",
   tiktok: null,
   privacy: null,

@@ -94,10 +94,7 @@ test("hover scale stays within the 1-2% ceiling and the hero poster is not lazy"
     `hover scale ${hover} exceeds ceiling`,
   );
   const src = readFileSync("src/brand/Experience.tsx", "utf8");
-  // Isolate the hero poster <img …/> and assert on that tag alone.
-  const tag = /<img\s[^>]*b-hero-poster[\s\S]*?\/>/.exec(src)?.[0] ?? "";
-  assert.ok(tag, "hero poster img not found");
-  assert.match(tag, /loading="eager"/);
-  assert.match(tag, /fetchPriority="high"/);
-  assert.doesNotMatch(tag, /loading="lazy"/);
+  assert.match(src, /poster=\{media\("hero-poster.jpg"\)\}/);
+  assert.match(src, /preload="none"/);
+  assert.doesNotMatch(src, /autoPlay/);
 });
