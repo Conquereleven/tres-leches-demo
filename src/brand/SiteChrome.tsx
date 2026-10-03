@@ -1,3 +1,4 @@
+import { useLanguage as useCustomerLanguage } from "./localization";
 import { CustomerCopy } from "./localization";
 import { useState } from "react";
 import { List, ShoppingBag, WhatsappLogo } from "@phosphor-icons/react";
@@ -21,6 +22,8 @@ import { LanguageSwitcher, useLanguage } from "./localization";
  * change here — see public/payments/README.md.
  */
 export function PaymentMarks() {
+  const { text: localize } = useCustomerLanguage();
+
   return (
     <div className="b-payments">
       <p className="b-label" id="b-payments-label">
@@ -31,7 +34,12 @@ export function PaymentMarks() {
           {/* Official Visa Brand Mark, viewBox 278.075 × 169.374 (ratio 1.642).
               The artboard carries Visa's required clear space, so the box is
               larger than the visible wordmark by design. */}
-          <img src="/payments/visa.svg" alt="Visa" width="53" height="32" />
+          <img
+            src="/payments/visa.svg"
+            alt={localize("Visa")}
+            width="53"
+            height="32"
+          />
         </li>
         <li>
           {/* Official Mastercard Symbol, viewBox 152.4 × 108 (ratio 1.411).
@@ -39,7 +47,7 @@ export function PaymentMarks() {
               their visible artwork lands at a matching optical size. */}
           <img
             src="/payments/mastercard.svg"
-            alt="Mastercard"
+            alt={localize("Mastercard")}
             width="45"
             height="32"
           />
@@ -101,6 +109,8 @@ export function SiteFooter({
   onSocial?: () => void;
   onManage?: () => void;
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   return (
     <footer className="b-footer">
       <div className="b-footer-main">
@@ -115,7 +125,7 @@ export function SiteFooter({
           </SectionLabel>
           <WhatsAppCTA unavailable={onContactUnavailable} />
         </div>
-        <nav aria-label="Collections">
+        <nav aria-label={localize("Collections")}>
           <a href="/#home">
             <CustomerCopy>HOME</CustomerCopy>
           </a>
@@ -132,7 +142,7 @@ export function SiteFooter({
             <CustomerCopy>SPECIAL OCCASIONS</CustomerCopy>
           </a>
         </nav>
-        <nav aria-label="Information">
+        <nav aria-label={localize("Information")}>
           <a href="/contact">
             <CustomerCopy>CONTACT US</CustomerCopy>
           </a>
@@ -155,7 +165,7 @@ export function SiteFooter({
             <CustomerCopy>WhatsApp</CustomerCopy>
           </WhatsAppCTA>
         </nav>
-        <nav aria-label="Policies">
+        <nav aria-label={localize("Policies")}>
           {policyRoutes
             .filter((r) => r.path !== "/contact")
             .map((r) => (
@@ -174,9 +184,7 @@ export function SiteFooter({
         <span>
           © {new Date().getFullYear()}{" "}
           <CustomerCopy>{legalEntityLabel()}</CustomerCopy> ·{" "}
-          <CustomerCopy>
-            {business.address ?? `${business.city}, ${business.country}`}
-          </CustomerCopy>
+          <bdi>{business.address ?? `${business.city}, ${business.country}`}</bdi>
           {business.supportContacts.length > 0 && (
             <>
               {" · "}
@@ -211,6 +219,8 @@ export function SiteHeader({
   home?: boolean;
   onContactUnavailable: () => void;
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   const [menu, setMenu] = useState(false);
   const { t } = useLanguage();
   void onContactUnavailable;
@@ -218,7 +228,7 @@ export function SiteHeader({
   return (
     <>
       <header className="b-header b-scrolled">
-        <nav className="b-nav-left" aria-label="Primary">
+        <nav className="b-nav-left" aria-label={localize("Primary")}>
           <a href="/#story">
             <CustomerCopy>{t("story").toUpperCase()}</CustomerCopy>
           </a>
@@ -231,16 +241,16 @@ export function SiteHeader({
         </nav>
         <button
           className="b-menu"
-          aria-label="Open menu"
+          aria-label={localize("Open menu")}
           aria-haspopup="dialog"
           onClick={() => setMenu(true)}
         >
           <List aria-hidden />
         </button>
-        <a href="/" className="b-home" aria-label="3L home">
+        <a href="/" className="b-home" aria-label={localize("3L home")}>
           <Logo />
         </a>
-        <nav className="b-nav-right" aria-label="Contact">
+        <nav className="b-nav-right" aria-label={localize("Contact")}>
           <a href="/#family-story">
             <CustomerCopy>JOURNAL</CustomerCopy>
           </a>
@@ -250,11 +260,17 @@ export function SiteHeader({
           <LanguageSwitcher />
           <CartLink placement="desktop" />
         </nav>
+        <div className="b-mobile-language">
+          <LanguageSwitcher />
+        </div>
         <CartLink placement="mobile" />
       </header>
       {menu && (
-        <Modal title="EXPLORE 3L" onClose={() => setMenu(false)}>
-          <nav className="b-modal-nav" aria-label="Mobile navigation">
+        <Modal title={localize("EXPLORE 3L")} onClose={() => setMenu(false)}>
+          <nav
+            className="b-modal-nav"
+            aria-label={localize("Mobile navigation")}
+          >
             <LanguageSwitcher />
             <a href="/">
               <CustomerCopy>HOME</CustomerCopy>
@@ -278,6 +294,8 @@ export function SiteHeader({
 }
 
 export function FloatingShopping() {
+  const { text: localize } = useCustomerLanguage();
+
   const count = cartCount(useCart());
   const { t, text } = useLanguage();
   const support = whatsappUrl(
@@ -285,7 +303,7 @@ export function FloatingShopping() {
     "Hello 3L, I need help with the online store.",
   );
   return (
-    <>
+    <aside aria-label={localize("Shopping assistance")}>
       {support && (
         <a
           className="b-shopping-wa"
@@ -304,12 +322,12 @@ export function FloatingShopping() {
         <a
           className="b-floating-cart"
           href="/cart"
-          aria-label={`View cart, ${count} items`}
+          aria-label={localize(`View cart, ${count} items`)}
         >
           <ShoppingBag aria-hidden />
           <CustomerCopy>{t("cart")}</CustomerCopy> ({count})
         </a>
       )}
-    </>
+    </aside>
   );
 }

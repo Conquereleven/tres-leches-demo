@@ -1,3 +1,4 @@
+import { useLanguage as useCustomerLanguage } from "./localization";
 import manifest from "./media-manifest.json";
 export const approvedMedia = manifest.assets.filter(
   (a) => a.status === "assigned",
@@ -44,12 +45,14 @@ export function ResponsiveMedia({
   className?: string;
   sizes?: string;
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   const media = selectedProductMedia(productId, family, variant, size);
   if (!media)
     return fallback ? (
       <img
         src={fallback}
-        alt={alt}
+        alt={localize(alt)}
         className={className}
         loading="lazy"
         decoding="async"
@@ -72,7 +75,7 @@ export function ResponsiveMedia({
         sizes={sizes}
         width={media.width!}
         height={media.height!}
-        alt={alt}
+        alt={localize(alt)}
         className={className}
         loading="lazy"
         decoding="async"

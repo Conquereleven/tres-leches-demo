@@ -1,3 +1,5 @@
+import { storefrontI18n } from "./locales/engine";
+import { useLanguage as useCustomerLanguage } from "./localization";
 import { QuantityInput } from "./QuantityInput";
 import { normalizeWhatsAppNumber } from "../../shared/contact";
 import { ResponsiveMedia, selectedProductMedia } from "./media";
@@ -134,7 +136,11 @@ const COUNTRY_CODES =
   );
 function countryName(code: string) {
   try {
-    return new Intl.DisplayNames(["en"], { type: "region" }).of(code) ?? code;
+    return (
+      new Intl.DisplayNames([storefrontI18n.language], { type: "region" }).of(
+        code,
+      ) ?? code
+    );
   } catch {
     return code;
   }
@@ -189,6 +195,11 @@ async function post<T>(path: string, body: unknown, key?: string): Promise<T> {
 /** Server messages written for operators are replaced with customer copy. */
 function friendly(message?: string) {
   if (!message) return undefined;
+  if (/held for review|could not be verified/i.test(message))
+    return "The payment result could not be verified. Your order is held for review.";
+  if (/could not be processed/i.test(message))
+    return "Payment could not be processed. Please check your details or try again.";
+
   if (/mínimo/i.test(message))
     return "Your order is below the minimum for this delivery area.";
   if (/pendiente de revisión|Regla pendiente/i.test(message))
@@ -197,7 +208,7 @@ function friendly(message?: string) {
     return "An item in your cart is no longer available.";
   if (/[áéíóúñ¿]/i.test(message))
     return "Something went wrong. Please try again.";
-  return message;
+  return "Something went wrong. Please try again.";
 }
 /** Mirrors the server's UAE mobile rule so mistakes are caught before submit. */
 export function normalizeUaeMobile(raw: string) {
@@ -234,12 +245,15 @@ function saveDraft(draft: {
 }
 const longDate = (iso?: string) =>
   iso
-    ? new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-GB", {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        timeZone: "UTC",
-      })
+    ? new Date(`${iso}T12:00:00Z`).toLocaleDateString(
+        storefrontI18n.language === "en" ? "en-GB" : storefrontI18n.language,
+        {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          timeZone: "UTC",
+        },
+      )
     : "";
 
 /** Owner-approved photograph for a catalog product, when one exists. */
@@ -287,19 +301,23 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
     />
   ) : (
     <span className="b-co-thumb b-co-thumb-empty" aria-hidden>
-      <CustomerCopy>{name.slice(0, 1)}</CustomerCopy>
+      {name.slice(0, 1)}
     </span>
   );
 }
 
 const STEPS = ["Cart", "Fulfillment", "Details", "Payment", "Confirmation"];
 function Progress({ step }: { step: number }) {
+  const { text: localize } = useCustomerLanguage();
+
   return (
-    <nav className="b-co-progress" aria-label="Checkout progress">
+    <nav className="b-co-progress" aria-label={localize("Checkout progress")}>
       <p className="b-co-progress-count" aria-hidden>
         <CustomerCopy>Step</CustomerCopy> {step + 1}{" "}
         <CustomerCopy>of</CustomerCopy> {STEPS.length} ·{" "}
-        <strong>{STEPS[step]}</strong>
+        <strong>
+          <CustomerCopy>{STEPS[step]!}</CustomerCopy>
+        </strong>
       </p>
       <ol>
         {STEPS.map((label, i) => (
@@ -322,9 +340,15 @@ function Progress({ step }: { step: number }) {
 }
 /** Checkout keeps its own compact header: logo, a secure-checkout cue, no menu. */
 function CheckoutHeader() {
+  const { text: localize } = useCustomerLanguage();
+
   return (
     <header className="b-co-header">
-      <a href="/" className="b-co-logo" aria-label="Pastelerías 3L · Home">
+      <a
+        href="/"
+        className="b-co-logo"
+        aria-label={localize("Pastelerías 3L · Home")}
+      >
         <Logo />
       </a>
       <LanguageSwitcher />
@@ -451,10 +475,12 @@ function OrderSummary({
   children?: ReactNode;
   fulfillmentMethod?: "delivery" | "pickup";
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   const [open, setOpen] = useState(false);
   const count = lines.reduce((n, l) => n + l.quantity, 0);
   return (
-    <aside className="b-co-summary" aria-label="Order summary">
+    <aside className="b-co-summary" aria-label={localize("Order summary")}>
       <button
         type="button"
         className="b-co-summary-toggle"
@@ -479,8 +505,7 @@ function OrderSummary({
         <h2>
           <CustomerCopy>Your order</CustomerCopy>{" "}
           <span className="b-caption">
-            {count} <CustomerCopy>item</CustomerCopy>
-            <CustomerCopy>{count === 1 ? "" : "s"}</CustomerCopy>
+            <CustomerCopy>{`${count} items`}</CustomerCopy>
           </span>
         </h2>
         <ul className="b-co-summary-items">
@@ -574,6 +599,8 @@ export function AddToCart({
   productId: string;
   fallback: ReactNode;
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   const { config, loading } = useCheckoutConfig();
   const lines = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -584,10 +611,10 @@ export function AddToCart({
   const inCart = lines.find((l) => l.productId === productId)?.quantity ?? 0;
   return (
     <div className="b-add-to-cart">
-      <div className="b-qty" role="group" aria-label="Quantity">
+      <div className="b-qty" role="group" aria-label={localize("Quantity")}>
         <button
           type="button"
-          aria-label="Decrease quantity"
+          aria-label={localize("Decrease quantity")}
           disabled={quantity <= 1}
           onClick={() => setQuantity((q) => Math.max(1, q - 1))}
         >
@@ -601,7 +628,7 @@ export function AddToCart({
         />
         <button
           type="button"
-          aria-label="Increase quantity"
+          aria-label={localize("Increase quantity")}
           disabled={quantity + inCart >= MAX_QTY}
           onClick={() => setQuantity((q) => Math.min(MAX_QTY - inCart, q + 1))}
         >
@@ -638,6 +665,8 @@ function CartItems({
   lines: CartLine[];
   config: CheckoutConfig;
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   return (
     <ul className="b-co-items">
       {lines.map((l) => {
@@ -676,11 +705,11 @@ function CartItems({
             <div
               className="b-qty"
               role="group"
-              aria-label={`${p.name} quantity`}
+              aria-label={localize(`${p.name} quantity`)}
             >
               <button
                 type="button"
-                aria-label={`Decrease ${p.name}`}
+                aria-label={localize(`Decrease ${p.name}`)}
                 onClick={() => cart.set(l.productId, l.quantity - 1)}
               >
                 <Minus aria-hidden />
@@ -693,7 +722,7 @@ function CartItems({
               />
               <button
                 type="button"
-                aria-label={`Increase ${p.name}`}
+                aria-label={localize(`Increase ${p.name}`)}
                 disabled={l.quantity >= MAX_QTY}
                 onClick={() => cart.set(l.productId, l.quantity + 1)}
               >
@@ -706,7 +735,7 @@ function CartItems({
             <button
               type="button"
               className="b-cart-remove"
-              aria-label={`Remove ${p.name}`}
+              aria-label={localize(`Remove ${p.name}`)}
               onClick={() => cart.remove(l.productId)}
             >
               <Trash aria-hidden />
@@ -719,11 +748,13 @@ function CartItems({
 }
 
 export function CartPage() {
+  const { text: localize } = useCustomerLanguage();
+
   const lines = useCart();
   const { config, loading, retry } = useCheckoutConfig();
   if (loading)
     return (
-      <ShopShell step={0} title="Your cart">
+      <ShopShell step={0} title={localize("Your cart")}>
         <p role="status">
           <CustomerCopy>Loading your cart…</CustomerCopy>
         </p>
@@ -731,7 +762,7 @@ export function CartPage() {
     );
   if (!config || !config.products.length)
     return (
-      <ShopShell step={0} title="Your cart">
+      <ShopShell step={0} title={localize("Your cart")}>
         <Unavailable retry={retry} />
       </ShopShell>
     );
@@ -740,7 +771,7 @@ export function CartPage() {
   );
   const subtotal = cartSubtotalFils(lines, config.products);
   return (
-    <ShopShell step={0} title="Your cart">
+    <ShopShell step={0} title={localize("Your cart")}>
       {lines.length === 0 ? (
         <EmptyCart />
       ) : (
@@ -749,7 +780,7 @@ export function CartPage() {
             <CartItems lines={lines} config={config} />
             <div className="b-co-inline-links">
               <a className="b-link" href="/menu">
-                <ArrowLeft aria-hidden />{" "}
+                <ArrowLeft className="b-directional" aria-hidden />{" "}
                 <CustomerCopy>Continue shopping</CustomerCopy>
               </a>
               <button
@@ -799,6 +830,8 @@ export function CartPage() {
 // ── Checkout ─────────────────────────────────────────────────────────────
 
 export function CheckoutPage() {
+  const { text: localize } = useCustomerLanguage();
+
   const lines = useCart();
   const { config, loading, retry } = useCheckoutConfig();
   const now = useCheckoutNow(config);
@@ -861,7 +894,7 @@ export function CheckoutPage() {
 
   if (loading)
     return (
-      <ShopShell step={1} title="Checkout">
+      <ShopShell step={1} title={localize("Checkout")}>
         <p role="status">
           <CustomerCopy>Preparing checkout…</CustomerCopy>
         </p>
@@ -869,13 +902,13 @@ export function CheckoutPage() {
     );
   if (!config?.enabled)
     return (
-      <ShopShell step={1} title="Checkout">
+      <ShopShell step={1} title={localize("Checkout")}>
         <Unavailable retry={retry} />
       </ShopShell>
     );
   if (!cartLines.length)
     return (
-      <ShopShell step={1} title="Checkout">
+      <ShopShell step={1} title={localize("Checkout")}>
         <EmptyCart />
       </ShopShell>
     );
@@ -917,7 +950,7 @@ export function CheckoutPage() {
 
   if (step === 1)
     return (
-      <ShopShell step={1} title="Delivery or pickup">
+      <ShopShell step={1} title={localize("Delivery or pickup")}>
         <div className="b-co-layout">
           {summary}
           <form
@@ -966,7 +999,7 @@ export function CheckoutPage() {
             }}
           >
             <Card
-              title={pickup ? "Pickup details" : "Delivery details"}
+              title={localize(pickup ? "Pickup details" : "Delivery details")}
               headingRef={heading}
             >
               <fieldset className="b-fulfillment-choice">
@@ -1036,8 +1069,7 @@ export function CheckoutPage() {
                       </option>
                       {config.zones.map((z) => (
                         <option key={z.id} value={z.id}>
-                          <CustomerCopy>{z.name}</CustomerCopy>{" "}
-                          <CustomerCopy>— Minimum AED</CustomerCopy>{" "}
+                          {z.name} <CustomerCopy>— Minimum AED</CustomerCopy>{" "}
                           {z.minOrderAed}
                         </option>
                       ))}
@@ -1067,9 +1099,7 @@ export function CheckoutPage() {
                       {quote.eligible ? (
                         <>
                           <p className="b-caption">
-                            <CustomerCopy>Minimum order for</CustomerCopy>{" "}
-                            {quote.zoneName} <CustomerCopy>is</CustomerCopy>{" "}
-                            <CustomerCopy>{formatAed(minFils)}</CustomerCopy>.
+                            <CustomerCopy>{`Minimum order for ${quote.zoneName} is ${formatAed(minFils)}.`}</CustomerCopy>
                           </p>
                         </>
                       ) : (
@@ -1210,7 +1240,7 @@ export function CheckoutPage() {
                       <Input
                         required
                         maxLength={60}
-                        placeholder="e.g. afternoon, after 4 pm"
+                        placeholder={localize("e.g. afternoon, after 4 pm")}
                         value={delivery.slot ?? ""}
                         onChange={(e) => set("slot", e.target.value)}
                       />
@@ -1233,7 +1263,9 @@ export function CheckoutPage() {
                     <Textarea
                       rows={3}
                       maxLength={500}
-                      placeholder="Gate code, landmark, who will receive it"
+                      placeholder={localize(
+                        "Gate code, landmark, who will receive it",
+                      )}
                       value={delivery.notes ?? ""}
                       onChange={(e) => set("notes", e.target.value)}
                     />
@@ -1272,7 +1304,7 @@ export function CheckoutPage() {
                 </CustomerCopy>
               </Button>
               <a className="b-link" href="/cart">
-                <ArrowLeft aria-hidden />{" "}
+                <ArrowLeft className="b-directional" aria-hidden />{" "}
                 <CustomerCopy>Back to cart</CustomerCopy>
               </a>
             </div>
@@ -1284,7 +1316,7 @@ export function CheckoutPage() {
   if (step === 2) {
     const phoneOk = !!normalizeUaeMobile(customer.phone ?? "");
     return (
-      <ShopShell step={2} title="Your details">
+      <ShopShell step={2} title={localize("Your details")}>
         <div className="b-co-layout">
           {summary}
           <form
@@ -1311,7 +1343,7 @@ export function CheckoutPage() {
               setStep(3);
             }}
           >
-            <Card title="Contact details" headingRef={heading}>
+            <Card title={localize("Contact details")} headingRef={heading}>
               <label>
                 <CustomerCopy>Full name</CustomerCopy>{" "}
                 <Input
@@ -1382,13 +1414,15 @@ export function CheckoutPage() {
                 <Textarea
                   rows={3}
                   maxLength={500}
-                  placeholder="A message for the cake, allergies to mention, anything we should know"
+                  placeholder={localize(
+                    "A message for the cake, allergies to mention, anything we should know",
+                  )}
                   value={customer.instructions ?? ""}
                   onChange={(e) => setC("instructions", e.target.value)}
                 />
               </label>
             </Card>
-            <Card title="Billing address">
+            <Card title={localize("Billing address")}>
               {!pickup && (
                 <label className="b-check b-co-toggle">
                   <input
@@ -1414,7 +1448,7 @@ export function CheckoutPage() {
               )}
               {billing.sameAsDelivery ? (
                 <p className="b-caption b-co-address-preview">
-                  <CustomerCopy>
+                  <bdi>
                     {billingLines(
                       billing,
                       delivery as Delivery,
@@ -1422,7 +1456,7 @@ export function CheckoutPage() {
                     )
                       .filter(Boolean)
                       .join(", ")}
-                  </CustomerCopy>
+                  </bdi>
                 </p>
               ) : (
                 <fieldset className="b-shop-billing">
@@ -1498,7 +1532,7 @@ export function CheckoutPage() {
                       </option>
                       {COUNTRIES.map((c) => (
                         <option key={c.code} value={c.code}>
-                          <CustomerCopy>{c.name}</CustomerCopy>
+                          {countryName(c.code)}
                         </option>
                       ))}
                     </Select>
@@ -1520,7 +1554,7 @@ export function CheckoutPage() {
                 className="b-link"
                 onClick={() => setStep(1)}
               >
-                <ArrowLeft aria-hidden />{" "}
+                <ArrowLeft className="b-directional" aria-hidden />{" "}
                 <CustomerCopy>Back to delivery</CustomerCopy>
               </button>
             </div>
@@ -1583,15 +1617,22 @@ async function heldCheckout(checkout: unknown): Promise<Status | null> {
 
 /** Accepted card marks: the official, unmodified files on white tiles. */
 function CardMarks() {
+  const { text: localize } = useCustomerLanguage();
+
   return (
-    <ul className="b-co-marks" aria-label="Accepted cards">
+    <ul className="b-co-marks" aria-label={localize("Accepted cards")}>
       <li>
-        <img src="/payments/visa.svg" alt="Visa" width="40" height="24" />
+        <img
+          src="/payments/visa.svg"
+          alt={localize("Visa")}
+          width="40"
+          height="24"
+        />
       </li>
       <li>
         <img
           src="/payments/mastercard.svg"
-          alt="Mastercard"
+          alt={localize("Mastercard")}
           width="34"
           height="24"
         />
@@ -1672,6 +1713,8 @@ function PaymentStep({
   back: () => void;
   backToDelivery: () => void;
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   const [reviewed, setReviewed] = useState(false);
   const [held, setHeld] = useState<Status | null>(null);
   const [checkingPrevious, setCheckingPrevious] = useState(true);
@@ -1789,13 +1832,13 @@ function PaymentStep({
       type="button"
       className="b-co-edit"
       onClick={onClick}
-      aria-label={label}
+      aria-label={localize(label)}
     >
       <CustomerCopy>Edit</CustomerCopy>
     </button>
   );
   return (
-    <ShopShell step={3} title="Review and pay">
+    <ShopShell step={3} title={localize("Review and pay")}>
       <div className="b-co-layout">
         <OrderSummary
           lines={lines}
@@ -1806,7 +1849,10 @@ function PaymentStep({
           total={total}
         />
         <div className="b-co-main">
-          <section className="b-co-card b-co-review" aria-label="Order review">
+          <section
+            className="b-co-card b-co-review"
+            aria-label={localize("Order review")}
+          >
             <div className="b-co-review-row">
               <h2>
                 <CustomerCopy>Your order</CustomerCopy>
@@ -1828,10 +1874,10 @@ function PaymentStep({
                 <CustomerCopy>{pickup ? "Pickup" : "Delivery"}</CustomerCopy>
               </h2>
               <p>
-                <CustomerCopy>{longDate(delivery.date)}</CustomerCopy> ·{" "}
+                <bdi>{longDate(delivery.date)}</bdi> ·{" "}
                 <CustomerCopy>{delivery.slot}</CustomerCopy>
                 <br />
-                <CustomerCopy>
+                <bdi>
                   {pickup
                     ? `${business.tradingName} · ${business.address}`
                     : [
@@ -1842,12 +1888,12 @@ function PaymentStep({
                       ]
                         .filter(Boolean)
                         .join(", ")}
-                </CustomerCopy>
+                </bdi>
                 {!pickup && delivery.notes && (
                   <>
                     <br />
                     <span className="b-caption">
-                      <CustomerCopy>{delivery.notes}</CustomerCopy>
+                      <bdi>{delivery.notes}</bdi>
                     </span>
                   </>
                 )}
@@ -1859,19 +1905,22 @@ function PaymentStep({
                 <CustomerCopy>Contact</CustomerCopy>
               </h2>
               <p>
-                <CustomerCopy>{customer.name}</CustomerCopy> ·{" "}
-                <CustomerCopy>
+                <bdi>{customer.name}</bdi> ·{" "}
+                <bdi dir="ltr">
                   {normalizeUaeMobile(customer.phone) ?? customer.phone}
-                </CustomerCopy>
+                </bdi>
                 {customer.whatsappNumber && (
-                  <p>
-                    WhatsApp: {normalizeWhatsAppNumber(customer.whatsappNumber)}
-                  </p>
+                  <>
+                    <br /> <CustomerCopy>WhatsApp:</CustomerCopy>{" "}
+                    <bdi dir="ltr">
+                      {normalizeWhatsAppNumber(customer.whatsappNumber)}
+                    </bdi>
+                  </>
                 )}
                 {customer.email && (
                   <>
                     <br />
-                    {customer.email}
+                    <bdi dir="ltr">{customer.email}</bdi>
                   </>
                 )}
               </p>
@@ -1890,11 +1939,11 @@ function PaymentStep({
                     <br />
                   </>
                 )}
-                <CustomerCopy>
+                <bdi>
                   {billingLines(billing, delivery, customer.name)
                     .filter(Boolean)
                     .join(", ")}
-                </CustomerCopy>
+                </bdi>
               </p>
               {edit(back, "Edit billing address")}
             </div>
@@ -1904,7 +1953,7 @@ function PaymentStep({
               {held.paymentStatus === "paid" ? (
                 <StateNotice
                   state="PAID"
-                  title="This order is already paid"
+                  title={localize("This order is already paid")}
                   message={`Order ${held.orderId} from this visit is already paid.`}
                 />
               ) : (
@@ -2025,7 +2074,7 @@ function PaymentStep({
                       <CustomerCopy>PROCESSING…</CustomerCopy>
                     </>
                   ) : (
-                    `PAY ${formatAed(total)}`
+                    <CustomerCopy>{`PAY ${formatAed(total)}`}</CustomerCopy>
                   )}
                 </Button>
               )}
@@ -2051,6 +2100,8 @@ function PaymentStep({
  * comes from the server's reconciled record, which asks the provider directly.
  */
 export function CheckoutReturn() {
+  const { text: localize } = useCustomerLanguage();
+
   const [result, setResult] = useState<Status | null>(null);
   const [error, setError] = useState("");
   const [revision, setRevision] = useState(0);
@@ -2119,7 +2170,7 @@ export function CheckoutReturn() {
         }
       : stateCopy("PROCESSING");
   return (
-    <ShopShell step={3} title={copy.title} bare>
+    <ShopShell step={3} title={localize(copy.title)} bare>
       <div className="b-co-status">
         <h1>
           <CustomerCopy>{copy.title}</CustomerCopy>
@@ -2138,7 +2189,7 @@ export function CheckoutReturn() {
                 <CustomerCopy>Order number</CustomerCopy>
               </dt>
               <dd>
-                <CustomerCopy>{result.orderId}</CustomerCopy>
+                <bdi>{result.orderId}</bdi>
               </dd>
             </div>
             <div>
@@ -2209,6 +2260,8 @@ function SupportLink({ orderId }: { orderId?: string }) {
 
 /** Shown only for an authoritative, reconciled PAID order (see paymentStateOf). */
 function Confirmation({ result }: { result: Status }) {
+  const { text: localize, language } = useCustomerLanguage();
+
   const s = result.summary;
   const name = firstName(s?.customerName);
   const progress =
@@ -2218,7 +2271,7 @@ function Confirmation({ result }: { result: Status }) {
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => heading.current?.focus(), []);
   return (
-    <ShopShell step={4} title="Thank you" bare>
+    <ShopShell step={4} title={localize("Thank you")} bare>
       <div className="b-co-confirm">
         <header className="b-co-confirm-hero">
           <span className="b-co-confirm-mark" aria-hidden>
@@ -2226,7 +2279,12 @@ function Confirmation({ result }: { result: Status }) {
           </span>
           <h1 ref={heading} tabIndex={-1}>
             <CustomerCopy>Thank you</CustomerCopy>
-            <CustomerCopy>{name ? `, ${name}` : ""}</CustomerCopy>
+            {name && (
+              <>
+                {language === "ar" ? "، " : ", "}
+                <bdi>{name}</bdi>
+              </>
+            )}
           </h1>
           <p className="b-co-confirm-lede" role="status">
             <CustomerCopy>Your order is confirmed</CustomerCopy>
@@ -2237,7 +2295,7 @@ function Confirmation({ result }: { result: Status }) {
                 <CustomerCopy>Order</CustomerCopy>
               </dt>
               <dd>
-                <CustomerCopy>{result.orderId}</CustomerCopy>
+                <bdi>{result.orderId}</bdi>
               </dd>
             </div>
             <div>
@@ -2301,7 +2359,7 @@ function Confirmation({ result }: { result: Status }) {
                 {business.address}
               </p>
               <p>
-                <CustomerCopy>{longDate(s.pickup.pickupDate)}</CustomerCopy> ·{" "}
+                <bdi>{longDate(s.pickup.pickupDate)}</bdi> ·{" "}
                 <CustomerCopy>{s.pickup.preferredTime}</CustomerCopy>
               </p>
               <p>
@@ -2326,7 +2384,7 @@ function Confirmation({ result }: { result: Status }) {
                       <CustomerCopy>Zone</CustomerCopy>
                     </dt>
                     <dd>
-                      <CustomerCopy>{s.delivery.zoneName}</CustomerCopy>
+                      <bdi>{s.delivery.zoneName}</bdi>
                     </dd>
                   </div>
                 )}
@@ -2335,15 +2393,15 @@ function Confirmation({ result }: { result: Status }) {
                     <CustomerCopy>Address</CustomerCopy>
                   </dt>
                   <dd>
-                    <CustomerCopy>
+                    <bdi>
                       {[
-                        s.delivery.unit && `Unit ${s.delivery.unit}`,
+                        s.delivery.unit,
                         s.delivery.building,
                         s.delivery.address,
                       ]
                         .filter(Boolean)
                         .join(", ")}
-                    </CustomerCopy>
+                    </bdi>
                   </dd>
                 </div>
                 <div>
@@ -2351,7 +2409,7 @@ function Confirmation({ result }: { result: Status }) {
                     <CustomerCopy>Date</CustomerCopy>
                   </dt>
                   <dd>
-                    <CustomerCopy>{longDate(s.delivery.date)}</CustomerCopy>
+                    <bdi>{longDate(s.delivery.date)}</bdi>
                   </dd>
                 </div>
                 <div>
@@ -2378,7 +2436,7 @@ function Confirmation({ result }: { result: Status }) {
                 </dt>
                 <dd className="b-co-paid">
                   <CustomerCopy>Paid</CustomerCopy>{" "}
-                  <Check aria-label="confirmed" weight="bold" />
+                  <Check aria-label={localize("confirmed")} weight="bold" />
                 </dd>
               </div>
               <div>
@@ -2402,7 +2460,7 @@ function Confirmation({ result }: { result: Status }) {
                   <CustomerCopy>Reference</CustomerCopy>
                 </dt>
                 <dd>
-                  <CustomerCopy>{result.orderId}</CustomerCopy>
+                  <bdi>{result.orderId}</bdi>
                 </dd>
               </div>
             </dl>

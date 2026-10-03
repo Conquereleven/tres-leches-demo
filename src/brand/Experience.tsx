@@ -1,3 +1,4 @@
+import { useLanguage as useCustomerLanguage } from "./localization";
 import { useEditorialMotion } from "./useEditorialMotion";
 import { MenuPreview, HowToOrderGuide } from "./StorefrontGuide";
 import { ResponsiveMedia } from "./media";
@@ -11,6 +12,8 @@ import "./storefront.css";
 const media = (name: string) => `/brand/reference/${name}`;
 /** Approved reference composition; no unfinished reference scaffolds or catalog duplication. */
 export function BrandExperience({ onManage }: { onManage: () => void }) {
+  const { text: localize } = useCustomerLanguage();
+
   const editorial = useEditorialMotion();
   const video = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -66,12 +69,12 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
         }}
       />
       <main id="main-content">
-        <section className="ref-hero" aria-label="Hero">
+        <section className="ref-hero" aria-label={localize("Hero")}>
           <video
             ref={video}
             width={540}
             height={960}
-            aria-label="Liza packaging a 3L cake"
+            aria-label={localize("Liza packaging a 3L cake")}
             poster="/brand/approved/packaging-poster.webp"
             autoPlay={allowMotion}
             onPlay={() => setPlaying(true)}
@@ -109,7 +112,9 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             </p>
             <button
               className="ref-watch"
-              aria-label={playing ? "Pause our story video" : "Watch our story"}
+              aria-label={localize(
+                playing ? "Pause our story video" : "Watch our story",
+              )}
               onClick={() => {
                 if (!video.current) return;
                 if (playing) {
@@ -145,7 +150,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             <span className="ref-city-crop">
               <img
                 src={"/brand/approved/editorial-mexico-dubai.webp"}
-                alt="Mexico City cathedral, the brand’s 1982 origin"
+                alt={localize("Mexico City cathedral, the brand’s 1982 origin")}
                 loading="lazy"
               />
             </span>
@@ -160,7 +165,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             <span className="ref-city-crop">
               <img
                 src={"/brand/approved/editorial-mexico-dubai.webp"}
-                alt="Dubai skyline, where the tradition continues"
+                alt={localize("Dubai skyline, where the tradition continues")}
                 loading="lazy"
               />
             </span>
@@ -215,7 +220,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
                         ? "Mango"
                         : "Saffron"
                   }
-                  alt={label!}
+                  alt={`${label!} product photograph`}
                 />
                 <span>{label}</span>
               </a>
@@ -223,13 +228,13 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
           </div>
           <a className="b-button" href="/menu?category=cakes">
             <CustomerCopy>VIEW ALL CAKES</CustomerCopy>{" "}
-            <ArrowRight aria-hidden />
+            <ArrowRight className="b-directional" aria-hidden />
           </a>
         </section>
         <section
           ref={editorial}
           className="ref-tradition"
-          aria-label="Tradition in every slice"
+          aria-label={localize("Tradition in every slice")}
         >
           <div className="ref-panel">
             <h2>
@@ -245,7 +250,10 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               </CustomerCopy>
             </p>
             <a className="b-link" href="/menu?category=cakes">
-              <ArrowRight className="ref-cta-circle" aria-hidden />
+              <ArrowRight
+                className="ref-cta-circle b-directional"
+                aria-hidden
+              />
               <span>
                 <CustomerCopy>VIEW THE</CustomerCopy> <br />{" "}
                 <CustomerCopy>COLLECTION</CustomerCopy>
@@ -262,19 +270,19 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             <img
               className="ref-slice ref-slice-one"
               src={media("nutella.webp")}
-              alt="Nutella Tres Leches slice"
+              alt={localize("Nutella Tres Leches slice")}
               loading="lazy"
             />
             <img
               className="ref-slice ref-slice-two"
               src={media("coffee.webp")}
-              alt="Coffee Latte Tres Leches slice"
+              alt={localize("Coffee Latte Tres Leches slice")}
               loading="lazy"
             />
             <img
               className="ref-slice ref-slice-three"
               src={media("original.webp")}
-              alt="Original Tres Leches slice"
+              alt={localize("Original Tres Leches slice")}
               loading="lazy"
             />
           </div>
@@ -297,7 +305,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             <img
               className="ref-alicia"
               src={media("alicia.webp")}
-              alt="Alicia Luna Baeza, 3L’s founding grandmother"
+              alt={localize("Alicia Luna Baeza, 3L’s founding grandmother")}
               loading="lazy"
             />
             <img
@@ -321,13 +329,13 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             <img
               className="ref-love"
               src={"/brand/approved/editorial-love.webp"}
-              alt="Nuestra historia también huele a amor"
+              alt={localize("Nuestra historia también huele a amor")}
               loading="lazy"
             />
             <img
               className="ref-liza"
               src={media("liza.webp")}
-              alt="Liza finishing a Tres Leches cake by hand"
+              alt={localize("Liza finishing a Tres Leches cake by hand")}
               loading="lazy"
             />
           </div>
@@ -359,7 +367,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               <CustomerCopy>
                 Treat yourself to our decadent Tres Leches cakes
               </CustomerCopy>{" "}
-              <ArrowRight aria-hidden />
+              <ArrowRight className="b-directional" aria-hidden />
             </a>
           </div>
         </section>

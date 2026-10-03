@@ -22,7 +22,7 @@ export const english = {
   how: "How to order",
   language: "Language",
 };
-// Existing approved general navigation only; all other copy stays English until reviewed.
+// Canonical navigation source labels; all locale resources live in locales/.
 export const arabic: Partial<typeof english> = {
   menu: "القائمة",
   cart: "السلة",
@@ -45,7 +45,7 @@ export function initialLocale(): Locale {
   }
 }
 type CopyResources = Record<string, { english: string; arabic: string | null }>;
-/** Approved resources only. Preserve English and interpolated values when input is incomplete. */
+/** Default resources use the strict i18next boundary; explicit fixtures retain legacy compatibility. */
 export function translatedCopy(
   source: string,
   locale: Locale,
@@ -127,7 +127,7 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
   );
 }
 export const useLanguage = () => useContext(Context);
-/** Text-node boundary: unapproved translations preserve the exact English source. */
+/** Text-node boundary: missing customer translations produce an explicit localized marker. */
 export function CustomerCopy({ children }: { children: string }) {
   const { text } = useLanguage();
   const value = text(children);

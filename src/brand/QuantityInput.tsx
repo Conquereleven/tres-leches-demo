@@ -1,3 +1,4 @@
+import { useLanguage as useCustomerLanguage } from "./localization";
 import { useState } from "react";
 /** Preserve an editing draft; commit complete integers, restore invalid drafts on blur. */
 export function QuantityInput({
@@ -11,11 +12,13 @@ export function QuantityInput({
   label: string;
   onChange: (value: number) => void;
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   const [draft, setDraft] = useState<string | null>(null);
   return (
     <input
       className="b-quantity-input"
-      aria-label={label}
+      aria-label={localize(label)}
       type="text"
       inputMode="numeric"
       pattern="[0-9]*"
@@ -46,7 +49,7 @@ export function QuantityInput({
           );
         }
       }}
-      aria-description={`Whole number from 1 to ${max}`}
+      aria-description={localize(`Whole number from 1 to ${max}`)}
     />
   );
 }

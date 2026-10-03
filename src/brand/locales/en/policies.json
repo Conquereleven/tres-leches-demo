@@ -151,7 +151,6 @@
   "copy_3542d896d1241150": "hours remaining before the scheduled delivery time;",
   "copy_1714a930396f4681": "is the customer-facing brand under which we trade. “You” means the person placing the order or using this website.",
   "copy_fd6e2e5e89b0b9fd": "non-refundable",
-  "copy_ec0f84cc9ffe5f58": "noopener noreferrer",
   "copy_2d5a48b39e17208c": "team members only.",
   "copy_00c61e182daf1f3d": "the cancellation was requested with fewer than",
   "copy_aa075725d5a6ec00": "the concern relates only to the natural variation of a handmade product, or to design details that were confirmed before payment;",
@@ -164,12 +163,14 @@
   "copy_b0c5f60b816e2b1d": "you cancel your order at least",
   "copy_44af570b43f02212": "you received an incorrect product, and the issue can reasonably be verified;",
   "copy_0c770277a7ece090": "your order reference;",
-  "copy_a9ca05770cc28c81": "{0}-h",
   "copy_08d5ffb77cb14530": "— carries the messages you exchange with us on WhatsApp.",
   "copy_75041f19c203e5d9": "— hosts this website and our order system.",
   "copy_a7fc45ace2d2d1a1": "— processes card payments and refunds on our behalf.",
   "copy_535de47af51604b8": "— receive the recipient details and location needed to deliver your order.",
   "copy_a665610ca0fcd3f6": "— status, amount, currency and a transaction reference — so we can confirm your order and handle any refund.",
   "copy_8d857c7b2869e4f2": "— where enabled, converts a shared location into an address so we can identify your delivery area.",
-  "copy_89f5fce3f22109a7": "— where enabled, provides AI tools that help our team prepare replies to customer messages. Our team remains responsible for orders, payments, refunds and cancellations."
+  "copy_89f5fce3f22109a7": "— where enabled, provides AI tools that help our team prepare replies to customer messages. Our team remains responsible for orders, payments, refunds and cancellations.",
+  "copy_e9f5387a744a5e44": "A confirmed order may be cancelled up to {0} hours before the scheduled delivery time. We then refund {1}% of the amount paid and retain {2}% as a cancellation and administrative fee. If fewer than {3} hours remain before the scheduled delivery time, the order cannot be cancelled and is non-refundable.",
+  "copy_df5a74a6246c5d87": "You can cancel a paid order up to {0} hours before the scheduled delivery time. Where we receive your request within that period, we refund {1}% of the amount you paid and retain {2}% as a cancellation and administrative fee.",
+  "copy_f772d231ea8be70f": "In cases 1 to 3 we refund the amount paid for the affected items. In case 4 we refund {0}% of the amount paid and retain {1}% as a cancellation and administrative fee."
 }

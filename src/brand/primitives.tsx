@@ -1,3 +1,5 @@
+import { useLanguage as useCustomerLanguage } from "./localization";
+import { CustomerCopy } from "./localization";
 import { approvedMedia, ResponsiveMedia as ApprovedImage } from "./media";
 import {
   useEffect,
@@ -24,7 +26,11 @@ export function TextLink({
 }) {
   return (
     <a className="b-link" href={href}>
-      {children}
+      {typeof children === "string" ? (
+        <CustomerCopy>{children}</CustomerCopy>
+      ) : (
+        children
+      )}
       <ArrowUpRight aria-hidden />
     </a>
   );
@@ -42,43 +48,121 @@ export function WhatsAppCTA({
   className?: string;
   ariaLabel?: string;
 }) {
-  const href = whatsappUrl(destinations.whatsapp, message);
+  const { text: localize } = useCustomerLanguage();
+
+  const href = whatsappUrl(destinations.whatsapp, localize(message));
   return href ? (
     <a
       className={`b-button b-wa ${className}`}
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ? localize(ariaLabel) : undefined}
       href={href}
       target="_blank"
       rel="noopener noreferrer"
     >
-      {children}
+      {typeof children === "string" ? (
+        <CustomerCopy>{children}</CustomerCopy>
+      ) : (
+        children
+      )}
       <ArrowUpRight aria-hidden />
     </a>
   ) : (
     <Button
       className={`b-wa ${className}`}
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ? localize(ariaLabel) : undefined}
       onClick={unavailable}
     >
-      {children}
+      {typeof children === "string" ? (
+        <CustomerCopy>{children}</CustomerCopy>
+      ) : (
+        children
+      )}
       <ArrowUpRight aria-hidden />
     </Button>
   );
 }
 export function SectionLabel({ children }: { children: ReactNode }) {
-  return <p className="b-label">{children}</p>;
+  return (
+    <p className="b-label">
+      {typeof children === "string" ? (
+        <CustomerCopy>{children}</CustomerCopy>
+      ) : (
+        children
+      )}
+    </p>
+  );
 }
 export function EditorialHeading({ children }: { children: ReactNode }) {
   return <h2 className="b-heading">{children}</h2>;
 }
 export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
-  return <input {...props} className={`b-input ${props.className ?? ""}`} />;
+  const { text: localize } = useCustomerLanguage();
+  return (
+    <input
+      {...props}
+      onInvalid={(event) => {
+        event.currentTarget.setCustomValidity(
+          localize(
+            event.currentTarget.validity.typeMismatch
+              ? "Enter a valid email address."
+              : "Please complete this field.",
+          ),
+        );
+        props.onInvalid?.(event);
+      }}
+      onInput={(event) => {
+        event.currentTarget.setCustomValidity("");
+        props.onInput?.(event);
+      }}
+      className={`b-input ${props.className ?? ""}`}
+    />
+  );
 }
 export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea {...props} className={`b-input ${props.className ?? ""}`} />;
+  const { text: localize } = useCustomerLanguage();
+  return (
+    <textarea
+      {...props}
+      onInvalid={(event) => {
+        event.currentTarget.setCustomValidity(
+          localize(
+            event.currentTarget.validity.typeMismatch
+              ? "Enter a valid email address."
+              : "Please complete this field.",
+          ),
+        );
+        props.onInvalid?.(event);
+      }}
+      onInput={(event) => {
+        event.currentTarget.setCustomValidity("");
+        props.onInput?.(event);
+      }}
+      className={`b-input ${props.className ?? ""}`}
+    />
+  );
 }
 export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
-  return <select {...props} className={`b-input ${props.className ?? ""}`} />;
+  const { text: localize } = useCustomerLanguage();
+  return (
+    <select
+      {...props}
+      onInvalid={(event) => {
+        event.currentTarget.setCustomValidity(
+          localize(
+            event.currentTarget.validity.typeMismatch
+              ? "Enter a valid email address."
+              : "Please complete this field.",
+          ),
+        );
+        props.onInvalid?.(event);
+      }}
+      onInput={(event) => {
+        event.currentTarget.setCustomValidity("");
+        props.onInput?.(event);
+      }}
+      className={`b-input ${props.className ?? ""}`}
+    />
+  );
 }
 export function Rule() {
   return <hr className="b-rule" />;
@@ -108,11 +192,13 @@ export function SectionContainer({
   className?: string;
   label?: string;
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   return (
     <section
       id={id}
       className={`b-section ${className}`}
-      aria-label={label}
+      aria-label={label ? localize(label) : undefined}
       data-reveal
     >
       {children}
@@ -126,6 +212,8 @@ export function ResponsiveMedia({
   asset: Asset;
   eager?: boolean;
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   const record = approvedMedia.find((a) =>
     a.derivatives.some((d) => d.src === asset.src),
   );
@@ -135,13 +223,13 @@ export function ResponsiveMedia({
         family={record.family}
         variant={record.variant ?? ""}
         size={record.size ?? undefined}
-        alt={asset.alt}
+        alt={localize(asset.alt)}
       />
     );
   return asset.src ? (
     <img
       src={asset.src}
-      alt={asset.alt}
+      alt={localize(asset.alt)}
       loading={eager ? "eager" : "lazy"}
       decoding="async"
     />
@@ -174,12 +262,14 @@ export function Logo({
   variant?: "wordmark" | "circle" | "circleNegative" | "icon";
   lazy?: boolean;
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   const asset = assets[variant];
   return (
     <img
       className={`b-logo b-logo-${variant}`}
       src={asset.src!}
-      alt={asset.alt}
+      alt={localize(asset.alt)}
       loading={lazy ? "lazy" : "eager"}
       decoding="async"
       width={variant === "wordmark" ? 430 : 220}
@@ -196,6 +286,8 @@ export function Modal({
   children: ReactNode;
   onClose: () => void;
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   const [closing, setClosing] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dismiss = () => {
@@ -262,7 +354,7 @@ export function Modal({
       <button
         autoFocus
         className="b-close"
-        aria-label="Close dialog"
+        aria-label={localize("Close dialog")}
         onClick={dismiss}
       >
         <X aria-hidden />

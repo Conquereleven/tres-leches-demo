@@ -3,34 +3,25 @@
     "english": "% as a cancellation and administrative fee. If fewer than",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:349"
-    ]
+    "sources": ["Policies.tsx:349"]
   },
   "% as a cancellation and administrative fee.": {
     "english": "% as a cancellation and administrative fee.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:770"
-    ]
+    "sources": ["Policies.tsx:770"]
   },
   "% of the amount paid and retain": {
     "english": "% of the amount paid and retain",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:348",
-      "Policies.tsx:769"
-    ]
+    "sources": ["Policies.tsx:348", "Policies.tsx:769"]
   },
   "% of the amount you paid": {
     "english": "% of the amount you paid",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:691"
-    ]
+    "sources": ["Policies.tsx:691"]
   },
   "(optional)": {
     "english": "(optional)",
@@ -48,65 +39,49 @@
     "english": "(trade licence {0})",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:188"
-    ]
+    "sources": ["Policies.tsx:188"]
   },
   ", and include:": {
     "english": ", and include:",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:729"
-    ]
+    "sources": ["Policies.tsx:729"]
   },
   ", and": {
     "english": ", and",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:196"
-    ]
+    "sources": ["Policies.tsx:196"]
   },
   ", based in": {
     "english": ", based in",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:452"
-    ]
+    "sources": ["Policies.tsx:452"]
   },
   ", is responsible for the personal information described in this policy. You can reach us using the details at the end of this page.": {
     "english": ", is responsible for the personal information described in this policy. You can reach us using the details at the end of this page.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:452"
-    ]
+    "sources": ["Policies.tsx:452"]
   },
   ", the legal entity behind the": {
     "english": ", the legal entity behind the",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:182"
-    ]
+    "sources": ["Policies.tsx:182"]
   },
   ", which explains delivery areas, minimum order values, charges, scheduling and what happens if a delivery cannot be completed.": {
     "english": ", which explains delivery areas, minimum order values, charges, scheduling and what happens if a delivery cannot be completed.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:331"
-    ]
+    "sources": ["Policies.tsx:331"]
   },
   ", which form part of these terms. If you do not agree, please do not place an order.": {
     "english": ", which form part of these terms. If you do not agree, please do not place an order.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:213"
-    ]
+    "sources": ["Policies.tsx:213"]
   },
   "": {
     "english": "",
@@ -179,97 +154,73 @@
     "english": ". If a price shown to you is clearly wrong, we will contact you before taking payment.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:263"
-    ]
+    "sources": ["Policies.tsx:263"]
   },
   ". Our products are freshly made to order and perishable, and preparation is already under way by that point.": {
     "english": ". Our products are freshly made to order and perishable, and preparation is already under way by that point.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:698"
-    ]
+    "sources": ["Policies.tsx:698"]
   },
   ". Please read them before placing an order.": {
     "english": ". Please read them before placing an order.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:168"
-    ]
+    "sources": ["Policies.tsx:168"]
   },
   ". We cannot refund to a different card or account. Once we have issued the refund, the time it takes to appear on your statement depends on your card issuer.": {
     "english": ". We cannot refund to a different card or account. Once we have issued the refund, the time it takes to appear on your statement depends on your card issuer.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:847"
-    ]
+    "sources": ["Policies.tsx:847"]
   },
   ". We do not receive or store your full card number or security code. We receive the payment result from": {
     "english": ". We do not receive or store your full card number or security code. We receive the payment result from",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:480"
-    ]
+    "sources": ["Policies.tsx:480"]
   },
   ". We then refund": {
     "english": ". We then refund",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:347"
-    ]
+    "sources": ["Policies.tsx:347"]
   },
   ". Where we receive your request within that period, we refund": {
     "english": ". Where we receive your request within that period, we refund",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:689"
-    ]
+    "sources": ["Policies.tsx:689"]
   },
   ". Your card details are entered directly on that page;": {
     "english": ". Your card details are entered directly on that page;",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:276"
-    ]
+    "sources": ["Policies.tsx:276"]
   },
   ". Your order is confirmed once the payment has been verified.": {
     "english": ". Your order is confirmed once the payment has been verified.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:123"
-    ]
+    "sources": ["Policies.tsx:123"]
   },
   "05X XXX XXXX": {
     "english": "05X XXX XXXX",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1282"
-    ]
+    "sources": ["Shop.tsx:1282"]
   },
   "1 kg": {
     "english": "1 kg",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.25.options.2.size"
-    ]
+    "sources": ["menu-data.json:catalog.families.25.options.2.size"]
   },
   "1.5 kg": {
     "english": "1.5 kg",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.25.options.3.size"
-    ]
+    "sources": ["menu-data.json:catalog.families.25.options.3.size"]
   },
   "10–12 personas": {
     "english": "10–12 personas",
@@ -395,9 +346,7 @@
     "english": "190 ml",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.26.options.0.size"
-    ]
+    "sources": ["menu-data.json:catalog.families.26.options.0.size"]
   },
   "1–3 personas": {
     "english": "1–3 personas",
@@ -466,41 +415,31 @@
     "english": "350 ml",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.26.options.1.size"
-    ]
+    "sources": ["menu-data.json:catalog.families.26.options.1.size"]
   },
   "3L home": {
     "english": "3L home",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:236"
-    ]
+    "sources": ["SiteChrome.tsx:236"]
   },
   "3L": {
     "english": "3L",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:217"
-    ]
+    "sources": ["MenuCatalog.tsx:217"]
   },
   "4 × 200 ml": {
     "english": "4 × 200 ml",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.14.options.0.size"
-    ]
+    "sources": ["menu-data.json:catalog.families.14.options.0.size"]
   },
   "500 g": {
     "english": "500 g",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.25.options.1.size"
-    ]
+    "sources": ["menu-data.json:catalog.families.25.options.1.size"]
   },
   "6 individuales · 100 g cada uno": {
     "english": "6 individuales · 100 g cada uno",
@@ -570,9 +509,7 @@
     "english": "6 × 110 ml",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.14.options.1.size"
-    ]
+    "sources": ["menu-data.json:catalog.families.14.options.1.size"]
   },
   "6–8 personas": {
     "english": "6–8 personas",
@@ -597,124 +534,91 @@
     "english": "A UAE mobile number, so our team can reach you.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1303"
-    ]
+    "sources": ["Shop.tsx:1303"]
   },
   "A confirmed order may be cancelled": {
     "english": "A confirmed order may be cancelled",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:346"
-    ]
+    "sources": ["Policies.tsx:346"]
   },
   "A family tradition.": {
     "english": "A family tradition.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:89"
-    ]
+    "sources": ["Experience.tsx:89"]
   },
   "A little taste": {
     "english": "A little taste",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:135"
-    ]
+    "sources": ["Experience.tsx:135"]
   },
   "A message for the cake, allergies to mention, anything we should know": {
     "english": "A message for the cake, allergies to mention, anything we should know",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1314"
-    ]
+    "sources": ["Shop.tsx:1314"]
   },
   "ADD TO CART · UNAVAILABLE": {
     "english": "ADD TO CART · UNAVAILABLE",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:124",
-      "MenuCatalog.tsx:124"
-    ]
+    "sources": ["MenuCatalog.tsx:124", "MenuCatalog.tsx:124"]
   },
   "ADD TO CART ·": {
     "english": "ADD TO CART ·",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:587"
-    ]
+    "sources": ["Shop.tsx:587"]
   },
   "ASK ABOUT COVERAGE": {
     "english": "ASK ABOUT COVERAGE",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:513",
-      "Shop.tsx:1023"
-    ]
+    "sources": ["Shop.tsx:513", "Shop.tsx:1023"]
   },
   "Accepted cards": {
     "english": "Accepted cards",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1517"
-    ]
+    "sources": ["Shop.tsx:1517"]
   },
   "Add to your cart. You can change quantities or remove items before checkout.": {
     "english": "Add to your cart. You can change quantities or remove items before checkout.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "StorePages.tsx:46"
-    ]
+    "sources": ["StorePages.tsx:46"]
   },
   "Address line 1": {
     "english": "Address line 1",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1373"
-    ]
+    "sources": ["Shop.tsx:1373"]
   },
   "Address line 2": {
     "english": "Address line 2",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1383"
-    ]
+    "sources": ["Shop.tsx:1383"]
   },
   "Address suggestions": {
     "english": "Address suggestions",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "AddressAutocomplete.tsx:142"
-    ]
+    "sources": ["AddressAutocomplete.tsx:142"]
   },
   "Address": {
     "english": "Address",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:79",
-      "Shop.tsx:2257"
-    ]
+    "sources": ["Policies.tsx:79", "Shop.tsx:2257"]
   },
   "After payment, your order moves through preparation, ready and out for delivery. Our team can update you on WhatsApp.": {
     "english": "After payment, your order moves through preparation, ready and out for delivery. Our team can update you on WhatsApp.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:932"
-    ]
+    "sources": ["Policies.tsx:932"]
   },
   "Ajonjolí · Chocolate covering": {
     "english": "Ajonjolí · Chocolate covering",
@@ -738,50 +642,37 @@
     "english": "Alicia Luna Baeza, 3L’s founding grandmother",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:234"
-    ]
+    "sources": ["Experience.tsx:234"]
   },
   "Allow at least 12 hours before your window starts. Mango cakes, gelatinas and Rosca require at least 24 hours.": {
     "english": "Allow at least 12 hours before your window starts. Mango cakes, gelatinas and Rosca require at least 24 hours.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "StorePages.tsx:72"
-    ]
+    "sources": ["StorePages.tsx:72"]
   },
   "Amount": {
     "english": "Amount",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2068",
-      "Shop.tsx:2308"
-    ]
+    "sources": ["Shop.tsx:2068", "Shop.tsx:2308"]
   },
   "An order is not confirmed until payment has been verified. Before you pay, you can cancel or change your order at any time by telling us on WhatsApp — or simply by not completing the payment. Nothing is charged. Payment links expire after a limited time; an expired link cannot be used to take payment.": {
     "english": "An order is not confirmed until payment has been verified. Before you pay, you can cancel or change your order at any time by telling us on WhatsApp — or simply by not completing the payment. Nothing is charged. Payment links expire after a limited time; an expired link cannot be used to take payment.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:669"
-    ]
+    "sources": ["Policies.tsx:669"]
   },
   "Apartment or unit": {
     "english": "Apartment or unit",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1104"
-    ]
+    "sources": ["Shop.tsx:1104"]
   },
   "Approved refunds are made to the original Visa or Mastercard card used for payment, through our payment provider,": {
     "english": "Approved refunds are made to the original Visa or Mastercard card used for payment, through our payment provider,",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:844"
-    ]
+    "sources": ["Policies.tsx:844"]
   },
   "Azúcar · Chocolate covering": {
     "english": "Azúcar · Chocolate covering",
@@ -805,57 +696,43 @@
     "english": "BACK TO 3L",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2371"
-    ]
+    "sources": ["Shop.tsx:2371"]
   },
   "BAKERY": {
     "english": "BAKERY",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:129"
-    ]
+    "sources": ["SiteChrome.tsx:129"]
   },
   "BRIGHTER DAYS.": {
     "english": "BRIGHTER DAYS.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:171"
-    ]
+    "sources": ["SiteChrome.tsx:171"]
   },
   "BROWSE THE COLLECTION": {
     "english": "BROWSE THE COLLECTION",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:530"
-    ]
+    "sources": ["Shop.tsx:530"]
   },
   "Back to cart": {
     "english": "Back to cart",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1234"
-    ]
+    "sources": ["Shop.tsx:1234"]
   },
   "Back to delivery": {
     "english": "Back to delivery",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1454"
-    ]
+    "sources": ["Shop.tsx:1454"]
   },
   "Because our products are perishable food, delivered items cannot be returned to us for resale. This does not affect your rights under applicable UAE consumer protection law.": {
     "english": "Because our products are perishable food, delivered items cannot be returned to us for resale. This does not affect your rights under applicable UAE consumer protection law.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:809"
-    ]
+    "sources": ["Policies.tsx:809"]
   },
   "Berries": {
     "english": "Berries",
@@ -888,148 +765,109 @@
     "english": "Billing address is the same as delivery address",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1331"
-    ]
+    "sources": ["Shop.tsx:1331"]
   },
   "Billing address": {
     "english": "Billing address",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1321",
-      "Shop.tsx:1360",
-      "Shop.tsx:1804"
-    ]
+    "sources": ["Shop.tsx:1321", "Shop.tsx:1360", "Shop.tsx:1804"]
   },
   "Bisquets": {
     "english": "Bisquets",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.22.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.22.name"]
   },
   "Born in Mexico City in 1982, 3L began with a family recipe made with love and shared around one table. Today, that same tradition continues in Dubai.": {
     "english": "Born in Mexico City in 1982, 3L began with a family recipe made with love and shared around one table. Today, that same tradition continues in Dubai.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:122"
-    ]
+    "sources": ["Experience.tsx:122"]
   },
   "Building or villa": {
     "english": "Building or villa",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1095"
-    ]
+    "sources": ["Shop.tsx:1095"]
   },
   "Business": {
     "english": "Business",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:69"
-    ]
+    "sources": ["Policies.tsx:69"]
   },
   "By placing an order you agree to our": {
     "english": "By placing an order you agree to our",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:68"
-    ]
+    "sources": ["SiteChrome.tsx:68"]
   },
   "By using this website or placing an order with us, you agree to these Terms &amp; Conditions together with our": {
     "english": "By using this website or placing an order with us, you agree to these Terms &amp; Conditions together with our",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:208"
-    ]
+    "sources": ["Policies.tsx:208"]
   },
   "CAKE JARS": {
     "english": "CAKE JARS",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:126"
-    ]
+    "sources": ["SiteChrome.tsx:126"]
   },
   "CAKES": {
     "english": "CAKES",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:123"
-    ]
+    "sources": ["SiteChrome.tsx:123"]
   },
   "CART ({0})": {
     "english": "CART ({0})",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "CartLink.tsx:19"
-    ]
+    "sources": ["CartLink.tsx:19"]
   },
   "CHECK AGAIN": {
     "english": "CHECK AGAIN",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2105"
-    ]
+    "sources": ["Shop.tsx:2105"]
   },
   "CHECK PAYMENT STATUS": {
     "english": "CHECK PAYMENT STATUS",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1843",
-      "Shop.tsx:1843"
-    ]
+    "sources": ["Shop.tsx:1843", "Shop.tsx:1843"]
   },
   "COLLECTION": {
     "english": "COLLECTION",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:187"
-    ]
+    "sources": ["Experience.tsx:187"]
   },
   "CONTACT US": {
     "english": "CONTACT US",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:137"
-    ]
+    "sources": ["SiteChrome.tsx:137"]
   },
   "CONTINUE PAYMENT": {
     "english": "CONTINUE PAYMENT",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2085"
-    ]
+    "sources": ["Shop.tsx:2085"]
   },
   "CONTINUE TO FULFILLMENT": {
     "english": "CONTINUE TO FULFILLMENT",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:745"
-    ]
+    "sources": ["Shop.tsx:745"]
   },
   "CONTINUE TO DETAILS": {
     "english": "CONTINUE TO DETAILS",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1229"
-    ]
+    "sources": ["Shop.tsx:1229"]
   },
   "Caffe Latte": {
     "english": "Caffe Latte",
@@ -1047,116 +885,85 @@
     "english": "Cake Jar Bundle",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.14.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.14.name"]
   },
   "Cake Jars": {
     "english": "Cake Jars",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.categories.1.name"
-    ]
+    "sources": ["menu-data.json:catalog.categories.1.name"]
   },
   "Cake Topper": {
     "english": "Cake Topper",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.27.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.27.name"]
   },
   "Cakes, jars, bakery": {
     "english": "Cakes, jars, bakery",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:110"
-    ]
+    "sources": ["SiteChrome.tsx:110"]
   },
   "Candles": {
     "english": "Candles",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.28.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.28.name"]
   },
   "Card payments are processed on a secure page hosted by our payment provider,": {
     "english": "Card payments are processed on a secure page hosted by our payment provider,",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:49"
-    ]
+    "sources": ["SiteChrome.tsx:49"]
   },
   "Card": {
     "english": "Card",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2319"
-    ]
+    "sources": ["Shop.tsx:2319"]
   },
   "Carrot Cake": {
     "english": "Carrot Cake",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.16.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.16.name"]
   },
   "Category photograph": {
     "english": "Category photograph",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:189"
-    ]
+    "sources": ["MenuCatalog.tsx:189"]
   },
   "Change language": {
     "english": "Change language",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "localization.tsx:128"
-    ]
+    "sources": ["localization.tsx:128"]
   },
   "Check payment status": {
     "english": "Check payment status",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1924",
-      "Shop.tsx:1932"
-    ]
+    "sources": ["Shop.tsx:1924", "Shop.tsx:1932"]
   },
   "Checking address…": {
     "english": "Checking address…",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "AddressAutocomplete.tsx:132"
-    ]
+    "sources": ["AddressAutocomplete.tsx:132"]
   },
   "Checkout progress": {
     "english": "Checkout progress",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:271"
-    ]
+    "sources": ["Shop.tsx:271"]
   },
   "Checkout": {
     "english": "Checkout",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:826",
-      "Shop.tsx:834",
-      "Shop.tsx:840"
-    ]
+    "sources": ["Shop.tsx:826", "Shop.tsx:834", "Shop.tsx:840"]
   },
   "Cheese": {
     "english": "Cheese",
@@ -1172,9 +979,7 @@
     "english": "Cheesecake",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.17.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.17.name"]
   },
   "Cherry": {
     "english": "Cherry",
@@ -1226,57 +1031,43 @@
     "english": "Choose a country",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1427"
-    ]
+    "sources": ["Shop.tsx:1427"]
   },
   "Choose a date from tomorrow onwards and an available time window: 8 AM–1 PM, 1 PM–4 PM or 4 PM–9 PM.": {
     "english": "Choose a date from tomorrow onwards and an available time window: 8 AM–1 PM, 1 PM–4 PM or 4 PM–9 PM.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "StorePages.tsx:66"
-    ]
+    "sources": ["StorePages.tsx:66"]
   },
   "Choose a time": {
     "english": "Choose a time",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1145"
-    ]
+    "sources": ["Shop.tsx:1145"]
   },
   "Choose delivery or pickup. Delivery requires a verified address in a supported area. If verification is unavailable, choose pickup or contact 3L for help.": {
     "english": "Choose delivery or pickup. Delivery requires a verified address in a supported area. If verification is unavailable, choose pickup or contact 3L for help.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "StorePages.tsx:52"
-    ]
+    "sources": ["StorePages.tsx:52"]
   },
   "Choose your area": {
     "english": "Choose your area",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:997"
-    ]
+    "sources": ["Shop.tsx:997"]
   },
   "Choose your products from the menu, then select a size, flavour and quantity.": {
     "english": "Choose your products from the menu, then select a size, flavour and quantity.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "StorePages.tsx:40"
-    ]
+    "sources": ["StorePages.tsx:40"]
   },
   "City": {
     "english": "City",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1396"
-    ]
+    "sources": ["Shop.tsx:1396"]
   },
   "Classic": {
     "english": "Classic",
@@ -1294,25 +1085,19 @@
     "english": "Clear cart",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:724"
-    ]
+    "sources": ["Shop.tsx:724"]
   },
   "Close dialog": {
     "english": "Close dialog",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "primitives.tsx:251"
-    ]
+    "sources": ["primitives.tsx:251"]
   },
   "Cloud hosting provider": {
     "english": "Cloud hosting provider",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:551"
-    ]
+    "sources": ["Policies.tsx:551"]
   },
   "Coconut": {
     "english": "Coconut",
@@ -1330,65 +1115,49 @@
     "english": "Coffee Latte Tres Leches slice",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:206"
-    ]
+    "sources": ["Experience.tsx:206"]
   },
   "Collected": {
     "english": "Collected",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2343"
-    ]
+    "sources": ["Shop.tsx:2343"]
   },
   "Collections": {
     "english": "Collections",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:118"
-    ]
+    "sources": ["SiteChrome.tsx:118"]
   },
   "Conchas rellenas": {
     "english": "Conchas rellenas",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.5.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.5.name"]
   },
   "Conchas tradicional": {
     "english": "Conchas tradicional",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.4.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.4.name"]
   },
   "Conchas · Pack relleno": {
     "english": "Conchas · Pack relleno",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.7.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.7.name"]
   },
   "Conchas · Pack tradicional": {
     "english": "Conchas · Pack tradicional",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.6.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.6.name"]
   },
   "Conchas": {
     "english": "Conchas",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.categories.4.name"
-    ]
+    "sources": ["menu-data.json:catalog.categories.4.name"]
   },
   "Confetti": {
     "english": "Confetti",
@@ -1406,91 +1175,67 @@
     "english": "Confirm the area detected from your verified address, review its minimum order and add items if needed. Delivery is included once the minimum is met.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "StorePages.tsx:59"
-    ]
+    "sources": ["StorePages.tsx:59"]
   },
   "Confirmed": {
     "english": "Confirmed",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2343"
-    ]
+    "sources": ["Shop.tsx:2343"]
   },
   "Contact Pastelerías 3L": {
     "english": "Contact Pastelerías 3L",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2127"
-    ]
+    "sources": ["Shop.tsx:2127"]
   },
   "Contact details": {
     "english": "Contact details",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1263"
-    ]
+    "sources": ["Shop.tsx:1263"]
   },
   "Contact our customer care team on any of the numbers listed below.": {
     "english": "Contact our customer care team on any of the numbers listed below.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:822"
-    ]
+    "sources": ["Policies.tsx:822"]
   },
   "Contact": {
     "english": "Contact",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1786",
-      "SiteChrome.tsx:249"
-    ]
+    "sources": ["Shop.tsx:1786", "SiteChrome.tsx:249"]
   },
   "Continue shopping": {
     "english": "Continue shopping",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:715"
-    ]
+    "sources": ["Shop.tsx:715"]
   },
   "Continue to Paymennt’s secure payment page to complete your order.": {
     "english": "Continue to Paymennt’s secure payment page to complete your order.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1867"
-    ]
+    "sources": ["Shop.tsx:1867"]
   },
   "Country": {
     "english": "Country",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1419"
-    ]
+    "sources": ["Shop.tsx:1419"]
   },
   "Coverage verified. We could not determine your delivery area. Contact 3L or choose pickup.": {
     "english": "Coverage verified. We could not determine your delivery area. Contact 3L or choose pickup.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1071",
-      "Shop.tsx:1071"
-    ]
+    "sources": ["Shop.tsx:1071", "Shop.tsx:1071"]
   },
   "Crafted with Love: The 3L Family Legacy": {
     "english": "Crafted with Love: The 3L Family Legacy",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:271"
-    ]
+    "sources": ["Experience.tsx:271"]
   },
   "Cream": {
     "english": "Cream",
@@ -1526,73 +1271,55 @@
     "english": "Croissant",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.23.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.23.name"]
   },
   "Cubilete": {
     "english": "Cubilete",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.24.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.24.name"]
   },
   "Custom cakes are made to the details you confirm with our team (size, flavour, design and any text). Please check these details carefully before paying. By sending us images or text for a custom design, you confirm that you are entitled to use them.": {
     "english": "Custom cakes are made to the details you confirm with our team (size, flavour, design and any text). Please check these details carefully before paying. By sending us images or text for a custom design, you confirm that you are entitled to use them.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:229"
-    ]
+    "sources": ["Policies.tsx:229"]
   },
   "Customer care hours": {
     "english": "Customer care hours",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:84"
-    ]
+    "sources": ["Policies.tsx:84"]
   },
   "Customer policies": {
     "english": "Customer policies",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:1142"
-    ]
+    "sources": ["Policies.tsx:1142"]
   },
   "DULCE DE LECHE": {
     "english": "DULCE DE LECHE",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:145"
-    ]
+    "sources": ["Experience.tsx:145"]
   },
   "Date": {
     "english": "Date",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2273"
-    ]
+    "sources": ["Shop.tsx:2273"]
   },
   "Decrease quantity": {
     "english": "Decrease quantity",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:561"
-    ]
+    "sources": ["Shop.tsx:561"]
   },
   "Decrease {0}": {
     "english": "Decrease {0}",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:650"
-    ]
+    "sources": ["Shop.tsx:650"]
   },
   "Delivery Policy": {
     "english": "Delivery Policy",
@@ -1611,84 +1338,61 @@
     "english": "Delivery area",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:983"
-    ]
+    "sources": ["Shop.tsx:983"]
   },
   "Delivery date": {
     "english": "Delivery date",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1120"
-    ]
+    "sources": ["Shop.tsx:1120"]
   },
   "Delivery is included once your area’s minimum order is reached. Your area and address are confirmed in the next step.": {
     "english": "Delivery is included once your area’s minimum order is reached. Your area and address are confirmed in the next step.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:735"
-    ]
+    "sources": ["Shop.tsx:735"]
   },
   "Delivery is included once your supported zone’s minimum order is reached. There is no additional delivery fee.": {
     "english": "Delivery is included once your supported zone’s minimum order is reached. There is no additional delivery fee.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:910"
-    ]
+    "sources": ["Policies.tsx:910"]
   },
   "Delivery notes": {
     "english": "Delivery notes",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1191"
-    ]
+    "sources": ["Shop.tsx:1191"]
   },
   "Delivery or pickup": {
     "english": "Delivery or pickup",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:882"
-    ]
+    "sources": ["Shop.tsx:882"]
   },
   "Delivery staff": {
     "english": "Delivery staff",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:555"
-    ]
+    "sources": ["Policies.tsx:555"]
   },
   "Delivery time": {
     "english": "Delivery time",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1137",
-      "Shop.tsx:1137"
-    ]
+    "sources": ["Shop.tsx:1137", "Shop.tsx:1137"]
   },
   "Delivery — Included once minimum order is reached": {
     "english": "Delivery — Included once minimum order is reached",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:975"
-    ]
+    "sources": ["Shop.tsx:975"]
   },
   "Delivery": {
     "english": "Delivery",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1755",
-      "Shop.tsx:2241",
-      "SiteChrome.tsx:78"
-    ]
+    "sources": ["Shop.tsx:1755", "Shop.tsx:2241", "SiteChrome.tsx:78"]
   },
   "Dozen": {
     "english": "Dozen",
@@ -1707,17 +1411,13 @@
     "english": "Dubai skyline, where the tradition continues",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:109"
-    ]
+    "sources": ["Experience.tsx:109"]
   },
   "Dubai": {
     "english": "Dubai",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:115"
-    ]
+    "sources": ["Experience.tsx:115"]
   },
   "Dulce De Leche": {
     "english": "Dulce De Leche",
@@ -1742,205 +1442,151 @@
     "english": "EXPLORE 3L",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:262"
-    ]
+    "sources": ["SiteChrome.tsx:262"]
   },
   "EXPLORE THE MENU": {
     "english": "EXPLORE THE MENU",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "StorePages.tsx:91"
-    ]
+    "sources": ["StorePages.tsx:91"]
   },
   "Edit billing address": {
     "english": "Edit billing address",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1821"
-    ]
+    "sources": ["Shop.tsx:1821"]
   },
   "Edit cart": {
     "english": "Edit cart",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1047"
-    ]
+    "sources": ["Shop.tsx:1047"]
   },
   "Edit contact details": {
     "english": "Edit contact details",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1800"
-    ]
+    "sources": ["Shop.tsx:1800"]
   },
   "Edit delivery": {
     "english": "Edit delivery",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1782"
-    ]
+    "sources": ["Shop.tsx:1782"]
   },
   "Edit pickup": {
     "english": "Edit pickup",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1782"
-    ]
+    "sources": ["Shop.tsx:1782"]
   },
   "Edit": {
     "english": "Edit",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1721"
-    ]
+    "sources": ["Shop.tsx:1721"]
   },
   "Email for payment receipt": {
     "english": "Email for payment receipt",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1291"
-    ]
+    "sources": ["Shop.tsx:1291"]
   },
   "English": {
     "english": "English",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "localization.tsx:133"
-    ]
+    "sources": ["localization.tsx:133"]
   },
   "Enter your contact and billing details, review your order, then continue to secure Paymennt checkout.": {
     "english": "Enter your contact and billing details, review your order, then continue to secure Paymennt checkout.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "StorePages.tsx:78"
-    ]
+    "sources": ["StorePages.tsx:78"]
   },
   "Extras": {
     "english": "Extras",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.categories.7.name"
-    ]
+    "sources": ["menu-data.json:catalog.categories.7.name"]
   },
   "FAQ": {
     "english": "FAQ",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:141"
-    ]
+    "sources": ["SiteChrome.tsx:141"]
   },
   "FIND YOUR FAVOURITE.": {
     "english": "FIND YOUR FAVOURITE.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:165"
-    ]
+    "sources": ["MenuCatalog.tsx:165"]
   },
   "Family photograph": {
     "english": "Family photograph",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:211"
-    ]
+    "sources": ["MenuCatalog.tsx:211"]
   },
   "Filling": {
     "english": "Filling",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:55",
-      "MenuCatalog.tsx:55"
-    ]
+    "sources": ["MenuCatalog.tsx:55", "MenuCatalog.tsx:55"]
   },
   "Flavour": {
     "english": "Flavour",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:55",
-      "MenuCatalog.tsx:55"
-    ]
+    "sources": ["MenuCatalog.tsx:55", "MenuCatalog.tsx:55"]
   },
   "Free delivery · Minimum AED": {
     "english": "Free delivery · Minimum AED",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:136"
-    ]
+    "sources": ["Policies.tsx:136"]
   },
   "Full menu": {
     "english": "Full menu",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:158"
-    ]
+    "sources": ["MenuCatalog.tsx:158"]
   },
   "Full name": {
     "english": "Full name",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1265"
-    ]
+    "sources": ["Shop.tsx:1265"]
   },
   "Gate code, landmark, who will receive it": {
     "english": "Gate code, landmark, who will receive it",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1198",
-      "Shop.tsx:1197"
-    ]
+    "sources": ["Shop.tsx:1198", "Shop.tsx:1197"]
   },
   "Gestión": {
     "english": "Gestión",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:197"
-    ]
+    "sources": ["SiteChrome.tsx:197"]
   },
   "Give your order reference, the name on the order and the reason for your request, with photos if the order has a problem.": {
     "english": "Give your order reference, the name on the order and the reason for your request, with photos if the order has a problem.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:825"
-    ]
+    "sources": ["Policies.tsx:825"]
   },
   "HOME": {
     "english": "HOME",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:120",
-      "SiteChrome.tsx:266"
-    ]
+    "sources": ["SiteChrome.tsx:120", "SiteChrome.tsx:266"]
   },
   "HOW TO ORDER": {
     "english": "HOW TO ORDER",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:303"
-    ]
+    "sources": ["Experience.tsx:303"]
   },
   "Half Dozen": {
     "english": "Half Dozen",
@@ -1969,145 +1615,109 @@
     "english": "Hello 3L, could you help me check delivery coverage for my area?",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1021"
-    ]
+    "sources": ["Shop.tsx:1021"]
   },
   "Hello everyone! I'm Liza, the founder of 3L in Dubai. Step into our world, where each Tres Leches cake is a symbol of our family's heritage, made with love and the finest natural ingredients.": {
     "english": "Hello everyone! I'm Liza, the founder of 3L in Dubai. Step into our world, where each Tres Leches cake is a symbol of our family's heritage, made with love and the finest natural ingredients.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:276"
-    ]
+    "sources": ["Experience.tsx:276"]
   },
   "Hero": {
     "english": "Hero",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:37"
-    ]
+    "sources": ["Experience.tsx:37"]
   },
   "Hide": {
     "english": "Hide",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:438"
-    ]
+    "sources": ["Shop.tsx:438"]
   },
   "How would you like your order?": {
     "english": "How would you like your order?",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:936"
-    ]
+    "sources": ["Shop.tsx:936"]
   },
   "I've reviewed my order, fulfillment details and total, and I accept the": {
     "english": "I've reviewed my order, fulfillment details and total, and I accept the",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1880"
-    ]
+    "sources": ["Shop.tsx:1880"]
   },
   "IN EVERY": {
     "english": "IN EVERY",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:173"
-    ]
+    "sources": ["Experience.tsx:173"]
   },
   "If a refund is approved, we process it and confirm to you once it has been issued.": {
     "english": "If a refund is approved, we process it and confirm to you once it has been issued.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:833"
-    ]
+    "sources": ["Policies.tsx:833"]
   },
   "If fewer than": {
     "english": "If fewer than",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:695"
-    ]
+    "sources": ["Policies.tsx:695"]
   },
   "If our driver cannot reach the recipient, cannot access the location, or the delivery details are incorrect, we will try to contact you and the recipient by phone or WhatsApp.": {
     "english": "If our driver cannot reach the recipient, cannot access the location, or the delivery details are incorrect, we will try to contact you and the recipient by phone or WhatsApp.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:999"
-    ]
+    "sources": ["Policies.tsx:999"]
   },
   "If the delivery still cannot be completed, our team will contact you to agree the next steps. Because our products are perishable, we cannot hold them indefinitely, and any redelivery or refund is agreed with you by our team.": {
     "english": "If the delivery still cannot be completed, our team will contact you to agree the next steps. Because our products are perishable, we cannot hold them indefinitely, and any redelivery or refund is agreed with you by our team.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:1005"
-    ]
+    "sources": ["Policies.tsx:1005"]
   },
   "If you need to change delivery details after paying, tell us as soon as possible. A new address may be in a delivery area with a different minimum order value or charge.": {
     "english": "If you need to change delivery details after paying, tell us as soon as possible. A new address may be in a delivery area with a different minimum order value or charge.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:963"
-    ]
+    "sources": ["Policies.tsx:963"]
   },
   "If your order arrives damaged, incorrect or incomplete, please follow the steps in our": {
     "english": "If your order arrives damaged, incorrect or incomplete, please follow the steps in our",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:1018"
-    ]
+    "sources": ["Policies.tsx:1018"]
   },
   "In cases 1 to 3 we refund the amount paid for the affected items. In case 4 we refund": {
     "english": "In cases 1 to 3 we refund the amount paid for the affected items. In case 4 we refund",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:767"
-    ]
+    "sources": ["Policies.tsx:767"]
   },
   "In these terms, “we”, “us”, “our” and “3L” mean": {
     "english": "In these terms, “we”, “us”, “our” and “3L” mean",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:195"
-    ]
+    "sources": ["Policies.tsx:195"]
   },
   "Increase quantity": {
     "english": "Increase quantity",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:570"
-    ]
+    "sources": ["Shop.tsx:570"]
   },
   "Increase {0}": {
     "english": "Increase {0}",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:658"
-    ]
+    "sources": ["Shop.tsx:658"]
   },
   "Individual Pan de Muerto is available October 3–November 15. Half Dozen and Dozen packs remain available year-round.": {
     "english": "Individual Pan de Muerto is available October 3–November 15. Half Dozen and Dozen packs remain available year-round.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:38"
-    ]
+    "sources": ["MenuCatalog.tsx:38"]
   },
   "Individual · 100 g": {
     "english": "Individual · 100 g",
@@ -2165,17 +1775,13 @@
     "english": "Information",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:135"
-    ]
+    "sources": ["SiteChrome.tsx:135"]
   },
   "Instagram": {
     "english": "Instagram",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:147"
-    ]
+    "sources": ["SiteChrome.tsx:147"]
   },
   "Integral": {
     "english": "Integral",
@@ -2194,65 +1800,49 @@
     "english": "JOURNAL",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:251"
-    ]
+    "sources": ["SiteChrome.tsx:251"]
   },
   "Jelly (gelatina) dulce de leche": {
     "english": "Jelly (gelatina) dulce de leche",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.19.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.19.name"]
   },
   "Jelly (gelatina) fruits": {
     "english": "Jelly (gelatina) fruits",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.18.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.18.name"]
   },
   "Jelly (gelatina) yogurt strawberry": {
     "english": "Jelly (gelatina) yogurt strawberry",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.20.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.20.name"]
   },
   "Last updated": {
     "english": "Last updated",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:1105"
-    ]
+    "sources": ["Policies.tsx:1105"]
   },
   "Liza finishing a Tres Leches cake by hand": {
     "english": "Liza finishing a Tres Leches cake by hand",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:264"
-    ]
+    "sources": ["Experience.tsx:264"]
   },
   "Loading your cart…": {
     "english": "Loading your cart…",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:690"
-    ]
+    "sources": ["Shop.tsx:690"]
   },
   "Location": {
     "english": "Location",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:79"
-    ]
+    "sources": ["Policies.tsx:79"]
   },
   "Lotus": {
     "english": "Lotus",
@@ -2282,9 +1872,7 @@
     "english": "MEXICO CITY",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:81"
-    ]
+    "sources": ["Experience.tsx:81"]
   },
   "Mango": {
     "english": "Mango",
@@ -2302,9 +1890,7 @@
     "english": "Mapbox",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:541"
-    ]
+    "sources": ["Policies.tsx:541"]
   },
   "Mascarpone y cajeta · Chocolate covering": {
     "english": "Mascarpone y cajeta · Chocolate covering",
@@ -2350,10 +1936,7 @@
     "english": "Mastercard",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1523",
-      "SiteChrome.tsx:41"
-    ]
+    "sources": ["Shop.tsx:1523", "SiteChrome.tsx:41"]
   },
   "Matcha": {
     "english": "Matcha",
@@ -2371,57 +1954,43 @@
     "english": "Menu categories",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:167"
-    ]
+    "sources": ["MenuCatalog.tsx:167"]
   },
   "Message us on WhatsApp with what you would like. Our team confirms the items, availability and prices in AED.": {
     "english": "Message us on WhatsApp with what you would like. Our team confirms the items, availability and prices in AED.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:109"
-    ]
+    "sources": ["Policies.tsx:109"]
   },
   "Meta (WhatsApp Business)": {
     "english": "Meta (WhatsApp Business)",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:537"
-    ]
+    "sources": ["Policies.tsx:537"]
   },
   "Method": {
     "english": "Method",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2316"
-    ]
+    "sources": ["Shop.tsx:2316"]
   },
   "Mexico City cathedral, the brand’s 1982 origin": {
     "english": "Mexico City cathedral, the brand’s 1982 origin",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:94"
-    ]
+    "sources": ["Experience.tsx:94"]
   },
   "Mexico City": {
     "english": "Mexico City",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:100"
-    ]
+    "sources": ["Experience.tsx:100"]
   },
   "Milk": {
     "english": "Milk",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.26.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.26.name"]
   },
   "Mini · 40 g": {
     "english": "Mini · 40 g",
@@ -2485,33 +2054,25 @@
     "english": "Minimum order AED",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:147"
-    ]
+    "sources": ["Policies.tsx:147"]
   },
   "Minimum order for": {
     "english": "Minimum order for",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1032"
-    ]
+    "sources": ["Shop.tsx:1032"]
   },
   "Mobile navigation": {
     "english": "Mobile navigation",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:263"
-    ]
+    "sources": ["SiteChrome.tsx:263"]
   },
   "Mobile number": {
     "english": "Mobile number",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1277"
-    ]
+    "sources": ["Shop.tsx:1277"]
   },
   "Mono portion": {
     "english": "Mono portion",
@@ -2530,65 +2091,49 @@
     "english": "More than a cake.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:88"
-    ]
+    "sources": ["Experience.tsx:88"]
   },
   "My area isn't listed": {
     "english": "My area isn't listed",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1007"
-    ]
+    "sources": ["Shop.tsx:1007"]
   },
   "Name on billing address": {
     "english": "Name on billing address",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1363"
-    ]
+    "sources": ["Shop.tsx:1363"]
   },
   "Need help?": {
     "english": "Need help?",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:302"
-    ]
+    "sources": ["SiteChrome.tsx:302"]
   },
   "No verified address suggestions are available. Try another search, contact 3L or choose pickup.": {
     "english": "No verified address suggestions are available. Try another search, contact 3L or choose pickup.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "AddressAutocomplete.tsx:134"
-    ]
+    "sources": ["AddressAutocomplete.tsx:134"]
   },
   "Nothing in these terms limits any rights you have under applicable UAE consumer protection law.": {
     "english": "Nothing in these terms limits any rights you have under applicable UAE consumer protection law.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:389"
-    ]
+    "sources": ["Policies.tsx:389"]
   },
   "Nuestra historia también huele a amor": {
     "english": "Nuestra historia también huele a amor",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:258"
-    ]
+    "sources": ["Experience.tsx:258"]
   },
   "Nutella Tres Leches slice": {
     "english": "Nutella Tres Leches slice",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:200"
-    ]
+    "sources": ["Experience.tsx:200"]
   },
   "Nutella": {
     "english": "Nutella",
@@ -2606,176 +2151,127 @@
     "english": "OUR SIGNATURE FLAVORS",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:132"
-    ]
+    "sources": ["Experience.tsx:132"]
   },
   "On this page": {
     "english": "On this page",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:1122",
-      "Policies.tsx:1122",
-      "Policies.tsx:1123"
-    ]
+    "sources": ["Policies.tsx:1122", "Policies.tsx:1122", "Policies.tsx:1123"]
   },
   "Once your payment is verified, your order is confirmed and scheduled for preparation. Paid orders cannot be cancelled automatically — please contact us to request a cancellation.": {
     "english": "Once your payment is verified, your order is confirmed and scheduled for preparation. Paid orders cannot be cancelled automatically — please contact us to request a cancellation.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:683"
-    ]
+    "sources": ["Policies.tsx:683"]
   },
   "Online delivery isn't available for this area yet.": {
     "english": "Online delivery isn't available for this area yet.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1043",
-      "Shop.tsx:1043",
-      "Shop.tsx:1043"
-    ]
+    "sources": ["Shop.tsx:1043", "Shop.tsx:1043", "Shop.tsx:1043"]
   },
   "Online delivery isn't available for your area yet. Our team can still help you on WhatsApp.": {
     "english": "Online delivery isn't available for your area yet. Our team can still help you on WhatsApp.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1014"
-    ]
+    "sources": ["Shop.tsx:1014"]
   },
   "Online ordering is not available right now. Our team is happy to take your order on WhatsApp.": {
     "english": "Online ordering is not available right now. Our team is happy to take your order on WhatsApp.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:504"
-    ]
+    "sources": ["Shop.tsx:504"]
   },
   "Online ordering is unavailable for this option. Please try again later.": {
     "english": "Online ordering is unavailable for this option. Please try again later.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:130"
-    ]
+    "sources": ["MenuCatalog.tsx:130"]
   },
   "Online ordering is unavailable.": {
     "english": "Online ordering is unavailable.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:116"
-    ]
+    "sources": ["MenuCatalog.tsx:116"]
   },
   "Open menu": {
     "english": "Open menu",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:229"
-    ]
+    "sources": ["SiteChrome.tsx:229"]
   },
   "OpenAI": {
     "english": "OpenAI",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:545"
-    ]
+    "sources": ["Policies.tsx:545"]
   },
   "Order at least 24 hours in advance": {
     "english": "Order at least 24 hours in advance",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:107"
-    ]
+    "sources": ["MenuCatalog.tsx:107"]
   },
   "Order number": {
     "english": "Order number",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2060"
-    ]
+    "sources": ["Shop.tsx:2060"]
   },
   "Order review": {
     "english": "Order review",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1736"
-    ]
+    "sources": ["Shop.tsx:1736"]
   },
   "Order summary": {
     "english": "Order summary",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:429"
-    ]
+    "sources": ["Shop.tsx:429"]
   },
   "Order total": {
     "english": "Order total",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:731"
-    ]
+    "sources": ["Shop.tsx:731"]
   },
   "Order {0} from this visit is already paid.": {
     "english": "Order {0} from this visit is already paid.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1830",
-      "Shop.tsx:1830"
-    ]
+    "sources": ["Shop.tsx:1830", "Shop.tsx:1830"]
   },
   "Order {0}. We'll confirm it, or contact us with your order number.": {
     "english": "Order {0}. We'll confirm it, or contact us with your order number.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1836",
-      "Shop.tsx:1836"
-    ]
+    "sources": ["Shop.tsx:1836", "Shop.tsx:1836"]
   },
   "Order": {
     "english": "Order",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2159",
-      "Shop.tsx:2181"
-    ]
+    "sources": ["Shop.tsx:2159", "Shop.tsx:2181"]
   },
   "Orders are paid in full, in advance, by Visa or Mastercard through a secure payment page hosted by our payment provider,": {
     "english": "Orders are paid in full, in advance, by Visa or Mastercard through a secure payment page hosted by our payment provider,",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:273"
-    ]
+    "sources": ["Policies.tsx:273"]
   },
   "Orders are placed with our team through WhatsApp:": {
     "english": "Orders are placed with our team through WhatsApp:",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:250"
-    ]
+    "sources": ["Policies.tsx:250"]
   },
   "Orejas": {
     "english": "Orejas",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.21.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.21.name"]
   },
   "Oreo (cookies and cream)": {
     "english": "Oreo (cookies and cream)",
@@ -2800,233 +2296,169 @@
     "english": "Original Tres Leches slice",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:212"
-    ]
+    "sources": ["Experience.tsx:212"]
   },
   "Other Specialities": {
     "english": "Other Specialities",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.categories.5.name"
-    ]
+    "sources": ["menu-data.json:catalog.categories.5.name"]
   },
   "Our business address is {0}.": {
     "english": "Our business address is {0}.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:192"
-    ]
+    "sources": ["Policies.tsx:192"]
   },
   "Our cakes are freshly prepared, perishable food. This policy explains when an order can be cancelled, when a refund is possible, and how to ask for one.": {
     "english": "Our cakes are freshly prepared, perishable food. This policy explains when an order can be cancelled, when a refund is possible, and how to ask for one.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:636"
-    ]
+    "sources": ["Policies.tsx:636"]
   },
   "Our culinary story begins in 1982, in our family home in Mexico City, where my grandmother, Alicia Luna Baeza, crafted magical Tres Leches Cakes for her loved ones. With a family of 12, each cake was a masterpiece of love and dedication. Today, with about 40 bakeries in Mexico City, we decided to bring this legacy of flavor and tradition to Dubai as well.": {
     "english": "Our culinary story begins in 1982, in our family home in Mexico City, where my grandmother, Alicia Luna Baeza, crafted magical Tres Leches Cakes for her loved ones. With a family of 12, each cake was a masterpiece of love and dedication. Today, with about 40 bakeries in Mexico City, we decided to bring this legacy of flavor and tradition to Dubai as well.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:284"
-    ]
+    "sources": ["Experience.tsx:284"]
   },
   "Our products are made with ingredients such as milk, eggs and wheat flour. If you or anyone eating the product has an allergy or dietary requirement, tell us before you order so our team can advise you. We cannot guarantee that any product is free from allergens.": {
     "english": "Our products are made with ingredients such as milk, eggs and wheat flour. If you or anyone eating the product has an allergy or dietary requirement, tell us before you order so our team can advise you. We cannot guarantee that any product is free from allergens.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:235"
-    ]
+    "sources": ["Policies.tsx:235"]
   },
   "Our team confirms the preferred time with you.": {
     "english": "Our team confirms the preferred time with you.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1184"
-    ]
+    "sources": ["Shop.tsx:1184"]
   },
   "Our team reviews the request, may ask you for more information, and tells you the outcome.": {
     "english": "Our team reviews the request, may ask you for more information, and tells you the outcome.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:829"
-    ]
+    "sources": ["Policies.tsx:829"]
   },
   "PAUSE OUR STORY": {
     "english": "PAUSE OUR STORY",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:77"
-    ]
+    "sources": ["Experience.tsx:77"]
   },
   "PAY {0}": {
     "english": "PAY {0}",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1949",
-      "Shop.tsx:1949",
-      "Shop.tsx:1949"
-    ]
+    "sources": ["Shop.tsx:1949", "Shop.tsx:1949", "Shop.tsx:1949"]
   },
   "PROCESSING…": {
     "english": "PROCESSING…",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1947"
-    ]
+    "sources": ["Shop.tsx:1947"]
   },
   "Pack": {
     "english": "Pack",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:77",
-      "MenuCatalog.tsx:77"
-    ]
+    "sources": ["MenuCatalog.tsx:77", "MenuCatalog.tsx:77"]
   },
   "Paid": {
     "english": "Paid",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2167",
-      "Shop.tsx:2302"
-    ]
+    "sources": ["Shop.tsx:2167", "Shop.tsx:2302"]
   },
   "Pan de Muerto relleno": {
     "english": "Pan de Muerto relleno",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.1.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.1.name"]
   },
   "Pan de Muerto tradicional": {
     "english": "Pan de Muerto tradicional",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.0.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.0.name"]
   },
   "Pan de Muerto · Pack relleno": {
     "english": "Pan de Muerto · Pack relleno",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.3.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.3.name"]
   },
   "Pan de Muerto · Pack tradicional": {
     "english": "Pan de Muerto · Pack tradicional",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.2.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.2.name"]
   },
   "Pan de Muerto": {
     "english": "Pan de Muerto",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.categories.3.name"
-    ]
+    "sources": ["menu-data.json:catalog.categories.3.name"]
   },
   "Panadería Mexicana": {
     "english": "Panadería Mexicana",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.categories.2.name"
-    ]
+    "sources": ["menu-data.json:catalog.categories.2.name"]
   },
   "Pastelerías 3L · Home": {
     "english": "Pastelerías 3L · Home",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:300"
-    ]
+    "sources": ["Shop.tsx:300"]
   },
   "Pastelerías 3L": {
     "english": "Pastelerías 3L",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:241",
-      "SiteChrome.tsx:240"
-    ]
+    "sources": ["SiteChrome.tsx:241", "SiteChrome.tsx:240"]
   },
   "Pay by Visa or Mastercard on the secure page hosted by our payment provider,": {
     "english": "Pay by Visa or Mastercard on the secure page hosted by our payment provider,",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:121"
-    ]
+    "sources": ["Policies.tsx:121"]
   },
   "Payment links are valid for a limited time. If a link expires before you pay, nothing is charged and our team can send you a new one.": {
     "english": "Payment links are valid for a limited time. If a link expires before you pay, nothing is charged and our team can send you a new one.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:280"
-    ]
+    "sources": ["Policies.tsx:280"]
   },
   "Payment": {
     "english": "Payment",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1862",
-      "Shop.tsx:2293"
-    ]
+    "sources": ["Shop.tsx:1862", "Shop.tsx:2293"]
   },
   "Pickup date": {
     "english": "Pickup date",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1120"
-    ]
+    "sources": ["Shop.tsx:1120"]
   },
   "Pickup time": {
     "english": "Pickup time",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1137",
-      "Shop.tsx:1137"
-    ]
+    "sources": ["Shop.tsx:1137", "Shop.tsx:1137"]
   },
   "Pickup ·": {
     "english": "Pickup ·",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:962"
-    ]
+    "sources": ["Shop.tsx:962"]
   },
   "Pickup": {
     "english": "Pickup",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1755",
-      "Shop.tsx:2218"
-    ]
+    "sources": ["Shop.tsx:1755", "Shop.tsx:2218"]
   },
   "Pistacchio": {
     "english": "Pistacchio",
@@ -3090,198 +2522,145 @@
     "english": "Please check your order when it arrives. If anything is damaged, incorrect or missing, contact us",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:725"
-    ]
+    "sources": ["Policies.tsx:725"]
   },
   "Please don't close or refresh this page, or pay again.": {
     "english": "Please don't close or refresh this page, or pay again.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1908",
-      "Shop.tsx:1908"
-    ]
+    "sources": ["Shop.tsx:1908", "Shop.tsx:1908"]
   },
   "Please include your order reference and the name on the order. To cancel, change or report a problem with an order, see our": {
     "english": "Please include your order reference and the name on the order. To cancel, change or report a problem with an order, see our",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:1050"
-    ]
+    "sources": ["Policies.tsx:1050"]
   },
   "Please keep the product and packaging until we have reviewed your report. Where we confirm that an item was damaged, incorrect or missing because of an error on our side, we will offer a replacement or a refund for the affected items, in line with applicable UAE consumer protection law.": {
     "english": "Please keep the product and packaging until we have reviewed your report. Where we confirm that an item was damaged, incorrect or missing because of an error on our side, we will offer a replacement or a refund for the affected items, in line with applicable UAE consumer protection law.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:739"
-    ]
+    "sources": ["Policies.tsx:739"]
   },
   "Please make sure someone is available to receive the order at the agreed time. Our cakes are fresh, milk-soaked products: check the order on arrival, keep cakes level, and refrigerate them promptly.": {
     "english": "Please make sure someone is available to receive the order at the agreed time. Our cakes are fresh, milk-soaked products: check the order on arrival, keep cakes level, and refrigerate them promptly.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:975"
-    ]
+    "sources": ["Policies.tsx:975"]
   },
   "Please order at least {0}.": {
     "english": "Please order at least {0}.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:929"
-    ]
+    "sources": ["Policies.tsx:929"]
   },
   "Please order early for custom cakes and busy dates, as availability is limited.": {
     "english": "Please order early for custom cakes and busy dates, as availability is limited.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:930"
-    ]
+    "sources": ["Policies.tsx:930"]
   },
   "Policies": {
     "english": "Policies",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:158"
-    ]
+    "sources": ["SiteChrome.tsx:158"]
   },
   "Postal code": {
     "english": "Postal code",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1406"
-    ]
+    "sources": ["Shop.tsx:1406"]
   },
   "Preferred delivery time": {
     "english": "Preferred delivery time",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1170",
-      "Shop.tsx:1170"
-    ]
+    "sources": ["Shop.tsx:1170", "Shop.tsx:1170"]
   },
   "Preferred pickup time": {
     "english": "Preferred pickup time",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1169",
-      "Shop.tsx:1169"
-    ]
+    "sources": ["Shop.tsx:1169", "Shop.tsx:1169"]
   },
   "Preferred time": {
     "english": "Preferred time",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2281"
-    ]
+    "sources": ["Shop.tsx:2281"]
   },
   "Preparing checkout…": {
     "english": "Preparing checkout…",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:828"
-    ]
+    "sources": ["Shop.tsx:828"]
   },
   "Preparing": {
     "english": "Preparing",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2343"
-    ]
+    "sources": ["Shop.tsx:2343"]
   },
   "Prices are in UAE dirhams (AED). The total you pay — products plus any delivery charge — is shown on your payment link before you pay. Each delivery area has a minimum order value, set out in our": {
     "english": "Prices are in UAE dirhams (AED). The total you pay — products plus any delivery charge — is shown on your payment link before you pay. Each delivery area has a minimum order value, set out in our",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:259"
-    ]
+    "sources": ["Policies.tsx:259"]
   },
   "Primary": {
     "english": "Primary",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:220"
-    ]
+    "sources": ["SiteChrome.tsx:220"]
   },
   "Privacy Policy": {
     "english": "Privacy Policy",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:213"
-    ]
+    "sources": ["Policies.tsx:213"]
   },
   "Privacy": {
     "english": "Privacy",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:82"
-    ]
+    "sources": ["SiteChrome.tsx:82"]
   },
   "Processing your payment…": {
     "english": "Processing your payment…",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1907",
-      "Shop.tsx:1907"
-    ]
+    "sources": ["Shop.tsx:1907", "Shop.tsx:1907"]
   },
   "Quantity": {
     "english": "Quantity",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:559",
-      "Shop.tsx:2198"
-    ]
+    "sources": ["Shop.tsx:559", "Shop.tsx:2198"]
   },
   "Questions about an order, a custom cake or delivery? Our team is here to help.": {
     "english": "Questions about an order, a custom cake or delivery? Our team is here to help.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:1035"
-    ]
+    "sources": ["Policies.tsx:1035"]
   },
   "Questions about this policy or an order can be sent to our customer care team. Please include your order reference where you have one.": {
     "english": "Questions about this policy or an order can be sent to our customer care team. Please include your order reference where you have one.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:98"
-    ]
+    "sources": ["Policies.tsx:98"]
   },
   "RETURN TO CHECKOUT": {
     "english": "RETURN TO CHECKOUT",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2095"
-    ]
+    "sources": ["Shop.tsx:2095"]
   },
   "REVIEW ORDER": {
     "english": "REVIEW ORDER",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1446"
-    ]
+    "sources": ["Shop.tsx:1446"]
   },
   "Raspberry": {
     "english": "Raspberry",
@@ -3299,17 +2678,13 @@
     "english": "Ready for pickup",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2343"
-    ]
+    "sources": ["Shop.tsx:2343"]
   },
   "Reference": {
     "english": "Reference",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2324"
-    ]
+    "sources": ["Shop.tsx:2324"]
   },
   "Refund &amp; Cancellation Policy": {
     "english": "Refund &amp; Cancellation Policy",
@@ -3328,57 +2703,43 @@
     "english": "Refund &amp;amp; Cancellation",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:74"
-    ]
+    "sources": ["SiteChrome.tsx:74"]
   },
   "Remove all items from your cart?": {
     "english": "Remove all items from your cart?",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:720"
-    ]
+    "sources": ["Shop.tsx:720"]
   },
   "Remove {0}": {
     "english": "Remove {0}",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:671"
-    ]
+    "sources": ["Shop.tsx:671"]
   },
   "Remove": {
     "english": "Remove",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:622"
-    ]
+    "sources": ["Shop.tsx:622"]
   },
   "Return to 3L for payment verification, confirmation and order tracking. An unverified payment is never shown as confirmed.": {
     "english": "Return to 3L for payment verification, confirmation and order tracking. An unverified payment is never shown as confirmed.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "StorePages.tsx:84"
-    ]
+    "sources": ["StorePages.tsx:84"]
   },
   "Review and pay": {
     "english": "Review and pay",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1725"
-    ]
+    "sources": ["Shop.tsx:1725"]
   },
   "Rosca de Reyes (3 kings pastry)": {
     "english": "Rosca de Reyes (3 kings pastry)",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.25.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.25.name"]
   },
   "Rosettas": {
     "english": "Rosettas",
@@ -3394,33 +2755,25 @@
     "english": "SINCE 1982",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:82"
-    ]
+    "sources": ["Experience.tsx:82"]
   },
   "SLICE.": {
     "english": "SLICE.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:174"
-    ]
+    "sources": ["Experience.tsx:174"]
   },
   "SPECIAL OCCASIONS": {
     "english": "SPECIAL OCCASIONS",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:132"
-    ]
+    "sources": ["SiteChrome.tsx:132"]
   },
   "SWEET PEOPLE.": {
     "english": "SWEET PEOPLE.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:170"
-    ]
+    "sources": ["SiteChrome.tsx:170"]
   },
   "Saffron": {
     "english": "Saffron",
@@ -3438,66 +2791,49 @@
     "english": "Same as delivery address",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1810"
-    ]
+    "sources": ["Shop.tsx:1810"]
   },
   "Seasonal": {
     "english": "Seasonal",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.categories.6.name"
-    ]
+    "sources": ["menu-data.json:catalog.categories.6.name"]
   },
   "Secure card payment · Visa and Mastercard": {
     "english": "Secure card payment · Visa and Mastercard",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:749"
-    ]
+    "sources": ["Shop.tsx:749"]
   },
   "Secure checkout": {
     "english": "Secure checkout",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:305"
-    ]
+    "sources": ["Shop.tsx:305"]
   },
   "Secure payments": {
     "english": "Secure payments",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:27"
-    ]
+    "sources": ["SiteChrome.tsx:27"]
   },
   "Share your delivery location — ideally a WhatsApp location pin — so we can confirm the delivery area and its minimum order value.": {
     "english": "Share your delivery location — ideally a WhatsApp location pin — so we can confirm the delivery area and its minimum order value.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:113"
-    ]
+    "sources": ["Policies.tsx:113"]
   },
   "Show": {
     "english": "Show",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:438"
-    ]
+    "sources": ["Shop.tsx:438"]
   },
   "Size / pack": {
     "english": "Size / pack",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:77",
-      "MenuCatalog.tsx:77"
-    ]
+    "sources": ["MenuCatalog.tsx:77", "MenuCatalog.tsx:77"]
   },
   "Skip to content": {
     "english": "Skip to content",
@@ -3529,240 +2865,175 @@
     "english": "Soaked in",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:54"
-    ]
+    "sources": ["Experience.tsx:54"]
   },
   "Some of these providers may process information outside the UAE. We may also disclose information where required by law or by a competent authority.": {
     "english": "Some of these providers may process information outside the UAE. We may also disclose information where required by law or by a competent authority.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:559"
-    ]
+    "sources": ["Policies.tsx:559"]
   },
   "Special Flavours 3 Leches Cake": {
     "english": "Special Flavours 3 Leches Cake",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.11.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.11.name"]
   },
   "Special Flavours Cake Jar": {
     "english": "Special Flavours Cake Jar",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.families.15.name"
-    ]
+    "sources": ["menu-data.json:catalog.families.15.name"]
   },
   "Special instructions": {
     "english": "Special instructions",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1308"
-    ]
+    "sources": ["Shop.tsx:1308"]
   },
   "Status": {
     "english": "Status",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2299"
-    ]
+    "sources": ["Shop.tsx:2299"]
   },
   "Step": {
     "english": "Step",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:273"
-    ]
+    "sources": ["Shop.tsx:273"]
   },
   "Street address and community": {
     "english": "Street address and community",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1060"
-    ]
+    "sources": ["Shop.tsx:1060"]
   },
   "Subject to applicable UAE data protection law, you can ask us for a copy of the personal information we hold about you, ask us to correct it, ask us to delete it where we are not required to keep it, or object to marketing. Contact us using the details below and we will respond to your request.": {
     "english": "Subject to applicable UAE data protection law, you can ask us for a copy of the personal information we hold about you, ask us to correct it, ask us to delete it where we are not required to keep it, or object to marketing. Contact us using the details below and we will respond to your request.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:607"
-    ]
+    "sources": ["Policies.tsx:607"]
   },
   "Subtotal": {
     "english": "Subtotal",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:359"
-    ]
+    "sources": ["Shop.tsx:359"]
   },
   "Summary": {
     "english": "Summary",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:1111",
-      "Policies.tsx:1111"
-    ]
+    "sources": ["Policies.tsx:1111", "Policies.tsx:1111"]
   },
   "THE 3L MENU": {
     "english": "THE 3L MENU",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:162"
-    ]
+    "sources": ["MenuCatalog.tsx:162"]
   },
   "TRADITION": {
     "english": "TRADITION",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:172"
-    ]
+    "sources": ["Experience.tsx:172"]
   },
   "TRY AGAIN": {
     "english": "TRY AGAIN",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:136",
-      "Shop.tsx:2090"
-    ]
+    "sources": ["MenuCatalog.tsx:136", "Shop.tsx:2090"]
   },
   "Terms &amp;amp; Conditions": {
     "english": "Terms &amp;amp; Conditions",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:70"
-    ]
+    "sources": ["SiteChrome.tsx:70"]
   },
   "Thank you": {
     "english": "Thank you",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2143",
-      "Shop.tsx:2150"
-    ]
+    "sources": ["Shop.tsx:2143", "Shop.tsx:2150"]
   },
   "The delivery date and time are agreed with our team on WhatsApp when you place your order, and are confirmed once your payment has been verified.": {
     "english": "The delivery date and time are agreed with our team on WhatsApp when you place your order, and are confirmed once your payment has been verified.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:921"
-    ]
+    "sources": ["Policies.tsx:921"]
   },
   "The full rules, including the other circumstances in which we issue a refund, are in our": {
     "english": "The full rules, including the other circumstances in which we issue a refund, are in our",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:353"
-    ]
+    "sources": ["Policies.tsx:353"]
   },
   "The minimum order for {0} is {1}. Add {2} more to continue.": {
     "english": "The minimum order for {0} is {1}. Add {2} more to continue.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1042",
-      "Shop.tsx:1042",
-      "Shop.tsx:1042"
-    ]
+    "sources": ["Shop.tsx:1042", "Shop.tsx:1042", "Shop.tsx:1042"]
   },
   "The products you order and their prices, your delivery address or location, the delivery area it falls in, recipient name and phone number if different from yours, access instructions, and notes you give us — such as a cake message, design details or allergy information. We also keep a record of each order’s status (for example, confirmed, out for delivery, delivered).": {
     "english": "The products you order and their prices, your delivery address or location, the delivery area it falls in, recipient name and phone number if different from yours, access instructions, and notes you give us — such as a cake message, design details or allergy information. We also keep a record of each order’s status (for example, confirmed, out for delivery, delivered).",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:469"
-    ]
+    "sources": ["Policies.tsx:469"]
   },
   "These terms apply when you use this website or order from": {
     "english": "These terms apply when you use this website or order from",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:166"
-    ]
+    "sources": ["Policies.tsx:166"]
   },
   "These terms are governed by the laws of the United Arab Emirates as applied in the Emirate of Dubai.": {
     "english": "These terms are governed by the laws of the United Arab Emirates as applied in the Emirate of Dubai.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:410"
-    ]
+    "sources": ["Policies.tsx:410"]
   },
   "This item is no longer available.": {
     "english": "This item is no longer available.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:616"
-    ]
+    "sources": ["Shop.tsx:616"]
   },
   "This order is already paid": {
     "english": "This order is already paid",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1829",
-      "Shop.tsx:1829",
-      "Shop.tsx:1828"
-    ]
+    "sources": ["Shop.tsx:1829", "Shop.tsx:1829", "Shop.tsx:1828"]
   },
   "This policy explains what information": {
     "english": "This policy explains what information",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:426"
-    ]
+    "sources": ["Policies.tsx:426"]
   },
   "This website and our ordering service are operated by": {
     "english": "This website and our ordering service are operated by",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:178"
-    ]
+    "sources": ["Policies.tsx:178"]
   },
   "This website is served over an encrypted (HTTPS) connection. Our order system can only be accessed by authorised team members with individual accounts and role-based permissions. Card payments are handled entirely on our payment provider’s secure page.": {
     "english": "This website is served over an encrypted (HTTPS) connection. Our order system can only be accessed by authorised team members with individual accounts and role-based permissions. Card payments are handled entirely on our payment provider’s secure page.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:595"
-    ]
+    "sources": ["Policies.tsx:595"]
   },
   "Three iconic cakes, the same beloved tradition.": {
     "english": "Three iconic cakes, the same beloved tradition.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:139"
-    ]
+    "sources": ["Experience.tsx:139"]
   },
   "TikTok": {
     "english": "TikTok",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:150"
-    ]
+    "sources": ["SiteChrome.tsx:150"]
   },
   "Tiramisu": {
     "english": "Tiramisu",
@@ -3780,121 +3051,91 @@
     "english": "To change the items, date, time or delivery address of a paid order, contact us as soon as possible. We will tell you whether the change is possible. A new address may fall in a delivery area with a different minimum order value or delivery charge.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:712"
-    ]
+    "sources": ["Policies.tsx:712"]
   },
   "To confirm your delivery area, its minimum order value and any delivery charge.": {
     "english": "To confirm your delivery area, its minimum order value and any delivery charge.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:504"
-    ]
+    "sources": ["Policies.tsx:504"]
   },
   "To create your payment link, verify your payment and process approved refunds.": {
     "english": "To create your payment link, verify your payment and process approved refunds.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:508"
-    ]
+    "sources": ["Policies.tsx:508"]
   },
   "To handle questions, complaints and refund requests.": {
     "english": "To handle questions, complaints and refund requests.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:513"
-    ]
+    "sources": ["Policies.tsx:513"]
   },
   "To keep our systems secure, prevent fraud and meet our legal, tax and accounting obligations.": {
     "english": "To keep our systems secure, prevent fraud and meet our legal, tax and accounting obligations.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:514"
-    ]
+    "sources": ["Policies.tsx:514"]
   },
   "To prepare and deliver your order and keep you updated.": {
     "english": "To prepare and deliver your order and keep you updated.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:512"
-    ]
+    "sources": ["Policies.tsx:512"]
   },
   "To reply to your enquiries and take your order.": {
     "english": "To reply to your enquiries and take your order.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:503"
-    ]
+    "sources": ["Policies.tsx:503"]
   },
   "Today": {
     "english": "Today",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:117"
-    ]
+    "sources": ["Experience.tsx:117"]
   },
   "Total": {
     "english": "Total",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:368"
-    ]
+    "sources": ["Shop.tsx:368"]
   },
   "Trade licence": {
     "english": "Trade licence",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:74"
-    ]
+    "sources": ["Policies.tsx:74"]
   },
   "Tradition in every slice": {
     "english": "Tradition in every slice",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:167"
-    ]
+    "sources": ["Experience.tsx:167"]
   },
   "Tradition.": {
     "english": "Tradition.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:55"
-    ]
+    "sources": ["Experience.tsx:55"]
   },
   "Treat yourself to our decadent Tres Leches cakes": {
     "english": "Treat yourself to our decadent Tres Leches cakes",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:294"
-    ]
+    "sources": ["Experience.tsx:294"]
   },
   "Tres Leches Cakes": {
     "english": "Tres Leches Cakes",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "menu-data.json:catalog.categories.0.name"
-    ]
+    "sources": ["menu-data.json:catalog.categories.0.name"]
   },
   "Tres Leches cakes made with time-honored recipes and a lot of love.": {
     "english": "Tres Leches cakes made with time-honored recipes and a lot of love.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:178"
-    ]
+    "sources": ["Experience.tsx:178"]
   },
   "Tricolor": {
     "english": "Tricolor",
@@ -3909,68 +3150,49 @@
     "english": "Try again",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:517"
-    ]
+    "sources": ["Shop.tsx:517"]
   },
   "Unit {0}": {
     "english": "Unit {0}",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1765",
-      "Shop.tsx:2262",
-      "Shop.tsx:2262"
-    ]
+    "sources": ["Shop.tsx:1765", "Shop.tsx:2262", "Shop.tsx:2262"]
   },
   "Unverified address — select a suggestion.": {
     "english": "Unverified address — select a suggestion.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "AddressAutocomplete.tsx:135"
-    ]
+    "sources": ["AddressAutocomplete.tsx:135"]
   },
   "VERIFYING ADDRESS…": {
     "english": "VERIFYING ADDRESS…",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1229"
-    ]
+    "sources": ["Shop.tsx:1229"]
   },
   "VIEW ALL CAKES": {
     "english": "VIEW ALL CAKES",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:162"
-    ]
+    "sources": ["Experience.tsx:162"]
   },
   "VIEW CART": {
     "english": "VIEW CART",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:229"
-    ]
+    "sources": ["MenuCatalog.tsx:229"]
   },
   "VIEW CONFIRMATION": {
     "english": "VIEW CONFIRMATION",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1842",
-      "Shop.tsx:1842"
-    ]
+    "sources": ["Shop.tsx:1842", "Shop.tsx:1842"]
   },
   "VIEW THE": {
     "english": "VIEW THE",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:186"
-    ]
+    "sources": ["Experience.tsx:186"]
   },
   "Vainilla": {
     "english": "Vainilla",
@@ -3997,463 +3219,343 @@
     "english": "Verified address",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "AddressAutocomplete.tsx:130"
-    ]
+    "sources": ["AddressAutocomplete.tsx:130"]
   },
   "Verified address. Delivery area: {0}. Minimum order: AED {1}.": {
     "english": "Verified address. Delivery area: {0}. Minimum order: AED {1}.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1070",
-      "Shop.tsx:1070"
-    ]
+    "sources": ["Shop.tsx:1070", "Shop.tsx:1070"]
   },
   "Visa": {
     "english": "Visa",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1519",
-      "SiteChrome.tsx:34"
-    ]
+    "sources": ["Shop.tsx:1519", "SiteChrome.tsx:34"]
   },
   "WATCH OUR STORY": {
     "english": "WATCH OUR STORY",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:77"
-    ]
+    "sources": ["Experience.tsx:77"]
   },
   "We aim to deliver at the agreed time. Traffic, weather, building access or security checks, and very busy dates can cause delays outside our control. If we expect a significant delay, we will contact you.": {
     "english": "We aim to deliver at the agreed time. Traffic, weather, building access or security checks, and very busy dates can cause delays outside our control. If we expect a significant delay, we will contact you.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:986"
-    ]
+    "sources": ["Policies.tsx:986"]
   },
   "We are based in {0}, {1}.": {
     "english": "We are based in {0}, {1}.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:193"
-    ]
+    "sources": ["Policies.tsx:193"]
   },
   "We deliver across Dubai. See our": {
     "english": "We deliver across Dubai. See our",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:1071"
-    ]
+    "sources": ["Policies.tsx:1071"]
   },
   "We deliver freshly prepared cakes, cake jars and bakery items across Dubai. This policy explains where we deliver, minimum order values, charges, scheduling and what happens if a delivery cannot be completed.": {
     "english": "We deliver freshly prepared cakes, cake jars and bakery items across Dubai. This policy explains where we deliver, minimum order values, charges, scheduling and what happens if a delivery cannot be completed.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:863"
-    ]
+    "sources": ["Policies.tsx:863"]
   },
   "We deliver only within Dubai, to the communities listed below. Each area has a minimum order value (products only). If your area is not listed, please ask us before ordering. We do not take payment for an address outside our delivery area, below its minimum order value, or whose area we cannot confirm.": {
     "english": "We deliver only within Dubai, to the communities listed below. Each area has a minimum order value (products only). If your area is not listed, please ask us before ordering. We do not take payment for an address outside our delivery area, below its minimum order value, or whose area we cannot confirm.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:895"
-    ]
+    "sources": ["Policies.tsx:895"]
   },
   "We deliver within the Dubai areas listed in our": {
     "english": "We deliver within the Dubai areas listed in our",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:329"
-    ]
+    "sources": ["Policies.tsx:329"]
   },
   "We deliver {0}.": {
     "english": "We deliver {0}.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:926"
-    ]
+    "sources": ["Policies.tsx:926"]
   },
   "We do not sell your personal information. We share it only with providers that help us run our service, and only as needed for their role:": {
     "english": "We do not sell your personal information. We share it only with providers that help us run our service, and only as needed for their role:",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:526"
-    ]
+    "sources": ["Policies.tsx:526"]
   },
   "We issue a refund where:": {
     "english": "We issue a refund where:",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:754"
-    ]
+    "sources": ["Policies.tsx:754"]
   },
   "We keep order, payment and conversation records only for as long as they are needed for the purposes above, including resolving questions about an order and meeting legal, tax and accounting record-keeping requirements.": {
     "english": "We keep order, payment and conversation records only for as long as they are needed for the purposes above, including resolving questions about an order and meeting legal, tax and accounting record-keeping requirements.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:583"
-    ]
+    "sources": ["Policies.tsx:583"]
   },
   "We make Tres Leches cakes, cake jars, bakery items and custom cakes. Products are freshly prepared and perishable. Because they are handmade, colours, decoration and finish may vary slightly from photographs, which are for illustration only.": {
     "english": "We make Tres Leches cakes, cake jars, bakery items and custom cakes. Products are freshly prepared and perishable. Because they are handmade, colours, decoration and finish may vary slightly from photographs, which are for illustration only.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:223"
-    ]
+    "sources": ["Policies.tsx:223"]
   },
   "We may decline a refund request where:": {
     "english": "We may decline a refund request where:",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:785"
-    ]
+    "sources": ["Policies.tsx:785"]
   },
   "We may decline an order before payment — for example if the delivery address is outside our delivery area, the order is below the area’s minimum value, or a product is unavailable. If, after payment, we cannot fulfil all or part of your order, we will contact you and refund the amount paid for anything we cannot supply.": {
     "english": "We may decline an order before payment — for example if the delivery address is outside our delivery area, the order is below the area’s minimum value, or a product is unavailable. If, after payment, we cannot fulfil all or part of your order, we will contact you and refund the amount paid for anything we cannot supply.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:299"
-    ]
+    "sources": ["Policies.tsx:299"]
   },
   "We may update these terms from time to time. The version published on this page when you pay for your order applies to that order.": {
     "english": "We may update these terms from time to time. The version published on this page when you pay for your order applies to that order.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:400"
-    ]
+    "sources": ["Policies.tsx:400"]
   },
   "We may update this policy from time to time. The date at the top of this page shows when it was last updated.": {
     "english": "We may update this policy from time to time. The date at the top of this page shows when it was last updated.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:620"
-    ]
+    "sources": ["Policies.tsx:620"]
   },
   "We only send you marketing messages if you have agreed to receive them, and you can opt out at any time. Our newsletter sign-up is not active yet, so we do not currently collect email addresses through this website.": {
     "english": "We only send you marketing messages if you have agreed to receive them, and you can opt out at any time. Our newsletter sign-up is not active yet, so we do not currently collect email addresses through this website.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:571"
-    ]
+    "sources": ["Policies.tsx:571"]
   },
   "We prepare your order and deliver it at the date and time agreed with you.": {
     "english": "We prepare your order and deliver it at the date and time agreed with you.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:126"
-    ]
+    "sources": ["Policies.tsx:126"]
   },
   "We send you a secure payment link showing the total amount, including any delivery charge.": {
     "english": "We send you a secure payment link showing the total amount, including any delivery charge.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:117"
-    ]
+    "sources": ["Policies.tsx:117"]
   },
   "We take care to prepare and deliver your order as agreed. To the extent permitted by the laws of the United Arab Emirates, we are not responsible for losses that were not reasonably foreseeable, for delays or failures caused by events outside our reasonable control, or for products that are stored or handled incorrectly after delivery. Where we are responsible, our liability is limited to the amount you paid for the affected order.": {
     "english": "We take care to prepare and deliver your order as agreed. To the extent permitted by the laws of the United Arab Emirates, we are not responsible for losses that were not reasonably foreseeable, for delays or failures caused by events outside our reasonable control, or for products that are stored or handled incorrectly after delivery. Where we are responsible, our liability is limited to the amount you paid for the affected order.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:380"
-    ]
+    "sources": ["Policies.tsx:380"]
   },
   "We will confirm the refund amount to you before processing it.": {
     "english": "We will confirm the refund amount to you before processing it.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:702"
-    ]
+    "sources": ["Policies.tsx:702"]
   },
   "What happens next": {
     "english": "What happens next",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2338"
-    ]
+    "sources": ["Shop.tsx:2338"]
   },
   "WhatsApp": {
     "english": "WhatsApp",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:155"
-    ]
+    "sources": ["SiteChrome.tsx:155"]
   },
   "When you message us on WhatsApp": {
     "english": "When you message us on WhatsApp",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:463"
-    ]
+    "sources": ["Policies.tsx:463"]
   },
   "When you pay": {
     "english": "When you pay",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:477"
-    ]
+    "sources": ["Policies.tsx:477"]
   },
   "When you place an order": {
     "english": "When you place an order",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:468"
-    ]
+    "sources": ["Policies.tsx:468"]
   },
   "When you visit this website": {
     "english": "When you visit this website",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:486"
-    ]
+    "sources": ["Policies.tsx:486"]
   },
   "Where a delivery fails because of incorrect details or the recipient being unavailable, a refund may not be possible — see our": {
     "english": "Where a delivery fails because of incorrect details or the recipient being unavailable, a refund may not be possible — see our",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:1006"
-    ]
+    "sources": ["Policies.tsx:1006"]
   },
   "Where fewer than": {
     "english": "Where fewer than",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:772"
-    ]
+    "sources": ["Policies.tsx:772"]
   },
   "You are responsible for giving us accurate and complete delivery information:": {
     "english": "You are responsible for giving us accurate and complete delivery information:",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:944"
-    ]
+    "sources": ["Policies.tsx:944"]
   },
   "You are responsible for giving us accurate and complete information: your name and mobile number, the recipient’s details, the exact delivery location and access instructions, the details of any custom design, and any allergy information. Problems caused by incorrect or incomplete information are handled under our": {
     "english": "You are responsible for giving us accurate and complete information: your name and mobile number, the recipient’s details, the exact delivery location and access instructions, the details of any custom design, and any allergy information. Problems caused by incorrect or incomplete information are handled under our",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:314"
-    ]
+    "sources": ["Policies.tsx:314"]
   },
   "You can cancel a paid order": {
     "english": "You can cancel a paid order",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:688"
-    ]
+    "sources": ["Policies.tsx:688"]
   },
   "You can cancel an order at no cost before you pay. Once payment is verified your order is confirmed.": {
     "english": "You can cancel an order at no cost before you pay. Once payment is verified your order is confirmed.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:342"
-    ]
+    "sources": ["Policies.tsx:342"]
   },
   "You do not need an account to browse. The website does not use analytics, advertising or tracking cookies. It uses your browser’s session storage only to remember that you have already seen the opening animation. Like any website, our hosting provider processes technical information such as your IP address and browser type to deliver and secure the site.": {
     "english": "You do not need an account to browse. The website does not use analytics, advertising or tracking cookies. It uses your browser’s session storage only to remember that you have already seen the opening animation. Like any website, our hosting provider processes technical information such as your IP address and browser type to deliver and secure the site.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:487"
-    ]
+    "sources": ["Policies.tsx:487"]
   },
   "You don't need to message us — our team is preparing your order and will contact you if anything about the fulfillment needs confirming.": {
     "english": "You don't need to message us — our team is preparing your order and will contact you if anything about the fulfillment needs confirming.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2361"
-    ]
+    "sources": ["Shop.tsx:2361"]
   },
   "You enter your card details on a secure page hosted by": {
     "english": "You enter your card details on a secure page hosted by",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:478"
-    ]
+    "sources": ["Policies.tsx:478"]
   },
   "You may use this website to learn about our products and to contact us. You must not misuse it, interfere with its operation, attempt to access areas that are not intended for customers, or copy our name, logos, photographs or content for commercial use without our written permission. The staff operations area is for authorised": {
     "english": "You may use this website to learn about our products and to contact us. You must not misuse it, interfere with its operation, attempt to access areas that are not intended for customers, or copy our name, logos, photographs or content for commercial use without our written permission. The staff operations area is for authorised",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:365"
-    ]
+    "sources": ["Policies.tsx:365"]
   },
   "Your billing address is required for payment. No delivery address is needed.": {
     "english": "Your billing address is required for payment. No delivery address is needed.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1339"
-    ]
+    "sources": ["Shop.tsx:1339"]
   },
   "Your card details are entered on Paymennt and are never seen or stored by 3L.": {
     "english": "Your card details are entered on Paymennt and are never seen or stored by 3L.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1956"
-    ]
+    "sources": ["Shop.tsx:1956"]
   },
   "Your cart is empty.": {
     "english": "Your cart is empty.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:527"
-    ]
+    "sources": ["Shop.tsx:527"]
   },
   "Your cart": {
     "english": "Your cart",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:688",
-      "Shop.tsx:696",
-      "Shop.tsx:705"
-    ]
+    "sources": ["Shop.tsx:688", "Shop.tsx:696", "Shop.tsx:705"]
   },
   "Your details": {
     "english": "Your details",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1245"
-    ]
+    "sources": ["Shop.tsx:1245"]
   },
   "Your mobile number, WhatsApp profile name, the messages you send us, and any location pin you share.": {
     "english": "Your mobile number, WhatsApp profile name, the messages you send us, and any location pin you share.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:464"
-    ]
+    "sources": ["Policies.tsx:464"]
   },
   "Your order can no longer be delivered as chosen. Please go back and review your delivery area.": {
     "english": "Your order can no longer be delivered as chosen. Please go back and review your delivery area.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1849"
-    ]
+    "sources": ["Shop.tsx:1849"]
   },
   "Your order is accepted and confirmed only once your payment has been verified with our payment provider. Reaching the payment page, or being redirected after it, does not by itself confirm an order.": {
     "english": "Your order is accepted and confirmed only once your payment has been verified with our payment provider. Reaching the payment page, or being redirected after it, does not by itself confirm an order.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:293"
-    ]
+    "sources": ["Policies.tsx:293"]
   },
   "Your order is confirmed": {
     "english": "Your order is confirmed",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2154"
-    ]
+    "sources": ["Shop.tsx:2154"]
   },
   "Your order will be ready for pickup at the selected date and time.": {
     "english": "Your order will be ready for pickup at the selected date and time.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:967",
-      "Shop.tsx:2230"
-    ]
+    "sources": ["Shop.tsx:967", "Shop.tsx:2230"]
   },
   "Your order": {
     "english": "Your order",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:452",
-      "Shop.tsx:1739"
-    ]
+    "sources": ["Shop.tsx:452", "Shop.tsx:1739"]
   },
   "Zone": {
     "english": "Zone",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2248"
-    ]
+    "sources": ["Shop.tsx:2248"]
   },
   "a delivery could not be completed because of incorrect delivery details or because the recipient was unavailable (see our": {
     "english": "a delivery could not be completed because of incorrect delivery details or because the recipient was unavailable (see our",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:791"
-    ]
+    "sources": ["Policies.tsx:791"]
   },
   "a short description of the problem.": {
     "english": "a short description of the problem.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:737"
-    ]
+    "sources": ["Policies.tsx:737"]
   },
   "and acknowledge our": {
     "english": "and acknowledge our",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:72"
-    ]
+    "sources": ["SiteChrome.tsx:72"]
   },
   "and retain": {
     "english": "and retain",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:691"
-    ]
+    "sources": ["Policies.tsx:691"]
   },
   "and so much more.": {
     "english": "and so much more.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:111"
-    ]
+    "sources": ["SiteChrome.tsx:111"]
   },
   "and": {
     "english": "and",
@@ -4470,535 +3572,396 @@
     "english": "any access instructions, such as gate codes, concierge or parking details.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:958"
-    ]
+    "sources": ["Policies.tsx:958"]
   },
   "as a cancellation and administrative fee.": {
     "english": "as a cancellation and administrative fee.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:692"
-    ]
+    "sources": ["Policies.tsx:692"]
   },
   "as soon as possible, ideally on the day of delivery": {
     "english": "as soon as possible, ideally on the day of delivery",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:728"
-    ]
+    "sources": ["Policies.tsx:728"]
   },
   "b-button b-co-cta {0}": {
     "english": "b-button b-co-cta {0}",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:741"
-    ]
+    "sources": ["Shop.tsx:741"]
   },
   "billing address-level2": {
     "english": "billing address-level2",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1400"
-    ]
+    "sources": ["Shop.tsx:1400"]
   },
   "billing address-line1": {
     "english": "billing address-line1",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1377"
-    ]
+    "sources": ["Shop.tsx:1377"]
   },
   "billing address-line2": {
     "english": "billing address-line2",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1389"
-    ]
+    "sources": ["Shop.tsx:1389"]
   },
   "billing country": {
     "english": "billing country",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1422"
-    ]
+    "sources": ["Shop.tsx:1422"]
   },
   "billing name": {
     "english": "billing name",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1367"
-    ]
+    "sources": ["Shop.tsx:1367"]
   },
   "billing postal-code": {
     "english": "billing postal-code",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1412"
-    ]
+    "sources": ["Shop.tsx:1412"]
   },
   "brand": {
     "english": "brand",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:184"
-    ]
+    "sources": ["Policies.tsx:184"]
   },
   "clear photos of the product and its packaging as received;": {
     "english": "clear photos of the product and its packaging as received;",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:734"
-    ]
+    "sources": ["Policies.tsx:734"]
   },
   "collects when you visit this website or order from us, how we use it, and the choices you have.": {
     "english": "collects when you visit this website or order from us, how we use it, and the choices you have.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:427"
-    ]
+    "sources": ["Policies.tsx:427"]
   },
   "confirmed": {
     "english": "confirmed",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:2303"
-    ]
+    "sources": ["Shop.tsx:2303"]
   },
   "delivery of your order becomes impossible; or": {
     "english": "delivery of your order becomes impossible; or",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:761"
-    ]
+    "sources": ["Policies.tsx:761"]
   },
   "does not receive or store your full card details. Visa and Mastercard are trademarks of their respective owners.": {
     "english": "does not receive or store your full card details. Visa and Mastercard are trademarks of their respective owners.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:55"
-    ]
+    "sources": ["SiteChrome.tsx:55"]
   },
   "does not receive or store your full card number or security code.": {
     "english": "does not receive or store your full card number or security code.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:277"
-    ]
+    "sources": ["Policies.tsx:277"]
   },
   "e.g. afternoon, after 4 pm": {
     "english": "e.g. afternoon, after 4 pm",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1175",
-      "Shop.tsx:1174"
-    ]
+    "sources": ["Shop.tsx:1175", "Shop.tsx:1174"]
   },
   "each": {
     "english": "each",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:640"
-    ]
+    "sources": ["Shop.tsx:640"]
   },
   "for the areas we cover, minimum order values and delivery charges.": {
     "english": "for the areas we cover, minimum order values and delivery charges.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:1073"
-    ]
+    "sources": ["Policies.tsx:1073"]
   },
   "hours before the scheduled delivery time.": {
     "english": "hours before the scheduled delivery time.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:763"
-    ]
+    "sources": ["Policies.tsx:763"]
   },
   "hours remain before the scheduled delivery time, the order can no longer be cancelled and it is": {
     "english": "hours remain before the scheduled delivery time, the order can no longer be cancelled and it is",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:696"
-    ]
+    "sources": ["Policies.tsx:696"]
   },
   "hours remain before the scheduled delivery time, the order cannot be cancelled and is non-refundable.": {
     "english": "hours remain before the scheduled delivery time, the order cannot be cancelled and is non-refundable.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:350"
-    ]
+    "sources": ["Policies.tsx:350"]
   },
   "hours remain before the scheduled delivery time, the order cannot be cancelled and no refund is available.": {
     "english": "hours remain before the scheduled delivery time, the order cannot be cancelled and no refund is available.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:773"
-    ]
+    "sources": ["Policies.tsx:773"]
   },
   "hours remaining before the scheduled delivery time;": {
     "english": "hours remaining before the scheduled delivery time;",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:788"
-    ]
+    "sources": ["Policies.tsx:788"]
   },
   "in your cart · View cart": {
     "english": "in your cart · View cart",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:592"
-    ]
+    "sources": ["Shop.tsx:592"]
   },
   "is the customer-facing brand under which we trade. “You” means the person placing the order or using this website.": {
     "english": "is the customer-facing brand under which we trade. “You” means the person placing the order or using this website.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:197"
-    ]
+    "sources": ["Policies.tsx:197"]
   },
   "is": {
     "english": "is",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1033"
-    ]
+    "sources": ["Shop.tsx:1033"]
   },
   "item": {
     "english": "item",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:454"
-    ]
+    "sources": ["Shop.tsx:454"]
   },
   "non-refundable": {
     "english": "non-refundable",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:698"
-    ]
+    "sources": ["Policies.tsx:698"]
   },
   "noopener noreferrer": {
     "english": "noopener noreferrer",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:58"
-    ]
+    "sources": ["Policies.tsx:58"]
   },
   "of what we do.": {
     "english": "of what we do.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:136"
-    ]
+    "sources": ["Experience.tsx:136"]
   },
   "of": {
     "english": "of",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:274"
-    ]
+    "sources": ["Shop.tsx:274"]
   },
   "order summary": {
     "english": "order summary",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:439"
-    ]
+    "sources": ["Shop.tsx:439"]
   },
   "policies.": {
     "english": "policies.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "SiteChrome.tsx:84"
-    ]
+    "sources": ["SiteChrome.tsx:84"]
   },
   "privacy policy": {
     "english": "privacy policy",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1893"
-    ]
+    "sources": ["Shop.tsx:1893"]
   },
   "refund policy": {
     "english": "refund policy",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1889"
-    ]
+    "sources": ["Shop.tsx:1889"]
   },
   "team members only.": {
     "english": "team members only.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:371"
-    ]
+    "sources": ["Policies.tsx:371"]
   },
   "terms": {
     "english": "terms",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1885"
-    ]
+    "sources": ["Shop.tsx:1885"]
   },
   "the cancellation was requested with fewer than": {
     "english": "the cancellation was requested with fewer than",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:787"
-    ]
+    "sources": ["Policies.tsx:787"]
   },
   "the concern relates only to the natural variation of a handmade product, or to design details that were confirmed before payment;": {
     "english": "the concern relates only to the natural variation of a handmade product, or to design details that were confirmed before payment;",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:799"
-    ]
+    "sources": ["Policies.tsx:799"]
   },
   "the exact location — a WhatsApp location pin is best, as it is how we confirm your delivery area;": {
     "english": "the exact location — a WhatsApp location pin is best, as it is how we confirm your delivery area;",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:949"
-    ]
+    "sources": ["Policies.tsx:949"]
   },
   "the full address, including building or villa, apartment number and community;": {
     "english": "the full address, including building or villa, apartment number and community;",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:953"
-    ]
+    "sources": ["Policies.tsx:953"]
   },
   "the issue is reported without the information needed to review it.": {
     "english": "the issue is reported without the information needed to review it.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:804"
-    ]
+    "sources": ["Policies.tsx:804"]
   },
   "the product was stored or handled incorrectly after delivery;": {
     "english": "the product was stored or handled incorrectly after delivery;",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:796"
-    ]
+    "sources": ["Policies.tsx:796"]
   },
   "the recipient’s name and a reachable mobile number;": {
     "english": "the recipient’s name and a reachable mobile number;",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:957"
-    ]
+    "sources": ["Policies.tsx:957"]
   },
   "this area": {
     "english": "this area",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1042",
-      "Shop.tsx:1042",
-      "Shop.tsx:1042"
-    ]
+    "sources": ["Shop.tsx:1042", "Shop.tsx:1042", "Shop.tsx:1042"]
   },
   "we made an error with your order;": {
     "english": "we made an error with your order;",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:756"
-    ]
+    "sources": ["Policies.tsx:756"]
   },
   "you cancel your order at least": {
     "english": "you cancel your order at least",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:762"
-    ]
+    "sources": ["Policies.tsx:762"]
   },
   "you received an incorrect product, and the issue can reasonably be verified;": {
     "english": "you received an incorrect product, and the issue can reasonably be verified;",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:757"
-    ]
+    "sources": ["Policies.tsx:757"]
   },
   "your order reference;": {
     "english": "your order reference;",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:733"
-    ]
+    "sources": ["Policies.tsx:733"]
   },
   "{0} category photography from Liza’s menu": {
     "english": "{0} category photography from Liza’s menu",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:186"
-    ]
+    "sources": ["MenuCatalog.tsx:186"]
   },
   "{0} family photography from Liza’s menu": {
     "english": "{0} family photography from Liza’s menu",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:207",
-      "MenuCatalog.tsx:207"
-    ]
+    "sources": ["MenuCatalog.tsx:207", "MenuCatalog.tsx:207"]
   },
   "{0} quantity": {
     "english": "{0} quantity",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:646"
-    ]
+    "sources": ["Shop.tsx:646"]
   },
   "{0}-h": {
     "english": "{0}-h",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:1135",
-      "Policies.tsx:1136"
-    ]
+    "sources": ["Policies.tsx:1135", "Policies.tsx:1136"]
   },
   "{0}-size": {
     "english": "{0}-size",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:75",
-      "MenuCatalog.tsx:80"
-    ]
+    "sources": ["MenuCatalog.tsx:75", "MenuCatalog.tsx:80"]
   },
   "{0}-variant": {
     "english": "{0}-variant",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "MenuCatalog.tsx:53",
-      "MenuCatalog.tsx:58"
-    ]
+    "sources": ["MenuCatalog.tsx:53", "MenuCatalog.tsx:58"]
   },
   "{0}.webp": {
     "english": "{0}.webp",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Experience.tsx:151"
-    ]
+    "sources": ["Experience.tsx:151"]
   },
   "— Minimum AED": {
     "english": "— Minimum AED",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Shop.tsx:1002"
-    ]
+    "sources": ["Shop.tsx:1002"]
   },
   "— carries the messages you exchange with us on WhatsApp.": {
     "english": "— carries the messages you exchange with us on WhatsApp.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:537"
-    ]
+    "sources": ["Policies.tsx:537"]
   },
   "— hosts this website and our order system.": {
     "english": "— hosts this website and our order system.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:551"
-    ]
+    "sources": ["Policies.tsx:551"]
   },
   "— processes card payments and refunds on our behalf.": {
     "english": "— processes card payments and refunds on our behalf.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:533"
-    ]
+    "sources": ["Policies.tsx:533"]
   },
   "— receive the recipient details and location needed to deliver your order.": {
     "english": "— receive the recipient details and location needed to deliver your order.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:555"
-    ]
+    "sources": ["Policies.tsx:555"]
   },
   "— status, amount, currency and a transaction reference — so we can confirm your order and handle any refund.": {
     "english": "— status, amount, currency and a transaction reference — so we can confirm your order and handle any refund.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:482"
-    ]
+    "sources": ["Policies.tsx:482"]
   },
   "— where enabled, converts a shared location into an address so we can identify your delivery area.": {
     "english": "— where enabled, converts a shared location into an address so we can identify your delivery area.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:541"
-    ]
+    "sources": ["Policies.tsx:541"]
   },
   "— where enabled, provides AI tools that help our team prepare replies to customer messages. Our team remains responsible for orders, payments, refunds and cancellations.": {
     "english": "— where enabled, provides AI tools that help our team prepare replies to customer messages. Our team remains responsible for orders, payments, refunds and cancellations.",
     "arabic": null,
     "review": "Arabic approval required",
-    "sources": [
-      "Policies.tsx:545"
-    ]
+    "sources": ["Policies.tsx:545"]
   }
 }

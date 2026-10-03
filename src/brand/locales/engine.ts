@@ -1,5 +1,5 @@
 import { createInstance } from "i18next";
-import { resources } from "./resources";
+import { localeResources, resources } from "./resources";
 import index from "./source-index.json";
 export const supportedLocales = ["en", "es", "ar"] as const;
 export type Locale = (typeof supportedLocales)[number];
@@ -19,6 +19,23 @@ void storefrontI18n.init({
   interpolation: { escapeValue: false, prefix: "{", suffix: "}" },
 });
 const sourceIndex: Record<string, string> = index;
+const foldedIndex = new Map(
+  Object.entries(sourceIndex).map(([source, key]) => [
+    source.toLocaleLowerCase("en"),
+    key,
+  ]),
+);
+const translatedValues = Object.fromEntries(
+  Object.entries(localeResources).map(([locale, nss]) => [
+    locale,
+    new Set(
+      Object.values(nss)
+        .flatMap((entries) => Object.values(entries))
+        .filter((v): v is string => typeof v === "string")
+        .map((v) => v.toLocaleLowerCase("en")),
+    ),
+  ]),
+);
 const missingLabels = {
   en: "Translation pending",
   es: "Traducción pendiente",
@@ -36,7 +53,13 @@ export function localizedKey(
 /** Compatibility boundary for existing copy nodes; new UI should use explicit keys + values. */
 export function localizedSource(source: string, locale: Locale): string {
   if (locale === "en" || !source.trim()) return source;
-  const key = sourceIndex[source];
+  source = source.replace(/\s+/g, " ").trim();
+  if (translatedValues[locale]!.has(source.toLocaleLowerCase("en")))
+    return source;
+  if (/^AED \d+(?:\.\d{1,2})?$/.test(source))
+    return localizedMoney(Math.round(Number(source.slice(4)) * 100), locale);
+  const key =
+    sourceIndex[source] ?? foldedIndex.get(source.toLocaleLowerCase("en"));
   if (key) return localizedKey(key, locale);
   // Existing dynamic nodes are matched only against inventoried copy templates.
   for (const [template, templateKey] of Object.entries(sourceIndex)) {
@@ -53,12 +76,24 @@ export function localizedSource(source: string, locale: Locale): string {
       return localizedKey(
         templateKey,
         locale,
-        Object.fromEntries(tokens.map((token, i) => [token, match[i + 1]!])),
+        Object.fromEntries(
+          tokens.map((token, i) => [
+            token,
+            sourceIndex[match[i + 1]!]
+              ? localizedSource(match[i + 1]!, locale)
+              : match[i + 1]!,
+          ]),
+        ),
       );
   }
   // Numbers/units and identifiers are data, not translated catalog records.
   if (/^[\d\s.,×·–/+()-]*(?:AED|g|kg|ml)?[\d\s.,×·–/+()-]*$/u.test(source))
     return source;
+  if (source.includes(" · "))
+    return source
+      .split(" · ")
+      .map((part) => localizedSource(part, locale))
+      .join(" · ");
   return missingLabels[locale];
 }
 export function localizedMoney(priceFils: number, locale: Locale): string {
@@ -68,6 +103,7 @@ export function localizedMoney(priceFils: number, locale: Locale): string {
       style: "currency",
       currency: "AED",
       currencyDisplay: "code",
+      minimumFractionDigits: priceFils % 100 === 0 ? 0 : 2,
       maximumFractionDigits: 2,
     },
   ).format(priceFils / 100);

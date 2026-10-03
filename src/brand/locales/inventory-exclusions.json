@@ -1,0 +1,54 @@
+[
+  {
+    "source": "(max-width: 640px)",
+    "reason": "Non-visible code identifier, URL, autocomplete token, media query or whitespace; excluded from customer copy inventory."
+  },
+  {
+    "source": "",
+    "reason": "Non-visible code identifier, URL, autocomplete token, media query or whitespace; excluded from customer copy inventory."
+  },
+  {
+    "source": "/menu?category={0}",
+    "reason": "Non-visible code identifier, URL, autocomplete token, media query or whitespace; excluded from customer copy inventory."
+  },
+  {
+    "source": "b-button b-co-cta {0}",
+    "reason": "Non-visible code identifier, URL, autocomplete token, media query or whitespace; excluded from customer copy inventory."
+  },
+  {
+    "source": "billing address-level2",
+    "reason": "Non-visible code identifier, URL, autocomplete token, media query or whitespace; excluded from customer copy inventory."
+  },
+  {
+    "source": "billing address-line1",
+    "reason": "Non-visible code identifier, URL, autocomplete token, media query or whitespace; excluded from customer copy inventory."
+  },
+  {
+    "source": "billing address-line2",
+    "reason": "Non-visible code identifier, URL, autocomplete token, media query or whitespace; excluded from customer copy inventory."
+  },
+  {
+    "source": "billing country",
+    "reason": "Non-visible code identifier, URL, autocomplete token, media query or whitespace; excluded from customer copy inventory."
+  },
+  {
+    "source": "billing name",
+    "reason": "Non-visible code identifier, URL, autocomplete token, media query or whitespace; excluded from customer copy inventory."
+  },
+  {
+    "source": "billing postal-code",
+    "reason": "Non-visible code identifier, URL, autocomplete token, media query or whitespace; excluded from customer copy inventory."
+  },
+  {
+    "source": "noopener noreferrer",
+    "reason": "Non-visible code identifier, URL, autocomplete token, media query or whitespace; excluded from customer copy inventory."
+  },
+  {
+    "source": "product-{0}",
+    "reason": "Non-visible code identifier, URL, autocomplete token, media query or whitespace; excluded from customer copy inventory."
+  },
+  {
+    "source": "{0}-h",
+    "reason": "Non-visible code identifier, URL, autocomplete token, media query or whitespace; excluded from customer copy inventory."
+  }
+]

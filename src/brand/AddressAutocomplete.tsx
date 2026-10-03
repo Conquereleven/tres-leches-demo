@@ -1,3 +1,4 @@
+import { useLanguage as useCustomerLanguage } from "./localization";
 import { useEffect, useId, useRef, useState } from "react";
 import { CustomerCopy } from "./localization";
 type Suggestion = { id: string; label: string };
@@ -45,6 +46,8 @@ export function AddressAutocomplete({
   onChange: (value: string) => void;
   onSelected: (selection: AddressSelection) => void;
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
@@ -135,12 +138,16 @@ export function AddressAutocomplete({
                 : "Unverified address — select a suggestion."}
         </CustomerCopy>
       </span>
-      {error && <span role="alert">{error}</span>}
+      {error && (
+        <span role="alert">
+          <CustomerCopy>{error}</CustomerCopy>
+        </span>
+      )}
       {suggestions.length > 0 && (
         <span
           className="b-address-suggestions"
           role="group"
-          aria-label="Address suggestions"
+          aria-label={localize("Address suggestions")}
         >
           {suggestions.map((s) => (
             <button type="button" key={s.id} onClick={() => void choose(s.id)}>

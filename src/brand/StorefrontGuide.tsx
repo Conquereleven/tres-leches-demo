@@ -61,9 +61,13 @@ export function MenuPreview() {
       className="b-menu-preview b-section"
       aria-labelledby="preview-title"
     >
-      <p className="b-label">THE 3L MENU</p>
+      <p className="b-label">
+        {" "}
+        <CustomerCopy>THE 3L MENU</CustomerCopy>{" "}
+      </p>
       <h2 id="preview-title" className="b-heading">
-        Find your sweet moment.
+        {" "}
+        <CustomerCopy>Find your sweet moment.</CustomerCopy>{" "}
       </h2>
       <div className="b-preview-grid">
         {previews.map((p) => (
@@ -71,7 +75,8 @@ export function MenuPreview() {
             <figure>
               {p.family === "croissant" ? (
                 <span className="b-preview-no-photo" aria-hidden="true">
-                  3L
+                  {" "}
+                  <CustomerCopy>3L</CustomerCopy>{" "}
                 </span>
               ) : (
                 <ResponsiveMedia
@@ -83,8 +88,8 @@ export function MenuPreview() {
               )}
             </figure>
             <span>
-              {p.title}
-              <ArrowRight aria-hidden />
+              <CustomerCopy>{p.title}</CustomerCopy>
+              <ArrowRight className="b-directional" aria-hidden />
             </span>
           </a>
         ))}
@@ -111,9 +116,13 @@ export function HowToOrderGuide() {
       className="b-how-guide b-section"
       aria-labelledby="how-title"
     >
-      <p className="b-label">A FEW SIMPLE STEPS</p>
+      <p className="b-label">
+        {" "}
+        <CustomerCopy>A FEW SIMPLE STEPS</CustomerCopy>{" "}
+      </p>
       <h2 id="how-title" className="b-heading">
-        How to order?
+        {" "}
+        <CustomerCopy>How to order?</CustomerCopy>{" "}
       </h2>
       <ol>
         {steps.map(([Icon, title, copy], i) => (
@@ -121,7 +130,10 @@ export function HowToOrderGuide() {
             <span className="b-step-number" aria-hidden>
               {String(i + 1).padStart(2, "0")}
             </span>
-            <Icon aria-hidden />
+            <Icon
+              className={Icon === ArrowRight ? "b-directional" : undefined}
+              aria-hidden
+            />
             <h3>
               <CustomerCopy>{title}</CustomerCopy>
             </h3>
@@ -132,10 +144,13 @@ export function HowToOrderGuide() {
         ))}
       </ol>
       <a className="b-button" href="/menu">
-        EXPLORE THE MENU <ArrowRight aria-hidden />
+        {" "}
+        <CustomerCopy>EXPLORE THE MENU</CustomerCopy>{" "}
+        <ArrowRight className="b-directional" aria-hidden />
       </a>
       <a className="b-link" href="/how-to-order">
-        Delivery, minimums & timing
+        {" "}
+        <CustomerCopy>Delivery, minimums & timing</CustomerCopy>{" "}
       </a>
     </section>
   );

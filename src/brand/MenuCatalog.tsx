@@ -1,3 +1,4 @@
+import { useLanguage as useCustomerLanguage } from "./localization";
 import { ResponsiveMedia, selectedProductMedia } from "./media";
 import { CustomerCopy } from "./localization";
 import { availableSku } from "../../shared/commerce-policy";
@@ -21,6 +22,8 @@ export function ProductOptions({
   product: StorefrontProduct;
   detail?: boolean;
 }) {
+  const { text: localize } = useCustomerLanguage();
+
   const family = productFamily(product),
     labelId = useId();
   const [sku, setSku] = useState(family.options[0]!.id);
@@ -55,9 +58,12 @@ export function ProductOptions({
         ) : (
           <div
             className="b-menu-no-photo"
-            aria-label="Product photograph coming soon"
+            aria-label={localize("Product photograph coming soon")}
           >
-            <span>3L</span>
+            <span>
+              {" "}
+              <CustomerCopy>3L</CustomerCopy>{" "}
+            </span>
           </div>
         )}
       </figure>
@@ -73,7 +79,7 @@ export function ProductOptions({
         </h4>
       )}
       <p className="b-menu-price" aria-live="polite">
-        {formatAed(display.priceFils)}
+        <CustomerCopy>{formatAed(display.priceFils)}</CustomerCopy>
       </p>
       {options.length > 1 && (
         <label className="b-menu-selectors" htmlFor={labelId}>
@@ -88,16 +94,17 @@ export function ProductOptions({
             {options.map((o) => (
               <option key={o.id} value={o.size}>
                 {/^(6|12) /.test(o.size)
-                  ? `${o.size.startsWith("6 ") ? "Half Dozen" : "Dozen"} · `
+                  ? localize(o.size.startsWith("6 ") ? "Half Dozen" : "Dozen") +
+                    " · "
                   : ""}
-                {o.size}
+                <CustomerCopy>{o.size}</CustomerCopy>
               </option>
             ))}
           </select>
         </label>
       )}
       <p className="b-menu-option-summary" aria-live="polite">
-        {display.size}
+        <CustomerCopy>{display.size}</CustomerCopy>
       </p>
       {family.advanceOrder && (
         <p className="b-menu-advance">
@@ -115,25 +122,41 @@ export function ProductOptions({
         <AddToCart
           key={option.id}
           productId={option.id}
-          fallback={<p>Online ordering is unavailable.</p>}
+          fallback={
+            <p>
+              {" "}
+              <CustomerCopy>Online ordering is unavailable.</CustomerCopy>{" "}
+            </p>
+          }
         />
       ) : (
         <div role="status">
           <button className="b-button" disabled>
-            {loading ? "LOADING…" : "ADD TO CART · UNAVAILABLE"}
+            <CustomerCopy>
+              {loading ? "LOADING…" : "ADD TO CART · UNAVAILABLE"}
+            </CustomerCopy>
           </button>
           {!loading && (
             <>
-              <p>Online ordering is unavailable for this option.</p>
+              <p>
+                {" "}
+                <CustomerCopy>
+                  Online ordering is unavailable for this option.
+                </CustomerCopy>{" "}
+              </p>
               <button className="b-text-button" onClick={retry}>
-                TRY AGAIN
+                {" "}
+                <CustomerCopy>TRY AGAIN</CustomerCopy>{" "}
               </button>
             </>
           )}
         </div>
       )}
       {detail && !!gallery?.length && (
-        <div className="b-product-gallery" aria-label="Product gallery">
+        <div
+          className="b-product-gallery"
+          aria-label={localize("Product gallery")}
+        >
           {gallery.map((id) => {
             const asset = manifest.assets.find(
               (a) => a.sourceId === id && a.status === "assigned",
@@ -146,7 +169,7 @@ export function ProductOptions({
                     (d) => d.format === "webp" && d.width === 640,
                   )?.src
                 }
-                alt={asset.alt}
+                alt={localize(asset.alt)}
                 loading="lazy"
               />
             ) : null;
@@ -157,6 +180,8 @@ export function ProductOptions({
   );
 }
 export function MenuCatalog() {
+  const { text: localize } = useCustomerLanguage();
+
   const params =
     typeof location === "undefined"
       ? new URLSearchParams()
@@ -170,7 +195,10 @@ export function MenuCatalog() {
   if (slug) {
     const product = storefrontProducts.find((p) => p.slug === slug);
     return (
-      <section className="b-product-page b-section" aria-label="Product detail">
+      <section
+        className="b-product-page b-section"
+        aria-label={localize("Product detail")}
+      >
         <a
           className="b-link"
           href={
@@ -179,7 +207,8 @@ export function MenuCatalog() {
               : "/menu"
           }
         >
-          ← BACK TO MENU
+          {" "}
+          <CustomerCopy>← BACK TO MENU</CustomerCopy>{" "}
         </a>
         {product ? (
           <article
@@ -191,8 +220,16 @@ export function MenuCatalog() {
           </article>
         ) : (
           <>
-            <h1>Product not found</h1>
-            <p>Please choose a product from the current menu.</p>
+            <h1>
+              {" "}
+              <CustomerCopy>Product not found</CustomerCopy>{" "}
+            </h1>
+            <p>
+              {" "}
+              <CustomerCopy>
+                Please choose a product from the current menu.
+              </CustomerCopy>{" "}
+            </p>
           </>
         )}
       </section>
@@ -203,11 +240,20 @@ export function MenuCatalog() {
     <section
       id="bakery"
       className="b-section b-full-menu"
-      aria-label="Full menu"
+      aria-label={localize("Full menu")}
     >
-      <p className="b-label">THE 3L MENU</p>
-      <h2 className="b-heading">FIND YOUR FAVOURITE.</h2>
-      <nav className="b-menu-categories" aria-label="Menu categories">
+      <p className="b-label">
+        {" "}
+        <CustomerCopy>THE 3L MENU</CustomerCopy>{" "}
+      </p>
+      <h2 className="b-heading">
+        {" "}
+        <CustomerCopy>FIND YOUR FAVOURITE.</CustomerCopy>{" "}
+      </h2>
+      <nav
+        className="b-menu-categories"
+        aria-label={localize("Menu categories")}
+      >
         {menuCategories.map((c) => (
           <button
             key={c.id}
@@ -215,7 +261,9 @@ export function MenuCatalog() {
             aria-pressed={category === c.id}
             onClick={() => {
               setCategory(c.id);
-              history.replaceState({}, "", `/menu?category=${c.id}`);
+              const url = new URL(location.href);
+              url.searchParams.set("category", c.id);
+              history.replaceState(history.state, "", url);
             }}
           >
             <CustomerCopy>{c.name}</CustomerCopy>
@@ -232,7 +280,7 @@ export function MenuCatalog() {
             <article
               className="b-menu-card"
               key={p.id}
-              aria-label={p.title}
+              aria-label={localize(p.title)}
               id={`product-${p.slug}`}
               data-product-id={p.id}
               data-menu-family={p.familyId}
@@ -242,7 +290,8 @@ export function MenuCatalog() {
           ))}
       </div>
       <a className="b-link" href="/cart">
-        VIEW CART
+        {" "}
+        <CustomerCopy>VIEW CART</CustomerCopy>{" "}
       </a>
     </section>
   );

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "build": "vite build && node scripts/prerender-brand.mjs && node scripts/prepare-sites-build.mjs && node scripts/build-server.mjs",
+    "build": "npm run audit:i18n && npm run audit:customer-copy && vite build && node scripts/prerender-brand.mjs && node scripts/prepare-sites-build.mjs && node scripts/build-server.mjs",
     "preview": "vite preview",
     "start": "node dist/node/server.mjs",
     "test:sites": "node --test tests/sites-worker.test.mjs",
@@ -18,7 +18,8 @@
     "catalog": "tsx scripts/catalog-import.ts",
     "paymennt:register": "tsx scripts/register-paymennt-webhook.ts",
     "test:e2e:build": "E2E_BUILD=true playwright test",
-    "audit:i18n": "node scripts/audit-i18n.mjs"
+    "audit:i18n": "node scripts/audit-i18n.mjs",
+    "audit:customer-copy": "node scripts/audit-customer-copy.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
