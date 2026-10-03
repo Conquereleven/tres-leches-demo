@@ -2,7 +2,7 @@ import { QuantityInput } from "./QuantityInput";
 import { normalizeWhatsAppNumber } from "../../shared/contact";
 import { ResponsiveMedia, selectedProductMedia } from "./media";
 import { AddressAutocomplete } from "./AddressAutocomplete";
-import { CustomerCopy } from "./localization";
+import { CustomerCopy, LanguageSwitcher } from "./localization";
 import { useCheckoutNow } from "./cart";
 import { validWindow, leadHours } from "../../shared/commerce-policy";
 import { FloatingShopping } from "./SiteChrome";
@@ -327,6 +327,7 @@ function CheckoutHeader() {
       <a href="/" className="b-co-logo" aria-label="Pastelerías 3L · Home">
         <Logo />
       </a>
+      <LanguageSwitcher />
       <p className="b-co-secure">
         <LockSimple aria-hidden weight="bold" />{" "}
         <CustomerCopy>Secure checkout</CustomerCopy>

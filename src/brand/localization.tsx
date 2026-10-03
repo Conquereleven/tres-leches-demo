@@ -6,6 +6,14 @@ import {
   type ReactNode,
 } from "react";
 import customerCopy from "./locales/customer-copy.json";
+import { I18nextProvider } from "react-i18next";
+import {
+  isLocale,
+  localizedSource,
+  storefrontI18n,
+  type Locale,
+} from "./locales/engine";
+export type { Locale } from "./locales/engine";
 export const english = {
   menu: "Menu",
   cart: "Cart",
@@ -23,14 +31,15 @@ export const arabic: Partial<typeof english> = {
   how: "كيفية الطلب",
   language: "اللغة",
 };
-export type Locale = "en" | "ar";
+
 export function initialLocale(): Locale {
   if (typeof window === "undefined") return "en";
   const url = new URL(window.location.href);
   const query = url.searchParams.get("lang");
-  if (query === "en" || query === "ar") return query;
+  if (isLocale(query)) return query;
   try {
-    return localStorage.getItem("3l-language") === "ar" ? "ar" : "en";
+    const stored = localStorage.getItem("3l-language");
+    return isLocale(stored) ? stored : "en";
   } catch {
     return "en";
   }
@@ -42,6 +51,7 @@ export function translatedCopy(
   locale: Locale,
   resources: CopyResources = customerCopy,
 ): string {
+  if (resources === customerCopy) return localizedSource(source, locale);
   if (locale !== "ar") return source;
   const exact = resources[source]?.arabic;
   if (exact) return exact;
@@ -83,6 +93,7 @@ const Context = createContext({
 export function LocalizationProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Locale>(initialLocale);
   useEffect(() => {
+    void storefrontI18n.changeLanguage(language);
     const publicPage = !location.pathname.startsWith("/operations");
     document.documentElement.lang = publicPage ? language : "en";
     document.documentElement.dir =
@@ -97,40 +108,54 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
     const url = new URL(location.href);
     url.searchParams.set("lang", next);
     history.replaceState(history.state, "", url);
+    void storefrontI18n.changeLanguage(next);
     setLanguage(next);
   };
   return (
-    <Context.Provider
-      value={{
-        language,
-        setLanguage: change,
-        t: (key) =>
-          language === "ar" ? (arabic[key] ?? english[key]) : english[key],
-        text: (source) => translatedCopy(source, language),
-      }}
-    >
-      {children}
-    </Context.Provider>
+    <I18nextProvider i18n={storefrontI18n}>
+      <Context.Provider
+        value={{
+          language,
+          setLanguage: change,
+          t: (key) => localizedSource(english[key], language),
+          text: (source) => translatedCopy(source, language),
+        }}
+      >
+        {children}
+      </Context.Provider>
+    </I18nextProvider>
   );
 }
 export const useLanguage = () => useContext(Context);
 /** Text-node boundary: unapproved translations preserve the exact English source. */
 export function CustomerCopy({ children }: { children: string }) {
-  const { language, text } = useLanguage();
+  const { text } = useLanguage();
   const value = text(children);
-  // Isolate mixed-script fallback text without adding invalid markup inside options.
-  return <>{language === "ar" ? `\u2068${value}\u2069` : value}</>;
+  return <>{value}</>;
 }
 export function LanguageSwitcher() {
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, text } = useLanguage();
   return (
-    <button
-      className="b-language"
-      aria-label="Change language"
-      lang={language === "ar" ? "en" : "ar"}
-      onClick={() => setLanguage(language === "ar" ? "en" : "ar")}
-    >
-      {language === "ar" ? "English" : "العربية"}
-    </button>
+    <label className="b-language-control">
+      <span className="b-visually-hidden">{text("Language")}</span>
+      <select
+        className="b-language"
+        aria-label={text("Change language")}
+        value={language}
+        onChange={(event) => {
+          if (isLocale(event.target.value)) setLanguage(event.target.value);
+        }}
+      >
+        <option value="en" lang="en">
+          EN
+        </option>
+        <option value="es" lang="es">
+          ES
+        </option>
+        <option value="ar" lang="ar">
+          العربية
+        </option>
+      </select>
+    </label>
   );
 }

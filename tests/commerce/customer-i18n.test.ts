@@ -1,10 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { translatedCopy } from "../../src/brand/localization";
-test("unapproved customer translations preserve source text and data", () => {
+test("missing customer translations are visible rather than silently falling back", () => {
   assert.equal(
     translatedCopy("Add AED 66 more to continue.", "ar"),
-    "Add AED 66 more to continue.",
+    "الترجمة قيد الإعداد",
   );
   assert.equal(
     translatedCopy("Pistachio · Individual", "en"),
