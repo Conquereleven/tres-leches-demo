@@ -15,6 +15,8 @@ import {
 import { FloatingShopping } from "./SiteChrome";
 import "./storefront.css";
 import { business } from "./business";
+import { AreaField } from "./AreaField";
+import { PICKUP_LOCATION } from "../../shared/pickup-location";
 import { menuFamilyForSku, storefrontProductForSku } from "./menu";
 /**
  * The 3L online store: cart → delivery → details → payment → confirmation.
@@ -23,7 +25,14 @@ import { menuFamilyForSku, storefrontProductForSku } from "./menu";
  * the approved catalog and delivery zone at quote, at checkout creation and
  * again before checkout creation. Card details are entered only on Paymennt.
  */
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   ArrowLeft,
   CaretDown,
@@ -97,6 +106,8 @@ type Summary = {
 };
 type Status = {
   orderId: string;
+  /** "#001" once paid; null before payment and for orders paid before numbering. */
+  orderNumber?: string | null;
   status: string;
   paymentStatus: string;
   paymentFlow?: "web";
@@ -118,7 +129,8 @@ type Delivery = {
 };
 type Customer = {
   whatsappNumber?: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   phone: string;
   email?: string;
   instructions?: string;
@@ -132,6 +144,11 @@ type Billing = {
   zip?: string;
   country?: string;
 };
+const fullName = (c: Partial<Customer>) =>
+  [c.firstName?.trim(), c.lastName?.trim()].filter(Boolean).join(" ");
+/** What a customer quotes to us: the short number once paid, else the internal reference. */
+const reference = (s: { orderId: string; orderNumber?: string | null }) =>
+  s.orderNumber ?? s.orderId;
 /** 3L delivers only within Dubai; a delivery address is in Dubai, UAE. */
 const SERVICE_AREA = { city: "Dubai", country: "AE" };
 /** ISO 3166-1 alpha-2 codes; names come from the browser, in English. */
@@ -168,17 +185,17 @@ function billingLines(billing: Billing, delivery: Delivery, name: string) {
         countryName(SERVICE_AREA.country),
       ]
     : [
-        billing.name,
+        billing.name?.trim() || name,
         billing.address1,
         billing.address2,
         billing.city,
         billing.zip,
-        billing.country && countryName(billing.country),
+        countryName(billing.country ?? SERVICE_AREA.country),
       ];
 }
+// Country is never blank: it defaults to the UAE and is fixed for pickup.
 const billingComplete = (b: Billing) =>
-  b.sameAsDelivery ||
-  !!(b.name?.trim() && b.address1?.trim() && b.city?.trim() && b.country);
+  b.sameAsDelivery || !!(b.address1?.trim() && b.city?.trim());
 
 async function post<T>(path: string, body: unknown, key?: string): Promise<T> {
   const res = await fetch(path, {
@@ -223,6 +240,7 @@ export function normalizeUaeMobile(raw: string) {
   return m ? `+971${m[1]}` : null;
 }
 const CAPABILITY = "3l-checkout";
+const CUTOFF_SEEN = "3l-cutoff-notice";
 const DRAFT = "3l-checkout-draft";
 function loadDraft(): {
   fulfillmentMethod?: "delivery" | "pickup";
@@ -231,7 +249,20 @@ function loadDraft(): {
   billing?: Billing;
 } {
   try {
-    return JSON.parse(sessionStorage.getItem(DRAFT) ?? "{}");
+    const draft = JSON.parse(sessionStorage.getItem(DRAFT) ?? "{}");
+    // A draft saved before names were captured separately holds one "name".
+    // Offer a best-effort split the customer can correct; nothing is lost.
+    const legacy = draft.customer?.name;
+    if (typeof legacy === "string" && !draft.customer.firstName) {
+      const [first, ...rest] = legacy.trim().split(/\s+/);
+      draft.customer = {
+        ...draft.customer,
+        firstName: first ?? "",
+        lastName: rest.join(" "),
+      };
+      delete draft.customer.name;
+    }
+    return draft;
   } catch {
     return {};
   }
@@ -857,6 +888,7 @@ export function CheckoutPage() {
     draft.billing ?? { sameAsDelivery: true },
   );
   const [areaMissing, setAreaMissing] = useState(false);
+  const [cutoffDialog, setCutoffDialog] = useState(false);
   const [addressBusy, setAddressBusy] = useState(false);
   const [addressNotice, setAddressNotice] = useState("");
   const [quote, setQuote] = useState<Quote | null>(null);
@@ -919,6 +951,11 @@ export function CheckoutPage() {
     );
 
   const subtotal = cartSubtotalFils(cartLines, config.products);
+  // Server-calibrated clock, Dubai rules, and this cart's own lead time.
+  const earliest = earliestFulfillmentDate(
+    now,
+    leadHours(cartLines.map((l) => l.productId)),
+  );
   const minFils = (quote?.minOrderAed ?? 0) * 100;
   const set = <K extends keyof Delivery>(k: K, v: Delivery[K]) => {
     setError("");
@@ -1022,8 +1059,15 @@ export function CheckoutPage() {
                         setAreaMissing(false);
                         setError("");
                         setQuote(null);
-                        if (method === "pickup")
-                          setBilling((b) => ({ ...b, sameAsDelivery: false }));
+                        // Pickup has no delivery address to reuse. Returning to
+                        // delivery restores the default only if nothing was typed.
+                        setBilling((b) =>
+                          method === "pickup"
+                            ? { ...b, sameAsDelivery: false, country: "AE" }
+                            : b.address1?.trim()
+                              ? b
+                              : { ...b, sameAsDelivery: true },
+                        );
                       }}
                     />
                     <CustomerCopy>
@@ -1036,9 +1080,11 @@ export function CheckoutPage() {
                 <div className="b-co-billing-preview">
                   <strong>
                     <CustomerCopy>Pickup ·</CustomerCopy>{" "}
-                    <CustomerCopy>{business.tradingName}</CustomerCopy>
+                    <CustomerCopy>{PICKUP_LOCATION.name}</CustomerCopy>
                   </strong>
-                  <p>{business.address}</p>
+                  <p>
+                    <bdi>{PICKUP_LOCATION.lines.join(", ")}</bdi>
+                  </p>
                   <p>
                     <CustomerCopy>
                       Your order will be ready for pickup at the selected date
@@ -1055,34 +1101,18 @@ export function CheckoutPage() {
               )}
               {!pickup && (
                 <>
-                  <label>
-                    <CustomerCopy>Delivery area</CustomerCopy>{" "}
-                    <Select
-                      required
+                  <div className="b-field">
+                    <span className="b-field-label" aria-hidden="true">
+                      <CustomerCopy>Delivery area</CustomerCopy>
+                    </span>
+                    <AreaField
+                      areas={config.zones}
+                      value={delivery.zoneId ?? ""}
                       disabled={config.addressVerificationRequired}
-                      value={
-                        areaMissing ? "__missing" : (delivery.zoneId ?? "")
-                      }
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        setAreaMissing(v === "__missing");
-                        set("zoneId", v === "__missing" ? "" : v);
-                      }}
-                    >
-                      <option value="">
-                        <CustomerCopy>Choose your area</CustomerCopy>
-                      </option>
-                      {config.zones.map((z) => (
-                        <option key={z.id} value={z.id}>
-                          {z.name} <CustomerCopy>— Minimum AED</CustomerCopy>{" "}
-                          {z.minOrderAed}
-                        </option>
-                      ))}
-                      <option value="__missing">
-                        <CustomerCopy>My area isn't listed</CustomerCopy>
-                      </option>
-                    </Select>
-                  </label>
+                      onChange={(zoneId) => set("zoneId", zoneId)}
+                      onUnsupported={setAreaMissing}
+                    />
+                  </div>
                   {areaMissing && (
                     <div className="b-shop-notice" role="status">
                       <p>
@@ -1206,14 +1236,31 @@ export function CheckoutPage() {
                     <Input
                       required
                       type="date"
-                      min={earliestFulfillmentDate(
-                        now,
-                        leadHours(cartLines.map((l) => l.productId)),
-                      )}
+                      min={earliest}
                       max={config.dates.max}
                       value={delivery.date ?? ""}
+                      onFocus={() => {
+                        // Once per closed evening, when the customer reaches the
+                        // date — never on page load.
+                        if (!nextDayClosed(now) || delivery.date) return;
+                        try {
+                          if (sessionStorage.getItem(CUTOFF_SEEN) === earliest)
+                            return;
+                          sessionStorage.setItem(CUTOFF_SEEN, earliest);
+                        } catch {
+                          /* Without storage the dialog may show again; harmless. */
+                        }
+                        setCutoffDialog(true);
+                      }}
                       onChange={(e) => {
-                        set("date", e.target.value);
+                        const next = e.target.value;
+                        // Asking for a date that closed at 9 PM explains itself
+                        // instead of silently failing. The date is not accepted.
+                        if (next && next < earliest && nextDayClosed(now)) {
+                          setCutoffDialog(true);
+                          return;
+                        }
+                        set("date", next);
                         set("slot", "");
                       }}
                     />
@@ -1297,6 +1344,25 @@ export function CheckoutPage() {
                 <CustomerCopy>{error}</CustomerCopy>
               </p>
             )}
+            {cutoffDialog && (
+              <CutoffDialog
+                date={new Date(`${earliest}T12:00:00+04:00`).toLocaleDateString(
+                  language,
+                  {
+                    timeZone: "Asia/Dubai",
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                  },
+                )}
+                onChoose={() => {
+                  set("date", earliest);
+                  set("slot", "");
+                  setCutoffDialog(false);
+                }}
+                onClose={() => setCutoffDialog(false)}
+              />
+            )}
             {addressNotice && (
               <p role="status">
                 <CustomerCopy>{addressNotice}</CustomerCopy>
@@ -1363,17 +1429,28 @@ export function CheckoutPage() {
             }}
           >
             <Card title={localize("Contact details")} headingRef={heading}>
-              <label>
-                <CustomerCopy>Full name</CustomerCopy>{" "}
-                <Input
-                  required
-                  minLength={2}
-                  maxLength={100}
-                  autoComplete="name"
-                  value={customer.name ?? ""}
-                  onChange={(e) => setC("name", e.target.value)}
-                />
-              </label>
+              <div className="b-shop-row">
+                <label>
+                  <CustomerCopy>First name</CustomerCopy>{" "}
+                  <Input
+                    required
+                    maxLength={60}
+                    autoComplete="given-name"
+                    value={customer.firstName ?? ""}
+                    onChange={(e) => setC("firstName", e.target.value)}
+                  />
+                </label>
+                <label>
+                  <CustomerCopy>Last name</CustomerCopy>{" "}
+                  <Input
+                    required
+                    maxLength={60}
+                    autoComplete="family-name"
+                    value={customer.lastName ?? ""}
+                    onChange={(e) => setC("lastName", e.target.value)}
+                  />
+                </label>
+              </div>
               <div className="b-shop-row">
                 <label>
                   <CustomerCopy>Mobile number</CustomerCopy>{" "}
@@ -1441,7 +1518,11 @@ export function CheckoutPage() {
                 />
               </label>
             </Card>
-            <Card title={localize("Billing address")}>
+            <Card
+              title={localize(
+                pickup ? "Billing address for your card" : "Billing address",
+              )}
+            >
               {!pickup && (
                 <label className="b-check b-co-toggle">
                   <input
@@ -1471,12 +1552,51 @@ export function CheckoutPage() {
                     {billingLines(
                       billing,
                       delivery as Delivery,
-                      customer.name ?? "",
+                      fullName(customer),
                     )
                       .filter(Boolean)
                       .join(", ")}
                   </bdi>
                 </p>
+              ) : pickup ? (
+                // The provider's minimum, and nothing else: the name comes
+                // from the contact details above, the country is the UAE.
+                <fieldset className="b-shop-billing">
+                  <legend className="b-visually-hidden">
+                    <CustomerCopy>Billing address for your card</CustomerCopy>
+                  </legend>
+                  <div className="b-shop-row">
+                    <label>
+                      <CustomerCopy>Street address</CustomerCopy>{" "}
+                      <Input
+                        required
+                        maxLength={200}
+                        autoComplete="billing address-line1"
+                        value={billing.address1 ?? ""}
+                        onChange={(e) => setB("address1", e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      <CustomerCopy>City</CustomerCopy>{" "}
+                      <Input
+                        required
+                        maxLength={100}
+                        autoComplete="billing address-level2"
+                        value={billing.city ?? ""}
+                        onChange={(e) => setB("city", e.target.value)}
+                      />
+                    </label>
+                  </div>
+                  <label>
+                    <CustomerCopy>Country</CustomerCopy>{" "}
+                    <Input
+                      readOnly
+                      aria-readonly="true"
+                      autoComplete="off"
+                      value={localize("United Arab Emirates")}
+                    />
+                  </label>
+                </fieldset>
               ) : (
                 <fieldset className="b-shop-billing">
                   <legend className="b-visually-hidden">
@@ -1543,7 +1663,7 @@ export function CheckoutPage() {
                     <Select
                       required
                       autoComplete="billing country"
-                      value={billing.country ?? ""}
+                      value={billing.country ?? "AE"}
                       onChange={(e) => setB("country", e.target.value)}
                     >
                       <option value="">
@@ -1635,6 +1755,62 @@ async function heldCheckout(checkout: unknown): Promise<Status | null> {
 }
 
 /** Accepted card marks: the official, unmodified files on white tiles. */
+/**
+ * Explains the 9 PM Dubai cutoff at the moment it matters. It only ever offers
+ * the earliest date the server will accept; closing it changes nothing, and
+ * the server rejects a closed date whatever the browser sends.
+ */
+function CutoffDialog({
+  date,
+  onChoose,
+  onClose,
+}: {
+  date: string;
+  onChoose: () => void;
+  onClose: () => void;
+}) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const id = useId();
+  useEffect(() => {
+    const dialog = ref.current!;
+    const previous = document.activeElement as HTMLElement | null;
+    dialog.showModal();
+    return () => {
+      dialog.close();
+      previous?.focus();
+    };
+  }, []);
+  return (
+    <dialog
+      ref={ref}
+      className="b-co-dialog"
+      aria-labelledby={`${id}-title`}
+      aria-describedby={`${id}-text`}
+      onCancel={(e) => {
+        e.preventDefault();
+        onClose();
+      }}
+    >
+      <h2 id={`${id}-title`}>
+        <CustomerCopy>Next-day ordering is closed</CustomerCopy>
+      </h2>
+      <p id={`${id}-text`}>
+        <CustomerCopy>
+          Orders for next-day production close at 9:00 PM Dubai time.
+        </CustomerCopy>{" "}
+        <CustomerCopy>{`The earliest available production date is now ${date}.`}</CustomerCopy>
+      </p>
+      <div className="b-co-dialog-actions">
+        <Button type="button" className="b-co-cta" autoFocus onClick={onChoose}>
+          <CustomerCopy>{`Choose ${date}`}</CustomerCopy>
+        </Button>
+        <button type="button" className="b-link" onClick={onClose}>
+          <CustomerCopy>Continue</CustomerCopy>
+        </button>
+      </div>
+    </dialog>
+  );
+}
 function CardMarks() {
   const { text: localize } = useCustomerLanguage();
 
@@ -1759,7 +1935,10 @@ function PaymentStep({
           },
         }),
     customer: {
-      ...customer,
+      firstName: customer.firstName?.trim() ?? "",
+      lastName: customer.lastName?.trim() ?? "",
+      phone: customer.phone,
+      email: customer.email,
       whatsappNumber: customer.whatsappNumber?.trim()
         ? (normalizeWhatsAppNumber(customer.whatsappNumber) ?? undefined)
         : undefined,
@@ -1767,15 +1946,24 @@ function PaymentStep({
     },
     billing: billing.sameAsDelivery
       ? { sameAsDelivery: true }
-      : {
-          sameAsDelivery: false,
-          name: billing.name,
-          address1: billing.address1,
-          address2: billing.address2 || undefined,
-          city: billing.city,
-          zip: billing.zip || undefined,
-          country: billing.country,
-        },
+      : pickup
+        ? {
+            // Pickup: only what the provider requires. Never the shop's address.
+            sameAsDelivery: false,
+            name: fullName(customer),
+            address1: billing.address1,
+            city: billing.city,
+            country: "AE",
+          }
+        : {
+            sameAsDelivery: false,
+            name: billing.name?.trim() || fullName(customer),
+            address1: billing.address1,
+            address2: billing.address2 || undefined,
+            city: billing.city,
+            zip: billing.zip || undefined,
+            country: billing.country ?? "AE",
+          },
   };
 
   const cartContext = JSON.stringify(body);
@@ -1898,7 +2086,7 @@ function PaymentStep({
                 <br />
                 <bdi>
                   {pickup
-                    ? `${business.tradingName} · ${business.address}`
+                    ? `${PICKUP_LOCATION.name} · ${PICKUP_LOCATION.lines.join(", ")}`
                     : [
                         delivery.unit && `Unit ${delivery.unit}`,
                         delivery.building,
@@ -1924,7 +2112,7 @@ function PaymentStep({
                 <CustomerCopy>Contact</CustomerCopy>
               </h2>
               <p>
-                <bdi>{customer.name}</bdi> ·{" "}
+                <bdi>{fullName(customer)}</bdi> ·{" "}
                 <bdi dir="ltr">
                   {normalizeUaeMobile(customer.phone) ?? customer.phone}
                 </bdi>
@@ -1959,7 +2147,7 @@ function PaymentStep({
                   </>
                 )}
                 <bdi>
-                  {billingLines(billing, delivery, customer.name)
+                  {billingLines(billing, delivery, fullName(customer))
                     .filter(Boolean)
                     .join(", ")}
                 </bdi>
@@ -1973,13 +2161,13 @@ function PaymentStep({
                 <StateNotice
                   state="PAID"
                   title={localize("This order is already paid")}
-                  message={`Order ${held.orderId} from this visit is already paid.`}
+                  message={`Order ${reference(held)} from this visit is already paid.`}
                 />
               ) : (
                 <StateNotice
                   state="HELD_FOR_REVIEW"
                   {...stateCopy("HELD_FOR_REVIEW")}
-                  detail={`Order ${held.orderId}. We'll confirm it, or contact us with your order number.`}
+                  detail={`Order ${reference(held)}. We'll confirm it, or contact us with your order number.`}
                 />
               )}
               <a className="b-button b-co-cta" href="/checkout/return">
@@ -2208,7 +2396,7 @@ export function CheckoutReturn() {
                 <CustomerCopy>Order number</CustomerCopy>
               </dt>
               <dd>
-                <bdi>{result.orderId}</bdi>
+                <bdi>{reference(result)}</bdi>
               </dd>
             </div>
             <div>
@@ -2253,7 +2441,7 @@ export function CheckoutReturn() {
               <CustomerCopy>CHECK AGAIN</CustomerCopy>
             </Button>
           )}
-          <SupportLink orderId={result?.orderId} />
+          <SupportLink orderId={result ? reference(result) : undefined} />
         </div>
       </div>
     </ShopShell>
@@ -2314,7 +2502,7 @@ function Confirmation({ result }: { result: Status }) {
                 <CustomerCopy>Order</CustomerCopy>
               </dt>
               <dd>
-                <bdi>{result.orderId}</bdi>
+                <bdi>{reference(result)}</bdi>
               </dd>
             </div>
             <div>
@@ -2479,7 +2667,7 @@ function Confirmation({ result }: { result: Status }) {
                   <CustomerCopy>Reference</CustomerCopy>
                 </dt>
                 <dd>
-                  <bdi>{result.orderId}</bdi>
+                  <bdi>{reference(result)}</bdi>
                 </dd>
               </div>
             </dl>
@@ -2525,7 +2713,7 @@ function Confirmation({ result }: { result: Status }) {
           <a className="b-button b-co-cta" href="/">
             <CustomerCopy>BACK TO 3L</CustomerCopy>
           </a>
-          <SupportLink orderId={result.orderId} />
+          <SupportLink orderId={reference(result)} />
         </div>
       </div>
     </ShopShell>

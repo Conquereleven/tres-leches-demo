@@ -15,7 +15,10 @@ const copy = (s: string, l: "en" | "es" | "ar") =>
         )[key!];
       })();
 async function switchTo(page: Page, locale: string) {
-  await page.locator(".b-language:visible").first().selectOption(locale);
+  await page.locator(".b-language:visible").first().click();
+  await page
+    .locator(`.b-language-menu:visible [data-locale="${locale}"]`)
+    .click();
   await expect(page.locator("html")).toHaveAttribute("lang", locale);
 }
 for (const locale of ["en", "es", "ar"] as const)
@@ -138,7 +141,7 @@ for (const locale of ["en", "es", "ar"] as const)
           name: copy("Delivery area", locale),
           exact: true,
         })
-        .selectOption("jlt-cluster-c");
+        .fill("JLT Cluster C");
       await page
         .getByLabel(copy("Street address and community", locale), {
           exact: true,
@@ -164,8 +167,11 @@ for (const locale of ["en", "es", "ar"] as const)
         })
         .click();
       await page
-        .getByLabel(copy("Full name", locale), { exact: true })
-        .fill("Fixture Customer");
+        .getByLabel(copy("First name", locale), { exact: true })
+        .fill("Fixture");
+      await page
+        .getByLabel(copy("Last name", locale), { exact: true })
+        .fill("Customer");
       await page
         .getByLabel(copy("Email for payment receipt", locale), { exact: true })
         .fill("fixture@example.invalid");
@@ -193,10 +199,15 @@ for (const locale of ["en", "es", "ar"] as const)
       for (const next of ["en", "es", "ar", locale]) {
         await switchTo(page, next);
         await expect(
-          page.getByLabel(copy("Full name", next as typeof locale), {
+          page.getByLabel(copy("First name", next as typeof locale), {
             exact: true,
           }),
-        ).toHaveValue("Fixture Customer");
+        ).toHaveValue("Fixture");
+        await expect(
+          page.getByLabel(copy("Last name", next as typeof locale), {
+            exact: true,
+          }),
+        ).toHaveValue("Customer");
       }
       await shot("contact");
       await page
@@ -242,7 +253,7 @@ for (const locale of ["en", "es", "ar"] as const) {
         name: copy("Delivery area", locale),
         exact: true,
       })
-      .selectOption("jlt-cluster-c");
+      .fill("JLT Cluster C");
     await expect(
       page.getByRole("button", {
         name: copy("CONTINUE TO DETAILS", locale),
@@ -273,7 +284,7 @@ for (const locale of ["en", "es", "ar"] as const) {
     await page
       .getByRole("button", { name: copy("REVIEW ORDER", locale), exact: true })
       .click();
-    const fullName = page.getByLabel(copy("Full name", locale), {
+    const fullName = page.getByLabel(copy("First name", locale), {
       exact: true,
     });
     expect(
@@ -281,7 +292,10 @@ for (const locale of ["en", "es", "ar"] as const) {
         (el) => (el as HTMLInputElement).validationMessage,
       ),
     ).toBe(copy("Please complete this field.", locale));
-    await fullName.fill("Pickup Fixture");
+    await fullName.fill("Pickup");
+    await page
+      .getByLabel(copy("Last name", locale), { exact: true })
+      .fill("Fixture");
     const email = page.getByLabel(copy("Email for payment receipt", locale), {
       exact: true,
     });
@@ -297,15 +311,12 @@ for (const locale of ["en", "es", "ar"] as const) {
       .getByLabel(copy("Mobile number", locale), { exact: true })
       .fill("0500000000");
     await page
-      .getByLabel(copy("Name on billing address", locale), { exact: true })
-      .fill("Pickup Fixture");
-    await page
-      .getByLabel(copy("Address line 1", locale), { exact: true })
+      .getByLabel(copy("Street address", locale), { exact: true })
       .fill("Fixture street");
     await page.getByLabel(copy("City", locale), { exact: true }).fill("Dubai");
-    await page
-      .getByRole("combobox", { name: copy("Country", locale), exact: true })
-      .selectOption("AE");
+    await expect(
+      page.getByLabel(copy("Country", locale), { exact: true }),
+    ).toHaveValue(copy("United Arab Emirates", locale));
     await page
       .getByRole("button", { name: copy("REVIEW ORDER", locale), exact: true })
       .click();
@@ -396,7 +407,7 @@ test("multiple SKUs, option identities and fulfillment draft survive every langu
   await page.goto("/checkout");
   await page
     .getByRole("combobox", { name: "Delivery area", exact: true })
-    .selectOption("jlt-cluster-c");
+    .fill("JLT Cluster C");
   await page
     .getByLabel("Street address and community", { exact: true })
     .fill("Persistent Fixture Street");
@@ -414,7 +425,7 @@ test("multiple SKUs, option identities and fulfillment draft survive every langu
         name: copy("Delivery area", lang),
         exact: true,
       }),
-    ).toHaveValue("jlt-cluster-c");
+    ).toHaveValue("JLT Cluster C");
     await expect(
       page.getByLabel(copy("Street address and community", lang), {
         exact: true,

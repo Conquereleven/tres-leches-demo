@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { chooseArea, fillName } from "../fixtures/storefront-form";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync } from "node:fs";
 const shots = "work/qa/uat-v2";
@@ -119,7 +120,7 @@ for (const width of [390, 768, 1440])
     await cartQty.press("Enter");
     await shot("cart");
     await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
-    await page.getByLabel("Delivery area").selectOption("jlt-cluster-c");
+    await chooseArea(page, "JLT", "JLT Cluster C");
     await page
       .getByLabel("Street address and community", { exact: true })
       .fill("UAT fixture street");
@@ -130,7 +131,7 @@ for (const width of [390, 768, 1440])
       .selectOption("4:00 PM – 9:00 PM");
     await shot("fulfillment");
     await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
-    await page.getByLabel("Full name").fill("UAT Fixture");
+    await fillName(page, "UAT", "Fixture");
     await page
       .getByLabel("Email for payment receipt")
       .fill("uat@example.invalid");

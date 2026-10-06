@@ -10,26 +10,30 @@ const secret = "http-test-webhook-secret-24-characters";
 async function start(port: number, production = false) {
   const dir = mkdtempSync(join(tmpdir(), "tl-http-"));
   const salt = "salt-at-least-16-characters";
-  const child = spawn(process.execPath, ["--import", "tsx", "tests/fixtures/server.ts"], {
-    env: {
-      ...process.env,
-      API_PORT: String(port),
-      APP_ORIGIN: `http://127.0.0.1:${port}`,
-      DB_PATH: join(dir, "db.sqlite"),
-      WEBHOOK_SECRET: secret,
-      NODE_ENV: production ? "production" : "test",
-      DEMO_MODE: "true",
-      OPERATOR_USERS_JSON: JSON.stringify([
-        {
-          id: "andrea",
-          role: "agent",
-          salt,
-          hash: scryptSync("a-safe-test-password", salt, 64).toString("hex"),
-        },
-      ]),
+  const child = spawn(
+    process.execPath,
+    ["--import", "tsx", "tests/fixtures/server.ts"],
+    {
+      env: {
+        ...process.env,
+        API_PORT: String(port),
+        APP_ORIGIN: `http://127.0.0.1:${port}`,
+        DB_PATH: join(dir, "db.sqlite"),
+        WEBHOOK_SECRET: secret,
+        NODE_ENV: production ? "production" : "test",
+        DEMO_MODE: "true",
+        OPERATOR_USERS_JSON: JSON.stringify([
+          {
+            id: "andrea",
+            role: "agent",
+            salt,
+            hash: scryptSync("a-safe-test-password", salt, 64).toString("hex"),
+          },
+        ]),
+      },
+      stdio: ["ignore", "pipe", "pipe"],
     },
-    stdio: ["ignore", "pipe", "pipe"],
-  });
+  );
   await new Promise<void>((resolve, reject) => {
     const timer = setTimeout(
       () => reject(new Error("Server failed to start")),

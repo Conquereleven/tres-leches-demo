@@ -8,9 +8,7 @@ import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { Store } from "../fixtures/runtime";
 import { CommerceService } from "../fixtures/runtime";
-import {
-  HmacVerifier,
-} from "../../server/adapters/providers";
+import { HmacVerifier } from "../../server/adapters/providers";
 const verifier = new HmacVerifier("test-long-secret-more-than-24-characters");
 test("restart retains command receipts, queued work and sends from original number", async () => {
   const dir = mkdtempSync(join(tmpdir(), "tl-test-")),

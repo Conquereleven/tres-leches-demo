@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { chooseArea, fillName } from "../fixtures/storefront-form";
 
 const ORIGIN = "http://127.0.0.1:3189";
 const tomorrow = () =>
@@ -30,7 +31,13 @@ test("cart → delivery → details → review → payment step", async ({
   await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
 
   await expect(page).toHaveURL(/\/checkout$/);
-  await page.getByLabel("Delivery area").selectOption("__missing");
+  // Typing an area we do not serve offers no suggestion and blocks checkout.
+  await page
+    .getByRole("combobox", { name: "Delivery area", exact: true })
+    .fill("Sharjah");
+  await expect(
+    page.getByText("We don't currently deliver to this area."),
+  ).toBeVisible();
   await expect(
     page.getByText("Online delivery isn't available for your area yet."),
   ).toBeVisible();
@@ -38,7 +45,7 @@ test("cart → delivery → details → review → payment step", async ({
     page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
   ).toBeDisabled();
 
-  await page.getByLabel("Delivery area").selectOption("jlt-cluster-c");
+  await chooseArea(page, "JLT", "JLT Cluster C");
   await expect(page.locator(".b-shop-form")).toContainText(
     "Included once minimum order is reached",
   );
@@ -53,7 +60,7 @@ test("cart → delivery → details → review → payment step", async ({
     .selectOption("4:00 PM – 9:00 PM");
   await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
 
-  await page.getByLabel("Full name").fill("UAT reviewer");
+  await fillName(page, "UAT", "Reviewer");
   await page.getByLabel("Email for payment receipt").fill("uat@example.com");
   await page.getByLabel("Mobile number").fill("04 000 0000");
   await page.getByRole("button", { name: "REVIEW ORDER" }).click();
@@ -83,7 +90,7 @@ test("cart → delivery → details → review → payment step", async ({
   await expect(review).toContainText("UAT Tower");
   await expect(review).toContainText("Same as delivery address");
   await expect(review).toContainText(
-    "UAT reviewer, UAT Tower, Jumeirah Lakes Towers, Cluster C, Dubai, United Arab Emirates",
+    "UAT Reviewer, UAT Tower, Jumeirah Lakes Towers, Cluster C, Dubai, United Arab Emirates",
   );
   await expect(
     page.getByRole("button", { name: "PAY AED 50", exact: true }),
@@ -161,7 +168,9 @@ test("confirmation comes from the server, never from the URL", async ({
   }, key);
   await page.goto("/checkout/return");
   await expect(page.getByRole("heading", { name: "Thank you" })).toBeVisible();
-  await expect(page.locator("main")).toContainText(orderId);
+  // The customer sees the short public number; the internal reference stays internal.
+  await expect(page.locator("main")).toContainText("#001");
+  await expect(page.locator("main")).not.toContainText(orderId);
   await expect(page.locator("main")).toContainText("AED 50");
 });
 
@@ -232,7 +241,7 @@ test("a paid checkout in this session cannot be paid again", async ({
   await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
   await page.getByRole("button", { name: "REVIEW ORDER" }).click();
   await expect(page.getByRole("alert")).toContainText(
-    `Order ${orderId} from this visit is already paid.`,
+    /Order #\d{3,} from this visit is already paid\./,
   );
   await expect(page.getByRole("button", { name: /^PAY / })).toHaveCount(0);
 });

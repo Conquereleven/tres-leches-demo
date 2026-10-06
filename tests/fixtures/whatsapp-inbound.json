@@ -1,5 +1,27 @@
 [
- {"type":"message","eventId":"fixture-wa1-001","sourceNumberId":"wa1","phone":"+971500001000","customer":"Ana Torres · demo","text":"Quiero pedir Pan de Muerto."},
- {"type":"message","eventId":"fixture-wa2-001","sourceNumberId":"wa2","phone":"+971500001001","customer":"Valentina García · demo","text":"Ubicación de entrega · demo","location":{"lat":25.0657,"lng":55.2089}},
- {"type":"message","eventId":"fixture-wa3-001","sourceNumberId":"wa3","phone":"+971500001002","customer":"Mónica Silva · demo","text":"¿Entregan en Jumeirah?"}
+  {
+    "type": "message",
+    "eventId": "fixture-wa1-001",
+    "sourceNumberId": "wa1",
+    "phone": "+971500001000",
+    "customer": "Ana Torres · demo",
+    "text": "Quiero pedir Pan de Muerto."
+  },
+  {
+    "type": "message",
+    "eventId": "fixture-wa2-001",
+    "sourceNumberId": "wa2",
+    "phone": "+971500001001",
+    "customer": "Valentina García · demo",
+    "text": "Ubicación de entrega · demo",
+    "location": { "lat": 25.0657, "lng": 55.2089 }
+  },
+  {
+    "type": "message",
+    "eventId": "fixture-wa3-001",
+    "sourceNumberId": "wa3",
+    "phone": "+971500001002",
+    "customer": "Mónica Silva · demo",
+    "text": "¿Entregan en Jumeirah?"
+  }
 ]

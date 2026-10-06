@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { fillName } from "../fixtures/storefront-form";
 import { mkdirSync, writeFileSync } from "node:fs";
 const shots = "work/qa/closure";
 const family = (page: Page, id: string) =>
@@ -64,7 +65,7 @@ test("actual Pan variants persist selector → cart → checkout → database �
     .getByRole("combobox", { name: "Delivery time", exact: true })
     .selectOption("4:00 PM – 9:00 PM");
   await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
-  await page.getByLabel("Full name").fill("Closure Fixture");
+  await fillName(page, "Closure", "Fixture");
   await page
     .getByLabel("Email for payment receipt")
     .fill("fixture@example.invalid");
@@ -475,7 +476,7 @@ test("coverage rejection is recoverable through pickup in the customer workspace
     .getByRole("combobox", { name: "Pickup time", exact: true })
     .selectOption("4:00 PM – 9:00 PM");
   await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
-  await expect(page.getByLabel("Full name")).toBeVisible();
+  await expect(page.getByLabel("First name", { exact: true })).toBeVisible();
 });
 
 test("minimum quote recalculates and elapsed server clock disables stale delivery windows", async ({
@@ -604,7 +605,7 @@ for (const width of [390, 768, 1440])
       .getByRole("combobox", { name: "Pickup time", exact: true })
       .selectOption("4:00 PM – 9:00 PM");
     await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
-    await expect(page.getByLabel("Full name")).toBeVisible();
+    await expect(page.getByLabel("First name", { exact: true })).toBeVisible();
     void request;
   });
 
@@ -659,7 +660,7 @@ test("unavailable verification, empty suggestions and network failure preserve p
     .getByRole("combobox", { name: "Pickup time", exact: true })
     .selectOption("4:00 PM – 9:00 PM");
   await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
-  await expect(page.getByLabel("Full name")).toBeVisible();
+  await expect(page.getByLabel("First name", { exact: true })).toBeVisible();
 });
 
 test("pickup golden path completes mock reconciliation, confirmation, tracking and operations without delivery verification", async ({
@@ -683,17 +684,15 @@ test("pickup golden path completes mock reconciliation, confirmation, tracking a
     .getByRole("combobox", { name: "Pickup time", exact: true })
     .selectOption("4:00 PM – 9:00 PM");
   await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
-  await page.getByLabel("Full name").fill("Pickup Fixture");
+  await fillName(page, "Pickup", "Fixture");
   await page
     .getByLabel("Email for payment receipt")
     .fill("fixture@example.invalid");
   await page.getByLabel("Mobile number").fill("0500000000");
-  await page.getByLabel("Name on billing address").fill("Pickup Fixture");
   await page
-    .getByLabel("Address line 1", { exact: true })
+    .getByLabel("Street address", { exact: true })
     .fill("Fixture billing street");
   await page.getByLabel("City", { exact: true }).fill("Dubai");
-  await page.getByRole("combobox", { name: /^Country/ }).selectOption("AE");
   await page.getByRole("button", { name: "REVIEW ORDER" }).click();
   await expect(
     page.getByRole("region", { name: "Order review" }),

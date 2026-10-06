@@ -1043,5 +1043,20 @@
   "Orders for next-day production close at 9:00 PM Dubai time.": "checkout:copy_abad3b1fffa4506c",
   "Next-day ordering is closed. Your earliest available date is {0}.": "checkout:copy_3c1f3562c591044f",
   "Choose a pickup date and time that respect the 9 PM Dubai cutoff and advance notice": "checkout:copy_e86dea8d746b31f7",
-  "Choose a delivery date and time that respect the 9 PM Dubai cutoff and advance notice": "checkout:copy_a8e6e60333fd172d"
+  "Choose a delivery date and time that respect the 9 PM Dubai cutoff and advance notice": "checkout:copy_a8e6e60333fd172d",
+  "Start typing your area": "checkout:copy_8dcce2c69454b93f",
+  "We don't currently deliver to this area.": "checkout:copy_c55f8948293811e2",
+  "Choose your delivery area from the list.": "checkout:copy_7b626fcc8cca2762",
+  "First name": "checkout:copy_702ef921ed1d89bf",
+  "Last name": "checkout:copy_7b4888049459f04a",
+  "Street address": "checkout:copy_8a386dd14cb9a70f",
+  "United Arab Emirates": "checkout:copy_dd64913c8b91d76c",
+  "Your payment provider needs a billing address for the card. No delivery address is needed for pickup.": "checkout:copy_439b423a2ccef5be",
+  "Next-day ordering is closed": "checkout:copy_d4ff414156461cde",
+  "The earliest available production date is now {0}.": "checkout:copy_fe9b1a4cdfa148df",
+  "Choose {0}": "checkout:copy_3b653968d5a63081",
+  "3L Pastelerías": "checkout:copy_e53477c894279e40",
+  "Pickup location": "checkout:copy_8c3b1e3e395c91e8",
+  "Billing address for your card": "checkout:copy_b32f970b25f3fef5",
+  "Continue": "checkout:copy_31fbef162594de01"
 }

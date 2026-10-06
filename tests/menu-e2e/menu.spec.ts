@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { chooseArea } from "../fixtures/storefront-form";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync, readFileSync } from "node:fs";
 const menuCategories: { id: string; name: string }[] = JSON.parse(
@@ -92,7 +93,7 @@ test("multiple menu SKUs go through cart and existing web checkout with authorit
   await expect(page.locator("main")).toContainText("AED 215");
   await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
   await expect(page).toHaveURL(/\/checkout$/);
-  await page.getByLabel("Delivery area").selectOption("jlt-cluster-c");
+  await chooseArea(page, "JLT", "JLT Cluster C");
   await expect(page.locator("main")).toContainText("AED 215");
   await expect(
     page.getByRole("link", { name: /ORDER ON WHATSAPP/ }),

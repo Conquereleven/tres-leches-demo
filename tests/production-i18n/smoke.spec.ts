@@ -56,8 +56,12 @@ for (const locale of ["en", "es", "ar"]) {
     await page.locator(".b-quantity-input").fill("3");
     await page.locator(".b-quantity-input").press("Tab");
     const before = await page.evaluate(() => localStorage.getItem("3l-cart"));
-    for (const next of ["en", "es", "ar", locale])
-      await page.locator(".b-language:visible").first().selectOption(next);
+    for (const next of ["en", "es", "ar", locale]) {
+      await page.locator(".b-language:visible").first().click();
+      await page
+        .locator(`.b-language-menu:visible [data-locale="${next}"]`)
+        .click();
+    }
     await page.reload();
     expect(await page.evaluate(() => localStorage.getItem("3l-cart"))).toBe(
       before,

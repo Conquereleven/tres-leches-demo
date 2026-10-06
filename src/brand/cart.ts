@@ -133,6 +133,8 @@ export type CheckoutConfig = {
   zones: {
     id: string;
     name: string;
+    /** Search labels only; the id is the authority. */
+    aliases?: string[];
     minOrderAed: number;
     deliveryFeeAed: number;
   }[];

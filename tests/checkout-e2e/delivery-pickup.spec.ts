@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { chooseArea, fillName } from "../fixtures/storefront-form";
 import { mkdirSync } from "node:fs";
 const tomorrow = () =>
   new Date(Date.now() + 172800000).toISOString().slice(0, 10);
@@ -17,9 +18,14 @@ for (const width of [390, 1440]) {
       ),
     );
     await page.goto("/checkout");
-    const area = page.getByLabel("Delivery area");
-    await expect(area.locator("option")).toHaveCount(96); //94 zones + prompt + out-of-coverage
-    await area.selectOption("marina");
+    // Focusing the empty field lists every approved area, as the dropdown did.
+    await page
+      .getByRole("combobox", { name: "Delivery area", exact: true })
+      .focus();
+    await expect(
+      page.getByRole("listbox", { name: "Delivery area" }).getByRole("option"),
+    ).toHaveCount(94);
+    await chooseArea(page, "Dubai Mar", "Marina");
     await expect(
       page.getByText(/The minimum order for Marina is AED 50/),
     ).toBeVisible();
@@ -31,15 +37,20 @@ for (const width of [390, 1440]) {
       path: `work/qa/delivery-pickup/delivery-${width}.png`,
       fullPage: true,
     });
-    for (const [id, min] of [
-      ["jlt-cluster-c", 30],
-      ["jvc", 100],
-      ["dubai-hills", 150],
-      ["dip", 200],
-      ["damac-hills", 250],
-      ["downtown", 300],
+    const area = page.getByRole("combobox", {
+      name: "Delivery area",
+      exact: true,
+    });
+    // Typed by name or alias; the minimum always comes from the resolved area.
+    for (const [typed, min] of [
+      ["JLT Cluster C", 30],
+      ["Jumeirah Village Circle", 100],
+      ["Dubai Hills", 150],
+      ["Dubai Investments Park", 200],
+      ["Damac Hills", 250],
+      ["Downtown Dubai", 300],
     ] as const) {
-      await area.selectOption(id);
+      await area.fill(typed);
       await expect(
         page.getByText(new RegExp(`minimum order.*AED ${min}`)),
       ).toBeVisible();
@@ -52,6 +63,7 @@ for (const width of [390, 1440]) {
     await expect(
       page.locator("main").getByText(/Golositalia JLT/),
     ).toBeVisible();
+    await expect(page.locator("main")).toContainText("Pickup · 3L Pastelerías");
     await page.getByLabel("Pickup date").fill(tomorrow());
     await page
       .getByRole("combobox", { name: "Pickup time", exact: true })
@@ -64,7 +76,7 @@ for (const width of [390, 1440]) {
       fullPage: true,
     });
     await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
-    await page.getByLabel("Full name").fill("Pickup UAT Reviewer");
+    await fillName(page, "Pickup", "UAT Reviewer");
     await page
       .getByLabel("Email for payment receipt")
       .fill("uat@example.invalid");
@@ -72,14 +84,19 @@ for (const width of [390, 1440]) {
     await expect(
       page.getByLabel("Billing address is the same as delivery address"),
     ).toHaveCount(0);
+    // Pickup asks only for what the payment provider requires.
+    await expect(page.getByLabel("Name on billing address")).toHaveCount(0);
+    await expect(page.getByLabel("Address line 2")).toHaveCount(0);
     await page
-      .getByLabel("Name on billing address")
-      .fill("Pickup UAT Reviewer");
-    await page
-      .getByLabel("Address line 1", { exact: true })
+      .getByLabel("Street address", { exact: true })
       .fill("UAT billing fixture address");
     await page.getByLabel("City", { exact: true }).fill("Dubai");
-    await page.getByRole("combobox", { name: /^Country/ }).selectOption("AE");
+    await expect(page.getByLabel("Country", { exact: true })).toHaveValue(
+      "United Arab Emirates",
+    );
+    await expect(
+      page.getByLabel("Country", { exact: true }),
+    ).not.toBeEditable();
     await page.getByRole("button", { name: "REVIEW ORDER" }).click();
     await expect(
       page.getByRole("region", { name: "Order review" }),

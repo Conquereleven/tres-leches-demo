@@ -1896,3 +1896,61 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
   .ref-route-tracer { display: none; }
   .ref-route-halo, .ref-route-ping { animation: none !important; }
 }
+
+/* Language menu: a flag beside each written language name. The name is the label. */
+.b-language-control { position: relative; }
+.brand-experience .b-language-control .b-language,
+.b-modal .b-language-control .b-language {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 6px;
+  border: 0; background: transparent; color: inherit; font: inherit; font-size: 12px;
+  font-weight: 600; letter-spacing: 0.04em; cursor: pointer; white-space: nowrap;
+}
+.b-language-control .b-flag { width: 21px; height: 14px; flex: none; border-radius: 2px; box-shadow: 0 0 0 1px var(--border-subtle); }
+.b-language-control .b-language-caret { width: 10px; height: 7px; flex: none; stroke-width: 1.6; }
+.b-language-control .b-language[aria-expanded="true"] .b-language-caret { transform: rotate(180deg); }
+.b-language-menu {
+  position: absolute; z-index: 40; inset-block-start: 100%; inset-inline-end: 0; margin: 4px 0 0; padding: 6px;
+  min-width: 168px; list-style: none; background: var(--surface-paper); border: 1px solid var(--border-subtle);
+  border-radius: 12px; box-shadow: 0 12px 28px #2b1b1626;
+}
+.b-language-menu[hidden] { display: none; }
+.b-language-menu button {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 0 12px;
+  border: 0; border-radius: 8px; background: transparent; color: var(--text-primary);
+  font: inherit; font-size: 14px; text-align: start; cursor: pointer;
+}
+.b-language-menu button:hover { background: var(--3l-blush); }
+.b-language-menu button[aria-current="true"] { background: var(--3l-blush); font-weight: 700; box-shadow: inset 3px 0 0 var(--3l-gold); }
+[dir="rtl"] .b-language-menu button[aria-current="true"] { box-shadow: inset -3px 0 0 var(--3l-gold); }
+
+/* Delivery-area typeahead: suggestions are approved areas; the id is what is submitted. */
+.b-field { display: grid; gap: 8px; }
+.b-field-label { font-weight: 600; }
+.b-area-field { position: relative; }
+.b-area-field .b-input { width: 100%; }
+.b-area-options {
+  position: absolute; z-index: 30; inset-inline: 0; margin: 4px 0 0; padding: 6px; max-height: 288px; overflow-y: auto;
+  list-style: none; background: var(--surface-paper); border: 1px solid var(--border-subtle); border-radius: 12px;
+  box-shadow: 0 12px 28px #2b1b1626;
+}
+.b-area-options[hidden] { display: none; }
+.b-area-options li {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px; min-height: 44px; padding: 10px 12px;
+  border-radius: 8px; cursor: pointer;
+}
+.b-area-options li small { color: var(--text-secondary); white-space: nowrap; }
+.b-area-options li:is(:hover, [data-active]) { background: var(--3l-blush); }
+.b-area-options li[aria-selected="true"] { font-weight: 700; box-shadow: inset 3px 0 0 var(--3l-gold); }
+[dir="rtl"] .b-area-options li[aria-selected="true"] { box-shadow: inset -3px 0 0 var(--3l-gold); }
+.b-area-field .b-caption { min-height: 1.4em; margin: 6px 0 0; }
+.brand-experience .b-shop-form input[readonly] { background: var(--surface-primary); color: var(--text-secondary); cursor: default; }
+
+/* 9 PM cutoff dialog. */
+.b-co-dialog {
+  width: min(480px, calc(100vw - 32px)); padding: 28px; border: 1px solid var(--3l-gold); border-radius: 20px;
+  background: var(--surface-paper); color: var(--text-primary); box-shadow: 0 24px 60px #2b1b1642;
+}
+.b-co-dialog::backdrop { background: #2b1b1642; }
+.b-co-dialog h2 { margin: 0 0 12px; font-family: var(--display-font, "3L Abril", serif); font-weight: 400; font-size: 1.6rem; line-height: 1.15; }
+.b-co-dialog p { margin: 0 0 20px; line-height: 1.6; }
+.b-co-dialog-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }

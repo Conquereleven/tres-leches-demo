@@ -164,5 +164,20 @@
   "copy_abad3b1fffa4506c": "Los pedidos para producción al día siguiente cierran a las 9:00 PM, hora de Dubái.",
   "copy_3c1f3562c591044f": "Los pedidos para mañana están cerrados. La primera fecha disponible es {0}.",
   "copy_e86dea8d746b31f7": "Elige fecha y hora de recogida que respeten el cierre a las 9 PM en Dubái y la antelación necesaria.",
-  "copy_a8e6e60333fd172d": "Elige fecha y hora de entrega que respeten el cierre a las 9 PM en Dubái y la antelación necesaria."
+  "copy_a8e6e60333fd172d": "Elige fecha y hora de entrega que respeten el cierre a las 9 PM en Dubái y la antelación necesaria.",
+  "copy_8dcce2c69454b93f": "Empieza a escribir tu zona",
+  "copy_c55f8948293811e2": "Por ahora no entregamos en esta zona.",
+  "copy_7b626fcc8cca2762": "Elige tu zona de entrega de la lista.",
+  "copy_702ef921ed1d89bf": "Nombre",
+  "copy_7b4888049459f04a": "Apellido",
+  "copy_8a386dd14cb9a70f": "Calle y número",
+  "copy_dd64913c8b91d76c": "Emiratos Árabes Unidos",
+  "copy_439b423a2ccef5be": "Tu proveedor de pago necesita una dirección de facturación para la tarjeta. Para recoger no hace falta dirección de entrega.",
+  "copy_d4ff414156461cde": "Los pedidos para mañana están cerrados",
+  "copy_fe9b1a4cdfa148df": "La primera fecha de producción disponible ahora es {0}.",
+  "copy_3b653968d5a63081": "Elegir {0}",
+  "copy_e53477c894279e40": "3L Pastelerías",
+  "copy_8c3b1e3e395c91e8": "Lugar de recogida",
+  "copy_b32f970b25f3fef5": "Dirección de facturación de tu tarjeta",
+  "copy_31fbef162594de01": "Continuar"
 }
