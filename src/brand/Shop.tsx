@@ -958,6 +958,21 @@ export function CheckoutPage() {
     leadHours(cartLines.map((l) => l.productId)),
   );
   const minFils = (quote?.minOrderAed ?? 0) * 100;
+  /**
+   * Once per closed evening, when the customer reaches the date — never on
+   * page load. Returns true when the dialog was opened.
+   */
+  const announceCutoff = () => {
+    if (!nextDayClosed(now) || delivery.date || cutoffDialog) return false;
+    try {
+      if (sessionStorage.getItem(CUTOFF_SEEN) === earliest) return false;
+      sessionStorage.setItem(CUTOFF_SEEN, earliest);
+    } catch {
+      /* Without storage the dialog may show again; harmless. */
+    }
+    setCutoffDialog(true);
+    return true;
+  };
   const set = <K extends keyof Delivery>(k: K, v: Delivery[K]) => {
     setError("");
     if (["address", "building", "zoneId"].includes(k)) setAddressNotice("");
@@ -1240,18 +1255,11 @@ export function CheckoutPage() {
                       min={earliest}
                       max={config.dates.max}
                       value={delivery.date ?? ""}
-                      onFocus={() => {
-                        // Once per closed evening, when the customer reaches the
-                        // date — never on page load.
-                        if (!nextDayClosed(now) || delivery.date) return;
-                        try {
-                          if (sessionStorage.getItem(CUTOFF_SEEN) === earliest)
-                            return;
-                          sessionStorage.setItem(CUTOFF_SEEN, earliest);
-                        } catch {
-                          /* Without storage the dialog may show again; harmless. */
-                        }
-                        setCutoffDialog(true);
+                      // Safari does not reliably report focus on a date field,
+                      // so reaching it by tap is handled as well.
+                      onFocus={() => void announceCutoff()}
+                      onPointerDown={(e) => {
+                        if (announceCutoff()) e.preventDefault();
                       }}
                       onChange={(e) => {
                         const next = e.target.value;

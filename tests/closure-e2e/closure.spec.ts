@@ -130,10 +130,10 @@ test("actual Pan variants persist selector → cart → checkout → database �
   await page.getByRole("button", { name: /^Todos los pedidos/ }).click();
   await expect(page.locator("main")).toContainText(data.orderId);
   await expect(
-    page.getByRole("article", { name: `Pedido ${data.orderId}` }),
+    page.getByRole("article", { name: `Pedido ${data.orderNumber}` }),
   ).toContainText("+525512345678");
   await page
-    .getByRole("article", { name: `Pedido ${data.orderId}` })
+    .getByRole("article", { name: `Pedido ${data.orderNumber}` })
     .getByText("Ver pedido y seguimiento", { exact: true })
     .click();
   await expect(page.getByTestId("order-panel")).toContainText("Pistachio");
@@ -731,7 +731,7 @@ test("pickup golden path completes mock reconciliation, confirmation, tracking a
   await page.goto("/operations/orders");
   await page.getByRole("button", { name: /^Todos los pedidos/ }).click();
   await expect(
-    page.getByRole("article", { name: `Pedido ${result.orderId}` }),
+    page.getByRole("article", { name: `Pedido ${result.orderNumber}` }),
   ).toContainText("Recoger en tienda");
   await page.screenshot({
     path: `${shots}/pickup-dashboard-1440.png`,

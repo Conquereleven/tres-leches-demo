@@ -85,3 +85,10 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Neither colour reaches text contrast on cream: text, numerals and outlines stay chocolate; focus rings pair a chocolate outline with a gold halo.
 - `tests/polish-e2e/polish.spec.ts` asserts the computed token values, the rendered colours, and that no retired colour is defined or painted.
 - Operations (`src/commerce/`) keeps its TL-27 styling and functional status colours until Joel decides otherwise.
+
+## Order Experience V2 (6 October 2026)
+- Customer-facing order number is `publicOrderNumber` shown as `#001`; the internal `TL-…` id stays the only key for payments, idempotency and audit. Issued once when an order first becomes paid; historical orders are not renumbered and show their internal id.
+- Checkout captures first and last name separately. Delivery area is a typeahead whose value is always a canonical zone id; minimums come from the zone, never from typed text.
+- Pickup asks only for street and city as billing (name from contact, country fixed UAE); never use the shop address as a customer's billing address. Pickup point is "3L Pastelerías".
+- Customer emails are durable events written with the operator's transition (production started; ready for pickup — pickup only; out for delivery — delivery only), sent through Resend only when explicitly enabled. Manager WhatsApp number is private configuration (`WHATSAPP_MANAGER_PHONE`), never source. `META_OUTBOUND_ENABLED` stays false until Meta approval.
+- Details and remaining configuration: `docs/order-experience/v2.md`.

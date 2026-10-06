@@ -624,7 +624,7 @@ for (const t of evening)
         await expect(dialog).toHaveCount(0);
         const date = page.getByLabel(`${kind} date`, { exact: true });
         await expect(date).toHaveAttribute("min", earliest);
-        await date.focus();
+        await date.click();
         if (!t.closed) {
           await expect(dialog).toHaveCount(0);
           await date.fill(earliest);
@@ -646,8 +646,8 @@ for (const t of evening)
         await page.keyboard.press("Escape");
         await expect(dialog).toHaveCount(0);
         await expect(date).toHaveValue("");
-        await date.focus();
-        await expect(dialog).toHaveCount(0); // not shown again on every focus
+        await date.click();
+        await expect(dialog).toHaveCount(0); // not shown again on every visit
         await date.fill("2026-10-07");
         await expect(dialog).toBeVisible(); // trying the closed date explains it
         await expect(date).toHaveValue("");
@@ -708,7 +708,7 @@ test("mobile: the cutoff dialog fits a 390px screen", async ({ page }) => {
   await addToCart(page, NORMAL, base);
   await page.goto(`${base}/checkout`);
   await page.getByRole("radio", { name: "PICKUP", exact: true }).check();
-  await page.getByLabel("Pickup date", { exact: true }).focus();
+  await page.getByLabel("Pickup date", { exact: true }).click();
   const dialog = page.getByRole("dialog", {
     name: "Next-day ordering is closed",
   });

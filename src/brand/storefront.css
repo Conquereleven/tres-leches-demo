@@ -1954,3 +1954,4 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
 .b-co-dialog h2 { margin: 0 0 12px; font-family: var(--display-font, "3L Abril", serif); font-weight: 400; font-size: 1.6rem; line-height: 1.15; }
 .b-co-dialog p { margin: 0 0 20px; line-height: 1.6; }
 .b-co-dialog-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+.b-language-control :is(.b-language span, .b-language-menu button)[lang="ar"] { font-size: 16px; letter-spacing: 0; }
