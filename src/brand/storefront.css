@@ -1800,3 +1800,44 @@ html[dir="rtl"] .b-modal .b-modal-nav {
 html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
   text-align: start;
 }
+
+/* 3L secondary accent: brand blush stays restrained; dark rose is readable ink. */
+:root {
+  --3l-pink-soft: var(--brand-blush);
+  --3l-pink: var(--brand-pink);
+  --3l-pink-ink: #94445a;
+  --3l-pink-border: #dfacb7;
+}
+.ref-bridge, .ref-family { --editorial-progress: 0; }
+.ref-scroll-sketch { position: absolute; display: block; height: auto; aspect-ratio: 640 / 768; }
+.ref-pencil-mask { stroke-dasharray: 1; stroke-dashoffset: var(--editorial-offset, 1); }
+.ref-journey { position: relative; }
+.ref-route-motion { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.ref-route-ink { stroke: var(--3l-pink-ink); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: var(--editorial-offset, 1); }
+.ref-route-tracer { stroke: var(--3l-pink); stroke-width: 14; stroke-linecap: round; stroke-dasharray: .008 .992; stroke-dashoffset: var(--editorial-tracer, 0); }
+.ref-city-label small { color: var(--3l-pink-ink); }
+.ref-family-copy { border-inline-start: 2px solid var(--3l-pink-border); padding-inline-start: 20px; }
+.b-shop-notice, .b-product-page .b-product-notice { background: var(--3l-pink-soft); border-inline-start: 3px solid var(--3l-pink-border); }
+.b-language select:focus-visible, .b-button:focus-visible { outline-color: var(--3l-pink-ink); }
+.brand-experience .b-full-menu .b-menu-card:hover { border-color: var(--3l-pink-border); }
+.brand-experience .b-full-menu .b-menu-categories button[aria-pressed="true"] { background: var(--3l-pink-soft); color: var(--brand-brown); border-color: var(--3l-pink-border); }
+@media (prefers-reduced-motion: reduce) {
+  .ref-bridge, .ref-family { --editorial-progress: 1 !important; --editorial-offset: 0 !important; }
+  .ref-route-tracer { display: none; }
+}
+@media (max-width: 640px) {
+  /* Stacked cities: physical route runs from upper Mexico to lower Dubai. */
+  .ref-journey img, .ref-journey .ref-route-motion {
+    position: absolute; width: 290px; height: 80.56px;
+    inset: auto; left: 50%; top: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+}
+/* These are illustrations, not the site's 20px interface icons. */
+.brand-experience.ref-home .ref-scroll-sketch { width: 62%; height: auto; }
+.brand-experience.ref-home .ref-route-motion { width: 100%; height: 100%; }
+@media (max-width: 640px) {
+  .brand-experience.ref-home .ref-journey .ref-route-motion { width: 290px; height: 80.56px; }
+}
+
+.brand-experience.b-shop .b-shop-notice, .brand-experience .b-menu-advance { background: var(--3l-pink-soft); border-inline-start: 3px solid var(--3l-pink-border); }

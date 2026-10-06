@@ -1,4 +1,5 @@
 import { useLanguage as useCustomerLanguage } from "./localization";
+import { ScrollSketch, JourneyRoute } from "./ScrollSketch";
 import { useEditorialMotion } from "./useEditorialMotion";
 import { MenuPreview, HowToOrderGuide } from "./StorefrontGuide";
 import { ResponsiveMedia } from "./media";
@@ -15,6 +16,8 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
   const { text: localize } = useCustomerLanguage();
 
   const editorial = useEditorialMotion();
+  const journal = useEditorialMotion();
+  const journey = useEditorialMotion<HTMLDivElement>();
   const video = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [allowMotion, setAllowMotion] = useState(false);
@@ -158,8 +161,9 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               <CustomerCopy>Mexico City</CustomerCopy> <small>1982</small>
             </span>
           </div>
-          <div className="ref-journey" aria-hidden="true">
+          <div className="ref-journey" aria-hidden="true" ref={journey}>
             <img src={"/brand/approved/editorial-journey.svg"} alt="" />
+            <JourneyRoute />
           </div>
           <div className="ref-city ref-dubai">
             <span className="ref-city-crop">
@@ -288,7 +292,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
           </div>
         </section>
         <HowToOrderGuide />
-        <section id="family-story" className="ref-family">
+        <section id="family-story" className="ref-family" ref={journal}>
           <div className="ref-collage">
             <img
               className="ref-paper"
@@ -302,11 +306,8 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
               alt=""
               loading="lazy"
             />
-            <img
-              className="ref-alicia"
-              src={media("alicia.webp")}
-              alt={localize("Alicia Luna Baeza, 3L’s founding grandmother")}
-              loading="lazy"
+            <ScrollSketch
+              label={localize("Alicia Luna Baeza, 3L’s founding grandmother")}
             />
             <img
               className="ref-flower"
