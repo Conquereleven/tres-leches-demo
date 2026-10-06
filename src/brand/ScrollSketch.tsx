@@ -28,7 +28,7 @@ export function ScrollSketch({ label }: { label: string }) {
             pathLength="1"
             fill="none"
             stroke="white"
-            strokeWidth="34"
+            strokeWidth="46"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
