@@ -67,3 +67,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Customer approved maximum100 units per SKU; quantity supports direct integer entry. Pan singles season begins October3 through November15.
 - Full text header wordmark, linked homepage menu preview, accessible visual ordering guide, scroll-driven assembly of separate cake layers; no looping motion and reduced motion shows final composition.
 - Optional international WhatsApp contact is separate from required UAE operations mobile. Production remains legacy address mode; Google prepared but off.
+
+## Approved final polish and cutoff (6 October 2026)
+- Preserve existing assets/layout and cream/cacao identity; use reusable blush/pink accents. Journal portrait reveals original raster pencil detail with scroll-driven SVG brush masking. Mexico→Dubai route follows the physical journey (left→right desktop, top→bottom stacked mobile), never reversed by RTL. Reduced-motion shows final composition.
+- Customer next-day cutoff is Asia/Dubai: entire 21:00 minute inclusive; 21:01 onward earliest global date is day after tomorrow. Delivery and pickup server normalization use shared policy, preserve 12/24-hour product-specific window-start notice and choose the later valid date. No closed production weekdays are invented.
+- Apple Pay is provider-hosted, observed visible in Safari macOS on an existing authorized LIVE checkout. Do not add Apple/Stripe JS, change payment credentials or simulate a wallet button.
+- MCP is audit/planning scope only; keep remote activation and any write tool behind separate explicit authorization. No Meta outbound, migration or ownership change. This sprint is TEST/preview-only until Production is separately authorized.
