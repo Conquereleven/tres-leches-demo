@@ -31,7 +31,7 @@ import {
 import { type GeoService, quoteOrder } from "./zones";
 import { recordOrderPaid } from "./notifications";
 import { recordCustomerEvent } from "./customer-notifications";
-import { assignPublicOrderNumber, customerName } from "./order-number";
+import { assignPublicOrderNumber } from "./order-number";
 import { transition } from "./workflow";
 import { Store } from "../db/store";
 import {

@@ -169,14 +169,9 @@ export type OperationsNotification = {
   orderId: string;
   publicOrderNumber?: number;
   paymentId: string;
-  /** An empty phone means the recipient is known but not configured yet. */
   recipient: { name: string; phone: string };
   message: string;
-  status:
-    | "pending-whatsapp-delivery"
-    | "recipient-not-configured"
-    | "sent"
-    | "failed";
+  status: "pending-whatsapp-delivery" | "sent" | "failed";
   attempts: number;
   createdAt: string;
   sentAt?: string;
@@ -204,11 +199,18 @@ export type CustomerNotification = {
   recipient: string;
   subject: string;
   body: string;
+  /**
+   * pending: recorded, not yet handed to a provider (also the resting state
+   * while no provider is configured). sending: claimed by a dispatcher.
+   */
   status: "pending" | "sending" | "sent" | "failed";
-  attempts: number;
+  attemptCount: number;
   createdAt: string;
-  sentAt?: string;
+  /** Which provider handled the last attempt; absent until one is tried. */
+  provider?: string;
   providerMessageId?: string;
+  lastAttemptAt?: string;
+  sentAt?: string;
   lastError?: string;
 };
 export type Payment = {

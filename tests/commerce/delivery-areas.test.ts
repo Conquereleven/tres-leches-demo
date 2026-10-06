@@ -280,6 +280,12 @@ test("public area config ignores obsolete fee metadata and hides unknown minima/
     { ...base, id: "unknown-minimum", minOrderAed: null },
   ]);
   assert.deepEqual(data, [
-    { id: "marina", name: "Marina", minOrderAed: 50, deliveryFeeAed: 0 },
+    {
+      id: "marina",
+      name: "Marina",
+      aliases: ["Dubai Marina"],
+      minOrderAed: 50,
+      deliveryFeeAed: 0,
+    },
   ]);
 });

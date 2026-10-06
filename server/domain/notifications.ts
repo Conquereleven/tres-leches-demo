@@ -32,15 +32,15 @@ export const OPERATIONS_RECIPIENT = {
   phone: "+971521683319",
 } as const;
 /**
- * Who is told about a paid order. Liza's number is confirmed. The manager's
- * is private configuration; until it is supplied the manager's row is still
- * recorded, marked as not configured, and never handed to a provider.
+ * Who is told about a paid order: one row per configured recipient. Liza's
+ * number is confirmed; the manager's is private configuration and is included
+ * only when a valid number has been supplied.
  */
 export function operationsRecipients(managerPhone?: string) {
   const phone = managerPhone?.replace(/[\s-]/g, "") ?? "";
   return [
     { ...OPERATIONS_RECIPIENT },
-    { name: "3L Manager", phone: /^\+[1-9]\d{7,14}$/.test(phone) ? phone : "" },
+    ...(/^\+[1-9]\d{7,14}$/.test(phone) ? [{ name: "3L Manager", phone }] : []),
   ];
 }
 
@@ -124,9 +124,7 @@ export function recordOrderPaid(
       paymentId: payment.id,
       recipient,
       message,
-      status: recipient.phone
-        ? "pending-whatsapp-delivery"
-        : "recipient-not-configured",
+      status: "pending-whatsapp-delivery",
       attempts: 0,
       createdAt,
     }),

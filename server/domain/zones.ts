@@ -195,6 +195,8 @@ export function publicDeliveryAreas(zones: DeliveryZone[]) {
     .map((z) => ({
       id: z.id,
       name: z.name,
+      // Search labels for the area typeahead; the id remains the only authority.
+      aliases: z.aliases,
       minOrderAed: z.minOrderAed,
       deliveryFeeAed: 0 as const, // Retained wire compatibility; never a separate charge.
     }));

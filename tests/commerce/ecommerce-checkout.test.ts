@@ -360,20 +360,15 @@ test("CAPTURED confirms the order and queues exactly one alert for the team", as
     assert.equal(n[0]!.status, "pending-whatsapp-delivery");
     assert.equal(n[0]!.recipient.phone, OPERATIONS_RECIPIENT.phone);
     const m = n[0]!.message;
+    // Concise by design (Order Experience V2): reference, who, how, when, total, items.
     for (const expected of [
-      "New paid order ✅",
-      `Order: ${order.orderId}`,
+      "New paid order #001 ✅",
       "Customer: Test Customer",
-      "Phone: +971501234567",
+      "DELIVERY to JLT Cluster C",
       "2 × Pan de Muerto",
-      "Subtotal: AED 50.00",
-      "Delivery: AED 0.00",
       "Total paid: AED 50.00",
       tomorrow(),
       "4:00 PM – 9:00 PM",
-      "Unit 1204, Test Tower, Jumeirah Lakes Towers, Cluster C",
-      "Call on arrival",
-      "Payment: PAID",
       `https://3l.example/operations/orders?order=${order.orderId}`,
     ])
       assert.ok(m.includes(expected), `message missing: ${expected}`);

@@ -49,6 +49,11 @@ import {
   UnconfiguredPaymentProvider,
 } from "./adapters/blocked";
 import { PaymenntProvider } from "./adapters/paymennt";
+import { resendFromEnv } from "./adapters/resend";
+import {
+  dispatchCustomerNotifications,
+  recoverInterruptedCustomerNotifications,
+} from "./domain/customer-notifications";
 import { MetaWhatsAppProvider } from "./adapters/meta";
 import { MapboxGeoProvider } from "./adapters/mapbox";
 import { GeocodingAdapter } from "./adapters/geo";
@@ -88,6 +93,7 @@ export async function startServer(
     agentProvider?: import("./agents/model").AgentModelProvider;
     whatsapp?: import("./adapters/providers").WhatsAppProvider;
     payment?: import("./adapters/providers").PaymentProvider;
+    email?: import("./domain/customer-notifications").CustomerEmailProvider;
     geo?: import("./domain/zones").GeoService;
     operationalNumbers?: typeof numbers;
   } = {},
@@ -188,6 +194,12 @@ export async function startServer(
     overrides.operationalNumbers ?? stagingAliases,
   );
   service.deliveryAddressMode = deliveryAddressMode;
+  // Private configuration; the number never lives in source.
+  service.operationsManagerPhone = process.env.WHATSAPP_MANAGER_PHONE;
+  // Isolated tests may inject a fake; they never construct the real provider.
+  const emailProvider =
+    overrides.email ?? (isolatedTest ? null : resendFromEnv(process.env));
+  recoverInterruptedCustomerNotifications(store);
   if (!overrides.geo)
     service.geo = attachVerifiedAddresses(
       service.geo,
@@ -238,6 +250,11 @@ export async function startServer(
   const limiter = new Map<string, { count: number; until: number }>();
   const origin = process.env.APP_ORIGIN ?? "http://127.0.0.1:5173";
   service.operationsOrigin = origin;
+  // "https://www.example.ae" → "example.ae"; null when the origin has no www.
+  const canonicalHost = new URL(origin).host;
+  const canonicalApex = canonicalHost.startsWith("www.")
+    ? canonicalHost.slice(4)
+    : null;
   // Paid-order alerts for the team. Built now, delivered only when outbound is
   // explicitly enabled, Meta can send, and an approved template is configured.
   const operationsOutboundEnabled =
@@ -309,6 +326,20 @@ export async function startServer(
       ),
     );
     try {
+      // Bare domain → canonical www host, keeping path and query. Read-only
+      // requests only: a redirected POST would lose or replay its body.
+      const host = String(req.headers.host ?? "").toLowerCase();
+      if (
+        canonicalApex &&
+        host === canonicalApex &&
+        (req.method === "GET" || req.method === "HEAD")
+      ) {
+        res.writeHead(301, {
+          Location: origin + (req.url?.startsWith("/") ? req.url : "/"),
+          "Cache-Control": "public, max-age=3600",
+        });
+        return res.end();
+      }
       const url = new URL(req.url ?? "/", origin),
         path = url.pathname;
       if (path.startsWith("/api/")) {
@@ -818,6 +849,8 @@ export async function startServer(
             orders: s.orders,
             payments: s.payments,
             operationsNotifications: s.operationsNotifications ?? [],
+            customerNotifications: s.customerNotifications ?? [],
+            customerEmailProvider: emailProvider?.name ?? null,
             operationsOutboundEnabled,
             readiness:
               staging && current.role === "admin"
@@ -1007,6 +1040,7 @@ export async function startServer(
           notifier: operationsNotifier,
         }),
       )
+      .then(() => dispatchCustomerNotifications(store, emailProvider))
       .catch(() => {
         safeLog("worker.failed");
       })

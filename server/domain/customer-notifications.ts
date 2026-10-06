@@ -144,7 +144,7 @@ export function recordCustomerEvent(
       zoneName: zone?.name ?? order.quote?.zoneName ?? undefined,
     }),
     status: "pending",
-    attempts: 0,
+    attemptCount: 0,
     createdAt: new Date().toISOString(),
   };
   s.events[key] = notification.id;
@@ -160,6 +160,7 @@ export function recordCustomerEvent(
 
 /** Delivery adapter. The idempotency key lets a provider drop a repeated send. */
 export interface CustomerEmailProvider {
+  readonly name: string;
   send(email: {
     to: string;
     subject: string;
@@ -188,7 +189,9 @@ export async function dispatchCustomerNotifications(
       const row = s.customerNotifications?.find((r) => r.id === pending.id);
       if (!row || row.status !== "pending") return null;
       row.status = "sending";
-      row.attempts++;
+      row.attemptCount++;
+      row.provider = provider.name;
+      row.lastAttemptAt = new Date().toISOString();
       return structuredClone(row);
     });
     if (!claimed) continue;
