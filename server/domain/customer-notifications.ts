@@ -176,12 +176,32 @@ export interface CustomerEmailProvider {
  * it; a row found "sending" after a crash is surfaced as failed for a person
  * to review rather than resent blindly.
  */
+/**
+ * A progress email is only useful near the moment it describes. One still
+ * unsent after this long — because no provider was configured, or it was
+ * down — is retired instead of being delivered late. This also means turning
+ * a provider on can never release a backlog of old emails.
+ */
+export const CUSTOMER_EMAIL_MAX_AGE_MS = 2 * 60 * 60 * 1000;
 export async function dispatchCustomerNotifications(
   store: { read(): State; write<T>(fn: (s: State) => T): T },
   provider: CustomerEmailProvider | null,
 ) {
   if (!provider) return { attempted: 0, skipped: "no-email-provider" as const };
   let attempted = 0;
+  const cutoff = Date.now() - CUSTOMER_EMAIL_MAX_AGE_MS;
+  if (
+    (store.read().customerNotifications ?? []).some(
+      (n) => n.status === "pending" && Date.parse(n.createdAt) < cutoff,
+    )
+  )
+    store.write((s) => {
+      for (const row of s.customerNotifications ?? [])
+        if (row.status === "pending" && Date.parse(row.createdAt) < cutoff) {
+          row.status = "failed";
+          row.lastError = "Expired before it could be sent; not sent";
+        }
+    });
   for (const pending of (store.read().customerNotifications ?? []).filter(
     (n) => n.status === "pending",
   )) {

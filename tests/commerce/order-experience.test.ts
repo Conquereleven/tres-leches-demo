@@ -25,6 +25,7 @@ import {
 import { reconcileEmbeddedPayment } from "../../server/domain/embedded-checkout";
 import { assignPublicOrderNumber } from "../../server/domain/order-number";
 import {
+  CUSTOMER_EMAIL_MAX_AGE_MS,
   customerEventFor,
   dispatchCustomerNotifications,
   recoverInterruptedCustomerNotifications,
@@ -1075,6 +1076,51 @@ test("an alert is never sent from the business number to itself", async () => {
       manager.lastError!,
       /recipient is the sending WhatsApp number/,
     );
+  } finally {
+    f.store.close();
+  }
+});
+
+test("turning the email provider on never releases a backlog of old emails", async () => {
+  const f = fixture();
+  const mail = fakeEmail();
+  try {
+    const key = await f.place(delivery());
+    await f.pay(key);
+    f.move(key, "Production");
+    f.move(key, "Ready");
+    f.move(key, "Out for Delivery");
+    // The first email was recorded long before any provider existed.
+    f.store.write((s) => {
+      s.customerNotifications![0]!.createdAt = new Date(
+        Date.now() - CUSTOMER_EMAIL_MAX_AGE_MS - 60000,
+      ).toISOString();
+    });
+    await dispatchCustomerNotifications(f.store, mail.provider);
+    const [stale, fresh] = f.store.read().customerNotifications!;
+    assert.deepEqual(
+      mail.sent.map((m) => m.subject),
+      ["Your 3L order #001 is on the way"],
+    );
+    assert.equal(stale!.status, "failed");
+    assert.equal(stale!.attemptCount, 0);
+    assert.equal(stale!.sentAt, undefined);
+    assert.match(stale!.lastError!, /Expired/);
+    assert.equal(fresh!.status, "sent");
+    // With no provider, nothing is retired or touched: rows stay pending.
+    const g = fixture();
+    try {
+      const k = await g.place(delivery());
+      await g.pay(k);
+      g.move(k, "Production");
+      g.store.write((s) => {
+        s.customerNotifications![0]!.createdAt = "2026-01-01T00:00:00.000Z";
+      });
+      await dispatchCustomerNotifications(g.store, null);
+      assert.equal(g.store.read().customerNotifications![0]!.status, "pending");
+    } finally {
+      g.store.close();
+    }
   } finally {
     f.store.close();
   }

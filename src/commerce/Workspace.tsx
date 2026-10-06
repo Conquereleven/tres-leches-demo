@@ -1385,7 +1385,9 @@ function OrderNotifications({ order, data }: { order: Order; data: Data }) {
           {n.status === "sent"
             ? "Enviado"
             : n.status === "failed"
-              ? "Falló · revisar"
+              ? n.lastError?.startsWith("Expired")
+                ? "No enviado · caducó"
+                : "Falló · revisar"
               : n.status === "sending"
                 ? "Enviando"
                 : data.customerEmailProvider
