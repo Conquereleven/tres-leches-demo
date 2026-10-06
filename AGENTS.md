@@ -73,3 +73,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Customer next-day cutoff is Asia/Dubai: entire 21:00 minute inclusive; 21:01 onward earliest global date is day after tomorrow. Delivery and pickup server normalization use shared policy, preserve 12/24-hour product-specific window-start notice and choose the later valid date. No closed production weekdays are invented.
 - Apple Pay is provider-hosted, observed visible in Safari macOS on an existing authorized LIVE checkout. Do not add Apple/Stripe JS, change payment credentials or simulate a wallet button.
 - MCP is audit/planning scope only; keep remote activation and any write tool behind separate explicit authorization. No Meta outbound, migration or ownership change. This sprint is TEST/preview-only until Production is separately authorized.
+
+## Visual polish v2 (6 October 2026, hotfix after failed visual acceptance)
+- Scroll-driven artwork measures the artwork's own on-screen centre, never its taller section; otherwise the animation finishes before it is visible.
+- Mexico→Dubai: pink route drawn behind a visible moving marker; 0–20% Mexico active, 20–80% travel, 80–100% Dubai active. Sizes are authored in screen pixels.
+- Journal portrait is drawn in stages (contour → linework → shading → untouched original) with interleaved pencil strokes; stage images are derived from the approved original by `scripts/derive-journal-layers.mjs`. A top-to-bottom wipe is not acceptable.
+- Pink hierarchy tokens (`--3l-pink-soft`, `--3l-pink`, `--3l-pink-strong`, `--3l-pink-ink`, `--3l-pink-border`) are declared on the brand scopes, not `:root`, and must be carried by real surfaces (signature-flavours band, active menu category, order-guide icons), not only hairlines.

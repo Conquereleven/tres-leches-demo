@@ -1,5 +1,10 @@
 import { useLanguage as useCustomerLanguage } from "./localization";
-import { ScrollSketch, JourneyRoute } from "./ScrollSketch";
+import {
+  ScrollSketch,
+  JourneyRoute,
+  paintSketch,
+  paintJourney,
+} from "./ScrollSketch";
 import { useEditorialMotion } from "./useEditorialMotion";
 import { MenuPreview, HowToOrderGuide } from "./StorefrontGuide";
 import { ResponsiveMedia } from "./media";
@@ -16,8 +21,18 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
   const { text: localize } = useCustomerLanguage();
 
   const editorial = useEditorialMotion();
-  const journal = useEditorialMotion();
-  const journey = useEditorialMotion<HTMLDivElement>();
+  const journal = useEditorialMotion({
+    target: ".ref-scroll-sketch",
+    from: 0.9,
+    to: 0.4,
+    paint: paintSketch,
+  });
+  const journey = useEditorialMotion<HTMLDivElement>({
+    target: ".ref-route-motion",
+    from: 0.92,
+    to: 0.4,
+    paint: paintJourney,
+  });
   const video = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [allowMotion, setAllowMotion] = useState(false);

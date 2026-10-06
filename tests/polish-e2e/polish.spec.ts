@@ -201,3 +201,80 @@ for (const method of ["delivery", "pickup"])
     ).toBe(true);
     void context;
   });
+for (const locale of ["en", "ar"])
+  test(`${locale} journey travels Mexico to Dubai and the portrait is drawn in stages`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`/?lang=${locale}`);
+    const place = (selector: string, from: number, to: number, at: number) =>
+      page.evaluate(
+        async ([selector, from, to, at]) => {
+          const box = document
+            .querySelector(selector as string)!
+            .getBoundingClientRect();
+          const centre =
+            (from as number) -
+            (at as number) * ((from as number) - (to as number));
+          window.scrollTo({
+            top: scrollY + box.top + box.height / 2 - innerHeight * centre,
+            behavior: "instant",
+          });
+          await new Promise((done) =>
+            requestAnimationFrame(() => requestAnimationFrame(done)),
+          );
+        },
+        [selector, from, to, at],
+      );
+    const bridge = page.locator(".ref-bridge");
+    const marker = () =>
+      page
+        .locator(".ref-route-dot")
+        .evaluate((el) => el.getBoundingClientRect().x);
+    await place(".ref-route-motion", 0.92, 0.4, 0.1);
+    await expect(bridge).toHaveAttribute("data-journey", "mexico");
+    const departed = await marker();
+    await place(".ref-route-motion", 0.92, 0.4, 0.5);
+    await expect(bridge).toHaveAttribute("data-journey", "travel");
+    const midway = await marker();
+    // Physical west-to-east travel, regardless of document direction.
+    expect(midway).toBeGreaterThan(departed + 100);
+    expect(
+      await page
+        .locator(".ref-route-dot")
+        .evaluate((el) => el.getBoundingClientRect().width),
+    ).toBeGreaterThan(12);
+    await place(".ref-route-motion", 0.92, 0.4, 1);
+    await expect(bridge).toHaveAttribute("data-journey", "dubai");
+    const drawn = (stage: string) =>
+      page
+        .locator(`.ref-pencil-${stage}`)
+        .evaluate(
+          (el) => 1 - parseFloat(getComputedStyle(el).strokeDashoffset),
+        );
+    const final = () =>
+      page
+        .locator(".ref-sketch-final")
+        .evaluate((el) => parseFloat(getComputedStyle(el).opacity));
+    await place(".ref-scroll-sketch", 0.9, 0.4, 0.2);
+    expect(await drawn("contour")).toBeGreaterThan(0.5);
+    expect(await drawn("detail")).toBe(0);
+    expect(await final()).toBe(0);
+    await place(".ref-scroll-sketch", 0.9, 0.4, 0.5);
+    expect(await drawn("contour")).toBe(1);
+    expect(await drawn("detail")).toBeGreaterThan(0.4);
+    expect(await drawn("shade")).toBe(0);
+    // Just past the nominal end: scroll positions land on whole pixels.
+    await place(".ref-scroll-sketch", 0.9, 0.4, 1.05);
+    expect(await final()).toBe(1);
+    // The pink hierarchy must resolve: an empty token silently removes the accent.
+    for (const token of ["--3l-pink-soft", "--3l-pink", "--3l-pink-strong"])
+      expect(
+        await page
+          .locator(".brand-experience")
+          .evaluate(
+            (el, name) => getComputedStyle(el).getPropertyValue(name).trim(),
+            token,
+          ),
+      ).toMatch(/^#[0-9a-f]{6}$/);
+  });

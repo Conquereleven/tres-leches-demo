@@ -1801,30 +1801,50 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
   text-align: start;
 }
 
-/* 3L secondary accent: brand blush stays restrained; dark rose is readable ink. */
-:root {
-  --3l-pink-soft: var(--brand-blush);
-  --3l-pink: var(--brand-pink);
+/* 3L pink hierarchy (6 October visual polish v2). Cream and cacao stay the base;
+   pink is the recognisable accent. Defined where the brand anchors exist: a :root
+   declaration cannot see --brand-* and silently resolves to nothing. */
+.brand-experience,
+.b-modal,
+.b-return {
+  --3l-pink-soft: #fbe6e9;
+  --3l-pink: #ffc0c8;
+  --3l-pink-strong: #b4496a;
   --3l-pink-ink: #94445a;
-  --3l-pink-border: #dfacb7;
+  --3l-pink-border: #e9a9b6;
 }
-.ref-bridge, .ref-family { --editorial-progress: 0; }
+.brand-experience ::selection { background: var(--3l-pink); color: #2b1b16; }
+
+/* Journal: the pencil. Defaults are the finished drawing so no-JS readers see the portrait. */
 .ref-scroll-sketch { position: absolute; display: block; height: auto; aspect-ratio: 640 / 768; }
-.ref-pencil-mask { stroke-dasharray: 1; stroke-dashoffset: var(--editorial-offset, 1); }
+.ref-pencil { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.ref-sketch-contour { opacity: var(--sketch-contour-ink, 0); }
+.ref-sketch-working { opacity: var(--sketch-working, 0); }
+.ref-sketch-final { opacity: var(--sketch-final, 1); }
+.ref-family-copy { border-inline-start: 3px solid var(--3l-pink); padding-inline-start: 24px; }
+
+/* Mexico City → Dubai: a pink line is drawn behind a traveller, then Dubai lights up. */
 .ref-journey { position: relative; }
 .ref-route-motion { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-.ref-route-ink { stroke: var(--3l-pink-ink); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: var(--editorial-offset, 1); }
-.ref-route-tracer { stroke: var(--3l-pink); stroke-width: 14; stroke-linecap: round; stroke-dasharray: .008 .992; stroke-dashoffset: var(--editorial-tracer, 0); }
+.ref-route-ink, .ref-route-glow { stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: var(--route-offset, 0); }
+.ref-route-ink { stroke: var(--3l-pink-strong); stroke-width: 11; }
+.ref-route-glow { stroke: var(--3l-pink); stroke-width: 36; opacity: 0.5; }
+.ref-journey:not([data-motion]) .ref-route-motion g { display: none; }
+.ref-route-origin circle { fill: var(--3l-pink-strong); }
+.ref-route-arrival circle { fill: var(--surface-primary); stroke: #b79f8c; stroke-width: 2; transition: fill 0.35s ease, stroke 0.35s ease; }
+.ref-route-arrival .ref-route-ping { fill: none; stroke: var(--3l-pink-strong); opacity: 0; transform-box: fill-box; transform-origin: center; }
+.ref-route-dot { fill: var(--3l-pink-strong); stroke: #fffdf8; stroke-width: 2.5; }
+.ref-route-halo { fill: var(--3l-pink); opacity: 0.55; transform-box: fill-box; transform-origin: center; animation: ref-route-breathe 1.8s ease-in-out infinite; }
+.ref-route-tracer { transition: opacity 0.3s ease; }
+.ref-bridge[data-journey="dubai"] .ref-route-tracer { opacity: 0; }
+.ref-bridge[data-journey="dubai"] .ref-route-arrival circle:not(.ref-route-ping) { fill: var(--3l-pink-strong); stroke: #fffdf8; }
+.ref-bridge[data-journey="dubai"] .ref-route-ping { animation: ref-route-arrive 1.5s ease-out 2; }
+@keyframes ref-route-breathe { 0%, 100% { transform: scale(0.8); opacity: 0.6; } 50% { transform: scale(1.35); opacity: 0.25; } }
+@keyframes ref-route-arrive { 0% { transform: scale(1); opacity: 0.9; } 100% { transform: scale(4); opacity: 0; } }
+.ref-city-label { width: fit-content; margin-inline: auto; padding: 8px 22px; border-radius: 999px; border: 1px solid transparent; transition: background-color 0.4s ease, border-color 0.4s ease; }
 .ref-city-label small { color: var(--3l-pink-ink); }
-.ref-family-copy { border-inline-start: 2px solid var(--3l-pink-border); padding-inline-start: 20px; }
-.b-shop-notice, .b-product-page .b-product-notice { background: var(--3l-pink-soft); border-inline-start: 3px solid var(--3l-pink-border); }
-.b-language select:focus-visible, .b-button:focus-visible { outline-color: var(--3l-pink-ink); }
-.brand-experience .b-full-menu .b-menu-card:hover { border-color: var(--3l-pink-border); }
-.brand-experience .b-full-menu .b-menu-categories button[aria-pressed="true"] { background: var(--3l-pink-soft); color: var(--brand-brown); border-color: var(--3l-pink-border); }
-@media (prefers-reduced-motion: reduce) {
-  .ref-bridge, .ref-family { --editorial-progress: 1 !important; --editorial-offset: 0 !important; }
-  .ref-route-tracer { display: none; }
-}
+.ref-bridge:is([data-journey="mexico"], [data-journey="travel"]) .ref-mexico .ref-city-label,
+.ref-bridge[data-journey="dubai"] .ref-dubai .ref-city-label { background: var(--3l-pink-soft); border-color: var(--3l-pink-border); }
 @media (max-width: 640px) {
   /* Stacked cities: physical route runs from upper Mexico to lower Dubai. */
   .ref-journey img, .ref-journey .ref-route-motion {
@@ -1839,5 +1859,33 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
 @media (max-width: 640px) {
   .brand-experience.ref-home .ref-journey .ref-route-motion { width: 290px; height: 80.56px; }
 }
+@media (prefers-reduced-motion: reduce) {
+  .ref-pencil { stroke-dashoffset: 0 !important; }
+  .ref-sketch-working { opacity: 0 !important; }
+  .ref-sketch-final { opacity: 1 !important; }
+  .ref-route-ink, .ref-route-glow { stroke-dashoffset: 0 !important; }
+  .ref-route-tracer { display: none; }
+  .ref-route-halo, .ref-route-ping { animation: none !important; }
+}
 
-.brand-experience.b-shop .b-shop-notice, .brand-experience .b-menu-advance { background: var(--3l-pink-soft); border-inline-start: 3px solid var(--3l-pink-border); }
+/* Pink carried by surfaces and controls, not only hairlines. */
+.brand-experience.ref-home .ref-featured { background: var(--3l-pink-soft); }
+.brand-experience .ref-star { color: var(--3l-pink-strong); }
+.brand-experience.ref-home :is(.ref-featured, .b-how-guide, .b-menu-preview) > .b-label { color: var(--3l-pink-ink); }
+.brand-experience.ref-home .ref-featured > p:last-of-type { color: var(--3l-pink-ink); }
+.brand-experience .b-step-number { color: var(--3l-pink-strong); }
+.brand-experience .b-how-guide li { border-top-color: var(--3l-pink-border); }
+.brand-experience .b-how-guide li > svg { box-sizing: content-box; padding: 9px; border-radius: 50%; background: var(--3l-pink-soft); color: var(--3l-pink-ink); }
+.brand-experience .b-header :is(.b-nav-left, .b-nav-right) > a { text-decoration: underline 2px transparent; text-underline-offset: 8px; transition: text-decoration-color 0.2s ease; }
+.brand-experience .b-header :is(.b-nav-left, .b-nav-right) > a:is(:hover, :focus-visible, [aria-current="page"]) { text-decoration-color: var(--3l-pink-strong); }
+.brand-experience .b-footer { border-top: 6px solid var(--3l-pink); }
+.brand-experience .b-footer nav :is(button, a):hover { color: var(--3l-pink); }
+.brand-experience .b-full-menu .b-menu-categories button { padding-inline: 0.9rem; border: 1px solid transparent; border-radius: 999px; }
+.brand-experience .b-full-menu .b-menu-categories button:hover { background: var(--3l-pink-soft); }
+.brand-experience .b-full-menu .b-menu-categories button[aria-pressed="true"] { background: var(--3l-pink); border-color: var(--3l-pink-border); color: #2b1b16; }
+.brand-experience :is(.b-full-menu, .b-product-page, .b-menu-preview) .b-menu-card:hover { border-color: var(--3l-pink-strong); }
+.brand-experience .b-shop-notice,
+.brand-experience .b-product-page .b-product-notice,
+.brand-experience .b-menu-advance { background: var(--3l-pink-soft); border-inline-start: 4px solid var(--3l-pink-strong); }
+.brand-experience .b-link { text-decoration-color: var(--3l-pink-strong); }
+.brand-experience :is(.b-language select, .b-button, a, button, input, select, textarea):focus-visible { outline-color: var(--3l-pink-strong); }
