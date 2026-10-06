@@ -1817,7 +1817,6 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
 
 /* Journal: the pencil. Defaults are the finished drawing so no-JS readers see the portrait. */
 .ref-scroll-sketch { position: absolute; display: block; height: auto; aspect-ratio: 640 / 768; }
-.ref-pencil { stroke-dasharray: 1; stroke-dashoffset: 0; }
 .ref-sketch-contour { opacity: var(--sketch-contour-ink, 0); }
 .ref-sketch-working { opacity: var(--sketch-working, 0); }
 .ref-sketch-final { opacity: var(--sketch-final, 1); }
@@ -1860,7 +1859,6 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
   .brand-experience.ref-home .ref-journey .ref-route-motion { width: 290px; height: 80.56px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ref-pencil { stroke-dashoffset: 0 !important; }
   .ref-sketch-working { opacity: 0 !important; }
   .ref-sketch-final { opacity: 1 !important; }
   .ref-route-ink, .ref-route-glow { stroke-dashoffset: 0 !important; }

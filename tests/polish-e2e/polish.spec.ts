@@ -28,12 +28,16 @@ for (const width of [390, 768, 1024, 1440])
         await expect
           .poll(() =>
             path.evaluate((el) =>
-              parseFloat(getComputedStyle(el).strokeDashoffset),
+              (el as SVGElement).dataset.drawn !== undefined
+                ? 1 - Number((el as SVGElement).dataset.drawn)
+                : parseFloat(getComputedStyle(el).strokeDashoffset),
             ),
           )
           .toBeGreaterThan(0.5);
         const start = await path.evaluate((el) =>
-          parseFloat(getComputedStyle(el).strokeDashoffset),
+          (el as SVGElement).dataset.drawn !== undefined
+            ? 1 - Number((el as SVGElement).dataset.drawn)
+            : parseFloat(getComputedStyle(el).strokeDashoffset),
         );
         await section.evaluate((el) =>
           window.scrollTo(
@@ -46,7 +50,9 @@ for (const width of [390, 768, 1024, 1440])
         await expect
           .poll(() =>
             path.evaluate((el) =>
-              parseFloat(getComputedStyle(el).strokeDashoffset),
+              (el as SVGElement).dataset.drawn !== undefined
+                ? 1 - Number((el as SVGElement).dataset.drawn)
+                : parseFloat(getComputedStyle(el).strokeDashoffset),
             ),
           )
           .toBeLessThan(start);
@@ -62,7 +68,9 @@ for (const width of [390, 768, 1024, 1440])
         await expect
           .poll(() =>
             path.evaluate((el) =>
-              parseFloat(getComputedStyle(el).strokeDashoffset),
+              (el as SVGElement).dataset.drawn !== undefined
+                ? 1 - Number((el as SVGElement).dataset.drawn)
+                : parseFloat(getComputedStyle(el).strokeDashoffset),
             ),
           )
           .toBeGreaterThan(0.5);
@@ -147,7 +155,9 @@ for (const width of [390, 768, 1024, 1440])
           page
             .locator(".ref-pencil-mask")
             .evaluate((el) =>
-              parseFloat(getComputedStyle(el).strokeDashoffset),
+              (el as SVGElement).dataset.drawn !== undefined
+                ? 1 - Number((el as SVGElement).dataset.drawn)
+                : parseFloat(getComputedStyle(el).strokeDashoffset),
             ),
         )
         .toBe(0);
@@ -249,9 +259,7 @@ for (const locale of ["en", "ar"])
     const drawn = (stage: string) =>
       page
         .locator(`.ref-pencil-${stage}`)
-        .evaluate(
-          (el) => 1 - parseFloat(getComputedStyle(el).strokeDashoffset),
-        );
+        .evaluate((el) => Number((el as SVGElement).dataset.drawn));
     const final = () =>
       page
         .locator(".ref-sketch-final")
