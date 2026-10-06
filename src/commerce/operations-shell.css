@@ -1155,3 +1155,29 @@
   min-height: 260px;
   padding: 50px 25px;
 }
+
+/* Order Experience V2: the public order number leads every order card. */
+.ops-oc-number {
+  font-size: 1.35rem;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: #2f2536;
+  margin-inline-end: 4px;
+}
+.co-internal-ref {
+  margin: 2px 0 8px;
+  font-size: 12px;
+  color: #6e6671;
+}
+.co-notifications {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 12.5px;
+  color: #4a4350;
+}
+.co-notifications b {
+  font-weight: 600;
+}

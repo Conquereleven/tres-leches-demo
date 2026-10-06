@@ -11,6 +11,7 @@ import {
 } from "@phosphor-icons/react";
 import type { Order } from "../../server/domain/model";
 import { money, type Workspace as Data } from "./api";
+import { orderReference } from "../../shared/order-number";
 import {
   BOARD_FILTERS,
   BOARD_VIEWS,
@@ -244,9 +245,13 @@ export function OrderCard({
       className="ops-order-card"
       data-state={o.state}
       data-payment={badge.tone}
-      aria-label={`Pedido ${o.id}`}
+      aria-label={`Pedido ${orderReference(o)}`}
     >
       <header className="ops-oc-head">
+        {/* The number customers quote; absent only for unpaid or pre-numbering orders. */}
+        {o.publicOrderNumber && (
+          <strong className="ops-oc-number">{orderReference(o)}</strong>
+        )}
         <span className={`ops-pay ops-pay-${badge.tone}`}>
           {badge.tone === "paid" && <CheckCircle weight="fill" aria-hidden />}
           {badge.label}
@@ -260,7 +265,8 @@ export function OrderCard({
       <div className="ops-oc-who">
         <h3>{c?.customer ?? "Cliente"}</h3>
         <p>
-          {o.id} · {o.fulfillmentMethod === "pickup" ? "PICKUP" : "DELIVERY"} ·{" "}
+          <span title="Referencia interna">{o.id}</span> ·{" "}
+          {o.fulfillmentMethod === "pickup" ? "PICKUP" : "DELIVERY"} ·{" "}
           {web ? "Web" : (c?.sourceNumberId.toUpperCase() ?? "")}
           {c?.phone && <> · {c.phone}</>}
         </p>

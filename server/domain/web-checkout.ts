@@ -574,6 +574,8 @@ export type WebCheckoutSummary = {
   pickup?: Order["pickup"];
   delivery?: DeliveryDetails & { zoneName?: string };
   customerName?: string;
+  /** As the customer typed it; absent for orders captured with a single name. */
+  customerFirstName?: string;
 };
 export type WebCheckoutResult = {
   cartHash?: string;
@@ -656,6 +658,7 @@ export function readWebCheckoutStatus(
           : undefined,
       customerName: s.conversations.find((c) => c.id === order.conversationId)
         ?.customer,
+      customerFirstName: order.customerDetails?.firstName,
     },
   };
 }

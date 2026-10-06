@@ -103,6 +103,7 @@ type Summary = {
   pickup?: { pickupDate: string; preferredTime: string };
   delivery?: Delivery & { zoneName?: string };
   customerName?: string;
+  customerFirstName?: string;
 };
 type Status = {
   orderId: string;
@@ -1346,15 +1347,7 @@ export function CheckoutPage() {
             )}
             {cutoffDialog && (
               <CutoffDialog
-                date={new Date(`${earliest}T12:00:00+04:00`).toLocaleDateString(
-                  language,
-                  {
-                    timeZone: "Asia/Dubai",
-                    weekday: "long",
-                    day: "numeric",
-                    month: "long",
-                  },
-                )}
+                date={longDate(earliest)}
                 onChoose={() => {
                   set("date", earliest);
                   set("slot", "");
@@ -2470,7 +2463,7 @@ function Confirmation({ result }: { result: Status }) {
   const { text: localize, language } = useCustomerLanguage();
 
   const s = result.summary;
-  const name = firstName(s?.customerName);
+  const name = s?.customerFirstName ?? firstName(s?.customerName);
   const progress =
     result.summary?.fulfillmentMethod === "pickup" && result.status === "Ready"
       ? 2

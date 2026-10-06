@@ -11,6 +11,7 @@ import type {
 import { api, money, type Workspace as Data } from "./api";
 import { OrderCard, OrdersBoard } from "./OrdersBoard";
 import { byDue, dubaiDate } from "./orders-board";
+import { orderReference } from "../../shared/order-number";
 import "./commerce.css";
 import "./operations-shell.css";
 type Run = (body: Record<string, unknown>, path?: string) => Promise<boolean>;
@@ -599,11 +600,15 @@ function OrderPanel({
   return (
     <section className="co-order" data-testid="order-panel">
       <div className="co-row">
-        <h3>{o.id}</h3>
+        <h3>{orderReference(o)}</h3>
         <span className="co-state">
           {o.fulfillmentMethod === "pickup" ? "PICKUP" : "DELIVERY"} · {o.state}
         </span>
       </div>
+      {o.publicOrderNumber && (
+        <p className="co-internal-ref">Referencia interna: {o.id}</p>
+      )}
+      <OrderNotifications order={o} data={data} />
       {p?.provider === "paymennt" &&
         (owned || ["admin", "manager"].includes(data.actor.role)) && (
           <button
@@ -1341,4 +1346,53 @@ function boardOrders(data: Data, view: string, focus: string) {
       ).includes(o.state),
     )
     .sort(byDue);
+}
+
+const EMAIL_EVENT: Record<string, string> = {
+  ORDER_PRODUCTION_STARTED: "En producción",
+  ORDER_READY_FOR_PICKUP: "Listo para pickup",
+  ORDER_OUT_FOR_DELIVERY: "En camino",
+};
+/**
+ * What was recorded for this order and what actually happened to it. A row is
+ * only ever "Enviado" when a provider confirmed it; otherwise it says why not.
+ */
+function OrderNotifications({ order, data }: { order: Order; data: Data }) {
+  const whatsapp = (data.operationsNotifications ?? []).filter(
+    (n) => n.orderId === order.id,
+  );
+  const emails = (data.customerNotifications ?? []).filter(
+    (n) => n.orderId === order.id,
+  );
+  if (!whatsapp.length && !emails.length) return null;
+  return (
+    <ul className="co-notifications" aria-label="Notificaciones">
+      {whatsapp.map((n) => (
+        <li key={n.id} data-status={n.status}>
+          <b>WhatsApp interno · {n.recipient.name}</b>{" "}
+          {n.status === "sent"
+            ? "Enviado"
+            : n.status === "failed"
+              ? "Falló · revisar"
+              : data.operationsOutboundEnabled
+                ? "Pendiente"
+                : "Pendiente · envío de WhatsApp desactivado"}
+        </li>
+      ))}
+      {emails.map((n) => (
+        <li key={n.id} data-status={n.status}>
+          <b>Email al cliente · {EMAIL_EVENT[n.event] ?? n.event}</b>{" "}
+          {n.status === "sent"
+            ? "Enviado"
+            : n.status === "failed"
+              ? "Falló · revisar"
+              : n.status === "sending"
+                ? "Enviando"
+                : data.customerEmailProvider
+                  ? "Pendiente"
+                  : "Pendiente · proveedor de email no configurado"}
+        </li>
+      ))}
+    </ul>
+  );
 }
