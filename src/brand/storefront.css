@@ -654,7 +654,7 @@
   display: block;
   width: 32px;
   height: 1px;
-  background: #a28d5b;
+  background: var(--3l-gold);
   margin: 0 auto 16px;
 }
 .brand-experience.ref-home .b-button {
@@ -1323,7 +1323,7 @@
   height: 100%;
   min-height: 0;
   background: #e9dfcd;
-  color: #775f30;
+  color: var(--text-secondary);
 }
 .b-product-page {
   max-width: 1000px;
@@ -1584,7 +1584,7 @@
   font:
     72px "3L Abril",
     serif;
-  color: #8a713a;
+  color: var(--text-secondary);
 }
 .brand-experience .b-product-page {
   padding-top: 48px;

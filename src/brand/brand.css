@@ -273,7 +273,7 @@
   background: repeating-radial-gradient(
     circle at 68% 34%,
     transparent 0 26px,
-    #a28d5b26 26px 27px,
+    var(--3l-gold) 26px 27px,
     transparent 27px 54px
   );
   -webkit-mask-image: radial-gradient(
@@ -288,7 +288,7 @@
   background: repeating-radial-gradient(
     circle at 32% 62%,
     transparent 0 22px,
-    #a28d5b26 22px 23px,
+    var(--3l-gold) 22px 23px,
     transparent 23px 46px
   );
   -webkit-mask-image: radial-gradient(
@@ -302,7 +302,7 @@
   background: repeating-radial-gradient(
     circle at 54% 20%,
     transparent 0 30px,
-    #a28d5b26 30px 31px,
+    var(--3l-gold) 30px 31px,
     transparent 31px 62px
   );
   -webkit-mask-image: radial-gradient(
@@ -437,7 +437,7 @@
   background: repeating-radial-gradient(
     circle at 74% 38%,
     transparent 0 46px,
-    #a28d5b2e 46px 47px,
+    var(--3l-gold) 46px 47px,
     transparent 47px 94px
   );
   -webkit-mask-image: radial-gradient(
@@ -452,7 +452,7 @@
     background: repeating-radial-gradient(
       circle at 62% 42%,
       transparent 0 30px,
-      #a28d5b2e 30px 31px,
+      var(--3l-gold) 30px 31px,
       transparent 31px 62px
     );
   }

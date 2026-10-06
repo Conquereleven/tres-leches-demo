@@ -356,6 +356,26 @@ for (const route of ["/", "/menu", "/cart"])
       return [...seen];
     });
     for (const colour of retiredPaint) expect(painted).not.toContain(colour);
+    // Brand colours are never tinted by opacity, including in decorative gradients.
+    // Sampled at rest: a state change may cross-fade for under half a second.
+    await page.waitForTimeout(700);
+    const tinted = await page.evaluate(() => {
+      const brand = /rgba\((?:246, 223, 224|162, 141, 91), [\d.]+\)/;
+      const found: string[] = [];
+      for (const el of document.querySelectorAll("body *"))
+        for (const pseudo of [undefined, "::before", "::after"]) {
+          const style = getComputedStyle(el, pseudo);
+          for (const value of [
+            style.backgroundImage,
+            style.backgroundColor,
+            style.borderTopColor,
+            style.color,
+          ])
+            if (brand.test(value)) found.push(value.slice(0, 80));
+        }
+      return found;
+    });
+    expect(tinted).toEqual([]);
   });
 test("final colours are what components actually render", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
