@@ -22,14 +22,31 @@ import type {
   State,
 } from "./model";
 
+import { orderReference } from "../../shared/order-number";
+import { PICKUP_LOCATION } from "../../shared/pickup-location";
+import { customerName } from "./order-number";
+
 /** Confirmed operations recipient for paid-order alerts. */
 export const OPERATIONS_RECIPIENT = {
   name: "Liza",
   phone: "+971521683319",
 } as const;
+/**
+ * Who is told about a paid order. Liza's number is confirmed. The manager's
+ * is private configuration; until it is supplied the manager's row is still
+ * recorded, marked as not configured, and never handed to a provider.
+ */
+export function operationsRecipients(managerPhone?: string) {
+  const phone = managerPhone?.replace(/[\s-]/g, "") ?? "";
+  return [
+    { ...OPERATIONS_RECIPIENT },
+    { name: "3L Manager", phone: /^\+[1-9]\d{7,14}$/.test(phone) ? phone : "" },
+  ];
+}
 
 const aed = (fils: number) => (fils / 100).toFixed(2);
 
+/** Concise by design: no card, payment-provider or address detail. */
 export function renderOrderPaidMessage(input: {
   order: Order;
   payment: Payment;
@@ -39,59 +56,34 @@ export function renderOrderPaidMessage(input: {
   origin?: string;
 }) {
   const { order, payment, conversation, catalog, zone } = input;
-  const items = order.lines
-    .map((l) => {
-      const name =
-        (order.catalogSnapshot ?? catalog).find((p) => p.id === l.productId)
-          ?.name ?? l.productId;
-      return `${l.quantity} × ${name}`;
-    })
-    .join("\n");
-  const subtotal = order.quote?.subtotalFils ?? payment.amountFils;
-  const delivery = order.quote?.feeFils ?? 0;
+  const items = order.lines.map((l) => {
+    const name =
+      (order.catalogSnapshot ?? catalog).find((p) => p.id === l.productId)
+        ?.name ?? l.productId;
+    return `${l.quantity} × ${name}`;
+  });
   const pickup = order.fulfillmentMethod === "pickup";
-  const d = pickup ? undefined : order.delivery;
-  const address = d
-    ? [
-        d.unit && `Unit ${d.unit}`,
-        d.building,
-        d.address,
-        zone?.name ?? order.quote?.zoneName,
-      ]
-        .filter(Boolean)
-        .join(", ")
-    : (order.address ?? "—");
-  const notes = [d?.notes, order.customerDetails?.instructions]
+  const when = [
+    order.pickup?.pickupDate ?? order.delivery?.date,
+    order.pickup?.preferredTime ?? order.delivery?.slot,
+  ]
     .filter(Boolean)
-    .join("\n");
+    .join(", ");
   const link = `${input.origin ?? ""}/operations/orders?order=${encodeURIComponent(order.id)}`;
   return [
-    "New paid order ✅",
+    `New paid order ${orderReference(order)} ✅`,
     "",
-    `Order: ${order.id}`,
-    `Customer: ${conversation?.customer ?? "—"}`,
-    `Phone: ${conversation?.phone ?? "—"}`,
-    "",
-    "Items:",
-    items,
-    "",
-    `Subtotal: AED ${aed(subtotal)}`,
-    `${pickup ? "Pickup" : "Delivery"}: AED ${aed(delivery)}`,
+    `Customer: ${customerName(order, conversation?.customer) || "—"}`,
+    pickup
+      ? `PICKUP at ${PICKUP_LOCATION.name}`
+      : `DELIVERY to ${zone?.name ?? order.quote?.zoneName ?? "—"}`,
+    `When: ${when || "—"}`,
     `Total paid: AED ${aed(payment.amountFils)}`,
     "",
-    pickup ? "PICKUP:" : "DELIVERY:",
-    order.pickup?.pickupDate ?? d?.date ?? "—",
-    order.pickup?.preferredTime ?? d?.slot ?? "—",
+    // A short summary; the full order is one tap away.
+    ...items.slice(0, 4),
+    ...(items.length > 4 ? [`+ ${items.length - 4} more`] : []),
     "",
-    "Address:",
-    pickup ? "Pickup at Pastelerías 3L" : address,
-    "",
-    "Notes:",
-    notes || "—",
-    "",
-    "Payment: PAID",
-    "",
-    "Open order:",
     link,
   ].join("\n");
 }
@@ -106,39 +98,47 @@ export function recordOrderPaid(
   order: Order,
   payment: Payment,
   origin?: string,
-): OperationsNotification | null {
+  managerPhone?: string,
+): OperationsNotification[] {
   const key = `order-paid:${order.id}`;
-  if (s.events[key]) return null;
+  if (s.events[key]) return [];
   s.events[key] = payment.id;
-  const notification: OperationsNotification = {
-    id: randomUUID(),
-    event: "ORDER_PAID",
-    kind: "notify_operations_whatsapp",
-    orderId: order.id,
-    paymentId: payment.id,
-    recipient: { ...OPERATIONS_RECIPIENT },
-    message: renderOrderPaidMessage({
-      order,
-      payment,
-      conversation: s.conversations.find((c) => c.id === order.conversationId),
-      catalog: s.catalog ?? [],
-      zone: s.zones.find(
-        (z) => z.id === (order.delivery?.zoneId ?? order.manualZoneId),
-      ),
-      origin,
+  const createdAt = new Date().toISOString();
+  const message = renderOrderPaidMessage({
+    order,
+    payment,
+    conversation: s.conversations.find((c) => c.id === order.conversationId),
+    catalog: s.catalog ?? [],
+    zone: s.zones.find(
+      (z) => z.id === (order.delivery?.zoneId ?? order.manualZoneId),
+    ),
+    origin,
+  });
+  const notifications = operationsRecipients(managerPhone).map(
+    (recipient): OperationsNotification => ({
+      id: randomUUID(),
+      event: "ORDER_PAID",
+      kind: "notify_operations_whatsapp",
+      orderId: order.id,
+      publicOrderNumber: order.publicOrderNumber,
+      paymentId: payment.id,
+      recipient,
+      message,
+      status: recipient.phone
+        ? "pending-whatsapp-delivery"
+        : "recipient-not-configured",
+      attempts: 0,
+      createdAt,
     }),
-    status: "pending-whatsapp-delivery",
-    attempts: 0,
-    createdAt: new Date().toISOString(),
-  };
+  );
   s.operationsNotifications ??= [];
-  s.operationsNotifications.push(notification);
+  s.operationsNotifications.push(...notifications);
   s.audit.push({
-    at: notification.createdAt,
+    at: createdAt,
     actor: "system",
     action: `ORDER_PAID ${order.id}: operations notification queued`,
   });
-  return notification;
+  return notifications;
 }
 
 /** Delivery adapter. Implemented over the WhatsApp provider once Meta is ready. */
@@ -210,6 +210,12 @@ export function createWhatsAppOperationsNotifier(
   return {
     async send(n) {
       const total = /Total paid: AED ([0-9.]+)/.exec(n.message)?.[1] ?? "";
+      const reference = n.publicOrderNumber
+        ? orderReference({
+            id: n.orderId,
+            publicOrderNumber: n.publicOrderNumber,
+          })
+        : n.orderId;
       return provider.send({
         sourceNumberId: origin.id,
         sourcePhoneNumber: origin.phone,
@@ -218,7 +224,7 @@ export function createWhatsAppOperationsNotifier(
         template: {
           name: template.name,
           language: template.language,
-          parameters: [n.orderId, total],
+          parameters: [reference, total],
         },
         idempotencyKey: n.id,
       });

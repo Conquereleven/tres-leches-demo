@@ -30,6 +30,8 @@ import {
 } from "./commands";
 import { type GeoService, quoteOrder } from "./zones";
 import { recordOrderPaid } from "./notifications";
+import { recordCustomerEvent } from "./customer-notifications";
+import { assignPublicOrderNumber, customerName } from "./order-number";
 import { transition } from "./workflow";
 import { Store } from "../db/store";
 import {
@@ -105,6 +107,8 @@ export class CommerceService {
   ) {}
   /** Public site origin, used only to build internal links in team alerts. */
   operationsOrigin?: string;
+  /** Private configuration; absent until the manager's number is supplied. */
+  operationsManagerPhone?: string;
   private async bounded<T>(work: Promise<T>): Promise<T> {
     let timer: ReturnType<typeof setTimeout> | undefined;
     try {
@@ -552,7 +556,11 @@ export class CommerceService {
           ),
           "Resuelve o cancela el cobro con el proveedor antes de modificar el pedido",
         );
+      const from = o.state;
       transition(o, cmd.state, actor.id);
+      // Same transaction as the state change: the event exists if and only
+      // if the transition committed, and at most once per order.
+      recordCustomerEvent(s, o, from, cmd.state);
       return o;
     }
     throw new DomainError(400, "Comando no soportado");
@@ -757,6 +765,7 @@ export class CommerceService {
         ) {
           transition(o, "Paid", "payment-webhook");
           transition(o, "Confirmed", "payment-webhook");
+          assignPublicOrderNumber(s, o);
         } else {
           p.timeline.push({
             ...at(),
@@ -1018,11 +1027,20 @@ export class CommerceService {
           transition(o, "Paid", actor);
           transition(o, "Confirmed", actor);
           o.paidAt = p.paidAt;
+          // The customer-facing number is issued here and only here: once,
+          // in the same transaction that makes the order paid.
+          assignPublicOrderNumber(s, o);
           // ORDER_PAID: the only place a paid-order alert is queued. This
           // branch runs once per payment (paidAt guard) and only when the
           // order was genuinely awaiting this payment; recordOrderPaid is
           // additionally idempotent per order.
-          recordOrderPaid(s, o, p, this.operationsOrigin);
+          recordOrderPaid(
+            s,
+            o,
+            p,
+            this.operationsOrigin,
+            this.operationsManagerPhone,
+          );
         } else
           p.timeline.push({
             ...at(),
@@ -1074,6 +1092,10 @@ export class CommerceService {
       409,
     );
     const names = customer.customer.trim().split(/\s+/);
+    // Names captured separately are sent as given; only older orders are split.
+    const firstName = order.customerDetails.firstName ?? names[0]!;
+    const lastName =
+      order.customerDetails.lastName ?? (names.slice(1).join(" ") || names[0]!);
     return this.payment.createWebPayment({
       paymentId: payment.id,
       orderId: order.id,
@@ -1090,8 +1112,8 @@ export class CommerceService {
         };
       }),
       customer: {
-        firstName: names[0]!,
-        lastName: names.slice(1).join(" ") || names[0]!,
+        firstName,
+        lastName,
         email: order.customerDetails.email,
         phone: customer.phone,
       },

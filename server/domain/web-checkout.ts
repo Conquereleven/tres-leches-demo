@@ -6,6 +6,7 @@ import {
   DELIVERY_WINDOWS,
 } from "../../shared/commerce-policy";
 import products from "../../shared/storefront-products.json";
+import { formatOrderNumber } from "../../shared/order-number";
 import { normalizeWhatsAppNumber } from "../../shared/contact";
 import { authoritativeAddress } from "./website-address";
 /** Public entry into the existing catalog/quote/command/outbox/payment domain. */
@@ -151,7 +152,11 @@ export const cartCheckoutSchema = z
       .strict(),
     customer: z
       .object({
-        name: z.string().trim().min(2).max(100),
+        // Website checkout sends first and last name separately. The single
+        // `name` remains accepted for clients built before that.
+        name: z.string().trim().min(2).max(100).optional(),
+        firstName: z.string().trim().min(1).max(60).optional(),
+        lastName: z.string().trim().min(1).max(60).optional(),
         phone: uaeMobile,
         whatsappNumber: z
           .string()
@@ -171,7 +176,13 @@ export const cartCheckoutSchema = z
         email: z.email().max(254),
         instructions: z.string().trim().max(500).optional(),
       })
-      .strict(),
+      .strict()
+      .refine(
+        (c) =>
+          (c.firstName && c.lastName) ||
+          (!c.firstName && !c.lastName && c.name),
+        "Enter your first and last name",
+      ),
     billing: billingInputSchema,
   })
   .strict();
@@ -201,6 +212,18 @@ type Normalized = {
   details?: Order["customerDetails"];
   billing?: OrderBilling;
 };
+/** Kept apart in storage; joined only for display and the provider's address name. */
+const identity = (c: {
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+}) =>
+  c.firstName && c.lastName
+    ? {
+        name: `${c.firstName} ${c.lastName}`,
+        names: { firstName: c.firstName, lastName: c.lastName },
+      }
+    : { name: c.name!, names: {} };
 export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
   const pickup = pickupCheckoutSchema.safeParse(raw);
   if (pickup.success) {
@@ -232,14 +255,16 @@ export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
       "Pickup requires a separate billing address",
       422,
     );
+    const who = identity(data.customer);
     return {
       lines: data.lines,
       fulfillmentMethod: "pickup",
       pickup: data.pickup,
-      name: data.customer.name,
+      name: who.name,
       phone: data.customer.phone,
       address: "",
       details: {
+        ...who.names,
         email: data.customer.email,
         ...(data.customer.whatsappNumber
           ? { whatsappNumber: data.customer.whatsappNumber }
@@ -248,7 +273,7 @@ export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
       },
       billing: toPaymenntBillingAddress({
         billing: data.billing,
-        name: data.customer.name,
+        name: who.name,
         delivery: undefined,
       }),
     };
@@ -289,17 +314,19 @@ export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
     ]
       .filter(Boolean)
       .join(", ");
+    const who = identity(customer);
     return {
       lines: cart.data.lines,
       ...(cart.data.fulfillmentMethod
         ? { fulfillmentMethod: cart.data.fulfillmentMethod }
         : {}),
       zoneId: delivery.zoneId,
-      name: customer.name,
+      name: who.name,
       phone: customer.phone,
       address: fullAddress,
       delivery: { ...delivery },
       details: {
+        ...who.names,
         email: customer.email,
         instructions: customer.instructions,
         ...(customer.whatsappNumber
@@ -310,7 +337,7 @@ export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
       // address Paymennt would reject.
       billing: toPaymenntBillingAddress({
         billing: cart.data.billing,
-        name: customer.name,
+        name: who.name,
         delivery,
       }),
     };
@@ -551,7 +578,10 @@ export type WebCheckoutSummary = {
 export type WebCheckoutResult = {
   cartHash?: string;
   superseded?: boolean;
+  /** Internal reference; kept for support and for clients built before #001. */
   orderId: string;
+  /** "#001" once the order is paid; null before then and for older orders. */
+  orderNumber: string | null;
   status: Order["state"];
   paymentStatus: string;
   paymentFlow?: "web";
@@ -581,6 +611,9 @@ export function readWebCheckoutStatus(
     cartHash: record?.cartHash,
     superseded: !!record?.supersededAt,
     orderId: order.id,
+    orderNumber: order.publicOrderNumber
+      ? formatOrderNumber(order.publicOrderNumber)
+      : null,
     status: order.state,
     paymentStatus: payment.status,
     ...(payment.checkoutFlow === "web" ? { paymentFlow: "web" as const } : {}),

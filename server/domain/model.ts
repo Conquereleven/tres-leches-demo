@@ -106,7 +106,14 @@ export type Quote = {
   zoneVersion: number | null;
 };
 export type Order = {
+  /** Internal immutable reference: payments, provider calls, idempotency, audit. */
   id: string;
+  /**
+   * Customer-facing sequence (#001). Allocated exactly once, when the order
+   * first becomes paid; absent on unpaid orders and on orders paid before the
+   * sequence existed. Never used as a key.
+   */
+  publicOrderNumber?: number;
   conversationId: string;
   state: OrderState;
   version: number;
@@ -122,6 +129,9 @@ export type Order = {
   pickup?: { pickupDate: string; preferredTime: string };
   delivery?: DeliveryDetails;
   customerDetails?: {
+    /** Captured separately by the website checkout; older orders have neither. */
+    firstName?: string;
+    lastName?: string;
     email?: string;
     instructions?: string;
     whatsappNumber?: string;
@@ -157,14 +167,48 @@ export type OperationsNotification = {
   event: "ORDER_PAID";
   kind: "notify_operations_whatsapp";
   orderId: string;
+  publicOrderNumber?: number;
   paymentId: string;
+  /** An empty phone means the recipient is known but not configured yet. */
   recipient: { name: string; phone: string };
   message: string;
-  status: "pending-whatsapp-delivery" | "sent" | "failed";
+  status:
+    | "pending-whatsapp-delivery"
+    | "recipient-not-configured"
+    | "sent"
+    | "failed";
   attempts: number;
   createdAt: string;
   sentAt?: string;
   providerId?: string;
+  lastError?: string;
+};
+export const customerEvents = [
+  "ORDER_PRODUCTION_STARTED",
+  "ORDER_READY_FOR_PICKUP",
+  "ORDER_OUT_FOR_DELIVERY",
+] as const;
+export type CustomerEvent = (typeof customerEvents)[number];
+/**
+ * Customer email outbox. One row per (order, event), created in the same
+ * transaction as the state transition that caused it. The rendered email is
+ * frozen at that moment so a later retry sends exactly what was decided.
+ */
+export type CustomerNotification = {
+  /** Event ID; also the provider idempotency key. */
+  id: string;
+  event: CustomerEvent;
+  channel: "email";
+  orderId: string;
+  publicOrderNumber?: number;
+  recipient: string;
+  subject: string;
+  body: string;
+  status: "pending" | "sending" | "sent" | "failed";
+  attempts: number;
+  createdAt: string;
+  sentAt?: string;
+  providerMessageId?: string;
   lastError?: string;
 };
 export type Payment = {
@@ -261,6 +305,9 @@ export type NotificationReceipt = {
   attempts: number;
 };
 export type State = {
+  /** Last public order number issued. Only ever increases. */
+  orderNumberSequence?: number;
+  customerNotifications?: CustomerNotification[];
   operationsNotifications?: OperationsNotification[];
   webCheckouts?: Record<
     string,
