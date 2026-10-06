@@ -26,7 +26,7 @@ import {
   createWebCheckout,
   resumeWebCheckout,
 } from "../../server/domain/web-checkout";
-const now = new Date("2026-10-03T19:00:00Z"); // Dubai 23:00
+const now = new Date("2026-10-03T16:59:00Z"); // Dubai 20:59, before the approved next-day cutoff
 for (const [label, valid] of [
   [DELIVERY_WINDOWS[0].label, false],
   [DELIVERY_WINDOWS[1].label, true],

@@ -224,7 +224,7 @@ export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
           new Date(),
           leadHours(data.lines.map((l) => l.productId)),
         ),
-      "Choose a pickup window with at least 12 hours notice (24 hours for advance-order items)",
+      "Choose a pickup date and time that respect the 9 PM Dubai cutoff and advance notice",
       422,
     );
     requireThat(
@@ -279,7 +279,7 @@ export function normalizeCheckout(raw: unknown, env = process.env): Normalized {
           new Date(),
           leadHours(cart.data.lines.map((l) => l.productId)),
         ),
-      "Choose a delivery window with at least 12 hours notice (24 hours for advance-order items)",
+      "Choose a delivery date and time that respect the 9 PM Dubai cutoff and advance notice",
       422,
     );
     const fullAddress = [

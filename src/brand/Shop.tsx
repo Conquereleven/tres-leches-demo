@@ -6,7 +6,12 @@ import { ResponsiveMedia, selectedProductMedia } from "./media";
 import { AddressAutocomplete } from "./AddressAutocomplete";
 import { CustomerCopy, LanguageSwitcher } from "./localization";
 import { useCheckoutNow } from "./cart";
-import { validWindow, leadHours } from "../../shared/commerce-policy";
+import {
+  validWindow,
+  leadHours,
+  earliestFulfillmentDate,
+  nextDayClosed,
+} from "../../shared/commerce-policy";
 import { FloatingShopping } from "./SiteChrome";
 import "./storefront.css";
 import { business } from "./business";
@@ -830,7 +835,7 @@ export function CartPage() {
 // ── Checkout ─────────────────────────────────────────────────────────────
 
 export function CheckoutPage() {
-  const { text: localize } = useCustomerLanguage();
+  const { text: localize, language } = useCustomerLanguage();
 
   const lines = useCart();
   const { config, loading, retry } = useCheckoutConfig();
@@ -1182,6 +1187,17 @@ export function CheckoutPage() {
                     </div>
                   </>
                 )}
+                <p className="b-shop-notice" role="status">
+                  <CustomerCopy>
+                    Orders for next-day production close at 9:00 PM Dubai time.
+                  </CustomerCopy>
+                  {nextDayClosed(now) && (
+                    <>
+                      <br />
+                      <CustomerCopy>{`Next-day ordering is closed. Your earliest available date is ${new Date(`${earliestFulfillmentDate(now, leadHours(cartLines.map((l) => l.productId)))}T12:00:00+04:00`).toLocaleDateString(language, { timeZone: "Asia/Dubai", day: "numeric", month: "long", year: "numeric" })}.`}</CustomerCopy>
+                    </>
+                  )}
+                </p>
                 <div className="b-shop-row">
                   <label>
                     <CustomerCopy>
@@ -1190,7 +1206,10 @@ export function CheckoutPage() {
                     <Input
                       required
                       type="date"
-                      min={config.dates.min}
+                      min={earliestFulfillmentDate(
+                        now,
+                        leadHours(cartLines.map((l) => l.productId)),
+                      )}
                       max={config.dates.max}
                       value={delivery.date ?? ""}
                       onChange={(e) => {

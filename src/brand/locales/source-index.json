@@ -1039,5 +1039,9 @@
   "When": "policies:copy_cf9c7aa24a26aac4",
   "By using this website or placing an order with us, you agree to these Terms & Conditions together with our": "policies:copy_714c29ee0b8266f1",
   "This website and our ordering service are operated by {0}.": "policies:copy_77537b7394c94fe0",
-  "{0} is the customer-facing brand of {1}.": "policies:copy_61e3edce64875b0f"
+  "{0} is the customer-facing brand of {1}.": "policies:copy_61e3edce64875b0f",
+  "Orders for next-day production close at 9:00 PM Dubai time.": "checkout:copy_abad3b1fffa4506c",
+  "Next-day ordering is closed. Your earliest available date is {0}.": "checkout:copy_3c1f3562c591044f",
+  "Choose a pickup date and time that respect the 9 PM Dubai cutoff and advance notice": "checkout:copy_e86dea8d746b31f7",
+  "Choose a delivery date and time that respect the 9 PM Dubai cutoff and advance notice": "checkout:copy_a8e6e60333fd172d"
 }

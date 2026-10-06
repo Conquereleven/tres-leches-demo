@@ -1,5 +1,8 @@
 import { mcpRead } from "./domain/mcp";
-import { availableSku } from "../shared/commerce-policy";
+import {
+  availableSku,
+  earliestFulfillmentDate,
+} from "../shared/commerce-policy";
 import {
   attachVerifiedAddresses,
   authoritativeAddress,
@@ -362,7 +365,7 @@ export async function startServer(
               slots: configuredSlots(),
               serverNow: new Date().toISOString(),
               dates: {
-                min: addDays(today, 1),
+                min: earliestFulfillmentDate(),
                 max: addDays(today, MAX_BOOKING_DAYS),
               },
               deliveryAddressMode,

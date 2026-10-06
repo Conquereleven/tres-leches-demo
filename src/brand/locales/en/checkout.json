@@ -160,5 +160,9 @@
   "copy_51d2361f4faea3bc": "terms",
   "copy_f42541304398440c": "this area",
   "copy_b9d015fec0feef7b": "{0} quantity",
-  "copy_fae6f4bf5465ee19": "— Minimum AED"
+  "copy_fae6f4bf5465ee19": "— Minimum AED",
+  "copy_abad3b1fffa4506c": "Orders for next-day production close at 9:00 PM Dubai time.",
+  "copy_3c1f3562c591044f": "Next-day ordering is closed. Your earliest available date is {0}.",
+  "copy_e86dea8d746b31f7": "Choose a pickup date and time that respect the 9 PM Dubai cutoff and advance notice",
+  "copy_a8e6e60333fd172d": "Choose a delivery date and time that respect the 9 PM Dubai cutoff and advance notice"
 }

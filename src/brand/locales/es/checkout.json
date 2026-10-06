@@ -160,5 +160,9 @@
   "copy_51d2361f4faea3bc": "términos",
   "copy_f42541304398440c": "esta zona",
   "copy_b9d015fec0feef7b": "Cantidad de {0}",
-  "copy_fae6f4bf5465ee19": "— Mínimo AED"
+  "copy_fae6f4bf5465ee19": "— Mínimo AED",
+  "copy_abad3b1fffa4506c": "Los pedidos para producción al día siguiente cierran a las 9:00 PM, hora de Dubái.",
+  "copy_3c1f3562c591044f": "Los pedidos para mañana están cerrados. La primera fecha disponible es {0}.",
+  "copy_e86dea8d746b31f7": "Elige fecha y hora de recogida que respeten el cierre a las 9 PM en Dubái y la antelación necesaria.",
+  "copy_a8e6e60333fd172d": "Elige fecha y hora de entrega que respeten el cierre a las 9 PM en Dubái y la antelación necesaria."
 }
