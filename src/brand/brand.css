@@ -242,9 +242,10 @@
   transition: transform var(--crossfade) var(--ease);
 }
 /* Decorative panel shown where an approved photograph is not yet available.
-   Brand palette and geometry only — no text, no image request, nothing that
-   reads to a customer as a missing asset. Variants are picked by the slot's
-   data-asset value so a grid of panels does not repeat identically. */
+   Cream ground with exact-gold rings — no text, no image request, nothing that
+   reads to a customer as a missing asset. Flat colour only: no fades, masks or
+   translucent brand tones. Variants are picked by the slot's data-asset value
+   so a grid of panels does not repeat identically. */
 .brand-experience .b-media-panel,
 .b-modal .b-media-panel {
   min-height: 160px;
@@ -252,18 +253,7 @@
   width: 100%;
   position: relative;
   overflow: hidden;
-  background:
-    radial-gradient(82% 78% at 72% 24%, var(--brand-blush) 0%, transparent 62%),
-    radial-gradient(
-      70% 74% at 24% 84%,
-      var(--brand-blush) 0%,
-      transparent 66%
-    ),
-    linear-gradient(
-      148deg,
-      var(--surface-paper) 0%,
-      var(--surface-primary) 100%
-    );
+  background: var(--surface-paper);
 }
 .brand-experience .b-media-panel::after,
 .b-modal .b-media-panel::after {
@@ -276,14 +266,7 @@
     var(--3l-gold) 26px 27px,
     transparent 27px 54px
   );
-  -webkit-mask-image: radial-gradient(
-    70% 76% at 68% 34%,
-    #000 0%,
-    transparent 76%
-  );
-  mask-image: radial-gradient(70% 76% at 68% 34%, #000 0%, transparent 76%);
 }
-/* Quiet variation so adjacent panels in a grid do not look stamped. */
 .brand-experience .b-media-panel[data-asset$="2"]::after {
   background: repeating-radial-gradient(
     circle at 32% 62%,
@@ -291,12 +274,6 @@
     var(--3l-gold) 22px 23px,
     transparent 23px 46px
   );
-  -webkit-mask-image: radial-gradient(
-    72% 78% at 32% 62%,
-    #000 0%,
-    transparent 78%
-  );
-  mask-image: radial-gradient(72% 78% at 32% 62%, #000 0%, transparent 78%);
 }
 .brand-experience .b-media-panel[data-asset$="3"]::after {
   background: repeating-radial-gradient(
@@ -305,12 +282,6 @@
     var(--3l-gold) 30px 31px,
     transparent 31px 62px
   );
-  -webkit-mask-image: radial-gradient(
-    76% 80% at 54% 20%,
-    #000 0%,
-    transparent 80%
-  );
-  mask-image: radial-gradient(76% 80% at 54% 20%, #000 0%, transparent 80%);
 }
 .brand-experience .b-selected-product .b-image-frame {
   animation: b-crossfade var(--crossfade) var(--ease);
@@ -403,59 +374,6 @@
   height: 100%;
   width: 100%;
   object-fit: cover;
-}
-/* Hero panel used while the approved film is pending. Built entirely from the
-   brand palette — cream ground, blush light, gold ring motif — so
-   it reads as an intentional editorial surface rather than a missing asset.
-   No image request, no animation, nothing that delays the hero CTAs. */
-.brand-experience .b-hero-canvas {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(78% 96% at 76% 22%, var(--brand-blush) 0%, transparent 60%),
-    radial-gradient(
-      70% 84% at 22% 86%,
-      var(--brand-blush) 0%,
-      transparent 64%
-    ),
-    radial-gradient(
-      60% 70% at 58% 54%,
-      var(--surface-paper) 0%,
-      transparent 72%
-    ),
-    linear-gradient(
-      142deg,
-      var(--surface-paper) 0%,
-      var(--surface-primary) 100%
-    );
-}
-/* Concentric gold rings, echoing the soaking rings on a Tres Leches plate. */
-.brand-experience .b-hero-canvas::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-radial-gradient(
-    circle at 74% 38%,
-    transparent 0 46px,
-    var(--3l-gold) 46px 47px,
-    transparent 47px 94px
-  );
-  -webkit-mask-image: radial-gradient(
-    64% 72% at 74% 38%,
-    #000 0%,
-    transparent 78%
-  );
-  mask-image: radial-gradient(64% 72% at 74% 38%, #000 0%, transparent 78%);
-}
-@media (max-width: 899px) {
-  .brand-experience .b-hero-canvas::after {
-    background: repeating-radial-gradient(
-      circle at 62% 42%,
-      transparent 0 30px,
-      var(--3l-gold) 30px 31px,
-      transparent 31px 62px
-    );
-  }
 }
 .brand-experience .b-hero-copy {
   z-index: 1;

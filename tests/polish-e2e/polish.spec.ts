@@ -309,9 +309,30 @@ const retiredPaint = [
 ];
 const rgb = (hex: string) =>
   `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
-for (const route of ["/", "/menu", "/cart"])
-  test(`final 3L palette resolves exactly on ${route}`, async ({ page }) => {
+// Every customer-facing view. Functional status colours are outside the brand palette by design.
+const customerViews = [
+  "/",
+  "/menu",
+  "/menu?product=conchas-filled--pistache",
+  "/cart",
+  "/checkout",
+  "/contact",
+  "/how-to-order",
+  "/terms",
+  "/privacy",
+  "/refund-policy",
+  "/delivery-policy",
+];
+for (const route of customerViews)
+  test(`final 3L palette is locked on ${route}`, async ({ page }) => {
+    if (route === "/checkout") {
+      // A real checkout form needs something in the cart.
+      await page.goto("/menu?product=conchas-filled--pistache");
+      await page.locator("main select").selectOption("Mini");
+      await page.locator("main .b-product-page .b-button").last().click();
+    }
     await page.goto(route);
+    await expect(page.locator(".brand-experience")).toBeVisible();
     const scope = page.locator(".brand-experience");
     for (const [token, hex] of Object.entries(official)) {
       // Computed by the browser, on the scope where components consume it.
@@ -336,46 +357,60 @@ for (const route of ["/", "/menu", "/cart"])
         ),
         token,
       ).toBe("");
-    // Nothing on the page is painted in a retired pink or lavender.
-    const painted = await page.evaluate(() => {
-      const seen = new Set<string>();
-      for (const el of document.querySelectorAll("body *")) {
-        const style = getComputedStyle(el);
-        for (const property of [
-          "backgroundColor",
-          "color",
-          "borderTopColor",
-          "borderInlineStartColor",
-          "fill",
-          "stroke",
-          "outlineColor",
-          "textDecorationColor",
-        ] as const)
-          seen.add(style[property]);
-      }
-      return [...seen];
-    });
-    for (const colour of retiredPaint) expect(painted).not.toContain(colour);
-    // Brand colours are never tinted by opacity, including in decorative gradients.
     // Sampled at rest: a state change may cross-fade for under half a second.
     await page.waitForTimeout(700);
-    const tinted = await page.evaluate(() => {
-      const brand = /rgba\((?:246, 223, 224|162, 141, 91), [\d.]+\)/;
+    const findings = await page.evaluate((retiredPaint) => {
+      const brand = "(?:246, 223, 224|162, 141, 91)";
+      const tinted = new RegExp(`rgba\\(${brand}, [\\d.]+\\)`);
+      const solid = new RegExp(`rgb\\(${brand}\\)`);
       const found: string[] = [];
       for (const el of document.querySelectorAll("body *"))
         for (const pseudo of [undefined, "::before", "::after"]) {
           const style = getComputedStyle(el, pseudo);
-          for (const value of [
-            style.backgroundImage,
+          if (pseudo && style.content === "none") continue;
+          const where = `${el.tagName.toLowerCase()}.${String(el.className).slice(0, 40)}${pseudo ?? ""}`;
+          const paints = [
             style.backgroundColor,
-            style.borderTopColor,
+            style.backgroundImage,
             style.color,
-          ])
-            if (brand.test(value)) found.push(value.slice(0, 80));
+            style.borderTopColor,
+            style.borderRightColor,
+            style.borderBottomColor,
+            style.borderLeftColor,
+            style.outlineColor,
+            style.textDecorationColor,
+            style.fill,
+            style.stroke,
+            style.boxShadow,
+          ];
+          for (const value of paints) {
+            // Retired pink and lavender never appear.
+            for (const colour of retiredPaint)
+              if (value.includes(colour))
+                found.push(`retired ${colour} on ${where}`);
+            // Blush and gold are never painted with alpha.
+            if (tinted.test(value))
+              found.push(`tinted brand colour on ${where}`);
+          }
+          const decorated = solid.test(style.backgroundImage);
+          const mask = style.maskImage || style.webkitMaskImage;
+          // A brand colour is never faded: no mask over it, no soft gradient to transparent.
+          if (decorated && mask && mask !== "none")
+            found.push(`masked brand decoration on ${where}`);
+          if (decorated && !style.backgroundImage.includes("repeating-"))
+            found.push(`brand colour inside a soft gradient on ${where}`);
+          if (
+            (solid.test(style.backgroundColor) || decorated) &&
+            parseFloat(style.opacity) < 1 &&
+            parseFloat(style.opacity) > 0
+          )
+            found.push(
+              `brand surface with opacity ${style.opacity} on ${where}`,
+            );
         }
-      return found;
-    });
-    expect(tinted).toEqual([]);
+      return [...new Set(found)];
+    }, retiredPaint);
+    expect(findings).toEqual([]);
   });
 test("final colours are what components actually render", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });

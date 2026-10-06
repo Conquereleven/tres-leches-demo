@@ -702,9 +702,7 @@
   text-align: center;
   padding: var(--space-4) var(--space-2);
   border-radius: var(--radius-panel);
-  background:
-    radial-gradient(circle at 50% 0%, #fff8 0 40%, transparent 70%),
-    var(--brand-blush);
+  background: var(--brand-blush);
 }
 .brand-experience .b-co-confirm-mark {
   display: grid;
