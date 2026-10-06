@@ -10,6 +10,7 @@ import {
 import { join, isAbsolute } from "node:path";
 import { randomUUID } from "node:crypto";
 import { spawnSync } from "node:child_process";
+import { catalogDifferences } from "./paymennt-test-catalog.mjs";
 try {
   process.umask(0o077);
   const e = process.env;
@@ -51,18 +52,7 @@ try {
     )
       throw Error("zone");
     const current = state.catalog ?? [];
-    const matches =
-      current.length === approved.items.length &&
-      approved.items.every((item) => {
-        const existing = current.find((product) => product.id === item.id);
-        return (
-          existing?.name === item.name &&
-          existing.priceFils === Math.round(Number(item.priceAed) * 100) &&
-          existing.active === item.active &&
-          existing.availability === item.availability &&
-          existing.description === item.description
-        );
-      });
+    const matches = catalogDifferences(current, approved.items).length === 0;
     console.log(
       JSON.stringify({
         catalogBefore: current.length,
@@ -125,22 +115,17 @@ try {
       verify.prepare("SELECT document FROM commerce_state WHERE id=1").get()
         .document,
     );
-    if (
-      state.catalog.length !== approved.items.length ||
-      state.catalog.some((product) => product.id === "pan-de-muerto") ||
-      !approved.items.every((item) => {
-        const product = state.catalog.find((product) => product.id === item.id);
-        return (
-          product?.priceFils === Math.round(Number(item.priceAed) * 100) &&
-          product.active === true &&
-          product.availability === "available"
-        );
-      })
-    )
+    // The stored catalog must equal the approved menu exactly, including the
+    // items the menu intentionally marks unavailable.
+    if (catalogDifferences(state.catalog, approved.items).length)
       throw Error("verification");
     console.log(
       JSON.stringify({
         catalogAfter: state.catalog.length,
+        unavailable: state.catalog.filter(
+          (product) =>
+            product.active === false || product.availability === "unavailable",
+        ).length,
         currency: "AED",
         approved: true,
       }),
