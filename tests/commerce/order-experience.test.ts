@@ -31,6 +31,7 @@ import {
   type CustomerEmailProvider,
 } from "../../server/domain/customer-notifications";
 import {
+  createWhatsAppOperationsNotifier,
   dispatchOperationsNotifications,
   operationsRecipients,
 } from "../../server/domain/notifications";
@@ -1037,4 +1038,44 @@ test("Resend adapter: configured only by explicit environment, and sends one ide
     provider.send(email),
     (e: Error) => e.message === "Resend HTTP 422",
   );
+});
+
+test("an alert is never sent from the business number to itself", async () => {
+  const f = fixture();
+  // The manager's phone is the same line the alerts would be sent from.
+  const shared = "+971500000009";
+  f.service.operationsManagerPhone = shared;
+  try {
+    await f.pay(await f.place(delivery()));
+    const sent: string[] = [];
+    const notifier = createWhatsAppOperationsNotifier(
+      {
+        name: "fake-whatsapp",
+        send: async (message: { recipient: string }) => {
+          sent.push(message.recipient);
+          return { providerId: `wamid-${sent.length}` };
+        },
+      } as never,
+      { id: "wa1", phone: "+971 50 000 0009" },
+      { name: "order_paid", language: "en" },
+    );
+    // Outbound explicitly enabled here, with a fake provider, to exercise the guard.
+    await dispatchOperationsNotifications(f.store, {
+      outboundEnabled: true,
+      notifier,
+    });
+    const rows = f.store.read().operationsNotifications!;
+    const liza = rows.find((r) => r.recipient.name === "Liza")!;
+    const manager = rows.find((r) => r.recipient.name === "3L Manager")!;
+    assert.deepEqual(sent, ["+971521683319"]);
+    assert.equal(liza.status, "sent");
+    assert.equal(manager.status, "failed");
+    assert.equal(manager.sentAt, undefined);
+    assert.match(
+      manager.lastError!,
+      /recipient is the sending WhatsApp number/,
+    );
+  } finally {
+    f.store.close();
+  }
 });

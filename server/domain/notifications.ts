@@ -183,16 +183,23 @@ export async function dispatchOperationsNotifications(
         row.providerId = result.providerId;
         row.lastError = undefined;
       });
-    } catch {
+    } catch (error) {
       // No automatic resend: an ambiguous send is surfaced for a human.
       store.write((s) => {
         const row = s.operationsNotifications!.find((r) => r.id === n.id)!;
-        row.lastError = "Delivery failed; review before resending";
+        row.lastError =
+          error instanceof SelfRecipientError
+            ? "Not sent: the recipient is the sending WhatsApp number"
+            : "Delivery failed; review before resending";
       });
     }
   }
   return { attempted, skipped: null };
 }
+
+/** A business number cannot usefully alert itself; refused before any provider call. */
+export class SelfRecipientError extends Error {}
+const digits = (phone: string) => phone.replace(/\D/g, "");
 
 /**
  * WhatsApp delivery for operations alerts. Business-initiated messages outside
@@ -207,6 +214,11 @@ export function createWhatsAppOperationsNotifier(
 ): OperationsNotifier {
   return {
     async send(n) {
+      // The alert goes FROM the business number. If a recipient is that same
+      // number (the manager's phone is also the public WhatsApp line), the
+      // message would be sent to itself: refuse rather than assume it works.
+      if (digits(n.recipient.phone) === digits(origin.phone))
+        throw new SelfRecipientError();
       const total = /Total paid: AED ([0-9.]+)/.exec(n.message)?.[1] ?? "";
       const reference = n.publicOrderNumber
         ? orderReference({
