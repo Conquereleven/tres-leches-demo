@@ -23,7 +23,7 @@ for (const width of [390, 768, 1024, 1440])
           ),
         );
         const path = page.locator(
-          selector === ".ref-journey" ? ".ref-route-ink" : ".ref-pencil-mask",
+          selector === ".ref-journey" ? ".ref-route-ink" : ".ref-scroll-sketch",
         );
         await expect
           .poll(() =>
@@ -153,7 +153,7 @@ for (const width of [390, 768, 1024, 1440])
       await expect
         .poll(() =>
           page
-            .locator(".ref-pencil-mask")
+            .locator(".ref-scroll-sketch")
             .evaluate((el) =>
               (el as SVGElement).dataset.drawn !== undefined
                 ? 1 - Number((el as SVGElement).dataset.drawn)
@@ -256,33 +256,114 @@ for (const locale of ["en", "ar"])
     ).toBeGreaterThan(12);
     await place(".ref-route-motion", 0.92, 0.4, 1);
     await expect(bridge).toHaveAttribute("data-journey", "dubai");
-    const drawn = (stage: string) =>
+    const sketch = page.locator(".ref-scroll-sketch");
+    const lines = () =>
       page
-        .locator(`.ref-pencil-${stage}`)
-        .evaluate((el) => Number((el as SVGElement).dataset.drawn));
-    const final = () =>
+        .locator(".ref-pencil-line")
+        .evaluateAll(
+          (els) =>
+            els.filter((el) => Number((el as SVGElement).dataset.drawn) >= 1)
+              .length,
+        );
+    const opacity = (selector: string) =>
       page
-        .locator(".ref-sketch-final")
+        .locator(selector)
         .evaluate((el) => parseFloat(getComputedStyle(el).opacity));
-    await place(".ref-scroll-sketch", 0.9, 0.4, 0.2);
-    expect(await drawn("contour")).toBeGreaterThan(0.5);
-    expect(await drawn("detail")).toBe(0);
-    expect(await final()).toBe(0);
-    await place(".ref-scroll-sketch", 0.9, 0.4, 0.5);
-    expect(await drawn("contour")).toBe(1);
-    expect(await drawn("detail")).toBeGreaterThan(0.4);
-    expect(await drawn("shade")).toBe(0);
+    const range = [0.97, 0.36] as const;
+    await place(".ref-scroll-sketch", ...range, 0);
+    await expect(sketch).toHaveAttribute("data-phase", "blank");
+    expect(await lines()).toBe(0);
+    expect(await opacity(".ref-sketch-final")).toBe(0);
+    await place(".ref-scroll-sketch", ...range, 0.1);
+    await expect(sketch).toHaveAttribute("data-phase", "construction");
+    // A line is growing behind a visible pencil point: no layer is fading in.
+    await expect.poll(() => opacity(".ref-pencil-point")).toBeGreaterThan(0.9);
+    expect(await opacity(".ref-sketch-final")).toBe(0);
+    const early = await lines();
+    await place(".ref-scroll-sketch", ...range, 0.55);
+    await expect(sketch).toHaveAttribute("data-phase", "hair");
+    const halfDrawn = await lines();
+    expect(halfDrawn).toBeGreaterThan(early + 15);
+    expect(await opacity(".ref-sketch-final")).toBe(0);
     // Just past the nominal end: scroll positions land on whole pixels.
-    await place(".ref-scroll-sketch", 0.9, 0.4, 1.05);
-    expect(await final()).toBe(1);
-    // The pink hierarchy must resolve: an empty token silently removes the accent.
-    for (const token of ["--3l-pink-soft", "--3l-pink", "--3l-pink-strong"])
-      expect(
-        await page
-          .locator(".brand-experience")
-          .evaluate(
-            (el, name) => getComputedStyle(el).getPropertyValue(name).trim(),
-            token,
-          ),
-      ).toMatch(/^#[0-9a-f]{6}$/);
+    await place(".ref-scroll-sketch", ...range, 1.05);
+    expect(await opacity(".ref-sketch-final")).toBe(1);
+    expect(await opacity(".ref-sketch-lines")).toBe(0);
+    // Reverse: the drawing retreats to the same state it passed on the way down.
+    await place(".ref-scroll-sketch", ...range, 0.55);
+    expect(await lines()).toBe(halfDrawn);
+    await place(".ref-scroll-sketch", ...range, 0);
+    expect(await lines()).toBe(0);
   });
+
+const official = {
+  "--3l-lavender": "#a191b2", // Pantone 666 C
+  "--3l-lavender-soft": "#dddae8", // Pantone 7443 C
+  "--3l-blush": "#f6dfe0", // Pantone 9286 C
+  "--3l-gold": "#a28d5b", // Pantone 8383 C
+  "--3l-pink": "#ffc0c8", // Pantone 919 C
+} as const;
+const rgb = (hex: string) =>
+  `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
+for (const route of ["/", "/menu", "/cart"])
+  test(`official 3L palette resolves exactly on ${route}`, async ({ page }) => {
+    await page.goto(route);
+    for (const [token, hex] of Object.entries(official)) {
+      // Computed by the browser, on the scope where components consume it.
+      const probe = await page
+        .locator(".brand-experience")
+        .evaluate((el, name) => {
+          const swatch = document.createElement("i");
+          swatch.style.backgroundColor = `var(${name})`;
+          el.append(swatch);
+          const value = [
+            getComputedStyle(el).getPropertyValue(name).trim().toLowerCase(),
+            getComputedStyle(swatch).backgroundColor,
+          ];
+          swatch.remove();
+          return value;
+        }, token);
+      expect(probe, token).toEqual([hex, rgb(hex)]);
+    }
+  });
+test("official colours are what components actually render", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const painted = (selector: string, property: string) =>
+    page
+      .locator(selector)
+      .first()
+      .evaluate(
+        (el, name) => getComputedStyle(el).getPropertyValue(name),
+        property,
+      );
+  expect(await painted(".ref-route-ink", "stroke")).toBe(
+    rgb(official["--3l-pink"]),
+  );
+  expect(await painted(".ref-family .b-button", "background-color")).toBe(
+    rgb(official["--3l-pink"]),
+  );
+  expect(await painted(".ref-featured", "background-color")).toBe(
+    rgb(official["--3l-blush"]),
+  );
+  expect(await painted(".ref-tradition > .ref-panel", "background-color")).toBe(
+    rgb(official["--3l-lavender"]),
+  );
+  expect(await painted(".b-how-guide li > svg", "background-color")).toBe(
+    rgb(official["--3l-lavender-soft"]),
+  );
+  expect(await painted(".ref-star", "color")).toBe(rgb(official["--3l-gold"]));
+  // Cream remains the canvas.
+  expect(await painted(".brand-experience", "background-color")).not.toBe(
+    rgb(official["--3l-pink"]),
+  );
+  await page.goto("/menu");
+  expect(
+    await painted(
+      '.b-menu-categories button[aria-pressed="true"]',
+      "background-color",
+    ),
+  ).toBe(rgb(official["--3l-pink"]));
+});

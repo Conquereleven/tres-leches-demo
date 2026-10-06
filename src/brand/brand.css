@@ -16,11 +16,11 @@
 .brand-experience,
 .b-modal,
 .b-return {
-  --brand-lavender: #a191b2;
-  --brand-lavender-light: #dddae8;
-  --brand-blush: #f6dfe0;
-  --brand-gold: #a28d5b;
-  --brand-pink: #ffc0c8;
+  --brand-lavender: var(--3l-lavender);
+  --brand-lavender-light: var(--3l-lavender-soft);
+  --brand-blush: var(--3l-blush);
+  --brand-gold: var(--3l-gold);
+  --brand-pink: var(--3l-pink);
   --surface-primary: #f8f4ed;
   --surface-paper: #fffdf8;
   --text-primary: #372c27;
@@ -2734,7 +2734,6 @@ a.b-return {
   --text-primary: #2b1b16;
   --text-secondary: #715e54;
   --border-subtle: #cfc3b4;
-  --brand-blush: #edcfd1;
 }
 .brand-experience:not(.b-shop) .b-header {
   height: 92px;

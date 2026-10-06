@@ -6,7 +6,7 @@
 .brand-experience.b-shop {
   --co-radius: 1rem;
   --co-gold-tint: #f4eee0;
-  --co-lavender-tint: #efecf4;
+  --co-lavender-tint: var(--3l-lavender-soft);
   --co-danger: #8a3b3b;
   --co-success: #5b6e4a;
 }

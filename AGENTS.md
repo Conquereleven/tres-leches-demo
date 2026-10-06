@@ -77,5 +77,11 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 ## Visual polish v2 (6 October 2026, hotfix after failed visual acceptance)
 - Scroll-driven artwork measures the artwork's own on-screen centre, never its taller section; otherwise the animation finishes before it is visible.
 - Mexico→Dubai: pink route drawn behind a visible moving marker; 0–20% Mexico active, 20–80% travel, 80–100% Dubai active. Sizes are authored in screen pixels.
-- Journal portrait is drawn in stages (contour → linework → shading → untouched original) with interleaved pencil strokes; stage images are derived from the approved original by `scripts/derive-journal-layers.mjs`. A top-to-bottom wipe is not acceptable.
-- Pink hierarchy tokens (`--3l-pink-soft`, `--3l-pink`, `--3l-pink-strong`, `--3l-pink-ink`, `--3l-pink-border`) are declared on the brand scopes, not `:root`, and must be carried by real surfaces (signature-flavours band, active menu category, order-guide icons), not only hairlines.
+- Journal portrait is drawn by hand-placed pencil strokes in an artist's order (construction, eyes and nose, mouth, hair, shoulders and necklace, secondary linework), each line growing behind a pencil point, then the untouched original resolves over them. Stroke data: `src/brand/journal-drawing.json`. No hatching, masks, wipes, filters or edge detection. Strokes are explicit geometry: Safari mis-measures dashes on long paths.
+
+## Official 3L palette (6 October 2026, authoritative)
+- Exact values only, declared once on `:root` in `src/styles.css`: `--3l-pink #FFC0C8` (Pantone 919 C), `--3l-blush #F6DFE0` (9286 C), `--3l-lavender #A191B2` (666 C), `--3l-lavender-soft #DDDAE8` (7443 C), `--3l-gold #A28D5B` (8383 C). Never approximate, derive or tint them by opacity.
+- Cream/beige stays the dominant canvas. Roles: pink = active/selected and the journey route; blush = soft warm surfaces and notices; lavender = editorial contrast and section markers; lavender-soft = quiet secondary surfaces; gold = sparing heritage detail.
+- None of the five reaches text contrast on cream: text and numerals stay chocolate, and focus rings pair a chocolate outline with a pink halo.
+- Operational status colours (success, warning, error, payment state) keep their functional meaning; the palette applies to chrome and selected states only.
+- `tests/polish-e2e/polish.spec.ts` asserts the computed token values and the rendered colours.

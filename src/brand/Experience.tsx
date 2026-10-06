@@ -23,8 +23,8 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
   const editorial = useEditorialMotion();
   const journal = useEditorialMotion({
     target: ".ref-scroll-sketch",
-    from: 0.9,
-    to: 0.4,
+    from: 0.97,
+    to: 0.36,
     paint: paintSketch,
   });
   const journey = useEditorialMotion<HTMLDivElement>({

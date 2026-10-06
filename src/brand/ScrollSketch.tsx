@@ -1,138 +1,141 @@
 import { useId } from "react";
+import drawing from "./journal-drawing.json";
 const WIDTH = 640,
   HEIGHT = 768;
 const clamp = (value: number) => Math.max(0, Math.min(1, value));
-type Stroke = readonly [number, number, number, number];
-/**
- * Parallel pencil strokes across the sheet. Passes interleave, so strokes first
- * land sparsely over the whole portrait and later passes fill between them.
- * Each stroke is clipped to the sheet's margin so scroll progress is spent only
- * on pencil that can be seen.
- */
-function hatch(angle: number, spacing: number, passes: number, margin: number) {
-  const radians = (angle * Math.PI) / 180;
-  const along = [Math.cos(radians), Math.sin(radians)] as const;
-  const across = [-along[1], along[0]] as const;
-  const count = Math.ceil(1060 / spacing);
-  const strokes: Stroke[] = [];
-  for (let pass = 0; pass < passes; pass++)
-    for (let line = pass; line < count; line += passes) {
-      // Deterministic unevenness: a ruler-straight hatch reads as a wipe, not a hand.
-      const wobble = Math.sin(line * 12.9898) * spacing * 0.1;
-      const offset = (line - count / 2) * spacing + wobble;
-      const cx = WIDTH / 2 + across[0] * offset,
-        cy = HEIGHT / 2 + across[1] * offset;
-      let enter = -Infinity,
-        leave = Infinity;
-      for (const [origin, step, high] of [
-        [cx, along[0], WIDTH + margin],
-        [cy, along[1], HEIGHT + margin],
-      ] as const) {
-        const a = (-margin - origin) / step,
-          b = (high - origin) / step;
-        enter = Math.max(enter, Math.min(a, b));
-        leave = Math.min(leave, Math.max(a, b));
-      }
-      if (enter >= leave) continue;
-      // Alternate direction like a hand shading back and forth.
-      const [from, to] = strokes.length % 2 ? [leave, enter] : [enter, leave];
-      strokes.push([
-        cx + along[0] * from,
-        cy + along[1] * from,
-        cx + along[0] * to,
-        cy + along[1] * to,
-      ]);
+type Point = readonly [number, number];
+/** A hand-placed stroke becomes a smooth pencil line (Catmull-Rom, ~3 units a step). */
+function trace(knots: number[][]): Point[] {
+  const at = (i: number) => knots[Math.max(0, Math.min(knots.length - 1, i))]!;
+  const line: Point[] = [[knots[0]![0]!, knots[0]![1]!]];
+  for (let i = 0; i < knots.length - 1; i++) {
+    const [a, b, c, d] = [at(i - 1), at(i), at(i + 1), at(i + 2)];
+    const steps = Math.max(
+      2,
+      Math.ceil(Math.hypot(c[0]! - b[0]!, c[1]! - b[1]!) / 3),
+    );
+    for (let step = 1; step <= steps; step++) {
+      const t = step / steps;
+      const spline = (axis: 0 | 1) =>
+        0.5 *
+        (2 * b[axis]! +
+          (c[axis]! - a[axis]!) * t +
+          (2 * a[axis]! - 5 * b[axis]! + 4 * c[axis]! - d[axis]!) * t * t +
+          (3 * b[axis]! - a[axis]! - 3 * c[axis]! + d[axis]!) * t * t * t);
+      line.push([spline(0), spline(1)]);
     }
-  return strokes;
-}
-const segment = ([x1, y1, x2, y2]: Stroke, part = 1) =>
-  `M${x1.toFixed(1)} ${y1.toFixed(1)}L${(x1 + (x2 - x1) * part).toFixed(1)} ${(y1 + (y2 - y1) * part).toFixed(1)}`;
-const stages = [
-  // Construction lines, the artist's own linework, then shading: three hands of pencil.
-  { key: "contour", angle: -38, spacing: 11, passes: 5 },
-  { key: "detail", angle: 52, spacing: 8, passes: 5 },
-  { key: "shade", angle: -14, spacing: 7, passes: 4 },
-] as const;
-const pencils = Object.fromEntries(
-  stages.map((stage) => {
-    const width = stage.spacing * 1.3;
-    const strokes = hatch(stage.angle, stage.spacing, stage.passes, width);
-    const lengths = strokes.map(([x1, y1, x2, y2]) =>
-      Math.hypot(x2 - x1, y2 - y1),
-    );
-    return [
-      stage.key,
-      {
-        width,
-        strokes,
-        lengths,
-        total: lengths.reduce((sum, length) => sum + length, 0),
-        full: strokes.map((stroke) => segment(stroke)).join(""),
-      },
-    ];
-  }),
-);
-/**
- * The strokes laid down so far. Geometry, not a dash offset: Safari mis-measures
- * dashes on paths this long and drew the portrait at twice the scroll position.
- */
-function drawn(stage: string, done: number) {
-  const pencil = pencils[stage]!;
-  if (done >= 1) return pencil.full;
-  let remaining = pencil.total * done;
-  let d = "";
-  for (let i = 0; i < pencil.strokes.length && remaining > 0; i++) {
-    const length = pencil.lengths[i]!;
-    d += segment(pencil.strokes[i]!, Math.min(1, remaining / length));
-    remaining -= length;
   }
-  // An empty path data attribute is invalid; a zero-length move draws nothing.
-  return d || "M0 0";
-}
-/** Scroll position → what the pencil has done so far. */
-export function paintSketch(section: HTMLElement, progress: number) {
-  const contour = clamp(progress / 0.3);
-  const detail = clamp((progress - 0.3) / 0.35);
-  const shade = clamp((progress - 0.65) / 0.25);
-  const finished = clamp((progress - 0.9) / 0.1);
-  const set = (name: string, value: number) =>
-    section.style.setProperty(name, value.toFixed(4));
-  const draw = (stage: string, done: number) => {
-    const pencil = section.querySelector<SVGPathElement>(
-      `.ref-pencil-${stage}`,
-    );
-    if (!pencil) return;
-    const amount = done.toFixed(4);
-    // Rebuilding path data on every frame is wasted work once a stage settles.
-    if (pencil.dataset.drawn === amount) return;
-    pencil.dataset.drawn = amount;
-    pencil.setAttribute("d", drawn(stage, done));
-  };
-  draw("contour", contour);
-  draw("detail", detail);
-  draw("shade", shade);
-  // Construction lines are erased as real shading replaces them.
-  set("--sketch-contour-ink", 1 - shade);
-  set("--sketch-working", 1 - finished);
-  set("--sketch-final", finished);
+  return line;
 }
 /**
- * The approved portrait appears to be drawn: construction contours, then linework,
- * then shading, and finally the untouched original. Stage images are derived from
- * that original by scripts/derive-journal-layers.mjs; nothing is redrawn.
+ * The artist's order: construction, features, mouth, hair, shoulders, then
+ * secondary linework. Inside a phase each stroke takes scroll in proportion to
+ * its length, so the pencil moves at a steady pace instead of a steady count.
+ */
+const strokes = drawing.groups.flatMap((group) => {
+  const lines = group.strokes.map((stroke) => {
+    const points = trace(stroke.pts);
+    const reach = [0];
+    for (let i = 1; i < points.length; i++)
+      reach.push(
+        reach[i - 1]! +
+          Math.hypot(
+            points[i]![0] - points[i - 1]![0],
+            points[i]![1] - points[i - 1]![1],
+          ),
+      );
+    return { width: stroke.w, points, reach, length: reach.at(-1)! };
+  });
+  const total = lines.reduce((sum, line) => sum + line.length, 0);
+  let spent = 0;
+  return lines.map((line) => {
+    const start = group.from + ((group.to - group.from) * spent) / total;
+    spent += line.length;
+    const end = group.from + ((group.to - group.from) * spent) / total;
+    return { ...line, phase: group.name, start, end };
+  });
+});
+const pen = ([x, y]: Point) => `${x.toFixed(1)} ${y.toFixed(1)}`;
+/** The part of a stroke already on paper, and where the pencil point is now. */
+function lay(stroke: (typeof strokes)[number], done: number) {
+  const target = stroke.length * done;
+  let d = `M${pen(stroke.points[0]!)}`;
+  let tip = stroke.points[0]!;
+  for (let i = 1; i < stroke.points.length; i++) {
+    if (stroke.reach[i]! <= target) {
+      tip = stroke.points[i]!;
+      d += `L${pen(tip)}`;
+      continue;
+    }
+    const from = stroke.points[i - 1]!,
+      to = stroke.points[i]!;
+    const part =
+      (target - stroke.reach[i - 1]!) /
+      (stroke.reach[i]! - stroke.reach[i - 1]!);
+    tip = [
+      from[0] + (to[0] - from[0]) * part,
+      from[1] + (to[1] - from[1]) * part,
+    ];
+    d += `L${pen(tip)}`;
+    break;
+  }
+  return { d, tip };
+}
+const finished = strokes.map((stroke) => lay(stroke, 1).d);
+/**
+ * Scroll position → what the artist has drawn so far. Lines are real geometry
+ * that grows behind the pencil point; no dash, mask or pathLength is involved
+ * (Safari mis-measures dashes on long paths).
+ */
+export function paintSketch(section: HTMLElement, progress: number) {
+  const sketch = section.querySelector<SVGSVGElement>(".ref-scroll-sketch");
+  if (!sketch) return;
+  const lines = sketch.querySelectorAll<SVGPathElement>(".ref-pencil-line");
+  let tip: Point | null = null;
+  let phase = "";
+  strokes.forEach((stroke, i) => {
+    const line = lines[i];
+    if (!line) return;
+    const done = clamp((progress - stroke.start) / (stroke.end - stroke.start));
+    if (done > 0 && done < 1) phase = stroke.phase;
+    const amount = done.toFixed(4);
+    const laid = done > 0 && done < 1 ? lay(stroke, done) : null;
+    if (laid) tip = laid.tip;
+    // Rebuilding path data is wasted work once a stroke has settled.
+    if (line.dataset.drawn === amount) return;
+    line.dataset.drawn = amount;
+    // An empty path data attribute is invalid; a lone move draws nothing.
+    line.setAttribute("d", laid?.d ?? (done ? finished[i]! : "M0 0"));
+  });
+  const pencil = sketch.querySelector<SVGGElement>(".ref-pencil-point");
+  if (pencil) {
+    const point = tip as Point | null;
+    pencil.style.opacity = point ? "1" : "0";
+    if (point)
+      pencil.setAttribute(
+        "transform",
+        `translate(${point[0].toFixed(1)} ${point[1].toFixed(1)})`,
+      );
+  }
+  // The finished artwork resolves over the drawing, then the drawing lifts away.
+  const resolved = clamp((progress - 0.88) / 0.12);
+  const eased = resolved * resolved * (3 - 2 * resolved);
+  section.style.setProperty("--sketch-final", eased.toFixed(4));
+  section.style.setProperty(
+    "--sketch-lines",
+    (1 - clamp((progress - 0.94) / 0.06)).toFixed(4),
+  );
+  sketch.dataset.drawn = clamp(progress / 0.9).toFixed(4);
+  sketch.dataset.phase =
+    progress <= 0 ? "blank" : resolved > 0 ? "resolving" : phase || "drawing";
+}
+/**
+ * The approved portrait appears to be drawn by hand: a controlled set of
+ * hand-placed construction strokes grows in an artist's order, then the
+ * untouched original resolves over them. Nothing is filtered or edge-detected.
  */
 export function ScrollSketch({ label }: { label: string }) {
   const id = useId();
-  const layer = (key: string, href: string) => (
-    <image
-      className={`ref-sketch-${key}`}
-      href={href}
-      width={WIDTH}
-      height={HEIGHT}
-      preserveAspectRatio="none"
-      mask={`url(#${id}-${key})`}
-    />
-  );
   return (
     <svg
       className="ref-alicia ref-scroll-sketch"
@@ -140,34 +143,6 @@ export function ScrollSketch({ label }: { label: string }) {
       role="img"
       aria-label={label}
     >
-      <defs>
-        {stages.map((stage) => (
-          <mask
-            key={stage.key}
-            id={`${id}-${stage.key}`}
-            maskUnits="userSpaceOnUse"
-            x="0"
-            y="0"
-            width={WIDTH}
-            height={HEIGHT}
-          >
-            <path
-              className={`ref-pencil ref-pencil-${stage.key}${stage.key === "contour" ? " ref-pencil-mask" : ""}`}
-              d={pencils[stage.key]!.full}
-              fill="none"
-              stroke="white"
-              strokeWidth={pencils[stage.key]!.width}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </mask>
-        ))}
-      </defs>
-      <g className="ref-sketch-working">
-        {layer("contour", "/brand/approved/journal-alicia-contour.webp")}
-        {layer("detail", "/brand/approved/journal-alicia-detail.webp")}
-        {layer("shade", "/brand/reference/alicia.webp")}
-      </g>
       <image
         className="ref-sketch-final"
         href="/brand/reference/alicia.webp"
@@ -175,6 +150,24 @@ export function ScrollSketch({ label }: { label: string }) {
         height={HEIGHT}
         preserveAspectRatio="none"
       />
+      <g className="ref-sketch-lines" aria-hidden="true">
+        {strokes.map((stroke, i) => (
+          <path
+            key={`${id}-${i}`}
+            className="ref-pencil-line"
+            d={finished[i]}
+            fill="none"
+            strokeWidth={stroke.width}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        ))}
+        <g className="ref-pencil-point">
+          <path className="ref-pencil-lead" d="M0 0L6 -15L15 -6Z" />
+          <path className="ref-pencil-body" d="M6 -15L15 -6L60 -51L51 -60Z" />
+          <path className="ref-pencil-cap" d="M51 -60L60 -51L68 -59L59 -68Z" />
+        </g>
+      </g>
     </svg>
   );
 }
@@ -203,7 +196,7 @@ export function paintJourney(section: HTMLElement, progress: number) {
   place(".ref-route-tracer", travelled);
   section.style.setProperty("--route-offset", (1 - travelled).toFixed(4));
   // Line weight is authored in screen pixels so the 290px mobile route stays legible.
-  route.style.strokeWidth = (3 * unit).toFixed(2);
+  route.style.strokeWidth = (6 * unit).toFixed(2);
   const glow = section.querySelector<SVGPathElement>(".ref-route-glow");
   if (glow) glow.style.strokeWidth = (10 * unit).toFixed(2);
   const bridge = section.closest<HTMLElement>(".ref-bridge") ?? section;
@@ -219,12 +212,12 @@ export function JourneyRoute() {
         <circle r="6" />
       </g>
       <g className="ref-route-arrival">
-        <circle className="ref-route-ping" r="7" />
-        <circle r="7" />
+        <circle className="ref-route-ping" r="9" />
+        <circle r="9" />
       </g>
       <g className="ref-route-tracer">
-        <circle className="ref-route-halo" r="15" />
-        <circle className="ref-route-dot" r="7.5" />
+        <circle className="ref-route-halo" r="19" />
+        <circle className="ref-route-dot" r="9" />
       </g>
     </svg>
   );
