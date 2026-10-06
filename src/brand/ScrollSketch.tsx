@@ -196,9 +196,9 @@ export function paintJourney(section: HTMLElement, progress: number) {
   place(".ref-route-tracer", travelled);
   section.style.setProperty("--route-offset", (1 - travelled).toFixed(4));
   // Line weight is authored in screen pixels so the 290px mobile route stays legible.
-  route.style.strokeWidth = (6 * unit).toFixed(2);
+  route.style.strokeWidth = (4 * unit).toFixed(2);
   const glow = section.querySelector<SVGPathElement>(".ref-route-glow");
-  if (glow) glow.style.strokeWidth = (10 * unit).toFixed(2);
+  if (glow) glow.style.strokeWidth = (14 * unit).toFixed(2);
   const bridge = section.closest<HTMLElement>(".ref-bridge") ?? section;
   bridge.dataset.journey =
     progress < 0.2 ? "mexico" : travelled < 1 ? "travel" : "dubai";

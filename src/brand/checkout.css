@@ -1,12 +1,11 @@
 /* ─── Checkout polish ────────────────────────────────────────────────────
-   Loaded after brand.css. 3L tokens only (cream, cacao, lavender, blush,
+   Loaded after brand.css. 3L tokens only (cream, cacao, blush,
    gold). Mobile-first: one column with a collapsible order summary; from
    960px a two-column layout with a sticky summary. */
 
 .brand-experience.b-shop {
   --co-radius: 1rem;
   --co-gold-tint: #f4eee0;
-  --co-lavender-tint: var(--3l-lavender-soft);
   --co-danger: #8a3b3b;
   --co-success: #5b6e4a;
 }
@@ -202,7 +201,7 @@
   outline: none;
 }
 .brand-experience .b-co-card h2:focus-visible {
-  outline: 2px solid var(--brand-lavender);
+  outline: 2px solid var(--brand-gold);
   outline-offset: 4px;
 }
 
@@ -594,7 +593,7 @@
   align-items: start;
   padding: var(--space-2);
   border-radius: 0.75rem;
-  background: var(--co-lavender-tint);
+  background: var(--brand-blush);
 }
 .brand-experience .b-co-state p {
   margin: 0;
@@ -682,7 +681,7 @@
   min-height: 52px;
 }
 .brand-experience .b-button.b-co-support:hover {
-  background: var(--brand-lavender-light);
+  background: var(--brand-blush);
 }
 @media (min-width: 600px) {
   .brand-experience .b-shop-actions .b-co-support {

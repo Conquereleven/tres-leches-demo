@@ -16,11 +16,8 @@
 .brand-experience,
 .b-modal,
 .b-return {
-  --brand-lavender: var(--3l-lavender);
-  --brand-lavender-light: var(--3l-lavender-soft);
   --brand-blush: var(--3l-blush);
   --brand-gold: var(--3l-gold);
-  --brand-pink: var(--3l-pink);
   --surface-primary: #f8f4ed;
   --surface-paper: #fffdf8;
   --text-primary: #372c27;
@@ -259,7 +256,7 @@
     radial-gradient(82% 78% at 72% 24%, var(--brand-blush) 0%, transparent 62%),
     radial-gradient(
       70% 74% at 24% 84%,
-      var(--brand-lavender-light) 0%,
+      var(--brand-blush) 0%,
       transparent 66%
     ),
     linear-gradient(
@@ -408,7 +405,7 @@
   object-fit: cover;
 }
 /* Hero panel used while the approved film is pending. Built entirely from the
-   brand palette — cream ground, blush and lavender light, gold ring motif — so
+   brand palette — cream ground, blush light, gold ring motif — so
    it reads as an intentional editorial surface rather than a missing asset.
    No image request, no animation, nothing that delays the hero CTAs. */
 .brand-experience .b-hero-canvas {
@@ -418,7 +415,7 @@
     radial-gradient(78% 96% at 76% 22%, var(--brand-blush) 0%, transparent 60%),
     radial-gradient(
       70% 84% at 22% 86%,
-      var(--brand-lavender-light) 0%,
+      var(--brand-blush) 0%,
       transparent 64%
     ),
     radial-gradient(
@@ -684,7 +681,7 @@
 .brand-experience .b-door-occasions {
   border-radius: 6rem 0 0 0;
   margin-bottom: 1rem;
-  background: var(--brand-lavender-light);
+  background: var(--brand-blush);
   padding-top: 2.5rem;
 }
 .brand-experience .b-door h3 {
@@ -767,7 +764,7 @@
   aspect-ratio: 0.92;
 }
 .brand-experience .b-jars .b-image-frame {
-  background: var(--brand-lavender-light);
+  background: var(--brand-blush);
   border-radius: 45% 45% 0 0;
   aspect-ratio: 0.85;
 }

@@ -1,10 +1,8 @@
 :root {
-  /* Official 3L palette. Exact Pantone conversions; never approximate or tint by opacity. */
-  --3l-pink: #ffc0c8; /* Pantone 919 C — primary active accent */
-  --3l-blush: #f6dfe0; /* Pantone 9286 C — soft warm surface */
-  --3l-lavender: #a191b2; /* Pantone 666 C — editorial contrast */
-  --3l-lavender-soft: #dddae8; /* Pantone 7443 C — quiet cool surface */
-  --3l-gold: #a28d5b; /* Pantone 8383 C — heritage detail, sparing */
+  /* Final 3L web palette: these two colours plus the cream base. Exact Pantone
+     conversions; never approximate, add further brand colours or tint by opacity. */
+  --3l-blush: #f6dfe0; /* Pantone 9286 C — soft warm surface and selected states */
+  --3l-gold: #a28d5b; /* Pantone 8383 C — line, rule and heritage accent */
   --cream: #fbf7ef;
   --paper: #fffdf8;
   --cacao: #3b2119;

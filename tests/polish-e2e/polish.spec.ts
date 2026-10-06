@@ -3,7 +3,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync, writeFileSync } from "node:fs";
 for (const width of [390, 768, 1024, 1440])
   for (const locale of ["en", "es", "ar"]) {
-    test(`${locale} scroll drawing, journey, pink contrast ${width}`, async ({
+    test(`${locale} scroll drawing, journey, palette contrast ${width}`, async ({
       page,
     }) => {
       await page.setViewportSize({ width, height: 900 });
@@ -297,38 +297,67 @@ for (const locale of ["en", "ar"])
   });
 
 const official = {
-  "--3l-lavender": "#a191b2", // Pantone 666 C
-  "--3l-lavender-soft": "#dddae8", // Pantone 7443 C
   "--3l-blush": "#f6dfe0", // Pantone 9286 C
   "--3l-gold": "#a28d5b", // Pantone 8383 C
-  "--3l-pink": "#ffc0c8", // Pantone 919 C
 } as const;
+// Earlier iterations' brand colours: none may be defined or painted any more.
+const retired = ["--3l-pink", "--3l-lavender", "--3l-lavender-soft"];
+const retiredPaint = [
+  "rgb(255, 192, 200)",
+  "rgb(161, 145, 178)",
+  "rgb(221, 218, 232)",
+];
 const rgb = (hex: string) =>
   `rgb(${[1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(", ")})`;
 for (const route of ["/", "/menu", "/cart"])
-  test(`official 3L palette resolves exactly on ${route}`, async ({ page }) => {
+  test(`final 3L palette resolves exactly on ${route}`, async ({ page }) => {
     await page.goto(route);
+    const scope = page.locator(".brand-experience");
     for (const [token, hex] of Object.entries(official)) {
       // Computed by the browser, on the scope where components consume it.
-      const probe = await page
-        .locator(".brand-experience")
-        .evaluate((el, name) => {
-          const swatch = document.createElement("i");
-          swatch.style.backgroundColor = `var(${name})`;
-          el.append(swatch);
-          const value = [
-            getComputedStyle(el).getPropertyValue(name).trim().toLowerCase(),
-            getComputedStyle(swatch).backgroundColor,
-          ];
-          swatch.remove();
-          return value;
-        }, token);
+      const probe = await scope.evaluate((el, name) => {
+        const swatch = document.createElement("i");
+        swatch.style.backgroundColor = `var(${name})`;
+        el.append(swatch);
+        const value = [
+          getComputedStyle(el).getPropertyValue(name).trim().toLowerCase(),
+          getComputedStyle(swatch).backgroundColor,
+        ];
+        swatch.remove();
+        return value;
+      }, token);
       expect(probe, token).toEqual([hex, rgb(hex)]);
     }
+    for (const token of retired)
+      expect(
+        await scope.evaluate(
+          (el, name) => getComputedStyle(el).getPropertyValue(name).trim(),
+          token,
+        ),
+        token,
+      ).toBe("");
+    // Nothing on the page is painted in a retired pink or lavender.
+    const painted = await page.evaluate(() => {
+      const seen = new Set<string>();
+      for (const el of document.querySelectorAll("body *")) {
+        const style = getComputedStyle(el);
+        for (const property of [
+          "backgroundColor",
+          "color",
+          "borderTopColor",
+          "borderInlineStartColor",
+          "fill",
+          "stroke",
+          "outlineColor",
+          "textDecorationColor",
+        ] as const)
+          seen.add(style[property]);
+      }
+      return [...seen];
+    });
+    for (const colour of retiredPaint) expect(painted).not.toContain(colour);
   });
-test("official colours are what components actually render", async ({
-  page,
-}) => {
+test("final colours are what components actually render", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const painted = (selector: string, property: string) =>
@@ -339,25 +368,24 @@ test("official colours are what components actually render", async ({
         (el, name) => getComputedStyle(el).getPropertyValue(name),
         property,
       );
-  expect(await painted(".ref-route-ink", "stroke")).toBe(
-    rgb(official["--3l-pink"]),
-  );
+  const blush = rgb(official["--3l-blush"]),
+    gold = rgb(official["--3l-gold"]);
+  expect(await painted(".ref-route-ink", "stroke")).toBe(gold);
+  expect(await painted(".ref-route-dot", "fill")).toBe(gold);
   expect(await painted(".ref-family .b-button", "background-color")).toBe(
-    rgb(official["--3l-pink"]),
+    blush,
   );
-  expect(await painted(".ref-featured", "background-color")).toBe(
-    rgb(official["--3l-blush"]),
-  );
+  expect(await painted(".ref-featured", "background-color")).toBe(blush);
   expect(await painted(".ref-tradition > .ref-panel", "background-color")).toBe(
-    rgb(official["--3l-lavender"]),
+    blush,
   );
   expect(await painted(".b-how-guide li > svg", "background-color")).toBe(
-    rgb(official["--3l-lavender-soft"]),
+    blush,
   );
-  expect(await painted(".ref-star", "color")).toBe(rgb(official["--3l-gold"]));
+  expect(await painted(".ref-star", "color")).toBe(gold);
   // Cream remains the canvas.
   expect(await painted(".brand-experience", "background-color")).not.toBe(
-    rgb(official["--3l-pink"]),
+    blush,
   );
   await page.goto("/menu");
   expect(
@@ -365,5 +393,5 @@ test("official colours are what components actually render", async ({
       '.b-menu-categories button[aria-pressed="true"]',
       "background-color",
     ),
-  ).toBe(rgb(official["--3l-pink"]));
+  ).toBe(blush);
 });

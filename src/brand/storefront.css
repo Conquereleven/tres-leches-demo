@@ -201,8 +201,8 @@
 .ref-tradition > .ref-panel {
   width: 50%;
   padding: 64px;
-  background: var(--3l-lavender);
-  border: 1px solid var(--3l-lavender);
+  background: var(--3l-blush);
+  border: 1px solid var(--3l-gold);
   border-radius: 28px;
   z-index: 1;
   position: relative;
@@ -251,8 +251,8 @@
   margin: 0 0 28px;
 }
 .ref-family .b-button {
-  background: var(--3l-pink);
-  border-color: var(--3l-pink);
+  background: var(--3l-blush);
+  border-color: var(--3l-gold);
   letter-spacing: 0;
   text-transform: none;
 }
@@ -330,7 +330,7 @@
   height: 22px;
 }
 .b-menu-page {
-  background: var(--brand-lavender-light);
+  background: var(--brand-blush);
 }
 .b-menu-page main,
 .b-how-page main {
@@ -674,7 +674,7 @@
 .ref-tradition > .ref-panel {
   width: 50%;
   padding: 32px 64px;
-  background: var(--3l-lavender);
+  background: var(--3l-blush);
   flex-shrink: 0;
   border-radius: 28px;
   z-index: 1;
@@ -819,8 +819,8 @@
   margin: 0 0 24px;
 }
 .brand-experience.ref-home .ref-family .b-button {
-  background: var(--3l-pink);
-  border-color: var(--3l-pink);
+  background: var(--3l-blush);
+  border-color: var(--3l-gold);
   padding: 16px 32px;
   font-size: 15px;
   text-transform: none;
@@ -1152,8 +1152,8 @@
 
 /* Preserve blush CTAs with accessible dark copy. */
 .brand-experience.ref-home .ref-family .b-button {
-  background: var(--3l-pink);
-  border-color: var(--3l-pink);
+  background: var(--3l-blush);
+  border-color: var(--3l-gold);
   color: #34231d;
 }
 .b-address-suggestions {
@@ -1801,54 +1801,47 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
   text-align: start;
 }
 
-/* 3L brand system (official palette, 6 October). Cream stays the canvas; the five
-   official colours are contrast with one role each. Their values live on :root in
-   styles.css as literals: a token built from a scoped variable resolves to nothing. */
-.brand-experience ::selection { background: var(--3l-pink); color: var(--text-primary); }
+/* 3L brand system (final palette, 6 October). Cream stays the canvas. Two brand
+   colours only: blush for surfaces and selected states, gold for line and accent.
+   Their values live on :root in styles.css as literals: a token built from a scoped
+   variable resolves to nothing. Neither reaches text contrast on cream, so text,
+   numerals and outlines stay chocolate. */
+.brand-experience ::selection { background: var(--3l-blush); color: var(--text-primary); }
 .brand-experience :is(a, button, input, select, textarea, summary):focus-visible {
-  /* Chocolate carries the contrast requirement; pink carries the brand. */
-  outline: 2px solid var(--text-primary); outline-offset: 2px; box-shadow: 0 0 0 6px var(--3l-pink);
+  outline: 2px solid var(--text-primary); outline-offset: 2px; box-shadow: 0 0 0 6px var(--3l-gold);
 }
 
-/* PINK — active and selected moments. */
-.brand-experience .b-header :is(.b-nav-left, .b-nav-right) > a { text-decoration: underline 3px transparent; text-underline-offset: 8px; transition: text-decoration-color 0.2s ease; }
-.brand-experience .b-header :is(.b-nav-left, .b-nav-right) > a:is(:hover, :focus-visible, [aria-current="page"]) { text-decoration-color: var(--3l-pink); }
+/* BLUSH — warm surfaces and what is currently selected. */
+.brand-experience.ref-home .ref-featured { background: var(--3l-blush); }
+.brand-experience .ref-tradition > .ref-panel { background: var(--3l-blush); border-color: var(--3l-gold); }
+.brand-experience .ref-tradition > .ref-panel :is(h2, p, a, span, svg) { color: var(--text-primary); }
 .brand-experience .b-full-menu .b-menu-categories button { padding-inline: 0.9rem; border: 1px solid transparent; border-radius: 999px; }
 .brand-experience .b-full-menu .b-menu-categories button:hover { background: var(--3l-blush); }
-.brand-experience .b-full-menu .b-menu-categories button[aria-pressed="true"] { background: var(--3l-pink); border-color: var(--3l-pink); color: var(--text-primary); }
-.brand-experience.ref-home .ref-family .b-button { background: var(--3l-pink); border-color: var(--3l-pink); color: var(--text-primary); }
-.ref-family-copy { border-inline-start: 3px solid var(--3l-pink); padding-inline-start: 24px; }
-.brand-experience .b-footer { border-top: 6px solid var(--3l-pink); }
-.brand-experience .b-footer nav :is(button, a):hover { color: var(--3l-pink); }
+.brand-experience .b-full-menu .b-menu-categories button[aria-pressed="true"] { background: var(--3l-blush); border-color: var(--3l-gold); color: var(--text-primary); }
+.brand-experience.ref-home .ref-family .b-button { background: var(--3l-blush); border-color: var(--3l-gold); color: var(--text-primary); }
 .brand-experience .b-fulfillment-choice label { padding: 0.55rem 1.15rem; border: 1px solid var(--border-subtle); border-radius: 999px; background: var(--surface-paper); transition: background-color 0.2s ease, border-color 0.2s ease; }
-.brand-experience .b-fulfillment-choice label:has(input:checked) { background: var(--3l-pink); border-color: var(--3l-pink); }
-.brand-experience .b-co-progress li.current .b-co-step-label { text-decoration: underline 3px var(--3l-pink); text-underline-offset: 6px; }
-
-/* BLUSH — soft warm surfaces. */
-.brand-experience.ref-home .ref-featured { background: var(--3l-blush); }
+.brand-experience .b-fulfillment-choice label:has(input:checked) { background: var(--3l-blush); border-color: var(--3l-gold); }
 .brand-experience .b-shop-notice,
 .brand-experience .b-product-page .b-product-notice,
-.brand-experience .b-menu-advance { background: var(--3l-blush); border-inline-start: 4px solid var(--3l-lavender); }
+.brand-experience .b-menu-advance { background: var(--3l-blush); border-inline-start: 4px solid var(--3l-gold); }
+.brand-experience .b-how-guide li > svg { box-sizing: content-box; padding: 9px; border-radius: 50%; background: var(--3l-blush); color: var(--text-primary); }
+.brand-experience .b-shopping-wa { background: var(--3l-blush); border-color: var(--3l-blush); }
 .ref-city-label { width: fit-content; margin-inline: auto; padding: 8px 22px; border-radius: 999px; border: 1px solid transparent; transition: background-color 0.4s ease, border-color 0.4s ease; }
 .ref-bridge:is([data-journey="mexico"], [data-journey="travel"]) .ref-mexico .ref-city-label,
-.ref-bridge[data-journey="dubai"] .ref-dubai .ref-city-label { background: var(--3l-blush); border-color: var(--3l-pink); }
+.ref-bridge[data-journey="dubai"] .ref-dubai .ref-city-label { background: var(--3l-blush); border-color: var(--3l-gold); }
 
-/* LAVENDER — editorial contrast and section markers. */
-.brand-experience .ref-tradition > .ref-panel { background: var(--3l-lavender); border-color: var(--3l-lavender); }
-.brand-experience .ref-tradition > .ref-panel :is(h2, p, a, span, svg) { color: var(--text-primary); }
+/* GOLD — rules, markers and active lines. */
+.brand-experience .b-header :is(.b-nav-left, .b-nav-right) > a { text-decoration: underline 3px transparent; text-underline-offset: 8px; transition: text-decoration-color 0.2s ease; }
+.brand-experience .b-header :is(.b-nav-left, .b-nav-right) > a:is(:hover, :focus-visible, [aria-current="page"]) { text-decoration-color: var(--3l-gold); }
+.ref-family-copy { border-inline-start: 3px solid var(--3l-gold); padding-inline-start: 24px; }
+.brand-experience .b-footer { border-top: 4px solid var(--3l-gold); }
+.brand-experience .b-footer nav :is(button, a):hover { color: var(--3l-blush); }
+.brand-experience .b-co-progress li.current .b-co-step-label { text-decoration: underline 3px var(--3l-gold); text-underline-offset: 6px; }
 .brand-experience.ref-home :is(.ref-featured, .b-how-guide, .b-menu-preview) > .b-label { color: var(--text-primary); }
-.brand-experience.ref-home :is(.b-how-guide, .b-menu-preview) > .b-label::before { content: ""; display: inline-block; width: 28px; height: 3px; margin-inline-end: 12px; vertical-align: middle; background: var(--3l-lavender); }
-/* No official colour reaches text contrast on cream: numerals stay chocolate, lavender underlines them. */
-.brand-experience .b-step-number { width: fit-content; color: var(--text-primary); border-bottom: 4px solid var(--3l-lavender); padding-bottom: 4px; }
-.brand-experience :is(.b-full-menu, .b-product-page, .b-menu-preview) .b-menu-card:hover { border-color: var(--3l-lavender); }
-.brand-experience :is(.b-shop-form, .b-product-page, .b-full-menu) select:has(option:checked:not([value=""])) { border-color: var(--3l-lavender); box-shadow: inset 0 -2px 0 var(--3l-lavender); }
-
-/* LAVENDER SOFT — quiet cool secondary surfaces. */
-.brand-experience .b-how-guide li > svg { box-sizing: content-box; padding: 9px; border-radius: 50%; background: var(--3l-lavender-soft); color: var(--text-primary); }
-.brand-experience.b-shop .b-co-summary :is(.b-co-summary-body, .b-co-summary-toggle) { background: var(--3l-lavender-soft); border-color: var(--3l-lavender-soft); }
-.brand-experience .b-shopping-wa { background: var(--3l-lavender-soft); border-color: var(--3l-lavender-soft); }
-
-/* GOLD — heritage detail only. */
+.brand-experience.ref-home :is(.b-how-guide, .b-menu-preview) > .b-label::before { content: ""; display: inline-block; width: 28px; height: 3px; margin-inline-end: 12px; vertical-align: middle; background: var(--3l-gold); }
+.brand-experience .b-step-number { width: fit-content; color: var(--text-primary); border-bottom: 4px solid var(--3l-gold); padding-bottom: 4px; }
+.brand-experience :is(.b-full-menu, .b-product-page, .b-menu-preview) .b-menu-card:hover { border-color: var(--3l-gold); }
+.brand-experience :is(.b-shop-form, .b-product-page, .b-full-menu) select:has(option:checked:not([value=""])) { border-color: var(--3l-gold); box-shadow: inset 0 -2px 0 var(--3l-gold); }
 .brand-experience .ref-star { color: var(--3l-gold); }
 .brand-experience .b-how-guide li { border-top-color: var(--3l-gold); }
 .brand-experience .b-link { text-decoration-color: var(--3l-gold); }
@@ -1861,23 +1854,23 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
 .ref-pencil-line { stroke: #3f3733; }
 .ref-pencil-point { opacity: 0; transition: opacity 0.2s ease; }
 .ref-pencil-lead { fill: #3f3733; }
-.ref-pencil-cap { fill: var(--3l-pink); }
+.ref-pencil-cap { fill: var(--3l-blush); stroke: var(--3l-gold); stroke-width: 1; }
 
-/* Mexico City → Dubai: the official pink route, cased in lavender so it holds on cream. */
+/* Mexico City → Dubai: a gold route on a blush bed, led by a chocolate-ringed marker. */
 .ref-journey { position: relative; }
 .ref-route-motion { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
 .ref-route-ink, .ref-route-glow { stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: var(--route-offset, 0); }
-.ref-route-ink { stroke: var(--3l-pink); stroke-width: 15; }
-.ref-route-glow { stroke: var(--3l-lavender); stroke-width: 26; }
+.ref-route-ink { stroke: var(--3l-gold); stroke-width: 15; }
+.ref-route-glow { stroke: var(--3l-blush); stroke-width: 40; }
 .ref-journey:not([data-motion]) .ref-route-motion g { display: none; }
-.ref-route-origin circle { fill: var(--3l-lavender); }
-.ref-route-arrival circle { fill: var(--surface-primary); stroke: var(--3l-lavender); stroke-width: 2.5; transition: fill 0.35s ease; }
-.ref-route-arrival .ref-route-ping { fill: none; stroke: var(--3l-pink); stroke-width: 3; opacity: 0; transform-box: fill-box; transform-origin: center; }
-.ref-route-dot { fill: var(--3l-lavender); stroke: var(--3l-pink); stroke-width: 4; }
-.ref-route-halo { fill: none; stroke: var(--3l-pink); stroke-width: 3; transform-box: fill-box; transform-origin: center; animation: ref-route-breathe 1.8s ease-in-out infinite; }
+.ref-route-origin circle { fill: var(--3l-gold); }
+.ref-route-arrival circle { fill: var(--surface-primary); stroke: var(--3l-gold); stroke-width: 2.5; transition: fill 0.35s ease; }
+.ref-route-arrival .ref-route-ping { fill: none; stroke: var(--3l-gold); stroke-width: 3; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.ref-route-dot { fill: var(--3l-gold); stroke: var(--text-primary); stroke-width: 2.5; }
+.ref-route-halo { fill: var(--3l-blush); stroke: var(--3l-gold); stroke-width: 2; transform-box: fill-box; transform-origin: center; animation: ref-route-breathe 1.8s ease-in-out infinite; }
 .ref-route-tracer { transition: opacity 0.3s ease; }
 .ref-bridge[data-journey="dubai"] .ref-route-tracer { opacity: 0; }
-.ref-bridge[data-journey="dubai"] .ref-route-arrival circle:not(.ref-route-ping) { fill: var(--3l-pink); }
+.ref-bridge[data-journey="dubai"] .ref-route-arrival circle:not(.ref-route-ping) { fill: var(--3l-gold); stroke: var(--text-primary); }
 .ref-bridge[data-journey="dubai"] .ref-route-ping { animation: ref-route-arrive 1.5s ease-out 2; }
 @keyframes ref-route-breathe { 0%, 100% { transform: scale(0.75); } 50% { transform: scale(1.3); } }
 @keyframes ref-route-arrive { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(4); opacity: 0; } }

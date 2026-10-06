@@ -79,9 +79,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Mexico→Dubai: pink route drawn behind a visible moving marker; 0–20% Mexico active, 20–80% travel, 80–100% Dubai active. Sizes are authored in screen pixels.
 - Journal portrait is drawn by hand-placed pencil strokes in an artist's order (construction, eyes and nose, mouth, hair, shoulders and necklace, secondary linework), each line growing behind a pencil point, then the untouched original resolves over them. Stroke data: `src/brand/journal-drawing.json`. No hatching, masks, wipes, filters or edge detection. Strokes are explicit geometry: Safari mis-measures dashes on long paths.
 
-## Official 3L palette (6 October 2026, authoritative)
-- Exact values only, declared once on `:root` in `src/styles.css`: `--3l-pink #FFC0C8` (Pantone 919 C), `--3l-blush #F6DFE0` (9286 C), `--3l-lavender #A191B2` (666 C), `--3l-lavender-soft #DDDAE8` (7443 C), `--3l-gold #A28D5B` (8383 C). Never approximate, derive or tint them by opacity.
-- Cream/beige stays the dominant canvas. Roles: pink = active/selected and the journey route; blush = soft warm surfaces and notices; lavender = editorial contrast and section markers; lavender-soft = quiet secondary surfaces; gold = sparing heritage detail.
-- None of the five reaches text contrast on cream: text and numerals stay chocolate, and focus rings pair a chocolate outline with a pink halo.
-- Operational status colours (success, warning, error, payment state) keep their functional meaning; the palette applies to chrome and selected states only.
-- `tests/polish-e2e/polish.spec.ts` asserts the computed token values and the rendered colours.
+## Final 3L web palette (6 October 2026, authoritative; supersedes the five-colour palette)
+- Brand colours are ONLY `--3l-blush #F6DFE0` (Pantone 9286 C) and `--3l-gold #A28D5B` (Pantone 8383 C), declared once on `:root` in `src/styles.css`, plus the existing cream/beige base. Pink `#FFC0C8`, lavender `#A191B2` and lavender-soft `#DDDAE8` are retired from the customer site: do not reintroduce them, approximate, or tint by opacity.
+- Cream/beige stays the dominant canvas. Blush = warm surfaces and selected states; gold = rules, markers, active lines and the Mexico→Dubai route.
+- Neither colour reaches text contrast on cream: text, numerals and outlines stay chocolate; focus rings pair a chocolate outline with a gold halo.
+- `tests/polish-e2e/polish.spec.ts` asserts the computed token values, the rendered colours, and that no retired colour is defined or painted.
+- Operations (`src/commerce/`) keeps its TL-27 styling and functional status colours until Joel decides otherwise.
