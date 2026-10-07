@@ -30,6 +30,7 @@ import { CommerceAgentGateway } from "./domain/agent-gateway";
 import { modes } from "./agents/model";
 import {
   PaymenntNotificationVerifier,
+  describeRejection,
   notificationSchema,
   paymentTopics,
 } from "./adapters/paymennt-notification";
@@ -602,8 +603,25 @@ export async function startServer(
               )
             )
               throw new DomainError(401, "Firma inválida");
-            z.enum(paymentTopics).parse(req.headers["x-pointcheckout-topic"]);
-            const event = notificationSchema.parse(parse(raw));
+            // The signature is valid from here on: the sender is Paymennt.
+            // Say why a notification is refused, without logging any value.
+            let event;
+            try {
+              z.enum(paymentTopics).parse(req.headers["x-pointcheckout-topic"]);
+              event = notificationSchema.parse(parse(raw));
+            } catch (error) {
+              let body: unknown;
+              try {
+                body = JSON.parse(raw.toString());
+              } catch {
+                body = undefined;
+              }
+              safeLog(
+                "webhook.rejected",
+                describeRejection(req.headers["x-pointcheckout-topic"], body),
+              );
+              throw error;
+            }
             return json(
               res,
               200,

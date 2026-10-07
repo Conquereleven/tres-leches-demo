@@ -45,3 +45,53 @@ export class PaymenntNotificationVerifier implements WebhookVerifier {
     );
   }
 }
+
+/**
+ * Why a signed notification was not accepted, in a form safe to log: header
+ * presence, the topic's name, and the NAMES and JSON types of body fields.
+ * Never a value — no ids, amounts, statuses, customer or payment data.
+ */
+export function describeRejection(
+  topic: unknown,
+  body: unknown,
+): { code: string; kind: string } {
+  const kind =
+    typeof topic !== "string"
+      ? "missing"
+      : /^[A-Za-z0-9/_.:-]{1,60}$/.test(topic)
+        ? topic
+        : "unprintable";
+  const shape = (value: unknown) =>
+    value === null ? "null" : Array.isArray(value) ? "array" : typeof value;
+  if (body === undefined) return { code: "invalid-json", kind };
+  if (shape(body) !== "object")
+    return { code: `body-not-object:${shape(body)}`, kind };
+  const fields = Object.entries(body as Record<string, unknown>)
+    .slice(0, 40)
+    .map(([key, value]) =>
+      /^[A-Za-z0-9_]{1,40}$/.test(key) ? `${key}:${shape(value)}` : "?",
+    )
+    .join(",");
+  const topicProblem =
+    typeof topic !== "string"
+      ? "topic-header-missing"
+      : (paymentTopics as readonly string[]).includes(topic)
+        ? null
+        : "topic-unsupported";
+  const parsed = notificationSchema.safeParse(body);
+  const bodyProblem = parsed.success
+    ? null
+    : "body-invalid(" +
+      parsed.error.issues
+        .slice(0, 6)
+        .map((issue) => `${issue.path.join(".") || "root"}=${issue.code}`)
+        .join(";") +
+      ")";
+  return {
+    code: `${[topicProblem, bodyProblem].filter(Boolean).join("+") || "unknown"} fields[${fields}]`.slice(
+      0,
+      600,
+    ),
+    kind,
+  };
+}

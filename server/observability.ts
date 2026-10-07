@@ -9,6 +9,7 @@ export function safeLog(
     | "reconciliation.complete"
     | "payment.provider"
     | "webhook.accepted"
+    | "webhook.rejected"
     | "worker.failed",
   fields: {
     status?: number | string;
