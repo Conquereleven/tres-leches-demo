@@ -128,6 +128,66 @@ test("public checkout HTTP, signatures, authoritative settlement and untrusted r
       404,
     );
     const id = checkout.url.split("/").at(-1);
+    // The notification Paymennt actually sends when a checkout is created:
+    // many extra fields, and an explicit null status timestamp.
+    const created = JSON.stringify({
+      id,
+      merchantId: "fixture-merchant",
+      referenceId: "fixture-reference",
+      currency: "AED",
+      grandtotal: 50,
+      status: "PENDING",
+      orderId: checkout.orderId,
+      totalRefunded: null,
+      customerEmail: "fixture@example.invalid",
+      paidOn: null,
+      statusUpdateTimestamp: null,
+      timestamp: "2026-09-22T00:00:00Z",
+      usedPaymentMethod: null,
+    });
+    const sign = (body: string) =>
+      createHmac("sha256", "fixture-hmac-key").update(body).digest("base64");
+    const send = (body: string, headers: Record<string, string>) =>
+      fetch(h.base + "/api/webhooks/payment", {
+        method: "POST",
+        headers,
+        body,
+      });
+    const createdHeaders = {
+      "X-PointCheckout-Hmac-Sha256": sign(created),
+      "X-PointCheckout-Topic": "checkout/created",
+    };
+    // Accepted, and accepted again when Paymennt repeats it.
+    assert.equal((await send(created, createdHeaders)).status, 200);
+    const repeat = await send(created, createdHeaders);
+    assert.equal(repeat.status, 200);
+    assert.deepEqual(await repeat.json(), { duplicate: true });
+    // It is a signal only: the order is exactly as the authoritative GET says.
+    const afterCreated = await (
+      await post("/api/checkout/status", { key })
+    ).json();
+    assert.equal(afterCreated.paymentStatus, "pending");
+    assert.equal(afterCreated.orderNumber, null);
+    // Unsigned, wrongly signed or tampered notifications are refused.
+    assert.equal(
+      (await send(created, { "X-PointCheckout-Topic": "checkout/created" }))
+        .status,
+      401,
+    );
+    assert.equal(
+      (await send(created.replace("PENDING", "PAID"), createdHeaders)).status,
+      401,
+    );
+    // A signed notification with a topic we do not handle is still refused.
+    assert.equal(
+      (
+        await send(created, {
+          ...createdHeaders,
+          "X-PointCheckout-Topic": "checkout/unknown",
+        })
+      ).status,
+      400,
+    );
     const event = JSON.stringify({
       id,
       status: "PAID",
@@ -164,6 +224,13 @@ test("public checkout HTTP, signatures, authoritative settlement and untrusted r
     ).json();
     assert.equal(confirmed.paymentStatus, "paid");
     assert.equal(confirmed.status, "Confirmed");
+    // One paid order, one number, one team alert — however many notifications arrived.
+    assert.equal(confirmed.orderNumber, "#001");
+    await hook(signature);
+    assert.equal(
+      (await (await post("/api/checkout/status", { key })).json()).orderNumber,
+      "#001",
+    );
   } finally {
     await h.close();
   }

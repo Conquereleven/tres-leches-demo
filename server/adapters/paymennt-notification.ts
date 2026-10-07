@@ -12,9 +12,11 @@ export const paymentTopics = [
 export const notificationSchema = z.object({
   id: z.string().min(1).max(200),
   status: z.string().regex(/^[A-Za-z_ ]{1,40}$/),
+  // Paymennt sends an explicit null until a checkout's status first changes
+  // (every `checkout/created`). Absent, null and present are all valid.
   statusUpdateTimestamp: z
     .union([z.string().min(1).max(100), z.number().finite()])
-    .optional(),
+    .nullish(),
 });
 export type PaymenntNotification = z.infer<typeof notificationSchema>;
 export function notificationIdentity(event: PaymenntNotification) {
