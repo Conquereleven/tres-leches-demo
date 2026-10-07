@@ -31,6 +31,7 @@ await build({
   entryPoints: [
     "scripts/catalog-import.ts",
     "scripts/register-paymennt-webhook.ts",
+    "scripts/send-test-email.ts",
   ],
   bundle: true,
   platform: "node",

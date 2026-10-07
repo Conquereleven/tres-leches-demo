@@ -260,6 +260,9 @@ for (const locale of ["en", "es", "ar"] as const) {
         exact: true,
       }),
     ).toBeDisabled();
+    // The amount still needed comes from the server quote, which arrives a
+    // moment after the area is chosen: wait for it rather than read at once.
+    await expect(page.locator("main")).toContainText("12");
     const text = await page.locator("main").innerText();
     expect(text).toContain("30");
     expect(text).toContain("12");
