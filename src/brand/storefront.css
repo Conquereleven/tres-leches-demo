@@ -1955,3 +1955,12 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
 .b-co-dialog p { margin: 0 0 20px; line-height: 1.6; }
 .b-co-dialog-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
 .b-language-control :is(.b-language span, .b-language-menu button)[lang="ar"] { font-size: 16px; letter-spacing: 0; }
+/* Official Pan de Muerto photography: full food proportions, stable crossfade. */
+.brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo img { object-fit: contain; }
+.b-official-rotation { display: grid; width: 100%; height: 100%; aspect-ratio: 1; background: #f6efe3; }
+.b-official-rotation picture { grid-area: 1 / 1; opacity: 0; transition: opacity 900ms ease; }
+.b-official-rotation picture:first-child,
+.b-official-rotation picture.is-active.is-loaded { opacity: 1; }
+.b-official-rotation picture img { width: 100%; height: 100%; object-fit: contain; }
+.b-official-rotation:focus-visible { outline: 2px solid #33241a; outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) { .b-official-rotation picture { transition: none; } }

@@ -36,6 +36,19 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
   const video = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [allowMotion, setAllowMotion] = useState(false);
+  const [heroWidth, setHeroWidth] = useState(0);
+  useEffect(() => {
+    const update = () => setHeroWidth(window.innerWidth);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  const desktopFilm = heroWidth >= 1024;
+  const heroSource = desktopFilm
+    ? "/brand/approved/story-desktop-576.mp4"
+    : heroWidth <= 640
+      ? "/brand/approved/packaging-540.mp4"
+      : "/brand/approved/packaging-720.mp4";
   useEffect(() => {
     const element = video.current;
     if (!element) return;
@@ -74,7 +87,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
     if (!allowMotion || !video.current) return;
     video.current.load();
     void video.current.play().catch(() => setPlaying(false));
-  }, [allowMotion]);
+  }, [allowMotion, heroSource]);
   return (
     <div className="brand-experience b-entered ref-home">
       <a className="b-skip" href="#main-content">
@@ -92,8 +105,12 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             ref={video}
             width={540}
             height={960}
-            aria-label={localize("Liza packaging a 3L cake")}
-            poster="/brand/approved/packaging-poster.webp"
+            aria-label={localize("Watch our story")}
+            poster={
+              desktopFilm
+                ? "/brand/approved/story-desktop-poster.webp"
+                : "/brand/approved/packaging-poster.webp"
+            }
             autoPlay={allowMotion}
             onPlay={() => setPlaying(true)}
             onPause={() => setPlaying(false)}
@@ -103,18 +120,8 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             preload="none"
             onError={() => setPlaying(false)}
           >
-            {allowMotion && (
-              <>
-                <source
-                  src="/brand/approved/packaging-540.mp4"
-                  type="video/mp4"
-                  media="(max-width: 640px)"
-                />
-                <source
-                  src="/brand/approved/packaging-720.mp4"
-                  type="video/mp4"
-                />
-              </>
+            {allowMotion && heroWidth > 0 && (
+              <source src={heroSource} type="video/mp4" />
             )}
           </video>
           <p className="ref-micro">

@@ -1,5 +1,10 @@
 import { useLanguage as useCustomerLanguage } from "./localization";
-import { ResponsiveMedia, selectedProductMedia } from "./media";
+import {
+  ResponsiveMedia,
+  selectedProductMedia,
+  productMediaAssignments,
+  approvedMedia,
+} from "./media";
 import { CustomerCopy } from "./localization";
 import { availableSku } from "../../shared/commerce-policy";
 import { useId, useState } from "react";
@@ -13,7 +18,6 @@ import {
   productHref,
   type StorefrontProduct,
 } from "./menu";
-import manifest from "./media-manifest.json";
 
 export function ProductOptions({
   product,
@@ -41,11 +45,14 @@ export function ProductOptions({
   const serverProduct = config?.products.find((p) => p.id === option?.id);
   const ready =
     !!option && !!serverProduct && serverProduct.priceFils === option.priceFils;
-  const gallery = manifest.products.find((p) => p.productId === product.id)
-    ?.gallerySourceIds as string[] | undefined;
+  const gallery = productMediaAssignments.find(
+    (p) => p.productId === product.id,
+  )?.gallerySourceIds as string[] | undefined;
   return (
     <div className="b-menu-options">
-      <figure className={`b-menu-photo ${media ? "" : "b-family-photo"}`}>
+      <figure
+        className={`b-menu-photo ${media ? "" : "b-family-photo"} ${media?.sourceId.startsWith("official-pan-") ? "b-official-photo" : ""}`}
+      >
         {media || family.image ? (
           <ResponsiveMedia
             productId={product.id}
@@ -54,6 +61,7 @@ export function ProductOptions({
             size={display.size}
             fallback={family.image}
             alt={media ? product.title : `${family.name} · family photograph`}
+            rotate={!detail}
           />
         ) : (
           <div
@@ -158,7 +166,7 @@ export function ProductOptions({
           aria-label={localize("Product gallery")}
         >
           {gallery.map((id) => {
-            const asset = manifest.assets.find(
+            const asset = approvedMedia.find(
               (a) => a.sourceId === id && a.status === "assigned",
             );
             return asset ? (
