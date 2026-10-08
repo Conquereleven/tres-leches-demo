@@ -1955,12 +1955,13 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
 .b-co-dialog p { margin: 0 0 20px; line-height: 1.6; }
 .b-co-dialog-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
 .b-language-control :is(.b-language span, .b-language-menu button)[lang="ar"] { font-size: 16px; letter-spacing: 0; }
-/* Official Pan de Muerto photography: full food proportions, stable crossfade. */
-.brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo img { object-fit: contain; }
-.b-official-rotation { display: grid; width: 100%; height: 100%; aspect-ratio: 1; background: #f6efe3; }
-.b-official-rotation picture { grid-area: 1 / 1; opacity: 0; transition: opacity 900ms ease; }
-.b-official-rotation picture:first-child,
-.b-official-rotation picture.is-active.is-loaded { opacity: 1; }
-.b-official-rotation picture img { width: 100%; height: 100%; object-fit: contain; }
+/* Official Pan de Muerto photography: one stable frame, incoming photo fades in over the last. */
+.brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo img { object-fit: cover; }
+.b-official-rotation { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; background: #f6efe3; }
+.brand-experience .b-official-rotation picture { position: absolute; inset: 0; width: 100%; height: 100%; background: #f6efe3; opacity: 0; transition: opacity 0s linear 900ms; }
+.brand-experience .b-official-rotation picture.is-active { opacity: 1; z-index: 1; transition: opacity 900ms ease; }
+.brand-experience .b-official-rotation picture img { width: 100%; height: 100%; object-fit: cover; }
 .b-official-rotation:focus-visible { outline: 2px solid #33241a; outline-offset: 4px; }
-@media (prefers-reduced-motion: reduce) { .b-official-rotation picture { transition: none; } }
+.b-category-showcase { width: 100%; max-width: 960px; aspect-ratio: 3 / 2; margin: 0 auto 40px; overflow: hidden; background: #f6efe3; }
+.brand-experience .b-product-page .b-official-gallery img { flex: none; width: min(220px, 60vw); height: auto; max-width: none; aspect-ratio: 1; object-fit: cover; }
+@media (prefers-reduced-motion: reduce) { .brand-experience .b-official-rotation picture { transition: none; } }

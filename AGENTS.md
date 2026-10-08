@@ -92,3 +92,7 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Pickup asks only for street and city as billing (name from contact, country fixed UAE); never use the shop address as a customer's billing address. Pickup point is "3L Pastelerías".
 - Customer emails are durable events written with the operator's transition (production started; ready for pickup — pickup only; out for delivery — delivery only), sent through Resend only when explicitly enabled. Manager WhatsApp number is private configuration (`WHATSAPP_MANAGER_PHONE`), never source. `META_OUTBOUND_ENABLED` stays false until Meta approval.
 - Details and remaining configuration: `docs/order-experience/v2.md`.
+
+## Official Pan de Muerto photography (9 October 2026)
+- Source library stays outside the repo; `docs/brand/pan-de-muerto-photo-map.csv` accounts for all 50 files and `scripts/prepare-official-pan-media.py` regenerates public derivatives. Photos are assigned by visible coating/filling only; mixed boards are category imagery, never a flavour or pack. Never publish a photo together with its cutout twin.
+- One rotation (`MediaRotation` in `src/brand/media.tsx`) serves cards and the Pan de Muerto banner. Products without their own photo keep the earlier image.

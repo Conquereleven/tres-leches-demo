@@ -58,19 +58,37 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
       /official-pan-09/,
     );
     await expect(page.locator(".b-product-gallery img")).toHaveCount(1);
+    await expect(page.locator(".b-official-rotation")).toHaveCount(0);
     await page.screenshot({
       path: `work/qa/official-media/${info.project.name}-product-${width}.png`,
     });
     await page.goto("/menu?category=pan");
-    const rotation = page.locator(".b-official-rotation").first();
-    await expect(rotation).toBeVisible();
+    const banner = page.locator(".b-category-showcase .b-official-rotation");
+    await expect(banner.locator("picture.is-active img")).toHaveAttribute(
+      "src",
+      /official-pan-01-/,
+    );
+    const rotation = page.locator(
+      '[data-product-id="pan-de-muerto-traditional--ajonjoli"] .b-official-rotation',
+    );
+    await rotation.scrollIntoViewIfNeeded();
+    // Only the current and the next photo are mounted until a turn has played.
+    await expect(rotation.locator("picture")).toHaveCount(2);
     const initial = await rotation.boundingBox();
-    await expect(rotation.locator("picture.is-loaded")).toHaveCount(2);
+    expect(Math.round(initial!.width)).toBe(Math.round(initial!.height));
     await expect(rotation.locator("picture.is-active img")).toHaveAttribute(
       "src",
-      /official-pan-06/,
+      /official-pan-06-/,
       { timeout: 12000 },
     );
+    // Mid-fade the outgoing photo is still fully painted: no blank frame.
+    expect(
+      await rotation.evaluate((node) =>
+        [...node.querySelectorAll("picture")].some(
+          (p) => getComputedStyle(p).opacity === "1",
+        ),
+      ),
+    ).toBe(true);
     const after = await rotation.boundingBox();
     expect(after?.height).toBe(initial?.height);
     await rotation.focus();
@@ -81,10 +99,32 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     expect(
       await rotation.locator("picture.is-active img").getAttribute("src"),
     ).toBe(active);
+    // Products without their own photograph stay static.
+    await expect(
+      page.locator(
+        '[data-product-id="pan-de-muerto-traditional-pack"] .b-official-rotation',
+      ),
+    ).toHaveCount(0);
+    expect(
+      await page.evaluate(() =>
+        [...document.images]
+          .filter((i) => i.complete && !i.naturalWidth)
+          .map((i) => i.currentSrc),
+      ),
+    ).toEqual([]);
     await page.screenshot({
       path: `work/qa/official-media/${info.project.name}-menu-${width}.png`,
     });
+    await page.goto("/menu?category=conchas");
+    await expect(page.locator(".b-official-rotation")).toHaveCount(0);
     await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/menu?category=pan");
+    await rotation.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(7500);
+    await expect(rotation.locator("picture.is-active img")).toHaveAttribute(
+      "src",
+      /official-pan-09-/,
+    );
     await page.goto("/");
     await expect(video.locator("source")).toHaveCount(0);
     expect(errors).toEqual([]);

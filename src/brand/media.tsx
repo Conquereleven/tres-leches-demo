@@ -1,7 +1,7 @@
 import { useLanguage as useCustomerLanguage } from "./localization";
 import manifest from "./media-manifest.json";
 import official from "./official-pan-media.json";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 export const productMediaAssignments = [
   ...official.products,
   ...manifest.products,
@@ -32,6 +32,145 @@ export function selectedProductMedia(
     ) ?? selectedMedia(family, variant, size)
   );
 }
+type MediaAsset = (typeof approvedMedia)[number];
+/** Mixed boards shown for a whole category; never tied to a flavour or pack. */
+export const categoryEditorialMedia = (category: string) =>
+  (official.editorial.find((e) => e.category === category)?.sourceIds ?? [])
+    .map((id) => approvedMedia.find((a) => a.sourceId === id))
+    .filter((a): a is MediaAsset => !!a);
+const srcSet = (asset: MediaAsset, format: string) =>
+  asset.derivatives
+    .filter((d) => d.format === format)
+    .map((d) => `${d.src} ${d.width}w`)
+    .join(", ");
+function MediaPicture({
+  asset,
+  alt,
+  sizes,
+  className,
+  active,
+}: {
+  asset: MediaAsset;
+  alt: string;
+  sizes: string;
+  className?: string;
+  active?: boolean;
+}) {
+  const webp = asset.derivatives.filter((d) => d.format === "webp");
+  return (
+    <picture
+      className={active ? "is-active" : undefined}
+      aria-hidden={active === false || undefined}
+    >
+      <source type="image/avif" srcSet={srcSet(asset, "avif")} sizes={sizes} />
+      <img
+        src={(webp.find((d) => d.width === 640) ?? webp[0])?.src}
+        srcSet={srcSet(asset, "webp")}
+        sizes={sizes}
+        width={asset.width!}
+        height={asset.height!}
+        alt={alt}
+        className={className}
+        loading="lazy"
+        decoding="async"
+      />
+    </picture>
+  );
+}
+const ROTATION_MS = 7000;
+/**
+ * The one gallery rotation: a gentle crossfade every seven seconds. It waits
+ * for the next photo to finish loading, mounts only the current and next frame
+ * until a full turn has played, and holds still while hovered, focused,
+ * off-screen or when reduced motion is requested.
+ */
+export function MediaRotation({
+  frames,
+  alt,
+  sizes,
+  className,
+}: {
+  frames: MediaAsset[];
+  alt: string;
+  sizes: string;
+  className?: string;
+}) {
+  const root = useRef<HTMLSpanElement>(null);
+  const [turn, setTurn] = useState(0);
+  const [held, setHeld] = useState(false);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const node = root.current;
+    if (!node || typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) =>
+      setVisible(!!entry?.isIntersecting),
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  useEffect(() => {
+    if (held || !visible || frames.length < 2) return;
+    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let timer: ReturnType<typeof setInterval> | undefined;
+    const update = () => {
+      if (timer) clearInterval(timer);
+      timer = undefined;
+      if (motion.matches) return setTurn(0);
+      timer = setInterval(
+        () =>
+          setTurn((value) => {
+            const next =
+              root.current?.querySelectorAll("img")[
+                (value + 1) % frames.length
+              ];
+            // A frame that has not arrived yet would fade in blank: wait a turn.
+            return next?.complete && next.naturalWidth ? value + 1 : value;
+          }),
+        ROTATION_MS,
+      );
+    };
+    update();
+    motion.addEventListener("change", update);
+    return () => {
+      if (timer) clearInterval(timer);
+      motion.removeEventListener("change", update);
+    };
+  }, [held, visible, frames.length]);
+  const current = turn % frames.length;
+  return (
+    <span
+      ref={root}
+      className="b-official-rotation"
+      data-frame={current}
+      onPointerEnter={(event) => {
+        // A tap must not leave a touch gallery frozen.
+        if (event.pointerType === "mouse") setHeld(true);
+      }}
+      onPointerLeave={() => setHeld(false)}
+      onFocus={() => setHeld(true)}
+      onBlur={() => setHeld(false)}
+      tabIndex={0}
+      role="group"
+      aria-label={alt}
+    >
+      {frames
+        .slice(0, Math.min(frames.length, turn + 2))
+        .map((asset, index) => (
+          <MediaPicture
+            key={asset.sourceId}
+            asset={asset}
+            alt={alt}
+            sizes={sizes}
+            className={className}
+            active={index === current}
+          />
+        ))}
+    </span>
+  );
+}
 export function ResponsiveMedia({
   productId,
   family,
@@ -54,41 +193,7 @@ export function ResponsiveMedia({
   rotate?: boolean;
 }) {
   const { text: localize } = useCustomerLanguage();
-
-  const primary = selectedProductMedia(productId, family, variant, size);
-  const assignment = official.products.find((p) => p.productId === productId);
-  const frames = primary
-    ? [
-        primary,
-        ...(assignment?.gallerySourceIds ?? [])
-          .map((id) => approvedMedia.find((a) => a.sourceId === id))
-          .filter((a): a is NonNullable<typeof a> => !!a),
-      ]
-    : [];
-  const [frame, setFrame] = useState(0);
-  const [paused, setPaused] = useState(false);
-  useEffect(() => {
-    if (!rotate || paused || frames.length < 2) return;
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let timer: ReturnType<typeof setInterval> | undefined;
-    const update = () => {
-      if (timer) clearInterval(timer);
-      timer = undefined;
-      if (!motion.matches)
-        timer = setInterval(
-          () => setFrame((value) => (value + 1) % frames.length),
-          7000,
-        );
-      else setFrame(0);
-    };
-    update();
-    motion.addEventListener("change", update);
-    return () => {
-      if (timer) clearInterval(timer);
-      motion.removeEventListener("change", update);
-    };
-  }, [rotate, paused, frames.length, productId]);
-  const media = primary;
+  const media = selectedProductMedia(productId, family, variant, size);
   if (!media)
     return fallback ? (
       <img
@@ -99,80 +204,29 @@ export function ResponsiveMedia({
         decoding="async"
       />
     ) : null;
-  const derivatives = media.derivatives;
-  if (rotate && frames.length > 1)
+  const gallery = rotate
+    ? (
+        official.products.find((p) => p.productId === productId)
+          ?.gallerySourceIds ?? []
+      )
+        .map((id) => approvedMedia.find((a) => a.sourceId === id))
+        .filter((a): a is MediaAsset => !!a)
+    : [];
+  if (gallery.length)
     return (
-      <span
-        className="b-official-rotation"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        onFocus={() => setPaused(true)}
-        onBlur={() => setPaused(false)}
-        tabIndex={0}
-        aria-label={localize(alt)}
-      >
-        {frames.map((asset, index) => (
-          <picture
-            key={asset.sourceId}
-            className={index === frame % frames.length ? "is-active" : ""}
-            aria-hidden={index !== frame % frames.length}
-          >
-            <source
-              type="image/avif"
-              srcSet={asset.derivatives
-                .filter((d) => d.format === "avif")
-                .map((d) => `${d.src} ${d.width}w`)
-                .join(", ")}
-              sizes={sizes}
-            />
-            <img
-              src={
-                asset.derivatives.find(
-                  (d) => d.format === "webp" && d.width === 640,
-                )?.src
-              }
-              srcSet={asset.derivatives
-                .filter((d) => d.format === "webp")
-                .map((d) => `${d.src} ${d.width}w`)
-                .join(", ")}
-              sizes={sizes}
-              width={asset.width!}
-              height={asset.height!}
-              alt={localize(alt)}
-              loading="lazy"
-              decoding="async"
-              onLoad={(event) => {
-                event.currentTarget
-                  .closest("picture")
-                  ?.classList.add("is-loaded");
-              }}
-              className={className}
-            />
-          </picture>
-        ))}
-      </span>
-    );
-  const srcSet = (format: string) =>
-    derivatives
-      .filter((d) => d.format === format)
-      .map((d) => `${d.src} ${d.width}w`)
-      .join(", ");
-  return (
-    <picture>
-      <source type="image/avif" srcSet={srcSet("avif")} sizes={sizes} />
-      <img
-        src={
-          derivatives.find((d) => d.format === "webp" && d.width === 640)?.src
-        }
-        srcSet={srcSet("webp")}
-        sizes={sizes}
-        width={media.width!}
-        height={media.height!}
+      <MediaRotation
+        frames={[media, ...gallery]}
         alt={localize(alt)}
+        sizes={sizes}
         className={className}
-        loading="lazy"
-        decoding="async"
       />
-    </picture>
+    );
+  return (
+    <MediaPicture
+      asset={media}
+      alt={localize(alt)}
+      sizes={sizes}
+      className={className}
+    />
   );
 }

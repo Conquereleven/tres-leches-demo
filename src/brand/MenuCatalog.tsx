@@ -1,6 +1,8 @@
 import { useLanguage as useCustomerLanguage } from "./localization";
 import {
   ResponsiveMedia,
+  MediaRotation,
+  categoryEditorialMedia,
   selectedProductMedia,
   productMediaAssignments,
   approvedMedia,
@@ -162,7 +164,7 @@ export function ProductOptions({
       )}
       {detail && !!gallery?.length && (
         <div
-          className="b-product-gallery"
+          className={`b-product-gallery ${media?.sourceId.startsWith("official-pan-") ? "b-official-gallery" : ""}`}
           aria-label={localize("Product gallery")}
         >
           {gallery.map((id) => {
@@ -179,6 +181,7 @@ export function ProductOptions({
                 }
                 alt={localize(asset.alt)}
                 loading="lazy"
+                decoding="async"
               />
             ) : null;
           })}
@@ -244,6 +247,7 @@ export function MenuCatalog() {
     );
   }
   const current = menuCategories.find((c) => c.id === category)!;
+  const editorial = categoryEditorialMedia(category);
   return (
     <section
       id="bakery"
@@ -281,6 +285,15 @@ export function MenuCatalog() {
       <h3 id={`category-${category}`} className="b-menu-category-heading">
         <CustomerCopy>{current.name}</CustomerCopy>
       </h3>
+      {editorial.length > 0 && (
+        <figure className="b-category-showcase">
+          <MediaRotation
+            frames={editorial}
+            alt={localize(current.name)}
+            sizes="(max-width: 1000px) 92vw, 960px"
+          />
+        </figure>
+      )}
       <div className="b-menu-grid">
         {storefrontProducts
           .filter((p) => productFamily(p).category === category)

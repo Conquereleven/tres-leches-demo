@@ -12,30 +12,35 @@ Every filename, dimensions, transparency and assignment status is inventoried in
 `src/brand/official-pan-media.json`. The reproducible offline image helper is
 `scripts/prepare-official-pan-media.py`; it uses explicit reviewed assignments only.
 
-## Product mapping
+## Product mapping (9 October 2026, supersedes the first eight-photo pass)
 
-| Existing product | Primary photo | Secondary photos | Evidence |
+All 50 sources are accounted for in `docs/brand/pan-de-muerto-photo-map.csv`
+(original filename, organized filename, role, product, displayed, reason).
+Filenames below are the originals; the CSV gives the organized names.
+
+| Existing product | Primary | Rotation / gallery | What the photo shows |
 | --- | --- | --- | --- |
-| Azúcar Pan de Muerto tradicional | 08.jpg | None | Intact sugar-coated bread, no filling shown |
-| Ajonjolí Pan de Muerto tradicional | 09.png | 06.jpg | Sesame-coated intact bread, two angles |
-| Azúcar · Chocolate covering Pan de Muerto tradicional | 12.png | 10.png | Sugar bread with external dark chocolate coating |
-| Chocolate Pan de Muerto relleno | 16.jpg | 18.jpg, 29.png | Sliced bread with visible dark chocolate filling |
+| Azúcar · tradicional | 08.jpg | 11.png | Whole sugar-coated bread |
+| Ajonjolí · tradicional | 09.png | 06.jpg | Whole glazed bread with sesame |
+| Azúcar · Chocolate covering · tradicional | 12.png | 10.png | Sugar bread half dipped in dark chocolate |
+| Crema diplomática (vainilla) · relleno | 14.png | 13.png | Plain pale cream at the seam |
+| Chocolate · relleno | 16.jpg | 18.jpg, 29.png | Brown chocolate-coloured cream |
+| Mascarpone y cajeta · relleno | 23.png | 30.png, 26.png | Pale cream with amber sauce |
+| Mascarpone y fresas · relleno | 17.jpg | 20.jpg, 24.png, 21.png | Pale cream with strawberries |
+| Pistachio · relleno | 07.png | 25.png, 27.jpg, 15 PNG.png (cutout) | Pale green coating, chopped pistachio |
 
-The imagery represents the flavour/presentation, not a proven weight. Both existing size options retain their unchanged catalog information.
-Cards use natural backgrounds and retain the complete photo proportions; galleries show distinct sources.
-No mixed tray is assigned to a six/dozen pack: the number of pieces and assortment rules are unconfirmed.
+Category banner (mixed boards, no flavour or pack implied): 01.png, 02.png, 03.png, 04.png.
 
-## Awaiting Joel's identity confirmation (42 unpublished files)
+Identification is by what is visible and by elimination against the live menu:
+plain cream is the only filling without fruit, sauce or chocolate; the green bread
+is the menu's only pistachio item. No photo proves a hidden recipe or a size, so
+both sizes of a product share its photos. **Joel/Liza should confirm the three
+cream assignments and pistachio before Production.**
 
-- 23 cutouts: every filename containing ` PNG` (including 15 PNG.png, which has no background counterpart).
-- Mixed trays/compositions: 01.png, 02.png, 03.png, 04.png, 05.png, 13.png, 22.jpg.
-- Green-coated presentations: 07.png, 25.png, 27.jpg. Confirm coating versus filling and exact pistachio SKU.
-- Sugar breads with uncertain hidden filling: 11.png, 21.png.
-- White cream: 14.png, 23.png, 30.png. Confirm diplomatic cream versus mascarpone/cajeta.
-- White cream with red fruit: 17.jpg, 20.jpg, 24.png. Confirm mascarpone/strawberry identity.
-- Amber filling: 26.png. Confirm exact filling.
-
-None of these 42 sources are published or used as a fallback for another flavour.
+Not displayed (24): 22 cutouts that repeat a published photo or board, and two
+portrait assortments (05.png, 22.jpg) that do not fit the landscape banner.
+No photograph exists for Ajonjolí · Chocolate covering, the five chocolate-covered
+fillings or the two packs; they keep their previous image and stay static.
 
 ## Desktop video
 
@@ -53,12 +58,13 @@ the existing explicit play control remains available. A failed decode also leave
 
 ## Photo optimization and rotation
 
-8 verified natural photos → 48 responsive derivatives: 320/640/960px, WebP and AVIF.
-Total image payload on disk: 2,978,063 bytes; browsers select a format and responsive size.
-Raw ZIP and unassigned originals are not in the public bundle. No cutout derivative is shipped until its identity is approved.
-Multi-photo Pan cards rotate every 7 seconds, fade over 900ms, hold a stable square frame,
-pause on hover/keyboard focus and stop for reduced motion. Single-photo products are static.
-Product detail uses a static primary with secondary gallery; unrelated categories retain their existing behavior.
+26 sources → 156 derivatives (AVIF + WebP at 320/640/960, banner at 640/960/1536), 10.8 MB on disk;
+a card typically downloads one 20–60 KB AVIF. The cutout keeps its alpha channel. Originals are read only.
+Regenerate with `scripts/prepare-official-pan-media.py <organized library>` (needs Pillow with AVIF).
+One rotation component serves product cards and the category banner: 7 s interval, 900 ms fade of the
+incoming photo over the previous one (no blank frame), square card frame, only current + next photo mounted,
+waits for the next photo to load, pauses on mouse hover, keyboard focus and off-screen, static for reduced motion.
+Product detail shows a static primary with the remaining photos as a gallery.
 
 ## Local review
 
