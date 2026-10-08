@@ -11,12 +11,7 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     page.on("pageerror", (e) => errors.push(e.message));
     await page.goto("/");
     const video = page.locator(".ref-hero video");
-    const expected =
-      width >= 1024
-        ? "story-desktop-576.mp4"
-        : width <= 640
-          ? "packaging-540.mp4"
-          : "packaging-720.mp4";
+    const expected = "story-desktop-576.mp4";
     await expect(video.locator("source")).toHaveAttribute(
       "src",
       `/brand/approved/${expected}`,
@@ -36,9 +31,7 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
       });
       await expect(video).toHaveAttribute(
         "poster",
-        width >= 1024
-          ? "/brand/approved/story-desktop-poster.webp"
-          : "/brand/approved/packaging-poster.webp",
+        "/brand/approved/story-desktop-poster.webp",
       );
     }
     expect(
@@ -46,10 +39,9 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
         (v: HTMLVideoElement) => v.muted && v.loop && v.playsInline,
       ),
     ).toBe(true);
-    if (width >= 1024)
-      expect(await video.evaluate((v) => getComputedStyle(v).objectFit)).toBe(
-        "contain",
-      );
+    expect(await video.evaluate((v) => getComputedStyle(v).objectFit)).toBe(
+      "contain",
+    );
     expect(requests.every((url) => url.endsWith(expected))).toBe(true);
     expect(
       await page.evaluate(

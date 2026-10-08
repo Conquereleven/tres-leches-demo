@@ -36,19 +36,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
   const video = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [allowMotion, setAllowMotion] = useState(false);
-  const [heroWidth, setHeroWidth] = useState(0);
-  useEffect(() => {
-    const update = () => setHeroWidth(window.innerWidth);
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-  const desktopFilm = heroWidth >= 1024;
-  const heroSource = desktopFilm
-    ? "/brand/approved/story-desktop-576.mp4"
-    : heroWidth <= 640
-      ? "/brand/approved/packaging-540.mp4"
-      : "/brand/approved/packaging-720.mp4";
+  const heroSource = "/brand/approved/story-desktop-576.mp4";
   useEffect(() => {
     const element = video.current;
     if (!element) return;
@@ -106,11 +94,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             width={540}
             height={960}
             aria-label={localize("Watch our story")}
-            poster={
-              desktopFilm
-                ? "/brand/approved/story-desktop-poster.webp"
-                : "/brand/approved/packaging-poster.webp"
-            }
+            poster="/brand/approved/story-desktop-poster.webp"
             autoPlay={allowMotion}
             onPlay={() => setPlaying(true)}
             onPause={() => setPlaying(false)}
@@ -120,7 +104,7 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             preload="none"
             onError={() => setPlaying(false)}
           >
-            {allowMotion && heroWidth > 0 && (
+            {allowMotion && (
               <source src={heroSource} type="video/mp4" />
             )}
           </video>

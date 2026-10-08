@@ -44,10 +44,11 @@ Optimized: H.264, 576×1024, full 68.7 seconds, 5,281,415 bytes, fast-start MP4.
 Audio removed to prevent any audible autoplay. No story edits, subtitles or branding crops.
 Poster: frame at 4 seconds, WebP, 30,306 bytes.
 
-At ≥1024px the existing cream editorial hero presents the portrait video using `object-fit: contain`.
+Per Joel's subsequent correction, all widths use the new official film and poster.
+The existing cream editorial hero presents the portrait video using `object-fit: contain`.
 Hero copy, layout, navigation and CTAs are preserved. No material hero-layout redesign was required.
-Below 1024px the previous packaging videos and poster remain byte-for-byte unchanged.
-Only one source is mounted for the device width. Reduced motion, save-data and slow connections keep the poster;
+The previous packaging files remain unchanged on disk but are no longer requested by the homepage.
+Only the official film source is mounted. Reduced motion, save-data and slow connections keep the poster;
 the existing explicit play control remains available. A failed decode also leaves a usable poster.
 
 ## Photo optimization and rotation
