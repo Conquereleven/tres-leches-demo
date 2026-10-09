@@ -640,6 +640,122 @@
       ]
     },
     {
+      "sourceId": "official-pan-16-cutout",
+      "sourceFilename": "16 PNG.png",
+      "family": "pan-de-muerto-filled",
+      "variant": "Chocolate",
+      "size": null,
+      "status": "assigned",
+      "transparent": true,
+      "fit": "cover",
+      "alt": "Pastelerías 3L Chocolate Pan de Muerto · photo 3",
+      "width": 1024,
+      "height": 1536,
+      "originalBytes": 2490360,
+      "derivatives": [
+        {
+          "src": "/brand/official-pan/official-pan-16-cutout-320.avif",
+          "width": 320,
+          "height": 480,
+          "bytes": 23182,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-16-cutout-320.webp",
+          "width": 320,
+          "height": 480,
+          "bytes": 38382,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-16-cutout-640.avif",
+          "width": 640,
+          "height": 960,
+          "bytes": 74961,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-16-cutout-640.webp",
+          "width": 640,
+          "height": 960,
+          "bytes": 133530,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-16-cutout-960.avif",
+          "width": 960,
+          "height": 1440,
+          "bytes": 140776,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-16-cutout-960.webp",
+          "width": 960,
+          "height": 1440,
+          "bytes": 259040,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "official-pan-18-cutout",
+      "sourceFilename": "18 PNG.png",
+      "family": "pan-de-muerto-filled",
+      "variant": "Chocolate",
+      "size": null,
+      "status": "assigned",
+      "transparent": true,
+      "fit": "cover",
+      "alt": "Pastelerías 3L Chocolate Pan de Muerto · photo 4",
+      "width": 1024,
+      "height": 1536,
+      "originalBytes": 2522368,
+      "derivatives": [
+        {
+          "src": "/brand/official-pan/official-pan-18-cutout-320.avif",
+          "width": 320,
+          "height": 480,
+          "bytes": 24179,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-18-cutout-320.webp",
+          "width": 320,
+          "height": 480,
+          "bytes": 40968,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-18-cutout-640.avif",
+          "width": 640,
+          "height": 960,
+          "bytes": 76357,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-18-cutout-640.webp",
+          "width": 640,
+          "height": 960,
+          "bytes": 141130,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-18-cutout-960.avif",
+          "width": 960,
+          "height": 1440,
+          "bytes": 139872,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-18-cutout-960.webp",
+          "width": 960,
+          "height": 1440,
+          "bytes": 268086,
+          "format": "webp"
+        }
+      ]
+    },
+    {
       "sourceId": "official-pan-29",
       "sourceFilename": "29.png",
       "family": "pan-de-muerto-filled",
@@ -648,7 +764,7 @@
       "status": "assigned",
       "transparent": false,
       "fit": "cover",
-      "alt": "Pastelerías 3L Chocolate Pan de Muerto · photo 3",
+      "alt": "Pastelerías 3L Chocolate Pan de Muerto · photo 5",
       "width": 941,
       "height": 1672,
       "originalBytes": 2211090,
@@ -1603,6 +1719,8 @@
       "primarySourceId": "official-pan-16",
       "gallerySourceIds": [
         "official-pan-18",
+        "official-pan-16-cutout",
+        "official-pan-18-cutout",
         "official-pan-29"
       ]
     },

@@ -145,6 +145,39 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     }
     const cremaBox = (await crema.boundingBox())!;
     expect(Math.abs(cremaBox.height - cremaBox.width)).toBeLessThan(1);
+    // Chocolate relleno: Joel's five photos, detail last, never first.
+    const choc = page.locator(
+      '[data-product-id="pan-de-muerto-filled--chocolate"] .b-official-rotation',
+    );
+    await choc.scrollIntoViewIfNeeded();
+    const chocShown = () =>
+      choc
+        .locator("picture.is-active img")
+        .evaluate((img: HTMLImageElement) =>
+          img.currentSrc.replace(/^.*official-pan-(.*)-\d+\.\w+$/, "$1"),
+        );
+    const chocSeen = [await chocShown()];
+    await choc.screenshot({
+      path: `work/qa/official-media/${info.project.name}-chocolate-${width}-1.png`,
+    });
+    while (chocSeen.length < 6) {
+      await expect.poll(chocShown, { timeout: 9000 }).not.toBe(chocSeen.at(-1));
+      chocSeen.push(await chocShown());
+      await choc.screenshot({
+        path: `work/qa/official-media/${info.project.name}-chocolate-${width}-${chocSeen.length}.png`,
+      });
+    }
+    const cycle = ["16", "18", "16-cutout", "18-cutout", "29"];
+    const from = cycle.indexOf(chocSeen[0]!);
+    expect(from).toBeGreaterThanOrEqual(0);
+    expect(chocSeen).toEqual(
+      chocSeen.map((_, i) => cycle[(from + i) % cycle.length]),
+    );
+    expect(
+      await choc
+        .locator("picture.is-active")
+        .evaluate((p) => getComputedStyle(p).backgroundColor),
+    ).toBe("rgb(246, 239, 227)");
     // Products without their own photograph stay static.
     await expect(
       page.locator(
@@ -171,6 +204,12 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
       "src",
       /official-pan-09-/,
     );
+    // Still frames: the default photograph is the first approved one.
+    await expect(
+      page.locator(
+        '[data-product-id="pan-de-muerto-filled--chocolate"] picture.is-active img',
+      ),
+    ).toHaveAttribute("src", /official-pan-16-/);
     await page.goto("/");
     await expect(video.locator("source")).toHaveCount(0);
     expect(errors).toEqual([]);
