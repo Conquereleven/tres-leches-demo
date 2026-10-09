@@ -112,6 +112,17 @@ function setup() {
         status: "PAID",
       },
     ],
+    [
+      "external-new",
+      {
+        id: "external-new",
+        requestId: "7b1d9c7e-0000-4000-8000-000000000004",
+        orderId: null,
+        amount: 20,
+        currency: "AED",
+        status: "PAID",
+      },
+    ],
     ["not-found", 404],
     ["provider-down", 500],
   ]);
@@ -134,6 +145,9 @@ function setup() {
     new DisabledWhatsAppProvider(),
     provider,
   );
+  // Tests that exercise the new external path explicitly opt in.
+  // An absent activation cutoff must never acknowledge an external checkout.
+  service.externalCheckoutAcknowledgementSince = Date.now() - 60_000;
   const business = () => {
     const { orders, payments } = store.read();
     return JSON.stringify({ orders, payments });
@@ -241,38 +255,97 @@ test("matched website checkouts reconcile exactly as before, with no ownership l
   }
 });
 
-test("the worker closes stored external receipts and leaves unknown ones for retry", async () => {
+test("without an explicit activation instant even a new external receipt remains open", async () => {
   const f = setup();
   try {
-    // Receipts as they sit in Production today: open, already retried many times.
+    f.service.externalCheckoutAcknowledgementSince = undefined;
+    await assert.rejects(
+      f.service.acceptPaymentNotification({ id: "external-new", status: "PAID" }),
+      retry,
+    );
+    assert.equal(f.receipt("external-new").completedAt, undefined);
+    assert.equal(f.receipt("external-new").outcome, undefined);
+    assert.deepEqual(f.gets, []);
+  } finally {
+    f.store.close();
+  }
+});
+
+test("legacy unmatched receipts stay open while new external receipts are acknowledged", async () => {
+  const f = setup();
+  try {
+    const before = f.business();
+    const historicalAt = "2026-10-02T11:19:51.136Z";
+    const cutoff = Date.now() - 60_000;
+    f.service.externalCheckoutAcknowledgementSince = cutoff;
     f.store.write((s) => {
       s.paymentNotifications = [
         "external-link",
         "external-text",
         "provider-down",
       ].map((checkoutId, i) => ({
-        id: `stored-${i}`,
+        id: "stored-" + i,
         checkoutId,
         status: "PAID",
-        receivedAt: "2026-10-02T11:19:51.136Z",
+        receivedAt: historicalAt,
         nextAt: 0,
         attempts: 179,
       }));
     });
-    const before = f.business();
+    const legacyBefore = JSON.stringify(f.store.read().paymentNotifications);
     await f.service.drain();
-    assert.equal(f.receipt("external-link").outcome, "external");
-    assert.equal(f.receipt("external-text").outcome, "external");
-    assert.equal(f.receipt("provider-down").completedAt, undefined);
-    assert.equal(f.receipt("provider-down").attempts, 180);
+    assert.equal(JSON.stringify(f.store.read().paymentNotifications), legacyBefore);
+    assert.deepEqual(f.gets, []);
     assert.equal(f.business(), before);
-    // A second pass has nothing left to do for the closed ones.
-    const lookups = f.gets.length;
+
+    await f.service.acceptPaymentNotification({ id: "external-new", status: "PAID" });
+    assert.equal(f.receipt("external-new").outcome, "external");
+    assert.ok(f.receipt("external-new").completedAt);
+    assert.equal(
+      JSON.stringify(f.store.read().paymentNotifications!.slice(0, 3)),
+      legacyBefore,
+    );
+    assert.deepEqual(f.gets, ["external-new"]);
+    assert.equal(f.business(), before);
+  } finally {
+    f.store.close();
+  }
+});
+
+test("Paymennt retries of a legacy checkout cannot close historical or newly created receipts", async () => {
+  const f = setup();
+  try {
+    const { notificationIdentity } = await import("../../server/adapters/paymennt-notification");
+    const oldEvent = { id: "external-link", status: "PAID" };
+    const oldId = notificationIdentity(oldEvent);
     f.store.write((s) => {
-      for (const r of s.paymentNotifications!) r.nextAt = 0;
+      s.paymentNotifications = [{
+        id: oldId,
+        checkoutId: "external-link",
+        status: "PAID",
+        receivedAt: "2026-10-02T11:19:51.136Z",
+        nextAt: 0,
+        attempts: 179,
+      }];
     });
+    await assert.rejects(f.service.acceptPaymentNotification(oldEvent), retry);
+    assert.equal(f.receipt("external-link").completedAt, undefined);
+    assert.deepEqual(f.gets, []);
+
+    await assert.rejects(
+      f.service.acceptPaymentNotification({ id: "external-link", status: "CANCELLED" }),
+      retry,
+    );
+    assert.equal(
+      f.store.read().paymentNotifications!.filter((r) => r.outcome === "external").length,
+      0,
+    );
+    assert.deepEqual(f.gets, []);
+    const before = f.store.read().paymentNotifications!.map((r) => r.attempts);
     await f.service.drain();
-    assert.deepEqual(f.gets.slice(lookups), ["provider-down"]);
+    assert.deepEqual(f.store.read().paymentNotifications!.map((r) => r.attempts), before);
+    assert.equal(f.store.read().orders.length, 2);
+    assert.equal(f.store.read().payments.length, 2);
   } finally {
     f.store.close();
   }
