@@ -10,7 +10,14 @@ for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
+    // The cart page asks the server for prices. Leaving before that answer
+    // arrives makes WebKit report the cancelled request as a page error, so
+    // wait for it; any real page error still fails the test below.
+    const config = page.waitForResponse((r) =>
+      r.url().endsWith("/api/checkout/config"),
+    );
     await page.goto("/cart");
+    await config;
     await page.evaluate(() =>
       localStorage.setItem(
         "3l-cart",
