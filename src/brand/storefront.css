@@ -1967,7 +1967,7 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
 .b-category-showcase { width: 100%; max-width: 960px; aspect-ratio: 3 / 2; margin: 0 auto 40px; overflow: hidden; background: #f6efe3; }
 /* Menu introduction: one large official logo as a quiet watermark, behind the headings only. */
 .b-menu-page main { position: relative; isolation: isolate; }
-.b-menu-intro-mark { position: absolute; z-index: -1; top: 0; left: 0; right: 0; height: 22rem; background: url("/brand/wordmark.png") center / min(88%, 900px) auto no-repeat; opacity: 0.05; pointer-events: none; }
+.b-menu-intro-mark { position: absolute; z-index: -1; top: 0; left: 0; right: 0; height: 22rem; background: url("/brand/wordmark.png") center / min(88%, 900px) auto no-repeat; opacity: 0.08; pointer-events: none; }
 @media (min-width: 1024px) { .b-menu-intro-mark { height: 29rem; } }
 .b-official-rotation:focus-visible { outline: 2px solid #33241a; outline-offset: 4px; }
 .brand-experience .b-product-page .b-official-gallery img { flex: none; width: min(220px, 60vw); height: auto; max-width: none; aspect-ratio: 1; object-fit: contain; background: #f6efe3; }

@@ -8,11 +8,17 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     page.on("request", (r) => {
       if (r.url().endsWith(".mp4")) requests.push(r.url());
     });
-    page.on("pageerror", (e) => {
-      // WebKit reports a fetch it cancelled on navigation as a page error; not a defect.
-      if (!/due to access control checks/.test(e.message))
-        errors.push(e.message);
-    });
+    page.on("pageerror", (e) => errors.push(e.message));
+    // Every menu page asks the server for prices. Leaving before that answer
+    // arrives makes WebKit report the cancelled request as a page error, so the
+    // test lets each page finish loading; any real page error still fails it.
+    const visitMenu = async (url: string) => {
+      const config = page.waitForResponse((r) =>
+        r.url().endsWith("/api/checkout/config"),
+      );
+      await page.goto(url);
+      await config;
+    };
     await page.goto("/");
     const video = page.locator(".ref-hero video");
     // New story film on desktop; the original packaging video on tablet and mobile.
@@ -69,7 +75,7 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     await page.screenshot({
       path: `work/qa/official-media/${info.project.name}-home-${width}.png`,
     });
-    await page.goto("/menu?product=pan-de-muerto-traditional--ajonjoli");
+    await visitMenu("/menu?product=pan-de-muerto-traditional--ajonjoli");
     await expect(page.locator(".b-menu-photo img")).toHaveAttribute(
       "src",
       /official-pan-09/,
@@ -82,7 +88,7 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     await page.screenshot({
       path: `work/qa/official-media/${info.project.name}-product-${width}.png`,
     });
-    await page.goto("/menu?category=pan");
+    await visitMenu("/menu?category=pan");
     // Restored Pan de Muerto banner: whole 3:2 boards, before the product grid.
     const banner = page.locator(".b-category-showcase .b-official-rotation");
     await expect(banner.locator("picture.is-active img")).toHaveAttribute(
@@ -115,7 +121,7 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
           m.getBoundingClientRect().bottom <= nav.bottom,
         ];
       }),
-    ).toEqual(["0.05", "none", "true", "no-repeat", true]);
+    ).toEqual(["0.08", "none", "true", "no-repeat", true]);
     // Every card image is a square with rounded corners and shows the whole photo.
     const frames = await page.evaluate(() =>
       [...document.querySelectorAll(".b-menu-card .b-menu-photo")].map((f) => {
@@ -319,10 +325,10 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     await page.screenshot({
       path: `work/qa/official-media/${info.project.name}-menu-${width}.png`,
     });
-    await page.goto("/menu?category=conchas");
+    await visitMenu("/menu?category=conchas");
     await expect(page.locator(".b-official-rotation")).toHaveCount(0);
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/menu?category=pan");
+    await visitMenu("/menu?category=pan");
     await rotation.scrollIntoViewIfNeeded();
     await page.waitForTimeout(4200);
     await expect(rotation.locator("picture.is-active img")).toHaveAttribute(

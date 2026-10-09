@@ -221,8 +221,8 @@
   },
   "13.png#pack": {
     "mode": "extend",
-    "trimBottom": 16,
-    "top": 346,
+    "trimBottom": 40,
+    "top": 370,
     "bottom": 182,
     "bottomFill": "mirror"
   }

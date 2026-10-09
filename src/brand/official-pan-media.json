@@ -1016,42 +1016,42 @@
           "src": "/brand/official-pan/official-pan-13-pack-320.avif",
           "width": 320,
           "height": 320,
-          "bytes": 12980,
+          "bytes": 12479,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-13-pack-320.webp",
           "width": 320,
           "height": 320,
-          "bytes": 17882,
+          "bytes": 17718,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-13-pack-640.avif",
           "width": 640,
           "height": 640,
-          "bytes": 48887,
+          "bytes": 48215,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-13-pack-640.webp",
           "width": 640,
           "height": 640,
-          "bytes": 69520,
+          "bytes": 68626,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-13-pack-960.avif",
           "width": 960,
           "height": 960,
-          "bytes": 103462,
+          "bytes": 101353,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-13-pack-960.webp",
           "width": 960,
           "height": 960,
-          "bytes": 147382,
+          "bytes": 144724,
           "format": "webp"
         }
       ]
