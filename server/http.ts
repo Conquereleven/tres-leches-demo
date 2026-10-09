@@ -201,7 +201,7 @@ export async function startServer(
   const externalAckSince = process.env.PAYMENNT_EXTERNAL_ACK_SINCE;
   if (externalAckSince !== undefined) {
     if (
-      !/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,3})?Z$/.test(externalAckSince) ||
+      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?Z$/.test(externalAckSince) ||
       !Number.isFinite(Date.parse(externalAckSince))
     ) throw new Error("Invalid PAYMENNT_EXTERNAL_ACK_SINCE (UTC ISO 8601 required)");
     service.externalCheckoutAcknowledgementSince = Date.parse(externalAckSince);
