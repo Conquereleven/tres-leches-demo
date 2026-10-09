@@ -1,0 +1,3641 @@
+{
+  "photoFolder": "19m33LpdpR6gefpTs_We7RwVmbgE9OgfY",
+  "video": {
+    "sourceId": "16SCtemsc6Q3tDhvXIk73K17p2FPk-P5x",
+    "sourceFilename": "cake packaging .MP4",
+    "originalBytes": 56039195,
+    "durationSeconds": 20.983333,
+    "poster": "/brand/approved/packaging-poster.webp",
+    "derivatives": [
+      {
+        "src": "/brand/approved/packaging-540.mp4",
+        "codec": "H.264",
+        "width": 540,
+        "height": 960,
+        "fps": 30,
+        "bytes": 3922397
+      },
+      {
+        "src": "/brand/approved/packaging-720.mp4",
+        "codec": "H.264",
+        "width": 720,
+        "height": 1280,
+        "fps": 30,
+        "bytes": 6203148
+      }
+    ],
+    "posterBytes": 49656
+  },
+  "assets": [
+    {
+      "sourceId": "1AQVsRpJ6v13GhTGJEICFDPK-vyq13DJO",
+      "sourceFilename": "3L CLASSIC 3.jpg",
+      "family": "tres-leches",
+      "variant": "Classic",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Classic tres leches",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: clearer texture/layer detail or overhead coconut decoration",
+      "originalBytes": 10353883,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/tres-leches-classic-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 10472,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-classic-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 8588,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-classic-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 27674,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-classic-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 30088,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-classic-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 51750,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-classic-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 58348,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1OCd7HYnPsl_ZbjF4m1SvRDMWKDN7OftN",
+      "sourceFilename": "3L COCONUT 2.jpg",
+      "family": "tres-leches",
+      "variant": "Coconut",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Coconut tres leches",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: clearer texture/layer detail or overhead coconut decoration",
+      "originalBytes": 5948374,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/tres-leches-coconut-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 8502,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-coconut-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 6040,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-coconut-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 20111,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-coconut-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 19238,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-coconut-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 35459,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-coconut-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 35890,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1eJaF3IF79qvg_P-Jh0fFhb9mPsgqasv7",
+      "sourceFilename": "3L CONFETTI 1.jpg",
+      "family": "tres-leches",
+      "variant": "Confetti",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Confetti tres leches",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 6387846,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/tres-leches-confetti-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 9509,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-confetti-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 7086,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-confetti-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 20523,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-confetti-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 19178,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-confetti-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 32665,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-confetti-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 33146,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1UOxCTO1a2wbHKtWGe7pB1Y9tvfDeU0sI",
+      "sourceFilename": "3L CAFE LATTE 1.jpg",
+      "family": "tres-leches",
+      "variant": "Caffe Latte",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Caffe Latte tres leches",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 9539527,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/tres-leches-caffe-latte-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 10449,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-caffe-latte-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 9450,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-caffe-latte-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 27136,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-caffe-latte-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 31638,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-caffe-latte-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 49471,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-caffe-latte-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 60990,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1U_I7bIHh5eR1FELk61uKe4wTkLvZ6oPP",
+      "sourceFilename": "3L LOTUS 1.jpg",
+      "family": "tres-leches",
+      "variant": "Lotus",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Lotus tres leches",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 6679757,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/tres-leches-lotus-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 9058,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-lotus-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 7124,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-lotus-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 20936,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-lotus-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 21622,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-lotus-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 36614,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-lotus-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 39824,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1LIEZjzeslI-ZMpGYCfk8zqeGB5tqP7Xq",
+      "sourceFilename": "3L M&M´S 1.jpg",
+      "family": "tres-leches",
+      "variant": "M&Ms",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L M&Ms tres leches",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 7085444,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/tres-leches-m-ms-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 10747,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-m-ms-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 9132,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-m-ms-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 24177,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-m-ms-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 25006,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-m-ms-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 39809,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-m-ms-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 43022,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1xZMi2wjmbPuK9-KQthnfv_K8AvRlLBXb",
+      "sourceFilename": "3L NUTELLA 1.jpg",
+      "family": "tres-leches",
+      "variant": "Nutella",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Nutella tres leches",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 9845824,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/tres-leches-nutella-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 10791,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-nutella-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 9478,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-nutella-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 25856,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-nutella-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 28078,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-nutella-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 44891,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-nutella-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 51044,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1jI6gdcjCpMYgwG5mc-0J_om6s2j2RVDr",
+      "sourceFilename": "3L OREO 1.jpg",
+      "family": "tres-leches",
+      "variant": "Oreo",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Oreo tres leches",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 6944887,
+      "width": 5922,
+      "height": 3953,
+      "derivatives": [
+        {
+          "src": "/brand/approved/tres-leches-oreo-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 9932,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-oreo-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 8646,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-oreo-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 25233,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-oreo-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 27554,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-oreo-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 44974,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-oreo-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 51300,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1SAFjwElHzkXtQfxLRSSxNpie7FTSO8YD",
+      "sourceFilename": "3L STRAWBERRY 1.jpg",
+      "family": "tres-leches",
+      "variant": "Vanilla Strawberry",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Vanilla Strawberry tres leches",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 6402159,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/tres-leches-vanilla-strawberry-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 7747,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-vanilla-strawberry-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 5208,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-vanilla-strawberry-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 17747,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-vanilla-strawberry-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 16974,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-vanilla-strawberry-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 30051,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-vanilla-strawberry-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 31762,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1ZfXU_Gaeg4Rd3dPVmMZS6dsucnwVWraF",
+      "sourceFilename": "3L DULCE DE LECHE 3.jpg",
+      "family": "tres-leches-premium",
+      "variant": "Dulce de Leche",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Dulce de Leche tres leches premium",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: clearer texture/layer detail or overhead coconut decoration",
+      "originalBytes": 10049135,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/tres-leches-premium-dulce-de-leche-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 12522,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-premium-dulce-de-leche-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 11582,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-premium-dulce-de-leche-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 31381,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-premium-dulce-de-leche-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 33450,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-premium-dulce-de-leche-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 54099,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-premium-dulce-de-leche-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 59502,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "17PHX1fgmJXdAsdA2HQKWkVW6kyg8rt_G",
+      "sourceFilename": "3L MANGO 1.jpg",
+      "family": "tres-leches-mango",
+      "variant": "Mango",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Mango tres leches mango",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 6776962,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/tres-leches-mango-mango-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 9231,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-mango-mango-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 6714,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-mango-mango-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 21139,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-mango-mango-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 19340,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/tres-leches-mango-mango-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 35020,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/tres-leches-mango-mango-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 35374,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1Z4vZNR3PPsndURye2AfcD9CjoBfeeOF0",
+      "sourceFilename": "3L PISTACHIO 3.jpg",
+      "family": "special-flavours-cake",
+      "variant": "Pistacchio",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Pistacchio special flavours cake",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: clearer texture/layer detail or overhead coconut decoration",
+      "originalBytes": 10393077,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/special-flavours-cake-pistacchio-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 12212,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-pistacchio-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 10666,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-pistacchio-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 31423,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-pistacchio-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 32670,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-pistacchio-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 56238,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-pistacchio-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 59764,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1wtPk4YjUv5irLyHpbhaet_uPdD7uSt7A",
+      "sourceFilename": "3L RASPBERRY 1 .jpg",
+      "family": "special-flavours-cake",
+      "variant": "Raspberry",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Raspberry special flavours cake",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 7576414,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/special-flavours-cake-raspberry-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 9688,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-raspberry-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 8330,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-raspberry-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 22104,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-raspberry-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 23190,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-raspberry-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 37029,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-raspberry-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 41282,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1uF3N2VrJvySMHYoYxaOVgUmVdcb4OPCG",
+      "sourceFilename": "3L SAFFRON 1.jpg",
+      "family": "special-flavours-cake",
+      "variant": "Saffron",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Saffron special flavours cake",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 9180663,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/special-flavours-cake-saffron-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 10872,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-saffron-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 9708,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-saffron-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 26903,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-saffron-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 30318,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-saffron-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 46878,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-saffron-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 54834,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1pJ9RvHUzcor5MlJcuAFh_-cnXC2MovUS",
+      "sourceFilename": "3L ROSETTES 1.jpg",
+      "family": "special-flavours-cake",
+      "variant": "Rosettas",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Rosettas special flavours cake",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 8053077,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/special-flavours-cake-rosettas-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 12402,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-rosettas-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 12390,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-rosettas-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 30466,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-rosettas-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 35258,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-rosettas-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 53696,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-cake-rosettas-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 63288,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1svsv4gUExatnLjoaenagvjym26Q_eKUQ",
+      "sourceFilename": "3L JELLY YOGURT 1 .jpg",
+      "family": "jelly-gelatina-yogurt-strawberry",
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L  jelly gelatina yogurt strawberry",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 5539099,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/jelly-gelatina-yogurt-strawberry-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 6722,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/jelly-gelatina-yogurt-strawberry-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 3584,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/jelly-gelatina-yogurt-strawberry-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 12889,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/jelly-gelatina-yogurt-strawberry-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 9788,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/jelly-gelatina-yogurt-strawberry-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 20429,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/jelly-gelatina-yogurt-strawberry-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 17930,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1Yh8wTTrCuJipMiDKmzFK8G4pMAeQxyaG",
+      "sourceFilename": "3L EXTRA MILK 190 ML .jpg",
+      "family": "milk",
+      "variant": "",
+      "size": "190 ml",
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L  milk",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 2653028,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/milk-190-ml-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 4442,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/milk-190-ml-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 1134,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/milk-190-ml-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 6330,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/milk-190-ml-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 3344,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/milk-190-ml-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 8135,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/milk-190-ml-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 6174,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1zJv9fNl403E_KgeRpawVq3_yaFLQYskW",
+      "sourceFilename": "3L EXTRA MILK 350 ML .jpg",
+      "family": "milk",
+      "variant": "",
+      "size": "350 ml",
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L  milk",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 2604363,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/milk-350-ml-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 4293,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/milk-350-ml-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 1048,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/milk-350-ml-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 5827,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/milk-350-ml-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 2762,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/milk-350-ml-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 7407,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/milk-350-ml-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 5028,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1-yxiwJ39gk3YJNHW8h6ALuZisG2NZ_qm",
+      "sourceFilename": "3L CANDLES 2.jpg",
+      "family": "candles",
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L  candles",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: clearer texture/layer detail or overhead coconut decoration",
+      "originalBytes": 3750920,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/candles-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 5976,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/candles-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 3222,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/candles-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 10359,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/candles-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 9280,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/candles-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 15942,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/candles-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 16474,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1rTHqazck_5X9O-4bRbv48qCpS0QpnHiT",
+      "sourceFilename": "3L BUNDLE JARS 2.jpg",
+      "family": "cake-jar-bundle",
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L  cake jar bundle",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: clearer texture/layer detail or overhead coconut decoration",
+      "originalBytes": 5786179,
+      "width": 5954,
+      "height": 3975,
+      "derivatives": [
+        {
+          "src": "/brand/approved/cake-jar-bundle-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 6752,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-bundle-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 3950,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-bundle-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 12541,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-bundle-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 11106,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-bundle-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 19907,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-bundle-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 20722,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1PPfBb0zDzygPb4o5oklRJZAy843rH75s",
+      "sourceFilename": "3L C. HAPPY BIRTHDAY 2.jpg",
+      "family": "cake-topper",
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L  cake topper",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: clearer texture/layer detail or overhead coconut decoration",
+      "originalBytes": 4016594,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/cake-topper-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 5548,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-topper-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 2656,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-topper-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 9350,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-topper-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 7084,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-topper-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 13667,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-topper-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 12934,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1p_7FlK7hMBIsD0YyhWFWJH7Zk8xq1mUx",
+      "sourceFilename": "3L CAKE JAR CAFE LATTE.jpg",
+      "family": "cake-jar",
+      "variant": "Caffe Latte",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Caffe Latte cake jar",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3724198,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/cake-jar-caffe-latte-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 6017,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-caffe-latte-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 2938,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-caffe-latte-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 10430,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-caffe-latte-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 8374,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-caffe-latte-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 15925,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-caffe-latte-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 15416,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1IxsNrRhMch8ivpqeqLMuIgCcjmDeSJlG",
+      "sourceFilename": "3L CAKE JAR CLASSIC .jpg",
+      "family": "cake-jar",
+      "variant": "Classic",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Classic cake jar",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3453679,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/cake-jar-classic-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 5325,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-classic-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 2124,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-classic-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 8716,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-classic-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 6270,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-classic-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 12919,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-classic-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 12016,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1mVJC2qORChL9HKG_uIJoP0oXA48gzop9",
+      "sourceFilename": "3L CAKE JAR COCONUT.jpg",
+      "family": "cake-jar",
+      "variant": "Coconut",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Coconut cake jar",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3411697,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/cake-jar-coconut-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 5088,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-coconut-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 1708,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-coconut-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 8113,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-coconut-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 4870,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-coconut-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 11679,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-coconut-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 8976,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1FWE_CNXVYg8gPwSQrv92wcJkd-hGuxSS",
+      "sourceFilename": "3L CAKE JAR CONFETTI.jpg",
+      "family": "cake-jar",
+      "variant": "Confetti",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Confetti cake jar",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3669649,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/cake-jar-confetti-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 5985,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-confetti-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 2924,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-confetti-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 9984,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-confetti-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 7670,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-confetti-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 14593,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-confetti-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 13346,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1eRoVXACLOyqsCtM6W1odO921Jv9MjAX8",
+      "sourceFilename": "3L CAKE JAR DULCE DE LECHE.jpg",
+      "family": "cake-jar-premium",
+      "variant": "Dulce De Leche",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Dulce De Leche cake jar premium",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3583047,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/cake-jar-premium-dulce-de-leche-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 5727,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-premium-dulce-de-leche-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 2692,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-premium-dulce-de-leche-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 9528,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-premium-dulce-de-leche-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 7032,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-premium-dulce-de-leche-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 14159,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-premium-dulce-de-leche-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 12820,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1y9ANv6P_H2yn0Vq8JgusvrG1emc9xJNz",
+      "sourceFilename": "3L CAKE JAR LOTUS.jpg",
+      "family": "cake-jar",
+      "variant": "Lotus",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Lotus cake jar",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3610021,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/cake-jar-lotus-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 5557,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-lotus-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 2482,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-lotus-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 9325,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-lotus-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 6926,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-lotus-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 13970,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-lotus-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 13138,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1zzkmTomAqXw8nxY7lMBDPIen--oXhN8A",
+      "sourceFilename": "3L CAKE JAR M&M´S.jpg",
+      "family": "cake-jar",
+      "variant": "M&Ms",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L M&Ms cake jar",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3583813,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/cake-jar-m-ms-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 5746,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-m-ms-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 2718,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-m-ms-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 9749,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-m-ms-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 7320,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-m-ms-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 14445,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-m-ms-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 13344,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1chQqCp9MWbFHP1xHoPJw_CZnF1mZNquI",
+      "sourceFilename": "3L CAKE JAR MANGO.jpg",
+      "family": "cake-jar-premium",
+      "variant": "Mango",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Mango cake jar premium",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3339039,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/cake-jar-premium-mango-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 5269,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-premium-mango-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 1982,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-premium-mango-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 8563,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-premium-mango-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 5450,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-premium-mango-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 12248,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-premium-mango-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 9910,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1X4G9m-4hMxBojkopCtvVQWBQUFQqsjpN",
+      "sourceFilename": "3L CAKE JAR NUTELLA.jpg",
+      "family": "cake-jar",
+      "variant": "Nutella",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Nutella cake jar",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3628259,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/cake-jar-nutella-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 5726,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-nutella-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 2706,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-nutella-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 9615,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-nutella-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 7438,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-nutella-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 14288,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-nutella-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 13124,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1wdfmRu1s5GC_2U9CSj3MzSTqfpJyrCWQ",
+      "sourceFilename": "3L CAKE JAR OREO.jpg",
+      "family": "cake-jar",
+      "variant": "Oreo (cookies and cream)",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Oreo (cookies and cream) cake jar",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3862795,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/cake-jar-oreo-cookies-and-cream-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 6102,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-oreo-cookies-and-cream-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 2988,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-oreo-cookies-and-cream-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 11086,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-oreo-cookies-and-cream-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 9022,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-oreo-cookies-and-cream-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 17193,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-oreo-cookies-and-cream-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 16484,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1AXQLq_TRNx-xI64rFutDFBMoBj0k6rOd",
+      "sourceFilename": "3L CAKE JAR PISTACHIO.jpg",
+      "family": "special-flavours-jar",
+      "variant": "Pistacchio",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Pistacchio special flavours jar",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3747927,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/special-flavours-jar-pistacchio-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 5964,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-pistacchio-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 2896,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-pistacchio-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 10610,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-pistacchio-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 8436,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-pistacchio-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 16120,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-pistacchio-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 15828,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1pTYRUW2Va5-wK8DM2jPlogEm2FdZPqf3",
+      "sourceFilename": "3L CAKE JAR RASPBERRY.jpg",
+      "family": "special-flavours-jar",
+      "variant": "Raspberry",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Raspberry special flavours jar",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3885821,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/special-flavours-jar-raspberry-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 6204,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-raspberry-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 3222,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-raspberry-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 11044,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-raspberry-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 9102,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-raspberry-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 17075,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-raspberry-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 16706,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1L8XDW2YvTblEdLZ0IdmT3TSn-rAVv-Ma",
+      "sourceFilename": "3L CAKE JAR SAFFRON .jpg",
+      "family": "special-flavours-jar",
+      "variant": "Saffron",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Saffron special flavours jar",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3785682,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/special-flavours-jar-saffron-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 6012,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-saffron-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 2838,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-saffron-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 10650,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-saffron-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 8572,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-saffron-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 16383,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/special-flavours-jar-saffron-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 15664,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1o85mQyi2C3FTp2IfS6tso4a2ovDA8p_J",
+      "sourceFilename": "3L CAKE JAR STRAWBERRY.jpg",
+      "family": "cake-jar",
+      "variant": "Vanilla Strawberry",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Pastelerías 3L Vanilla Strawberry cake jar",
+      "status": "assigned",
+      "selectionReason": "Reviewed against alternate angles: complete product silhouette and toppings",
+      "originalBytes": 3549976,
+      "width": 6016,
+      "height": 4016,
+      "derivatives": [
+        {
+          "src": "/brand/approved/cake-jar-vanilla-strawberry-320.avif",
+          "width": 320,
+          "height": 214,
+          "bytes": 5715,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-vanilla-strawberry-320.webp",
+          "width": 320,
+          "height": 214,
+          "bytes": 2704,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-vanilla-strawberry-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 9883,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-vanilla-strawberry-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 7606,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/cake-jar-vanilla-strawberry-960.avif",
+          "width": 960,
+          "height": 641,
+          "bytes": 14830,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/cake-jar-vanilla-strawberry-960.webp",
+          "width": 960,
+          "height": 641,
+          "bytes": 14042,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "1Q_YZxSMXZBhWBVxyuaET35KHV4KT6_vY",
+      "sourceFilename": "3L  COCONUT 1.jpg",
+      "family": null,
+      "routes": [],
+      "usage": null,
+      "derivatives": [],
+      "alt": "3L  COCONUT 1 approved photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery"
+    },
+    {
+      "sourceId": "172O4947ziD3u8EohoEg3qq3Pmn_BmPmD",
+      "sourceFilename": "3L  OREO 3.jpg",
+      "family": null,
+      "routes": [],
+      "usage": null,
+      "derivatives": [],
+      "alt": "3L  OREO 3 approved photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery"
+    },
+    {
+      "sourceId": "1HcW1wN0x2acE2CTA6WJrwHytnQrL68R_",
+      "sourceFilename": "3L BOUQUET ROSES.jpg",
+      "family": null,
+      "routes": [],
+      "usage": null,
+      "derivatives": [],
+      "alt": "3L BOUQUET ROSES approved photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery"
+    },
+    {
+      "sourceId": "1iynXZv1aFqLR4YJ-ofp0flvW_tWQeXrg",
+      "sourceFilename": "3L BOX.jpg",
+      "family": null,
+      "routes": [
+        "/"
+      ],
+      "usage": "available editorial alternate; approved film already used",
+      "derivatives": [],
+      "alt": "3L branded cake packaging",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "category": "Packaging / brand"
+    },
+    {
+      "sourceId": "1kPaZKFo69Y0odxVRz5eIEkBjNNYrWLik",
+      "sourceFilename": "3L C. GET WELL SOON.jpg",
+      "family": "cake-topper",
+      "routes": [
+        "/menu?category=extras"
+      ],
+      "usage": "alternate family photograph; no customization options inferred",
+      "derivatives": [],
+      "alt": "Approved cake topper photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": ""
+    },
+    {
+      "sourceId": "1GH3vta4GzmdxrVyAhSsC21EuuEX8WQG0",
+      "sourceFilename": "3L C. HAPPY BIRTHDAY 3.jpg",
+      "family": "cake-topper",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved cake-topper photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": ""
+    },
+    {
+      "sourceId": "1jDwqeq30bTCFEPn_1BbYEpu9R8w32Ucv",
+      "sourceFilename": "3L C. HAPPY BIRTHDAY.jpg",
+      "family": "cake-topper",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved cake-topper photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": ""
+    },
+    {
+      "sourceId": "1oT9rAwdPgMJPHK9BbQg0Qwv_GtPoBHXx",
+      "sourceFilename": "3L C. LOVE.jpg",
+      "family": "cake-topper",
+      "routes": [
+        "/menu?category=extras"
+      ],
+      "usage": "alternate family photograph; no customization options inferred",
+      "derivatives": [],
+      "alt": "Approved cake topper photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": ""
+    },
+    {
+      "sourceId": "1OolFUtbCjnDi11uhoFbHceCfCyOLP8AG",
+      "sourceFilename": "3L C. WELCOME.jpg",
+      "family": "cake-topper",
+      "routes": [
+        "/menu?category=extras"
+      ],
+      "usage": "alternate family photograph; no customization options inferred",
+      "derivatives": [],
+      "alt": "Approved cake topper photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": ""
+    },
+    {
+      "sourceId": "10QUSo0ZTcIsa-Cn5M16m6HU8BnsmxFx8",
+      "sourceFilename": "3L CAFE LATTE 2.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Caffe Latte"
+    },
+    {
+      "sourceId": "1OCUl8T28sX_TQO2nsfdumiBqCpttvZ16",
+      "sourceFilename": "3L CAFE LATTE 3.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Caffe Latte"
+    },
+    {
+      "sourceId": "1h41aO8B2UU6vrO80jiy1VSK5fwlbJ-88",
+      "sourceFilename": "3L CAKE DESIGN 1.jpg",
+      "family": null,
+      "routes": [],
+      "usage": "unassigned: flavour/size not identified",
+      "derivatives": [],
+      "alt": "Approved decorated cake photograph",
+      "status": "ambiguous",
+      "reason": "Alternate approved angle retained for future gallery",
+      "category": "Cakes"
+    },
+    {
+      "sourceId": "1kjlqw-6LA9YchAmk3APuLFExDUybCh4z",
+      "sourceFilename": "3L CAKE DESIGN 2.jpg",
+      "family": null,
+      "routes": [],
+      "usage": "unassigned: flavour/size not identified",
+      "derivatives": [],
+      "alt": "Approved decorated cake photograph",
+      "status": "ambiguous",
+      "reason": "Alternate approved angle retained for future gallery",
+      "category": "Cakes"
+    },
+    {
+      "sourceId": "1K0D3bWFYXJX2fPr71Fqhf-nxdmPAWDYB",
+      "sourceFilename": "3L CAKE JARS.jpg",
+      "family": "cake-jar-bundle",
+      "routes": [
+        "/menu?category=jars"
+      ],
+      "usage": "alternate family photograph; no assortment promised",
+      "derivatives": [],
+      "alt": "3L cake jar family photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": ""
+    },
+    {
+      "sourceId": "1MtH1x7-v1vtWHSMGkmbQF0d2bxD71n2w",
+      "sourceFilename": "3L CANDLES 1.jpg",
+      "family": "candles",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved candles photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": ""
+    },
+    {
+      "sourceId": "1xiNbch518T7N2unCqgl4Q0yKm6uHr8iM",
+      "sourceFilename": "3L CLASSIC 1.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Classic"
+    },
+    {
+      "sourceId": "1Rlks5Qh3CAy6AahTkE_JdZHmRunGh7VG",
+      "sourceFilename": "3L CLASSIC 2.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Classic"
+    },
+    {
+      "sourceId": "1WGsbj1r6SUw-ukBwz9XoDjVndS1iTwmF",
+      "sourceFilename": "3L COCONUT 3.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Coconut"
+    },
+    {
+      "sourceId": "10y0hOJfLOVECo3q0WkjuYe102M_doy9Q",
+      "sourceFilename": "3L CONFETTI 2.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Confetti"
+    },
+    {
+      "sourceId": "1dg9Vns0PbcK9engCIFStu3UdG8cLeFyF",
+      "sourceFilename": "3L CONFETTI 3.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Confetti"
+    },
+    {
+      "sourceId": "1wZKbgpW7J1ZTlz3h4e3FwDAspD79eHqG",
+      "sourceFilename": "3L CREME CARAMEL 1.jpg",
+      "family": null,
+      "routes": [],
+      "usage": null,
+      "derivatives": [],
+      "alt": "3L CREME CARAMEL 1 approved photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery"
+    },
+    {
+      "sourceId": "1M2024JhfVtbmQzpmNBV3mW3-B4_rqp3B",
+      "sourceFilename": "3L CREME CARAMEL 2.jpg",
+      "family": null,
+      "routes": [],
+      "usage": null,
+      "derivatives": [],
+      "alt": "3L CREME CARAMEL 2 approved photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery"
+    },
+    {
+      "sourceId": "1l1CXVunDeEnfxUmIEKdHm_hh_a67iOsv",
+      "sourceFilename": "3L DULCE DE LECHE 1.jpg",
+      "family": "tres-leches-premium",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches-premium photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Dulce de Leche"
+    },
+    {
+      "sourceId": "114pW6AeVXqBVA7D23OV8EKJbPBEa6j5s",
+      "sourceFilename": "3L DULCE DE LECHE 2.jpg",
+      "family": "tres-leches-premium",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches-premium photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Dulce de Leche"
+    },
+    {
+      "sourceId": "1HOBKguX9i9_oKY9rzT47A_tSwFbmLsPo",
+      "sourceFilename": "3L JELLY YOGURT 2.jpg",
+      "family": null,
+      "routes": [],
+      "usage": null,
+      "derivatives": [],
+      "alt": "3L JELLY YOGURT 2 approved photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery"
+    },
+    {
+      "sourceId": "1qNijnmzrFkiPrE1a5A98O4iqZYF_89Kn",
+      "sourceFilename": "3L JELLY YOGURT JAR.jpg",
+      "family": null,
+      "routes": [],
+      "usage": null,
+      "derivatives": [],
+      "alt": "3L JELLY YOGURT JAR approved photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery"
+    },
+    {
+      "sourceId": "1vmFqj39W--kVhw8Y7b3ZtWXg3xeuZ5ne",
+      "sourceFilename": "3L LOTUS 2.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Lotus"
+    },
+    {
+      "sourceId": "1EldYZ3-qAk5TkUVgNUueuNaf7l69sE22",
+      "sourceFilename": "3L LOTUS 3.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Lotus"
+    },
+    {
+      "sourceId": "1GC4XqiyR-3EIClYyO2NJdVgZzsK6bmFk",
+      "sourceFilename": "3L LUXURY EDITION 1.jpg",
+      "family": null,
+      "routes": [],
+      "usage": "unassigned: flavour/size not identified",
+      "derivatives": [],
+      "alt": "Approved decorated cake photograph",
+      "status": "ambiguous",
+      "reason": "Alternate approved angle retained for future gallery",
+      "category": "Cakes"
+    },
+    {
+      "sourceId": "1kTwr5bMIxe0GqFmOmLI8s4VpUPF8wCHe",
+      "sourceFilename": "3L LUXURY EDITION 2.jpg",
+      "family": null,
+      "routes": [],
+      "usage": "unassigned: flavour/size not identified",
+      "derivatives": [],
+      "alt": "Approved decorated cake photograph",
+      "status": "ambiguous",
+      "reason": "Alternate approved angle retained for future gallery",
+      "category": "Cakes"
+    },
+    {
+      "sourceId": "10nVZ0SCXQgrQEpF8UiOX9t52bbHmT-t2",
+      "sourceFilename": "3L M&M´S 2.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "M&Ms"
+    },
+    {
+      "sourceId": "1SA1FMsYgvhUg09SQ7qEIaqGmHTV9QwAa",
+      "sourceFilename": "3L M&M´S 3.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "M&Ms"
+    },
+    {
+      "sourceId": "1r7yRUr-0ewurtOPuggUBoocBY_XqICjb",
+      "sourceFilename": "3L MANGO 2.jpg",
+      "family": "tres-leches-mango",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches-mango photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Mango"
+    },
+    {
+      "sourceId": "1K8V3mdQQcq51-5LHr8iIML3kHIwqnq3t",
+      "sourceFilename": "3L MANGO 3.jpg",
+      "family": "tres-leches-mango",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches-mango photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Mango"
+    },
+    {
+      "sourceId": "1UNayOgEccgx-XIcSzAGc5Aug5EBXoHqg",
+      "sourceFilename": "3L NUTELLA 2.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Nutella"
+    },
+    {
+      "sourceId": "1NITcQTTTk7c6l2jCRSDgCN_Rl5TcLEtB",
+      "sourceFilename": "3L NUTELLA 3.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Nutella"
+    },
+    {
+      "sourceId": "1uS4R7HGAvjKGWutzUknCF7Ay_zHv-GYn",
+      "sourceFilename": "3L OREO 2.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Oreo"
+    },
+    {
+      "sourceId": "1YsjXfUgPwjN0_n08VwqXslRreVv37dbt",
+      "sourceFilename": "3L PISTACHIO 1.jpg",
+      "family": "special-flavours-cake",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved special-flavours-cake photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Pistacchio"
+    },
+    {
+      "sourceId": "1DGmVdtFJAPrYBguQjjFM_LPHnM-WGR4m",
+      "sourceFilename": "3L PISTACHIO 2.jpg",
+      "family": "special-flavours-cake",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved special-flavours-cake photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Pistacchio"
+    },
+    {
+      "sourceId": "1D1UnOXDuf8CqTKgpLgc0o69fuULFGG99",
+      "sourceFilename": "3L RASPBERRY 2.jpg",
+      "family": null,
+      "routes": [],
+      "usage": null,
+      "derivatives": [],
+      "alt": "3L RASPBERRY 2 approved photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery"
+    },
+    {
+      "sourceId": "1lSei6fycSjyN40Q-ICs5pY-HUk-QUH83",
+      "sourceFilename": "3L RASPBERRY 3.jpg",
+      "family": null,
+      "routes": [],
+      "usage": null,
+      "derivatives": [],
+      "alt": "3L RASPBERRY 3 approved photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery"
+    },
+    {
+      "sourceId": "1IvJuul7sz_lvDO1QQJhEspCfZe5C2BT6",
+      "sourceFilename": "3L ROSETTES 2.jpg",
+      "family": "special-flavours-cake",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved special-flavours-cake photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Rosettas"
+    },
+    {
+      "sourceId": "1E7WSR6YjW1Wtv4M-yhMBt3MiqY4prOrY",
+      "sourceFilename": "3L SAFFRON 2.jpg",
+      "family": "special-flavours-cake",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved special-flavours-cake photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Saffron"
+    },
+    {
+      "sourceId": "1Nz-_8JJkyLEmhcj5uwZNUD02EN3Psapi",
+      "sourceFilename": "3L STRAWBERRY 3.jpg",
+      "family": "tres-leches",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate gallery candidate; existing UI has no gallery",
+      "derivatives": [],
+      "alt": "Alternate approved tres-leches photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Vanilla Strawberry"
+    },
+    {
+      "sourceId": "1_DaQHMhtDSFYqhATw-3Ub3RAPfigeSSE",
+      "sourceFilename": "3L ZAFRON 3.jpg",
+      "family": "special-flavours-cake",
+      "routes": [
+        "/menu"
+      ],
+      "usage": "alternate angle",
+      "derivatives": [],
+      "alt": "Alternate Saffron cake photograph",
+      "status": "available but unused",
+      "reason": "Alternate approved angle retained for future gallery",
+      "variant": "Saffron"
+    }
+  ],
+  "editorial": [
+    {
+      "sourceFilename": "mexico-dubai.png",
+      "source": "Existing approved reference artwork; provenance.json",
+      "route": "/",
+      "usage": "editorial",
+      "alt": "Preserved existing alt or decorative empty alt",
+      "status": "assigned",
+      "originalBytes": 1286307,
+      "derivative": {
+        "src": "/brand/approved/editorial-mexico-dubai.webp",
+        "bytes": 334592,
+        "width": 1568,
+        "height": 1003
+      }
+    },
+    {
+      "sourceFilename": "cake-particles.png",
+      "source": "Existing approved reference artwork; provenance.json",
+      "route": "/",
+      "usage": "editorial",
+      "alt": "Preserved existing alt or decorative empty alt",
+      "status": "assigned",
+      "originalBytes": 2165356,
+      "derivative": {
+        "src": "/brand/approved/editorial-cake-particles.webp",
+        "bytes": 347076,
+        "width": 1536,
+        "height": 1024
+      }
+    },
+    {
+      "sourceFilename": "rose-paper.png",
+      "source": "Existing approved reference artwork; provenance.json",
+      "route": "/",
+      "usage": "editorial",
+      "alt": "Preserved existing alt or decorative empty alt",
+      "status": "assigned",
+      "originalBytes": 2618737,
+      "derivative": {
+        "src": "/brand/approved/editorial-rose-paper.webp",
+        "bytes": 261180,
+        "width": 1536,
+        "height": 1024
+      }
+    },
+    {
+      "sourceFilename": "beige-paper.png",
+      "source": "Existing approved reference artwork; provenance.json",
+      "route": "/",
+      "usage": "editorial",
+      "alt": "Preserved existing alt or decorative empty alt",
+      "status": "assigned",
+      "originalBytes": 1765565,
+      "derivative": {
+        "src": "/brand/approved/editorial-beige-paper.webp",
+        "bytes": 186962,
+        "width": 1536,
+        "height": 1024
+      }
+    },
+    {
+      "sourceFilename": "flower.png",
+      "source": "Existing approved reference artwork; provenance.json",
+      "route": "/",
+      "usage": "editorial",
+      "alt": "Preserved existing alt or decorative empty alt",
+      "status": "assigned",
+      "originalBytes": 1846486,
+      "derivative": {
+        "src": "/brand/approved/editorial-flower.webp",
+        "bytes": 289380,
+        "width": 1383,
+        "height": 1137
+      }
+    },
+    {
+      "sourceFilename": "vanilla.png",
+      "source": "Existing approved reference artwork; provenance.json",
+      "route": "/",
+      "usage": "editorial",
+      "alt": "Preserved existing alt or decorative empty alt",
+      "status": "assigned",
+      "originalBytes": 1766049,
+      "derivative": {
+        "src": "/brand/approved/editorial-vanilla.webp",
+        "bytes": 184754,
+        "width": 1536,
+        "height": 1024
+      }
+    },
+    {
+      "sourceFilename": "tape.png",
+      "source": "Existing approved reference artwork; provenance.json",
+      "route": "/",
+      "usage": "editorial",
+      "alt": "Preserved existing alt or decorative empty alt",
+      "status": "assigned",
+      "originalBytes": 1938350,
+      "derivative": {
+        "src": "/brand/approved/editorial-tape.webp",
+        "bytes": 216066,
+        "width": 1536,
+        "height": 1024
+      }
+    },
+    {
+      "sourceFilename": "love.png",
+      "source": "Existing approved reference artwork; provenance.json",
+      "route": "/",
+      "usage": "editorial",
+      "alt": "Preserved existing alt or decorative empty alt",
+      "status": "assigned",
+      "originalBytes": 1677355,
+      "derivative": {
+        "src": "/brand/approved/editorial-love.webp",
+        "bytes": 221992,
+        "width": 1536,
+        "height": 1024
+      }
+    },
+    {
+      "sourceFilename": "journey.svg",
+      "source": "Existing approved reference illustration; vector wrapper unchanged",
+      "route": "/",
+      "usage": "editorial",
+      "status": "assigned",
+      "originalBytes": 1833563,
+      "derivative": {
+        "src": "/brand/approved/editorial-journey.svg",
+        "bytes": 199932
+      }
+    }
+  ],
+  "products": [
+    {
+      "productId": "pan-de-muerto-traditional--azucar",
+      "slug": "pan-de-muerto-traditional--azucar",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-traditional",
+      "variant": "Azúcar"
+    },
+    {
+      "productId": "pan-de-muerto-traditional--ajonjoli",
+      "slug": "pan-de-muerto-traditional--ajonjoli",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-traditional",
+      "variant": "Ajonjolí"
+    },
+    {
+      "productId": "pan-de-muerto-traditional--azucar-chocolate-covering",
+      "slug": "pan-de-muerto-traditional--azucar-chocolate-covering",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-traditional",
+      "variant": "Azúcar · Chocolate covering"
+    },
+    {
+      "productId": "pan-de-muerto-filled--crema-diplomatica-vainilla",
+      "slug": "pan-de-muerto-filled--crema-diplomatica-vainilla",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Crema diplomática (vainilla)"
+    },
+    {
+      "productId": "pan-de-muerto-filled--chocolate",
+      "slug": "pan-de-muerto-filled--chocolate",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Chocolate"
+    },
+    {
+      "productId": "pan-de-muerto-filled--mascarpone-y-cajeta",
+      "slug": "pan-de-muerto-filled--mascarpone-y-cajeta",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Mascarpone y cajeta"
+    },
+    {
+      "productId": "pan-de-muerto-filled--mascarpone-y-fresas",
+      "slug": "pan-de-muerto-filled--mascarpone-y-fresas",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Mascarpone y fresas"
+    },
+    {
+      "productId": "pan-de-muerto-filled--pistachio",
+      "slug": "pan-de-muerto-filled--pistachio",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled",
+      "variant": "Pistachio"
+    },
+    {
+      "productId": "pan-de-muerto-traditional-pack",
+      "slug": "pan-de-muerto-traditional-pack",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-traditional-pack",
+      "variant": ""
+    },
+    {
+      "productId": "pan-de-muerto-filled-pack",
+      "slug": "pan-de-muerto-filled-pack",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "pan-de-muerto-filled-pack",
+      "variant": ""
+    },
+    {
+      "productId": "conchas-traditional--chocolate",
+      "slug": "conchas-traditional--chocolate",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "conchas-traditional",
+      "variant": "Chocolate"
+    },
+    {
+      "productId": "conchas-filled--pistache",
+      "slug": "conchas-filled--pistache",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "conchas-filled",
+      "variant": "Pistache"
+    },
+    {
+      "productId": "conchas-traditional-pack",
+      "slug": "conchas-traditional-pack",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "conchas-traditional-pack",
+      "variant": ""
+    },
+    {
+      "productId": "conchas-filled-pack",
+      "slug": "conchas-filled-pack",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "conchas-filled-pack",
+      "variant": ""
+    },
+    {
+      "productId": "tres-leches--vanilla-strawberry",
+      "slug": "tres-leches--vanilla-strawberry",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1SAFjwElHzkXtQfxLRSSxNpie7FTSO8YD",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Vanilla Strawberry"
+    },
+    {
+      "productId": "tres-leches--classic",
+      "slug": "tres-leches--classic",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1AQVsRpJ6v13GhTGJEICFDPK-vyq13DJO",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Classic"
+    },
+    {
+      "productId": "tres-leches--nutella",
+      "slug": "tres-leches--nutella",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1xZMi2wjmbPuK9-KQthnfv_K8AvRlLBXb",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Nutella"
+    },
+    {
+      "productId": "tres-leches--caffe-latte",
+      "slug": "tres-leches--caffe-latte",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1UOxCTO1a2wbHKtWGe7pB1Y9tvfDeU0sI",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Caffe Latte"
+    },
+    {
+      "productId": "tres-leches--coconut",
+      "slug": "tres-leches--coconut",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1OCd7HYnPsl_ZbjF4m1SvRDMWKDN7OftN",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Coconut"
+    },
+    {
+      "productId": "tres-leches--confetti",
+      "slug": "tres-leches--confetti",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1eJaF3IF79qvg_P-Jh0fFhb9mPsgqasv7",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Confetti"
+    },
+    {
+      "productId": "tres-leches--lotus",
+      "slug": "tres-leches--lotus",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1U_I7bIHh5eR1FELk61uKe4wTkLvZ6oPP",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Lotus"
+    },
+    {
+      "productId": "tres-leches--m-ms",
+      "slug": "tres-leches--m-ms",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1LIEZjzeslI-ZMpGYCfk8zqeGB5tqP7Xq",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "M&Ms"
+    },
+    {
+      "productId": "tres-leches--oreo",
+      "slug": "tres-leches--oreo",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1jI6gdcjCpMYgwG5mc-0J_om6s2j2RVDr",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches",
+      "variant": "Oreo"
+    },
+    {
+      "productId": "tres-leches-premium--dulce-de-leche",
+      "slug": "tres-leches-premium--dulce-de-leche",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1ZfXU_Gaeg4Rd3dPVmMZS6dsucnwVWraF",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches-premium",
+      "variant": "Dulce de Leche"
+    },
+    {
+      "productId": "tres-leches-premium--tiramisu",
+      "slug": "tres-leches-premium--tiramisu",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "tres-leches-premium",
+      "variant": "Tiramisu"
+    },
+    {
+      "productId": "tres-leches-mango--mango",
+      "slug": "tres-leches-mango--mango",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "17PHX1fgmJXdAsdA2HQKWkVW6kyg8rt_G",
+      "gallerySourceIds": [],
+      "familyId": "tres-leches-mango",
+      "variant": "Mango"
+    },
+    {
+      "productId": "special-flavours-cake--berries",
+      "slug": "special-flavours-cake--berries",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Berries"
+    },
+    {
+      "productId": "special-flavours-cake--chocolate",
+      "slug": "special-flavours-cake--chocolate",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Chocolate"
+    },
+    {
+      "productId": "special-flavours-cake--half-rosettas",
+      "slug": "special-flavours-cake--half-rosettas",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Half Rosettas"
+    },
+    {
+      "productId": "special-flavours-cake--matcha",
+      "slug": "special-flavours-cake--matcha",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Matcha"
+    },
+    {
+      "productId": "special-flavours-cake--pistacchio",
+      "slug": "special-flavours-cake--pistacchio",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1Z4vZNR3PPsndURye2AfcD9CjoBfeeOF0",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Pistacchio"
+    },
+    {
+      "productId": "special-flavours-cake--raspberry",
+      "slug": "special-flavours-cake--raspberry",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1wtPk4YjUv5irLyHpbhaet_uPdD7uSt7A",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Raspberry"
+    },
+    {
+      "productId": "special-flavours-cake--rosettas",
+      "slug": "special-flavours-cake--rosettas",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1pJ9RvHUzcor5MlJcuAFh_-cnXC2MovUS",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Rosettas"
+    },
+    {
+      "productId": "special-flavours-cake--saffron",
+      "slug": "special-flavours-cake--saffron",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1uF3N2VrJvySMHYoYxaOVgUmVdcb4OPCG",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-cake",
+      "variant": "Saffron"
+    },
+    {
+      "productId": "cake-jar--classic",
+      "slug": "cake-jar--classic",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1IxsNrRhMch8ivpqeqLMuIgCcjmDeSJlG",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Classic"
+    },
+    {
+      "productId": "cake-jar--vanilla-strawberry",
+      "slug": "cake-jar--vanilla-strawberry",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1o85mQyi2C3FTp2IfS6tso4a2ovDA8p_J",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Vanilla Strawberry"
+    },
+    {
+      "productId": "cake-jar--nutella",
+      "slug": "cake-jar--nutella",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1X4G9m-4hMxBojkopCtvVQWBQUFQqsjpN",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Nutella"
+    },
+    {
+      "productId": "cake-jar--lotus",
+      "slug": "cake-jar--lotus",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1y9ANv6P_H2yn0Vq8JgusvrG1emc9xJNz",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Lotus"
+    },
+    {
+      "productId": "cake-jar--caffe-latte",
+      "slug": "cake-jar--caffe-latte",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1p_7FlK7hMBIsD0YyhWFWJH7Zk8xq1mUx",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Caffe Latte"
+    },
+    {
+      "productId": "cake-jar--coconut",
+      "slug": "cake-jar--coconut",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1mVJC2qORChL9HKG_uIJoP0oXA48gzop9",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Coconut"
+    },
+    {
+      "productId": "cake-jar--oreo-cookies-and-cream",
+      "slug": "cake-jar--oreo-cookies-and-cream",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1wdfmRu1s5GC_2U9CSj3MzSTqfpJyrCWQ",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Oreo (cookies and cream)"
+    },
+    {
+      "productId": "cake-jar--confetti",
+      "slug": "cake-jar--confetti",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1FWE_CNXVYg8gPwSQrv92wcJkd-hGuxSS",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "Confetti"
+    },
+    {
+      "productId": "cake-jar--m-ms",
+      "slug": "cake-jar--m-ms",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1zzkmTomAqXw8nxY7lMBDPIen--oXhN8A",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar",
+      "variant": "M&Ms"
+    },
+    {
+      "productId": "cake-jar-premium--tiramisu",
+      "slug": "cake-jar-premium--tiramisu",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "cake-jar-premium",
+      "variant": "Tiramisu"
+    },
+    {
+      "productId": "cake-jar-premium--mango",
+      "slug": "cake-jar-premium--mango",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1chQqCp9MWbFHP1xHoPJw_CZnF1mZNquI",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar-premium",
+      "variant": "Mango"
+    },
+    {
+      "productId": "cake-jar-premium--dulce-de-leche",
+      "slug": "cake-jar-premium--dulce-de-leche",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1eRoVXACLOyqsCtM6W1odO921Jv9MjAX8",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar-premium",
+      "variant": "Dulce De Leche"
+    },
+    {
+      "productId": "cake-jar-bundle",
+      "slug": "cake-jar-bundle",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1rTHqazck_5X9O-4bRbv48qCpS0QpnHiT",
+      "gallerySourceIds": [],
+      "familyId": "cake-jar-bundle",
+      "variant": ""
+    },
+    {
+      "productId": "special-flavours-jar--raspberry",
+      "slug": "special-flavours-jar--raspberry",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1pTYRUW2Va5-wK8DM2jPlogEm2FdZPqf3",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-jar",
+      "variant": "Raspberry"
+    },
+    {
+      "productId": "special-flavours-jar--saffron",
+      "slug": "special-flavours-jar--saffron",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1L8XDW2YvTblEdLZ0IdmT3TSn-rAVv-Ma",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-jar",
+      "variant": "Saffron"
+    },
+    {
+      "productId": "special-flavours-jar--pistacchio",
+      "slug": "special-flavours-jar--pistacchio",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1AXQLq_TRNx-xI64rFutDFBMoBj0k6rOd",
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-jar",
+      "variant": "Pistacchio"
+    },
+    {
+      "productId": "special-flavours-jar--matcha",
+      "slug": "special-flavours-jar--matcha",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-jar",
+      "variant": "Matcha"
+    },
+    {
+      "productId": "special-flavours-jar--chocolate",
+      "slug": "special-flavours-jar--chocolate",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-jar",
+      "variant": "Chocolate"
+    },
+    {
+      "productId": "special-flavours-jar--berries",
+      "slug": "special-flavours-jar--berries",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "special-flavours-jar",
+      "variant": "Berries"
+    },
+    {
+      "productId": "carrot-cake",
+      "slug": "carrot-cake",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "carrot-cake",
+      "variant": ""
+    },
+    {
+      "productId": "cheesecake",
+      "slug": "cheesecake",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "cheesecake",
+      "variant": ""
+    },
+    {
+      "productId": "jelly-gelatina-fruits",
+      "slug": "jelly-gelatina-fruits",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "jelly-gelatina-fruits",
+      "variant": ""
+    },
+    {
+      "productId": "jelly-gelatina-dulce-de-leche",
+      "slug": "jelly-gelatina-dulce-de-leche",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "jelly-gelatina-dulce-de-leche",
+      "variant": ""
+    },
+    {
+      "productId": "jelly-gelatina-yogurt-strawberry",
+      "slug": "jelly-gelatina-yogurt-strawberry",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1svsv4gUExatnLjoaenagvjym26Q_eKUQ",
+      "gallerySourceIds": [],
+      "familyId": "jelly-gelatina-yogurt-strawberry",
+      "variant": ""
+    },
+    {
+      "productId": "orejas",
+      "slug": "orejas",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "orejas",
+      "variant": ""
+    },
+    {
+      "productId": "bisquets",
+      "slug": "bisquets",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "bisquets",
+      "variant": ""
+    },
+    {
+      "productId": "croissant--plain",
+      "slug": "croissant--plain",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "croissant",
+      "variant": "Plain"
+    },
+    {
+      "productId": "croissant--chocolate",
+      "slug": "croissant--chocolate",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "croissant",
+      "variant": "Chocolate"
+    },
+    {
+      "productId": "croissant--pistacchio",
+      "slug": "croissant--pistacchio",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "croissant",
+      "variant": "Pistacchio"
+    },
+    {
+      "productId": "croissant--cherry",
+      "slug": "croissant--cherry",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "croissant",
+      "variant": "Cherry"
+    },
+    {
+      "productId": "croissant--integral",
+      "slug": "croissant--integral",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "croissant",
+      "variant": "Integral"
+    },
+    {
+      "productId": "cubilete--cream",
+      "slug": "cubilete--cream",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "cubilete",
+      "variant": "Cream"
+    },
+    {
+      "productId": "cubilete--cheese",
+      "slug": "cubilete--cheese",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "cubilete",
+      "variant": "Cheese"
+    },
+    {
+      "productId": "rosca-de-reyes",
+      "slug": "rosca-de-reyes",
+      "status": "PHOTO PENDING FROM LISA",
+      "primarySourceId": null,
+      "gallerySourceIds": [],
+      "familyId": "rosca-de-reyes",
+      "variant": ""
+    },
+    {
+      "productId": "milk",
+      "slug": "milk",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1Yh8wTTrCuJipMiDKmzFK8G4pMAeQxyaG",
+      "gallerySourceIds": [],
+      "familyId": "milk",
+      "variant": ""
+    },
+    {
+      "productId": "cake-topper",
+      "slug": "cake-topper",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1PPfBb0zDzygPb4o5oklRJZAy843rH75s",
+      "gallerySourceIds": [],
+      "familyId": "cake-topper",
+      "variant": ""
+    },
+    {
+      "productId": "candles",
+      "slug": "candles",
+      "status": "FINAL PHOTO AVAILABLE",
+      "primarySourceId": "1-yxiwJ39gk3YJNHW8h6ALuZisG2NZ_qm",
+      "gallerySourceIds": [],
+      "familyId": "candles",
+      "variant": ""
+    }
+  ]
+}

@@ -1,0 +1,229 @@
+{
+  "08.jpg": {
+    "mode": "crop",
+    "square": [
+      32,
+      491,
+      1305
+    ]
+  },
+  "11.png": {
+    "mode": "crop",
+    "square": [
+      128,
+      332,
+      791
+    ]
+  },
+  "09.png": {
+    "mode": "crop",
+    "square": [
+      0,
+      354,
+      1024
+    ]
+  },
+  "06.jpg": {
+    "mode": "crop",
+    "square": [
+      7,
+      482,
+      1311
+    ]
+  },
+  "12.png": {
+    "mode": "crop",
+    "square": [
+      261,
+      0,
+      1024
+    ]
+  },
+  "10.png": {
+    "mode": "crop",
+    "square": [
+      132,
+      478,
+      740
+    ]
+  },
+  "14.png": {
+    "mode": "crop",
+    "square": [
+      35,
+      300,
+      989
+    ]
+  },
+  "14 PNG.png": {
+    "mode": "crop",
+    "square": [
+      -66,
+      209,
+      1169
+    ]
+  },
+  "13.png": {
+    "mode": "canvas"
+  },
+  "16.jpg": {
+    "mode": "crop",
+    "square": [
+      21,
+      516,
+      1344
+    ]
+  },
+  "18.jpg": {
+    "mode": "crop",
+    "square": [
+      90,
+      554,
+      1184
+    ]
+  },
+  "16 PNG.png": {
+    "mode": "crop",
+    "square": [
+      -56,
+      216,
+      1156
+    ]
+  },
+  "18 PNG.png": {
+    "mode": "crop",
+    "square": [
+      -100,
+      195,
+      1230
+    ]
+  },
+  "29.png": {
+    "mode": "crop",
+    "square": [
+      0,
+      626,
+      941
+    ]
+  },
+  "23.png": {
+    "mode": "crop",
+    "square": [
+      23,
+      314,
+      989
+    ]
+  },
+  "30.png": {
+    "mode": "crop",
+    "square": [
+      0,
+      645,
+      941
+    ]
+  },
+  "26.png": {
+    "mode": "crop",
+    "square": [
+      16,
+      287,
+      999
+    ]
+  },
+  "17.jpg": {
+    "mode": "crop",
+    "square": [
+      0,
+      487,
+      1365
+    ]
+  },
+  "20.jpg": {
+    "mode": "crop",
+    "square": [
+      0,
+      323,
+      1365
+    ]
+  },
+  "24.png": {
+    "mode": "crop",
+    "square": [
+      0,
+      522,
+      941
+    ]
+  },
+  "21.png": {
+    "mode": "crop",
+    "square": [
+      283,
+      32,
+      969
+    ]
+  },
+  "07.png": {
+    "mode": "crop",
+    "square": [
+      0,
+      440,
+      1024
+    ]
+  },
+  "25.png": {
+    "mode": "crop",
+    "square": [
+      0,
+      532,
+      941
+    ]
+  },
+  "27.jpg": {
+    "mode": "crop",
+    "square": [
+      0,
+      896,
+      1152
+    ],
+    "note": "front bread; the rear bread is already cut by the source frame"
+  },
+  "15 PNG.png": {
+    "mode": "crop",
+    "square": [
+      -60,
+      248,
+      1147
+    ]
+  },
+  "02.png": {
+    "mode": "extend",
+    "top": 256,
+    "bottom": 256
+  },
+  "01.png": {
+    "mode": "extend",
+    "top": 256,
+    "bottom": 256
+  },
+  "03.png": {
+    "mode": "extend",
+    "top": 512,
+    "bottom": 0
+  },
+  "04.png": {
+    "mode": "crop",
+    "square": [
+      256,
+      0,
+      1024
+    ],
+    "note": "tight detail; every bread is already cut by the source frame"
+  },
+  "13.png#pack": {
+    "mode": "extend",
+    "trimBottom": 40,
+    "top": 370,
+    "bottom": 182,
+    "bottomFill": "mirror"
+  }
+}

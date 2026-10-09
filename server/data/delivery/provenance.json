@@ -1,0 +1,10 @@
+{
+  "source": "docs/sources/3L_Dubai_delivery_coverage.geojson",
+  "sourceSha256": "69acabeb0de1b15935cb0ab9e995e30be7152ce3e78b5da0d2ec23b72e7b9e0b",
+  "received": "2026-10-03",
+  "geometry": "Polygon",
+  "positions": 37,
+  "coordinateChanges": false,
+  "exclusions": 0,
+  "approval": "User supplied final outer coverage; supersedes earlier screenshot"
+}

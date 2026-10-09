@@ -13,3 +13,101 @@ Before making substantial visual changes, use the Product Design plugin's `get-c
 When implementing from a selected generated mock, treat that image as the source of truth for layout, component anatomy, density, spacing, color, typography, visible content, and hierarchy.
 
 Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts/prepare-sites-build.mjs`, and `tests/sites-worker.test.mjs` intact so the same local prototype can be handed to Sites. Before a Sites handoff, run `npm run build` and `npm run test:sites`; the build must leave `dist/client/index.html`, `dist/server/index.js`, and `dist/.openai/hosting.json`.
+
+## Commerce OS extension (TL-09–TL-12)
+
+- Continue directly in this Git repository; do not use Lovable.
+- New operational code is strict TypeScript in `server/` and `src/commerce/`. Validate financial/state changes on the server and keep external integrations behind adapters.
+- The original storefront/history remain labelled demo. Never promote its client-selected payment labels into reconciled operational records.
+- Delivery source data are in `docs/sources/`; unspecified fees/minimums must stay unknown and block payment until reviewed. Do not invent geography or rates.
+- Full runtime is compiled Node + SQLite (`npm start` after `npm run build`). The preserved Sites Worker is static-only; never publish it as the complete operational backend.
+- Load base styles before Commerce workspace styles so the responsive navigation overrides remain effective.
+- Validate changes with typecheck, lint, unit/HTTP tests, build, original Sites tests and affected Playwright scenarios. Browser E2E uses its own disposable database on port 5174.
+
+## Approved 3L brand phase (TL-19–TL-21)
+
+- The user's corporate manual and Master Build Specification supersede the earlier visual option for the customer site only. Use Abril Fatface / Montserrat Medium, corporate lavender/blush/gold anchors and documented cream/brown web neutrals.
+- `src/brand/` is the customer experience; `src/brand/content.ts` is its approved content/asset boundary. Never populate it from the fictitious Commerce OS catalog.
+- Preserve the original checkout under the explicit MVP demo entry and operations under Gestión. Do not impose editorial compositions on the workspace.
+- Heritage is MEXICO CITY SINCE 1982. Missing imagery, products, phone numbers, reviews, URLs and legal content remain explicit data slots. The supplied MP4 is a filmed screen reference, not a production hero asset.
+- No push, deploy or merge without explicit user approval. Build includes a prerendered brand shell for no-JavaScript reading; the preserved Worker is still static-only.
+- Brand QA covers 320/375/390/430/768/1024/1280/1440, keyboard/modal, reduced motion, axe and original Commerce regressions. See `docs/brand/implementation.md`.
+
+## TL-24 release cleanup (supersedes prototype/demo instructions above)
+- Runtime and navigation must contain only canonical operations and the approved brand site. No legacy MVP entry or synthetic data.
+- Test fixtures belong under tests/ and must be injected explicitly; staging seeds are empty. Preserve production/provider activation gates.
+
+## TL-25 provider activation
+- Paymennt notifications use raw bytes, Base64 HMAC-SHA256 with the private registered hmacKey. Notification payload is never financial authority; GET reconciliation and durable receipts are mandatory.
+- Independent provider groups activate by configuration; Meta outbound remains explicit, same-origin and governed by the 24h/template policy.
+- Approved catalog lives in SQLite; use the validated admin import with backup. No runtime product fixtures.
+- Admin readiness is staging-only. Do not assert PILOT READY or enable live/production without real provider validation and Lisa UAT.
+- Current activation instructions: `docs/today-activation-runbook.md`; older TL18 blocked-contract notes are historical.
+
+## Authorized offline Production release (2026-09-11)
+- Production may run the current code with providers offline; this supersedes the earlier unconditional production boot block, not the LIVE payment gate.
+- Require a dedicated release-production database, secure hosted configuration, no STAGING_SEED variable, Meta/AI disabled and copilot defaults. Never copy staging secrets or databases.
+- Authenticated admin readiness GET is available in production; provider probes remain staging-only. See docs/production-offline-release.md.
+
+## TL-27 premium operations shell
+- Operations use a fixed left sidebar (252px desktop, 80px tablet rail) and a native modal drawer below 768px. One centralized navigation; existing permissions and routes remain authoritative.
+- Approved operations styling: Montserrat UI, warm neutral surfaces, restrained lavender and taupe. No decorative headings for operational data; customer storefront unchanged.
+- UI-only scope: preserve providers, auth, domain logic, database, state machine and commercial rules. No fake catalog/conversations/metrics.
+- Branch feature/3l-premium-dashboard-shell stays local until Rodrigo reviews screenshots. No automatic production deployment or merge.
+
+## Approved current Liza menu (1 October 2026)
+- Canonical repository is `~/code/tres-leches-demo`. Preserve the approved public storefront direction.
+- `src/brand/menu-data.json` and `data-imports/liza-current-menu.json` contain the reviewed current menu; the old AED25 `pan-de-muerto` SKU is retired and exists only in historical test fixtures.
+- Latest Pan de Muerto/Conchas image menus override the older PDF. Packs have no invented assortment rules. Filled Conchas select size and filling only. Special cake sizes remain Mini / Small / Big.
+- Advance-order notices apply only to Mango Cake, gelatinas and Rosca. Do not change scheduling or payment logic to implement them.
+- Customer orders use product → cart → web checkout → Paymennt. WhatsApp remains support-only. No deploy without approval.
+
+## Approved UAT patch V2 (3 October 2026)
+- Flavours are separate authored storefront products with stable slugs; sizes/packs retain authoritative SKU IDs. Retired concha SKUs remain historical, not purchasable. Traditional conchas: Chocolate only. Filled conchas: Pistache only, existing prices confirmed.
+- Customer approved maximum100 units per SKU; quantity supports direct integer entry. Pan singles season begins October3 through November15.
+- Full text header wordmark, linked homepage menu preview, accessible visual ordering guide, scroll-driven assembly of separate cake layers; no looping motion and reduced motion shows final composition.
+- Optional international WhatsApp contact is separate from required UAE operations mobile. Production remains legacy address mode; Google prepared but off.
+
+## Approved final polish and cutoff (6 October 2026)
+- Preserve existing assets/layout and cream/cacao identity; use reusable blush/pink accents. Journal portrait reveals original raster pencil detail with scroll-driven SVG brush masking. Mexico→Dubai route follows the physical journey (left→right desktop, top→bottom stacked mobile), never reversed by RTL. Reduced-motion shows final composition.
+- Customer next-day cutoff is Asia/Dubai: entire 21:00 minute inclusive; 21:01 onward earliest global date is day after tomorrow. Delivery and pickup server normalization use shared policy, preserve 12/24-hour product-specific window-start notice and choose the later valid date. No closed production weekdays are invented.
+- Apple Pay is provider-hosted, observed visible in Safari macOS on an existing authorized LIVE checkout. Do not add Apple/Stripe JS, change payment credentials or simulate a wallet button.
+- MCP is audit/planning scope only; keep remote activation and any write tool behind separate explicit authorization. No Meta outbound, migration or ownership change. This sprint is TEST/preview-only until Production is separately authorized.
+
+## Visual polish v2 (6 October 2026, hotfix after failed visual acceptance)
+- Scroll-driven artwork measures the artwork's own on-screen centre, never its taller section; otherwise the animation finishes before it is visible.
+- Mexico→Dubai: pink route drawn behind a visible moving marker; 0–20% Mexico active, 20–80% travel, 80–100% Dubai active. Sizes are authored in screen pixels.
+- Journal portrait is drawn by hand-placed pencil strokes in an artist's order (construction, eyes and nose, mouth, hair, shoulders and necklace, secondary linework), each line growing behind a pencil point, then the untouched original resolves over them. Stroke data: `src/brand/journal-drawing.json`. No hatching, masks, wipes, filters or edge detection. Strokes are explicit geometry: Safari mis-measures dashes on long paths.
+
+## Final 3L web palette (6 October 2026, authoritative; supersedes the five-colour palette)
+- Brand colours are ONLY `--3l-blush #F6DFE0` (Pantone 9286 C) and `--3l-gold #A28D5B` (Pantone 8383 C), declared once on `:root` in `src/styles.css`, plus the existing cream/beige base. Pink `#FFC0C8`, lavender `#A191B2` and lavender-soft `#DDDAE8` are retired from the customer site: do not reintroduce them, approximate, or tint by opacity.
+- Cream/beige stays the dominant canvas. Blush = warm surfaces and selected states; gold = rules, markers, active lines and the Mexico→Dubai route.
+- Neither colour reaches text contrast on cream: text, numerals and outlines stay chocolate; focus rings pair a chocolate outline with a gold halo.
+- `tests/polish-e2e/polish.spec.ts` asserts the computed token values, the rendered colours, and that no retired colour is defined or painted.
+- Operations (`src/commerce/`) keeps its TL-27 styling and functional status colours until Joel decides otherwise.
+
+## Order Experience V2 (6 October 2026)
+- Customer-facing order number is `publicOrderNumber` shown as `#001`; the internal `TL-…` id stays the only key for payments, idempotency and audit. Issued once when an order first becomes paid; historical orders are not renumbered and show their internal id.
+- Checkout captures first and last name separately. Delivery area is a typeahead whose value is always a canonical zone id; minimums come from the zone, never from typed text.
+- Pickup asks only for street and city as billing (name from contact, country fixed UAE); never use the shop address as a customer's billing address. Pickup point is "3L Pastelerías".
+- Customer emails are durable events written with the operator's transition (production started; ready for pickup — pickup only; out for delivery — delivery only), sent through Resend only when explicitly enabled. Manager WhatsApp number is private configuration (`WHATSAPP_MANAGER_PHONE`), never source. `META_OUTBOUND_ENABLED` stays false until Meta approval.
+- Details and remaining configuration: `docs/order-experience/v2.md`.
+
+## Official Pan de Muerto photography (9 October 2026)
+- Source library stays outside the repo; `docs/brand/pan-de-muerto-photo-map.csv` accounts for all 50 files and `scripts/prepare-official-pan-media.py` regenerates public derivatives. Photos are assigned by visible coating/filling only; mixed boards are category imagery, never a flavour or pack. Never publish a photo together with its cutout twin.
+- One rotation (`MediaRotation` in `src/brand/media.tsx`) serves cards and the Pan de Muerto banner. Products without their own photo keep the earlier image.
+
+## Removed Pan de Muerto combinations (9 October 2026, Joel)
+- Six chocolate-covering combinations were never approved and are removed: Ajonjolí · Chocolate covering (traditional) and Chocolate covering on all five fillings. The only covering product is Azúcar · Chocolate covering. Do not reintroduce them.
+- Their 12 SKU ids live in `RETIRED_SKUS` (`shared/commerce-policy.ts`), which blocks listing and checkout regardless of the stored catalog; the import file marks them inactive. Historical orders are untouched.
+
+## Approved Pan de Muerto prices (9 October 2026, Joel) — Conchas deferred
+- Table and previous→new values: `server/domain/pan-price-update.ts`. Traditional 13/15; filled 21/23; Pistachio 23/26; packs 72/140/80/155 (traditional), 120/235/130/255 (filled). Pack prices are fixed, never multiples.
+- Conchas (prices, names, variants, availability, photos) are out of scope until the next sprint and must stay identical to the released catalog. Azúcar · Chocolate covering Pan de Muerto and the filled Pistache concha are authorized products: never remove them.
+- Production prices change only through `update-pan-prices` (plan, then apply); never the general importer for this release. See `docs/catalog/current-menu.md`.
+- Homepage hero: new story film at ≥1024px, original packaging video below. Static files answer Range requests so Safari can play video.
+
+## Menu watermark, restored banner and square pack photos (9 October 2026, Joel and Lisa)
+- The official wordmark appears once as an 8% watermark (Joel approved Proposal A) behind the Menu introduction only (`.b-menu-intro-mark`). Never on product photos, cards, galleries, detail pages, or as a repeating or global background.
+- The Pan de Muerto category banner is back (Lisa): the four mixed boards, whole, 3:2, same 3.5 s rotation. No banners on other categories. This supersedes the earlier "banner removed" decision.
+- Pack photos are square by continuing each photo's own background (`extend` in `scripts/official-pan-crops.json`); breads are never copied, moved or redrawn. The filled pack uses its own asset (`official-pan-13-pack`) so Crema diplomática's approved third photo is untouched.

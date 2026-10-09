@@ -9,3 +9,11 @@ playwright-report/
 test-results/
 *.log
 .DS_Store
+
+# Reviewed, public delivery geography is source code, not a runtime database.
+!server/data/
+server/data/*
+!server/data/delivery/
+server/data/delivery/*
+!server/data/delivery/approved-coverage.json
+!server/data/delivery/provenance.json
