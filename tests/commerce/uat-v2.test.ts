@@ -39,7 +39,7 @@ test("UAT V2: every active SKU belongs to exactly one stable single-flavour prod
 });
 test("UAT V2: conchas only chocolate traditional and pistache filled at approved prices", () => {
   for (const [id, variant, prices] of [
-    ["conchas-traditional", "Chocolate", [1300, 1100]],
+    ["conchas-traditional", "Chocolate", [1500, 1300]],
     ["conchas-filled", "Pistache", [2100, 1800]],
   ] as const) {
     const options = menuFamilies.find((f) => f.id === id)!.options;

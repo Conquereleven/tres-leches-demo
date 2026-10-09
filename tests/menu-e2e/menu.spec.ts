@@ -46,7 +46,7 @@ test("latest individual sizes, fillings and packs preserve their precise prices"
   await category(page, "Pan de Muerto");
   await expect(
     family(page, "pan-de-muerto-traditional").getByRole("button", {
-      name: "ADD TO CART · AED 13",
+      name: "ADD TO CART · AED 15",
     }),
   ).toBeEnabled();
   const pack = family(page, "pan-de-muerto-filled-pack");
@@ -55,7 +55,7 @@ test("latest individual sizes, fillings and packs preserve their precise prices"
     .getByRole("combobox", { name: "Pack", exact: true })
     .selectOption("12 individuales");
   await expect(
-    pack.getByRole("button", { name: "ADD TO CART · AED 235" }),
+    pack.getByRole("button", { name: "ADD TO CART · AED 255" }),
   ).toBeEnabled();
   await category(page, "Conchas");
   const concha = family(page, "conchas-filled");
@@ -78,7 +78,7 @@ test("multiple menu SKUs go through cart and existing web checkout with authorit
     .getByRole("combobox")
     .selectOption("6 mini");
   await family(page, "pan-de-muerto-traditional-pack")
-    .getByRole("button", { name: "ADD TO CART · AED 60" })
+    .getByRole("button", { name: "ADD TO CART · AED 72" })
     .click();
   await category(page, "Cake Jars");
   const bundle = family(page, "cake-jar-bundle");
@@ -90,11 +90,11 @@ test("multiple menu SKUs go through cart and existing web checkout with authorit
     .getByRole("button", { name: "ADD TO CART · AED 25" })
     .click();
   await page.goto("/cart");
-  await expect(page.locator("main")).toContainText("AED 215");
+  await expect(page.locator("main")).toContainText("AED 227");
   await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
   await expect(page).toHaveURL(/\/checkout$/);
   await chooseArea(page, "JLT", "JLT Cluster C");
-  await expect(page.locator("main")).toContainText("AED 215");
+  await expect(page.locator("main")).toContainText("AED 227");
   await expect(
     page.getByRole("link", { name: /ORDER ON WHATSAPP/ }),
   ).toHaveCount(0);
@@ -193,7 +193,7 @@ for (const width of [390, 768, 1440]) {
       .getByRole("combobox")
       .selectOption("6 mini");
     await family(page, "pan-de-muerto-traditional-pack")
-      .getByRole("button", { name: "ADD TO CART · AED 60" })
+      .getByRole("button", { name: "ADD TO CART · AED 72" })
       .click();
     await page.goto("/cart");
     await shot("cart");

@@ -6,7 +6,7 @@
       "name": "Pan de Muerto tradicional · Azúcar · Mini · 40 g",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto tradicional · Azúcar · Mini · 40 g",
-      "priceAed": "11.00",
+      "priceAed": "13.00",
       "active": true,
       "availability": "available"
     },
@@ -15,7 +15,7 @@
       "name": "Pan de Muerto tradicional · Azúcar · Individual · 70 g",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto tradicional · Azúcar · Individual · 70 g",
-      "priceAed": "13.00",
+      "priceAed": "15.00",
       "active": true,
       "availability": "available"
     },
@@ -24,7 +24,7 @@
       "name": "Pan de Muerto tradicional · Ajonjolí · Mini · 40 g",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto tradicional · Ajonjolí · Mini · 40 g",
-      "priceAed": "11.00",
+      "priceAed": "13.00",
       "active": true,
       "availability": "available"
     },
@@ -33,7 +33,7 @@
       "name": "Pan de Muerto tradicional · Ajonjolí · Individual · 70 g",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto tradicional · Ajonjolí · Individual · 70 g",
-      "priceAed": "13.00",
+      "priceAed": "15.00",
       "active": true,
       "availability": "available"
     },
@@ -42,7 +42,7 @@
       "name": "Pan de Muerto relleno · Crema diplomática (vainilla) · Mini",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto relleno · Crema diplomática (vainilla) · Mini",
-      "priceAed": "18.00",
+      "priceAed": "21.00",
       "active": true,
       "availability": "available"
     },
@@ -51,7 +51,7 @@
       "name": "Pan de Muerto relleno · Crema diplomática (vainilla) · Individual",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto relleno · Crema diplomática (vainilla) · Individual",
-      "priceAed": "21.00",
+      "priceAed": "23.00",
       "active": true,
       "availability": "available"
     },
@@ -60,7 +60,7 @@
       "name": "Pan de Muerto relleno · Chocolate · Mini",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto relleno · Chocolate · Mini",
-      "priceAed": "18.00",
+      "priceAed": "21.00",
       "active": true,
       "availability": "available"
     },
@@ -69,7 +69,7 @@
       "name": "Pan de Muerto relleno · Chocolate · Individual",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto relleno · Chocolate · Individual",
-      "priceAed": "21.00",
+      "priceAed": "23.00",
       "active": true,
       "availability": "available"
     },
@@ -78,7 +78,7 @@
       "name": "Pan de Muerto relleno · Mascarpone y cajeta · Mini",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto relleno · Mascarpone y cajeta · Mini",
-      "priceAed": "18.00",
+      "priceAed": "21.00",
       "active": true,
       "availability": "available"
     },
@@ -87,7 +87,7 @@
       "name": "Pan de Muerto relleno · Mascarpone y cajeta · Individual",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto relleno · Mascarpone y cajeta · Individual",
-      "priceAed": "21.00",
+      "priceAed": "23.00",
       "active": true,
       "availability": "available"
     },
@@ -96,7 +96,7 @@
       "name": "Pan de Muerto relleno · Mascarpone y fresas · Mini",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto relleno · Mascarpone y fresas · Mini",
-      "priceAed": "18.00",
+      "priceAed": "21.00",
       "active": true,
       "availability": "available"
     },
@@ -105,7 +105,7 @@
       "name": "Pan de Muerto relleno · Mascarpone y fresas · Individual",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto relleno · Mascarpone y fresas · Individual",
-      "priceAed": "21.00",
+      "priceAed": "23.00",
       "active": true,
       "availability": "available"
     },
@@ -114,7 +114,7 @@
       "name": "Pan de Muerto · Pack tradicional · 6 mini",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto · Pack tradicional · 6 mini",
-      "priceAed": "60.00",
+      "priceAed": "72.00",
       "active": true,
       "availability": "available"
     },
@@ -123,7 +123,7 @@
       "name": "Pan de Muerto · Pack tradicional · 12 mini",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto · Pack tradicional · 12 mini",
-      "priceAed": "115.00",
+      "priceAed": "140.00",
       "active": true,
       "availability": "available"
     },
@@ -132,7 +132,7 @@
       "name": "Pan de Muerto · Pack tradicional · 6 individuales",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto · Pack tradicional · 6 individuales",
-      "priceAed": "72.00",
+      "priceAed": "80.00",
       "active": true,
       "availability": "available"
     },
@@ -141,7 +141,7 @@
       "name": "Pan de Muerto · Pack tradicional · 12 individuales",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto · Pack tradicional · 12 individuales",
-      "priceAed": "140.00",
+      "priceAed": "155.00",
       "active": true,
       "availability": "available"
     },
@@ -150,7 +150,7 @@
       "name": "Pan de Muerto · Pack relleno · 6 mini",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto · Pack relleno · 6 mini",
-      "priceAed": "100.00",
+      "priceAed": "120.00",
       "active": true,
       "availability": "available"
     },
@@ -159,7 +159,7 @@
       "name": "Pan de Muerto · Pack relleno · 12 mini",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto · Pack relleno · 12 mini",
-      "priceAed": "190.00",
+      "priceAed": "235.00",
       "active": true,
       "availability": "available"
     },
@@ -168,7 +168,7 @@
       "name": "Pan de Muerto · Pack relleno · 6 individuales",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto · Pack relleno · 6 individuales",
-      "priceAed": "120.00",
+      "priceAed": "130.00",
       "active": true,
       "availability": "available"
     },
@@ -177,7 +177,7 @@
       "name": "Pan de Muerto · Pack relleno · 12 individuales",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto · Pack relleno · 12 individuales",
-      "priceAed": "235.00",
+      "priceAed": "255.00",
       "active": true,
       "availability": "available"
     },
@@ -186,7 +186,7 @@
       "name": "Conchas tradicional · Vainilla · Mini · 40 g",
       "category": "Conchas",
       "description": "Conchas tradicional · Vainilla · Mini · 40 g",
-      "priceAed": "11.00",
+      "priceAed": "13.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -195,7 +195,7 @@
       "name": "Conchas tradicional · Vainilla · Individual · 70 g",
       "category": "Conchas",
       "description": "Conchas tradicional · Vainilla · Individual · 70 g",
-      "priceAed": "13.00",
+      "priceAed": "15.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -204,7 +204,7 @@
       "name": "Concha tradicional de chocolate · Mini · 40 g",
       "category": "Conchas",
       "description": "Concha tradicional de chocolate · Mini · 40 g",
-      "priceAed": "11.00",
+      "priceAed": "13.00",
       "active": true,
       "availability": "available"
     },
@@ -213,7 +213,7 @@
       "name": "Concha tradicional de chocolate · Individual · 70 g",
       "category": "Conchas",
       "description": "Concha tradicional de chocolate · Individual · 70 g",
-      "priceAed": "13.00",
+      "priceAed": "15.00",
       "active": true,
       "availability": "available"
     },
@@ -222,7 +222,7 @@
       "name": "Conchas tradicional · Pistache · Mini · 40 g",
       "category": "Conchas",
       "description": "Conchas tradicional · Pistache · Mini · 40 g",
-      "priceAed": "11.00",
+      "priceAed": "13.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -231,7 +231,7 @@
       "name": "Conchas tradicional · Pistache · Individual · 70 g",
       "category": "Conchas",
       "description": "Conchas tradicional · Pistache · Individual · 70 g",
-      "priceAed": "13.00",
+      "priceAed": "15.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -240,7 +240,7 @@
       "name": "Conchas tradicional · Tricolor · Mini · 40 g",
       "category": "Conchas",
       "description": "Conchas tradicional · Tricolor · Mini · 40 g",
-      "priceAed": "11.00",
+      "priceAed": "13.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -249,7 +249,7 @@
       "name": "Conchas tradicional · Tricolor · Individual · 70 g",
       "category": "Conchas",
       "description": "Conchas tradicional · Tricolor · Individual · 70 g",
-      "priceAed": "13.00",
+      "priceAed": "15.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -258,7 +258,7 @@
       "name": "Conchas rellenas · Crema diplomática (vainilla) · Mini",
       "category": "Conchas",
       "description": "Conchas rellenas · Crema diplomática (vainilla) · Mini",
-      "priceAed": "18.00",
+      "priceAed": "21.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -267,7 +267,7 @@
       "name": "Conchas rellenas · Crema diplomática (vainilla) · Individual",
       "category": "Conchas",
       "description": "Conchas rellenas · Crema diplomática (vainilla) · Individual",
-      "priceAed": "21.00",
+      "priceAed": "23.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -276,7 +276,7 @@
       "name": "Conchas rellenas · Chocolate · Mini",
       "category": "Conchas",
       "description": "Conchas rellenas · Chocolate · Mini",
-      "priceAed": "18.00",
+      "priceAed": "21.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -285,7 +285,7 @@
       "name": "Conchas rellenas · Chocolate · Individual",
       "category": "Conchas",
       "description": "Conchas rellenas · Chocolate · Individual",
-      "priceAed": "21.00",
+      "priceAed": "23.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -294,7 +294,7 @@
       "name": "Conchas rellenas · Mascarpone y cajeta · Mini",
       "category": "Conchas",
       "description": "Conchas rellenas · Mascarpone y cajeta · Mini",
-      "priceAed": "18.00",
+      "priceAed": "21.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -303,7 +303,7 @@
       "name": "Conchas rellenas · Mascarpone y cajeta · Individual",
       "category": "Conchas",
       "description": "Conchas rellenas · Mascarpone y cajeta · Individual",
-      "priceAed": "21.00",
+      "priceAed": "23.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -312,7 +312,7 @@
       "name": "Conchas rellenas · Mascarpone y fresas · Mini",
       "category": "Conchas",
       "description": "Conchas rellenas · Mascarpone y fresas · Mini",
-      "priceAed": "18.00",
+      "priceAed": "21.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -321,7 +321,7 @@
       "name": "Conchas rellenas · Mascarpone y fresas · Individual",
       "category": "Conchas",
       "description": "Conchas rellenas · Mascarpone y fresas · Individual",
-      "priceAed": "21.00",
+      "priceAed": "23.00",
       "active": false,
       "availability": "unavailable"
     },
@@ -330,7 +330,7 @@
       "name": "Concha tradicional de chocolate · Pack · 6 mini",
       "category": "Conchas",
       "description": "Concha tradicional de chocolate · Pack · 6 mini",
-      "priceAed": "60.00",
+      "priceAed": "72.00",
       "active": true,
       "availability": "available"
     },
@@ -339,7 +339,7 @@
       "name": "Concha tradicional de chocolate · Pack · 12 mini",
       "category": "Conchas",
       "description": "Concha tradicional de chocolate · Pack · 12 mini",
-      "priceAed": "115.00",
+      "priceAed": "140.00",
       "active": true,
       "availability": "available"
     },
@@ -348,7 +348,7 @@
       "name": "Concha tradicional de chocolate · Pack · 6 individuales",
       "category": "Conchas",
       "description": "Concha tradicional de chocolate · Pack · 6 individuales",
-      "priceAed": "72.00",
+      "priceAed": "80.00",
       "active": true,
       "availability": "available"
     },
@@ -357,7 +357,7 @@
       "name": "Concha tradicional de chocolate · Pack · 12 individuales",
       "category": "Conchas",
       "description": "Concha tradicional de chocolate · Pack · 12 individuales",
-      "priceAed": "140.00",
+      "priceAed": "155.00",
       "active": true,
       "availability": "available"
     },
@@ -366,7 +366,7 @@
       "name": "Concha rellena de pistache · Pack · 6 mini",
       "category": "Conchas",
       "description": "Concha rellena de pistache · Pack · 6 mini",
-      "priceAed": "100.00",
+      "priceAed": "120.00",
       "active": true,
       "availability": "available"
     },
@@ -375,7 +375,7 @@
       "name": "Concha rellena de pistache · Pack · 12 mini",
       "category": "Conchas",
       "description": "Concha rellena de pistache · Pack · 12 mini",
-      "priceAed": "190.00",
+      "priceAed": "235.00",
       "active": true,
       "availability": "available"
     },
@@ -384,7 +384,7 @@
       "name": "Concha rellena de pistache · Pack · 6 individuales",
       "category": "Conchas",
       "description": "Concha rellena de pistache · Pack · 6 individuales",
-      "priceAed": "120.00",
+      "priceAed": "130.00",
       "active": true,
       "availability": "available"
     },
@@ -393,7 +393,7 @@
       "name": "Concha rellena de pistache · Pack · 12 individuales",
       "category": "Conchas",
       "description": "Concha rellena de pistache · Pack · 12 individuales",
-      "priceAed": "235.00",
+      "priceAed": "255.00",
       "active": true,
       "availability": "available"
     },
@@ -1968,7 +1968,7 @@
       "name": "Pan de Muerto relleno · Pistachio · Mini",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto relleno · Pistachio · Mini",
-      "priceAed": "18.00",
+      "priceAed": "23.00",
       "active": true,
       "availability": "available"
     },
@@ -1977,7 +1977,7 @@
       "name": "Pan de Muerto relleno · Pistachio · Individual",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto relleno · Pistachio · Individual",
-      "priceAed": "21.00",
+      "priceAed": "26.00",
       "active": true,
       "availability": "available"
     },
@@ -1986,7 +1986,7 @@
       "name": "Pan de Muerto tradicional · Azúcar · Chocolate covering · Mini · 40 g",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto tradicional · Azúcar · Chocolate covering · Mini · 40 g",
-      "priceAed": "11.00",
+      "priceAed": "13.00",
       "active": true,
       "availability": "available"
     },
@@ -1995,7 +1995,7 @@
       "name": "Pan de Muerto tradicional · Azúcar · Chocolate covering · Individual · 70 g",
       "category": "Pan de Muerto",
       "description": "Pan de Muerto tradicional · Azúcar · Chocolate covering · Individual · 70 g",
-      "priceAed": "13.00",
+      "priceAed": "15.00",
       "active": true,
       "availability": "available"
     },

@@ -100,3 +100,7 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 ## Removed Pan de Muerto combinations (9 October 2026, Joel)
 - Six chocolate-covering combinations were never approved and are removed: Ajonjolí · Chocolate covering (traditional) and Chocolate covering on all five fillings. The only covering product is Azúcar · Chocolate covering. Do not reintroduce them.
 - Their 12 SKU ids live in `RETIRED_SKUS` (`shared/commerce-policy.ts`), which blocks listing and checkout regardless of the stored catalog; the import file marks them inactive. Historical orders are untouched.
+
+## Official Pan de Muerto and Conchas prices (9 October 2026, Joel)
+- Authoritative table: `tests/fixtures/official-prices-oct-2026.ts`. Traditional 13/15; filled 21/23; Pan de Muerto Pistachio 23/26; packs 72/140/80/155 (traditional) and 120/235/130/255 (filled). Pack prices are fixed, never multiples.
+- Storefront menu and stored catalog must change together (`docs/catalog/current-menu.md`). Filled Pistache concha (18/21) was not on the list and is unchanged until Joel decides.

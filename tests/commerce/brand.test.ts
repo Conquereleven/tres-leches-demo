@@ -46,8 +46,8 @@ test("brand content is approved, heritage fixed, no fabricated catalog or testim
     listed[0]!.name,
     "Pan de Muerto tradicional · Ajonjolí · Individual · 70 g",
   );
-  assert.equal(listed[0]!.priceFils, 1300);
-  assert.equal(formatAed(listed[0]!.priceFils!), "AED 13");
+  assert.equal(listed[0]!.priceFils, 1500);
+  assert.equal(formatAed(listed[0]!.priceFils!), "AED 15");
   assert.deepEqual(
     visibleTestimonials([
       {

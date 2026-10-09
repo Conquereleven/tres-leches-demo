@@ -17,7 +17,7 @@ async function addVariants(page: Page) {
     .getByRole("combobox", { name: "Size / pack", exact: true })
     .selectOption("Individual");
   await filled
-    .getByRole("button", { name: "ADD TO CART · AED 21", exact: true })
+    .getByRole("button", { name: "ADD TO CART · AED 26", exact: true })
     .click();
   const traditional = page.locator(
     '[data-product-id="pan-de-muerto-traditional--azucar-chocolate-covering"]',
@@ -26,7 +26,7 @@ async function addVariants(page: Page) {
     .getByRole("combobox", { name: "Size / pack", exact: true })
     .selectOption("Individual · 70 g");
   await traditional
-    .getByRole("button", { name: "ADD TO CART · AED 13", exact: true })
+    .getByRole("button", { name: "ADD TO CART · AED 15", exact: true })
     .click();
 }
 test("actual Pan variants persist selector → cart → checkout → database → dashboard → customer tracking", async ({
@@ -48,7 +48,7 @@ test("actual Pan variants persist selector → cart → checkout → database �
     "Chocolate",
   );
   await expect(page.locator("main")).toContainText("Chocolate covering");
-  await expect(page.locator("main")).toContainText("AED 34");
+  await expect(page.locator("main")).toContainText("AED 41");
   await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
 
   await page
@@ -77,7 +77,7 @@ test("actual Pan variants persist selector → cart → checkout → database �
   ).toContainText("Chocolate covering");
   await expect(page.locator(".b-shop-totals")).not.toContainText("Delivery");
   await page.getByRole("checkbox", { name: /I've reviewed/ }).check();
-  await page.getByRole("button", { name: "PAY AED 34", exact: true }).click();
+  await page.getByRole("button", { name: "PAY AED 41", exact: true }).click();
   await expect(page).toHaveURL(/pay.test.paymennt.com/);
   await page.goto("http://127.0.0.1:3198/checkout/return");
   await expect(page.getByRole("heading", { name: /Thank you/ })).toBeVisible();
@@ -156,17 +156,17 @@ test("cart quantity, removal, clear cancel/accept and floating support do not ov
     .getByRole("button", { name: /^Increase / })
     .first()
     .click();
-  await expect(page.locator("main")).toContainText("AED 55");
+  await expect(page.locator("main")).toContainText("AED 67");
   await page
     .getByRole("button", { name: /^Decrease / })
     .first()
     .click();
-  await expect(page.locator("main")).toContainText("AED 34");
+  await expect(page.locator("main")).toContainText("AED 41");
   await page
     .getByRole("button", { name: /Remove/ })
     .first()
     .click();
-  await expect(page.locator("main")).toContainText("AED 13");
+  await expect(page.locator("main")).toContainText("AED 15");
   const wa = await page.locator(".b-shopping-wa").boundingBox(),
     cart = await page.locator(".b-floating-cart").boundingBox();
   expect(wa!.x + wa!.width).toBeLessThan(cart!.x);
@@ -176,7 +176,7 @@ test("cart quantity, removal, clear cancel/accept and floating support do not ov
   );
   page.once("dialog", (d) => d.dismiss());
   await page.getByRole("button", { name: "Clear cart", exact: true }).click();
-  await expect(page.locator("main")).toContainText("AED 13");
+  await expect(page.locator("main")).toContainText("AED 15");
   page.once("dialog", (d) => d.accept());
   await page.getByRole("button", { name: "Clear cart", exact: true }).click();
   await expect(page.locator("main")).toContainText("Your cart is empty");
@@ -495,7 +495,7 @@ test("minimum quote recalculates and elapsed server clock disables stale deliver
     })
     .click();
   await expect(page.locator("main")).toContainText(
-    "Add AED 66 more to continue.",
+    "Add AED 59 more to continue.",
   );
   await expect(
     page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
@@ -511,7 +511,7 @@ test("minimum quote recalculates and elapsed server clock disables stale deliver
     })
     .click();
   await expect(page.locator("main")).not.toContainText(
-    "Add AED 66 more to continue.",
+    "Add AED 59 more to continue.",
   );
   await expect(page.getByLabel("Delivery date")).toHaveAttribute(
     "min",
@@ -580,7 +580,7 @@ for (const width of [390, 768, 1440])
       })
       .click();
     await expect(page.locator("main")).toContainText(
-      "Add AED 266 more to continue.",
+      "Add AED 259 more to continue.",
     );
     await input.fill("Unresolved coverage fixture");
     await page
@@ -698,7 +698,7 @@ test("pickup golden path completes mock reconciliation, confirmation, tracking a
     page.getByRole("region", { name: "Order review" }),
   ).toContainText("Pickup");
   await page.getByRole("checkbox", { name: /I've reviewed/ }).check();
-  await page.getByRole("button", { name: "PAY AED 34", exact: true }).click();
+  await page.getByRole("button", { name: "PAY AED 41", exact: true }).click();
   await expect(page).toHaveURL(/pay.test.paymennt.com/);
   await page.goto("http://127.0.0.1:3198/checkout/return");
   await expect(page.getByRole("heading", { name: /Thank you/ })).toBeVisible();

@@ -45,37 +45,37 @@
           "id": "pan-de-muerto-traditional-azucar-mini-40-g",
           "variant": "Azúcar",
           "size": "Mini · 40 g",
-          "priceFils": 1100
+          "priceFils": 1300
         },
         {
           "id": "pan-de-muerto-traditional-azucar-individual-70-g",
           "variant": "Azúcar",
           "size": "Individual · 70 g",
-          "priceFils": 1300
+          "priceFils": 1500
         },
         {
           "id": "pan-de-muerto-traditional-ajonjoli-mini-40-g",
           "variant": "Ajonjolí",
           "size": "Mini · 40 g",
-          "priceFils": 1100
+          "priceFils": 1300
         },
         {
           "id": "pan-de-muerto-traditional-ajonjoli-individual-70-g",
           "variant": "Ajonjolí",
           "size": "Individual · 70 g",
-          "priceFils": 1300
+          "priceFils": 1500
         },
         {
           "id": "pan-de-muerto-traditional-azucar-mini-40-g-chocolate-covering",
           "variant": "Azúcar · Chocolate covering",
           "size": "Mini · 40 g",
-          "priceFils": 1100
+          "priceFils": 1300
         },
         {
           "id": "pan-de-muerto-traditional-azucar-individual-70-g-chocolate-covering",
           "variant": "Azúcar · Chocolate covering",
           "size": "Individual · 70 g",
-          "priceFils": 1300
+          "priceFils": 1500
         }
       ],
       "image": "/brand/menu/pan-traditional.webp",
@@ -92,61 +92,61 @@
           "id": "pan-de-muerto-filled-crema-diplomatica-vainilla-mini",
           "variant": "Crema diplomática (vainilla)",
           "size": "Mini",
-          "priceFils": 1800
+          "priceFils": 2100
         },
         {
           "id": "pan-de-muerto-filled-crema-diplomatica-vainilla-individual",
           "variant": "Crema diplomática (vainilla)",
           "size": "Individual",
-          "priceFils": 2100
+          "priceFils": 2300
         },
         {
           "id": "pan-de-muerto-filled-chocolate-mini",
           "variant": "Chocolate",
           "size": "Mini",
-          "priceFils": 1800
+          "priceFils": 2100
         },
         {
           "id": "pan-de-muerto-filled-chocolate-individual",
           "variant": "Chocolate",
           "size": "Individual",
-          "priceFils": 2100
+          "priceFils": 2300
         },
         {
           "id": "pan-de-muerto-filled-mascarpone-y-cajeta-mini",
           "variant": "Mascarpone y cajeta",
           "size": "Mini",
-          "priceFils": 1800
+          "priceFils": 2100
         },
         {
           "id": "pan-de-muerto-filled-mascarpone-y-cajeta-individual",
           "variant": "Mascarpone y cajeta",
           "size": "Individual",
-          "priceFils": 2100
+          "priceFils": 2300
         },
         {
           "id": "pan-de-muerto-filled-mascarpone-y-fresas-mini",
           "variant": "Mascarpone y fresas",
           "size": "Mini",
-          "priceFils": 1800
+          "priceFils": 2100
         },
         {
           "id": "pan-de-muerto-filled-mascarpone-y-fresas-individual",
           "variant": "Mascarpone y fresas",
           "size": "Individual",
-          "priceFils": 2100
+          "priceFils": 2300
         },
         {
           "id": "pan-de-muerto-filled-pistachio-mini",
           "variant": "Pistachio",
           "size": "Mini",
-          "priceFils": 1800
+          "priceFils": 2300
         },
         {
           "id": "pan-de-muerto-filled-pistachio-individual",
           "variant": "Pistachio",
           "size": "Individual",
-          "priceFils": 2100
+          "priceFils": 2600
         }
       ],
       "image": "/brand/menu/pan-filled.webp",
@@ -163,25 +163,25 @@
           "id": "pan-de-muerto-traditional-pack-6-mini",
           "variant": "",
           "size": "6 mini",
-          "priceFils": 6000
+          "priceFils": 7200
         },
         {
           "id": "pan-de-muerto-traditional-pack-12-mini",
           "variant": "",
           "size": "12 mini",
-          "priceFils": 11500
+          "priceFils": 14000
         },
         {
           "id": "pan-de-muerto-traditional-pack-6-individuales",
           "variant": "",
           "size": "6 individuales",
-          "priceFils": 7200
+          "priceFils": 8000
         },
         {
           "id": "pan-de-muerto-traditional-pack-12-individuales",
           "variant": "",
           "size": "12 individuales",
-          "priceFils": 14000
+          "priceFils": 15500
         }
       ],
       "image": "/brand/menu/pan-pack.webp",
@@ -198,25 +198,25 @@
           "id": "pan-de-muerto-filled-pack-6-mini",
           "variant": "",
           "size": "6 mini",
-          "priceFils": 10000
+          "priceFils": 12000
         },
         {
           "id": "pan-de-muerto-filled-pack-12-mini",
           "variant": "",
           "size": "12 mini",
-          "priceFils": 19000
+          "priceFils": 23500
         },
         {
           "id": "pan-de-muerto-filled-pack-6-individuales",
           "variant": "",
           "size": "6 individuales",
-          "priceFils": 12000
+          "priceFils": 13000
         },
         {
           "id": "pan-de-muerto-filled-pack-12-individuales",
           "variant": "",
           "size": "12 individuales",
-          "priceFils": 23500
+          "priceFils": 25500
         }
       ],
       "image": "/brand/menu/pan-pack.webp",
@@ -233,13 +233,13 @@
           "id": "conchas-traditional-chocolate-mini-40-g",
           "variant": "Chocolate",
           "size": "Mini · 40 g",
-          "priceFils": 1100
+          "priceFils": 1300
         },
         {
           "id": "conchas-traditional-chocolate-individual-70-g",
           "variant": "Chocolate",
           "size": "Individual · 70 g",
-          "priceFils": 1300
+          "priceFils": 1500
         }
       ],
       "image": "/brand/menu/conchas-traditional.webp",
@@ -279,25 +279,25 @@
           "id": "conchas-traditional-pack-6-mini",
           "variant": "",
           "size": "6 mini",
-          "priceFils": 6000
+          "priceFils": 7200
         },
         {
           "id": "conchas-traditional-pack-12-mini",
           "variant": "",
           "size": "12 mini",
-          "priceFils": 11500
+          "priceFils": 14000
         },
         {
           "id": "conchas-traditional-pack-6-individuales",
           "variant": "",
           "size": "6 individuales",
-          "priceFils": 7200
+          "priceFils": 8000
         },
         {
           "id": "conchas-traditional-pack-12-individuales",
           "variant": "",
           "size": "12 individuales",
-          "priceFils": 14000
+          "priceFils": 15500
         }
       ],
       "image": "/brand/menu/conchas-pack.webp",
@@ -314,25 +314,25 @@
           "id": "conchas-filled-pack-6-mini",
           "variant": "",
           "size": "6 mini",
-          "priceFils": 10000
+          "priceFils": 12000
         },
         {
           "id": "conchas-filled-pack-12-mini",
           "variant": "",
           "size": "12 mini",
-          "priceFils": 19000
+          "priceFils": 23500
         },
         {
           "id": "conchas-filled-pack-6-individuales",
           "variant": "",
           "size": "6 individuales",
-          "priceFils": 12000
+          "priceFils": 13000
         },
         {
           "id": "conchas-filled-pack-12-individuales",
           "variant": "",
           "size": "12 individuales",
-          "priceFils": 23500
+          "priceFils": 25500
         }
       ],
       "image": "/brand/menu/conchas-pack.webp",

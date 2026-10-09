@@ -91,7 +91,7 @@ test("approved new filling/covering use same size prices and stable SKU througho
   const filled = menuFamilies.find((f) => f.id === "pan-de-muerto-filled")!;
   assert.ok(
     filled.options.some(
-      (o) => o.variant === "Pistachio" && o.priceFils === 2100,
+      (o) => o.variant === "Pistachio" && o.priceFils === 2600,
     ),
   );
   // Chocolate covering exists only on the traditional sugar bread.
