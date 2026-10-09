@@ -255,6 +255,27 @@ test("matched website checkouts reconcile exactly as before, with no ownership l
   }
 });
 
+test("a website checkout stored only as providerCheckoutId reconciles and is never classified external", async () => {
+  const f = setup();
+  try {
+    f.store.write((s) => {
+      const payment = s.payments[0]!;
+      payment.providerCheckoutId = payment.providerReference;
+      delete payment.providerReference;
+    });
+    await f.service.acceptPaymentNotification({
+      id: "checkout-1",
+      status: "PAID",
+    });
+    assert.equal(f.store.read().payments[0]!.status, "paid");
+    assert.equal(f.store.read().orders[0]!.state, "Confirmed");
+    assert.equal(f.receipt("checkout-1").outcome, undefined);
+    assert.deepEqual(f.gets, ["checkout-1"]);
+  } finally {
+    f.store.close();
+  }
+});
+
 test("without an explicit activation instant even a new external receipt remains open", async () => {
   const f = setup();
   try {

@@ -901,7 +901,11 @@ export class CommerceService {
     if (!receipt || receipt.completedAt) return;
     const payment = this.store
       .read()
-      .payments.find((p) => p.providerReference === receipt.checkoutId);
+      .payments.find(
+        (p) =>
+          p.providerReference === receipt.checkoutId ||
+          p.providerCheckoutId === receipt.checkoutId,
+      );
     if (!payment && (await this.closeIfExternal(id, receipt.checkoutId)))
       return;
     try {
@@ -937,8 +941,9 @@ export class CommerceService {
     requireThat(!this.reconciling.has(paymentId), "Conciliación en curso", 409);
     this.reconciling.add(paymentId);
     try {
-      const checkout = p.providerReference
-        ? await this.payment.getCheckout(p.providerReference)
+      const checkoutId = p.providerReference ?? p.providerCheckoutId;
+      const checkout = checkoutId
+        ? await this.payment.getCheckout(checkoutId)
         : await this.payment.findCheckout?.(p.id);
       requireThat(
         checkout,
@@ -956,7 +961,7 @@ export class CommerceService {
           502,
         );
       }
-      if (!p.providerReference)
+      if (!checkoutId)
         this.store.write((s) => {
           const current = s.payments.find((x) => x.id === p.id)!;
           const job = s.jobs.find(
@@ -1036,7 +1041,8 @@ export class CommerceService {
     return this.store.write((s) => {
       const p = s.payments.find((p) => p.id === paymentId)!;
       requireThat(
-        checkout.checkoutId === p.providerReference &&
+        checkout.checkoutId ===
+          (p.providerReference ?? p.providerCheckoutId) &&
           checkout.requestId === p.id &&
           checkout.orderId === p.orderId &&
           checkout.amountFils === p.amountFils &&
