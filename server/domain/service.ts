@@ -109,6 +109,13 @@ export class CommerceService {
   operationsOrigin?: string;
   /** Private configuration; absent until the manager's number is supplied. */
   operationsManagerPhone?: string;
+  /**
+   * Activation timestamp for external-only Paymennt acknowledgements.
+   * When absent, no unmatched checkout can be auto-closed as external.
+   * Historical receipts received before this cutoff stay open for a separately
+   * approved reconciliation, even when Paymennt retries their signatures.
+   */
+  externalCheckoutAcknowledgementSince?: number;
   private async bounded<T>(work: Promise<T>): Promise<T> {
     let timer: ReturnType<typeof setTimeout> | undefined;
     try {
@@ -822,6 +829,19 @@ export class CommerceService {
    * Absence from our database alone is never treated as "external".
    */
   private async closeIfExternal(receiptId: string, checkoutId: string) {
+    // Fail closed unless this receipt was first received after the explicitly
+    // configured activation instant. Duplicate notifications preserve receivedAt.
+    const receipt = this.store
+      .read()
+      .paymentNotifications?.find((r) => r.id === receiptId);
+    const since = this.externalCheckoutAcknowledgementSince;
+    if (
+      !receipt ||
+      since === undefined ||
+      !Number.isFinite(since) ||
+      !Number.isFinite(Date.parse(receipt.receivedAt)) ||
+      Date.parse(receipt.receivedAt) < since
+    ) return false;
     if (!this.payment.describeCheckout) return false;
     let owner;
     try {
@@ -842,7 +862,11 @@ export class CommerceService {
         (owner.orderId !== null &&
           s.orders.some((o) => o.id === owner.orderId));
       const r = s.paymentNotifications?.find((r) => r.id === receiptId);
-      if (ours || !r || r.completedAt) return false;
+      if (
+        ours || !r || r.completedAt ||
+        !Number.isFinite(Date.parse(r.receivedAt)) ||
+        Date.parse(r.receivedAt) < since
+      ) return false;
       r.completedAt = now();
       r.outcome = "external";
       return true;
@@ -1172,8 +1196,23 @@ export class CommerceService {
   }
   async drain() {
     await this.drainInbound();
-    for (const receipt of (this.store.read().paymentNotifications ?? [])
-      .filter((r) => !r.completedAt && r.nextAt <= Date.now())
+    const receiptsSnapshot = this.store.read();
+    const since = this.externalCheckoutAcknowledgementSince;
+    for (const receipt of (receiptsSnapshot.paymentNotifications ?? [])
+      .filter((r) => {
+        if (r.completedAt || r.nextAt > Date.now()) return false;
+        // Keep historical unmatched records untouched by background cleanup;
+        // otherwise 31 old receipts could starve newly received checkouts.
+        // Historical website-owned receipts still reconcile normally.
+        const received = Date.parse(r.receivedAt);
+        const historical = since !== undefined &&
+          (!Number.isFinite(received) || received < since);
+        if (!historical) return true;
+        return receiptsSnapshot.payments.some((p) =>
+          p.providerReference === r.checkoutId ||
+          p.providerCheckoutId === r.checkoutId,
+        );
+      })
       .slice(0, 10)) {
       try {
         await this.reconcileNotification(receipt.id);
