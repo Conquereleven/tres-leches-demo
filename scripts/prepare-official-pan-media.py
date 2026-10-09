@@ -57,13 +57,42 @@ def identifier(name: str) -> str:
     return "official-pan-" + ("assortment-cutout" if stem.startswith("panes") else stem)
 
 
+CREAM = (246, 239, 227)
+crops = json.loads((Path(__file__).parent / "official-pan-crops.json").read_text())
+
+
+def square(name: str, image: Image.Image) -> Image.Image:
+    """Every published photo is a 1:1 product photograph with the whole bread centred.
+
+    Reviewed windows live in official-pan-crops.json: `crop` trims unused
+    photographic background around the bread (cutouts may extend past the
+    source, staying transparent); `canvas` places a group photograph whole on a
+    cream square because no square window holds every bread. Nothing is
+    stretched and no pixel is invented.
+    """
+    spec = crops[name]
+    if spec["mode"] == "canvas":
+        side = max(image.size)
+        canvas = Image.new("RGB", (side, side), CREAM)
+        canvas.paste(image, ((side - image.width) // 2, (side - image.height) // 2))
+        return canvas
+    x, y, side = spec["square"]
+    if image.mode == "RGBA":
+        canvas = Image.new("RGBA", (side, side), (0, 0, 0, 0))
+        canvas.paste(image, (-x, -y))
+        return canvas
+    assert x >= 0 and y >= 0 and x + side <= image.width and y + side <= image.height, name
+    return image.crop((x, y, x + side, y + side))
+
+
 def derive(name: str, widths: tuple[int, ...]):
     row = by_original[name]
     path = library / row["Relative organized path"]
     transparent = row["Transparent background (yes/no)"] == "yes"
-    image = ImageOps.exif_transpose(Image.open(path)).convert("RGBA" if transparent else "RGB")
+    image = square(name, ImageOps.exif_transpose(Image.open(path)).convert("RGBA" if transparent else "RGB"))
     derivatives = []
-    for width in widths:
+    # Never enlarge: a tight crop of a small bread simply ships fewer sizes.
+    for width in [w for w in widths if w <= image.width * 1.05] or widths[:1]:
         scaled = image.resize((width, round(image.height * width / image.width)), Image.Resampling.LANCZOS)
         for fmt, quality in (("avif", 60), ("webp", 80)):
             relative = f"/brand/official-pan/{identifier(name)}-{width}.{fmt}"

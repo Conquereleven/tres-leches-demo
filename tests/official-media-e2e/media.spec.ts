@@ -81,6 +81,44 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
         ];
       }),
     );
+    // The photograph itself is square and fills the frame: no portrait strip inside a square box.
+    for (const card of await page.locator(".b-menu-card .b-menu-photo").all()) {
+      await card.scrollIntoViewIfNeeded();
+      const img = card.locator("picture.is-active img, img").first();
+      await expect
+        .poll(() => img.evaluate((i: HTMLImageElement) => i.naturalWidth))
+        .toBeGreaterThan(0);
+      const fill = await card.evaluate((frame) => {
+        const f = frame.getBoundingClientRect();
+        const image = (frame.querySelector("picture.is-active img") ??
+          frame.querySelector("img")) as HTMLImageElement;
+        const i = image.getBoundingClientRect();
+        const layers = [
+          ...frame.querySelectorAll(".b-official-rotation picture"),
+        ].map((p) => p.getBoundingClientRect());
+        return {
+          frame: Math.abs(f.width - f.height),
+          natural: image.naturalWidth / image.naturalHeight,
+          image: Math.max(
+            Math.abs(i.width - f.width),
+            Math.abs(i.height - f.height),
+          ),
+          layers: Math.max(
+            0,
+            ...layers.map(
+              (l) =>
+                Math.abs(l.width - f.width) + Math.abs(l.height - f.height),
+            ),
+          ),
+          clips: getComputedStyle(frame).overflow,
+        };
+      });
+      expect(fill.frame).toBeLessThanOrEqual(2);
+      expect(fill.natural).toBe(1);
+      expect(fill.image).toBeLessThanOrEqual(2);
+      expect(fill.layers).toBeLessThanOrEqual(2);
+      expect(fill.clips).toBe("hidden");
+    }
     expect(frames.length).toBeGreaterThan(8);
     expect(frames.every(([square]) => square)).toBe(true);
     expect([...new Set(frames.map(([, radius]) => radius))]).toEqual(["20px"]);

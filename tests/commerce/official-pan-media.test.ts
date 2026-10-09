@@ -98,7 +98,9 @@ test("all 50 official photos are accounted for and only reviewed ones are public
       );
   }
   for (const asset of official.assets) {
-    assert.equal(asset.derivatives.length, 6);
+    // Every published photo is a square product photograph, never enlarged.
+    assert.equal(asset.width, asset.height);
+    assert.ok([4, 6].includes(asset.derivatives.length));
     for (const derivative of asset.derivatives) {
       assert.equal(statSync("public" + derivative.src).size, derivative.bytes);
       assert.ok(

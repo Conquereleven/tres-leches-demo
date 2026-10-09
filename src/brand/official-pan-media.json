@@ -10,50 +10,50 @@
       "status": "assigned",
       "transparent": false,
       "alt": "Pastelerías 3L Azúcar Pan de Muerto · photo 1",
-      "width": 1365,
-      "height": 2047,
+      "width": 1305,
+      "height": 1305,
       "originalBytes": 603527,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-08-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 12510,
+          "height": 320,
+          "bytes": 11560,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-08-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 18272,
+          "height": 320,
+          "bytes": 17080,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-08-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 39220,
+          "height": 640,
+          "bytes": 36838,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-08-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 56098,
+          "height": 640,
+          "bytes": 53164,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-08-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 75887,
+          "height": 960,
+          "bytes": 71233,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-08-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 102346,
+          "height": 960,
+          "bytes": 97114,
           "format": "webp"
         }
       ]
@@ -67,50 +67,36 @@
       "status": "assigned",
       "transparent": false,
       "alt": "Pastelerías 3L Azúcar Pan de Muerto · photo 2",
-      "width": 1024,
-      "height": 1536,
+      "width": 791,
+      "height": 791,
       "originalBytes": 2535124,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-11-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 20802,
+          "height": 320,
+          "bytes": 19311,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-11-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 33710,
+          "height": 320,
+          "bytes": 31370,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-11-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 66896,
+          "height": 640,
+          "bytes": 59789,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-11-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 107738,
-          "format": "webp"
-        },
-        {
-          "src": "/brand/official-pan/official-pan-11-960.avif",
-          "width": 960,
-          "height": 1440,
-          "bytes": 118782,
-          "format": "avif"
-        },
-        {
-          "src": "/brand/official-pan/official-pan-11-960.webp",
-          "width": 960,
-          "height": 1440,
-          "bytes": 187514,
+          "height": 640,
+          "bytes": 101892,
           "format": "webp"
         }
       ]
@@ -125,49 +111,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Ajonjolí Pan de Muerto · photo 1",
       "width": 1024,
-      "height": 1536,
+      "height": 1024,
       "originalBytes": 2103200,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-09-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 13130,
+          "height": 320,
+          "bytes": 11561,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-09-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 19290,
+          "height": 320,
+          "bytes": 17176,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-09-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 42193,
+          "height": 640,
+          "bytes": 37191,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-09-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 60466,
+          "height": 640,
+          "bytes": 52302,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-09-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 78681,
+          "height": 960,
+          "bytes": 68633,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-09-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 107020,
+          "height": 960,
+          "bytes": 94440,
           "format": "webp"
         }
       ]
@@ -181,50 +167,50 @@
       "status": "assigned",
       "transparent": false,
       "alt": "Pastelerías 3L Ajonjolí Pan de Muerto · photo 2",
-      "width": 1365,
-      "height": 2047,
+      "width": 1311,
+      "height": 1311,
       "originalBytes": 718160,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-06-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 17223,
+          "height": 320,
+          "bytes": 13406,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-06-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 27882,
+          "height": 320,
+          "bytes": 21330,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-06-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 47281,
+          "height": 640,
+          "bytes": 36029,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-06-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 69396,
+          "height": 640,
+          "bytes": 52420,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-06-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 83731,
+          "height": 960,
+          "bytes": 63980,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-06-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 116586,
+          "height": 960,
+          "bytes": 88282,
           "format": "webp"
         }
       ]
@@ -238,50 +224,50 @@
       "status": "assigned",
       "transparent": false,
       "alt": "Pastelerías 3L Azúcar · Chocolate covering Pan de Muerto · photo 1",
-      "width": 1536,
+      "width": 1024,
       "height": 1024,
       "originalBytes": 2250716,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-12-320.avif",
           "width": 320,
-          "height": 213,
-          "bytes": 8024,
+          "height": 320,
+          "bytes": 11476,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-12-320.webp",
           "width": 320,
-          "height": 213,
-          "bytes": 11024,
+          "height": 320,
+          "bytes": 17116,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-12-640.avif",
           "width": 640,
-          "height": 427,
-          "bytes": 24897,
+          "height": 640,
+          "bytes": 38021,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-12-640.webp",
           "width": 640,
-          "height": 427,
-          "bytes": 37634,
+          "height": 640,
+          "bytes": 57958,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-12-960.avif",
           "width": 960,
-          "height": 640,
-          "bytes": 48554,
+          "height": 960,
+          "bytes": 71813,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-12-960.webp",
           "width": 960,
-          "height": 640,
-          "bytes": 74002,
+          "height": 960,
+          "bytes": 106156,
           "format": "webp"
         }
       ]
@@ -295,50 +281,36 @@
       "status": "assigned",
       "transparent": false,
       "alt": "Pastelerías 3L Azúcar · Chocolate covering Pan de Muerto · photo 2",
-      "width": 1024,
-      "height": 1536,
+      "width": 740,
+      "height": 740,
       "originalBytes": 2751385,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-10-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 19193,
+          "height": 320,
+          "bytes": 15591,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-10-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 31832,
+          "height": 320,
+          "bytes": 24644,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-10-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 56878,
+          "height": 640,
+          "bytes": 45080,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-10-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 93536,
-          "format": "webp"
-        },
-        {
-          "src": "/brand/official-pan/official-pan-10-960.avif",
-          "width": 960,
-          "height": 1440,
-          "bytes": 100938,
-          "format": "avif"
-        },
-        {
-          "src": "/brand/official-pan/official-pan-10-960.webp",
-          "width": 960,
-          "height": 1440,
-          "bytes": 163902,
+          "height": 640,
+          "bytes": 73466,
           "format": "webp"
         }
       ]
@@ -352,50 +324,50 @@
       "status": "assigned",
       "transparent": false,
       "alt": "Pastelerías 3L Crema diplomática (vainilla) Pan de Muerto · photo 1",
-      "width": 1024,
-      "height": 1536,
+      "width": 989,
+      "height": 989,
       "originalBytes": 2636192,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-14-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 19348,
+          "height": 320,
+          "bytes": 16079,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-14-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 30120,
+          "height": 320,
+          "bytes": 24552,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-14-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 59698,
+          "height": 640,
+          "bytes": 47732,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-14-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 94406,
+          "height": 640,
+          "bytes": 76114,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-14-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 104763,
+          "height": 960,
+          "bytes": 83266,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-14-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 163280,
+          "height": 960,
+          "bytes": 133520,
           "format": "webp"
         }
       ]
@@ -409,50 +381,50 @@
       "status": "assigned",
       "transparent": true,
       "alt": "Pastelerías 3L Crema diplomática (vainilla) Pan de Muerto · photo 2",
-      "width": 1024,
-      "height": 1536,
+      "width": 1169,
+      "height": 1169,
       "originalBytes": 2368890,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-14-cutout-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 21592,
+          "height": 320,
+          "bytes": 17613,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-14-cutout-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 35006,
+          "height": 320,
+          "bytes": 28098,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-14-cutout-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 70610,
+          "height": 640,
+          "bytes": 57191,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-14-cutout-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 119574,
+          "height": 640,
+          "bytes": 94410,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-14-cutout-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 130155,
+          "height": 960,
+          "bytes": 107432,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-14-cutout-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 230396,
+          "height": 960,
+          "bytes": 189232,
           "format": "webp"
         }
       ]
@@ -467,49 +439,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Crema diplomática (vainilla) Pan de Muerto · photo 3",
       "width": 1536,
-      "height": 1024,
+      "height": 1536,
       "originalBytes": 3051922,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-13-320.avif",
           "width": 320,
-          "height": 213,
-          "bytes": 11713,
+          "height": 320,
+          "bytes": 11784,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-13-320.webp",
           "width": 320,
-          "height": 213,
-          "bytes": 17286,
+          "height": 320,
+          "bytes": 16366,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-13-640.avif",
           "width": 640,
-          "height": 427,
-          "bytes": 43650,
+          "height": 640,
+          "bytes": 44360,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-13-640.webp",
           "width": 640,
-          "height": 427,
-          "bytes": 66048,
+          "height": 640,
+          "bytes": 62514,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-13-960.avif",
           "width": 960,
-          "height": 640,
-          "bytes": 91908,
+          "height": 960,
+          "bytes": 91215,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-13-960.webp",
           "width": 960,
-          "height": 640,
-          "bytes": 133966,
+          "height": 960,
+          "bytes": 131284,
           "format": "webp"
         }
       ]
@@ -523,50 +495,50 @@
       "status": "assigned",
       "transparent": false,
       "alt": "Pastelerías 3L Chocolate Pan de Muerto · photo 1",
-      "width": 1365,
-      "height": 2048,
+      "width": 1344,
+      "height": 1344,
       "originalBytes": 597986,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-16-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 14271,
+          "height": 320,
+          "bytes": 12484,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-16-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 20734,
+          "height": 320,
+          "bytes": 17660,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-16-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 40723,
+          "height": 640,
+          "bytes": 35379,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-16-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 57248,
+          "height": 640,
+          "bytes": 48928,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-16-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 75487,
+          "height": 960,
+          "bytes": 64823,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-16-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 97518,
+          "height": 960,
+          "bytes": 82394,
           "format": "webp"
         }
       ]
@@ -580,50 +552,50 @@
       "status": "assigned",
       "transparent": false,
       "alt": "Pastelerías 3L Chocolate Pan de Muerto · photo 2",
-      "width": 1365,
-      "height": 2047,
+      "width": 1184,
+      "height": 1184,
       "originalBytes": 682508,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-18-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 15492,
+          "height": 320,
+          "bytes": 13777,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-18-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 21818,
+          "height": 320,
+          "bytes": 20128,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-18-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 44275,
+          "height": 640,
+          "bytes": 40045,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-18-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 59506,
+          "height": 640,
+          "bytes": 55554,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-18-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 82100,
+          "height": 960,
+          "bytes": 75863,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-18-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 104724,
+          "height": 960,
+          "bytes": 98246,
           "format": "webp"
         }
       ]
@@ -637,50 +609,50 @@
       "status": "assigned",
       "transparent": true,
       "alt": "Pastelerías 3L Chocolate Pan de Muerto · photo 3",
-      "width": 1024,
-      "height": 1536,
+      "width": 1156,
+      "height": 1156,
       "originalBytes": 2490360,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-16-cutout-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 23182,
+          "height": 320,
+          "bytes": 19365,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-16-cutout-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 38382,
+          "height": 320,
+          "bytes": 31490,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-16-cutout-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 74961,
+          "height": 640,
+          "bytes": 62305,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-16-cutout-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 133530,
+          "height": 640,
+          "bytes": 107494,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-16-cutout-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 140776,
+          "height": 960,
+          "bytes": 117283,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-16-cutout-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 259040,
+          "height": 960,
+          "bytes": 214726,
           "format": "webp"
         }
       ]
@@ -694,50 +666,50 @@
       "status": "assigned",
       "transparent": true,
       "alt": "Pastelerías 3L Chocolate Pan de Muerto · photo 4",
-      "width": 1024,
-      "height": 1536,
+      "width": 1230,
+      "height": 1230,
       "originalBytes": 2522368,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-18-cutout-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 24179,
+          "height": 320,
+          "bytes": 18386,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-18-cutout-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 40968,
+          "height": 320,
+          "bytes": 29996,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-18-cutout-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 76357,
+          "height": 640,
+          "bytes": 58254,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-18-cutout-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 141130,
+          "height": 640,
+          "bytes": 102830,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-18-cutout-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 139872,
+          "height": 960,
+          "bytes": 108213,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-18-cutout-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 268086,
+          "height": 960,
+          "bytes": 205712,
           "format": "webp"
         }
       ]
@@ -752,49 +724,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Chocolate Pan de Muerto · photo 5",
       "width": 941,
-      "height": 1672,
+      "height": 941,
       "originalBytes": 2211090,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-29-320.avif",
           "width": 320,
-          "height": 569,
-          "bytes": 16400,
+          "height": 320,
+          "bytes": 14250,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-29-320.webp",
           "width": 320,
-          "height": 569,
-          "bytes": 25594,
+          "height": 320,
+          "bytes": 22766,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-29-640.avif",
           "width": 640,
-          "height": 1137,
-          "bytes": 50182,
+          "height": 640,
+          "bytes": 45192,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-29-640.webp",
           "width": 640,
-          "height": 1137,
-          "bytes": 78114,
+          "height": 640,
+          "bytes": 71690,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-29-960.avif",
           "width": 960,
-          "height": 1706,
-          "bytes": 88603,
+          "height": 960,
+          "bytes": 80187,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-29-960.webp",
           "width": 960,
-          "height": 1706,
-          "bytes": 133330,
+          "height": 960,
+          "bytes": 124006,
           "format": "webp"
         }
       ]
@@ -809,49 +781,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Pan de Muerto assortment · photo 1",
       "width": 1536,
-      "height": 1024,
+      "height": 1536,
       "originalBytes": 2602010,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-02-320.avif",
           "width": 320,
-          "height": 213,
-          "bytes": 10200,
+          "height": 320,
+          "bytes": 10191,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-02-320.webp",
           "width": 320,
-          "height": 213,
-          "bytes": 14708,
+          "height": 320,
+          "bytes": 14668,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-02-640.avif",
           "width": 640,
-          "height": 427,
-          "bytes": 34700,
+          "height": 640,
+          "bytes": 35459,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-02-640.webp",
           "width": 640,
-          "height": 427,
-          "bytes": 50874,
+          "height": 640,
+          "bytes": 50324,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-02-960.avif",
           "width": 960,
-          "height": 640,
-          "bytes": 70761,
+          "height": 960,
+          "bytes": 69668,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-02-960.webp",
           "width": 960,
-          "height": 640,
-          "bytes": 104280,
+          "height": 960,
+          "bytes": 102974,
           "format": "webp"
         }
       ]
@@ -866,49 +838,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Pan de Muerto assortment · photo 2",
       "width": 1536,
-      "height": 1024,
+      "height": 1536,
       "originalBytes": 2880840,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-01-320.avif",
           "width": 320,
-          "height": 213,
-          "bytes": 11920,
+          "height": 320,
+          "bytes": 11586,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-01-320.webp",
           "width": 320,
-          "height": 213,
-          "bytes": 17332,
+          "height": 320,
+          "bytes": 17092,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-01-640.avif",
           "width": 640,
-          "height": 427,
-          "bytes": 42757,
+          "height": 640,
+          "bytes": 42378,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-01-640.webp",
           "width": 640,
-          "height": 427,
-          "bytes": 62558,
+          "height": 640,
+          "bytes": 61290,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-01-960.avif",
           "width": 960,
-          "height": 640,
-          "bytes": 87542,
+          "height": 960,
+          "bytes": 85351,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-01-960.webp",
           "width": 960,
-          "height": 640,
-          "bytes": 129028,
+          "height": 960,
+          "bytes": 125056,
           "format": "webp"
         }
       ]
@@ -923,49 +895,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Pan de Muerto assortment · photo 3",
       "width": 1536,
-      "height": 1024,
+      "height": 1536,
       "originalBytes": 2520557,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-03-320.avif",
           "width": 320,
-          "height": 213,
-          "bytes": 9253,
+          "height": 320,
+          "bytes": 9294,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-03-320.webp",
           "width": 320,
-          "height": 213,
-          "bytes": 13652,
+          "height": 320,
+          "bytes": 13358,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-03-640.avif",
           "width": 640,
-          "height": 427,
-          "bytes": 31874,
+          "height": 640,
+          "bytes": 31659,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-03-640.webp",
           "width": 640,
-          "height": 427,
-          "bytes": 47182,
+          "height": 640,
+          "bytes": 46188,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-03-960.avif",
           "width": 960,
-          "height": 640,
-          "bytes": 63953,
+          "height": 960,
+          "bytes": 63259,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-03-960.webp",
           "width": 960,
-          "height": 640,
-          "bytes": 94152,
+          "height": 960,
+          "bytes": 92048,
           "format": "webp"
         }
       ]
@@ -980,49 +952,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Pan de Muerto assortment · photo 4",
       "width": 1536,
-      "height": 1024,
+      "height": 1536,
       "originalBytes": 2469076,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-04-320.avif",
           "width": 320,
-          "height": 213,
-          "bytes": 11706,
+          "height": 320,
+          "bytes": 12037,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-04-320.webp",
           "width": 320,
-          "height": 213,
-          "bytes": 17416,
+          "height": 320,
+          "bytes": 17168,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-04-640.avif",
           "width": 640,
-          "height": 427,
-          "bytes": 33751,
+          "height": 640,
+          "bytes": 34240,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-04-640.webp",
           "width": 640,
-          "height": 427,
-          "bytes": 49246,
+          "height": 640,
+          "bytes": 48492,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-04-960.avif",
           "width": 960,
-          "height": 640,
-          "bytes": 62000,
+          "height": 960,
+          "bytes": 62837,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-04-960.webp",
           "width": 960,
-          "height": 640,
-          "bytes": 87686,
+          "height": 960,
+          "bytes": 85694,
           "format": "webp"
         }
       ]
@@ -1036,50 +1008,50 @@
       "status": "assigned",
       "transparent": false,
       "alt": "Pastelerías 3L Mascarpone y cajeta Pan de Muerto · photo 1",
-      "width": 1024,
-      "height": 1536,
+      "width": 989,
+      "height": 989,
       "originalBytes": 2530122,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-23-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 18314,
+          "height": 320,
+          "bytes": 15586,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-23-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 29068,
+          "height": 320,
+          "bytes": 24328,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-23-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 54689,
+          "height": 640,
+          "bytes": 45025,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-23-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 85236,
+          "height": 640,
+          "bytes": 70560,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-23-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 96435,
+          "height": 960,
+          "bytes": 78782,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-23-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 141684,
+          "height": 960,
+          "bytes": 119466,
           "format": "webp"
         }
       ]
@@ -1094,49 +1066,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Mascarpone y cajeta Pan de Muerto · photo 2",
       "width": 941,
-      "height": 1672,
+      "height": 941,
       "originalBytes": 2121764,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-30-320.avif",
           "width": 320,
-          "height": 569,
-          "bytes": 14715,
+          "height": 320,
+          "bytes": 13904,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-30-320.webp",
           "width": 320,
-          "height": 569,
-          "bytes": 21484,
+          "height": 320,
+          "bytes": 20342,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-30-640.avif",
           "width": 640,
-          "height": 1137,
-          "bytes": 46781,
+          "height": 640,
+          "bytes": 45130,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-30-640.webp",
           "width": 640,
-          "height": 1137,
-          "bytes": 71910,
+          "height": 640,
+          "bytes": 70156,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-30-960.avif",
           "width": 960,
-          "height": 1706,
-          "bytes": 84015,
+          "height": 960,
+          "bytes": 80087,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-30-960.webp",
           "width": 960,
-          "height": 1706,
-          "bytes": 132232,
+          "height": 960,
+          "bytes": 126696,
           "format": "webp"
         }
       ]
@@ -1150,50 +1122,50 @@
       "status": "assigned",
       "transparent": false,
       "alt": "Pastelerías 3L Mascarpone y cajeta Pan de Muerto · photo 3",
-      "width": 1024,
-      "height": 1536,
+      "width": 999,
+      "height": 999,
       "originalBytes": 2345462,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-26-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 16627,
+          "height": 320,
+          "bytes": 15122,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-26-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 24662,
+          "height": 320,
+          "bytes": 22040,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-26-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 52371,
+          "height": 640,
+          "bytes": 48353,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-26-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 79920,
+          "height": 640,
+          "bytes": 74950,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-26-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 95615,
+          "height": 960,
+          "bytes": 88968,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-26-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 145500,
+          "height": 960,
+          "bytes": 138128,
           "format": "webp"
         }
       ]
@@ -1208,49 +1180,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Mascarpone y fresas Pan de Muerto · photo 1",
       "width": 1365,
-      "height": 2048,
+      "height": 1365,
       "originalBytes": 641939,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-17-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 16188,
+          "height": 320,
+          "bytes": 13841,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-17-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 24328,
+          "height": 320,
+          "bytes": 20880,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-17-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 45839,
+          "height": 640,
+          "bytes": 38875,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-17-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 69856,
+          "height": 640,
+          "bytes": 59568,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-17-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 82191,
+          "height": 960,
+          "bytes": 70621,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-17-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 119856,
+          "height": 960,
+          "bytes": 104594,
           "format": "webp"
         }
       ]
@@ -1265,49 +1237,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Mascarpone y fresas Pan de Muerto · photo 2",
       "width": 1365,
-      "height": 2048,
+      "height": 1365,
       "originalBytes": 686299,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-20-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 18019,
+          "height": 320,
+          "bytes": 14634,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-20-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 28306,
+          "height": 320,
+          "bytes": 22256,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-20-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 52348,
+          "height": 640,
+          "bytes": 41809,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-20-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 81070,
+          "height": 640,
+          "bytes": 64438,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-20-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 94465,
+          "height": 960,
+          "bytes": 75680,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-20-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 142732,
+          "height": 960,
+          "bytes": 112542,
           "format": "webp"
         }
       ]
@@ -1322,49 +1294,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Mascarpone y fresas Pan de Muerto · photo 3",
       "width": 941,
-      "height": 1672,
+      "height": 941,
       "originalBytes": 2329589,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-24-320.avif",
           "width": 320,
-          "height": 569,
-          "bytes": 18161,
+          "height": 320,
+          "bytes": 14941,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-24-320.webp",
           "width": 320,
-          "height": 569,
-          "bytes": 27610,
+          "height": 320,
+          "bytes": 22272,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-24-640.avif",
           "width": 640,
-          "height": 1137,
-          "bytes": 54502,
+          "height": 640,
+          "bytes": 47217,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-24-640.webp",
           "width": 640,
-          "height": 1137,
-          "bytes": 84416,
+          "height": 640,
+          "bytes": 72234,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-24-960.avif",
           "width": 960,
-          "height": 1706,
-          "bytes": 93425,
+          "height": 960,
+          "bytes": 81764,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-24-960.webp",
           "width": 960,
-          "height": 1706,
-          "bytes": 141024,
+          "height": 960,
+          "bytes": 122360,
           "format": "webp"
         }
       ]
@@ -1378,50 +1350,50 @@
       "status": "assigned",
       "transparent": false,
       "alt": "Pastelerías 3L Mascarpone y fresas Pan de Muerto · photo 4",
-      "width": 1536,
-      "height": 1024,
+      "width": 969,
+      "height": 969,
       "originalBytes": 2597728,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-21-320.avif",
           "width": 320,
-          "height": 213,
-          "bytes": 11102,
+          "height": 320,
+          "bytes": 18290,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-21-320.webp",
           "width": 320,
-          "height": 213,
-          "bytes": 17384,
+          "height": 320,
+          "bytes": 29272,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-21-640.avif",
           "width": 640,
-          "height": 427,
-          "bytes": 35447,
+          "height": 640,
+          "bytes": 57153,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-21-640.webp",
           "width": 640,
-          "height": 427,
-          "bytes": 56354,
+          "height": 640,
+          "bytes": 93870,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-21-960.avif",
           "width": 960,
-          "height": 640,
-          "bytes": 66599,
+          "height": 960,
+          "bytes": 101052,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-21-960.webp",
           "width": 960,
-          "height": 640,
-          "bytes": 106860,
+          "height": 960,
+          "bytes": 170016,
           "format": "webp"
         }
       ]
@@ -1436,49 +1408,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Pistachio Pan de Muerto · photo 1",
       "width": 1024,
-      "height": 1536,
+      "height": 1024,
       "originalBytes": 2387771,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-07-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 16454,
+          "height": 320,
+          "bytes": 14496,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-07-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 26324,
+          "height": 320,
+          "bytes": 23316,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-07-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 48507,
+          "height": 640,
+          "bytes": 43348,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-07-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 78506,
+          "height": 640,
+          "bytes": 71154,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-07-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 87575,
+          "height": 960,
+          "bytes": 78127,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-07-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 136742,
+          "height": 960,
+          "bytes": 123086,
           "format": "webp"
         }
       ]
@@ -1493,49 +1465,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Pistachio Pan de Muerto · photo 2",
       "width": 941,
-      "height": 1672,
+      "height": 941,
       "originalBytes": 2169179,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-25-320.avif",
           "width": 320,
-          "height": 569,
-          "bytes": 12861,
+          "height": 320,
+          "bytes": 12295,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-25-320.webp",
           "width": 320,
-          "height": 569,
-          "bytes": 17134,
+          "height": 320,
+          "bytes": 16548,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-25-640.avif",
           "width": 640,
-          "height": 1137,
-          "bytes": 44137,
+          "height": 640,
+          "bytes": 41873,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-25-640.webp",
           "width": 640,
-          "height": 1137,
-          "bytes": 55682,
+          "height": 640,
+          "bytes": 54780,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-25-960.avif",
           "width": 960,
-          "height": 1706,
-          "bytes": 82519,
+          "height": 960,
+          "bytes": 77049,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-25-960.webp",
           "width": 960,
-          "height": 1706,
-          "bytes": 99786,
+          "height": 960,
+          "bytes": 94146,
           "format": "webp"
         }
       ]
@@ -1550,49 +1522,49 @@
       "transparent": false,
       "alt": "Pastelerías 3L Pistachio Pan de Muerto · photo 3",
       "width": 1152,
-      "height": 2048,
+      "height": 1152,
       "originalBytes": 510589,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-27-320.avif",
           "width": 320,
-          "height": 569,
-          "bytes": 19706,
+          "height": 320,
+          "bytes": 12492,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-27-320.webp",
           "width": 320,
-          "height": 569,
-          "bytes": 26886,
+          "height": 320,
+          "bytes": 17724,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-27-640.avif",
           "width": 640,
-          "height": 1138,
-          "bytes": 53468,
+          "height": 640,
+          "bytes": 37066,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-27-640.webp",
           "width": 640,
-          "height": 1138,
-          "bytes": 70176,
+          "height": 640,
+          "bytes": 48452,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-27-960.avif",
           "width": 960,
-          "height": 1707,
-          "bytes": 93868,
+          "height": 960,
+          "bytes": 66810,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-27-960.webp",
           "width": 960,
-          "height": 1707,
-          "bytes": 117108,
+          "height": 960,
+          "bytes": 81638,
           "format": "webp"
         }
       ]
@@ -1606,50 +1578,50 @@
       "status": "assigned",
       "transparent": true,
       "alt": "Pastelerías 3L Pistachio Pan de Muerto · photo 4",
-      "width": 1024,
-      "height": 1536,
+      "width": 1147,
+      "height": 1147,
       "originalBytes": 2209519,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-15-cutout-320.avif",
           "width": 320,
-          "height": 480,
-          "bytes": 22383,
+          "height": 320,
+          "bytes": 19116,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-15-cutout-320.webp",
           "width": 320,
-          "height": 480,
-          "bytes": 33742,
+          "height": 320,
+          "bytes": 28724,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-15-cutout-640.avif",
           "width": 640,
-          "height": 960,
-          "bytes": 62474,
+          "height": 640,
+          "bytes": 53205,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-15-cutout-640.webp",
           "width": 640,
-          "height": 960,
-          "bytes": 100182,
+          "height": 640,
+          "bytes": 82076,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-15-cutout-960.avif",
           "width": 960,
-          "height": 1440,
-          "bytes": 112055,
+          "height": 960,
+          "bytes": 95470,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-15-cutout-960.webp",
           "width": 960,
-          "height": 1440,
-          "bytes": 178478,
+          "height": 960,
+          "bytes": 155268,
           "format": "webp"
         }
       ]
