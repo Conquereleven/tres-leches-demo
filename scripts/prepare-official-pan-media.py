@@ -12,7 +12,7 @@ import csv
 import json
 import sys
 from pathlib import Path
-from PIL import Image, ImageOps
+from PIL import Image, ImageFilter, ImageOps
 
 repo = Path(__file__).resolve().parent.parent
 library = Path(sys.argv[1])
@@ -33,7 +33,7 @@ assignments = [
     # Packs: illustrative groups only; the size selector stays authoritative.
     (f"{T}-pack", f"{T}-pack", "", ["02.png", "01.png", "03.png", "04.png"],
      "Mixed board of sesame, sugar and chocolate-dipped breads (plus pistachio-coated); illustrative, no pack count implied"),
-    (f"{F}-pack", f"{F}-pack", "", ["13.png"],
+    (f"{F}-pack", f"{F}-pack", "", ["13.png#pack"],
      "Three cream-filled breads, the only group photograph of filled breads; illustrative, no pack count implied"),
     (f"{F}--mascarpone-y-cajeta", F, "Mascarpone y cajeta", ["23.png", "30.png", "26.png"],
      "Pale cream with amber sauce running down the bread"),
@@ -42,6 +42,8 @@ assignments = [
     (f"{F}--pistachio", F, "Pistachio", ["07.png", "25.png", "27.jpg", "15 PNG.png"],
      "Pale green coating with chopped pistachio; the menu's only pistachio bread"),
 ]
+# The category banner shows the same boards whole, in their original 3:2 frame.
+banner = ["01.png", "02.png", "03.png", "04.png"]
 held = {
     "05.png": "Mixed board; the pack photos already cover assortments and none is a filled group",
     "22.jpg": "Mixed board; the pack photos already cover assortments and none is a filled group",
@@ -52,9 +54,15 @@ by_original = {row["Original filename"]: row for row in rows}
 assert len(rows) == 50, len(rows)
 
 
+def source(name: str) -> str:
+    """`13.png#pack` is a second, differently framed asset from the same original."""
+    return name.split("#")[0]
+
+
 def identifier(name: str) -> str:
-    stem = Path(name).stem.lower().replace(" png", "-cutout")
-    return "official-pan-" + ("assortment-cutout" if stem.startswith("panes") else stem)
+    stem = Path(source(name)).stem.lower().replace(" png", "-cutout")
+    suffix = "-" + name.split("#")[1] if "#" in name else ""
+    return "official-pan-" + ("assortment-cutout" if stem.startswith("panes") else stem) + suffix
 
 
 CREAM = (246, 239, 227)
@@ -68,9 +76,23 @@ def square(name: str, image: Image.Image) -> Image.Image:
     photographic background around the bread (cutouts may extend past the
     source, staying transparent); `canvas` places a group photograph whole on a
     cream square because no square window holds every bread. Nothing is
-    stretched and no pixel is invented.
+    stretched and no pixel is invented. `extend` makes a landscape group square
+    by continuing the photograph's own background above and below it: the
+    studio backdrop's edge tone, or a mirrored strip of bare board. Breads are
+    never copied, moved or redrawn.
     """
     spec = crops[name]
+    if spec["mode"] == "extend":
+        image = image.crop((0, 0, image.width, image.height - spec.get("trimBottom", 0)))
+        top, bottom = spec["top"], spec["bottom"]
+        canvas = Image.new("RGB", (image.width, image.height + top + bottom))
+        if top:
+            canvas.paste(background(image, 0, top, "edge"), (0, 0))
+        canvas.paste(image, (0, top))
+        if bottom:
+            canvas.paste(background(image, image.height, bottom, spec.get("bottomFill", "edge")), (0, top + image.height))
+        assert canvas.width == canvas.height, (name, canvas.size)
+        return canvas
     if spec["mode"] == "canvas":
         side = max(image.size)
         canvas = Image.new("RGB", (side, side), CREAM)
@@ -85,17 +107,28 @@ def square(name: str, image: Image.Image) -> Image.Image:
     return image.crop((x, y, x + side, y + side))
 
 
-def derive(name: str, widths: tuple[int, ...]):
-    row = by_original[name]
+def background(image: Image.Image, edge: int, height: int, fill: str) -> Image.Image:
+    """Extra background beyond the top (edge 0) or bottom (edge = height) of a photo."""
+    width = image.width
+    if fill == "mirror":
+        return image.crop((0, edge - height, width, edge)).transpose(Image.Transpose.FLIP_TOP_BOTTOM)
+    rows = (0, 14) if edge == 0 else (edge - 14, edge)
+    tone = image.crop((0, rows[0], width, rows[1])).resize((width, 1), Image.Resampling.BOX)
+    return tone.filter(ImageFilter.GaussianBlur(40)).resize((width, height), Image.Resampling.NEAREST)
+
+
+def derive(name: str, widths: tuple[int, ...], whole: str = ""):
+    row = by_original[source(name)]
     path = library / row["Relative organized path"]
     transparent = row["Transparent background (yes/no)"] == "yes"
-    image = square(name, ImageOps.exif_transpose(Image.open(path)).convert("RGBA" if transparent else "RGB"))
+    image = ImageOps.exif_transpose(Image.open(path)).convert("RGBA" if transparent else "RGB")
+    image = image if whole else square(name, image)
     derivatives = []
     # Never enlarge: a tight crop of a small bread simply ships fewer sizes.
     for width in [w for w in widths if w <= image.width * 1.05] or widths[:1]:
         scaled = image.resize((width, round(image.height * width / image.width)), Image.Resampling.LANCZOS)
         for fmt, quality in (("avif", 60), ("webp", 80)):
-            relative = f"/brand/official-pan/{identifier(name)}-{width}.{fmt}"
+            relative = f"/brand/official-pan/{whole or identifier(name)}-{width}.{fmt}"
             scaled.save(repo / "public" / relative.lstrip("/"), quality=quality)
             derivatives.append({"src": relative, "width": scaled.width, "height": scaled.height,
                                 "bytes": (repo / "public" / relative.lstrip("/")).stat().st_size, "format": fmt})
@@ -121,12 +154,28 @@ for product, family, variant, names, evidence in assignments:
                        "alt": (f"Pastelerías 3L {variant} Pan de Muerto" if variant else "Pastelerías 3L Pan de Muerto assortment") + f" · photo {index + 1}",
                        "width": image.width, "height": image.height,
                        "originalBytes": path.stat().st_size, "derivatives": derivatives})
+        assets[-1]["sourceFilename"] = source(name)
     products.append({"productId": product, "primarySourceId": ids[0], "gallerySourceIds": ids[1:]})
-manifest = {"sourceArchive": "PAN DE MUERTO PACK.zip", "assets": assets, "products": products}
+for index, name in enumerate(banner):
+    sid = identifier(name).replace("official-pan-", "official-pan-banner-")
+    image, transparent, derivatives, path = derive(name, (640, 960, 1536), whole=sid)
+    assets.append({"sourceId": sid, "sourceFilename": name, "family": "pan-de-muerto-category",
+                   "variant": "", "size": None, "status": "assigned", "transparent": transparent,
+                   "alt": f"Pastelerías 3L Pan de Muerto assortment · banner {index + 1}",
+                   "width": image.width, "height": image.height,
+                   "originalBytes": path.stat().st_size, "derivatives": derivatives})
+manifest = {"sourceArchive": "PAN DE MUERTO PACK.zip", "assets": assets, "products": products,
+            "editorial": [{"category": "pan", "sourceIds": [identifier(n).replace("official-pan-", "official-pan-banner-") for n in banner]}]}
 (repo / "src/brand/official-pan-media.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
 
 # The full account: one line per source, including what is deliberately not shown.
-shown_groups = {by_original[name]["Related image group"] for name in role}
+shown_groups = {by_original[source(name)]["Related image group"] for name in role}
+for name in [n for n in role if "#" in n]:  # fold a second framing into its original's row
+    kind, target, reason = role.pop(name)
+    first = role[source(name)]
+    role[source(name)] = (first[0], first[1] + " + " + target, first[2])
+for name in banner:
+    role[name] = (role[name][0] + " + category banner", role[name][1], role[name][2])
 with (repo / "docs/brand/pan-de-muerto-photo-map.csv").open("w", newline="", encoding="utf-8") as handle:
     out = csv.writer(handle)
     out.writerow(["Original filename", "Organized filename", "Transparent", "Role", "Product or category",

@@ -8,7 +8,11 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     page.on("request", (r) => {
       if (r.url().endsWith(".mp4")) requests.push(r.url());
     });
-    page.on("pageerror", (e) => errors.push(e.message));
+    page.on("pageerror", (e) => {
+      // WebKit reports a fetch it cancelled on navigation as a page error; not a defect.
+      if (!/due to access control checks/.test(e.message))
+        errors.push(e.message);
+    });
     await page.goto("/");
     const video = page.locator(".ref-hero video");
     // New story film on desktop; the original packaging video on tablet and mobile.
@@ -72,17 +76,46 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     );
     await expect(page.locator(".b-product-gallery img")).toHaveCount(1);
     await expect(page.locator(".b-official-rotation")).toHaveCount(0);
+    // Product pages carry neither the watermark nor the banner.
+    await expect(page.locator(".b-menu-intro-mark")).toHaveCount(0);
+    await expect(page.locator(".b-category-showcase")).toHaveCount(0);
     await page.screenshot({
       path: `work/qa/official-media/${info.project.name}-product-${width}.png`,
     });
     await page.goto("/menu?category=pan");
-    // The category photo banner is gone: no container, and the grid starts under the heading.
-    await expect(page.locator(".b-category-showcase")).toHaveCount(0);
-    const heading = await page
-      .locator(".b-menu-category-heading")
-      .boundingBox();
-    const firstCard = await page.locator(".b-menu-grid").boundingBox();
-    expect(firstCard!.y - (heading!.y + heading!.height)).toBeLessThan(80);
+    // Restored Pan de Muerto banner: whole 3:2 boards, before the product grid.
+    const banner = page.locator(".b-category-showcase .b-official-rotation");
+    await expect(banner.locator("picture.is-active img")).toHaveAttribute(
+      "src",
+      /official-pan-banner-0[1-4]-/,
+    );
+    const bannerBox = (await page
+      .locator(".b-category-showcase")
+      .boundingBox())!;
+    expect(Math.abs(bannerBox.width / bannerBox.height - 1.5)).toBeLessThan(
+      0.02,
+    );
+    expect(bannerBox.y + bannerBox.height).toBeLessThanOrEqual(
+      (await page.locator(".b-menu-grid").boundingBox())!.y,
+    );
+    // The logo watermark belongs to the Menu introduction and nowhere else.
+    const mark = page.locator(".b-menu-intro-mark");
+    await expect(mark).toHaveCount(1);
+    expect(
+      await mark.evaluate((m) => {
+        const cs = getComputedStyle(m);
+        const nav = document
+          .querySelector(".b-menu-categories")!
+          .getBoundingClientRect();
+        return [
+          cs.opacity,
+          cs.pointerEvents,
+          m.getAttribute("aria-hidden"),
+          cs.backgroundRepeat,
+          m.getBoundingClientRect().bottom <= nav.bottom,
+        ];
+      }),
+    ).toEqual(["0.05", "none", "true", "no-repeat", true]);
     // Every card image is a square with rounded corners and shows the whole photo.
     const frames = await page.evaluate(() =>
       [...document.querySelectorAll(".b-menu-card .b-menu-photo")].map((f) => {
@@ -138,7 +171,7 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     expect([...new Set(frames.map(([, , fit]) => fit))]).toEqual(["contain"]);
     for (const [id, source] of [
       ["pan-de-muerto-traditional-pack", /official-pan-02-/],
-      ["pan-de-muerto-filled-pack", /official-pan-13-/],
+      ["pan-de-muerto-filled-pack", /official-pan-13-pack-/],
     ] as const) {
       const card = page.locator(`[data-product-id="${id}"] .b-menu-photo`);
       await card.scrollIntoViewIfNeeded();

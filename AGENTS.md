@@ -106,3 +106,8 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Conchas (prices, names, variants, availability, photos) are out of scope until the next sprint and must stay identical to the released catalog. Azúcar · Chocolate covering Pan de Muerto and the filled Pistache concha are authorized products: never remove them.
 - Production prices change only through `update-pan-prices` (plan, then apply); never the general importer for this release. See `docs/catalog/current-menu.md`.
 - Homepage hero: new story film at ≥1024px, original packaging video below. Static files answer Range requests so Safari can play video.
+
+## Menu watermark, restored banner and square pack photos (9 October 2026, Joel and Lisa)
+- The official wordmark appears once as a 5% watermark behind the Menu introduction only (`.b-menu-intro-mark`). Never on product photos, cards, galleries, detail pages, or as a repeating or global background.
+- The Pan de Muerto category banner is back (Lisa): the four mixed boards, whole, 3:2, same 3.5 s rotation. No banners on other categories. This supersedes the earlier "banner removed" decision.
+- Pack photos are square by continuing each photo's own background (`extend` in `scripts/official-pan-crops.json`); breads are never copied, moved or redrawn. The filled pack uses its own asset (`official-pan-13-pack`) so Crema diplomática's approved third photo is untouched.

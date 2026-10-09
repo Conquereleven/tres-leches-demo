@@ -20,9 +20,13 @@ export function MenuPage() {
         {!new URLSearchParams(
           typeof location === "undefined" ? "" : location.search,
         ).has("product") && (
-          <h1 className="b-heading" style={{ textAlign: "center" }}>
-            <CustomerCopy>{t("menu")}</CustomerCopy>
-          </h1>
+          <>
+            {/* Decorative official logo behind the Menu introduction only. */}
+            <div className="b-menu-intro-mark" aria-hidden="true" />
+            <h1 className="b-heading" style={{ textAlign: "center" }}>
+              <CustomerCopy>{t("menu")}</CustomerCopy>
+            </h1>
+          </>
         )}
         <MenuCatalog />
       </main>

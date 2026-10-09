@@ -3,7 +3,10 @@ import assert from "node:assert/strict";
 import { readFileSync, statSync } from "node:fs";
 import official from "../../src/brand/official-pan-media.json";
 import { storefrontProducts, productFamily } from "../../src/brand/menu";
-import { selectedProductMedia } from "../../src/brand/media";
+import {
+  categoryEditorialMedia,
+  selectedProductMedia,
+} from "../../src/brand/media";
 
 test("all 50 official photos are accounted for and only reviewed ones are public", () => {
   const map = readFileSync("docs/brand/pan-de-muerto-photo-map.csv", "utf8")
@@ -12,9 +15,11 @@ test("all 50 official photos are accounted for and only reviewed ones are public
     .slice(1);
   assert.equal(map.length, 50);
   const shown = map.filter((line) => /,yes,official-pan-[^,]+,/.test(line));
-  assert.equal(shown.length, official.assets.length);
-  assert.equal(official.assets.length, 29);
-  assert.equal(new Set(official.assets.map((a) => a.sourceId)).size, 29);
+  // 29 originals are published. Five more assets reuse them in another frame:
+  // the filled pack's square board and the four whole boards of the banner.
+  assert.equal(shown.length, 29);
+  assert.equal(official.assets.length, 34);
+  assert.equal(new Set(official.assets.map((a) => a.sourceId)).size, 34);
   // A photo and its cutout are one composition: published together only where
   // Joel approved it (Crema diplomática, 9 October 2026).
   assert.deepEqual(
@@ -48,11 +53,6 @@ test("all 50 official photos are accounted for and only reviewed ones are public
   const asset = (id: string) => official.assets.find((a) => a.sourceId === id)!;
   assert.equal(asset("official-pan-14-cutout").transparent, true);
   assert.equal(official.products.length, 10);
-  // The category banner is gone: no editorial data, no banner markup.
-  assert.ok(!("editorial" in official));
-  assert.ok(
-    !readFileSync("src/brand/MenuCatalog.tsx", "utf8").includes("showcase"),
-  );
   // Packs show illustrative groups, never one flavour's gallery.
   const pack = (id: string) => {
     const m = official.products.find((p) => p.productId === id)!;
@@ -64,7 +64,16 @@ test("all 50 official photos are accounted for and only reviewed ones are public
     "official-pan-03",
     "official-pan-04",
   ]);
-  assert.deepEqual(pack("pan-de-muerto-filled-pack"), ["official-pan-13"]);
+  assert.deepEqual(pack("pan-de-muerto-filled-pack"), ["official-pan-13-pack"]);
+  // Restored category banner: the four boards, whole, in their original 3:2 frame.
+  const boards = categoryEditorialMedia("pan");
+  assert.deepEqual(
+    boards.map((b) => b.sourceId),
+    ["01", "02", "03", "04"].map((n) => `official-pan-banner-${n}`),
+  );
+  for (const board of boards) assert.equal(board.width! / board.height!, 1.5);
+  for (const other of ["cakes", "conchas", "jars"])
+    assert.deepEqual(categoryEditorialMedia(other), []);
   // Chocolate-covered fillings have no photograph of their own.
   for (const product of storefrontProducts.filter((p) =>
     /filled--.*chocolate-covering|ajonjoli-chocolate-covering/.test(p.id),
@@ -98,8 +107,9 @@ test("all 50 official photos are accounted for and only reviewed ones are public
       );
   }
   for (const asset of official.assets) {
-    // Every published photo is a square product photograph, never enlarged.
-    assert.equal(asset.width, asset.height);
+    // Every product photograph is square and never enlarged; only the banner is 3:2.
+    if (asset.family !== "pan-de-muerto-category")
+      assert.equal(asset.width, asset.height);
     assert.ok([4, 6].includes(asset.derivatives.length));
     for (const derivative of asset.derivatives) {
       assert.equal(statSync("public" + derivative.src).size, derivative.bytes);

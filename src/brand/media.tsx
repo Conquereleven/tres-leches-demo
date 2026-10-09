@@ -33,6 +33,11 @@ export function selectedProductMedia(
   );
 }
 type MediaAsset = (typeof approvedMedia)[number];
+/** Mixed boards shown for a whole category; never tied to a flavour or pack. */
+export const categoryEditorialMedia = (category: string) =>
+  (official.editorial.find((e) => e.category === category)?.sourceIds ?? [])
+    .map((id) => approvedMedia.find((a) => a.sourceId === id))
+    .filter((a): a is MediaAsset => !!a);
 const srcSet = (asset: MediaAsset, format: string) =>
   asset.derivatives
     .filter((d) => d.format === format)

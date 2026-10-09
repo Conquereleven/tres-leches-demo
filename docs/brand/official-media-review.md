@@ -90,3 +90,14 @@ Cause: static files were sent without `Accept-Ranges`/`Content-Length`, and Safa
 server that ignores Range. Static responses now honour a single byte range (`server/static-range.ts`).
 The official-media test requires real playback (readyState ≥ 2 and advancing currentTime) in Chromium and WebKit
 at 390/768/1024/1440/1920. Production currently has the old behaviour until this release is deployed.
+
+## Visual refinement (9 October 2026)
+
+- Menu introduction: the official wordmark as one 5% watermark behind "Menu / THE 3L MENU / FIND YOUR FAVOURITE."; `aria-hidden`, no pointer events, already cached by the header, no layout shift.
+- Pan de Muerto banner restored at Lisa's request: boards 01–04 whole in their original 3:2 frame (`official-pan-banner-0N`, 640/960/1536).
+- Pack photographs made square without letterboxing:
+  - Traditional pack 02.png and 01.png: studio backdrop continued above and below.
+  - 03.png: backdrop continued above only (the board's front edge is at the bottom).
+  - 04.png: centred square of a tight detail whose breads the source frame already cuts.
+  - Filled pack 13.png: backdrop continued above, bare board mirrored below (182 px), as a separate asset.
+  The added areas are background only. Originals are unchanged.

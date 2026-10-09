@@ -196,15 +196,34 @@
     ]
   },
   "02.png": {
-    "mode": "canvas"
+    "mode": "extend",
+    "top": 256,
+    "bottom": 256
   },
   "01.png": {
-    "mode": "canvas"
+    "mode": "extend",
+    "top": 256,
+    "bottom": 256
   },
   "03.png": {
-    "mode": "canvas"
+    "mode": "extend",
+    "top": 512,
+    "bottom": 0
   },
   "04.png": {
-    "mode": "canvas"
+    "mode": "crop",
+    "square": [
+      256,
+      0,
+      1024
+    ],
+    "note": "tight detail; every bread is already cut by the source frame"
+  },
+  "13.png#pack": {
+    "mode": "extend",
+    "trimBottom": 16,
+    "top": 346,
+    "bottom": 182,
+    "bottomFill": "mirror"
   }
 }

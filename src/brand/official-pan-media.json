@@ -788,42 +788,42 @@
           "src": "/brand/official-pan/official-pan-02-320.avif",
           "width": 320,
           "height": 320,
-          "bytes": 10191,
+          "bytes": 10053,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-02-320.webp",
           "width": 320,
           "height": 320,
-          "bytes": 14668,
+          "bytes": 14654,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-02-640.avif",
           "width": 640,
           "height": 640,
-          "bytes": 35459,
+          "bytes": 35146,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-02-640.webp",
           "width": 640,
           "height": 640,
-          "bytes": 50324,
+          "bytes": 50346,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-02-960.avif",
           "width": 960,
           "height": 960,
-          "bytes": 69668,
+          "bytes": 69859,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-02-960.webp",
           "width": 960,
           "height": 960,
-          "bytes": 102974,
+          "bytes": 103266,
           "format": "webp"
         }
       ]
@@ -845,42 +845,42 @@
           "src": "/brand/official-pan/official-pan-01-320.avif",
           "width": 320,
           "height": 320,
-          "bytes": 11586,
+          "bytes": 11487,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-01-320.webp",
           "width": 320,
           "height": 320,
-          "bytes": 17092,
+          "bytes": 16998,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-01-640.avif",
           "width": 640,
           "height": 640,
-          "bytes": 42378,
+          "bytes": 42205,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-01-640.webp",
           "width": 640,
           "height": 640,
-          "bytes": 61290,
+          "bytes": 61162,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-01-960.avif",
           "width": 960,
           "height": 960,
-          "bytes": 85351,
+          "bytes": 85449,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-01-960.webp",
           "width": 960,
           "height": 960,
-          "bytes": 125056,
+          "bytes": 125092,
           "format": "webp"
         }
       ]
@@ -902,42 +902,42 @@
           "src": "/brand/official-pan/official-pan-03-320.avif",
           "width": 320,
           "height": 320,
-          "bytes": 9294,
+          "bytes": 9602,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-03-320.webp",
           "width": 320,
           "height": 320,
-          "bytes": 13358,
+          "bytes": 13218,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-03-640.avif",
           "width": 640,
           "height": 640,
-          "bytes": 31659,
+          "bytes": 30793,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-03-640.webp",
           "width": 640,
           "height": 640,
-          "bytes": 46188,
+          "bytes": 45990,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-03-960.avif",
           "width": 960,
           "height": 960,
-          "bytes": 63259,
+          "bytes": 63364,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-03-960.webp",
           "width": 960,
           "height": 960,
-          "bytes": 92048,
+          "bytes": 91822,
           "format": "webp"
         }
       ]
@@ -951,50 +951,107 @@
       "status": "assigned",
       "transparent": false,
       "alt": "Pastelerías 3L Pan de Muerto assortment · photo 4",
-      "width": 1536,
-      "height": 1536,
+      "width": 1024,
+      "height": 1024,
       "originalBytes": 2469076,
       "derivatives": [
         {
           "src": "/brand/official-pan/official-pan-04-320.avif",
           "width": 320,
           "height": 320,
-          "bytes": 12037,
+          "bytes": 14621,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-04-320.webp",
           "width": 320,
           "height": 320,
-          "bytes": 17168,
+          "bytes": 21120,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-04-640.avif",
           "width": 640,
           "height": 640,
-          "bytes": 34240,
+          "bytes": 41266,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-04-640.webp",
           "width": 640,
           "height": 640,
-          "bytes": 48492,
+          "bytes": 58460,
           "format": "webp"
         },
         {
           "src": "/brand/official-pan/official-pan-04-960.avif",
           "width": 960,
           "height": 960,
-          "bytes": 62837,
+          "bytes": 74166,
           "format": "avif"
         },
         {
           "src": "/brand/official-pan/official-pan-04-960.webp",
           "width": 960,
           "height": 960,
-          "bytes": 85694,
+          "bytes": 101140,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "official-pan-13-pack",
+      "sourceFilename": "13.png",
+      "family": "pan-de-muerto-filled-pack",
+      "variant": "",
+      "size": null,
+      "status": "assigned",
+      "transparent": false,
+      "alt": "Pastelerías 3L Pan de Muerto assortment · photo 1",
+      "width": 1536,
+      "height": 1536,
+      "originalBytes": 3051922,
+      "derivatives": [
+        {
+          "src": "/brand/official-pan/official-pan-13-pack-320.avif",
+          "width": 320,
+          "height": 320,
+          "bytes": 12980,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-13-pack-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 17882,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-13-pack-640.avif",
+          "width": 640,
+          "height": 640,
+          "bytes": 48887,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-13-pack-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 69520,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-13-pack-960.avif",
+          "width": 960,
+          "height": 960,
+          "bytes": 103462,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-13-pack-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 147382,
           "format": "webp"
         }
       ]
@@ -1625,6 +1682,234 @@
           "format": "webp"
         }
       ]
+    },
+    {
+      "sourceId": "official-pan-banner-01",
+      "sourceFilename": "01.png",
+      "family": "pan-de-muerto-category",
+      "variant": "",
+      "size": null,
+      "status": "assigned",
+      "transparent": false,
+      "alt": "Pastelerías 3L Pan de Muerto assortment · banner 1",
+      "width": 1536,
+      "height": 1024,
+      "originalBytes": 2880840,
+      "derivatives": [
+        {
+          "src": "/brand/official-pan/official-pan-banner-01-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 42757,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-01-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 62558,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-01-960.avif",
+          "width": 960,
+          "height": 640,
+          "bytes": 87542,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-01-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 129028,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-01-1536.avif",
+          "width": 1536,
+          "height": 1024,
+          "bytes": 177913,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-01-1536.webp",
+          "width": 1536,
+          "height": 1024,
+          "bytes": 268616,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "official-pan-banner-02",
+      "sourceFilename": "02.png",
+      "family": "pan-de-muerto-category",
+      "variant": "",
+      "size": null,
+      "status": "assigned",
+      "transparent": false,
+      "alt": "Pastelerías 3L Pan de Muerto assortment · banner 2",
+      "width": 1536,
+      "height": 1024,
+      "originalBytes": 2602010,
+      "derivatives": [
+        {
+          "src": "/brand/official-pan/official-pan-banner-02-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 34700,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-02-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 50874,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-02-960.avif",
+          "width": 960,
+          "height": 640,
+          "bytes": 70761,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-02-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 104280,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-02-1536.avif",
+          "width": 1536,
+          "height": 1024,
+          "bytes": 143828,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-02-1536.webp",
+          "width": 1536,
+          "height": 1024,
+          "bytes": 216548,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "official-pan-banner-03",
+      "sourceFilename": "03.png",
+      "family": "pan-de-muerto-category",
+      "variant": "",
+      "size": null,
+      "status": "assigned",
+      "transparent": false,
+      "alt": "Pastelerías 3L Pan de Muerto assortment · banner 3",
+      "width": 1536,
+      "height": 1024,
+      "originalBytes": 2520557,
+      "derivatives": [
+        {
+          "src": "/brand/official-pan/official-pan-banner-03-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 31874,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-03-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 47182,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-03-960.avif",
+          "width": 960,
+          "height": 640,
+          "bytes": 63953,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-03-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 94152,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-03-1536.avif",
+          "width": 1536,
+          "height": 1024,
+          "bytes": 129437,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-03-1536.webp",
+          "width": 1536,
+          "height": 1024,
+          "bytes": 194602,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "official-pan-banner-04",
+      "sourceFilename": "04.png",
+      "family": "pan-de-muerto-category",
+      "variant": "",
+      "size": null,
+      "status": "assigned",
+      "transparent": false,
+      "alt": "Pastelerías 3L Pan de Muerto assortment · banner 4",
+      "width": 1536,
+      "height": 1024,
+      "originalBytes": 2469076,
+      "derivatives": [
+        {
+          "src": "/brand/official-pan/official-pan-banner-04-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 33751,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-04-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 49246,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-04-960.avif",
+          "width": 960,
+          "height": 640,
+          "bytes": 62000,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-04-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 87686,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-04-1536.avif",
+          "width": 1536,
+          "height": 1024,
+          "bytes": 121996,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/official-pan/official-pan-banner-04-1536.webp",
+          "width": 1536,
+          "height": 1024,
+          "bytes": 168712,
+          "format": "webp"
+        }
+      ]
     }
   ],
   "products": [
@@ -1678,7 +1963,7 @@
     },
     {
       "productId": "pan-de-muerto-filled-pack",
-      "primarySourceId": "official-pan-13",
+      "primarySourceId": "official-pan-13-pack",
       "gallerySourceIds": []
     },
     {
@@ -1705,6 +1990,17 @@
         "official-pan-25",
         "official-pan-27",
         "official-pan-15-cutout"
+      ]
+    }
+  ],
+  "editorial": [
+    {
+      "category": "pan",
+      "sourceIds": [
+        "official-pan-banner-01",
+        "official-pan-banner-02",
+        "official-pan-banner-03",
+        "official-pan-banner-04"
       ]
     }
   ]
