@@ -1,3 +1,4 @@
+import { byteRange } from "./static-range";
 import { mcpRead } from "./domain/mcp";
 import {
   availableSku,
@@ -996,13 +997,39 @@ export async function startServer(
         ".mp4": "video/mp4",
         ".ico": "image/x-icon",
       };
-      res.writeHead(200, {
+      const body = readFileSync(file);
+      const headers = {
         "Content-Type": mime[extname(file)] ?? "application/octet-stream",
         "X-Content-Type-Options": "nosniff",
         "Referrer-Policy": "same-origin",
         "Content-Security-Policy": customerCsp,
-      });
-      res.end(req.method === "HEAD" ? undefined : readFileSync(file));
+        "Accept-Ranges": "bytes",
+      };
+      const range = byteRange(
+        typeof req.headers.range === "string" ? req.headers.range : undefined,
+        body.length,
+      );
+      if (range.status === 416) {
+        res.writeHead(416, {
+          ...headers,
+          "Content-Range": `bytes */${body.length}`,
+        });
+        res.end();
+      } else if (range.status === 206) {
+        res.writeHead(206, {
+          ...headers,
+          "Content-Range": `bytes ${range.start}-${range.end}/${body.length}`,
+          "Content-Length": range.end - range.start + 1,
+        });
+        res.end(
+          req.method === "HEAD"
+            ? undefined
+            : body.subarray(range.start, range.end + 1),
+        );
+      } else {
+        res.writeHead(200, { ...headers, "Content-Length": body.length });
+        res.end(req.method === "HEAD" ? undefined : body);
+      }
     } catch (error) {
       const status =
         error instanceof DomainError

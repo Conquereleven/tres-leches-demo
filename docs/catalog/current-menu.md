@@ -27,46 +27,49 @@ being listed or paid for (`RETIRED_SKUS`). Optionally, after approval, tidy the 
 take the usual verified backup, then run the existing admin catalog import with
 `data-imports/liza-current-menu.json`, which marks only those 12 rows inactive. No order or payment record changes.
 
-## 9 October 2026 — official Pan de Muerto and Conchas prices
+## 9 October 2026 — approved Pan de Muerto prices (Conchas deferred)
 
-Source: Joel's updated official menu image, plus his written confirmation of Pistachio.
-The full table lives in `tests/fixtures/official-prices-oct-2026.ts` and is asserted row by row in
-`tests/commerce/official-pricing.test.ts`.
+Approved by Joel. Conchas are out of scope for this release and are identical to the released catalog.
+The table lives in `server/domain/pan-price-update.ts` (previous → new, per SKU) and is asserted row by row
+in `tests/commerce/official-pricing.test.ts` and `tests/commerce/pan-price-update.test.ts`.
 
-| Item | Mini | Individual |
+| Pan de Muerto | Mini | Individual |
 | --- | ---: | ---: |
-| Pan de Muerto tradicional (Azúcar, Ajonjolí, Azúcar · Chocolate covering) | 13 (was 11) | 15 (was 13) |
-| Pan de Muerto relleno (Crema diplomática, Chocolate, Mascarpone y cajeta, Mascarpone y fresas) | 21 (was 18) | 23 (was 21) |
-| Pan de Muerto relleno · Pistachio | 23 (was 18) | 26 (was 21) |
-| Concha tradicional de chocolate | 13 (was 11) | 15 (was 13) |
+| Tradicional: Azúcar, Ajonjolí, Azúcar · Chocolate covering | 11 → 13 | 13 → 15 |
+| Relleno: Crema diplomática, Chocolate, Mascarpone y cajeta, Mascarpone y fresas | 18 → 21 | 21 → 23 |
+| Relleno: Pistachio | 18 → 23 | 21 → 26 |
 
-| Pack (Pan de Muerto and Conchas) | Traditional | Filled |
+| Pan de Muerto pack | Traditional | Filled |
 | --- | ---: | ---: |
-| 6 mini | 72 (was 60) | 120 (was 100) |
-| 12 mini | 140 (was 115) | 235 (was 190) |
-| 6 individual | 80 (was 72) | 130 (was 120) |
-| 12 individual | 155 (was 140) | 255 (was 235) |
+| 6 mini | 60 → 72 | 100 → 120 |
+| 12 mini | 115 → 140 | 190 → 235 |
+| 6 individual | 72 → 80 | 120 → 130 |
+| 12 individual | 140 → 155 | 235 → 255 |
 
-Unlisted conchas that stay inactive (traditional Vainilla, Pistache, Tricolor; filled Crema diplomática,
-Chocolate, Mascarpone y cajeta, Mascarpone y fresas) carry the new list price in the import file only.
-Open points: Azúcar · Chocolate covering is not named on the list and follows the traditional price;
-the filled Pistache concha (18 / 21) is not on the list and is unchanged.
+Authorized and kept on sale unchanged: Azúcar · Chocolate covering Pan de Muerto and the filled Pistache concha.
 
 ### Production procedure (needs Joel's approval; nothing has been run)
 
-Prices live in two places that must agree: the storefront menu shipped with the code, and the catalog
-stored in the Production database. Where they differ the storefront refuses the option
-("Online ordering is unavailable"), so a mismatch can never charge a wrong amount, only block the item.
+The storefront menu ships with the code; the server charges from the catalog stored in the Production
+database. Where they differ the storefront refuses the option ("Online ordering is unavailable"), so a
+mismatch can block an item but never charge a wrong amount.
 
-1. Take the usual verified private backup and record the catalog fingerprint.
-2. Read-only: compare the stored Production catalog with `data-imports/liza-current-menu.json`. The only
-   expected differences are these 48 price rows and the 12 retired SKUs turning inactive. Stop on anything else.
-3. Deploy the release.
-4. Immediately run the existing import inside the Production service:
-   `node dist/node/catalog-import.js apply data-imports/liza-current-menu.json` (with `APP_ENV`, `DB_PATH`
-   and `BACKUP_DIR` already set there). It validates, writes its own backup, replaces the catalog in one
-   write and records an audit entry. Running it twice gives the same result.
-5. Verify `/api/checkout/config` shows the new prices and one product per category can reach the payment step.
+Do NOT run the general catalog importer for this release: it replaces every record. Use the targeted command,
+which writes only the 24 approved `priceFils` values.
 
-Rollback: `catalog-import.js rollback <backup file>` restores the previous catalog; redeploy the previous build.
-Orders and payments are not touched: each order keeps the unit prices it was created with.
+1. Verified private backup and catalog fingerprint, as for every release.
+2. Deploy the release.
+3. Inside the Production service, read-only: `node dist/node/update-pan-prices.js plan`.
+   Expect `willChange: 24`, `blocked: []`, `safeToApply: true`. Stop on anything else.
+4. `node dist/node/update-pan-prices.js apply`. It takes its own backup, re-checks inside one transaction,
+   writes the 24 prices and an audit entry, and reports `untouchedIdentical: true` for every non-Pan record.
+   Running it again reports `already current` and writes nothing.
+5. Verify `/api/checkout/config`: the 24 new prices, Conchas unchanged, and a Pan de Muerto item reaches payment.
+
+Between steps 2 and 4 the 24 repriced SKUs are briefly unorderable. Rollback: restore the backup from step 4
+(or re-run the importer's `rollback` with it) and redeploy the previous build. Orders and payments keep the
+unit prices and amounts they were created with; the command never reads or writes them.
+
+A read-only comparison of Production's public catalog on 9 October 2026 showed exactly this: 24 prices to
+change, nothing blocked, Conchas identical, no other price or name difference. The 12 removed-combination
+SKUs remain active in the stored catalog and are refused by code (`RETIRED_SKUS`); they are not touched here.

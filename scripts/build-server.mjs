@@ -32,6 +32,7 @@ await build({
     "scripts/catalog-import.ts",
     "scripts/register-paymennt-webhook.ts",
     "scripts/send-test-email.ts",
+    "scripts/update-pan-prices.ts",
   ],
   bundle: true,
   platform: "node",

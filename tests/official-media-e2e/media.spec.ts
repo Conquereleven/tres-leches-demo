@@ -11,37 +11,50 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     page.on("pageerror", (e) => errors.push(e.message));
     await page.goto("/");
     const video = page.locator(".ref-hero video");
-    const expected = "story-desktop-576.mp4";
+    // New story film on desktop; the original packaging video on tablet and mobile.
+    const expected =
+      width >= 1024
+        ? "story-desktop-576.mp4"
+        : width <= 640
+          ? "packaging-540.mp4"
+          : "packaging-720.mp4";
     await expect(video.locator("source")).toHaveAttribute(
       "src",
       `/brand/approved/${expected}`,
     );
-    if (info.project.name === "chromium") {
-      await expect
-        .poll(() => video.evaluate((v: HTMLVideoElement) => v.readyState))
-        .toBeGreaterThanOrEqual(2);
-    } else {
-      await expect
-        .poll(() => requests.some((url) => url.endsWith(expected)))
-        .toBe(true);
-      info.annotations.push({
-        type: "playback-unresolved",
-        description:
-          "Local WebKit requests H.264 but does not decode it with the existing chunked static response. These checks verify source selection, poster fallback and photo UX; playback is not a pass.",
+    await expect(video).toHaveAttribute(
+      "poster",
+      width >= 1024
+        ? "/brand/approved/story-desktop-poster.webp"
+        : "/brand/approved/packaging-poster.webp",
+    );
+    // Real playback in both engines: Safari needs the server to honour Range.
+    const ranged = await page.evaluate(async (file) => {
+      const r = await fetch(`/brand/approved/${file}`, {
+        headers: { Range: "bytes=0-1" },
       });
-      await expect(video).toHaveAttribute(
-        "poster",
-        "/brand/approved/story-desktop-poster.webp",
-      );
-    }
+      return [r.status, r.headers.get("content-range")?.slice(0, 10)];
+    }, expected);
+    expect(ranged).toEqual([206, "bytes 0-1/"]);
+    await expect
+      .poll(() => video.evaluate((v: HTMLVideoElement) => v.readyState), {
+        timeout: 20000,
+      })
+      .toBeGreaterThanOrEqual(2);
+    await expect
+      .poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime), {
+        timeout: 20000,
+      })
+      .toBeGreaterThan(0);
     expect(
       await video.evaluate(
         (v: HTMLVideoElement) => v.muted && v.loop && v.playsInline,
       ),
     ).toBe(true);
-    expect(await video.evaluate((v) => getComputedStyle(v).objectFit)).toBe(
-      "contain",
-    );
+    if (width >= 1024)
+      expect(await video.evaluate((v) => getComputedStyle(v).objectFit)).toBe(
+        "contain",
+      );
     expect(requests.every((url) => url.endsWith(expected))).toBe(true);
     expect(
       await page.evaluate(

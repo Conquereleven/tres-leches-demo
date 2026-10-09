@@ -159,7 +159,7 @@ test("web checkout preserves pricing/addresses and concurrent requests create on
       "pending",
     );
     assert.equal(f.store.read().orders[0]!.state, "Awaiting Payment");
-    assert.equal(f.body().amount, 78);
+    assert.equal(f.body().amount, 66);
     assert.equal(
       f.body().returnUrl,
       "https://test.example.invalid/checkout/return",
@@ -327,12 +327,12 @@ test("pickup hosted checkout: no zone/minimum/shipping address; server pricing a
       "web",
       "https://test.example.invalid",
     );
-    assert.equal(result.amountFils, 1300);
+    assert.equal(result.amountFils, 1100);
     assert.equal(result.paymentStatus, "pending");
     assert.deepEqual(result.summary?.pickup, pickupInput.pickup);
     assert.equal(result.summary?.delivery, undefined);
     assert.equal(f.body().deliveryAddress, undefined);
-    assert.deepEqual(f.body().totals, { subtotal: 13, tax: 0, shipping: 0 });
+    assert.deepEqual(f.body().totals, { subtotal: 11, tax: 0, shipping: 0 });
     const order = f.store.read().orders[0]!;
     assert.equal(order.fulfillmentMethod, "pickup");
     assert.equal(order.quote?.zoneId, null);

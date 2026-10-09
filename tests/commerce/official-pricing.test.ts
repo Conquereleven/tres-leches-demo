@@ -20,7 +20,7 @@ const storefront = new Map(
 );
 const aed = (id: string) => OFFICIAL_PRICES_FILS[id]! / 100;
 
-test("official price list: every row of the October 2026 menu", () => {
+test("official Pan de Muerto price list: every approved row", () => {
   // Written out row by row so the table Joel approved is readable here.
   const rows: [string, number][] = [
     ["pan-de-muerto-traditional-azucar-mini-40-g", 13],
@@ -37,23 +37,7 @@ test("official price list: every row of the October 2026 menu", () => {
     ["pan-de-muerto-filled-mascarpone-y-fresas-individual", 23],
     ["pan-de-muerto-filled-pistachio-mini", 23],
     ["pan-de-muerto-filled-pistachio-individual", 26],
-    ["conchas-traditional-vainilla-mini-40-g", 13],
-    ["conchas-traditional-vainilla-individual-70-g", 15],
-    ["conchas-traditional-chocolate-mini-40-g", 13],
-    ["conchas-traditional-chocolate-individual-70-g", 15],
-    ["conchas-traditional-pistache-mini-40-g", 13],
-    ["conchas-traditional-pistache-individual-70-g", 15],
-    ["conchas-traditional-tricolor-mini-40-g", 13],
-    ["conchas-traditional-tricolor-individual-70-g", 15],
-    ["conchas-filled-crema-diplomatica-vainilla-mini", 21],
-    ["conchas-filled-crema-diplomatica-vainilla-individual", 23],
-    ["conchas-filled-chocolate-mini", 21],
-    ["conchas-filled-chocolate-individual", 23],
-    ["conchas-filled-mascarpone-y-cajeta-mini", 21],
-    ["conchas-filled-mascarpone-y-cajeta-individual", 23],
-    ["conchas-filled-mascarpone-y-fresas-mini", 21],
-    ["conchas-filled-mascarpone-y-fresas-individual", 23],
-    ...["pan-de-muerto", "conchas"].flatMap((c): [string, number][] => [
+    ...["pan-de-muerto"].flatMap((c): [string, number][] => [
       [`${c}-traditional-pack-6-mini`, 72],
       [`${c}-traditional-pack-12-mini`, 140],
       [`${c}-traditional-pack-6-individuales`, 80],
@@ -64,7 +48,7 @@ test("official price list: every row of the October 2026 menu", () => {
       [`${c}-filled-pack-12-individuales`, 255],
     ]),
   ];
-  assert.equal(rows.length, 46);
+  assert.equal(rows.length, 22);
   for (const [id, price] of rows) {
     assert.equal(aed(id), price, id);
     const stored = catalog.find((p) => p.id === id);
@@ -83,7 +67,7 @@ test("official price list: every row of the October 2026 menu", () => {
     aed("pan-de-muerto-traditional-azucar-individual-70-g-chocolate-covering"),
     15,
   );
-  assert.equal(Object.keys(OFFICIAL_PRICES_FILS).length, 48);
+  assert.equal(Object.keys(OFFICIAL_PRICES_FILS).length, 24);
 });
 
 test("the server charges the official price for every purchasable repriced SKU, alone and in quantity", () => {
@@ -112,7 +96,7 @@ test("the server charges the official price for every purchasable repriced SKU, 
     }
     checked++;
   }
-  assert.equal(checked, 34);
+  assert.equal(checked, 24);
 });
 
 test("nothing outside the official list changed price, availability or identity", () => {
@@ -142,12 +126,31 @@ test("nothing outside the official list changed price, availability or identity"
       before.id,
     );
   }
-  // Not on the October list: left exactly as it was, pending Joel's decision.
-  for (const [id, price] of [
-    ["conchas-filled-pistache-mini", "18.00"],
-    ["conchas-filled-pistache-individual", "21.00"],
-  ] as const)
-    assert.equal(now.find((i) => i.id === id)!.priceAed, price);
+  // Conchas are deferred: every Concha record is identical to the released one.
+  const conchas = (items: typeof released) =>
+    items.filter((i) => i.id.startsWith("conchas"));
+  assert.equal(conchas(now).length, 26);
+  assert.deepEqual(conchas(now), conchas(released));
+  assert.ok(
+    Object.keys(OFFICIAL_PRICES_FILS).every((id) =>
+      id.startsWith("pan-de-muerto-"),
+    ),
+  );
+  // Both authorized products stay on sale under their existing identifiers.
+  for (const id of [
+    "conchas-filled-pistache-mini",
+    "conchas-filled-pistache-individual",
+    "pan-de-muerto-traditional-azucar-mini-40-g-chocolate-covering",
+    "pan-de-muerto-traditional-azucar-individual-70-g-chocolate-covering",
+  ]) {
+    assert.equal(now.find((i) => i.id === id)!.active, true, id);
+    assert.equal(storefront.has(id), true, id);
+  }
+  assert.equal(storefront.get("conchas-filled-pistache-mini")!.priceFils, 1800);
+  assert.equal(
+    storefront.get("conchas-filled-pistache-individual")!.priceFils,
+    2100,
+  );
   // The removed combinations were not repriced or brought back.
   for (const id of RETIRED_SKUS) {
     assert.equal(id in OFFICIAL_PRICES_FILS, false);

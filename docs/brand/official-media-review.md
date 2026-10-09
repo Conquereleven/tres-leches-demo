@@ -49,11 +49,11 @@ Optimized: H.264, 576×1024, full 68.7 seconds, 5,281,415 bytes, fast-start MP4.
 Audio removed to prevent any audible autoplay. No story edits, subtitles or branding crops.
 Poster: frame at 4 seconds, WebP, 30,306 bytes.
 
-Per Joel's subsequent correction, all widths use the new official film and poster.
+Final decision (9 October 2026): the new official film and poster are used at 1024px and wider; tablet and mobile keep the original packaging video.
 The existing cream editorial hero presents the portrait video using `object-fit: contain`.
 Hero copy, layout, navigation and CTAs are preserved. No material hero-layout redesign was required.
-The previous packaging files remain unchanged on disk but are no longer requested by the homepage.
-Only the official film source is mounted. Reduced motion, save-data and slow connections keep the poster;
+Below 1024px the homepage requests the original packaging video and poster, unchanged.
+Only one source is mounted at a time. Reduced motion, save-data and slow connections keep the poster;
 the existing explicit play control remains available. A failed decode also leaves a usable poster.
 
 ## Photo optimization and rotation
@@ -83,3 +83,10 @@ this is a potential cause, not a confirmed diagnosis. Server changes are explici
 WebKit source selection, poster, images, crossfade, keyboard pause and responsive layout are tested independently;
 those passing checks must not be reported as passing video playback. Confirm Safari playback on the intended
 media-serving environment, or authorize a separate static-media serving fix, before deployment.
+
+## Safari playback (resolved 9 October 2026)
+
+Cause: static files were sent without `Accept-Ranges`/`Content-Length`, and Safari will not play video from a
+server that ignores Range. Static responses now honour a single byte range (`server/static-range.ts`).
+The official-media test requires real playback (readyState ≥ 2 and advancing currentTime) in Chromium and WebKit
+at 390/768/1024/1440/1920. Production currently has the old behaviour until this release is deployed.

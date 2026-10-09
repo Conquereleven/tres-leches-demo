@@ -564,7 +564,7 @@ test("the minimum comes from the canonical zone, and free text can never be chec
       await assert.rejects(
         f.place(delivery({ delivery: { ...delivery().delivery, zoneId } })),
       );
-    // Marina's approved minimum is AED 50: six conchas (AED 78) pass, one (AED 13) does not.
+    // Marina's approved minimum is AED 50: six conchas (AED 66) pass, one (AED 11) does not.
     const marina = {
       ...delivery().delivery,
       zoneId: exactArea(areas, "dubai marina")!.id,
@@ -691,7 +691,7 @@ test("a paid order records one WhatsApp alert per configured recipient and sends
     assert.match(message, /Customer: Ana María López Ortega/);
     assert.match(message, /PICKUP at 3L Pastelerías/);
     assert.match(message, /4:00 PM – 9:00 PM/);
-    assert.match(message, /Total paid: AED 13\.00/);
+    assert.match(message, /Total paid: AED 11\.00/);
     assert.match(message, /1 × /);
     // No contact, address or payment-instrument detail.
     for (const secret of [

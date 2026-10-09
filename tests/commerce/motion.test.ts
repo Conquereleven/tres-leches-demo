@@ -94,6 +94,7 @@ test("hover scale stays within the 1-2% ceiling and the hero poster is not lazy"
     `hover scale ${hover} exceeds ceiling`,
   );
   const src = readFileSync("src/brand/Experience.tsx", "utf8");
+  assert.match(src, /\/brand\/approved\/packaging-poster.webp/);
   assert.match(src, /\/brand\/approved\/story-desktop-poster.webp/);
   assert.match(src, /preload="none"/);
   assert.match(src, /autoPlay=\{allowMotion\}/);

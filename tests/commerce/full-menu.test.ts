@@ -56,7 +56,9 @@ test("latest images override old bakery prices and weights without inventing pac
           ),
         ),
       ],
-      ["Individual · 70 g:1500", "Mini · 40 g:1300"],
+      prefix === "conchas"
+        ? ["Individual · 70 g:1300", "Mini · 40 g:1100"]
+        : ["Individual · 70 g:1500", "Mini · 40 g:1300"],
     );
     assert.deepEqual(
       [
@@ -81,13 +83,23 @@ test("latest images override old bakery prices and weights without inventing pac
     );
     assert.deepEqual(
       [...new Set(filled.options.map((option) => option.priceFils))],
-      // Pan: pistachio 26/23, standard fillings 23/21. Conchas: the filled
-      // Pistache concha is absent from the October list and keeps 21/18.
+      // Pan: pistachio 26/23, standard fillings 23/21. Conchas are deferred
+      // to the next sprint and keep their released prices.
       prefix === "conchas" ? [2100, 1800] : [2600, 2300, 2100],
     );
     for (const [type, prices] of [
-      ["traditional", [7200, 14000, 8000, 15500]],
-      ["filled", [12000, 23500, 13000, 25500]],
+      [
+        "traditional",
+        prefix === "conchas"
+          ? [6000, 11500, 7200, 14000]
+          : [7200, 14000, 8000, 15500],
+      ],
+      [
+        "filled",
+        prefix === "conchas"
+          ? [10000, 19000, 12000, 23500]
+          : [12000, 23500, 13000, 25500],
+      ],
     ] as const) {
       const pack = menuFamilies.find(
         (family) => family.id === `${prefix}-${type}-pack`,
