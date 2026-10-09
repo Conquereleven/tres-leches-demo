@@ -33,17 +33,6 @@
     ]
   },
   {
-    "id": "pan-de-muerto-traditional--ajonjoli-chocolate-covering",
-    "slug": "pan-de-muerto-traditional--ajonjoli-chocolate-covering",
-    "familyId": "pan-de-muerto-traditional",
-    "variant": "Ajonjolí · Chocolate covering",
-    "title": "Ajonjolí · Chocolate covering Pan de Muerto tradicional",
-    "optionIds": [
-      "pan-de-muerto-traditional-ajonjoli-mini-40-g-chocolate-covering",
-      "pan-de-muerto-traditional-ajonjoli-individual-70-g-chocolate-covering"
-    ]
-  },
-  {
     "id": "pan-de-muerto-filled--crema-diplomatica-vainilla",
     "slug": "pan-de-muerto-filled--crema-diplomatica-vainilla",
     "familyId": "pan-de-muerto-filled",
@@ -96,61 +85,6 @@
     "optionIds": [
       "pan-de-muerto-filled-pistachio-mini",
       "pan-de-muerto-filled-pistachio-individual"
-    ]
-  },
-  {
-    "id": "pan-de-muerto-filled--crema-diplomatica-vainilla-chocolate-covering",
-    "slug": "pan-de-muerto-filled--crema-diplomatica-vainilla-chocolate-covering",
-    "familyId": "pan-de-muerto-filled",
-    "variant": "Crema diplomática (vainilla) · Chocolate covering",
-    "title": "Crema diplomática (vainilla) · Chocolate covering Pan de Muerto relleno",
-    "optionIds": [
-      "pan-de-muerto-filled-crema-diplomatica-vainilla-mini-chocolate-covering",
-      "pan-de-muerto-filled-crema-diplomatica-vainilla-individual-chocolate-covering"
-    ]
-  },
-  {
-    "id": "pan-de-muerto-filled--chocolate-chocolate-covering",
-    "slug": "pan-de-muerto-filled--chocolate-chocolate-covering",
-    "familyId": "pan-de-muerto-filled",
-    "variant": "Chocolate · Chocolate covering",
-    "title": "Chocolate · Chocolate covering Pan de Muerto relleno",
-    "optionIds": [
-      "pan-de-muerto-filled-chocolate-mini-chocolate-covering",
-      "pan-de-muerto-filled-chocolate-individual-chocolate-covering"
-    ]
-  },
-  {
-    "id": "pan-de-muerto-filled--mascarpone-y-cajeta-chocolate-covering",
-    "slug": "pan-de-muerto-filled--mascarpone-y-cajeta-chocolate-covering",
-    "familyId": "pan-de-muerto-filled",
-    "variant": "Mascarpone y cajeta · Chocolate covering",
-    "title": "Mascarpone y cajeta · Chocolate covering Pan de Muerto relleno",
-    "optionIds": [
-      "pan-de-muerto-filled-mascarpone-y-cajeta-mini-chocolate-covering",
-      "pan-de-muerto-filled-mascarpone-y-cajeta-individual-chocolate-covering"
-    ]
-  },
-  {
-    "id": "pan-de-muerto-filled--mascarpone-y-fresas-chocolate-covering",
-    "slug": "pan-de-muerto-filled--mascarpone-y-fresas-chocolate-covering",
-    "familyId": "pan-de-muerto-filled",
-    "variant": "Mascarpone y fresas · Chocolate covering",
-    "title": "Mascarpone y fresas · Chocolate covering Pan de Muerto relleno",
-    "optionIds": [
-      "pan-de-muerto-filled-mascarpone-y-fresas-mini-chocolate-covering",
-      "pan-de-muerto-filled-mascarpone-y-fresas-individual-chocolate-covering"
-    ]
-  },
-  {
-    "id": "pan-de-muerto-filled--pistachio-chocolate-covering",
-    "slug": "pan-de-muerto-filled--pistachio-chocolate-covering",
-    "familyId": "pan-de-muerto-filled",
-    "variant": "Pistachio · Chocolate covering",
-    "title": "Pistachio · Chocolate covering Pan de Muerto relleno",
-    "optionIds": [
-      "pan-de-muerto-filled-pistachio-mini-chocolate-covering",
-      "pan-de-muerto-filled-pistachio-individual-chocolate-covering"
     ]
   },
   {

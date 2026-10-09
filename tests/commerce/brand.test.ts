@@ -41,7 +41,7 @@ test("brand content is approved, heritage fixed, no fabricated catalog or testim
   const listed = Object.values(collections)
     .flat()
     .filter((p) => p.name);
-  assert.equal(listed.length, 74);
+  assert.equal(listed.length, 62);
   assert.equal(
     listed[0]!.name,
     "Pan de Muerto tradicional · Ajonjolí · Individual · 70 g",

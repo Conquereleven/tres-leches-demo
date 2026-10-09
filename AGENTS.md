@@ -96,3 +96,7 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 ## Official Pan de Muerto photography (9 October 2026)
 - Source library stays outside the repo; `docs/brand/pan-de-muerto-photo-map.csv` accounts for all 50 files and `scripts/prepare-official-pan-media.py` regenerates public derivatives. Photos are assigned by visible coating/filling only; mixed boards are category imagery, never a flavour or pack. Never publish a photo together with its cutout twin.
 - One rotation (`MediaRotation` in `src/brand/media.tsx`) serves cards and the Pan de Muerto banner. Products without their own photo keep the earlier image.
+
+## Removed Pan de Muerto combinations (9 October 2026, Joel)
+- Six chocolate-covering combinations were never approved and are removed: Ajonjolí · Chocolate covering (traditional) and Chocolate covering on all five fillings. The only covering product is Azúcar · Chocolate covering. Do not reintroduce them.
+- Their 12 SKU ids live in `RETIRED_SKUS` (`shared/commerce-policy.ts`), which blocks listing and checkout regardless of the stored catalog; the import file marks them inactive. Historical orders are untouched.

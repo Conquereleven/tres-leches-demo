@@ -94,12 +94,8 @@ test("approved new filling/covering use same size prices and stable SKU througho
       (o) => o.variant === "Pistachio" && o.priceFils === 2100,
     ),
   );
-  assert.ok(
-    filled.options.some(
-      (o) =>
-        o.variant === "Pistachio · Chocolate covering" && o.priceFils === 1800,
-    ),
-  );
+  // Chocolate covering exists only on the traditional sugar bread.
+  assert.ok(!filled.options.some((o) => /Chocolate covering/.test(o.variant)));
   for (const f of menuFamilies)
     assert.ok(
       f.options.every(

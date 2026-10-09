@@ -14,12 +14,12 @@ test("UAT V2: every active SKU belongs to exactly one stable single-flavour prod
   const catalog = JSON.parse(
     readFileSync("data-imports/liza-current-menu.json", "utf8"),
   ).items;
-  assert.equal(storefrontProducts.length, 77);
-  assert.equal(new Set(storefrontProducts.map((p) => p.id)).size, 77);
-  assert.equal(new Set(storefrontProducts.map((p) => p.slug)).size, 77);
+  assert.equal(storefrontProducts.length, 71);
+  assert.equal(new Set(storefrontProducts.map((p) => p.id)).size, 71);
+  assert.equal(new Set(storefrontProducts.map((p) => p.slug)).size, 71);
   const ids = storefrontProducts.flatMap((p) => p.optionIds);
-  assert.equal(ids.length, 222);
-  assert.equal(new Set(ids).size, 222);
+  assert.equal(ids.length, 210);
+  assert.equal(new Set(ids).size, 210);
   assert.deepEqual(
     [...ids].sort(),
     catalog
@@ -34,7 +34,7 @@ test("UAT V2: every active SKU belongs to exactly one stable single-flavour prod
     );
   assert.equal(
     catalog.filter((p: { active: boolean }) => !p.active).length,
-    14,
+    26,
   );
 });
 test("UAT V2: conchas only chocolate traditional and pistache filled at approved prices", () => {

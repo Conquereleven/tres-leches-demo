@@ -15,3 +15,14 @@ The guarded Railway TEST startup now uses this same full-menu import and a verif
 The public menu displays approved prices but disables Add to Cart if a SKU is missing, ordering is unavailable, or its server price differs. It never substitutes the old AED25 SKU or falls back to WhatsApp ordering. A stale cart with a retired SKU is handled by the existing unknown-product checks.
 
 Historical financial regression tests retain the AED25 fixture under `tests/fixtures/retired-pan-de-muerto.json`; it is not a current catalog import. New menu/browser tests use the full-menu fixture and local provider only. No real Paymennt calls are used.
+
+## 9 October 2026 — six unauthorized Pan de Muerto combinations removed
+
+Removed products: `pan-de-muerto-traditional--ajonjoli-chocolate-covering` and
+`pan-de-muerto-filled--{crema-diplomatica-vainilla,chocolate,mascarpone-y-cajeta,mascarpone-y-fresas,pistachio}-chocolate-covering`
+(12 SKUs). The storefront now has 71 products and 210 purchasable SKUs.
+
+Production's stored catalog still holds the 12 SKUs as active. Deploying this code is enough to stop them
+being listed or paid for (`RETIRED_SKUS`). Optionally, after approval, tidy the stored rows:
+take the usual verified backup, then run the existing admin catalog import with
+`data-imports/liza-current-menu.json`, which marks only those 12 rows inactive. No order or payment record changes.

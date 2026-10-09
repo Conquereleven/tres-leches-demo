@@ -3026,15 +3026,6 @@
       "variant": "Azúcar · Chocolate covering"
     },
     {
-      "productId": "pan-de-muerto-traditional--ajonjoli-chocolate-covering",
-      "slug": "pan-de-muerto-traditional--ajonjoli-chocolate-covering",
-      "status": "PHOTO PENDING FROM LISA",
-      "primarySourceId": null,
-      "gallerySourceIds": [],
-      "familyId": "pan-de-muerto-traditional",
-      "variant": "Ajonjolí · Chocolate covering"
-    },
-    {
       "productId": "pan-de-muerto-filled--crema-diplomatica-vainilla",
       "slug": "pan-de-muerto-filled--crema-diplomatica-vainilla",
       "status": "PHOTO PENDING FROM LISA",
@@ -3078,51 +3069,6 @@
       "gallerySourceIds": [],
       "familyId": "pan-de-muerto-filled",
       "variant": "Pistachio"
-    },
-    {
-      "productId": "pan-de-muerto-filled--crema-diplomatica-vainilla-chocolate-covering",
-      "slug": "pan-de-muerto-filled--crema-diplomatica-vainilla-chocolate-covering",
-      "status": "PHOTO PENDING FROM LISA",
-      "primarySourceId": null,
-      "gallerySourceIds": [],
-      "familyId": "pan-de-muerto-filled",
-      "variant": "Crema diplomática (vainilla) · Chocolate covering"
-    },
-    {
-      "productId": "pan-de-muerto-filled--chocolate-chocolate-covering",
-      "slug": "pan-de-muerto-filled--chocolate-chocolate-covering",
-      "status": "PHOTO PENDING FROM LISA",
-      "primarySourceId": null,
-      "gallerySourceIds": [],
-      "familyId": "pan-de-muerto-filled",
-      "variant": "Chocolate · Chocolate covering"
-    },
-    {
-      "productId": "pan-de-muerto-filled--mascarpone-y-cajeta-chocolate-covering",
-      "slug": "pan-de-muerto-filled--mascarpone-y-cajeta-chocolate-covering",
-      "status": "PHOTO PENDING FROM LISA",
-      "primarySourceId": null,
-      "gallerySourceIds": [],
-      "familyId": "pan-de-muerto-filled",
-      "variant": "Mascarpone y cajeta · Chocolate covering"
-    },
-    {
-      "productId": "pan-de-muerto-filled--mascarpone-y-fresas-chocolate-covering",
-      "slug": "pan-de-muerto-filled--mascarpone-y-fresas-chocolate-covering",
-      "status": "PHOTO PENDING FROM LISA",
-      "primarySourceId": null,
-      "gallerySourceIds": [],
-      "familyId": "pan-de-muerto-filled",
-      "variant": "Mascarpone y fresas · Chocolate covering"
-    },
-    {
-      "productId": "pan-de-muerto-filled--pistachio-chocolate-covering",
-      "slug": "pan-de-muerto-filled--pistachio-chocolate-covering",
-      "status": "PHOTO PENDING FROM LISA",
-      "primarySourceId": null,
-      "gallerySourceIds": [],
-      "familyId": "pan-de-muerto-filled",
-      "variant": "Pistachio · Chocolate covering"
     },
     {
       "productId": "pan-de-muerto-traditional-pack",

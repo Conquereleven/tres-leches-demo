@@ -76,18 +76,6 @@
           "variant": "Azúcar · Chocolate covering",
           "size": "Individual · 70 g",
           "priceFils": 1300
-        },
-        {
-          "id": "pan-de-muerto-traditional-ajonjoli-mini-40-g-chocolate-covering",
-          "variant": "Ajonjolí · Chocolate covering",
-          "size": "Mini · 40 g",
-          "priceFils": 1100
-        },
-        {
-          "id": "pan-de-muerto-traditional-ajonjoli-individual-70-g-chocolate-covering",
-          "variant": "Ajonjolí · Chocolate covering",
-          "size": "Individual · 70 g",
-          "priceFils": 1300
         }
       ],
       "image": "/brand/menu/pan-traditional.webp",
@@ -157,66 +145,6 @@
         {
           "id": "pan-de-muerto-filled-pistachio-individual",
           "variant": "Pistachio",
-          "size": "Individual",
-          "priceFils": 2100
-        },
-        {
-          "id": "pan-de-muerto-filled-crema-diplomatica-vainilla-mini-chocolate-covering",
-          "variant": "Crema diplomática (vainilla) · Chocolate covering",
-          "size": "Mini",
-          "priceFils": 1800
-        },
-        {
-          "id": "pan-de-muerto-filled-crema-diplomatica-vainilla-individual-chocolate-covering",
-          "variant": "Crema diplomática (vainilla) · Chocolate covering",
-          "size": "Individual",
-          "priceFils": 2100
-        },
-        {
-          "id": "pan-de-muerto-filled-chocolate-mini-chocolate-covering",
-          "variant": "Chocolate · Chocolate covering",
-          "size": "Mini",
-          "priceFils": 1800
-        },
-        {
-          "id": "pan-de-muerto-filled-chocolate-individual-chocolate-covering",
-          "variant": "Chocolate · Chocolate covering",
-          "size": "Individual",
-          "priceFils": 2100
-        },
-        {
-          "id": "pan-de-muerto-filled-mascarpone-y-cajeta-mini-chocolate-covering",
-          "variant": "Mascarpone y cajeta · Chocolate covering",
-          "size": "Mini",
-          "priceFils": 1800
-        },
-        {
-          "id": "pan-de-muerto-filled-mascarpone-y-cajeta-individual-chocolate-covering",
-          "variant": "Mascarpone y cajeta · Chocolate covering",
-          "size": "Individual",
-          "priceFils": 2100
-        },
-        {
-          "id": "pan-de-muerto-filled-mascarpone-y-fresas-mini-chocolate-covering",
-          "variant": "Mascarpone y fresas · Chocolate covering",
-          "size": "Mini",
-          "priceFils": 1800
-        },
-        {
-          "id": "pan-de-muerto-filled-mascarpone-y-fresas-individual-chocolate-covering",
-          "variant": "Mascarpone y fresas · Chocolate covering",
-          "size": "Individual",
-          "priceFils": 2100
-        },
-        {
-          "id": "pan-de-muerto-filled-pistachio-mini-chocolate-covering",
-          "variant": "Pistachio · Chocolate covering",
-          "size": "Mini",
-          "priceFils": 1800
-        },
-        {
-          "id": "pan-de-muerto-filled-pistachio-individual-chocolate-covering",
-          "variant": "Pistachio · Chocolate covering",
           "size": "Individual",
           "priceFils": 2100
         }

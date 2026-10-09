@@ -17,7 +17,28 @@ export function businessDate(now = new Date()) {
     day: "2-digit",
   }).format(now);
 }
+/**
+ * Combinations that were never on the approved menu (removed 9 October 2026).
+ * Refused here so they cannot be listed or paid for whatever a stored catalog says.
+ */
+export const RETIRED_SKUS: ReadonlySet<string> = new Set(
+  [
+    "traditional-ajonjoli-mini-40-g",
+    "traditional-ajonjoli-individual-70-g",
+    ...[
+      "crema-diplomatica-vainilla",
+      "chocolate",
+      "mascarpone-y-cajeta",
+      "mascarpone-y-fresas",
+      "pistachio",
+    ].flatMap((filling) => [
+      `filled-${filling}-mini`,
+      `filled-${filling}-individual`,
+    ]),
+  ].map((sku) => `pan-de-muerto-${sku}-chocolate-covering`),
+);
 export function availableSku(id: string, now = new Date()) {
+  if (RETIRED_SKUS.has(id)) return false;
   const date = businessDate(now).slice(5);
   return SEASONAL_RULES.every(
     (r) =>

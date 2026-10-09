@@ -235,3 +235,73 @@ test("catalog remains server-authoritative when payment activation is offline", 
     page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }),
   ).toHaveAttribute("href", "/checkout");
 });
+
+const REMOVED = [
+  "pan-de-muerto-traditional--ajonjoli-chocolate-covering",
+  "pan-de-muerto-filled--crema-diplomatica-vainilla-chocolate-covering",
+  "pan-de-muerto-filled--chocolate-chocolate-covering",
+  "pan-de-muerto-filled--mascarpone-y-cajeta-chocolate-covering",
+  "pan-de-muerto-filled--pistachio-chocolate-covering",
+  "pan-de-muerto-filled--mascarpone-y-fresas-chocolate-covering",
+];
+test("removed Pan de Muerto combinations cannot be found, linked to, or paid for", async ({
+  page,
+  request,
+}) => {
+  const config = await (await request.get("/api/checkout/config")).json();
+  const listed: string[] = config.products.map((p: { id: string }) => p.id);
+  expect(
+    listed.filter((id) => /(ajonjoli|filled).*chocolate-covering/.test(id)),
+  ).toEqual([]);
+  expect(listed).toContain("pan-de-muerto-filled-pistachio-individual");
+  await page.goto("/menu?category=pan");
+  await expect(page.locator(".b-menu-grid article")).toHaveCount(10);
+  for (const slug of REMOVED) {
+    await expect(page.locator(`[data-product-id="${slug}"]`)).toHaveCount(0);
+    await page.goto(`/menu?product=${slug}`);
+    await expect(
+      page.getByRole("heading", { name: "Product not found" }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /ADD TO CART/ })).toHaveCount(
+      0,
+    );
+  }
+  // A cart saved before the removal: the item is flagged and cannot be paid for.
+  const stale = "pan-de-muerto-filled-pistachio-individual-chocolate-covering";
+  await page.evaluate(
+    (id) =>
+      localStorage.setItem(
+        "3l-cart",
+        JSON.stringify([
+          { productId: id, quantity: 2 },
+          {
+            productId: "pan-de-muerto-filled-pistachio-individual",
+            quantity: 1,
+          },
+        ]),
+      ),
+    stale,
+  );
+  await page.goto("/cart");
+  await expect(page.getByText("This item is no longer available.")).toHaveCount(
+    1,
+  );
+  const quote = (productId: string) =>
+    page.evaluate(async (id) => {
+      const response = await fetch("/api/checkout/quote", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          fulfillmentMethod: "pickup",
+          lines: [{ productId: id, quantity: 1 }],
+        }),
+      });
+      return { status: response.status, body: await response.text() };
+    }, productId);
+  const refused = await quote(stale);
+  expect(refused.status).toBe(422);
+  expect(refused.body).toContain("Product unavailable");
+  expect(
+    (await quote("pan-de-muerto-filled-pistachio-individual")).status,
+  ).toBe(200);
+});

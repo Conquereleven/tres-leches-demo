@@ -1,5 +1,6 @@
 import {
   availableSku,
+  RETIRED_SKUS,
   MAX_ITEM_QUANTITY,
   validWindow,
   leadHours,
@@ -536,6 +537,11 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
         };
       })();
   const s = service.store.read();
+  requireThat(
+    !input.lines.some((l) => RETIRED_SKUS.has(l.productId)),
+    "Product unavailable",
+    422,
+  );
   requireThat(
     input.lines.every((l) => availableSku(l.productId)),
     "This product is outside its ordering season",
