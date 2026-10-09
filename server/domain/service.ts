@@ -840,7 +840,12 @@ export class CommerceService {
       since === undefined ||
       !Number.isFinite(since) ||
       !Number.isFinite(Date.parse(receipt.receivedAt)) ||
-      Date.parse(receipt.receivedAt) < since
+      Date.parse(receipt.receivedAt) < since ||
+      this.store.read().paymentNotifications?.some((r) =>
+        r.checkoutId === checkoutId && r.id !== receiptId &&
+        (!Number.isFinite(Date.parse(r.receivedAt)) ||
+          Date.parse(r.receivedAt) < since),
+      )
     ) return false;
     if (!this.payment.describeCheckout) return false;
     let owner;
@@ -865,7 +870,12 @@ export class CommerceService {
       if (
         ours || !r || r.completedAt ||
         !Number.isFinite(Date.parse(r.receivedAt)) ||
-        Date.parse(r.receivedAt) < since
+        Date.parse(r.receivedAt) < since ||
+        s.paymentNotifications?.some((other) =>
+          other.checkoutId === checkoutId && other.id !== receiptId &&
+          (!Number.isFinite(Date.parse(other.receivedAt)) ||
+            Date.parse(other.receivedAt) < since),
+        )
       ) return false;
       r.completedAt = now();
       r.outcome = "external";
@@ -1207,7 +1217,13 @@ export class CommerceService {
         const received = Date.parse(r.receivedAt);
         const historical = since !== undefined &&
           (!Number.isFinite(received) || received < since);
-        if (!historical) return true;
+        const historicallySeenCheckout = historical ||
+          receiptsSnapshot.paymentNotifications?.some((other) =>
+            other.checkoutId === r.checkoutId && other.id !== r.id &&
+            (!Number.isFinite(Date.parse(other.receivedAt)) ||
+              (since !== undefined && Date.parse(other.receivedAt) < since)),
+          );
+        if (!historicallySeenCheckout) return true;
         return receiptsSnapshot.payments.some((p) =>
           p.providerReference === r.checkoutId ||
           p.providerCheckoutId === r.checkoutId,
