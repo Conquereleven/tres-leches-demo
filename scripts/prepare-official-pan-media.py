@@ -26,8 +26,8 @@ assignments = [
      "Whole glazed bread with sesame seeds"),
     (f"{T}--azucar-chocolate-covering", T, "Azúcar · Chocolate covering", ["12.png", "10.png"],
      "Sugar-coated bread half dipped in dark chocolate"),
-    (f"{F}--crema-diplomatica-vainilla", F, "Crema diplomática (vainilla)", ["14.png", "13.png"],
-     "Plain pale cream at the seam; the only filling on the menu with no fruit, sauce or chocolate"),
+    (f"{F}--crema-diplomatica-vainilla", F, "Crema diplomática (vainilla)", ["14.png", "14 PNG.png", "13.png"],
+     "Joel approved these three, in this order, on 9 October 2026 (photo, its cutout, group of three)"),
     (f"{F}--chocolate", F, "Chocolate", ["16.jpg", "18.jpg", "29.png"],
      "Brown chocolate-coloured cream at the seam"),
     (f"{F}--mascarpone-y-cajeta", F, "Mascarpone y cajeta", ["23.png", "30.png", "26.png"],
@@ -39,6 +39,8 @@ assignments = [
 ]
 # Mixed boards belong to the category, never to one flavour or a pack.
 editorial = ["01.png", "02.png", "03.png", "04.png"]
+# Shown whole inside the square frame instead of filling it.
+contain = {"13.png"}
 held = {
     "05.png": "Portrait assortment; the category banner is landscape",
     "22.jpg": "Portrait assortment; the category banner is landscape",
@@ -82,6 +84,7 @@ for product, family, variant, names, evidence in assignments:
         role[name] = ("product gallery" if index else "product primary", product, evidence)
         assets.append({"sourceId": identifier(name), "sourceFilename": name, "family": family,
                        "variant": variant, "size": None, "status": "assigned", "transparent": transparent,
+                       "fit": "contain" if name in contain else "cover",
                        "alt": f"Pastelerías 3L {variant} Pan de Muerto · photo {index + 1}",
                        "width": image.width, "height": image.height,
                        "originalBytes": path.stat().st_size, "derivatives": derivatives})
@@ -90,7 +93,7 @@ for index, name in enumerate(editorial):
     image, transparent, derivatives, path = derive(name, (640, 960, 1536))
     role[name] = ("category editorial", "pan", "Mixed board of several breads")
     assets.append({"sourceId": identifier(name), "sourceFilename": name, "family": "pan-de-muerto-category",
-                   "variant": "", "size": None, "status": "assigned", "transparent": transparent,
+                   "variant": "", "size": None, "status": "assigned", "transparent": transparent, "fit": "cover",
                    "alt": f"Pastelerías 3L Pan de Muerto assortment · photo {index + 1}",
                    "width": image.width, "height": image.height,
                    "originalBytes": path.stat().st_size, "derivatives": derivatives})

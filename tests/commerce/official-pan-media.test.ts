@@ -16,15 +16,28 @@ test("all 50 official photos are accounted for and only reviewed ones are public
   assert.equal(map.length, 50);
   const shown = map.filter((line) => /,yes,official-pan-[^,]+,/.test(line));
   assert.equal(shown.length, official.assets.length);
-  assert.equal(official.assets.length, 26);
-  assert.equal(new Set(official.assets.map((a) => a.sourceId)).size, 26);
-  // A photo and its cutout are one composition: never both in the same gallery.
-  for (const asset of official.assets)
-    assert.ok(
-      !official.assets.some(
-        (other) => other.sourceId === `${asset.sourceId}-cutout`,
-      ),
-    );
+  assert.equal(official.assets.length, 27);
+  assert.equal(new Set(official.assets.map((a) => a.sourceId)).size, 27);
+  // A photo and its cutout are one composition: published together only where
+  // Joel approved it (Crema diplomática, 9 October 2026).
+  assert.deepEqual(
+    official.assets
+      .filter((asset) =>
+        official.assets.some((o) => o.sourceId === `${asset.sourceId}-cutout`),
+      )
+      .map((asset) => asset.sourceId),
+    ["official-pan-14"],
+  );
+  const crema = official.products.find(
+    (p) => p.productId === "pan-de-muerto-filled--crema-diplomatica-vainilla",
+  )!;
+  assert.deepEqual(
+    [crema.primarySourceId, ...crema.gallerySourceIds],
+    ["official-pan-14", "official-pan-14-cutout", "official-pan-13"],
+  );
+  const asset = (id: string) => official.assets.find((a) => a.sourceId === id)!;
+  assert.equal(asset("official-pan-14-cutout").transparent, true);
+  assert.equal(asset("official-pan-13").fit, "contain");
   assert.equal(official.products.length, 8);
   const boards = categoryEditorialMedia("pan");
   assert.equal(boards.length, 4);

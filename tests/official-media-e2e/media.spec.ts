@@ -95,10 +95,56 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     const active = await rotation
       .locator("picture.is-active img")
       .getAttribute("src");
-    await page.waitForTimeout(7500);
+    await page.waitForTimeout(4200);
     expect(
       await rotation.locator("picture.is-active img").getAttribute("src"),
     ).toBe(active);
+    // Crema diplomática: Joel's three photos, in order, 3.5 s apart, then back to the first.
+    const crema = page.locator(
+      '[data-product-id="pan-de-muerto-filled--crema-diplomatica-vainilla"] .b-official-rotation',
+    );
+    await crema.scrollIntoViewIfNeeded();
+    const shown = () =>
+      crema
+        .locator("picture.is-active img")
+        .evaluate((img: HTMLImageElement) =>
+          img.currentSrc.replace(/^.*official-pan-(.*)-\d+\.\w+$/, "$1"),
+        );
+    const seen: [string, number][] = [[await shown(), Date.now()]];
+    while (seen.length < 5) {
+      await expect.poll(shown, { timeout: 9000 }).not.toBe(seen.at(-1)![0]);
+      seen.push([await shown(), Date.now()]);
+      if (seen.length === 3) {
+        // The cutout keeps its transparency and sits on the cream card, never black.
+        expect(
+          await crema
+            .locator("picture.is-active")
+            .evaluate((p) => getComputedStyle(p).backgroundColor),
+        ).toBe("rgb(246, 239, 227)");
+      }
+      if (seen.at(-1)![0] === "13")
+        expect(
+          await crema
+            .locator("picture.is-active img")
+            .evaluate((img) => getComputedStyle(img).objectFit),
+        ).toBe("contain");
+      await crema.screenshot({
+        path: `work/qa/official-media/${info.project.name}-crema-${width}-${seen.length}.png`,
+      });
+    }
+    const order = seen.map(([name]) => name);
+    const start = order.indexOf("14");
+    expect(order.slice(start, start + 3)).toEqual(["14", "14-cutout", "13"]);
+    expect(order.filter((n) => !["14", "14-cutout", "13"].includes(n))).toEqual(
+      [],
+    );
+    for (let i = 2; i < seen.length; i++) {
+      const gap = seen[i]![1] - seen[i - 1]![1];
+      expect(gap).toBeGreaterThan(3000 - 150);
+      expect(gap).toBeLessThan(4300);
+    }
+    const cremaBox = (await crema.boundingBox())!;
+    expect(Math.abs(cremaBox.height - cremaBox.width)).toBeLessThan(1);
     // Products without their own photograph stay static.
     await expect(
       page.locator(
@@ -120,7 +166,7 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/menu?category=pan");
     await rotation.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(7500);
+    await page.waitForTimeout(4200);
     await expect(rotation.locator("picture.is-active img")).toHaveAttribute(
       "src",
       /official-pan-09-/,

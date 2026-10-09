@@ -180,6 +180,11 @@ export function ProductOptions({
                   )?.src
                 }
                 alt={localize(asset.alt)}
+                className={
+                  "fit" in asset && asset.fit === "contain"
+                    ? "is-whole"
+                    : undefined
+                }
                 loading="lazy"
                 decoding="async"
               />

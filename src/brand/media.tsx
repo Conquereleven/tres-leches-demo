@@ -59,7 +59,14 @@ function MediaPicture({
   const webp = asset.derivatives.filter((d) => d.format === "webp");
   return (
     <picture
-      className={active ? "is-active" : undefined}
+      className={
+        [
+          active && "is-active",
+          "fit" in asset && asset.fit === "contain" && "is-whole",
+        ]
+          .filter(Boolean)
+          .join(" ") || undefined
+      }
       aria-hidden={active === false || undefined}
     >
       <source type="image/avif" srcSet={srcSet(asset, "avif")} sizes={sizes} />
@@ -77,9 +84,9 @@ function MediaPicture({
     </picture>
   );
 }
-const ROTATION_MS = 7000;
+const ROTATION_MS = 3500;
 /**
- * The one gallery rotation: a gentle crossfade every seven seconds. It waits
+ * The one gallery rotation: a gentle crossfade every 3.5 seconds. It waits
  * for the next photo to finish loading, mounts only the current and next frame
  * until a full turn has played, and holds still while hovered, focused,
  * off-screen or when reduced motion is requested.
