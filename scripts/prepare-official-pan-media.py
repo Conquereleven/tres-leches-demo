@@ -30,6 +30,11 @@ assignments = [
      "Joel approved these three, in this order, on 9 October 2026 (photo, its cutout, group of three)"),
     (f"{F}--chocolate", F, "Chocolate", ["16.jpg", "18.jpg", "16 PNG.png", "18 PNG.png", "29.png"],
      "Joel approved these five, in this order, on 9 October 2026 (two photos, their cutouts, side detail)"),
+    # Packs: illustrative groups only; the size selector stays authoritative.
+    (f"{T}-pack", f"{T}-pack", "", ["02.png", "01.png", "03.png", "04.png"],
+     "Mixed board of sesame, sugar and chocolate-dipped breads (plus pistachio-coated); illustrative, no pack count implied"),
+    (f"{F}-pack", f"{F}-pack", "", ["13.png"],
+     "Three cream-filled breads, the only group photograph of filled breads; illustrative, no pack count implied"),
     (f"{F}--mascarpone-y-cajeta", F, "Mascarpone y cajeta", ["23.png", "30.png", "26.png"],
      "Pale cream with amber sauce running down the bread"),
     (f"{F}--mascarpone-y-fresas", F, "Mascarpone y fresas", ["17.jpg", "20.jpg", "24.png", "21.png"],
@@ -37,13 +42,9 @@ assignments = [
     (f"{F}--pistachio", F, "Pistachio", ["07.png", "25.png", "27.jpg", "15 PNG.png"],
      "Pale green coating with chopped pistachio; the menu's only pistachio bread"),
 ]
-# Mixed boards belong to the category, never to one flavour or a pack.
-editorial = ["01.png", "02.png", "03.png", "04.png"]
-# Shown whole inside the square frame instead of filling it.
-contain = {"13.png"}
 held = {
-    "05.png": "Portrait assortment; the category banner is landscape",
-    "22.jpg": "Portrait assortment; the category banner is landscape",
+    "05.png": "Mixed board; the pack photos already cover assortments and none is a filled group",
+    "22.jpg": "Mixed board; the pack photos already cover assortments and none is a filled group",
 }
 
 rows = list(csv.DictReader((library / "_documentation/PAN_DE_MUERTO_IMAGE_MANIFEST.csv").open(encoding="utf-8-sig")))
@@ -79,26 +80,20 @@ assets, products, role = [], [], {}
 for product, family, variant, names, evidence in assignments:
     ids = []
     for index, name in enumerate(names):
-        image, transparent, derivatives, path = derive(name, (320, 640, 960))
         ids.append(identifier(name))
-        role[name] = ("product gallery" if index else "product primary", product, evidence)
+        kind = "product gallery" if index else "product primary"
+        if name in role:  # one published asset may serve two products
+            role[name] = (role[name][0], role[name][1] + " + " + product, role[name][2])
+            continue
+        image, transparent, derivatives, path = derive(name, (320, 640, 960))
+        role[name] = (kind, product, evidence)
         assets.append({"sourceId": identifier(name), "sourceFilename": name, "family": family,
                        "variant": variant, "size": None, "status": "assigned", "transparent": transparent,
-                       "fit": "contain" if name in contain else "cover",
-                       "alt": f"Pastelerías 3L {variant} Pan de Muerto · photo {index + 1}",
+                       "alt": (f"Pastelerías 3L {variant} Pan de Muerto" if variant else "Pastelerías 3L Pan de Muerto assortment") + f" · photo {index + 1}",
                        "width": image.width, "height": image.height,
                        "originalBytes": path.stat().st_size, "derivatives": derivatives})
     products.append({"productId": product, "primarySourceId": ids[0], "gallerySourceIds": ids[1:]})
-for index, name in enumerate(editorial):
-    image, transparent, derivatives, path = derive(name, (640, 960, 1536))
-    role[name] = ("category editorial", "pan", "Mixed board of several breads")
-    assets.append({"sourceId": identifier(name), "sourceFilename": name, "family": "pan-de-muerto-category",
-                   "variant": "", "size": None, "status": "assigned", "transparent": transparent, "fit": "cover",
-                   "alt": f"Pastelerías 3L Pan de Muerto assortment · photo {index + 1}",
-                   "width": image.width, "height": image.height,
-                   "originalBytes": path.stat().st_size, "derivatives": derivatives})
-manifest = {"sourceArchive": "PAN DE MUERTO PACK.zip", "assets": assets, "products": products,
-            "editorial": [{"category": "pan", "sourceIds": [identifier(name) for name in editorial]}]}
+manifest = {"sourceArchive": "PAN DE MUERTO PACK.zip", "assets": assets, "products": products}
 (repo / "src/brand/official-pan-media.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
 
 # The full account: one line per source, including what is deliberately not shown.
@@ -114,7 +109,7 @@ with (repo / "docs/brand/pan-de-muerto-photo-map.csv").open("w", newline="", enc
             kind, target, reason = role[name]
             out.writerow([name, row["New organized filename"], transparent, kind, target, "yes", identifier(name), reason])
         elif name in held:
-            out.writerow([name, row["New organized filename"], transparent, "category editorial (held)", "pan", "no", "", held[name]])
+            out.writerow([name, row["New organized filename"], transparent, "not used", "", "no", "", held[name]])
         else:
             assert transparent == "yes", name
             paired = row["Related image group"] in shown_groups
@@ -122,6 +117,6 @@ with (repo / "docs/brand/pan-de-muerto-photo-map.csv").open("w", newline="", enc
                           "Same composition as the published photo of this series" if paired
                           else "Cutout of a mixed board; the photographed boards are published instead"])
 print(json.dumps({"sources": len(rows), "productPhotos": sum(len(a[3]) for a in assignments),
-                  "editorial": len(editorial), "notDisplayed": len(rows) - len(role),
+                  "notDisplayed": len(rows) - len(role),
                   "derivatives": sum(len(a["derivatives"]) for a in assets),
                   "optimizedBytes": sum(d["bytes"] for a in assets for d in a["derivatives"])}))

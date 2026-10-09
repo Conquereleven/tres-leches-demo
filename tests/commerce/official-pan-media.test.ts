@@ -3,10 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync, statSync } from "node:fs";
 import official from "../../src/brand/official-pan-media.json";
 import { storefrontProducts, productFamily } from "../../src/brand/menu";
-import {
-  categoryEditorialMedia,
-  selectedProductMedia,
-} from "../../src/brand/media";
+import { selectedProductMedia } from "../../src/brand/media";
 
 test("all 50 official photos are accounted for and only reviewed ones are public", () => {
   const map = readFileSync("docs/brand/pan-de-muerto-photo-map.csv", "utf8")
@@ -50,18 +47,27 @@ test("all 50 official photos are accounted for and only reviewed ones are public
   );
   const asset = (id: string) => official.assets.find((a) => a.sourceId === id)!;
   assert.equal(asset("official-pan-14-cutout").transparent, true);
-  assert.equal(asset("official-pan-13").fit, "contain");
-  assert.equal(official.products.length, 8);
-  const boards = categoryEditorialMedia("pan");
-  assert.equal(boards.length, 4);
-  for (const board of boards)
-    assert.equal(board.family, "pan-de-muerto-category");
-  assert.deepEqual(categoryEditorialMedia("cakes"), []);
-  // Packs and chocolate-covered fillings have no photograph of their own.
-  for (const product of storefrontProducts.filter(
-    (p) =>
-      p.familyId.endsWith("-pack") ||
-      /filled--.*chocolate-covering|ajonjoli-chocolate-covering/.test(p.id),
+  assert.equal(official.products.length, 10);
+  // The category banner is gone: no editorial data, no banner markup.
+  assert.ok(!("editorial" in official));
+  assert.ok(
+    !readFileSync("src/brand/MenuCatalog.tsx", "utf8").includes("showcase"),
+  );
+  // Packs show illustrative groups, never one flavour's gallery.
+  const pack = (id: string) => {
+    const m = official.products.find((p) => p.productId === id)!;
+    return [m.primarySourceId, ...m.gallerySourceIds];
+  };
+  assert.deepEqual(pack("pan-de-muerto-traditional-pack"), [
+    "official-pan-02",
+    "official-pan-01",
+    "official-pan-03",
+    "official-pan-04",
+  ]);
+  assert.deepEqual(pack("pan-de-muerto-filled-pack"), ["official-pan-13"]);
+  // Chocolate-covered fillings have no photograph of their own.
+  for (const product of storefrontProducts.filter((p) =>
+    /filled--.*chocolate-covering|ajonjoli-chocolate-covering/.test(p.id),
   ))
     assert.ok(!official.products.some((m) => m.productId === product.id));
   for (const mapping of official.products) {
@@ -76,13 +82,16 @@ test("all 50 official photos are accounted for and only reviewed ones are public
         option.size,
       )!;
       assert.equal(asset.sourceId, mapping.primarySourceId);
-      assert.equal(asset.variant, product.variant);
+      if (!product.familyId.endsWith("-pack"))
+        assert.equal(asset.variant, product.variant);
     }
     assert.equal(
       new Set([mapping.primarySourceId, ...mapping.gallerySourceIds]).size,
       1 + mapping.gallerySourceIds.length,
     );
-    for (const id of mapping.gallerySourceIds)
+    for (const id of product.familyId.endsWith("-pack")
+      ? []
+      : mapping.gallerySourceIds)
       assert.equal(
         official.assets.find((a) => a.sourceId === id)?.variant,
         product.variant,

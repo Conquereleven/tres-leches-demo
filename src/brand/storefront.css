@@ -1955,15 +1955,15 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
 .b-co-dialog p { margin: 0 0 20px; line-height: 1.6; }
 .b-co-dialog-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
 .b-language-control :is(.b-language span, .b-language-menu button)[lang="ar"] { font-size: 16px; letter-spacing: 0; }
-/* Official Pan de Muerto photography: one stable frame, incoming photo fades in over the last. */
-.brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo img { object-fit: cover; }
+/* Official Pan de Muerto photography: the whole bread is always shown, centred on the cream card;
+   the incoming photo fades in over the last, so there is never a blank frame. */
+.brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo { background: #f6efe3; border-radius: var(--radius-panel); overflow: hidden; aspect-ratio: 1; }
+.brand-experience .b-official-gallery img { border-radius: var(--radius-panel); }
+.brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo img { object-fit: contain; object-position: center; }
 .b-official-rotation { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; background: #f6efe3; }
 .brand-experience .b-official-rotation picture { position: absolute; inset: 0; width: 100%; height: 100%; background: #f6efe3; opacity: 0; transition: opacity 0s linear 800ms; }
 .brand-experience .b-official-rotation picture.is-active { opacity: 1; z-index: 1; transition: opacity 800ms ease; }
-.brand-experience .b-official-rotation picture img { width: 100%; height: 100%; object-fit: cover; }
-.brand-experience .b-official-rotation picture.is-whole img,
-.brand-experience .b-product-page .b-official-gallery img.is-whole { object-fit: contain; background: #f6efe3; }
+.brand-experience .b-official-rotation picture img { width: 100%; height: 100%; object-fit: contain; object-position: center; }
 .b-official-rotation:focus-visible { outline: 2px solid #33241a; outline-offset: 4px; }
-.b-category-showcase { width: 100%; max-width: 960px; aspect-ratio: 3 / 2; margin: 0 auto 40px; overflow: hidden; background: #f6efe3; }
-.brand-experience .b-product-page .b-official-gallery img { flex: none; width: min(220px, 60vw); height: auto; max-width: none; aspect-ratio: 1; object-fit: cover; }
+.brand-experience .b-product-page .b-official-gallery img { flex: none; width: min(220px, 60vw); height: auto; max-width: none; aspect-ratio: 1; object-fit: contain; background: #f6efe3; }
 @media (prefers-reduced-motion: reduce) { .brand-experience .b-official-rotation picture { transition: none; } }

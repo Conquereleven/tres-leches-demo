@@ -1,12 +1,12 @@
 Original filename,Organized filename,Transparent,Role,Product or category,Displayed,Public asset id,Reason
 01 PNG.png,pan-de-muerto__unverified-assortment__group-on-board-cutout__overhead__01.png,yes,cutout alternate,,no,,Same composition as the published photo of this series
-01.png,pan-de-muerto__unverified-assortment__group-on-board__overhead__02.png,no,category editorial,pan,yes,official-pan-01,Mixed board of several breads
-02.png,pan-de-muerto__unverified-assortment__group-on-board__three-quarter__03.png,no,category editorial,pan,yes,official-pan-02,Mixed board of several breads
+01.png,pan-de-muerto__unverified-assortment__group-on-board__overhead__02.png,no,product gallery,pan-de-muerto-traditional-pack,yes,official-pan-01,"Mixed board of sesame, sugar and chocolate-dipped breads (plus pistachio-coated); illustrative, no pack count implied"
+02.png,pan-de-muerto__unverified-assortment__group-on-board__three-quarter__03.png,no,product primary,pan-de-muerto-traditional-pack,yes,official-pan-02,"Mixed board of sesame, sugar and chocolate-dipped breads (plus pistachio-coated); illustrative, no pack count implied"
 03 PNG.png,pan-de-muerto__unverified-assortment__group-detail-cutout__three-quarter__04.png,yes,cutout alternate,,no,,Same composition as the published photo of this series
-03.png,pan-de-muerto__unverified-assortment__group-detail__three-quarter__05.png,no,category editorial,pan,yes,official-pan-03,Mixed board of several breads
+03.png,pan-de-muerto__unverified-assortment__group-detail__three-quarter__05.png,no,product gallery,pan-de-muerto-traditional-pack,yes,official-pan-03,"Mixed board of sesame, sugar and chocolate-dipped breads (plus pistachio-coated); illustrative, no pack count implied"
 04 PNG.png,pan-de-muerto__unverified-assortment__group-detail-cutout__front__06.png,yes,cutout alternate,,no,,Same composition as the published photo of this series
-04.png,pan-de-muerto__unverified-assortment__group-detail__front__07.png,no,category editorial,pan,yes,official-pan-04,Mixed board of several breads
-05.png,pan-de-muerto__unverified-assortment__group-portrait__front__08.png,no,category editorial (held),pan,no,,Portrait assortment; the category banner is landscape
+04.png,pan-de-muerto__unverified-assortment__group-detail__front__07.png,no,product gallery,pan-de-muerto-traditional-pack,yes,official-pan-04,"Mixed board of sesame, sugar and chocolate-dipped breads (plus pistachio-coated); illustrative, no pack count implied"
+05.png,pan-de-muerto__unverified-assortment__group-portrait__front__08.png,no,not used,,no,,Mixed board; the pack photos already cover assortments and none is a filled group
 06 PNG.png,pan-de-muerto__ajonjoli__single-whole-bread-cutout__three-quarter__09.png,yes,cutout alternate,,no,,Same composition as the published photo of this series
 06.jpg,pan-de-muerto__ajonjoli__single-whole-bread__three-quarter__10.jpg,no,product gallery,pan-de-muerto-traditional--ajonjoli,yes,official-pan-06,Whole glazed bread with sesame seeds
 07 PNG.png,pan-de-muerto__cobertura-pistacho__single-whole-bread-cutout__three-quarter__11.png,yes,cutout alternate,,no,,Same composition as the published photo of this series
@@ -21,7 +21,7 @@ Original filename,Organized filename,Transparent,Role,Product or category,Displa
 11.png,pan-de-muerto__azucar__single-whole-bread__overhead__20.png,no,product gallery,pan-de-muerto-traditional--azucar,yes,official-pan-11,"Whole sugar-coated bread, no topping or filling shown"
 12 PNG.png,pan-de-muerto__cobertura-chocolate__single-whole-bread-cutout__side__21.png,yes,cutout alternate,,no,,Same composition as the published photo of this series
 12.png,pan-de-muerto__cobertura-chocolate__single-whole-bread__side__22.png,no,product primary,pan-de-muerto-traditional--azucar-chocolate-covering,yes,official-pan-12,Sugar-coated bread half dipped in dark chocolate
-13.png,pan-de-muerto__unverified-white-cream__three-filled-breads__overhead__23.png,no,product gallery,pan-de-muerto-filled--crema-diplomatica-vainilla,yes,official-pan-13,"Joel approved these three, in this order, on 9 October 2026 (photo, its cutout, group of three)"
+13.png,pan-de-muerto__unverified-white-cream__three-filled-breads__overhead__23.png,no,product gallery,pan-de-muerto-filled--crema-diplomatica-vainilla + pan-de-muerto-filled-pack,yes,official-pan-13,"Joel approved these three, in this order, on 9 October 2026 (photo, its cutout, group of three)"
 14 PNG.png,pan-de-muerto__unverified-white-cream__single-filled-bread-cutout__three-quarter__24.png,yes,product gallery,pan-de-muerto-filled--crema-diplomatica-vainilla,yes,official-pan-14-cutout,"Joel approved these three, in this order, on 9 October 2026 (photo, its cutout, group of three)"
 14.png,pan-de-muerto__unverified-white-cream__single-filled-bread__three-quarter__25.png,no,product primary,pan-de-muerto-filled--crema-diplomatica-vainilla,yes,official-pan-14,"Joel approved these three, in this order, on 9 October 2026 (photo, its cutout, group of three)"
 15 PNG.png,pan-de-muerto__cobertura-pistacho__single-whole-bread-cutout__overhead__26.png,yes,product gallery,pan-de-muerto-filled--pistachio,yes,official-pan-15-cutout,Pale green coating with chopped pistachio; the menu's only pistachio bread
@@ -35,7 +35,7 @@ Original filename,Organized filename,Transparent,Role,Product or category,Displa
 20.jpg,pan-de-muerto__unverified-berry-cream__single-filled-bread__front__34.jpg,no,product gallery,pan-de-muerto-filled--mascarpone-y-fresas,yes,official-pan-20,Pale cream with visible strawberries
 21 PNG.png,pan-de-muerto__unverified-berry-cream__single-filled-bread-cutout__overhead__35.png,yes,cutout alternate,,no,,Same composition as the published photo of this series
 21.png,pan-de-muerto__unverified-berry-cream__single-filled-bread__overhead__36.png,no,product gallery,pan-de-muerto-filled--mascarpone-y-fresas,yes,official-pan-21,Pale cream with visible strawberries
-22.jpg,pan-de-muerto__unverified-assortment__eight-breads-on-board__overhead__37.jpg,no,category editorial (held),pan,no,,Portrait assortment; the category banner is landscape
+22.jpg,pan-de-muerto__unverified-assortment__eight-breads-on-board__overhead__37.jpg,no,not used,,no,,Mixed board; the pack photos already cover assortments and none is a filled group
 23 PNG.png,pan-de-muerto__unverified-white-cream-caramel__single-filled-bread-cutout__three-quarter__38.png,yes,cutout alternate,,no,,Same composition as the published photo of this series
 23.png,pan-de-muerto__unverified-white-cream-caramel__single-filled-bread__three-quarter__39.png,no,product primary,pan-de-muerto-filled--mascarpone-y-cajeta,yes,official-pan-23,Pale cream with amber sauce running down the bread
 24 PNG.png,pan-de-muerto__unverified-berry-cream__single-filled-bread-cutout__side__40.png,yes,cutout alternate,,no,,Same composition as the published photo of this series

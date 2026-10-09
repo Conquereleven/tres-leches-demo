@@ -63,11 +63,47 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
       path: `work/qa/official-media/${info.project.name}-product-${width}.png`,
     });
     await page.goto("/menu?category=pan");
-    const banner = page.locator(".b-category-showcase .b-official-rotation");
-    await expect(banner.locator("picture.is-active img")).toHaveAttribute(
-      "src",
-      /official-pan-01-/,
+    // The category photo banner is gone: no container, and the grid starts under the heading.
+    await expect(page.locator(".b-category-showcase")).toHaveCount(0);
+    const heading = await page
+      .locator(".b-menu-category-heading")
+      .boundingBox();
+    const firstCard = await page.locator(".b-menu-grid").boundingBox();
+    expect(firstCard!.y - (heading!.y + heading!.height)).toBeLessThan(80);
+    // Every card image is a square with rounded corners and shows the whole photo.
+    const frames = await page.evaluate(() =>
+      [...document.querySelectorAll(".b-menu-card .b-menu-photo")].map((f) => {
+        const r = f.getBoundingClientRect();
+        return [
+          Math.abs(r.width - r.height) < 1,
+          getComputedStyle(f).borderRadius,
+          getComputedStyle(f.querySelector("img")!).objectFit,
+        ];
+      }),
     );
+    expect(frames.length).toBeGreaterThan(8);
+    expect(frames.every(([square]) => square)).toBe(true);
+    expect([...new Set(frames.map(([, radius]) => radius))]).toEqual(["20px"]);
+    expect([...new Set(frames.map(([, , fit]) => fit))]).toEqual(["contain"]);
+    for (const [id, source] of [
+      ["pan-de-muerto-traditional-pack", /official-pan-02-/],
+      ["pan-de-muerto-filled-pack", /official-pan-13-/],
+    ] as const) {
+      const card = page.locator(`[data-product-id="${id}"] .b-menu-photo`);
+      await card.scrollIntoViewIfNeeded();
+      await expect(
+        card.locator("picture.is-active img, img").first(),
+      ).toHaveAttribute("src", source);
+    }
+    // Whole bread, centred on cream: every official photo is contained, none zoomed.
+    expect(
+      await page.evaluate(() =>
+        [...document.querySelectorAll(".b-official-photo img")]
+          .filter((i) => !i.closest("picture:not(.is-active)") || true)
+          .map((i) => getComputedStyle(i).objectFit)
+          .filter((f) => f !== "contain"),
+      ),
+    ).toEqual([]);
     const rotation = page.locator(
       '[data-product-id="pan-de-muerto-traditional--ajonjoli"] .b-official-rotation',
     );
@@ -178,10 +214,15 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
         .locator("picture.is-active")
         .evaluate((p) => getComputedStyle(p).backgroundColor),
     ).toBe("rgb(246, 239, 227)");
-    // Products without their own photograph stay static.
+    // The traditional pack has four photos and rotates; the filled pack has one and stays static.
     await expect(
       page.locator(
         '[data-product-id="pan-de-muerto-traditional-pack"] .b-official-rotation',
+      ),
+    ).toHaveCount(1);
+    await expect(
+      page.locator(
+        '[data-product-id="pan-de-muerto-filled-pack"] .b-official-rotation',
       ),
     ).toHaveCount(0);
     expect(
