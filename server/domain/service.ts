@@ -810,6 +810,46 @@ export class CommerceService {
     await this.reconcileNotification(id);
     return { duplicate: false };
   }
+  /**
+   * A signed notification names a checkout no payment here points to. Three
+   * cases, told apart only by the provider's own record of that checkout:
+   *  - ours, not yet associated (its request id is one of our payments, or
+   *    its order id one of our orders): keep asking the provider to retry;
+   *  - confirmed external (the provider returns the checkout and nothing on
+   *    it refers to us): acknowledge and close the receipt;
+   *  - anything else (lookup failed, checkout not found, identity mismatch):
+   *    unknown, so keep asking the provider to retry.
+   * Absence from our database alone is never treated as "external".
+   */
+  private async closeIfExternal(receiptId: string, checkoutId: string) {
+    if (!this.payment.describeCheckout) return false;
+    let owner;
+    try {
+      owner = await this.payment.describeCheckout(checkoutId);
+    } catch {
+      return false;
+    }
+    if (owner.checkoutId !== checkoutId) return false;
+    const closed = this.store.write((s) => {
+      // Decided inside the write: an association that landed meanwhile wins.
+      const ours =
+        s.payments.some(
+          (p) =>
+            p.providerReference === checkoutId ||
+            p.providerCheckoutId === checkoutId ||
+            (owner.requestId !== null && p.id === owner.requestId),
+        ) ||
+        (owner.orderId !== null &&
+          s.orders.some((o) => o.id === owner.orderId));
+      const r = s.paymentNotifications?.find((r) => r.id === receiptId);
+      if (ours || !r || r.completedAt) return false;
+      r.completedAt = now();
+      r.outcome = "external";
+      return true;
+    });
+    if (closed) safeLog("webhook.external", { status: "acknowledged" });
+    return closed;
+  }
   private async reconcileNotification(id: string) {
     const receipt = this.store
       .read()
@@ -818,6 +858,8 @@ export class CommerceService {
     const payment = this.store
       .read()
       .payments.find((p) => p.providerReference === receipt.checkoutId);
+    if (!payment && (await this.closeIfExternal(id, receipt.checkoutId)))
+      return;
     try {
       requireThat(payment, "Checkout aún no asociado; reintentar", 503);
       await this.reconcile(

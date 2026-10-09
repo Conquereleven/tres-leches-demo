@@ -3,7 +3,11 @@ import { PaymenntNotificationVerifier } from "./paymennt-notification";
 import type { AuthoritativeCheckout } from "../domain/checkout";
 import { ProviderFailure } from "./failure";
 import { z } from "zod";
-import type { PaymentProvider, WebhookVerifier } from "./providers";
+import type {
+  CheckoutOwnership,
+  PaymentProvider,
+  WebhookVerifier,
+} from "./providers";
 import type { Payment } from "../domain/model";
 
 // Official contract: https://docs.paymennt.com/openapi/paymennt.yaml
@@ -280,6 +284,20 @@ export class PaymenntProvider implements PaymentProvider {
       url: c.url,
       provider: "paymennt" as const,
       checkoutId: c.checkoutId,
+    };
+  }
+  async describeCheckout(reference: string): Promise<CheckoutOwnership> {
+    const text = (value: unknown) =>
+      typeof value === "string" && value.length > 0 ? value : null;
+    const raw = z
+      .object({ id: z.string().min(1) })
+      .passthrough()
+      .parse(await this.request(`/checkout/${encodeURIComponent(reference)}`));
+    if (raw.id !== reference) throw new ProviderFailure("unknown", false);
+    return {
+      checkoutId: raw.id,
+      requestId: text(raw.requestId),
+      orderId: text(raw.orderId),
     };
   }
   async getCheckout(reference: string): Promise<AuthoritativeCheckout> {
