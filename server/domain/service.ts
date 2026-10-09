@@ -841,12 +841,17 @@ export class CommerceService {
       !Number.isFinite(since) ||
       !Number.isFinite(Date.parse(receipt.receivedAt)) ||
       Date.parse(receipt.receivedAt) < since ||
-      this.store.read().paymentNotifications?.some((r) =>
-        r.checkoutId === checkoutId && r.id !== receiptId &&
-        (!Number.isFinite(Date.parse(r.receivedAt)) ||
-          Date.parse(r.receivedAt) < since),
-      )
-    ) return false;
+      this.store
+        .read()
+        .paymentNotifications?.some(
+          (r) =>
+            r.checkoutId === checkoutId &&
+            r.id !== receiptId &&
+            (!Number.isFinite(Date.parse(r.receivedAt)) ||
+              Date.parse(r.receivedAt) < since),
+        )
+    )
+      return false;
     if (!this.payment.describeCheckout) return false;
     let owner;
     try {
@@ -868,15 +873,20 @@ export class CommerceService {
           s.orders.some((o) => o.id === owner.orderId));
       const r = s.paymentNotifications?.find((r) => r.id === receiptId);
       if (
-        ours || !r || r.completedAt ||
+        ours ||
+        !r ||
+        r.completedAt ||
         !Number.isFinite(Date.parse(r.receivedAt)) ||
         Date.parse(r.receivedAt) < since ||
-        s.paymentNotifications?.some((other) =>
-          other.checkoutId === checkoutId && other.id !== receiptId &&
-          (!Number.isFinite(Date.parse(other.receivedAt)) ||
-            Date.parse(other.receivedAt) < since),
+        s.paymentNotifications?.some(
+          (other) =>
+            other.checkoutId === checkoutId &&
+            other.id !== receiptId &&
+            (!Number.isFinite(Date.parse(other.receivedAt)) ||
+              Date.parse(other.receivedAt) < since),
         )
-      ) return false;
+      )
+        return false;
       r.completedAt = now();
       r.outcome = "external";
       return true;
@@ -1215,18 +1225,23 @@ export class CommerceService {
         // otherwise 31 old receipts could starve newly received checkouts.
         // Historical website-owned receipts still reconcile normally.
         const received = Date.parse(r.receivedAt);
-        const historical = since !== undefined &&
+        const historical =
+          since !== undefined &&
           (!Number.isFinite(received) || received < since);
-        const historicallySeenCheckout = historical ||
-          receiptsSnapshot.paymentNotifications?.some((other) =>
-            other.checkoutId === r.checkoutId && other.id !== r.id &&
-            (!Number.isFinite(Date.parse(other.receivedAt)) ||
-              (since !== undefined && Date.parse(other.receivedAt) < since)),
+        const historicallySeenCheckout =
+          historical ||
+          receiptsSnapshot.paymentNotifications?.some(
+            (other) =>
+              other.checkoutId === r.checkoutId &&
+              other.id !== r.id &&
+              (!Number.isFinite(Date.parse(other.receivedAt)) ||
+                (since !== undefined && Date.parse(other.receivedAt) < since)),
           );
         if (!historicallySeenCheckout) return true;
-        return receiptsSnapshot.payments.some((p) =>
-          p.providerReference === r.checkoutId ||
-          p.providerCheckoutId === r.checkoutId,
+        return receiptsSnapshot.payments.some(
+          (p) =>
+            p.providerReference === r.checkoutId ||
+            p.providerCheckoutId === r.checkoutId,
         );
       })
       .slice(0, 10)) {

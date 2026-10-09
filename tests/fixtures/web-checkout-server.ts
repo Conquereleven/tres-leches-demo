@@ -118,6 +118,19 @@ const provider = new PaymenntProvider(
     const id = String(url).split("/").at(-1)!;
     if (debits.has(id))
       return Response.json({ success: true, result: debits.get(id) });
+    // A checkout created outside this site on the same merchant account.
+    if (id === process.env.FIXTURE_EXTERNAL_CHECKOUT)
+      return Response.json({
+        success: true,
+        result: {
+          id,
+          requestId: "7b1d9c7e-0000-4000-8000-00000000e001",
+          orderId: null,
+          amount: 374,
+          currency: "AED",
+          status: "PAID",
+        },
+      });
     return Response.json({
       success: true,
       result: { ...checkouts.get(id), status },
