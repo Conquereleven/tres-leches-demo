@@ -22,16 +22,12 @@ test("approved full menu has 236 unique authoritative SKUs and retires AED25 Pan
     for (const option of family.options) {
       const item = catalog.find((item) => item.id === option.id)!;
       assert.equal(item.priceFils, option.priceFils);
-      assert.equal(
-        item.name,
-        [
-          family.name,
-          family.id.startsWith("conchas-") ? "" : option.variant,
-          option.size,
-        ]
-          .filter(Boolean)
-          .join(" · "),
-      );
+      const expectedName =
+        family.id === "conchas-traditional" && option.variant !== "Chocolate"
+          ? `Conchas tradicional · ${option.variant} · ${option.size}`
+          : [family.name, family.id.startsWith("conchas-") ? "" : option.variant, option.size]
+              .filter(Boolean).join(" · ");
+      assert.equal(item.name, expectedName);
       assert.equal(item.active, true);
       assert.equal(
         selectMenuOption(family, option.variant, option.size).id,
