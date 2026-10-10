@@ -303,6 +303,12 @@ export type NotificationReceipt = {
   status: string;
   receivedAt: string;
   completedAt?: string;
+  /**
+   * `external`: the provider confirmed this checkout was created outside this
+   * system (another channel on the same merchant account). Acknowledged and
+   * closed without touching any order or payment.
+   */
+  outcome?: "external";
   nextAt: number;
   attempts: number;
 };

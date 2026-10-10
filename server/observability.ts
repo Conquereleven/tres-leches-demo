@@ -10,6 +10,7 @@ export function safeLog(
     | "payment.provider"
     | "webhook.accepted"
     | "webhook.rejected"
+    | "webhook.external"
     | "worker.failed",
   fields: {
     status?: number | string;

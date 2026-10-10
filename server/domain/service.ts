@@ -109,6 +109,13 @@ export class CommerceService {
   operationsOrigin?: string;
   /** Private configuration; absent until the manager's number is supplied. */
   operationsManagerPhone?: string;
+  /**
+   * Activation timestamp for external-only Paymennt acknowledgements.
+   * When absent, no unmatched checkout can be auto-closed as external.
+   * Historical receipts received before this cutoff stay open for a separately
+   * approved reconciliation, even when Paymennt retries their signatures.
+   */
+  externalCheckoutAcknowledgementSince?: number;
   private async bounded<T>(work: Promise<T>): Promise<T> {
     let timer: ReturnType<typeof setTimeout> | undefined;
     try {
@@ -810,6 +817,83 @@ export class CommerceService {
     await this.reconcileNotification(id);
     return { duplicate: false };
   }
+  /**
+   * A signed notification names a checkout no payment here points to. Three
+   * cases, told apart only by the provider's own record of that checkout:
+   *  - ours, not yet associated (its request id is one of our payments, or
+   *    its order id one of our orders): keep asking the provider to retry;
+   *  - confirmed external (the provider returns the checkout and nothing on
+   *    it refers to us): acknowledge and close the receipt;
+   *  - anything else (lookup failed, checkout not found, identity mismatch):
+   *    unknown, so keep asking the provider to retry.
+   * Absence from our database alone is never treated as "external".
+   */
+  private async closeIfExternal(receiptId: string, checkoutId: string) {
+    // Fail closed unless this receipt was first received after the explicitly
+    // configured activation instant. Duplicate notifications preserve receivedAt.
+    const receipt = this.store
+      .read()
+      .paymentNotifications?.find((r) => r.id === receiptId);
+    const since = this.externalCheckoutAcknowledgementSince;
+    if (
+      !receipt ||
+      since === undefined ||
+      !Number.isFinite(since) ||
+      !Number.isFinite(Date.parse(receipt.receivedAt)) ||
+      Date.parse(receipt.receivedAt) < since ||
+      this.store
+        .read()
+        .paymentNotifications?.some(
+          (r) =>
+            r.checkoutId === checkoutId &&
+            r.id !== receiptId &&
+            (!Number.isFinite(Date.parse(r.receivedAt)) ||
+              Date.parse(r.receivedAt) < since),
+        )
+    )
+      return false;
+    if (!this.payment.describeCheckout) return false;
+    let owner;
+    try {
+      owner = await this.payment.describeCheckout(checkoutId);
+    } catch {
+      return false;
+    }
+    if (owner.checkoutId !== checkoutId) return false;
+    const closed = this.store.write((s) => {
+      // Decided inside the write: an association that landed meanwhile wins.
+      const ours =
+        s.payments.some(
+          (p) =>
+            p.providerReference === checkoutId ||
+            p.providerCheckoutId === checkoutId ||
+            (owner.requestId !== null && p.id === owner.requestId),
+        ) ||
+        (owner.orderId !== null &&
+          s.orders.some((o) => o.id === owner.orderId));
+      const r = s.paymentNotifications?.find((r) => r.id === receiptId);
+      if (
+        ours ||
+        !r ||
+        r.completedAt ||
+        !Number.isFinite(Date.parse(r.receivedAt)) ||
+        Date.parse(r.receivedAt) < since ||
+        s.paymentNotifications?.some(
+          (other) =>
+            other.checkoutId === checkoutId &&
+            other.id !== receiptId &&
+            (!Number.isFinite(Date.parse(other.receivedAt)) ||
+              Date.parse(other.receivedAt) < since),
+        )
+      )
+        return false;
+      r.completedAt = now();
+      r.outcome = "external";
+      return true;
+    });
+    if (closed) safeLog("webhook.external", { status: "acknowledged" });
+    return closed;
+  }
   private async reconcileNotification(id: string) {
     const receipt = this.store
       .read()
@@ -817,7 +901,13 @@ export class CommerceService {
     if (!receipt || receipt.completedAt) return;
     const payment = this.store
       .read()
-      .payments.find((p) => p.providerReference === receipt.checkoutId);
+      .payments.find(
+        (p) =>
+          p.providerReference === receipt.checkoutId ||
+          p.providerCheckoutId === receipt.checkoutId,
+      );
+    if (!payment && (await this.closeIfExternal(id, receipt.checkoutId)))
+      return;
     try {
       requireThat(payment, "Checkout aún no asociado; reintentar", 503);
       await this.reconcile(
@@ -851,8 +941,9 @@ export class CommerceService {
     requireThat(!this.reconciling.has(paymentId), "Conciliación en curso", 409);
     this.reconciling.add(paymentId);
     try {
-      const checkout = p.providerReference
-        ? await this.payment.getCheckout(p.providerReference)
+      const checkoutId = p.providerReference ?? p.providerCheckoutId;
+      const checkout = checkoutId
+        ? await this.payment.getCheckout(checkoutId)
         : await this.payment.findCheckout?.(p.id);
       requireThat(
         checkout,
@@ -870,7 +961,7 @@ export class CommerceService {
           502,
         );
       }
-      if (!p.providerReference)
+      if (!checkoutId)
         this.store.write((s) => {
           const current = s.payments.find((x) => x.id === p.id)!;
           const job = s.jobs.find(
@@ -950,7 +1041,8 @@ export class CommerceService {
     return this.store.write((s) => {
       const p = s.payments.find((p) => p.id === paymentId)!;
       requireThat(
-        checkout.checkoutId === p.providerReference &&
+        checkout.checkoutId ===
+          (p.providerReference ?? p.providerCheckoutId) &&
           checkout.requestId === p.id &&
           checkout.orderId === p.orderId &&
           checkout.amountFils === p.amountFils &&
@@ -1130,8 +1222,34 @@ export class CommerceService {
   }
   async drain() {
     await this.drainInbound();
-    for (const receipt of (this.store.read().paymentNotifications ?? [])
-      .filter((r) => !r.completedAt && r.nextAt <= Date.now())
+    const receiptsSnapshot = this.store.read();
+    const since = this.externalCheckoutAcknowledgementSince;
+    for (const receipt of (receiptsSnapshot.paymentNotifications ?? [])
+      .filter((r) => {
+        if (r.completedAt || r.nextAt > Date.now()) return false;
+        // Keep historical unmatched records untouched by background cleanup;
+        // otherwise 31 old receipts could starve newly received checkouts.
+        // Historical website-owned receipts still reconcile normally.
+        const received = Date.parse(r.receivedAt);
+        const historical =
+          since !== undefined &&
+          (!Number.isFinite(received) || received < since);
+        const historicallySeenCheckout =
+          historical ||
+          receiptsSnapshot.paymentNotifications?.some(
+            (other) =>
+              other.checkoutId === r.checkoutId &&
+              other.id !== r.id &&
+              (!Number.isFinite(Date.parse(other.receivedAt)) ||
+                (since !== undefined && Date.parse(other.receivedAt) < since)),
+          );
+        if (!historicallySeenCheckout) return true;
+        return receiptsSnapshot.payments.some(
+          (p) =>
+            p.providerReference === r.checkoutId ||
+            p.providerCheckoutId === r.checkoutId,
+        );
+      })
       .slice(0, 10)) {
       try {
         await this.reconcileNotification(receipt.id);

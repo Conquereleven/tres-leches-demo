@@ -1,3 +1,4 @@
+import { parseExternalAckSince } from "./domain/external-ack";
 import { byteRange } from "./static-range";
 import { mcpRead } from "./domain/mcp";
 import {
@@ -196,6 +197,11 @@ export async function startServer(
     overrides.operationalNumbers ?? stagingAliases,
   );
   service.deliveryAddressMode = deliveryAddressMode;
+  // Explicit, deployment-scoped cutoff: no external payment is acknowledged
+  // when this setting is absent. Never infer a cutoff from process start time.
+  service.externalCheckoutAcknowledgementSince = parseExternalAckSince(
+    process.env.PAYMENNT_EXTERNAL_ACK_SINCE,
+  );
   // Private configuration; the number never lives in source.
   service.operationsManagerPhone = process.env.WHATSAPP_MANAGER_PHONE;
   // Isolated tests may inject a fake; they never construct the real provider.

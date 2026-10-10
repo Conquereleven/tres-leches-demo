@@ -35,6 +35,11 @@ export interface WhatsAppProvider {
     idempotencyKey: string;
   }): Promise<{ providerId: string; status: "sent" }>;
 }
+export type CheckoutOwnership = {
+  checkoutId: string;
+  requestId: string | null;
+  orderId: string | null;
+};
 export interface PaymentProvider {
   readonly name?: "mock" | "paymennt";
   findCheckout?(requestId: string): Promise<AuthoritativeCheckout | null>;
@@ -53,6 +58,12 @@ export interface PaymentProvider {
     checkoutId?: string;
   }>;
   getCheckout?(reference: string): Promise<AuthoritativeCheckout>;
+  /**
+   * Whose checkout this is, read from the provider. Unlike getCheckout it
+   * tolerates checkouts this system never created (no order id, foreign
+   * request id), because its only use is to tell those apart.
+   */
+  describeCheckout?(reference: string): Promise<CheckoutOwnership>;
   getStatus(reference: string): Promise<Payment["status"]>;
   verifier: WebhookVerifier;
   cancel?(reference: string): Promise<void>;
