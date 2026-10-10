@@ -27,7 +27,7 @@ test("approved original bytes and responsive derivatives retain source hashes", 
     }
   }
 });
-test("only chocolate receives the digital art; filled pistache and packs keep existing assets", () => {
+test("each traditional Concha receives exact approved artwork, filled pistache and packs unchanged", () => {
   const chocolate = selectedProductMedia(
     "conchas-traditional--chocolate",
     "conchas-traditional",
@@ -53,12 +53,12 @@ test("only chocolate receives the digital art; filled pistache and packs keep ex
       ),
     );
   }
-  assert.equal(
-    productMediaAssignments.filter((p) =>
-      p.primarySourceId?.startsWith("3l-ai-concha"),
-    ).length,
-    1,
-  );
+  for (const [slug, label, source] of [
+    ["vainilla", "Vainilla", "3l-conchas-editorial-concha-tradicional-vainilla"],
+    ["pistache", "Pistache", "3l-conchas-editorial-concha-tradicional-pistache"],
+    ["tricolor", "Tricolor", "3l-conchas-editorial-concha-tradicional-tricolor-mexico"],
+  ]) assert.equal(selectedProductMedia(`conchas-traditional--${slug}`, "conchas-traditional", label)?.sourceId, source);
+  assert.equal(productMediaAssignments.filter((p) => p.productId.startsWith("conchas-traditional--") && p.primarySourceId).length, 4);
   for (const a of index.filter((x) => !x.productId)) {
     assert.ok(!existsSync("public/brand/approved/" + a.source));
     assert.ok(a.derivatives.every((d) => !d.file.startsWith("public/")));
@@ -72,14 +72,7 @@ test("Conchas uses the menu reference pipeline with four category-only frames", 
     for (const d of asset.derivatives) {
       assert.equal(readFileSync("public" + d.src).length, d.bytes);
     }
-    if (asset.family === "conchas-editorial")
-      assert.ok(
-        !productMediaAssignments.some(
-          (p) =>
-            p.primarySourceId === asset.sourceId ||
-            p.gallerySourceIds.some((id) => id === asset.sourceId),
-        ),
-      );
+    assert.ok(productMediaAssignments.some(p => p.primarySourceId === asset.sourceId));
   }
   assert.equal(categoryEditorialMedia("pan").length, 4);
   assert.equal(categoryEditorialMedia("cakes").length, 0);
