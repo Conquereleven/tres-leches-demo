@@ -128,6 +128,7 @@ test("final batch maps filled Pistache and both packs exactly, retaining origina
       (a) => a.sourceId === item.sourceId,
     );
     assert.ok(asset);
+    assert.ok(asset.width && asset.height);
     assert.equal(asset.width / asset.height, 4 / 3);
     for (const d of item.derivatives) {
       const data = readFileSync("public" + d.src);
