@@ -322,7 +322,11 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
         variant={option.variant}
         size={option.size}
         alt=""
-        fallback={image?.src}
+        fallback={
+          family.id === "conchas-traditional" && option.variant !== "Chocolate"
+            ? "/brand/icon.png"
+            : image?.src
+        }
         className="b-co-thumb"
         sizes="72px"
       />
