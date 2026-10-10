@@ -125,6 +125,39 @@
     ]
   },
   {
+    "id": "conchas-traditional--vainilla",
+    "slug": "conchas-traditional--vainilla",
+    "familyId": "conchas-traditional",
+    "variant": "Vainilla",
+    "title": "Concha tradicional de vainilla",
+    "optionIds": [
+      "conchas-traditional-vainilla-mini-40-g",
+      "conchas-traditional-vainilla-individual-70-g"
+    ]
+  },
+  {
+    "id": "conchas-traditional--pistache",
+    "slug": "conchas-traditional--pistache",
+    "familyId": "conchas-traditional",
+    "variant": "Pistache",
+    "title": "Concha tradicional de pistache",
+    "optionIds": [
+      "conchas-traditional-pistache-mini-40-g",
+      "conchas-traditional-pistache-individual-70-g"
+    ]
+  },
+  {
+    "id": "conchas-traditional--tricolor",
+    "slug": "conchas-traditional--tricolor",
+    "familyId": "conchas-traditional",
+    "variant": "Tricolor",
+    "title": "Concha tradicional tricolor",
+    "optionIds": [
+      "conchas-traditional-tricolor-mini-40-g",
+      "conchas-traditional-tricolor-individual-70-g"
+    ]
+  },
+  {
     "id": "conchas-filled--pistache",
     "slug": "conchas-filled--pistache",
     "familyId": "conchas-filled",
@@ -407,7 +440,10 @@
     "familyId": "cake-jar",
     "variant": "Classic",
     "title": "Classic 3 Leches Cake Jar",
-    "optionIds": ["cake-jar-classic-110-ml", "cake-jar-classic-200-ml"]
+    "optionIds": [
+      "cake-jar-classic-110-ml",
+      "cake-jar-classic-200-ml"
+    ]
   },
   {
     "id": "cake-jar--vanilla-strawberry",
@@ -426,7 +462,10 @@
     "familyId": "cake-jar",
     "variant": "Nutella",
     "title": "Nutella 3 Leches Cake Jar",
-    "optionIds": ["cake-jar-nutella-110-ml", "cake-jar-nutella-200-ml"]
+    "optionIds": [
+      "cake-jar-nutella-110-ml",
+      "cake-jar-nutella-200-ml"
+    ]
   },
   {
     "id": "cake-jar--lotus",
@@ -434,7 +473,10 @@
     "familyId": "cake-jar",
     "variant": "Lotus",
     "title": "Lotus 3 Leches Cake Jar",
-    "optionIds": ["cake-jar-lotus-110-ml", "cake-jar-lotus-200-ml"]
+    "optionIds": [
+      "cake-jar-lotus-110-ml",
+      "cake-jar-lotus-200-ml"
+    ]
   },
   {
     "id": "cake-jar--caffe-latte",
@@ -442,7 +484,10 @@
     "familyId": "cake-jar",
     "variant": "Caffe Latte",
     "title": "Caffe Latte 3 Leches Cake Jar",
-    "optionIds": ["cake-jar-caffe-latte-110-ml", "cake-jar-caffe-latte-200-ml"]
+    "optionIds": [
+      "cake-jar-caffe-latte-110-ml",
+      "cake-jar-caffe-latte-200-ml"
+    ]
   },
   {
     "id": "cake-jar--coconut",
@@ -450,7 +495,10 @@
     "familyId": "cake-jar",
     "variant": "Coconut",
     "title": "Coconut 3 Leches Cake Jar",
-    "optionIds": ["cake-jar-coconut-110-ml", "cake-jar-coconut-200-ml"]
+    "optionIds": [
+      "cake-jar-coconut-110-ml",
+      "cake-jar-coconut-200-ml"
+    ]
   },
   {
     "id": "cake-jar--oreo-cookies-and-cream",
@@ -469,7 +517,10 @@
     "familyId": "cake-jar",
     "variant": "Confetti",
     "title": "Confetti 3 Leches Cake Jar",
-    "optionIds": ["cake-jar-confetti-110-ml", "cake-jar-confetti-200-ml"]
+    "optionIds": [
+      "cake-jar-confetti-110-ml",
+      "cake-jar-confetti-200-ml"
+    ]
   },
   {
     "id": "cake-jar--m-ms",
@@ -477,7 +528,10 @@
     "familyId": "cake-jar",
     "variant": "M&Ms",
     "title": "M&Ms 3 Leches Cake Jar",
-    "optionIds": ["cake-jar-m-ms-110-ml", "cake-jar-m-ms-200-ml"]
+    "optionIds": [
+      "cake-jar-m-ms-110-ml",
+      "cake-jar-m-ms-200-ml"
+    ]
   },
   {
     "id": "cake-jar-premium--tiramisu",
@@ -518,7 +572,10 @@
     "familyId": "cake-jar-bundle",
     "variant": "",
     "title": "Cake Jar Bundle",
-    "optionIds": ["cake-jar-bundle-4-200-ml", "cake-jar-bundle-6-110-ml"]
+    "optionIds": [
+      "cake-jar-bundle-4-200-ml",
+      "cake-jar-bundle-6-110-ml"
+    ]
   },
   {
     "id": "special-flavours-jar--raspberry",
@@ -799,7 +856,10 @@
     "familyId": "milk",
     "variant": "",
     "title": "Milk",
-    "optionIds": ["milk-190-ml", "milk-350-ml"]
+    "optionIds": [
+      "milk-190-ml",
+      "milk-350-ml"
+    ]
   },
   {
     "id": "cake-topper",
@@ -807,7 +867,9 @@
     "familyId": "cake-topper",
     "variant": "",
     "title": "Cake Topper",
-    "optionIds": ["cake-topper-"]
+    "optionIds": [
+      "cake-topper-"
+    ]
   },
   {
     "id": "candles",
@@ -815,6 +877,8 @@
     "familyId": "candles",
     "variant": "",
     "title": "Candles",
-    "optionIds": ["candles-"]
+    "optionIds": [
+      "candles-"
+    ]
   }
 ]

@@ -72,7 +72,7 @@ test("all 50 official photos are accounted for and only reviewed ones are public
     ["01", "02", "03", "04"].map((n) => `official-pan-banner-${n}`),
   );
   for (const board of boards) assert.equal(board.width! / board.height!, 1.5);
-  for (const other of ["cakes", "conchas", "jars"])
+  for (const other of ["cakes", "jars"])
     assert.deepEqual(categoryEditorialMedia(other), []);
   // Chocolate-covered fillings have no photograph of their own.
   for (const product of storefrontProducts.filter((p) =>

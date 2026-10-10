@@ -6,6 +6,7 @@ import {
   selectedProductMedia,
   productMediaAssignments,
   approvedMedia,
+  usesMenuReferencePresentation,
 } from "./media";
 import { CustomerCopy } from "./localization";
 import { availableSku } from "../../shared/commerce-policy";
@@ -44,6 +45,11 @@ export function ProductOptions({
     product.variant,
     display.size,
   );
+  // Never show the chocolate family fallback for a different Concha flavour.
+  const fallback =
+    family.id === "conchas-traditional" && product.variant !== "Chocolate"
+      ? "/brand/icon.png"
+      : family.image;
   const serverProduct = config?.products.find((p) => p.id === option?.id);
   const ready =
     !!option && !!serverProduct && serverProduct.priceFils === option.priceFils;
@@ -53,16 +59,16 @@ export function ProductOptions({
   return (
     <div className="b-menu-options">
       <figure
-        className={`b-menu-photo ${media ? "" : "b-family-photo"} ${media?.sourceId.startsWith("official-pan-") ? "b-official-photo" : ""}`}
+        className={`b-menu-photo ${media ? "" : "b-family-photo"} ${usesMenuReferencePresentation(media) ? "b-official-photo" : ""}`}
       >
-        {media || family.image ? (
+        {media || fallback ? (
           <ResponsiveMedia
             productId={product.id}
             family={family.id}
             variant={product.variant}
             size={display.size}
-            fallback={family.image}
-            alt={media ? product.title : `${family.name} · family photograph`}
+            fallback={fallback}
+            alt={product.title}
             rotate={!detail}
           />
         ) : (
@@ -164,7 +170,7 @@ export function ProductOptions({
       )}
       {detail && !!gallery?.length && (
         <div
-          className={`b-product-gallery ${media?.sourceId.startsWith("official-pan-") ? "b-official-gallery" : ""}`}
+          className={`b-product-gallery ${usesMenuReferencePresentation(media) ? "b-official-gallery" : ""}`}
           aria-label={localize("Product gallery")}
         >
           {gallery.map((id) => {

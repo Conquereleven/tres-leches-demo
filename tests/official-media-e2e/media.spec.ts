@@ -326,7 +326,9 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
       path: `work/qa/official-media/${info.project.name}-menu-${width}.png`,
     });
     await visitMenu("/menu?category=conchas");
-    await expect(page.locator(".b-official-rotation")).toHaveCount(0);
+    await expect(
+      page.locator(".b-category-showcase .b-official-rotation"),
+    ).toHaveCount(1);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await visitMenu("/menu?category=pan");
     await rotation.scrollIntoViewIfNeeded();

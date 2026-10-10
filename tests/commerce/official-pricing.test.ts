@@ -19,6 +19,14 @@ const storefront = new Map(
   menuFamilies.flatMap((f) => f.options.map((o) => [o.id, o] as const)),
 );
 const aed = (id: string) => OFFICIAL_PRICES_FILS[id]! / 100;
+const ACTIVATED_CONCHAS = new Set([
+  "conchas-traditional-vainilla-mini-40-g",
+  "conchas-traditional-vainilla-individual-70-g",
+  "conchas-traditional-pistache-mini-40-g",
+  "conchas-traditional-pistache-individual-70-g",
+  "conchas-traditional-tricolor-mini-40-g",
+  "conchas-traditional-tricolor-individual-70-g",
+]);
 
 test("official Pan de Muerto price list: every approved row", () => {
   // Written out row by row so the table Joel approved is readable here.
@@ -106,7 +114,7 @@ test("nothing outside the official list changed price, availability or identity"
       ["show", "4838030:data-imports/liza-current-menu.json"],
       { encoding: "utf8", maxBuffer: 1 << 26 },
     ),
-  ).items as { id: string; priceAed: string; active: boolean; name: string }[];
+  ).items as { id: string; priceAed: string; active: boolean; availability: string; name: string }[];
   const now = JSON.parse(
     readFileSync("data-imports/liza-current-menu.json", "utf8"),
   ).items as typeof released;
@@ -119,18 +127,18 @@ test("nothing outside the official list changed price, availability or identity"
     assert.equal(after.name, before.name);
     if (!(before.id in OFFICIAL_PRICES_FILS))
       assert.equal(after.priceAed, before.priceAed, before.id);
-    // Only the six removed combinations changed availability.
-    assert.equal(
-      after.active,
-      RETIRED_SKUS.has(before.id) ? false : before.active,
-      before.id,
-    );
+    // Only six approved traditional Conchas were activated; retired Pan stays retired.
+    assert.equal(after.active, ACTIVATED_CONCHAS.has(before.id) ? true : RETIRED_SKUS.has(before.id) ? false : before.active, before.id);
+    if (ACTIVATED_CONCHAS.has(before.id)) {
+      assert.equal(after.availability, "available");
+      assert.equal(before.active, false);
+      assert.equal(storefront.get(before.id)?.priceFils, Number(before.priceAed) * 100);
+    }
   }
-  // Conchas are deferred: every Concha record is identical to the released one.
-  const conchas = (items: typeof released) =>
-    items.filter((i) => i.id.startsWith("conchas"));
+  // Exactly six existing Concha records changed availability, not prices or identity.
+  const conchas = (items: typeof released) => items.filter((i) => i.id.startsWith("conchas"));
   assert.equal(conchas(now).length, 26);
-  assert.deepEqual(conchas(now), conchas(released));
+  assert.deepEqual(conchas(now).map((item) => ACTIVATED_CONCHAS.has(item.id) ? { ...item, active: false, availability: "unavailable" } : item), conchas(released));
   assert.ok(
     Object.keys(OFFICIAL_PRICES_FILS).every((id) =>
       id.startsWith("pan-de-muerto-"),

@@ -33,6 +33,7 @@ await build({
     "scripts/register-paymennt-webhook.ts",
     "scripts/send-test-email.ts",
     "scripts/update-pan-prices.ts",
+    "scripts/activate-conchas.ts",
   ],
   bundle: true,
   platform: "node",

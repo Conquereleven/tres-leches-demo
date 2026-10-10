@@ -14,12 +14,12 @@ test("UAT V2: every active SKU belongs to exactly one stable single-flavour prod
   const catalog = JSON.parse(
     readFileSync("data-imports/liza-current-menu.json", "utf8"),
   ).items;
-  assert.equal(storefrontProducts.length, 71);
-  assert.equal(new Set(storefrontProducts.map((p) => p.id)).size, 71);
-  assert.equal(new Set(storefrontProducts.map((p) => p.slug)).size, 71);
+  assert.equal(storefrontProducts.length, 74);
+  assert.equal(new Set(storefrontProducts.map((p) => p.id)).size, 74);
+  assert.equal(new Set(storefrontProducts.map((p) => p.slug)).size, 74);
   const ids = storefrontProducts.flatMap((p) => p.optionIds);
-  assert.equal(ids.length, 210);
-  assert.equal(new Set(ids).size, 210);
+  assert.equal(ids.length, 216);
+  assert.equal(new Set(ids).size, 216);
   assert.deepEqual(
     [...ids].sort(),
     catalog
@@ -34,21 +34,20 @@ test("UAT V2: every active SKU belongs to exactly one stable single-flavour prod
     );
   assert.equal(
     catalog.filter((p: { active: boolean }) => !p.active).length,
-    26,
+    20,
   );
 });
-test("UAT V2: conchas only chocolate traditional and pistache filled at approved prices", () => {
-  for (const [id, variant, prices] of [
-    ["conchas-traditional", "Chocolate", [1300, 1100]],
-    ["conchas-filled", "Pistache", [2100, 1800]],
-  ] as const) {
-    const options = menuFamilies.find((f) => f.id === id)!.options;
-    assert.deepEqual([...new Set(options.map((o) => o.variant))], [variant]);
-    assert.deepEqual(
-      options.map((o) => o.priceFils),
-      prices,
-    );
+test("UAT V2: four traditional Concha flavours and filled Pistache retain approved prices", () => {
+  const traditional = menuFamilies.find((f) => f.id === "conchas-traditional")!.options;
+  assert.equal(traditional.length, 8);
+  assert.deepEqual([...new Set(traditional.map((o) => o.variant))].sort(), ["Chocolate", "Pistache", "Tricolor", "Vainilla"]);
+  for (const variant of ["Chocolate", "Pistache", "Tricolor", "Vainilla"]) {
+    const prices = traditional.filter(o => o.variant === variant).map(o => o.priceFils);
+    assert.deepEqual(prices, [1300, 1100]);
   }
+  const filled = menuFamilies.find((f) => f.id === "conchas-filled")!.options;
+  assert.deepEqual([...new Set(filled.map(o => o.variant))], ["Pistache"]);
+  assert.deepEqual(filled.map(o => o.priceFils), [2100, 1800]);
 });
 test("UAT V2: direct quantity 40 and maximum 100 accepted, malformed quantities rejected on server", () => {
   for (const quantity of [1, 40, 100])

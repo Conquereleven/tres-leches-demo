@@ -240,6 +240,42 @@
           "variant": "Chocolate",
           "size": "Individual · 70 g",
           "priceFils": 1300
+        },
+        {
+          "id": "conchas-traditional-vainilla-mini-40-g",
+          "variant": "Vainilla",
+          "size": "Mini · 40 g",
+          "priceFils": 1100
+        },
+        {
+          "id": "conchas-traditional-vainilla-individual-70-g",
+          "variant": "Vainilla",
+          "size": "Individual · 70 g",
+          "priceFils": 1300
+        },
+        {
+          "id": "conchas-traditional-pistache-mini-40-g",
+          "variant": "Pistache",
+          "size": "Mini · 40 g",
+          "priceFils": 1100
+        },
+        {
+          "id": "conchas-traditional-pistache-individual-70-g",
+          "variant": "Pistache",
+          "size": "Individual · 70 g",
+          "priceFils": 1300
+        },
+        {
+          "id": "conchas-traditional-tricolor-mini-40-g",
+          "variant": "Tricolor",
+          "size": "Mini · 40 g",
+          "priceFils": 1100
+        },
+        {
+          "id": "conchas-traditional-tricolor-individual-70-g",
+          "variant": "Tricolor",
+          "size": "Individual · 70 g",
+          "priceFils": 1300
         }
       ],
       "image": "/brand/menu/conchas-traditional.webp",

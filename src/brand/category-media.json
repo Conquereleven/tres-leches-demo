@@ -1,0 +1,213 @@
+{
+  "assets": [
+    {
+      "sourceId": "3l-conchas-editorial-concha-tradicional-vainilla",
+      "sourceFilename": "concha-tradicional-vainilla.png",
+      "family": "conchas-traditional",
+      "variant": "Vainilla",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "exact approved traditional concha product and category gallery",
+      "alt": "Concha tradicional de vainilla",
+      "status": "assigned",
+      "selectionReason": "Lisa-approved illustration for the matching existing traditional variant; SKU activation authorized 2026-10-10",
+      "mediaKind": "digital-illustration",
+      "presentation": "menu-reference",
+      "originalBytes": 2479338,
+      "width": 1254,
+      "height": 1254,
+      "derivatives": [
+        {
+          "width": 320,
+          "height": 320,
+          "bytes": 11840,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-vainilla-320.avif"
+        },
+        {
+          "width": 320,
+          "height": 320,
+          "bytes": 19138,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-vainilla-320.webp"
+        },
+        {
+          "width": 640,
+          "height": 640,
+          "bytes": 38207,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-vainilla-640.avif"
+        },
+        {
+          "width": 640,
+          "height": 640,
+          "bytes": 57990,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-vainilla-640.webp"
+        },
+        {
+          "width": 960,
+          "height": 960,
+          "bytes": 73448,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-vainilla-960.avif"
+        },
+        {
+          "width": 960,
+          "height": 960,
+          "bytes": 105594,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-vainilla-960.webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-conchas-editorial-concha-tradicional-pistache",
+      "sourceFilename": "concha-tradicional-pistache.png",
+      "family": "conchas-traditional",
+      "variant": "Pistache",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "exact approved traditional concha product and category gallery",
+      "alt": "Concha tradicional de pistache",
+      "status": "assigned",
+      "selectionReason": "Lisa-approved illustration for the matching existing traditional variant; SKU activation authorized 2026-10-10",
+      "mediaKind": "digital-illustration",
+      "presentation": "menu-reference",
+      "originalBytes": 2673121,
+      "width": 1254,
+      "height": 1254,
+      "derivatives": [
+        {
+          "width": 320,
+          "height": 320,
+          "bytes": 14078,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-pistache-320.avif"
+        },
+        {
+          "width": 320,
+          "height": 320,
+          "bytes": 24178,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-pistache-320.webp"
+        },
+        {
+          "width": 640,
+          "height": 640,
+          "bytes": 47905,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-pistache-640.avif"
+        },
+        {
+          "width": 640,
+          "height": 640,
+          "bytes": 78440,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-pistache-640.webp"
+        },
+        {
+          "width": 960,
+          "height": 960,
+          "bytes": 91006,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-pistache-960.avif"
+        },
+        {
+          "width": 960,
+          "height": 960,
+          "bytes": 140588,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-pistache-960.webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-conchas-editorial-concha-tradicional-tricolor-mexico",
+      "sourceFilename": "concha-tradicional-tricolor-mexico.png",
+      "family": "conchas-traditional",
+      "variant": "Tricolor",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "exact approved traditional concha product and category gallery",
+      "alt": "Concha tradicional tricolor",
+      "status": "assigned",
+      "selectionReason": "Lisa-approved illustration for the matching existing traditional variant; SKU activation authorized 2026-10-10",
+      "mediaKind": "digital-illustration",
+      "presentation": "menu-reference",
+      "originalBytes": 2646244,
+      "width": 1254,
+      "height": 1254,
+      "derivatives": [
+        {
+          "width": 320,
+          "height": 320,
+          "bytes": 14346,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-tricolor-mexico-320.avif"
+        },
+        {
+          "width": 320,
+          "height": 320,
+          "bytes": 25066,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-tricolor-mexico-320.webp"
+        },
+        {
+          "width": 640,
+          "height": 640,
+          "bytes": 49324,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-tricolor-mexico-640.avif"
+        },
+        {
+          "width": 640,
+          "height": 640,
+          "bytes": 81670,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-tricolor-mexico-640.webp"
+        },
+        {
+          "width": 960,
+          "height": 960,
+          "bytes": 93855,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-tricolor-mexico-960.avif"
+        },
+        {
+          "width": 960,
+          "height": 960,
+          "bytes": 148752,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-tricolor-mexico-960.webp"
+        }
+      ]
+    }
+  ],
+  "editorial": [
+    {
+      "category": "conchas",
+      "sourceIds": [
+        "3l-ai-concha-traditional-chocolate-20261010",
+        "3l-conchas-editorial-concha-tradicional-vainilla",
+        "3l-conchas-editorial-concha-tradicional-pistache",
+        "3l-conchas-editorial-concha-tradicional-tricolor-mexico"
+      ]
+    }
+  ]
+}
