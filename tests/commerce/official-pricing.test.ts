@@ -114,7 +114,7 @@ test("nothing outside the official list changed price, availability or identity"
       ["show", "4838030:data-imports/liza-current-menu.json"],
       { encoding: "utf8", maxBuffer: 1 << 26 },
     ),
-  ).items as { id: string; priceAed: string; active: boolean; name: string }[];
+  ).items as { id: string; priceAed: string; active: boolean; availability: string; name: string }[];
   const now = JSON.parse(
     readFileSync("data-imports/liza-current-menu.json", "utf8"),
   ).items as typeof released;
