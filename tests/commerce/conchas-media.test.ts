@@ -138,3 +138,24 @@ test("final batch maps filled Pistache and both packs exactly, retaining origina
     }
   }
 });
+
+test("all seven Conchas reuse the Pan presentation without a separate frame system", () => {
+  const products = [
+    ["conchas-traditional--chocolate", "conchas-traditional", "Chocolate"],
+    ["conchas-traditional--vainilla", "conchas-traditional", "Vainilla"],
+    ["conchas-traditional--pistache", "conchas-traditional", "Pistache"],
+    ["conchas-traditional--tricolor", "conchas-traditional", "Tricolor"],
+    ["conchas-filled--pistache", "conchas-filled", "Pistache"],
+    ["conchas-traditional-pack", "conchas-traditional-pack", ""],
+    ["conchas-filled-pack", "conchas-filled-pack", ""],
+  ];
+  for (const [id, family, variant] of products) {
+    const asset = selectedProductMedia(id, family!, variant!);
+    assert.ok(asset);
+    assert.ok(usesMenuReferencePresentation(asset));
+  }
+  assert.equal(
+    usesMenuReferencePresentation(categoryEditorialMedia("pan")[0]),
+    true,
+  );
+});

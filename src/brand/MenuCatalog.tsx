@@ -7,7 +7,6 @@ import {
   productMediaAssignments,
   approvedMedia,
   usesMenuReferencePresentation,
-  usesLandscapeMenuPresentation,
 } from "./media";
 import { CustomerCopy } from "./localization";
 import { availableSku } from "../../shared/commerce-policy";
@@ -60,7 +59,7 @@ export function ProductOptions({
   return (
     <div className="b-menu-options">
       <figure
-        className={`b-menu-photo ${media ? "" : "b-family-photo"} ${usesMenuReferencePresentation(media) ? "b-official-photo" : ""} ${usesLandscapeMenuPresentation(media) ? "b-landscape-photo" : ""}`}
+        className={`b-menu-photo ${media ? "" : "b-family-photo"} ${usesMenuReferencePresentation(media) ? "b-official-photo" : ""}`}
       >
         {media || fallback ? (
           <ResponsiveMedia

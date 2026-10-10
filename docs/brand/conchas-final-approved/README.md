@@ -16,9 +16,10 @@ The alternate square versions in Downloads are not used.
 These three assets also form the Conchas opening gallery, through the existing
 Pan de Muerto `MediaRotation` (same timing, crossfade, focus/hover pause and
 reduced-motion behavior). The shared banner is 3:2, with the existing 20px panel
-radius. The three product frames and cart/checkout thumbnails use 3:2 and
-`object-fit: contain`; original composition and embedded margins stay intact.
-The four traditional-flavour assignments remain unchanged.
+radius. All seven Conchas product frames use the same square Pan de Muerto
+presentation, with contain fit; cart/checkout retain the shared square thumbnails.
+Original composition and embedded margins stay intact. All seven image
+assignments remain unchanged. No category-specific frame system is used.
 
 Provenance is internal; no public digital/AI badge or claim of real photography.
 AVIF/WebP derivatives at 320/640/960px retain original proportions, with no crop.

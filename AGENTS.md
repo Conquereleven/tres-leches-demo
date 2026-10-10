@@ -114,5 +114,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 
 ## Final Conchas visual batch (10 October 2026, Joel)
 - The approved filled Pistache and two pack artworks are exact product images and the three-frame Conchas opening gallery. See `docs/brand/conchas-final-approved/` for untouched originals, assignments and hashes.
-- Reuse Pan de Muerto `MediaRotation`, 3:2 banner, panel radius, transitions and pause/reduced-motion behavior. The three new product frames and thumbnails are horizontal 3:2 with contain fit; never aggressively crop or stretch the artwork. Preserve the four existing traditional-flavour assignments.
+- Reuse Pan de Muerto `MediaRotation`, 3:2 banner, panel radius, transitions and pause/reduced-motion behavior. Product frames and thumbnails follow the shared Pan reference with contain fit; never aggressively crop or stretch the artwork. Preserve the four existing traditional-flavour assignments.
 - Digital provenance stays in internal manifests, never a public badge or a claim of real photography. Visual-only integration: no commercial data, provider, delivery or Production changes.
+
+## Conchas visual reference correction (10 October 2026, Joel)
+- The final instruction supersedes the earlier horizontal product-frame direction: Conchas must match the actual Pan de Muerto design exactly. Both use square product cards/details with the shared panel radius, plus the horizontal 3:2 opening gallery. Cart/checkout use the same existing square thumbnail component. No Conchas-specific frame override.
+- Preserve all seven exact image assignments, the three-frame opening gallery, responsive derivatives and the shared MediaRotation behavior. Measure full style parity, equal heights and row alignment at 390/768/1440 in Chromium/WebKit. No commercial or Production changes.

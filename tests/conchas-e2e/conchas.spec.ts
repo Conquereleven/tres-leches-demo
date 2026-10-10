@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { mkdirSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import type { Page } from "@playwright/test";
 async function capture(page: Page, path: string) {
   // Full-page captures do not trigger below-fold lazy images by themselves.
@@ -155,7 +155,8 @@ for (const width of [390, 768, 1440])
     page,
   }, info) => {
     await page.setViewportSize({ width, height: 1000 });
-    const styles: unknown[] = [];
+    mkdirSync("docs/brand/conchas-pan-parity-qa", { recursive: true });
+    const styles: { cardRatio: number; [key: string]: unknown }[] = [];
     for (const category of ["pan", "conchas"]) {
       const config = page.waitForResponse((r) =>
         r.url().endsWith("/api/checkout/config"),
@@ -188,6 +189,19 @@ for (const width of [390, 768, 1440])
             bannerMargin: getComputedStyle(banner).marginBottom,
             cardRatio: Math.round((c.width / c.height) * 100),
             cardRadius: getComputedStyle(card).borderRadius,
+            cardBackground: getComputedStyle(card).backgroundColor,
+            cardOverflow: getComputedStyle(card).overflow,
+            cardWidth: c.width,
+            cardHeight: c.height,
+            imageWidth: img.getBoundingClientRect().width,
+            imageHeight: img.getBoundingClientRect().height,
+            cardMargin: getComputedStyle(card).margin,
+            titleMargin: getComputedStyle(
+              document.querySelector(".b-menu-card h4")!,
+            ).margin,
+            selectorHeight: getComputedStyle(
+              document.querySelector(".b-menu-selectors select")!,
+            ).height,
             imageFit: getComputedStyle(img).objectFit,
             gridGap: getComputedStyle(grid).gap,
             transition: getComputedStyle(
@@ -196,11 +210,18 @@ for (const width of [390, 768, 1440])
           };
         }),
       );
-      if (info.project.name === "chromium")
+      if (info.project.name === "chromium") {
         await capture(
           page,
-          `docs/brand/conchas-qa/after/reference-${category}-${width}.png`,
+          `docs/brand/conchas-pan-parity-qa/reference-${category}-${width}.png`,
         );
+        await page.locator(".b-menu-grid").screenshot({
+          path: `docs/brand/conchas-pan-parity-qa/grid-${category}-${width}.png`,
+          // Isolate the comparison; fixed navigation is verified in full-page captures.
+          style:
+            ".b-header, .b-shopping-wa, .b-floating-cart { visibility: hidden !important; }",
+        });
+      }
       expect(
         await page.evaluate(
           () => document.documentElement.scrollWidth <= innerWidth,
@@ -215,6 +236,10 @@ for (const width of [390, 768, 1440])
       );
       await page.emulateMedia({ reducedMotion: "no-preference" });
     }
+    writeFileSync(
+      `docs/brand/conchas-pan-parity-qa/parity-${info.project.name}-${width}.json`,
+      JSON.stringify({ pan: styles[0], conchas: styles[1] }, null, 2),
+    );
     expect(styles[0]).toEqual(styles[1]);
   });
 
@@ -274,7 +299,7 @@ for (const [slug, image] of [
 }
 
 for (const width of [390, 768, 1440])
-  test(`final batch whole landscape images and checkout continuity ${width}`, async ({
+  test(`final batch whole images in Pan reference frames and checkout continuity ${width}`, async ({
     page,
   }, info) => {
     await page.setViewportSize({ width, height: 900 });
@@ -325,7 +350,7 @@ for (const width of [390, 768, 1440])
         await card
           .locator(".b-menu-photo")
           .evaluate((el) => getComputedStyle(el).aspectRatio),
-      ).toBe("3 / 2");
+      ).toBe("1 / 1");
       expect(await img.evaluate((el) => getComputedStyle(el).objectFit)).toBe(
         "contain",
       );
@@ -354,7 +379,7 @@ for (const width of [390, 768, 1440])
             radius: parseFloat(getComputedStyle(el).borderRadius),
           };
         });
-        expect(frame.ratio).toBeCloseTo(1.5, 1);
+        expect(frame.ratio).toBeCloseTo(1, 1);
         expect(frame.radius).toBeGreaterThan(0);
         expect(
           await page.evaluate(
@@ -367,6 +392,129 @@ for (const width of [390, 768, 1440])
             fullPage: true,
           });
       }
+    }
+    expect(errors).toEqual([]);
+  });
+
+for (const width of [390, 768, 1440])
+  test(`all seven Conchas uniform frames, row alignment and journey ${width}`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    page.on("console", (m) => {
+      if (m.type() === "error") errors.push(m.text());
+    });
+    const visit = async (path: string) => {
+      const ready = page.waitForResponse((r) =>
+        r.url().endsWith("/api/checkout/config"),
+      );
+      await page.goto(path);
+      await ready;
+    };
+    await visit("/menu?category=conchas");
+    const cards = page.locator(".b-menu-card");
+    await expect(cards).toHaveCount(7);
+    for (const card of await cards.all()) {
+      await card.scrollIntoViewIfNeeded();
+      await expect
+        .poll(() =>
+          card
+            .locator(".b-menu-photo img")
+            .evaluate((i: HTMLImageElement) => i.naturalWidth),
+        )
+        .toBeGreaterThan(0);
+    }
+    const frames = await cards.evaluateAll((nodes) =>
+      nodes.map((card) => {
+        const frame = card.querySelector(".b-menu-photo")!,
+          img = frame.querySelector("img")!;
+        const b = frame.getBoundingClientRect(),
+          css = getComputedStyle(frame);
+        return {
+          id: card.getAttribute("data-product-id"),
+          width: b.width,
+          height: b.height,
+          top: b.top,
+          bottom: b.bottom,
+          ratio: css.aspectRatio,
+          radius: css.borderRadius,
+          background: css.backgroundColor,
+          overflow: css.overflow,
+          fit: getComputedStyle(img).objectFit,
+          imageHeight: img.getBoundingClientRect().height,
+          imageWidth: img.getBoundingClientRect().width,
+        };
+      }),
+    );
+    for (const f of frames) {
+      expect(f.ratio).toBe("1 / 1");
+      expect(f.radius).toBe("20px");
+      expect(f.overflow).toBe("hidden");
+      expect(f.fit).toBe("contain");
+      expect(f.background).toBe(frames[0]!.background);
+      expect(f.height).toBeCloseTo(frames[0]!.height, 0);
+      expect(f.width / f.height).toBeCloseTo(1, 2);
+      expect(Math.abs(f.imageHeight - f.height)).toBeLessThan(1);
+      expect(Math.abs(f.imageWidth - f.width)).toBeLessThan(1);
+    }
+    for (const a of frames)
+      for (const b of frames)
+        if (Math.abs(a.top - b.top) < 1)
+          expect(a.bottom).toBeCloseTo(b.bottom, 0);
+    const root = "docs/brand/conchas-pan-parity-qa";
+    mkdirSync(root, { recursive: true });
+    writeFileSync(
+      `${root}/geometry-${info.project.name}-${width}.json`,
+      JSON.stringify(frames, null, 2),
+    );
+    if (info.project.name === "chromium")
+      await capture(page, `${root}/seven-cards-${width}.png`);
+    const ids = frames.map((f) => f.id!);
+    for (const id of ids) {
+      await visit(`/menu?product=${id}`);
+      const frame = page.locator(".b-menu-photo");
+      expect(
+        await frame.evaluate((el) => getComputedStyle(el).aspectRatio),
+      ).toBe("1 / 1");
+      expect(
+        await frame.evaluate((el) => getComputedStyle(el).borderRadius),
+      ).toBe("20px");
+      await page.locator(".b-menu-options button").last().click();
+    }
+    for (const path of ["cart", "checkout"]) {
+      await visit(`/${path}`);
+      if (await page.locator(".b-co-summary-toggle").isVisible())
+        await page.locator(".b-co-summary-toggle").click();
+      const thumbs = page.locator(".b-co-thumb");
+      await expect(thumbs).toHaveCount(7);
+      for (const thumb of await thumbs.all()) {
+        const f = await thumb.evaluate((el) => {
+          const b = el.getBoundingClientRect(),
+            s = getComputedStyle(el);
+          return {
+            ratio: b.width / b.height,
+            radius: s.borderRadius,
+            fit: s.objectFit,
+            background: s.backgroundColor,
+          };
+        });
+        expect(f.ratio).toBeCloseTo(1, 2);
+        expect(f.radius).toBe("12px");
+        expect(f.fit).toBe("contain");
+      }
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      if (info.project.name === "chromium")
+        await page.screenshot({
+          path: `${root}/seven-${path}-${width}.png`,
+          fullPage: true,
+        });
     }
     expect(errors).toEqual([]);
   });

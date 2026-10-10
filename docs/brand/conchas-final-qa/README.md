@@ -1,3 +1,5 @@
+> Previous batch evidence, superseded by the exact Pan de Muerto design correction. Current evidence: [conchas-pan-parity-qa](../conchas-pan-parity-qa/README.md).
+
 # Conchas final visual batch — QA
 
 Visual-only follow-up to merged PR #5 on the same sprint branch.
