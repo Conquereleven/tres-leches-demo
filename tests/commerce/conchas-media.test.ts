@@ -27,7 +27,7 @@ test("approved original bytes and responsive derivatives retain source hashes", 
     }
   }
 });
-test("each traditional Concha receives exact approved artwork, filled pistache and packs unchanged", () => {
+test("each traditional Concha retains exact approved artwork alongside the final batch", () => {
   const chocolate = selectedProductMedia(
     "conchas-traditional--chocolate",
     "conchas-traditional",
@@ -54,26 +54,86 @@ test("each traditional Concha receives exact approved artwork, filled pistache a
     );
   }
   for (const [slug, label, source] of [
-    ["vainilla", "Vainilla", "3l-conchas-editorial-concha-tradicional-vainilla"],
-    ["pistache", "Pistache", "3l-conchas-editorial-concha-tradicional-pistache"],
-    ["tricolor", "Tricolor", "3l-conchas-editorial-concha-tradicional-tricolor-mexico"],
-  ] as const) assert.equal(selectedProductMedia(`conchas-traditional--${slug}`, "conchas-traditional", label)?.sourceId, source);
-  assert.equal(productMediaAssignments.filter((p) => p.productId.startsWith("conchas-traditional--") && p.primarySourceId).length, 4);
+    [
+      "vainilla",
+      "Vainilla",
+      "3l-conchas-editorial-concha-tradicional-vainilla",
+    ],
+    [
+      "pistache",
+      "Pistache",
+      "3l-conchas-editorial-concha-tradicional-pistache",
+    ],
+    [
+      "tricolor",
+      "Tricolor",
+      "3l-conchas-editorial-concha-tradicional-tricolor-mexico",
+    ],
+  ] as const)
+    assert.equal(
+      selectedProductMedia(
+        `conchas-traditional--${slug}`,
+        "conchas-traditional",
+        label,
+      )?.sourceId,
+      source,
+    );
+  assert.equal(
+    productMediaAssignments.filter(
+      (p) =>
+        p.productId.startsWith("conchas-traditional--") && p.primarySourceId,
+    ).length,
+    4,
+  );
   for (const a of index.filter((x) => !x.productId)) {
     assert.ok(!existsSync("public/brand/approved/" + a.source));
     assert.ok(a.derivatives.every((d) => !d.file.startsWith("public/")));
   }
 });
-test("Conchas uses the menu reference pipeline with four category-only frames", () => {
+test("Conchas opens with the three approved final batch frames", () => {
   const frames = categoryEditorialMedia("conchas");
-  assert.equal(frames.length, 4);
+  assert.equal(frames.length, 3);
   assert.ok(frames.every(usesMenuReferencePresentation));
   for (const asset of frames) {
     for (const d of asset.derivatives) {
       assert.equal(readFileSync("public" + d.src).length, d.bytes);
     }
-    assert.ok(productMediaAssignments.some(p => p.primarySourceId === asset.sourceId));
+    assert.ok(
+      productMediaAssignments.some((p) => p.primarySourceId === asset.sourceId),
+    );
   }
   assert.equal(categoryEditorialMedia("pan").length, 4);
   assert.equal(categoryEditorialMedia("cakes").length, 0);
+});
+
+test("final batch maps filled Pistache and both packs exactly, retaining original and derivative bytes", async () => {
+  const { default: batch } =
+    await import("../../docs/brand/conchas-final-approved/image-index.json");
+  for (const item of batch) {
+    assert.equal(
+      createHash("sha256")
+        .update(
+          readFileSync(
+            `docs/brand/conchas-final-approved/originals/${item.source}`,
+          ),
+        )
+        .digest("hex"),
+      item.sha256,
+    );
+    const assignment = productMediaAssignments.find(
+      (p) => p.productId === item.productId,
+    );
+    assert.equal(assignment?.primarySourceId, item.sourceId);
+    const asset = categoryEditorialMedia("conchas").find(
+      (a) => a.sourceId === item.sourceId,
+    );
+    assert.ok(asset);
+    assert.equal(asset.width / asset.height, 4 / 3);
+    for (const d of item.derivatives) {
+      const data = readFileSync("public" + d.src);
+      assert.equal(data.length, d.bytes);
+      assert.equal(createHash("sha256").update(data).digest("hex"), d.sha256);
+      assert.ok(Math.abs(d.width / d.height - 4 / 3) < 0.01);
+    }
+  }
 });

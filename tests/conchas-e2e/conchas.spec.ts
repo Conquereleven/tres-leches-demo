@@ -16,6 +16,7 @@ async function capture(page: Page, path: string) {
       .toBeGreaterThan(0);
   }
   await page.evaluate(() => window.scrollTo(0, 0));
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
   await page.screenshot({ path, fullPage: true });
 }
 for (const width of [390, 768, 1440])
@@ -222,30 +223,150 @@ for (const [slug, image] of [
   ["pistache", "concha-tradicional-pistache"],
   ["tricolor", "concha-tradicional-tricolor-mexico"],
 ] as const) {
-  for (const [size, fils] of [["Mini · 40 g", 1100], ["Individual · 70 g", 1300]] as const) {
-    test(`new traditional ${slug} ${size}: image, menu, cart and checkout`, async ({ page }) => {
+  for (const [size, fils] of [
+    ["Mini · 40 g", 1100],
+    ["Individual · 70 g", 1300],
+  ] as const) {
+    test(`new traditional ${slug} ${size}: image, menu, cart and checkout`, async ({
+      page,
+    }) => {
       await page.setViewportSize({ width: 390, height: 860 });
-      const ready = page.waitForResponse(r => r.url().endsWith("/api/checkout/config"));
+      const ready = page.waitForResponse((r) =>
+        r.url().endsWith("/api/checkout/config"),
+      );
       await page.goto(`/menu?product=conchas-traditional--${slug}&lang=es`);
       await ready;
       const card = page.locator('[data-menu-family="conchas-traditional"]');
       const img = card.locator(".b-menu-photo img");
-      await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
+      await expect
+        .poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth))
+        .toBeGreaterThan(0);
       await expect(img).toHaveAttribute("src", new RegExp(image));
       const selector = card.locator(".b-menu-selectors select");
       await selector.selectOption({ label: size });
-      await expect(card.locator(".b-menu-price")).toContainText(String(fils / 100));
+      await expect(card.locator(".b-menu-price")).toContainText(
+        String(fils / 100),
+      );
       await expect(card.locator(".b-menu-options button").last()).toBeEnabled();
       await card.locator(".b-menu-options button").last().click();
-      const cartReady = page.waitForResponse(r => r.url().endsWith("/api/checkout/config"));
+      const cartReady = page.waitForResponse((r) =>
+        r.url().endsWith("/api/checkout/config"),
+      );
       await page.goto("/cart?lang=es");
       await cartReady;
-      await expect(page.locator(".b-co-thumb")).toHaveAttribute("src", new RegExp(image));
-      const checkoutReady = page.waitForResponse(r => r.url().endsWith("/api/checkout/config"));
+      await expect(page.locator(".b-co-thumb")).toHaveAttribute(
+        "src",
+        new RegExp(image),
+      );
+      const checkoutReady = page.waitForResponse((r) =>
+        r.url().endsWith("/api/checkout/config"),
+      );
       await page.goto("/checkout?lang=es");
       await checkoutReady;
-      if (await page.locator(".b-co-summary-toggle").isVisible()) await page.locator(".b-co-summary-toggle").click();
-      await expect(page.locator(".b-co-thumb")).toHaveAttribute("src", new RegExp(image));
+      if (await page.locator(".b-co-summary-toggle").isVisible())
+        await page.locator(".b-co-summary-toggle").click();
+      await expect(page.locator(".b-co-thumb")).toHaveAttribute(
+        "src",
+        new RegExp(image),
+      );
     });
   }
 }
+
+for (const width of [390, 768, 1440])
+  test(`final batch whole landscape images and checkout continuity ${width}`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(e.message));
+    page.on("console", (m) => {
+      if (m.type() === "error") errors.push(m.text());
+    });
+    const visit = async (path: string) => {
+      const ready = page.waitForResponse((r) =>
+        r.url().endsWith("/api/checkout/config"),
+      );
+      await page.goto(path);
+      await ready;
+    };
+    const root = "docs/brand/conchas-final-qa";
+    mkdirSync(root, { recursive: true });
+    await visit("/menu?category=conchas");
+    const banner = page.locator(".b-category-showcase");
+    await banner.scrollIntoViewIfNeeded();
+    await expect(banner.locator("picture.is-active img")).toHaveAttribute(
+      "src",
+      /conchas_de_pistache_sobre_tabla_de_madera/,
+    );
+    const bannerStyle = await banner.evaluate((el) => ({
+      ratio: getComputedStyle(el).aspectRatio,
+      radius: getComputedStyle(el).borderRadius,
+    }));
+    expect(bannerStyle.ratio).toBe("3 / 2");
+    expect(parseFloat(bannerStyle.radius)).toBeGreaterThan(0);
+    if (info.project.name === "chromium")
+      await capture(page, `${root}/opening-${width}.png`);
+    for (const [id, image] of [
+      ["conchas-filled--pistache", "conchas_de_pistache_sobre_tabla_de_madera"],
+      ["conchas-traditional-pack", "docena_de_conchas_de_chocolate_envuelta"],
+      ["conchas-filled-pack", "conchas_de_pistache_envueltas_en_celofán"],
+    ]) {
+      await page.evaluate(() => localStorage.removeItem("3l-cart"));
+      await visit(`/menu?product=${id}`);
+      const card = page.locator(".b-menu-options");
+      const img = card.locator(".b-menu-photo img");
+      await expect(img).toHaveAttribute("src", new RegExp(image));
+      await expect
+        .poll(() => img.evaluate((i: HTMLImageElement) => i.naturalWidth))
+        .toBeGreaterThan(0);
+      expect(
+        await card
+          .locator(".b-menu-photo")
+          .evaluate((el) => getComputedStyle(el).aspectRatio),
+      ).toBe("3 / 2");
+      expect(await img.evaluate((el) => getComputedStyle(el).objectFit)).toBe(
+        "contain",
+      );
+      expect(
+        (await new AxeBuilder({ page }).include(".b-menu-options").analyze())
+          .violations,
+      ).toEqual([]);
+      const add = card.locator("button").last();
+      await expect(add).toBeEnabled();
+      if (info.project.name === "chromium")
+        await page.screenshot({
+          path: `${root}/${id}-${width}.png`,
+          fullPage: true,
+        });
+      await add.click();
+      for (const path of ["cart", "checkout"]) {
+        await visit(`/${path}`);
+        if (await page.locator(".b-co-summary-toggle").isVisible())
+          await page.locator(".b-co-summary-toggle").click();
+        const thumb = page.locator(".b-co-thumb");
+        await expect(thumb).toHaveAttribute("src", new RegExp(image));
+        const frame = await thumb.evaluate((el) => {
+          const b = el.getBoundingClientRect();
+          return {
+            ratio: b.width / b.height,
+            radius: parseFloat(getComputedStyle(el).borderRadius),
+          };
+        });
+        expect(frame.ratio).toBeCloseTo(1.5, 1);
+        expect(frame.radius).toBeGreaterThan(0);
+        expect(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        ).toBe(true);
+        if (info.project.name === "chromium")
+          await page.screenshot({
+            path: `${root}/${id}-${path}-${width}.png`,
+            fullPage: true,
+          });
+      }
+    }
+    expect(errors).toEqual([]);
+  });

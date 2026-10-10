@@ -111,3 +111,8 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - The official wordmark appears once as an 8% watermark (Joel approved Proposal A) behind the Menu introduction only (`.b-menu-intro-mark`). Never on product photos, cards, galleries, detail pages, or as a repeating or global background.
 - The Pan de Muerto category banner is back (Lisa): the four mixed boards, whole, 3:2, same 3.5 s rotation. No banners on other categories. This supersedes the earlier "banner removed" decision.
 - Pack photos are square by continuing each photo's own background (`extend` in `scripts/official-pan-crops.json`); breads are never copied, moved or redrawn. The filled pack uses its own asset (`official-pan-13-pack`) so Crema diplomática's approved third photo is untouched.
+
+## Final Conchas visual batch (10 October 2026, Joel)
+- The approved filled Pistache and two pack artworks are exact product images and the three-frame Conchas opening gallery. See `docs/brand/conchas-final-approved/` for untouched originals, assignments and hashes.
+- Reuse Pan de Muerto `MediaRotation`, 3:2 banner, panel radius, transitions and pause/reduced-motion behavior. The three new product frames and thumbnails are horizontal 3:2 with contain fit; never aggressively crop or stretch the artwork. Preserve the four existing traditional-flavour assignments.
+- Digital provenance stays in internal manifests, never a public badge or a claim of real photography. Visual-only integration: no commercial data, provider, delivery or Production changes.

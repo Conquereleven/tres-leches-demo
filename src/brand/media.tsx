@@ -40,7 +40,13 @@ type MediaAsset = (typeof approvedMedia)[number];
 export const usesMenuReferencePresentation = (asset: MediaAsset | undefined) =>
   !!asset &&
   (asset.sourceId.startsWith("official-pan-") ||
-    ("presentation" in asset && asset.presentation === "menu-reference"));
+    ("presentation" in asset &&
+      asset.presentation.startsWith("menu-reference")));
+/** Approved horizontal artwork uses the same frame ratio as the category banner. */
+export const usesLandscapeMenuPresentation = (asset: MediaAsset | undefined) =>
+  !!asset &&
+  "presentation" in asset &&
+  asset.presentation === "menu-reference-landscape";
 /** Mixed boards shown for a whole category; never tied to a flavour or pack. */
 export const categoryEditorialMedia = (category: string) =>
   (

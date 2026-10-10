@@ -2,7 +2,11 @@ import { storefrontI18n } from "./locales/engine";
 import { useLanguage as useCustomerLanguage } from "./localization";
 import { QuantityInput } from "./QuantityInput";
 import { normalizeWhatsAppNumber } from "../../shared/contact";
-import { ResponsiveMedia, selectedProductMedia } from "./media";
+import {
+  ResponsiveMedia,
+  selectedProductMedia,
+  usesLandscapeMenuPresentation,
+} from "./media";
 import { AddressAutocomplete } from "./AddressAutocomplete";
 import { CustomerCopy, LanguageSwitcher } from "./localization";
 import { useCheckoutNow } from "./cart";
@@ -327,7 +331,7 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
             ? "/brand/icon.png"
             : image?.src
         }
-        className="b-co-thumb"
+        className={`b-co-thumb ${usesLandscapeMenuPresentation(selectedProductMedia(storefrontProductForSku(productId)?.id, family.id, option.variant, option.size)) ? "b-co-thumb-landscape" : ""}`}
         sizes="72px"
       />
     );

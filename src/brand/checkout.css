@@ -850,3 +850,10 @@
   height: 20px;
   accent-color: var(--b-brown, #442c21);
 }
+
+/* Whole approved horizontal artwork; checkout/cart behavior is unchanged. */
+.brand-experience .b-co-thumb.b-co-thumb-landscape {
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: contain;
+}
