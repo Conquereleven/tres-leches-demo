@@ -45,6 +45,11 @@ export function ProductOptions({
     product.variant,
     display.size,
   );
+  // Never show the chocolate family fallback for a different Concha flavour.
+  const fallback =
+    family.id === "conchas-traditional" && product.variant !== "Chocolate"
+      ? "/brand/icon.png"
+      : family.image;
   const serverProduct = config?.products.find((p) => p.id === option?.id);
   const ready =
     !!option && !!serverProduct && serverProduct.priceFils === option.priceFils;
@@ -56,14 +61,14 @@ export function ProductOptions({
       <figure
         className={`b-menu-photo ${media ? "" : "b-family-photo"} ${usesMenuReferencePresentation(media) ? "b-official-photo" : ""}`}
       >
-        {media || family.image ? (
+        {media || fallback ? (
           <ResponsiveMedia
             productId={product.id}
             family={family.id}
             variant={product.variant}
             size={display.size}
-            fallback={family.image}
-            alt={media ? product.title : `${family.name} · family photograph`}
+            fallback={fallback}
+            alt={product.title}
             rotate={!detail}
           />
         ) : (
