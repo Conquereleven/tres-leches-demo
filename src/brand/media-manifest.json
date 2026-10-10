@@ -2925,7 +2925,8 @@
           "format": "webp"
         }
       ],
-      "mediaKind": "digital-illustration"
+      "mediaKind": "digital-illustration",
+      "presentation": "menu-reference"
     }
   ],
   "editorial": [

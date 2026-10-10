@@ -6,6 +6,7 @@ import {
   selectedProductMedia,
   productMediaAssignments,
   approvedMedia,
+  usesMenuReferencePresentation,
 } from "./media";
 import { CustomerCopy } from "./localization";
 import { availableSku } from "../../shared/commerce-policy";
@@ -53,7 +54,7 @@ export function ProductOptions({
   return (
     <div className="b-menu-options">
       <figure
-        className={`b-menu-photo ${media ? "" : "b-family-photo"} ${media?.sourceId.startsWith("official-pan-") ? "b-official-photo" : ""}`}
+        className={`b-menu-photo ${media ? "" : "b-family-photo"} ${usesMenuReferencePresentation(media) ? "b-official-photo" : ""}`}
       >
         {media || family.image ? (
           <ResponsiveMedia
@@ -77,13 +78,6 @@ export function ProductOptions({
           </div>
         )}
       </figure>
-      {media &&
-        "mediaKind" in media &&
-        media.mediaKind === "digital-illustration" && (
-          <p className="b-menu-media-note">
-            <CustomerCopy>Digital illustration</CustomerCopy>
-          </p>
-        )}
       {detail ? (
         <h1 className="b-product-title">
           <CustomerCopy>{product.title}</CustomerCopy>
@@ -171,7 +165,7 @@ export function ProductOptions({
       )}
       {detail && !!gallery?.length && (
         <div
-          className={`b-product-gallery ${media?.sourceId.startsWith("official-pan-") ? "b-official-gallery" : ""}`}
+          className={`b-product-gallery ${usesMenuReferencePresentation(media) ? "b-official-gallery" : ""}`}
           aria-label={localize("Product gallery")}
         >
           {gallery.map((id) => {

@@ -18,7 +18,8 @@
         "height": 320,
         "bytes": 11840,
         "format": "avif",
-        "sha256": "ecbe53986f3eb3f27f69af69eb7f0c12c98aaa41971d31b0b57a5555e428cbda"
+        "sha256": "ecbe53986f3eb3f27f69af69eb7f0c12c98aaa41971d31b0b57a5555e428cbda",
+        "publicSrc": "/brand/approved/concha-tradicional-vainilla-320.avif"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-vainilla-320.webp",
@@ -27,7 +28,8 @@
         "height": 320,
         "bytes": 19138,
         "format": "webp",
-        "sha256": "f938b6ebe66b5929284f629b15b96527c6f51bb6460a69de80b13e7d2770cdf6"
+        "sha256": "f938b6ebe66b5929284f629b15b96527c6f51bb6460a69de80b13e7d2770cdf6",
+        "publicSrc": "/brand/approved/concha-tradicional-vainilla-320.webp"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-vainilla-640.avif",
@@ -36,7 +38,8 @@
         "height": 640,
         "bytes": 38207,
         "format": "avif",
-        "sha256": "f42344209f7af41522dd6d50cb4830f44ae8e12cb2227afd8457342a9fdec758"
+        "sha256": "f42344209f7af41522dd6d50cb4830f44ae8e12cb2227afd8457342a9fdec758",
+        "publicSrc": "/brand/approved/concha-tradicional-vainilla-640.avif"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-vainilla-640.webp",
@@ -45,7 +48,8 @@
         "height": 640,
         "bytes": 57990,
         "format": "webp",
-        "sha256": "a0867612f52676fb5f318284e2152b4edaa748fb8a4b5b455dc97266e37bd3c5"
+        "sha256": "a0867612f52676fb5f318284e2152b4edaa748fb8a4b5b455dc97266e37bd3c5",
+        "publicSrc": "/brand/approved/concha-tradicional-vainilla-640.webp"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-vainilla-960.avif",
@@ -54,7 +58,8 @@
         "height": 960,
         "bytes": 73448,
         "format": "avif",
-        "sha256": "35bdcb05a728ba677ae7210db2cddd29cc057c108772c016557678a1bf803f6a"
+        "sha256": "35bdcb05a728ba677ae7210db2cddd29cc057c108772c016557678a1bf803f6a",
+        "publicSrc": "/brand/approved/concha-tradicional-vainilla-960.avif"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-vainilla-960.webp",
@@ -63,9 +68,11 @@
         "height": 960,
         "bytes": 105594,
         "format": "webp",
-        "sha256": "80629131a355914626e68ec1a1c9673fb1cd38c7e91b1e352fff491d3bf676c1"
+        "sha256": "80629131a355914626e68ec1a1c9673fb1cd38c7e91b1e352fff491d3bf676c1",
+        "publicSrc": "/brand/approved/concha-tradicional-vainilla-960.webp"
       }
-    ]
+    ],
+    "publicUsage": "category editorial only; no SKU assignment"
   },
   {
     "source": "concha-tradicional-chocolate.png",
@@ -86,7 +93,8 @@
         "height": 320,
         "bytes": 15025,
         "format": "avif",
-        "sha256": "aec540cdc39ed13433b77ef340f85b6f3ea38b645571ce3ec3cad2fc8ac6d442"
+        "sha256": "aec540cdc39ed13433b77ef340f85b6f3ea38b645571ce3ec3cad2fc8ac6d442",
+        "publicSrc": "/brand/approved/concha-tradicional-chocolate-320.avif"
       },
       {
         "file": "public/brand/approved/concha-tradicional-chocolate-320.webp",
@@ -95,7 +103,8 @@
         "height": 320,
         "bytes": 26092,
         "format": "webp",
-        "sha256": "d83540066a83399525cb5c3b9eef686dacb866e4f1e4fec19fb3dbd2373776f8"
+        "sha256": "d83540066a83399525cb5c3b9eef686dacb866e4f1e4fec19fb3dbd2373776f8",
+        "publicSrc": "/brand/approved/concha-tradicional-chocolate-320.webp"
       },
       {
         "file": "public/brand/approved/concha-tradicional-chocolate-640.avif",
@@ -104,7 +113,8 @@
         "height": 640,
         "bytes": 51705,
         "format": "avif",
-        "sha256": "db4b2fddd13fb57263d20b74a24f277a8f92cf9c3df81f767c34df1fc2bea700"
+        "sha256": "db4b2fddd13fb57263d20b74a24f277a8f92cf9c3df81f767c34df1fc2bea700",
+        "publicSrc": "/brand/approved/concha-tradicional-chocolate-640.avif"
       },
       {
         "file": "public/brand/approved/concha-tradicional-chocolate-640.webp",
@@ -113,7 +123,8 @@
         "height": 640,
         "bytes": 86244,
         "format": "webp",
-        "sha256": "910273dc75e3a4113864235a023b1bb27c7c502713ff348c4a21b843b1e3f14b"
+        "sha256": "910273dc75e3a4113864235a023b1bb27c7c502713ff348c4a21b843b1e3f14b",
+        "publicSrc": "/brand/approved/concha-tradicional-chocolate-640.webp"
       },
       {
         "file": "public/brand/approved/concha-tradicional-chocolate-960.avif",
@@ -122,7 +133,8 @@
         "height": 960,
         "bytes": 96680,
         "format": "avif",
-        "sha256": "6580131976775e3b54711533bbcef20caa76a93c7ae845b26ca20709fd2961ad"
+        "sha256": "6580131976775e3b54711533bbcef20caa76a93c7ae845b26ca20709fd2961ad",
+        "publicSrc": "/brand/approved/concha-tradicional-chocolate-960.avif"
       },
       {
         "file": "public/brand/approved/concha-tradicional-chocolate-960.webp",
@@ -131,9 +143,11 @@
         "height": 960,
         "bytes": 158302,
         "format": "webp",
-        "sha256": "baa8194fc124987b6d3d92e13b2e25abad77e0da1f391a6808013ffe526bcce8"
+        "sha256": "baa8194fc124987b6d3d92e13b2e25abad77e0da1f391a6808013ffe526bcce8",
+        "publicSrc": "/brand/approved/concha-tradicional-chocolate-960.webp"
       }
-    ]
+    ],
+    "publicUsage": "product and category"
   },
   {
     "source": "concha-tradicional-pistache.png",
@@ -154,7 +168,8 @@
         "height": 320,
         "bytes": 14078,
         "format": "avif",
-        "sha256": "05464fb0892d407417e8546b33244d8fbaa893e4dc99672bec57689869cba5a3"
+        "sha256": "05464fb0892d407417e8546b33244d8fbaa893e4dc99672bec57689869cba5a3",
+        "publicSrc": "/brand/approved/concha-tradicional-pistache-320.avif"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-pistache-320.webp",
@@ -163,7 +178,8 @@
         "height": 320,
         "bytes": 24178,
         "format": "webp",
-        "sha256": "245c7f26c83eae79c14022a24d6155f247b82a5bad81a01e6017dc788b818c05"
+        "sha256": "245c7f26c83eae79c14022a24d6155f247b82a5bad81a01e6017dc788b818c05",
+        "publicSrc": "/brand/approved/concha-tradicional-pistache-320.webp"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-pistache-640.avif",
@@ -172,7 +188,8 @@
         "height": 640,
         "bytes": 47905,
         "format": "avif",
-        "sha256": "9de9b0b29154f321cc0a53bd074cb078849c86982ce457bce3ead651f5af6652"
+        "sha256": "9de9b0b29154f321cc0a53bd074cb078849c86982ce457bce3ead651f5af6652",
+        "publicSrc": "/brand/approved/concha-tradicional-pistache-640.avif"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-pistache-640.webp",
@@ -181,7 +198,8 @@
         "height": 640,
         "bytes": 78440,
         "format": "webp",
-        "sha256": "77e824af434737d85a966a409f91c176f042d62c57fb3782a5d7d4ee1631264f"
+        "sha256": "77e824af434737d85a966a409f91c176f042d62c57fb3782a5d7d4ee1631264f",
+        "publicSrc": "/brand/approved/concha-tradicional-pistache-640.webp"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-pistache-960.avif",
@@ -190,7 +208,8 @@
         "height": 960,
         "bytes": 91006,
         "format": "avif",
-        "sha256": "600d918d5269d54974563acffcee6788bfb01f6cfb09a6d3a584d6d3d754c031"
+        "sha256": "600d918d5269d54974563acffcee6788bfb01f6cfb09a6d3a584d6d3d754c031",
+        "publicSrc": "/brand/approved/concha-tradicional-pistache-960.avif"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-pistache-960.webp",
@@ -199,9 +218,11 @@
         "height": 960,
         "bytes": 140588,
         "format": "webp",
-        "sha256": "c9fd38d648007bc261aa984ed13e50cfd6a572d072da877c0dd2b31561a3c406"
+        "sha256": "c9fd38d648007bc261aa984ed13e50cfd6a572d072da877c0dd2b31561a3c406",
+        "publicSrc": "/brand/approved/concha-tradicional-pistache-960.webp"
       }
-    ]
+    ],
+    "publicUsage": "category editorial only; no SKU assignment"
   },
   {
     "source": "concha-tradicional-tricolor-mexico.png",
@@ -222,7 +243,8 @@
         "height": 320,
         "bytes": 14346,
         "format": "avif",
-        "sha256": "cf26fdff15257af72a827f01d51bcbc6480366046fb2a369161111e802f49900"
+        "sha256": "cf26fdff15257af72a827f01d51bcbc6480366046fb2a369161111e802f49900",
+        "publicSrc": "/brand/approved/concha-tradicional-tricolor-mexico-320.avif"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-tricolor-mexico-320.webp",
@@ -231,7 +253,8 @@
         "height": 320,
         "bytes": 25066,
         "format": "webp",
-        "sha256": "7c5fe3adadf9bce1af1ac0f2f30c535ee382e6cc72d366b56edda238f043320e"
+        "sha256": "7c5fe3adadf9bce1af1ac0f2f30c535ee382e6cc72d366b56edda238f043320e",
+        "publicSrc": "/brand/approved/concha-tradicional-tricolor-mexico-320.webp"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-tricolor-mexico-640.avif",
@@ -240,7 +263,8 @@
         "height": 640,
         "bytes": 49324,
         "format": "avif",
-        "sha256": "621098dc669466bbe93bc69bf024690b462c8028e6067e3e059df0497c71e3ba"
+        "sha256": "621098dc669466bbe93bc69bf024690b462c8028e6067e3e059df0497c71e3ba",
+        "publicSrc": "/brand/approved/concha-tradicional-tricolor-mexico-640.avif"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-tricolor-mexico-640.webp",
@@ -249,7 +273,8 @@
         "height": 640,
         "bytes": 81670,
         "format": "webp",
-        "sha256": "1b24318497526fd274b93b4b6fbb665d14ddbc461a446c9c2b583d421b2b04d7"
+        "sha256": "1b24318497526fd274b93b4b6fbb665d14ddbc461a446c9c2b583d421b2b04d7",
+        "publicSrc": "/brand/approved/concha-tradicional-tricolor-mexico-640.webp"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-tricolor-mexico-960.avif",
@@ -258,7 +283,8 @@
         "height": 960,
         "bytes": 93855,
         "format": "avif",
-        "sha256": "a08a1d9d9af205ad340db706e370c2dac1492134176174d107928363f197b0d8"
+        "sha256": "a08a1d9d9af205ad340db706e370c2dac1492134176174d107928363f197b0d8",
+        "publicSrc": "/brand/approved/concha-tradicional-tricolor-mexico-960.avif"
       },
       {
         "file": "docs/brand/conchas-approved/unassigned-derivatives/concha-tradicional-tricolor-mexico-960.webp",
@@ -267,8 +293,10 @@
         "height": 960,
         "bytes": 148752,
         "format": "webp",
-        "sha256": "2092ab53f1697110ddc8d16cde772022307cd79da258f03ef4e4a89db0b59f9e"
+        "sha256": "2092ab53f1697110ddc8d16cde772022307cd79da258f03ef4e4a89db0b59f9e",
+        "publicSrc": "/brand/approved/concha-tradicional-tricolor-mexico-960.webp"
       }
-    ]
+    ],
+    "publicUsage": "category editorial only; no SKU assignment"
   }
 ]

@@ -10,7 +10,7 @@ Base: `d7b141a5a2f19c080e6dce558cee2c8330c22fed`
 | Typecheck / lint / build | Passed |
 | Commerce unit/integration/payment suite | 445 / 445 |
 | Preserved Sites tests | 4 / 4 |
-| Conchas Chromium / WebKit, 390 / 1440, EN / ES / AR | 16 / 16 |
+| Conchas + shared Pan comparison Chromium / WebKit, 390 / 768 / 1440, EN / ES / AR | 28 / 28 |
 | Existing checkout Chromium, independent fixture DB | 19 / 19 |
 | Existing checkout WebKit, independent fixture DB | 19 / 19 |
 | Source hashes | 4 originals + 24 derivatives verified |
@@ -26,7 +26,7 @@ Catalog/menu data and all `server/`, `shared/` and PaymentFrame files are byte-i
 
 ## Visual comparison
 
-Full-page screenshots, local approved catalog fixture. Menu has only the four released Concha presentation products; unassigned art is never offered for sale. Mobile checkout has its existing order-summary drawer expanded to reveal the thumbnail. Product size selectors are also exercised independently of these captures.
+Full-page screenshots, local approved catalog fixture. Menu has only the four released Concha presentation products; Vanilla, Traditional Pistache and Tricolor appear only in the category gallery and are never offered as products. All public provenance labels were removed by Joel’s priority update. Mobile checkout has its existing order-summary drawer expanded to reveal the thumbnail. Product size selectors are also exercised independently of these captures.
 
 | View | Before | After |
 | --- | --- | --- |
@@ -38,3 +38,15 @@ Full-page screenshots, local approved catalog fixture. Menu has only the four re
 | Product 1440px | ![Before product 1440](before/product-1440.png) | ![After product 1440](after/product-1440.png) |
 | Cart 1440px | ![Before cart 1440](before/cart-1440.png) | ![After cart 1440](after/cart-1440.png) |
 | Checkout 1440px | ![Before checkout 1440](before/checkout-1440.png) | ![After checkout 1440](after/checkout-1440.png) |
+
+## Pan de Muerto reference vs Conchas
+
+Identical components and computed banner ratio/margins, card ratio/radius, image containment, grid gaps and transition timings at each breakpoint. Rotation, focus pause and reduced-motion behavior validated in Chromium/WebKit.
+
+| Width | Pan de Muerto reference | Conchas |
+| --- | --- | --- |
+| 390px | ![Pan 390](after/reference-pan-390.png) | ![Conchas 390](after/reference-conchas-390.png) |
+| 768px | ![Pan 768](after/reference-pan-768.png) | ![Conchas 768](after/reference-conchas-768.png) |
+| 1440px | ![Pan 1440](after/reference-pan-1440.png) | ![Conchas 1440](after/reference-conchas-1440.png) |
+
+[Exact file list](changed-files.txt). Original checkout tests are unchanged; the prior Pan-only gallery assertions now allow the explicitly approved Conchas editorial gallery.

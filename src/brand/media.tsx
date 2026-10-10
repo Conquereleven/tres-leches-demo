@@ -1,14 +1,17 @@
 import { useLanguage as useCustomerLanguage } from "./localization";
 import manifest from "./media-manifest.json";
+import categories from "./category-media.json";
 import official from "./official-pan-media.json";
 import { useEffect, useRef, useState } from "react";
 export const productMediaAssignments = [
   ...official.products,
   ...manifest.products,
 ];
-export const approvedMedia = [...official.assets, ...manifest.assets].filter(
-  (a) => a.status === "assigned",
-);
+export const approvedMedia = [
+  ...official.assets,
+  ...manifest.assets,
+  ...categories.assets,
+].filter((a) => a.status === "assigned");
 export function selectedMedia(family: string, variant: string, size?: string) {
   return approvedMedia.find(
     (a) =>
@@ -33,9 +36,18 @@ export function selectedProductMedia(
   );
 }
 type MediaAsset = (typeof approvedMedia)[number];
+/** Shared Pan de Muerto presentation, opt-in for future category assets. */
+export const usesMenuReferencePresentation = (asset: MediaAsset | undefined) =>
+  !!asset &&
+  (asset.sourceId.startsWith("official-pan-") ||
+    ("presentation" in asset && asset.presentation === "menu-reference"));
 /** Mixed boards shown for a whole category; never tied to a flavour or pack. */
 export const categoryEditorialMedia = (category: string) =>
-  (official.editorial.find((e) => e.category === category)?.sourceIds ?? [])
+  (
+    [...official.editorial, ...categories.editorial].find(
+      (e) => e.category === category,
+    )?.sourceIds ?? []
+  )
     .map((id) => approvedMedia.find((a) => a.sourceId === id))
     .filter((a): a is MediaAsset => !!a);
 const srcSet = (asset: MediaAsset, format: string) =>
@@ -228,7 +240,7 @@ export function ResponsiveMedia({
     ) : null;
   const gallery = rotate
     ? (
-        official.products.find((p) => p.productId === productId)
+        productMediaAssignments.find((p) => p.productId === productId)
           ?.gallerySourceIds ?? []
       )
         .map((id) => approvedMedia.find((a) => a.sourceId === id))
@@ -246,11 +258,7 @@ export function ResponsiveMedia({
   return (
     <MediaPicture
       asset={media}
-      alt={localize(
-        "mediaKind" in media && media.mediaKind === "digital-illustration"
-          ? media.alt
-          : alt,
-      )}
+      alt={localize(alt)}
       sizes={sizes}
       className={className}
       fallback={fallback}

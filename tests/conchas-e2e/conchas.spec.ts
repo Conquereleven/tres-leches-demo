@@ -1,7 +1,24 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync } from "node:fs";
-for (const width of [390, 1440])
+import type { Page } from "@playwright/test";
+async function capture(page: Page, path: string) {
+  // Full-page captures do not trigger below-fold lazy images by themselves.
+  for (const frame of await page.locator(".b-menu-card .b-menu-photo").all()) {
+    await frame.scrollIntoViewIfNeeded();
+    await expect
+      .poll(() =>
+        frame
+          .locator("picture.is-active img, img")
+          .first()
+          .evaluate((i: HTMLImageElement) => i.naturalWidth),
+      )
+      .toBeGreaterThan(0);
+  }
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({ path, fullPage: true });
+}
+for (const width of [390, 768, 1440])
   for (const locale of ["en", "es", "ar"]) {
     test(`conchas journey ${width} ${locale}`, async ({ page }, info) => {
       await page.setViewportSize({ width, height: 900 });
@@ -19,10 +36,7 @@ for (const width of [390, 1440])
       mkdirSync(root, { recursive: true });
       const shot = async (name: string) => {
         if (locale === "en" && info.project.name === "chromium")
-          await page.screenshot({
-            path: `${root}/${name}-${width}.png`,
-            fullPage: true,
-          });
+          await capture(page, `${root}/${name}-${width}.png`);
       };
       await visit(`/menu?category=conchas&lang=${locale}`);
       const card = page.locator(
@@ -57,12 +71,12 @@ for (const width of [390, 1440])
         expect(await image.evaluate((i) => getComputedStyle(i).objectFit)).toBe(
           "contain",
         );
-        await expect(page.locator(".b-menu-media-note")).toContainText(
-          locale === "en"
-            ? "Digital illustration"
-            : locale === "es"
-              ? "Ilustración digital"
-              : "رسم رقمي",
+        await expect(page.locator(".b-menu-media-note")).toHaveCount(0);
+        expect(await page.locator("main").innerText()).not.toMatch(
+          /digital illustration|AI generated|digitally generated|concept image|ilustración digital|رسم رقمي/i,
+        );
+        expect(await image.getAttribute("alt")).not.toMatch(
+          /digital|illustration|generated/i,
         );
         expect(
           (await new AxeBuilder({ page }).include(".b-menu-options").analyze())
@@ -87,7 +101,8 @@ for (const width of [390, 1440])
         );
       await shot("cart");
       await visit(`/checkout?lang=${locale}`);
-      if (width === 390) await page.locator(".b-co-summary-toggle").click();
+      if (await page.locator(".b-co-summary-toggle").isVisible())
+        await page.locator(".b-co-summary-toggle").click();
       await expect(page.locator(".b-co-thumb")).toBeVisible();
       if (!process.env.CONCHAS_BASELINE)
         await expect(page.locator(".b-co-thumb")).toHaveAttribute(
@@ -133,3 +148,71 @@ if (!process.env.CONCHAS_BASELINE)
           : /concha-tradicional-chocolate/,
       );
     });
+
+for (const width of [390, 768, 1440])
+  test(`shared Pan and Conchas presentation ${width}`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize({ width, height: 1000 });
+    const styles: unknown[] = [];
+    for (const category of ["pan", "conchas"]) {
+      const config = page.waitForResponse((r) =>
+        r.url().endsWith("/api/checkout/config"),
+      );
+      await page.goto(`/menu?category=${category}`);
+      await config;
+      const showcase = page.locator(".b-category-showcase");
+      await showcase.scrollIntoViewIfNeeded();
+      const rotation = showcase.locator(".b-official-rotation");
+      const first = rotation.locator("picture.is-active img");
+      await expect
+        .poll(() => first.evaluate((i: HTMLImageElement) => i.naturalWidth))
+        .toBeGreaterThan(0);
+      const src = await first.getAttribute("src");
+      await expect(first).not.toHaveAttribute("src", src!, { timeout: 10000 });
+      await rotation.focus();
+      const held = await first.getAttribute("src");
+      await page.waitForTimeout(3800);
+      await expect(first).toHaveAttribute("src", held!);
+      styles.push(
+        await page.evaluate(() => {
+          const banner = document.querySelector(".b-category-showcase")!;
+          const card = document.querySelector(".b-menu-card .b-menu-photo")!;
+          const img = card.querySelector("img")!;
+          const grid = document.querySelector(".b-menu-grid")!;
+          const b = banner.getBoundingClientRect();
+          const c = card.getBoundingClientRect();
+          return {
+            bannerRatio: Math.round((b.width / b.height) * 100),
+            bannerMargin: getComputedStyle(banner).marginBottom,
+            cardRatio: Math.round((c.width / c.height) * 100),
+            cardRadius: getComputedStyle(card).borderRadius,
+            imageFit: getComputedStyle(img).objectFit,
+            gridGap: getComputedStyle(grid).gap,
+            transition: getComputedStyle(
+              banner.querySelector("picture.is-active")!,
+            ).transition,
+          };
+        }),
+      );
+      if (info.project.name === "chromium")
+        await capture(
+          page,
+          `docs/brand/conchas-qa/after/reference-${category}-${width}.png`,
+        );
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      await rotation.scrollIntoViewIfNeeded();
+      await rotation.evaluate((node: HTMLElement) => node.blur());
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await expect(rotation.locator("picture.is-active img")).toHaveAttribute(
+        "src",
+        src!,
+      );
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+    }
+    expect(styles[0]).toEqual(styles[1]);
+  });

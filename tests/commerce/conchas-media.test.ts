@@ -6,8 +6,10 @@ import index from "../../docs/brand/conchas-approved/image-index.json";
 import {
   selectedProductMedia,
   productMediaAssignments,
+  categoryEditorialMedia,
+  usesMenuReferencePresentation,
 } from "../../src/brand/media";
-import { localizedSource } from "../../src/brand/locales/engine";
+
 test("approved original bytes and responsive derivatives retain source hashes", () => {
   for (const asset of index) {
     const source = readFileSync(
@@ -62,16 +64,23 @@ test("only chocolate receives the digital art; filled pistache and packs keep ex
     assert.ok(a.derivatives.every((d) => !d.file.startsWith("public/")));
   }
 });
-test("digital artwork label and descriptive alt are translated in every locale", () => {
-  for (const locale of ["en", "es", "ar"] as const)
-    for (const text of [
-      "Digital illustration",
-      "Digital illustration of a traditional chocolate concha on a wooden board",
-    ] as const) {
-      const translated = localizedSource(text, locale);
-      assert.notEqual(translated, "Translation pending");
-      assert.notEqual(translated, "Traducción pendiente");
-      assert.notEqual(translated, "الترجمة قيد الإعداد");
-      if (locale !== "en") assert.notEqual(translated, text);
+test("Conchas uses the menu reference pipeline with four category-only frames", () => {
+  const frames = categoryEditorialMedia("conchas");
+  assert.equal(frames.length, 4);
+  assert.ok(frames.every(usesMenuReferencePresentation));
+  for (const asset of frames) {
+    for (const d of asset.derivatives) {
+      assert.equal(readFileSync("public" + d.src).length, d.bytes);
     }
+    if (asset.family === "conchas-editorial")
+      assert.ok(
+        !productMediaAssignments.some(
+          (p) =>
+            p.primarySourceId === asset.sourceId ||
+            p.gallerySourceIds.some((id) => id === asset.sourceId),
+        ),
+      );
+  }
+  assert.equal(categoryEditorialMedia("pan").length, 4);
+  assert.equal(categoryEditorialMedia("cakes").length, 0);
 });
