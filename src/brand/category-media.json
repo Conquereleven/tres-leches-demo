@@ -197,16 +197,411 @@
           "src": "/brand/approved/concha-tradicional-tricolor-mexico-960.webp"
         }
       ]
+    },
+    {
+      "sourceId": "3l-conchas-final-conchas_de_pistache_sobre_tabla_de_madera",
+      "sourceFilename": "conchas_de_pistache_sobre_tabla_de_madera.png",
+      "family": "conchas-filled",
+      "variant": "Pistache",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "exact approved product and Conchas opening gallery",
+      "alt": "Concha rellena de pistache",
+      "status": "assigned",
+      "selectionReason": "Exact square image explicitly supplied by Joel, 10 October 2026; original bytes preserved; digital provenance internal, not a claim of real product photography.",
+      "mediaKind": "digital-illustration",
+      "presentation": "menu-reference",
+      "width": 1254,
+      "height": 1254,
+      "originalBytes": 2462939,
+      "derivatives": [
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-320.avif",
+          "width": 320,
+          "height": 320,
+          "bytes": 17295,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 25732,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-640.avif",
+          "width": 640,
+          "height": 640,
+          "bytes": 53900,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 74546,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-960.avif",
+          "width": 960,
+          "height": 960,
+          "bytes": 99182,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 131898,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-conchas-final-docena_de_conchas_de_chocolate_envuelta",
+      "sourceFilename": "docena_de_conchas_de_chocolate_envuelta.png",
+      "family": "conchas-traditional-pack",
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "exact approved product and Conchas opening gallery",
+      "alt": "Concha tradicional de chocolate · Pack",
+      "status": "assigned",
+      "selectionReason": "Exact square image explicitly supplied by Joel, 10 October 2026; original bytes preserved; digital provenance internal, not a claim of real product photography.",
+      "mediaKind": "digital-illustration",
+      "presentation": "menu-reference",
+      "width": 1254,
+      "height": 1254,
+      "originalBytes": 2837730,
+      "derivatives": [
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-320.avif",
+          "width": 320,
+          "height": 320,
+          "bytes": 19628,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 29468,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-640.avif",
+          "width": 640,
+          "height": 640,
+          "bytes": 62288,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 90836,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-960.avif",
+          "width": 960,
+          "height": 960,
+          "bytes": 119203,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 164044,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán",
+      "sourceFilename": "conchas_de_pistache_envueltas_en_celofán.png",
+      "family": "conchas-filled-pack",
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "exact approved product and Conchas opening gallery",
+      "alt": "Concha rellena de pistache · Pack",
+      "status": "assigned",
+      "selectionReason": "Exact square image explicitly supplied by Joel, 10 October 2026; original bytes preserved; digital provenance internal, not a claim of real product photography.",
+      "mediaKind": "digital-illustration",
+      "presentation": "menu-reference",
+      "width": 1254,
+      "height": 1254,
+      "originalBytes": 2693079,
+      "derivatives": [
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-320.avif",
+          "width": 320,
+          "height": 320,
+          "bytes": 22016,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 33064,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-640.avif",
+          "width": 640,
+          "height": 640,
+          "bytes": 64657,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 93722,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-960.avif",
+          "width": 960,
+          "height": 960,
+          "bytes": 116914,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 162158,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-conchas-final-conchas_de_pistache_sobre_tabla_de_madera-opening-horizontal",
+      "sourceFilename": "docs/brand/conchas-final-approved/superseded-horizontal-originals/conchas_de_pistache_sobre_tabla_de_madera.png",
+      "family": null,
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "Conchas opening gallery only; never a purchasable product image",
+      "alt": "Concha rellena de pistache",
+      "status": "assigned",
+      "selectionReason": "Original approved horizontal opening frame retained separately from the new square product image, per Joel.",
+      "mediaKind": "digital-illustration",
+      "presentation": "menu-reference-landscape",
+      "width": 1448,
+      "height": 1086,
+      "originalBytes": 2369952,
+      "derivatives": [
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-320.avif",
+          "width": 320,
+          "height": 240,
+          "bytes": 13358,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-320.webp",
+          "width": 320,
+          "height": 240,
+          "bytes": 17816,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-640.avif",
+          "width": 640,
+          "height": 480,
+          "bytes": 43181,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-640.webp",
+          "width": 640,
+          "height": 480,
+          "bytes": 59230,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-960.avif",
+          "width": 960,
+          "height": 720,
+          "bytes": 82596,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-960.webp",
+          "width": 960,
+          "height": 720,
+          "bytes": 114616,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-conchas-final-docena_de_conchas_de_chocolate_envuelta-opening-horizontal",
+      "sourceFilename": "docs/brand/conchas-final-approved/superseded-horizontal-originals/docena_de_conchas_de_chocolate_envuelta.png",
+      "family": null,
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "Conchas opening gallery only; never a purchasable product image",
+      "alt": "Concha tradicional de chocolate · Pack",
+      "status": "assigned",
+      "selectionReason": "Original approved horizontal opening frame retained separately from the new square product image, per Joel.",
+      "mediaKind": "digital-illustration",
+      "presentation": "menu-reference-landscape",
+      "width": 1448,
+      "height": 1086,
+      "originalBytes": 2786680,
+      "derivatives": [
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-320.avif",
+          "width": 320,
+          "height": 240,
+          "bytes": 13952,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-320.webp",
+          "width": 320,
+          "height": 240,
+          "bytes": 20154,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-640.avif",
+          "width": 640,
+          "height": 480,
+          "bytes": 45916,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-640.webp",
+          "width": 640,
+          "height": 480,
+          "bytes": 66300,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-960.avif",
+          "width": 960,
+          "height": 720,
+          "bytes": 92478,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-960.webp",
+          "width": 960,
+          "height": 720,
+          "bytes": 132456,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán-opening-horizontal",
+      "sourceFilename": "docs/brand/conchas-final-approved/superseded-horizontal-originals/conchas_de_pistache_envueltas_en_celofán.png",
+      "family": null,
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "Conchas opening gallery only; never a purchasable product image",
+      "alt": "Concha rellena de pistache · Pack",
+      "status": "assigned",
+      "selectionReason": "Original approved horizontal opening frame retained separately from the new square product image, per Joel.",
+      "mediaKind": "digital-illustration",
+      "presentation": "menu-reference-landscape",
+      "width": 1448,
+      "height": 1086,
+      "originalBytes": 2434161,
+      "derivatives": [
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-320.avif",
+          "width": 320,
+          "height": 240,
+          "bytes": 15475,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-320.webp",
+          "width": 320,
+          "height": 240,
+          "bytes": 21490,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-640.avif",
+          "width": 640,
+          "height": 480,
+          "bytes": 45530,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-640.webp",
+          "width": 640,
+          "height": 480,
+          "bytes": 65754,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-960.avif",
+          "width": 960,
+          "height": 720,
+          "bytes": 84326,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-960.webp",
+          "width": 960,
+          "height": 720,
+          "bytes": 116778,
+          "format": "webp"
+        }
+      ]
     }
   ],
   "editorial": [
     {
       "category": "conchas",
       "sourceIds": [
-        "3l-ai-concha-traditional-chocolate-20261010",
-        "3l-conchas-editorial-concha-tradicional-vainilla",
-        "3l-conchas-editorial-concha-tradicional-pistache",
-        "3l-conchas-editorial-concha-tradicional-tricolor-mexico"
+        "3l-conchas-final-conchas_de_pistache_sobre_tabla_de_madera-opening-horizontal",
+        "3l-conchas-final-docena_de_conchas_de_chocolate_envuelta-opening-horizontal",
+        "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán-opening-horizontal"
       ]
     }
   ]

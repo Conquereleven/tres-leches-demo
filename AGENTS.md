@@ -111,3 +111,16 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - The official wordmark appears once as an 8% watermark (Joel approved Proposal A) behind the Menu introduction only (`.b-menu-intro-mark`). Never on product photos, cards, galleries, detail pages, or as a repeating or global background.
 - The Pan de Muerto category banner is back (Lisa): the four mixed boards, whole, 3:2, same 3.5 s rotation. No banners on other categories. This supersedes the earlier "banner removed" decision.
 - Pack photos are square by continuing each photo's own background (`extend` in `scripts/official-pan-crops.json`); breads are never copied, moved or redrawn. The filled pack uses its own asset (`official-pan-13-pack`) so Crema diplomática's approved third photo is untouched.
+
+## Final Conchas visual batch (10 October 2026, Joel)
+- The approved filled Pistache and two pack artworks are exact product images and the three-frame Conchas opening gallery. See `docs/brand/conchas-final-approved/` for untouched originals, assignments and hashes.
+- Reuse Pan de Muerto `MediaRotation`, 3:2 banner, panel radius, transitions and pause/reduced-motion behavior. Product frames and thumbnails follow the shared Pan reference with contain fit; never aggressively crop or stretch the artwork. Preserve the four existing traditional-flavour assignments.
+- Digital provenance stays in internal manifests, never a public badge or a claim of real photography. Visual-only integration: no commercial data, provider, delivery or Production changes.
+
+## Conchas visual reference correction (10 October 2026, Joel)
+- The final instruction supersedes the earlier horizontal product-frame direction: Conchas must match the actual Pan de Muerto design exactly. Both use square product cards/details with the shared panel radius, plus the horizontal 3:2 opening gallery. Cart/checkout use the same existing square thumbnail component. No Conchas-specific frame override.
+- Preserve all seven exact image assignments, the three-frame opening gallery, responsive derivatives and the shared MediaRotation behavior. Measure full style parity, equal heights and row alignment at 390/768/1440 in Chromium/WebKit. No commercial or Production changes.
+
+## Exact square Conchas sources (10 October 2026, Joel)
+- Use the newly supplied 05_41_25 / 05_41_27 / 05_41_29 square PNGs for filled Pistache / chocolate pack / filled Pistache pack. They supersede the earlier horizontal artworks with baked margins. Preserve source bytes and existing product/source identifiers; generate versioned square derivatives. All seven cards must be visually filled like Tricolor, not merely have equal CSS dimensions. No cropping or image generation.
+- The opening gallery must retain the previous three horizontal images. They are independent editorial assets; the new square replacements apply only to products/details/cart/checkout. Never automatically replace the banner from a product-image change.
