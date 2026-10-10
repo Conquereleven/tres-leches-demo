@@ -3164,6 +3164,33 @@
       "variant": "Chocolate"
     },
     {
+      "productId": "conchas-traditional--vainilla",
+      "slug": "conchas-traditional--vainilla",
+      "status": "DIGITAL ILLUSTRATION — LISA APPROVED; SKU AUTHORIZED",
+      "primarySourceId": "3l-conchas-editorial-concha-tradicional-vainilla",
+      "gallerySourceIds": [],
+      "familyId": "conchas-traditional",
+      "variant": "Vainilla"
+    },
+    {
+      "productId": "conchas-traditional--pistache",
+      "slug": "conchas-traditional--pistache",
+      "status": "DIGITAL ILLUSTRATION — LISA APPROVED; SKU AUTHORIZED",
+      "primarySourceId": "3l-conchas-editorial-concha-tradicional-pistache",
+      "gallerySourceIds": [],
+      "familyId": "conchas-traditional",
+      "variant": "Pistache"
+    },
+    {
+      "productId": "conchas-traditional--tricolor",
+      "slug": "conchas-traditional--tricolor",
+      "status": "DIGITAL ILLUSTRATION — LISA APPROVED; SKU AUTHORIZED",
+      "primarySourceId": "3l-conchas-editorial-concha-tradicional-tricolor-mexico",
+      "gallerySourceIds": [],
+      "familyId": "conchas-traditional",
+      "variant": "Tricolor"
+    },
+    {
       "productId": "conchas-filled--pistache",
       "slug": "conchas-filled--pistache",
       "status": "PHOTO PENDING FROM LISA",
