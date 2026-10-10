@@ -57,7 +57,7 @@ test("each traditional Concha receives exact approved artwork, filled pistache a
     ["vainilla", "Vainilla", "3l-conchas-editorial-concha-tradicional-vainilla"],
     ["pistache", "Pistache", "3l-conchas-editorial-concha-tradicional-pistache"],
     ["tricolor", "Tricolor", "3l-conchas-editorial-concha-tradicional-tricolor-mexico"],
-  ]) assert.equal(selectedProductMedia(`conchas-traditional--${slug}`, "conchas-traditional", label)?.sourceId, source);
+  ] as const) assert.equal(selectedProductMedia(`conchas-traditional--${slug}`, "conchas-traditional", label)?.sourceId, source);
   assert.equal(productMediaAssignments.filter((p) => p.productId.startsWith("conchas-traditional--") && p.primarySourceId).length, 4);
   for (const a of index.filter((x) => !x.productId)) {
     assert.ok(!existsSync("public/brand/approved/" + a.source));
