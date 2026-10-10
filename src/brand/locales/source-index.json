@@ -1056,5 +1056,8 @@
   "Choose {0}": "checkout:copy_3b653968d5a63081",
   "3L Pastelerías": "checkout:copy_e53477c894279e40",
   "Billing address for your card": "checkout:copy_b32f970b25f3fef5",
-  "Continue": "checkout:copy_31fbef162594de01"
+  "Continue": "checkout:copy_31fbef162594de01",
+  "Concha tradicional de vainilla": "menu:copy_8ac93f91a21b40c1",
+  "Concha tradicional de pistache": "menu:copy_8ac93f91a21b40c2",
+  "Concha tradicional tricolor": "menu:copy_8ac93f91a21b40c3"
 }
