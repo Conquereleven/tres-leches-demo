@@ -3,16 +3,19 @@
     {
       "sourceId": "3l-conchas-editorial-concha-tradicional-vainilla",
       "sourceFilename": "concha-tradicional-vainilla.png",
-      "family": "conchas-editorial",
-      "variant": "",
+      "family": "conchas-traditional",
+      "variant": "Vainilla",
       "size": null,
       "routes": [
-        "/menu"
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
       ],
-      "usage": "category editorial only; never a product or SKU",
-      "alt": "Conchas",
+      "usage": "exact approved traditional concha product and category gallery",
+      "alt": "Concha tradicional de vainilla",
       "status": "assigned",
-      "selectionReason": "Lisa approved digital artwork; category-only representation, not a real-product photograph.",
+      "selectionReason": "Lisa-approved illustration for the matching existing traditional variant; SKU activation authorized 2026-10-10",
       "mediaKind": "digital-illustration",
       "presentation": "menu-reference",
       "originalBytes": 2479338,
@@ -66,16 +69,19 @@
     {
       "sourceId": "3l-conchas-editorial-concha-tradicional-pistache",
       "sourceFilename": "concha-tradicional-pistache.png",
-      "family": "conchas-editorial",
-      "variant": "",
+      "family": "conchas-traditional",
+      "variant": "Pistache",
       "size": null,
       "routes": [
-        "/menu"
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
       ],
-      "usage": "category editorial only; never a product or SKU",
-      "alt": "Conchas",
+      "usage": "exact approved traditional concha product and category gallery",
+      "alt": "Concha tradicional de pistache",
       "status": "assigned",
-      "selectionReason": "Lisa approved digital artwork; category-only representation, not a real-product photograph.",
+      "selectionReason": "Lisa-approved illustration for the matching existing traditional variant; SKU activation authorized 2026-10-10",
       "mediaKind": "digital-illustration",
       "presentation": "menu-reference",
       "originalBytes": 2673121,
@@ -129,16 +135,19 @@
     {
       "sourceId": "3l-conchas-editorial-concha-tradicional-tricolor-mexico",
       "sourceFilename": "concha-tradicional-tricolor-mexico.png",
-      "family": "conchas-editorial",
-      "variant": "",
+      "family": "conchas-traditional",
+      "variant": "Tricolor",
       "size": null,
       "routes": [
-        "/menu"
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
       ],
-      "usage": "category editorial only; never a product or SKU",
-      "alt": "Conchas",
+      "usage": "exact approved traditional concha product and category gallery",
+      "alt": "Concha tradicional tricolor",
       "status": "assigned",
-      "selectionReason": "Lisa approved digital artwork; category-only representation, not a real-product photograph.",
+      "selectionReason": "Lisa-approved illustration for the matching existing traditional variant; SKU activation authorized 2026-10-10",
       "mediaKind": "digital-illustration",
       "presentation": "menu-reference",
       "originalBytes": 2646244,
