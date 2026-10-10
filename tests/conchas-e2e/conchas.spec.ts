@@ -216,3 +216,36 @@ for (const width of [390, 768, 1440])
     }
     expect(styles[0]).toEqual(styles[1]);
   });
+
+for (const [slug, image] of [
+  ["vainilla", "concha-tradicional-vainilla"],
+  ["pistache", "concha-tradicional-pistache"],
+  ["tricolor", "concha-tradicional-tricolor-mexico"],
+] as const) {
+  for (const [size, fils] of [["Mini · 40 g", 1100], ["Individual · 70 g", 1300]] as const) {
+    test(`new traditional ${slug} ${size}: image, menu, cart and checkout`, async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 860 });
+      const ready = page.waitForResponse(r => r.url().endsWith("/api/checkout/config"));
+      await page.goto(`/menu?product=conchas-traditional--${slug}&lang=es`);
+      await ready;
+      const card = page.locator('[data-menu-family="conchas-traditional"]');
+      const img = card.locator(".b-menu-photo img");
+      await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
+      await expect(img).toHaveAttribute("src", new RegExp(image));
+      const selector = card.locator(".b-menu-selectors select");
+      await selector.selectOption({ label: size });
+      await expect(card.locator(".b-menu-price")).toContainText(String(fils / 100));
+      await expect(card.locator(".b-menu-options button").last()).toBeEnabled();
+      await card.locator(".b-menu-options button").last().click();
+      const cartReady = page.waitForResponse(r => r.url().endsWith("/api/checkout/config"));
+      await page.goto("/cart?lang=es");
+      await cartReady;
+      await expect(page.locator(".b-co-thumb")).toHaveAttribute("src", new RegExp(image));
+      const checkoutReady = page.waitForResponse(r => r.url().endsWith("/api/checkout/config"));
+      await page.goto("/checkout?lang=es");
+      await checkoutReady;
+      if (await page.locator(".b-co-summary-toggle").isVisible()) await page.locator(".b-co-summary-toggle").click();
+      await expect(page.locator(".b-co-thumb")).toHaveAttribute("src", new RegExp(image));
+    });
+  }
+}
