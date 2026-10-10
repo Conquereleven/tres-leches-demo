@@ -120,3 +120,7 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 ## Conchas visual reference correction (10 October 2026, Joel)
 - The final instruction supersedes the earlier horizontal product-frame direction: Conchas must match the actual Pan de Muerto design exactly. Both use square product cards/details with the shared panel radius, plus the horizontal 3:2 opening gallery. Cart/checkout use the same existing square thumbnail component. No Conchas-specific frame override.
 - Preserve all seven exact image assignments, the three-frame opening gallery, responsive derivatives and the shared MediaRotation behavior. Measure full style parity, equal heights and row alignment at 390/768/1440 in Chromium/WebKit. No commercial or Production changes.
+
+## Exact square Conchas sources (10 October 2026, Joel)
+- Use the newly supplied 05_41_25 / 05_41_27 / 05_41_29 square PNGs for filled Pistache / chocolate pack / filled Pistache pack. They supersede the earlier horizontal artworks with baked margins. Preserve source bytes and existing product/source identifiers; generate versioned square derivatives. All seven cards must be visually filled like Tricolor, not merely have equal CSS dimensions. No cropping or image generation.
+- The opening gallery must retain the previous three horizontal images. They are independent editorial assets; the new square replacements apply only to products/details/cart/checkout. Never automatically replace the banner from a product-image change.

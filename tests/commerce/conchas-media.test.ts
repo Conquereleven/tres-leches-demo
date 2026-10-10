@@ -5,6 +5,7 @@ import { createHash } from "node:crypto";
 import index from "../../docs/brand/conchas-approved/image-index.json";
 import {
   selectedProductMedia,
+  approvedMedia,
   productMediaAssignments,
   categoryEditorialMedia,
   usesMenuReferencePresentation,
@@ -98,8 +99,13 @@ test("Conchas opens with the three approved final batch frames", () => {
     for (const d of asset.derivatives) {
       assert.equal(readFileSync("public" + d.src).length, d.bytes);
     }
+    assert.ok(asset.sourceId.endsWith("-opening-horizontal"));
+    assert.equal(asset.width! / asset.height!, 4 / 3);
+    assert.ok(asset.derivatives.every((d) => !d.src.includes("-square-v2-")));
     assert.ok(
-      productMediaAssignments.some((p) => p.primarySourceId === asset.sourceId),
+      !productMediaAssignments.some(
+        (p) => p.primarySourceId === asset.sourceId,
+      ),
     );
   }
   assert.equal(categoryEditorialMedia("pan").length, 4);
@@ -124,17 +130,17 @@ test("final batch maps filled Pistache and both packs exactly, retaining origina
       (p) => p.productId === item.productId,
     );
     assert.equal(assignment?.primarySourceId, item.sourceId);
-    const asset = categoryEditorialMedia("conchas").find(
-      (a) => a.sourceId === item.sourceId,
-    );
+    const asset = approvedMedia.find((a) => a.sourceId === item.sourceId);
     assert.ok(asset);
     assert.ok(asset.width && asset.height);
-    assert.equal(asset.width / asset.height, 4 / 3);
+    assert.equal(asset.width, 1254);
+    assert.equal(asset.height, 1254);
     for (const d of item.derivatives) {
       const data = readFileSync("public" + d.src);
       assert.equal(data.length, d.bytes);
       assert.equal(createHash("sha256").update(data).digest("hex"), d.sha256);
-      assert.ok(Math.abs(d.width / d.height - 4 / 3) < 0.01);
+      assert.equal(d.width, d.height);
+      assert.ok(d.src.includes("-square-v2-"));
     }
   }
 });

@@ -1,173 +1,191 @@
 [
   {
     "source": "conchas_de_pistache_sobre_tabla_de_madera.png",
-    "uploadedFilename": "Imagen de ChatGPT 10 oct 2026, 05_41_09 p.m-1.png",
+    "uploadedFilename": "Imagen de ChatGPT 10 oct 2026, 05_41_25 p.m-1.png",
     "sourceId": "3l-conchas-final-conchas_de_pistache_sobre_tabla_de_madera",
     "productId": "conchas-filled--pistache",
-    "sha256": "ab99d5d17cfd27518f6aada705e55b28ff6addeb16383403c51800703f64298f",
+    "sha256": "0219fcf7ed7d2a1df67c276c1fcb46bfd2897811c9ace03816e146d3a467433d",
     "derivatives": [
       {
-        "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-320.avif",
+        "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-320.avif",
         "width": 320,
-        "height": 240,
-        "bytes": 13358,
+        "height": 320,
+        "bytes": 17295,
         "format": "avif",
-        "sha256": "612348f7f228222ca26d4ea19132b0a728edf632931d12997a2a4a75d86e17c1"
+        "sha256": "f1379be8f3c8d4f71f4fe395d1be207b1f267651733606c3e9a12bda35b80c3b"
       },
       {
-        "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-320.webp",
+        "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-320.webp",
         "width": 320,
-        "height": 240,
-        "bytes": 17816,
+        "height": 320,
+        "bytes": 25732,
         "format": "webp",
-        "sha256": "7c6774d6e633a75f01f2fada985d1033d36b8e3ade6f9f875cee59dec267d0ca"
+        "sha256": "5c16c65a4fb4821686bbae84d9ea9cb97d1420cead1d5ed0bec6154b2a26873b"
       },
       {
-        "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-640.avif",
+        "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-640.avif",
         "width": 640,
-        "height": 480,
-        "bytes": 43181,
+        "height": 640,
+        "bytes": 53900,
         "format": "avif",
-        "sha256": "e7dbb6105191522a197980a731eb80bd3f4c77d31ca3faa67fbae72525bbaaa3"
+        "sha256": "2de8c0557870ea95eefe59ac0b65b10f9dfe1d68dbad9f77a5bd0f31e83ebed6"
       },
       {
-        "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-640.webp",
+        "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-640.webp",
         "width": 640,
-        "height": 480,
-        "bytes": 59230,
+        "height": 640,
+        "bytes": 74546,
         "format": "webp",
-        "sha256": "2e87c465ebe0fdc89158aeeee33bfde5e2bad59e7b651b00f39692f4023db21b"
+        "sha256": "a7a691ccbe10bb86c0238562a964e5cd2f71ba9c7cac47ec279e9486bf8f65f1"
       },
       {
-        "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-960.avif",
+        "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-960.avif",
         "width": 960,
-        "height": 720,
-        "bytes": 82596,
+        "height": 960,
+        "bytes": 99182,
         "format": "avif",
-        "sha256": "42a2e6cf7937689a9f5ceb60a08869caed070c4bc278e7c68e9a3eaafcf61d3a"
+        "sha256": "3b8be584e7f95106d95af996db72354de6b5deb77dd9cc958cda905b4d43c2c4"
       },
       {
-        "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-960.webp",
+        "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-960.webp",
         "width": 960,
-        "height": 720,
-        "bytes": 114616,
+        "height": 960,
+        "bytes": 131898,
         "format": "webp",
-        "sha256": "93dd3eaeb08d0afe90c9f4a524fa9b0110f2e3db513a2814e78a71e05583a84f"
+        "sha256": "30cf6647b7e24ccfbc9b23d85559dffedaad1505d0ab13d5c9681ed4bc46fc81"
       }
-    ]
+    ],
+    "supersededOriginal": {
+      "file": "superseded-horizontal-originals/conchas_de_pistache_sobre_tabla_de_madera.png",
+      "uploadedFilename": "Imagen de ChatGPT 10 oct 2026, 05_41_09 p.m-1.png",
+      "sha256": "ab99d5d17cfd27518f6aada705e55b28ff6addeb16383403c51800703f64298f"
+    },
+    "derivativeStem": "conchas_de_pistache_sobre_tabla_de_madera-square-v2"
   },
   {
     "source": "docena_de_conchas_de_chocolate_envuelta.png",
-    "uploadedFilename": "Imagen de ChatGPT 10 oct 2026, 05_41_11 p.m-2.png",
+    "uploadedFilename": "Imagen de ChatGPT 10 oct 2026, 05_41_27 p.m-2.png",
     "sourceId": "3l-conchas-final-docena_de_conchas_de_chocolate_envuelta",
     "productId": "conchas-traditional-pack",
-    "sha256": "8688e440f0971752496ed39670257207ef1234e4ee05845c1bdf2442b464e519",
+    "sha256": "6dc74f34cb1a024e0cff393ae2b008d0f2120b814c36c4afed34e5528b67a265",
     "derivatives": [
       {
-        "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-320.avif",
+        "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-320.avif",
         "width": 320,
-        "height": 240,
-        "bytes": 13952,
+        "height": 320,
+        "bytes": 19628,
         "format": "avif",
-        "sha256": "deea416073be223f65fb201a21e056e84376d73f039b4f4290fdd2cecd5cbab5"
+        "sha256": "1f7b2753acc3f944da2909b12e20e65c2cb1cefd294290985b3d5ccfcd2e20df"
       },
       {
-        "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-320.webp",
+        "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-320.webp",
         "width": 320,
-        "height": 240,
-        "bytes": 20154,
+        "height": 320,
+        "bytes": 29468,
         "format": "webp",
-        "sha256": "e1d9a05964cb934bc8c40812a192ff4b1b8f2f56b9b04699a3f665ee0f309b2e"
+        "sha256": "dc0ac1bf61853a9d055d1587c76637fce8274cb1b505de0159e166eb242e0864"
       },
       {
-        "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-640.avif",
+        "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-640.avif",
         "width": 640,
-        "height": 480,
-        "bytes": 45916,
+        "height": 640,
+        "bytes": 62288,
         "format": "avif",
-        "sha256": "7a73ef38ac01023fb062e27c05cdc959fb76195f7e11a6fbd993245d325da5c1"
+        "sha256": "8b16afff6a0f94fb7d45f7a44fd4d7b02fd4054cc6ac59c8ea6e0723ee724798"
       },
       {
-        "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-640.webp",
+        "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-640.webp",
         "width": 640,
-        "height": 480,
-        "bytes": 66300,
+        "height": 640,
+        "bytes": 90836,
         "format": "webp",
-        "sha256": "44e5353b3168e358c9697f319c4cd4b15f1e50d97a357e28cc6f51a62fcd66cb"
+        "sha256": "fd6ca834109e57733c86a78403c494c8938152f33b9bd064c3cbec4b24c55db4"
       },
       {
-        "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-960.avif",
+        "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-960.avif",
         "width": 960,
-        "height": 720,
-        "bytes": 92478,
+        "height": 960,
+        "bytes": 119203,
         "format": "avif",
-        "sha256": "ab4d041473ab5fe4c6c59b346a171b79bf5f14b17b835db117b51c519b1da06f"
+        "sha256": "8ff94f0c28813175f8b2d2cdf41fcc43d4e34442063399abecf6c1b71f3091ff"
       },
       {
-        "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-960.webp",
+        "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-960.webp",
         "width": 960,
-        "height": 720,
-        "bytes": 132456,
+        "height": 960,
+        "bytes": 164044,
         "format": "webp",
-        "sha256": "7d36ff9172d727684270f668e32de56d9a4e061d1494cc50a83e0aed99b6df4a"
+        "sha256": "edb73496a009ea5bec9e39c5d65301614dedd9fe8185364c3b27c7256de165c2"
       }
-    ]
+    ],
+    "supersededOriginal": {
+      "file": "superseded-horizontal-originals/docena_de_conchas_de_chocolate_envuelta.png",
+      "uploadedFilename": "Imagen de ChatGPT 10 oct 2026, 05_41_11 p.m-2.png",
+      "sha256": "8688e440f0971752496ed39670257207ef1234e4ee05845c1bdf2442b464e519"
+    },
+    "derivativeStem": "docena_de_conchas_de_chocolate_envuelta-square-v2"
   },
   {
     "source": "conchas_de_pistache_envueltas_en_celofán.png",
-    "uploadedFilename": "Imagen de ChatGPT 10 oct 2026, 05_41_13 p.m-3.png",
+    "uploadedFilename": "Imagen de ChatGPT 10 oct 2026, 05_41_29 p.m-3.png",
     "sourceId": "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán",
     "productId": "conchas-filled-pack",
-    "sha256": "cb1022cfe939269eec356d255d1398279ed0b74b3732144c0a9c39ac41d962df",
+    "sha256": "98c94a24a1da97d5138a34de82ff2349430e69ab32e3d50823773b3cd0e1177c",
     "derivatives": [
       {
-        "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-320.avif",
+        "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-320.avif",
         "width": 320,
-        "height": 240,
-        "bytes": 15475,
+        "height": 320,
+        "bytes": 22016,
         "format": "avif",
-        "sha256": "ae806ebe031af8bf676eb4fba058cec4d88cade60c6a855a2e66ca6fd6abc0c7"
+        "sha256": "4e03b804d009c040cda1c37444f9206e2933e4ec5c35e4007e1db571bfc546b0"
       },
       {
-        "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-320.webp",
+        "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-320.webp",
         "width": 320,
-        "height": 240,
-        "bytes": 21490,
+        "height": 320,
+        "bytes": 33064,
         "format": "webp",
-        "sha256": "e527401dc69eb34a545de4923cea93f398f715405186f5f350c9abf9459cb6ad"
+        "sha256": "71e53c6bba16f9018c443c66e3cd526e3b78647894439e0644740d3bea4993b3"
       },
       {
-        "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-640.avif",
+        "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-640.avif",
         "width": 640,
-        "height": 480,
-        "bytes": 45530,
+        "height": 640,
+        "bytes": 64657,
         "format": "avif",
-        "sha256": "12b6aaba6c899f47c1321b6d8b259bd5e6cf00772627797c3b973fb098312172"
+        "sha256": "61ff0311476d568973fadb1a73bb87cafa8a946d8a3140517f9902f2fd28370e"
       },
       {
-        "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-640.webp",
+        "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-640.webp",
         "width": 640,
-        "height": 480,
-        "bytes": 65754,
+        "height": 640,
+        "bytes": 93722,
         "format": "webp",
-        "sha256": "6f06284db5a5c53dc6daba2630cf5b03664cd6077c1601207e8ab1ed6026790c"
+        "sha256": "5b5398eda2a18d8d5b0f345a2b55fecb55836ac0d23740f96a2ff1b6276aff06"
       },
       {
-        "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-960.avif",
+        "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-960.avif",
         "width": 960,
-        "height": 720,
-        "bytes": 84326,
+        "height": 960,
+        "bytes": 116914,
         "format": "avif",
-        "sha256": "227f2cd23a8664b4200501fa6fc43885e1c8632c15bd67dd258d56867b873e71"
+        "sha256": "a523205044413ce32262c64db0a7970a02aebb6b347603bc3ed7f433ec8ff760"
       },
       {
-        "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-960.webp",
+        "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-960.webp",
         "width": 960,
-        "height": 720,
-        "bytes": 116778,
+        "height": 960,
+        "bytes": 162158,
         "format": "webp",
-        "sha256": "35b62290d6429fc23e5bbe85ed45059805630e473ce5b8de0eaad05947694281"
+        "sha256": "f558eaa742909313d4abe51bacc1a70ee1f931afd24959157107765d15a52904"
       }
-    ]
+    ],
+    "supersededOriginal": {
+      "file": "superseded-horizontal-originals/conchas_de_pistache_envueltas_en_celofán.png",
+      "uploadedFilename": "Imagen de ChatGPT 10 oct 2026, 05_41_13 p.m-3.png",
+      "sha256": "cb1022cfe939269eec356d255d1398279ed0b74b3732144c0a9c39ac41d962df"
+    },
+    "derivativeStem": "conchas_de_pistache_envueltas_en_celofán-square-v2"
   }
 ]

@@ -3,9 +3,9 @@
 Three user-approved digital images, integrated without changing commercial data.
 Original PNG bytes are preserved in `originals/`. `image-index.json` records the
 uploaded filenames, approved semantic filenames, product assignments, hashes and
-all responsive derivatives. The upload filenames differed from the brief; the
-three horizontal versions were identified by their exact depicted products.
-The alternate square versions in Downloads are not used.
+all responsive derivatives. Joel supplied the exact three square replacements (05_41_25, 05_41_27,
+05_41_29). These are now authoritative. Earlier horizontal originals are preserved
+in `superseded-horizontal-originals/` with their hashes in the index.
 
 | Product | Approved image |
 | --- | --- |
@@ -13,13 +13,13 @@ The alternate square versions in Downloads are not used.
 | Concha tradicional de chocolate · Pack | docena_de_conchas_de_chocolate_envuelta.png |
 | Concha rellena de pistache · Pack | conchas_de_pistache_envueltas_en_celofán.png |
 
-These three assets also form the Conchas opening gallery, through the existing
+The earlier three horizontal assets remain in the Conchas opening gallery, through the existing
 Pan de Muerto `MediaRotation` (same timing, crossfade, focus/hover pause and
 reduced-motion behavior). The shared banner is 3:2, with the existing 20px panel
 radius. All seven Conchas product frames use the same square Pan de Muerto
 presentation, with contain fit; cart/checkout retain the shared square thumbnails.
-Original composition and embedded margins stay intact. All seven image
-assignments remain unchanged. No category-specific frame system is used.
+The square sources fill each product frame like Tricolor, with no baked-in letterbox margins.
+Original composition remains intact. Product/source identifiers remain unchanged; the opening gallery uses separate editorial identifiers. No category-specific frame system is used.
 
 Provenance is internal; no public digital/AI badge or claim of real photography.
 AVIF/WebP derivatives at 320/640/960px retain original proportions, with no crop.

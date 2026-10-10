@@ -194,6 +194,9 @@ for (const width of [390, 768, 1440])
             cardWidth: c.width,
             cardHeight: c.height,
             imageWidth: img.getBoundingClientRect().width,
+            sourceRatio:
+              (img as HTMLImageElement).naturalWidth /
+              (img as HTMLImageElement).naturalHeight,
             imageHeight: img.getBoundingClientRect().height,
             cardMargin: getComputedStyle(card).margin,
             titleMargin: getComputedStyle(
@@ -329,6 +332,10 @@ for (const width of [390, 768, 1440])
       ratio: getComputedStyle(el).aspectRatio,
       radius: getComputedStyle(el).borderRadius,
     }));
+    await expect(banner.locator("picture.is-active img")).not.toHaveAttribute(
+      "src",
+      /square-v2/,
+    );
     expect(bannerStyle.ratio).toBe("3 / 2");
     expect(parseFloat(bannerStyle.radius)).toBeGreaterThan(0);
     if (info.project.name === "chromium")
@@ -446,6 +453,9 @@ for (const width of [390, 768, 1440])
           fit: getComputedStyle(img).objectFit,
           imageHeight: img.getBoundingClientRect().height,
           imageWidth: img.getBoundingClientRect().width,
+          sourceRatio:
+            (img as HTMLImageElement).naturalWidth /
+            (img as HTMLImageElement).naturalHeight,
         };
       }),
     );
@@ -454,6 +464,7 @@ for (const width of [390, 768, 1440])
       expect(f.radius).toBe("20px");
       expect(f.overflow).toBe("hidden");
       expect(f.fit).toBe("contain");
+      expect(f.sourceRatio).toBe(1);
       expect(f.background).toBe(frames[0]!.background);
       expect(f.height).toBeCloseTo(frames[0]!.height, 0);
       expect(f.width / f.height).toBeCloseTo(1, 2);

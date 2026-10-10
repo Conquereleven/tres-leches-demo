@@ -11,7 +11,8 @@
     "overflow": "hidden",
     "fit": "contain",
     "imageHeight": 350,
-    "imageWidth": 350
+    "imageWidth": 350,
+    "sourceRatio": 1
   },
   {
     "id": "conchas-traditional--vainilla",
@@ -25,7 +26,8 @@
     "overflow": "hidden",
     "fit": "contain",
     "imageHeight": 350,
-    "imageWidth": 350
+    "imageWidth": 350,
+    "sourceRatio": 1
   },
   {
     "id": "conchas-traditional--pistache",
@@ -39,7 +41,8 @@
     "overflow": "hidden",
     "fit": "contain",
     "imageHeight": 350,
-    "imageWidth": 350
+    "imageWidth": 350,
+    "sourceRatio": 1
   },
   {
     "id": "conchas-traditional--tricolor",
@@ -53,7 +56,8 @@
     "overflow": "hidden",
     "fit": "contain",
     "imageHeight": 350,
-    "imageWidth": 350
+    "imageWidth": 350,
+    "sourceRatio": 1
   },
   {
     "id": "conchas-filled--pistache",
@@ -67,7 +71,8 @@
     "overflow": "hidden",
     "fit": "contain",
     "imageHeight": 350,
-    "imageWidth": 350
+    "imageWidth": 350,
+    "sourceRatio": 1
   },
   {
     "id": "conchas-traditional-pack",
@@ -81,7 +86,8 @@
     "overflow": "hidden",
     "fit": "contain",
     "imageHeight": 350,
-    "imageWidth": 350
+    "imageWidth": 350,
+    "sourceRatio": 1
   },
   {
     "id": "conchas-filled-pack",
@@ -95,6 +101,7 @@
     "overflow": "hidden",
     "fit": "contain",
     "imageHeight": 350,
-    "imageWidth": 350
+    "imageWidth": 350,
+    "sourceRatio": 1
   }
 ]

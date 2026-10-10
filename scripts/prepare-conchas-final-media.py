@@ -21,7 +21,7 @@ for item in index:
     for width in (320, 640, 960):
         thumb = image.resize((width, round(image.height * width / image.width)), Image.Resampling.LANCZOS)
         for fmt in ('avif', 'webp'):
-            src = f"/brand/approved/{original.stem}-{width}.{fmt}"
+            src = f"/brand/approved/{item.get('derivativeStem', original.stem)}-{width}.{fmt}"
             target = repo / 'public' / src.lstrip('/')
             thumb.save(target, quality=65 if fmt == 'avif' else 82)
             data = dict(src=src, width=width, height=thumb.height, bytes=target.stat().st_size, format=fmt)

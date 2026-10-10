@@ -4,14 +4,16 @@ Joel's final correction supersedes the earlier horizontal product-card request.
 Conchas now uses the actual Pan de Muerto design, without its own frame rules:
 
 - square product cards and details; shared 20px panel radius, cream and contain fit;
-- the shared 3:2 opening gallery, with the three approved Conchas images;
+- the shared 3:2 opening gallery, with the three previous horizontal Conchas images;
 - identical grid, spacing, title/selector styling and MediaRotation crossfade,
   hover/focus pause and reduced-motion behavior;
 - the existing square cart/checkout thumbnails, with their shared 12px radius.
 
-All seven exact image assignments and responsive AVIF/WebP derivatives remain
-unchanged. Whole artwork stays visible, including margins contained in the
-approved originals. No cropping, stretching, new images or public provenance badges.
+The four traditional image assignments are unchanged. The three new square
+originals supplied by Joel replace product imagery only, retaining product/source
+identifiers. The earlier horizontal images remain in the opening gallery as
+independent editorial assets. Square product sources fill the frames like Tricolor,
+without internal letterbox bands. No cropping, stretching or public provenance badges.
 
 ## Comparison and journey captures
 
