@@ -187,8 +187,8 @@
       "category": "Conchas",
       "description": "Conchas tradicional · Vainilla · Mini · 40 g",
       "priceAed": "11.00",
-      "active": false,
-      "availability": "unavailable"
+      "active": true,
+      "availability": "available"
     },
     {
       "id": "conchas-traditional-vainilla-individual-70-g",
@@ -196,8 +196,8 @@
       "category": "Conchas",
       "description": "Conchas tradicional · Vainilla · Individual · 70 g",
       "priceAed": "13.00",
-      "active": false,
-      "availability": "unavailable"
+      "active": true,
+      "availability": "available"
     },
     {
       "id": "conchas-traditional-chocolate-mini-40-g",
@@ -223,8 +223,8 @@
       "category": "Conchas",
       "description": "Conchas tradicional · Pistache · Mini · 40 g",
       "priceAed": "11.00",
-      "active": false,
-      "availability": "unavailable"
+      "active": true,
+      "availability": "available"
     },
     {
       "id": "conchas-traditional-pistache-individual-70-g",
@@ -232,8 +232,8 @@
       "category": "Conchas",
       "description": "Conchas tradicional · Pistache · Individual · 70 g",
       "priceAed": "13.00",
-      "active": false,
-      "availability": "unavailable"
+      "active": true,
+      "availability": "available"
     },
     {
       "id": "conchas-traditional-tricolor-mini-40-g",
@@ -241,8 +241,8 @@
       "category": "Conchas",
       "description": "Conchas tradicional · Tricolor · Mini · 40 g",
       "priceAed": "11.00",
-      "active": false,
-      "availability": "unavailable"
+      "active": true,
+      "availability": "available"
     },
     {
       "id": "conchas-traditional-tricolor-individual-70-g",
@@ -250,8 +250,8 @@
       "category": "Conchas",
       "description": "Conchas tradicional · Tricolor · Individual · 70 g",
       "priceAed": "13.00",
-      "active": false,
-      "availability": "unavailable"
+      "active": true,
+      "availability": "available"
     },
     {
       "id": "conchas-filled-crema-diplomatica-vainilla-mini",
