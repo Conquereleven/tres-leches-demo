@@ -96,40 +96,59 @@ test("a cart holding a removed combination cannot be quoted or paid, even if a s
     );
 });
 
-test("every other product keeps its SKUs, variants and sizes; only officially repriced SKUs change price", () => {
+test("only six approved Conchas SKUs join the preserved catalog and pricing", () => {
   const before = released("src/brand/menu-data.json");
   const after = JSON.parse(readFileSync("src/brand/menu-data.json", "utf8"));
   assert.deepEqual(after.categories, before.categories);
+  const newFlavours = [
+    ["vainilla", "Vainilla", "Concha tradicional de vainilla"],
+    ["pistache", "Pistache", "Concha tradicional de pistache"],
+    ["tricolor", "Tricolor", "Concha tradicional tricolor"],
+  ] as const;
+  const six = new Set(newFlavours.flatMap(([slug]) => [
+    `conchas-traditional-${slug}-mini-40-g`,
+    `conchas-traditional-${slug}-individual-70-g`,
+  ]));
+  const expectedOptions = newFlavours.flatMap(([slug, variant]) => [
+    { id: `conchas-traditional-${slug}-mini-40-g`, variant, size: "Mini · 40 g", priceFils: 1100 },
+    { id: `conchas-traditional-${slug}-individual-70-g`, variant, size: "Individual · 70 g", priceFils: 1300 },
+  ]);
   assert.deepEqual(
     after.families,
-    before.families.map(
-      (f: { options: { id: string; priceFils: number }[] }) => ({
-        ...f,
-        options: f.options
-          .filter((o) => !RETIRED_SKUS.has(o.id))
-          .map((o) => ({
-            ...o,
-            priceFils: OFFICIAL_PRICES_FILS[o.id] ?? o.priceFils,
-          })),
-      }),
-    ),
+    before.families.map((f: { id: string; options: { id: string; priceFils: number }[] }) => ({
+      ...f,
+      options: [
+        ...f.options
+          .filter(o => !RETIRED_SKUS.has(o.id))
+          .map(o => ({ ...o, priceFils: OFFICIAL_PRICES_FILS[o.id] ?? o.priceFils })),
+        ...(f.id === "conchas-traditional" ? expectedOptions : []),
+      ],
+    })),
   );
-  const productsBefore = released("shared/storefront-products.json");
-  assert.deepEqual(
-    storefrontProducts,
-    productsBefore.filter((p: { id: string }) => !REMOVED.includes(p.id)),
+  const productsBefore = released("shared/storefront-products.json").filter(
+    (p: { id: string }) => !REMOVED.includes(p.id),
   );
+  const insertAt = productsBefore.findIndex((p: { id: string }) => p.id === "conchas-traditional--chocolate");
+  assert.ok(insertAt >= 0);
+  productsBefore.splice(insertAt + 1, 0, ...newFlavours.map(([slug, variant, title]) => ({
+    id: `conchas-traditional--${slug}`,
+    slug: `conchas-traditional--${slug}`,
+    familyId: "conchas-traditional",
+    variant,
+    title,
+    optionIds: [`conchas-traditional-${slug}-mini-40-g`, `conchas-traditional-${slug}-individual-70-g`],
+  })));
+  assert.deepEqual(storefrontProducts, productsBefore);
   const importBefore = released("data-imports/liza-current-menu.json");
   assert.deepEqual(
     imported().items.filter((i: { id: string }) => !RETIRED_SKUS.has(i.id)),
     importBefore.items
       .filter((i: { id: string }) => !RETIRED_SKUS.has(i.id))
-      .map((i: { id: string; priceAed: string }) => ({
+      .map((i: { id: string; priceAed: string; active: boolean; availability: string }) => ({
         ...i,
-        priceAed:
-          i.id in OFFICIAL_PRICES_FILS
-            ? (OFFICIAL_PRICES_FILS[i.id]! / 100).toFixed(2)
-            : i.priceAed,
+        priceAed: i.id in OFFICIAL_PRICES_FILS ? (OFFICIAL_PRICES_FILS[i.id]! / 100).toFixed(2) : i.priceAed,
+        active: six.has(i.id) ? true : i.active,
+        availability: six.has(i.id) ? "available" : i.availability,
       })),
   );
   for (const [variant, family, price] of [
