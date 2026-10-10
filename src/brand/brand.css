@@ -3244,3 +3244,10 @@ a.b-return {
   font-size: 0.7rem;
   color: var(--text-secondary);
 }
+
+/* Approved digital artwork is disclosed separately from product photography. */
+.brand-experience .b-menu-media-note {
+  margin: 0.6rem 0;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}

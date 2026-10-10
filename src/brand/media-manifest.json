@@ -2861,6 +2861,71 @@
       "status": "available but unused",
       "reason": "Alternate approved angle retained for future gallery",
       "variant": "Saffron"
+    },
+    {
+      "sourceId": "3l-ai-concha-traditional-chocolate-20261010",
+      "sourceFilename": "concha-tradicional-chocolate.png",
+      "family": "conchas-traditional",
+      "variant": "Chocolate",
+      "size": null,
+      "routes": [
+        "/menu",
+        "/products",
+        "/cart",
+        "/checkout"
+      ],
+      "usage": "primary/card/checkout thumbnail",
+      "alt": "Digital illustration of a traditional chocolate concha on a wooden board",
+      "status": "assigned",
+      "selectionReason": "Lisa-approved digital illustration, authorized for development and QA on 10 October 2026; not a photograph of the actual product.",
+      "originalBytes": 2797774,
+      "width": 1254,
+      "height": 1254,
+      "derivatives": [
+        {
+          "src": "/brand/approved/concha-tradicional-chocolate-320.avif",
+          "width": 320,
+          "height": 320,
+          "bytes": 15025,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/concha-tradicional-chocolate-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 26092,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/concha-tradicional-chocolate-640.avif",
+          "width": 640,
+          "height": 640,
+          "bytes": 51705,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/concha-tradicional-chocolate-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 86244,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/concha-tradicional-chocolate-960.avif",
+          "width": 960,
+          "height": 960,
+          "bytes": 96680,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/concha-tradicional-chocolate-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 158302,
+          "format": "webp"
+        }
+      ],
+      "mediaKind": "digital-illustration"
     }
   ],
   "editorial": [
@@ -3091,8 +3156,8 @@
     {
       "productId": "conchas-traditional--chocolate",
       "slug": "conchas-traditional--chocolate",
-      "status": "PHOTO PENDING FROM LISA",
-      "primarySourceId": null,
+      "status": "DIGITAL ILLUSTRATION — LISA APPROVED",
+      "primarySourceId": "3l-ai-concha-traditional-chocolate-20261010",
       "gallerySourceIds": [],
       "familyId": "conchas-traditional",
       "variant": "Chocolate"

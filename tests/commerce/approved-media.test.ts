@@ -5,9 +5,9 @@ import manifest from "../../src/brand/media-manifest.json";
 import { menuFamilies } from "../../src/brand/menu";
 import { selectedMedia } from "../../src/brand/media";
 test("all curated media match actual catalog variants and ship responsive derivatives, never originals", () => {
-  assert.equal(manifest.assets.length, 80);
+  assert.equal(manifest.assets.length, 81);
   const assigned = manifest.assets.filter((a) => a.status === "assigned");
-  assert.equal(assigned.length, 35);
+  assert.equal(assigned.length, 36);
   for (const a of assigned) {
     const family = menuFamilies.find((f) => f.id === a.family);
     assert.ok(family);

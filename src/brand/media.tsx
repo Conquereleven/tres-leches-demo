@@ -49,23 +49,39 @@ function MediaPicture({
   sizes,
   className,
   active,
+  fallback,
 }: {
   asset: MediaAsset;
   alt: string;
   sizes: string;
   className?: string;
   active?: boolean;
+  fallback?: string | null;
 }) {
+  const [failed, setFailed] = useState(0);
+  const digital =
+    "mediaKind" in asset && asset.mediaKind === "digital-illustration";
   const webp = asset.derivatives.filter((d) => d.format === "webp");
   return (
     <picture
       className={active ? "is-active" : undefined}
       aria-hidden={active === false || undefined}
+      data-media-kind={digital ? "digital-illustration" : undefined}
     >
-      <source type="image/avif" srcSet={srcSet(asset, "avif")} sizes={sizes} />
+      {failed === 0 && (
+        <source
+          type="image/avif"
+          srcSet={srcSet(asset, "avif")}
+          sizes={sizes}
+        />
+      )}
       <img
-        src={(webp.find((d) => d.width === 640) ?? webp[0])?.src}
-        srcSet={srcSet(asset, "webp")}
+        src={
+          failed >= 2 && fallback
+            ? fallback
+            : (webp.find((d) => d.width === 640) ?? webp[0])?.src
+        }
+        srcSet={failed >= 2 ? undefined : srcSet(asset, "webp")}
         sizes={sizes}
         width={asset.width!}
         height={asset.height!}
@@ -73,6 +89,12 @@ function MediaPicture({
         className={className}
         loading="lazy"
         decoding="async"
+        style={digital ? { objectFit: "contain" } : undefined}
+        onError={
+          digital && failed < 2
+            ? () => setFailed((value) => value + 1)
+            : undefined
+        }
       />
     </picture>
   );
@@ -224,9 +246,14 @@ export function ResponsiveMedia({
   return (
     <MediaPicture
       asset={media}
-      alt={localize(alt)}
+      alt={localize(
+        "mediaKind" in media && media.mediaKind === "digital-illustration"
+          ? media.alt
+          : alt,
+      )}
       sizes={sizes}
       className={className}
+      fallback={fallback}
     />
   );
 }

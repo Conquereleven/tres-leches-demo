@@ -1056,5 +1056,7 @@
   "Choose {0}": "checkout:copy_3b653968d5a63081",
   "3L Pastelerías": "checkout:copy_e53477c894279e40",
   "Billing address for your card": "checkout:copy_b32f970b25f3fef5",
-  "Continue": "checkout:copy_31fbef162594de01"
+  "Continue": "checkout:copy_31fbef162594de01",
+  "Digital illustration": "menu:digital_illustration",
+  "Digital illustration of a traditional chocolate concha on a wooden board": "menu:digital_concha_chocolate_alt"
 }

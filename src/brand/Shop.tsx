@@ -322,6 +322,7 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
         variant={option.variant}
         size={option.size}
         alt=""
+        fallback={image?.src}
         className="b-co-thumb"
         sizes="72px"
       />

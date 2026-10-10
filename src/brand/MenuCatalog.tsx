@@ -77,6 +77,13 @@ export function ProductOptions({
           </div>
         )}
       </figure>
+      {media &&
+        "mediaKind" in media &&
+        media.mediaKind === "digital-illustration" && (
+          <p className="b-menu-media-note">
+            <CustomerCopy>Digital illustration</CustomerCopy>
+          </p>
+        )}
       {detail ? (
         <h1 className="b-product-title">
           <CustomerCopy>{product.title}</CustomerCopy>
