@@ -1,0 +1,38 @@
+✔ preaccept price change rejects displayed revision atomically; fresh quote accepts current price (73.800958ms)
+✔ postaccept price: frozen provider lines, replay and resume (14.648208ms)
+✔ postaccept deactivate: frozen provider lines, replay and resume (11.030125ms)
+✔ postaccept remove: frozen provider lines, replay and resume (9.350375ms)
+✔ postaccept rename: frozen provider lines, replay and resume (13.683208ms)
+✔ delayed creation plus simultaneous workers/replays create one checkout (28.69875ms)
+✔ pending checkout survives restart and new catalog without repricing (21.169542ms)
+✔ incomplete/inconsistent frozen missing fails closed with no historical fabrication (10.056541ms)
+✔ incomplete/inconsistent frozen partial fails closed with no historical fabrication (9.238334ms)
+✔ incomplete/inconsistent frozen price fails closed with no historical fabrication (8.908792ms)
+✔ incomplete/inconsistent frozen fee fails closed with no historical fabrication (16.594375ms)
+✔ incomplete/inconsistent frozen amount fails closed with no historical fabrication (13.765792ms)
+✔ incomplete/inconsistent frozen currency fails closed with no historical fabrication (17.324167ms)
+✔ incomplete/inconsistent frozen duplicate fails closed with no historical fabrication (18.260583ms)
+✔ historical multi-SKU and explicit stored fee agree with provider totals (9.9845ms)
+✔ provider rejected after acceptance never duplicates on replay (16.155208ms)
+✔ provider unknown after acceptance never duplicates on replay (16.855667ms)
+✔ expired same cart creates fresh priced replacement, never reuses expired URL (28.518375ms)
+✔ independent SQLite connections share the durable worker lease (33.557584ms)
+✔ a stale processing lease is held for reconciliation rather than recreated (3.66575ms)
+✔ late worker result does not overwrite a paid payment or historical order (17.247416ms)
+✔ PR7 bootstrap and shadow read preserve accepted checkout and quote revision (220.405417ms)
+✔ PR7 revision drift/publication cannot reprice PR9 accepted payload; new quotes use current prices (427.902666ms)
+✔ PR7 cannot repair or reinterpret incomplete paid history from current catalog (182.881708ms)
+✔ overview separates manual review from uncertain payments and excludes terminal orders (2.460958ms)
+✔ every literal admin translation has EN/TL coverage and equal interpolation variables (151.682666ms)
+✔ printer contract identifies known models without claiming connectivity (0.416875ms)
+✔ historical tickets reject missing and incomplete snapshots (0.675791ms)
+✔ historical tickets reject inconsistent snapshot rows and quantities (0.118334ms)
+✔ accepted snapshot survives later catalog name and price changes (0.496667ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1412.70575
