@@ -1,3 +1,4 @@
+import { useOps } from "./ops-i18n";
 import { useEffect, useState } from "react";
 import type { Conversation } from "../../server/domain/model";
 import type { Mode } from "../../server/agents/model";
@@ -29,6 +30,7 @@ export function AgentPanel({
   data: Workspace;
   run: Run;
 }) {
+  const { t } = useOps();
   const session = data.ai?.sessions[c.id];
   const latest = data.ai?.runs.filter((r) => r.conversationId === c.id).at(-1);
   const [text, setText] = useState(""),
@@ -65,22 +67,27 @@ export function AgentPanel({
       "ai/approve",
     );
   return (
-    <section className="co-ai-panel" aria-label="Asistente de conversación">
+    <section
+      className="co-ai-panel"
+      aria-label={t("Asistente de conversación")}
+    >
       <div className="co-ai-heading">
-        <h3>Asistente 3L</h3>
+        <h3>{t("Asistente 3L")}</h3>
         <span>
-          {session?.state ?? "AI_ACTIVE"} · {session?.mode ?? "copilot"}
+          {t(session?.state ?? "AI_ACTIVE")} · {t(session?.mode ?? "copilot")}
         </span>
       </div>
       {!ready && (
         <p>
-          AI NOT CONFIGURED · Configura el proveedor y el modelo para generar
-          sugerencias. No se enviará nada automáticamente.
+          {t(
+            "AI NOT CONFIGURED · Configura el proveedor y el modelo para generar sugerencias. No se enviará nada automáticamente.",
+          )}
         </p>
       )}
       <p className="co-ai-caption">
-        Copilot propone; el equipo aprueba. Importes, catálogo y pagos vienen
-        del sistema.
+        {t(
+          "Copilot propone; el equipo aprueba. Importes, catálogo y pagos vienen del sistema.",
+        )}
       </p>
       <div className="co-ai-controls">
         <button
@@ -91,7 +98,7 @@ export function AgentPanel({
             )
           }
         >
-          Tomar control humano
+          {t("Tomar control humano")}
         </button>
         <button
           onClick={() =>
@@ -101,18 +108,22 @@ export function AgentPanel({
             )
           }
         >
-          Pausar IA
+          {t("Pausar IA")}
         </button>
         <label>
-          Modo de asistencia
+          {t("Modo de asistencia")}
           <select
             value={mode}
             onChange={(e) => setMode(e.target.value as Mode)}
           >
-            <option value="copilot">Copilot</option>
-            <option value="supervised_auto">Automático supervisado</option>
+            <option value="copilot">{t("Copilot")}</option>
+            <option value="supervised_auto">
+              {t("Automático supervisado")}
+            </option>
             {data.ai?.autonomousAllowed && (
-              <option value="autonomous_bounded">Autonomía limitada</option>
+              <option value="autonomous_bounded">
+                {t("Autonomía limitada")}
+              </option>
             )}
           </select>
         </label>
@@ -125,27 +136,30 @@ export function AgentPanel({
             )
           }
         >
-          Devolver a IA
+          {t("Devolver a IA")}
         </button>
       </div>
       {(session?.handoffReason || latest?.handoffReason) && (
         <p className="co-ai-handoff" role="status">
-          Revisión humana: {session?.handoffReason ?? latest?.handoffReason}
+          {t("Revisión humana:")}{" "}
+          {session?.handoffReason ?? latest?.handoffReason}
         </p>
       )}
       {latest?.status === "running" && (
-        <p role="status">Preparando una sugerencia privada…</p>
+        <p role="status">{t("Preparando una sugerencia privada…")}</p>
       )}
       {latest?.intent && (
         <p>
-          Intención: <strong>{latest.intent}</strong> · Confianza:{" "}
-          {Math.round((latest.confidence ?? 0) * 100)}% · {latest.disposition}
+          {t("Intención:")}
+          <strong>{latest.intent}</strong>
+          {t("· Confianza:")} {Math.round((latest.confidence ?? 0) * 100)}{" "}
+          {t("% ·")} {latest.disposition}
         </p>
       )}
       {latest?.suggestion && (
         <>
           <label>
-            Sugerencia privada
+            {t("Sugerencia privada")}
             <textarea
               rows={4}
               value={text}
@@ -157,7 +171,7 @@ export function AgentPanel({
               disabled={!owned || !suggest || latest?.responseApproved}
               onClick={() => void invoke("send")}
             >
-              Aprobar y enviar
+              {t("Aprobar y enviar")}
             </button>
             <button
               disabled={
@@ -165,13 +179,13 @@ export function AgentPanel({
               }
               onClick={() => void invoke("send", true)}
             >
-              Enviar texto editado
+              {t("Enviar texto editado")}
             </button>
             <button
               disabled={!owned || !suggest}
               onClick={() => void invoke("reject")}
             >
-              Rechazar sugerencia
+              {t("Rechazar sugerencia")}
             </button>
           </div>
         </>
@@ -182,15 +196,17 @@ export function AgentPanel({
           void run({ id: c.id, version: c.version }, "ai/generate")
         }
       >
-        {latest ? "Regenerar sugerencia" : "Generar sugerencia"}
+        {latest ? t("Regenerar sugerencia") : t("Generar sugerencia")}
       </button>
       {latest?.tools.length ? (
         <details>
-          <summary>Consultas y acciones ({latest.tools.length})</summary>
+          <summary>
+            {t("Consultas y acciones (")} {latest.tools.length})
+          </summary>
           <ul>
-            {latest.tools.map((t, i) => (
+            {latest.tools.map((tool, i) => (
               <li key={i}>
-                {toolLabels[t.name] ?? t.name} · {t.code}
+                {t(toolLabels[tool.name] ?? tool.name)} · {tool.code}
               </li>
             ))}
           </ul>
@@ -198,34 +214,41 @@ export function AgentPanel({
       ) : null}
       {pending && (
         <div className="co-ai-action">
-          <h4>{toolLabels[pending.name] ?? pending.name}</h4>
+          <h4>{t(toolLabels[pending.name] ?? pending.name)}</h4>
           <p>
-            Acción {latest!.approvedActions + 1} de {latest!.actions.length}.
-            Requiere aprobación del responsable.
+            {t("Acción")} {latest!.approvedActions + 1} {t("de")}{" "}
+            {latest!.actions.length}{" "}
+            {t(". Requiere aprobación del responsable.")}
           </p>
           {args.productId && (
             <p>
               {args.quantity ? `${args.quantity} × ` : ""}
               {product?.name ?? args.productId}
-              {product ? ` · ${money(product.priceFils)} / unidad` : ""}
+              {product
+                ? ` · ${t(money(product.priceFils))} / ${t("unidad")}`
+                : ""}
             </p>
           )}
-          {args.address && <p>Dirección propuesta: {args.address}</p>}
+          {args.address && (
+            <p>
+              {t("Dirección propuesta:")} {args.address}
+            </p>
+          )}
           {pending.name === "prepare_payment_request" && (
             <dl>
-              <dt>Total del pedido</dt>
-              <dd>{money(payment?.quote?.totalFils)}</dd>
-              <dt>Zona</dt>
-              <dd>{payment?.quote?.zoneName ?? "Por resolver"}</dd>
-              <dt>Mínimo</dt>
+              <dt>{t("Total del pedido")}</dt>
+              <dd>{t(money(payment?.quote?.totalFils))}</dd>
+              <dt>{t("Zona")}</dt>
+              <dd>{payment?.quote?.zoneName ?? t("Por resolver")}</dd>
+              <dt>{t("Mínimo")}</dt>
               <dd>
                 {payment?.quote?.minOrderAed == null
-                  ? "Por confirmar"
-                  : money(payment.quote.minOrderAed * 100)}
+                  ? t("Por confirmar")
+                  : t(money(payment.quote.minOrderAed * 100))}
               </dd>
-              <dt>Entrega</dt>
-              <dd>{money(payment?.quote?.feeFils)}</dd>
-              <dt>Validación</dt>
+              <dt>{t("Entrega")}</dt>
+              <dd>{t(money(payment?.quote?.feeFils))}</dd>
+              <dt>{t("Validación")}</dt>
               <dd>
                 {payment?.code} · {payment?.quote?.reason}
               </dd>
@@ -236,8 +259,8 @@ export function AgentPanel({
             onClick={() => void invoke("action")}
           >
             {pending.name === "prepare_payment_request"
-              ? "Aprobar enlace de pago"
-              : "Aprobar acción"}
+              ? t("Aprobar enlace de pago")
+              : t("Aprobar acción")}
           </button>
         </div>
       )}
@@ -246,21 +269,22 @@ export function AgentPanel({
         .slice(-1)
         .map((e) => (
           <div className="co-ai-action" key={e.inboundId}>
-            <h4>Consulta personalizada · cotización humana</h4>
+            <h4>{t("Consulta personalizada · cotización humana")}</h4>
             <p>
-              {e.occasion ?? "Ocasión por confirmar"} ·{" "}
+              {e.occasion ?? t("Ocasión por confirmar")} ·{" "}
               {e.servings
                 ? `${e.servings} personas`
-                : "Porciones por confirmar"}{" "}
-              · {e.desiredDate ?? "Fecha por confirmar"}
+                : t("Porciones por confirmar")}{" "}
+              · {e.desiredDate ?? t("Fecha por confirmar")}
             </p>
             <p>{e.referenceNotes}</p>
           </div>
         ))}
       {!owned && (
         <p className="co-ai-caption">
-          Toma la conversación y regenera antes de aprobar. Una sugerencia
-          desactualizada nunca se envía.
+          {t(
+            "Toma la conversación y regenera antes de aprobar. Una sugerencia desactualizada nunca se envía.",
+          )}
         </p>
       )}
     </section>
@@ -273,6 +297,7 @@ export function AgentKnowledgeEditor({
   data: Workspace;
   run: Run;
 }) {
+  const { t } = useOps();
   const [key, setKey] = useState("ordering"),
     [language, setLanguage] = useState("en"),
     [content, setContent] = useState(""),
@@ -287,14 +312,15 @@ export function AgentKnowledgeEditor({
   if (data.actor.role !== "admin") return null;
   return (
     <details className="co-ai-knowledge">
-      <summary>Conocimiento aprobado para el asistente</summary>
+      <summary>{t("Conocimiento aprobado para el asistente")}</summary>
       <p>
-        Vacío significa información no disponible. Solo publica contenido
-        confirmado por 3L.
+        {t(
+          "Vacío significa información no disponible. Solo publica contenido confirmado por 3L.",
+        )}
       </p>
       <div className="co-ai-controls">
         <label>
-          Tema
+          {t("Tema")}
           <select value={key} onChange={(e) => setKey(e.target.value)}>
             {faqKeys.map((k) => (
               <option key={k}>{k}</option>
@@ -302,18 +328,18 @@ export function AgentKnowledgeEditor({
           </select>
         </label>
         <label>
-          Idioma
+          {t("Idioma")}
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
           >
-            <option value="en">English</option>
-            <option value="es">Español</option>
+            <option value="en">{t("English")}</option>
+            <option value="es">{t("Español")}</option>
           </select>
         </label>
       </div>
       <label>
-        Contenido del negocio
+        {t("Contenido del negocio")}
         <textarea
           value={content}
           maxLength={3000}
@@ -327,7 +353,7 @@ export function AgentKnowledgeEditor({
           checked={approved}
           onChange={(e) => setApproved(e.target.checked)}
         />
-        Aprobado para responder a clientes
+        {t("Aprobado para responder a clientes")}
       </label>
       <button
         onClick={() =>
@@ -343,7 +369,7 @@ export function AgentKnowledgeEditor({
           )
         }
       >
-        Guardar conocimiento
+        {t("Guardar conocimiento")}
       </button>
     </details>
   );

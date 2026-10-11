@@ -44,7 +44,7 @@ test("operations card surfaces server-owned unverified/manual-review state", () 
     }),
   );
   assert.match(html, /ADDRESS NOT VERIFIED/);
-  assert.match(html, /Revisión manual/);
+  assert.match(html, /Manual address review/);
   const verified = renderToStaticMarkup(
     createElement(OrderCard, {
       order: {

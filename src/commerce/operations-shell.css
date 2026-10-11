@@ -1181,3 +1181,284 @@
 .co-notifications b {
   font-weight: 600;
 }
+
+/* D1: private workspace surfaces. No storefront token changes. */
+.commerce.ops-shell {
+  --cacao: #202523;
+  --ink: #202523;
+  --paper: #fff;
+  --line: #dce1de;
+  --orange: #176346;
+  background: #f1f3f2;
+  color: #202523;
+}
+.commerce.ops-shell button {
+  min-height: 44px;
+}
+.commerce.ops-shell button.primary {
+  background: #176346;
+  border-color: #176346;
+  color: #fff;
+}
+.commerce.ops-shell button.primary:hover:not(:disabled) {
+  background: #104b34;
+}
+.commerce.ops-shell button:hover:not(:disabled) {
+  background: #e8eeeb;
+  border-color: #93a69c;
+}
+.commerce.ops-shell :focus-visible {
+  outline-color: #176346;
+}
+.commerce.ops-shell input,
+.commerce.ops-shell select,
+.commerce.ops-shell textarea {
+  background: #fff;
+  border-color: #b5beb8;
+  min-height: 44px;
+  color: #202523;
+}
+.commerce.ops-shell .ops-sidebar {
+  background: #ebefed;
+  border-color: #d4dbd7;
+}
+.commerce.ops-shell .ops-nav-item[aria-current="page"] {
+  background: #d5e6dc;
+  color: #12462f;
+}
+.commerce.ops-shell .ops-topbar {
+  background: #fff;
+}
+.commerce.ops-shell .ops-panel,
+.commerce.ops-shell .ops-order-card,
+.commerce.ops-shell .co-panel {
+  background: #fff;
+  border: 1px solid #dce1de;
+  border-radius: 12px;
+}
+.commerce.ops-shell .ops-panel {
+  padding: 24px;
+  min-width: 0;
+}
+.commerce.ops-shell .ops-panel h2 {
+  margin-top: 0;
+}
+.commerce.ops-shell .ops-overview,
+.commerce.ops-shell .ops-print {
+  display: grid;
+  gap: 24px;
+}
+.commerce.ops-shell .ops-overview-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 0;
+}
+.commerce.ops-shell .ops-overview-intro h2 {
+  font-size: 28px;
+  margin: 4px 0 10px;
+}
+.commerce.ops-shell .ops-overview-intro p {
+  margin: 0;
+}
+.commerce.ops-shell .ops-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #4b6255;
+}
+.commerce.ops-shell .ops-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+.commerce.ops-shell .ops-summary-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 10px;
+  padding: 20px;
+  background: white;
+  border: 1px solid #dce1de;
+  border-radius: 12px;
+}
+.commerce.ops-shell .ops-summary-card span {
+  font-size: 12px;
+  font-weight: 600;
+}
+.commerce.ops-shell .ops-summary-card strong {
+  font-size: 32px;
+  line-height: 1.2;
+}
+.commerce.ops-shell .ops-overview-columns {
+  display: grid;
+  grid-template-columns: 1.65fr 1fr;
+  gap: 24px;
+}
+.commerce.ops-shell .ops-table-scroll {
+  overflow-x: auto;
+}
+.commerce.ops-shell table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+.commerce.ops-shell th {
+  font-weight: 600;
+  color: #526158;
+  background: #f5f7f6;
+}
+.commerce.ops-shell th,
+.commerce.ops-shell td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #e4e9e6;
+}
+.commerce.ops-shell a {
+  color: #15583c;
+}
+.commerce.ops-shell .ops-status-pill {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: #e8eeeb;
+  color: #334b3d;
+  font-size: 11px;
+}
+.commerce.ops-shell .ops-warning-list {
+  padding-left: 20px;
+  line-height: 2;
+}
+.commerce.ops-shell .ops-printer-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.commerce.ops-shell .ops-ticket {
+  margin-top: 24px;
+  padding: 24px;
+  max-width: 440px;
+  border: 1px dashed #a5b3aa;
+  background: #fafbf9;
+  font-family: ui-monospace, monospace;
+}
+.commerce.ops-shell .ops-settings-list {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 12px;
+}
+.commerce.ops-shell .ops-settings-list dd {
+  margin: 0;
+}
+.commerce.ops-shell .ops-order-search {
+  display: block;
+  max-width: 520px;
+  margin: 0 0 20px;
+}
+.commerce.ops-shell .ops-order-search input {
+  width: 100%;
+  margin-top: 6px;
+}
+.commerce.ops-shell .ops-order-instructions {
+  padding: 12px;
+  background: #f5f7f6;
+  border-radius: 6px;
+}
+.commerce.ops-shell .ops-language {
+  min-width: 120px;
+}
+.commerce.ops-shell.ops-auth {
+  padding: 32px;
+}
+@media (max-width: 1100px) {
+  .commerce.ops-shell .ops-summary-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .commerce.ops-shell .ops-overview-columns {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .commerce.ops-shell .ops-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .commerce.ops-shell .ops-summary-card {
+    padding: 16px;
+  }
+  .commerce.ops-shell .ops-summary-card:last-child {
+    grid-column: 1 / -1;
+  }
+  .commerce.ops-shell .ops-overview-intro {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .commerce.ops-shell .ops-overview-intro h2 {
+    font-size: 24px;
+  }
+  .commerce.ops-shell .ops-printer-grid {
+    grid-template-columns: 1fr;
+  }
+  .commerce.ops-shell .ops-panel {
+    padding: 18px;
+  }
+  .commerce.ops-shell .ops-settings-list {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .commerce.ops-shell .ops-settings-list dd {
+    margin-bottom: 12px;
+  }
+  .commerce.ops-shell .ops-language {
+    min-width: 90px;
+  }
+}
+.commerce.ops-shell .ops-page-header > div > p,
+.commerce.ops-shell .co-muted,
+.commerce.ops-shell .co-empty {
+  color: #5b625d;
+}
+.commerce.ops-shell .ops-oc-steps li,
+.commerce.ops-shell .ops-oc-steps li.done,
+.commerce.ops-shell .ops-unpaid small,
+.commerce.ops-shell .ops-nav-group > p,
+.commerce.ops-shell .ops-sidebar small,
+.commerce.ops-shell .ops-oc-state,
+.commerce.ops-shell .ops-oc-who p,
+.commerce.ops-shell .ops-oc-meta dt {
+  color: #515d55;
+}
+.commerce.ops-shell .ops-pay-paid {
+  color: #285a32;
+}
+.commerce.ops-shell .ops-order-card[data-state="Delivered"] {
+  opacity: 1;
+}
+.commerce.ops-shell .ops-nav-section > p {
+  color: #515d55;
+}
+.commerce.ops-shell .ops-navigation button[aria-current="page"] {
+  background: #d5e6dc;
+  color: #12462f;
+}
+.commerce.ops-shell .ops-navigation button[aria-current="page"]::before {
+  background: #176346;
+}
+.commerce.ops-shell .ops-topbar {
+  height: auto;
+  min-height: 88px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.commerce.ops-shell .ops-language {
+  align-self: center;
+  line-height: 1.4;
+}
+.commerce.ops-shell .ops-language select {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+}
+.commerce.ops-shell .ops-oc-who h2 { font-size: 15px; line-height: 1.5; margin: 0; }

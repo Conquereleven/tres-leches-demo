@@ -1,3 +1,4 @@
+import { ticketSnapshot } from "../../src/commerce/ticket-snapshot";
 /** Claude's checkout audit cases, extended for atomic receipts and capability-based status. */
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -278,3 +279,26 @@ for (const status of ["PAID", "FAILED", "CANCELLED", "EXPIRED"])
       f.store.close();
     }
   });
+
+test("ticket preview retains accepted checkout names and prices after catalog changes", async () => {
+  const f = fixture();
+  try {
+    const result = await createWebCheckout(f.service, input(), randomUUID());
+    const accepted = f.store.read().orders.find((o) => o.id === result.orderId)!;
+    const before = ticketSnapshot(accepted);
+    assert.ok(before);
+    f.store.write((state) => {
+      const product = state.catalog!.find((p) => p.id === "pan-de-muerto")!;
+      product.name = "Changed current catalog";
+      product.priceFils = 99900;
+      product.active = false;
+    });
+    const stored = f.store.read().orders.find((o) => o.id === result.orderId)!;
+    assert.deepEqual(ticketSnapshot(stored), before);
+    assert.deepEqual(stored.catalogSnapshot, accepted.catalogSnapshot);
+    assert.equal(before[0]?.priceFils, 2500);
+    assert.notEqual(before[0]?.name, "Changed current catalog");
+  } finally {
+    f.store.close();
+  }
+});

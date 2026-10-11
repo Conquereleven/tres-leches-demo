@@ -1,3 +1,4 @@
+import { useOps } from "./ops-i18n";
 import { useState, type ReactNode } from "react";
 import {
   CalendarBlank,
@@ -21,7 +22,6 @@ import {
   boardMetrics,
   byDue,
   dubaiDate,
-  dueLabel,
   fulfilmentIndex,
   inQueue,
   matchesFilter,
@@ -54,74 +54,107 @@ export function OrdersBoard({
   details: (o: Order) => ReactNode;
   openConversation: (conversationId: string) => void;
 }) {
+  const { t } = useOps();
   const [view, setView] = useState<BoardView>("today");
+  const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<BoardFilter>("any");
   const today = dubaiDate();
   const metrics = boardMetrics(data.orders, data.payments, today);
   const queue = data.orders.filter(inQueue);
   const inView = queue.filter((o) => matchesView(o, view, today));
-  const shown = inView.filter((o) => matchesFilter(o, filter)).sort(byDue);
+  const shown = inView
+    .filter(
+      (o) =>
+        matchesFilter(o, filter) &&
+        [
+          orderReference(o),
+          o.id,
+          customerOf(data, o)?.customer,
+          ...o.lines.map((l) => productName(data, o, l.productId)),
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(search.toLowerCase()),
+    )
+    .sort(byDue);
   const unpaid = data.orders
     .filter((o) => o.state === "Awaiting Payment")
     .sort(byDue);
   const upcoming = queue.filter((o) => matchesView(o, "upcoming", today));
   return (
     <div className="ops-orders">
-      <section className="ops-metrics" aria-label="Resumen de hoy">
+      <section className="ops-metrics" aria-label={t("Resumen de hoy")}>
         <Metric
           icon={<Receipt aria-hidden />}
-          label="Pedidos de hoy"
+          label={t("Pedidos de hoy")}
           value={String(metrics.todayOrders)}
-          hint="Con entrega hoy"
+          hint={t("Con entrega hoy")}
         />
         <Metric
           icon={<CurrencyCircleDollar aria-hidden />}
-          label="Ingresos de hoy"
-          value={money(metrics.todayRevenueFils)}
-          hint="Pagos confirmados hoy"
+          label={t("Confirmed payments today")}
+          value={t(money(metrics.todayRevenueFils))}
+          hint={t("Pagos confirmados hoy")}
         />
         <Metric
           icon={<Oven aria-hidden />}
-          label="En preparación"
+          label={t("En preparación")}
           value={String(metrics.preparing)}
         />
         <Metric
           icon={<Truck aria-hidden />}
-          label="En camino"
+          label={t("En camino")}
           value={String(metrics.outForDelivery)}
         />
       </section>
 
+      <label className="ops-order-search">
+        {t("Search orders")}
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={t("Order, customer or product")}
+        />
+      </label>
       <div className="ops-board-controls">
-        <div className="ops-views" role="group" aria-label="Vista de pedidos">
+        <div
+          className="ops-views"
+          role="group"
+          aria-label={t("Vista de pedidos")}
+        >
           {BOARD_VIEWS.map(([id, label]) => (
             <button
               key={id}
               aria-pressed={view === id}
               onClick={() => setView(id)}
             >
-              {label}
+              {t(label)}
               <span>
                 {queue.filter((o) => matchesView(o, id, today)).length}
               </span>
             </button>
           ))}
         </div>
-        <div className="ops-chips" role="group" aria-label="Filtrar por estado">
+        <div
+          className="ops-chips"
+          role="group"
+          aria-label={t("Filtrar por estado")}
+        >
           {BOARD_FILTERS.map(([id, label]) => (
             <button
               key={id}
               aria-pressed={filter === id}
               onClick={() => setFilter(id)}
             >
-              {label} · {inView.filter((o) => matchesFilter(o, id)).length}
+              {t(label)} · {inView.filter((o) => matchesFilter(o, id)).length}
             </button>
           ))}
         </div>
       </div>
 
       {shown.length ? (
-        <ul className="ops-order-list" aria-label="Pedidos">
+        <ul className="ops-order-list" aria-label={t("Pedidos")}>
           {shown.map((o) => (
             <li key={o.id}>
               <OrderCard
@@ -143,19 +176,20 @@ export function OrdersBoard({
           <h2>
             {queue.length
               ? view === "today"
-                ? "Nada pendiente para hoy"
-                : "Sin pedidos en esta vista"
-              : "Todo listo para el primer pedido"}
+                ? t("Nada pendiente para hoy")
+                : t("Sin pedidos en esta vista")
+              : t("Todo listo para el primer pedido")}
           </h2>
           <p className="co-empty">
             {queue.length
-              ? "Cambia la vista o el filtro para ver otros pedidos."
-              : "No orders yet. Los pedidos pagados aparecerán aquí automáticamente."}
+              ? t("Cambia la vista o el filtro para ver otros pedidos.")
+              : t(
+                  "No orders yet. Los pedidos pagados aparecerán aquí automáticamente.",
+                )}
           </p>
           {view === "today" && upcoming.length > 0 && (
             <button className="co-link" onClick={() => setView("upcoming")}>
-              Ver {upcoming.length} pedido{upcoming.length === 1 ? "" : "s"}{" "}
-              próximo{upcoming.length === 1 ? "" : "s"}
+              {t("View upcoming orders", { count: upcoming.length })}
             </button>
           )}
         </div>
@@ -164,8 +198,8 @@ export function OrdersBoard({
       {unpaid.length > 0 && (
         <details className="ops-unpaid">
           <summary>
-            Sin pago confirmado · {unpaid.length}
-            <small>Fuera de la cola de producción</small>
+            {t("Sin pago confirmado ·")} {unpaid.length}
+            <small>{t("Fuera de la cola de producción")}</small>
           </summary>
           <ul className="ops-order-list">
             {unpaid.map((o) => (
@@ -198,10 +232,11 @@ function Metric({
   value: string;
   hint?: string;
 }) {
+  const { t } = useOps();
   return (
     <div className="ops-metric">
       <span className="ops-metric-icon">{icon}</span>
-      <p>{label}</p>
+      <p>{t(label)}</p>
       <strong>{value}</strong>
       {hint && <small>{hint}</small>}
     </div>
@@ -223,10 +258,23 @@ export function OrderCard({
   details: (o: Order) => ReactNode;
   openConversation: (conversationId: string) => void;
 }) {
+  const { t, formatDate } = useOps();
   const c = customerOf(data, o);
   const payment = data.payments.find((p) => p.id === o.paymentId);
   const badge = paymentBadge(payment);
-  const due = dueLabel(o.pickup?.pickupDate ?? o.delivery?.date, today);
+  const date = o.pickup?.pickupDate ?? o.delivery?.date;
+  const due = {
+    tone: !date
+      ? "none"
+      : date < today
+        ? "late"
+        : date === today
+          ? "today"
+          : "future",
+    label: !date
+      ? t("Sin fecha")
+      : `${date < today && o.state !== "Delivered" ? t("Overdue") + " · " : ""}${formatDate(date, false)}`,
+  };
   const web = c?.sourceNumberId === "web";
   const owned = !!c && c.assignedAgent === data.actor.id && c.status === "open";
   const canTake =
@@ -245,7 +293,7 @@ export function OrderCard({
       className="ops-order-card"
       data-state={o.state}
       data-payment={badge.tone}
-      aria-label={`Pedido ${orderReference(o)}`}
+      aria-label={`${t("Order")} ${orderReference(o)}`}
     >
       <header className="ops-oc-head">
         {/* The number customers quote; absent only for unpaid or pre-numbering orders. */}
@@ -254,27 +302,27 @@ export function OrderCard({
         )}
         <span className={`ops-pay ops-pay-${badge.tone}`}>
           {badge.tone === "paid" && <CheckCircle weight="fill" aria-hidden />}
-          {badge.label}
+          {t(badge.label)}
         </span>
         <span className="ops-oc-state">
-          {FULFILMENT_LABEL[o.state] ?? o.state}
+          {t(FULFILMENT_LABEL[o.state] ?? o.state)}
         </span>
-        <strong className="ops-oc-total">{money(o.quote?.totalFils)}</strong>
+        <strong className="ops-oc-total">{t(money(o.quote?.totalFils))}</strong>
       </header>
 
       <div className="ops-oc-who">
-        <h3>{c?.customer ?? "Cliente"}</h3>
+        <h2>{c?.customer ?? t("Cliente")}</h2>
         <p>
-          <span title="Referencia interna">{o.id}</span> ·{" "}
-          {o.fulfillmentMethod === "pickup" ? "PICKUP" : "DELIVERY"} ·{" "}
-          {web ? "Web" : (c?.sourceNumberId.toUpperCase() ?? "")}
+          <span title={t("Referencia interna")}>{o.id}</span> ·{" "}
+          {o.fulfillmentMethod === "pickup" ? t("PICKUP") : t("DELIVERY")} ·{" "}
+          {web ? t("Web") : (c?.sourceNumberId.toUpperCase() ?? "")}
           {c?.phone && <> · {c.phone}</>}
         </p>
       </div>
 
       {o.customerDetails?.whatsappNumber && (
         <p className="ops-oc-whatsapp">
-          WhatsApp:{" "}
+          {t("WhatsApp:")}{" "}
           <a
             href={`https://wa.me/${o.customerDetails.whatsappNumber.slice(1)}`}
             target="_blank"
@@ -284,7 +332,7 @@ export function OrderCard({
           </a>
         </p>
       )}
-      <ul className="ops-oc-lines" aria-label="Productos">
+      <ul className="ops-oc-lines" aria-label={t("Productos")}>
         {o.lines.map((l) => (
           <li key={l.productId}>
             <b>{l.quantity}×</b> {productName(data, o, l.productId)}
@@ -294,15 +342,21 @@ export function OrderCard({
 
       {o.delivery?.addressVerification === "UNVERIFIED" && (
         <p role="status" className="ops-address-review">
-          <strong>ADDRESS NOT VERIFIED</strong> · Revisión manual de dirección
-          requerida
+          <strong>{t("ADDRESS NOT VERIFIED")}</strong>
+          {t("· Revisión manual de dirección requerida")}
+        </p>
+      )}
+      {o.customerDetails?.instructions && (
+        <p className="ops-order-instructions">
+          <strong>{t("Preparation instructions")}</strong>{" "}
+          {o.customerDetails.instructions}
         </p>
       )}
       <dl className="ops-oc-meta">
         <div data-tone={o.state === "Delivered" ? "none" : due.tone}>
           <dt>
             <CalendarBlank aria-hidden />{" "}
-            {o.fulfillmentMethod === "pickup" ? "Pickup" : "Entrega"}
+            {o.fulfillmentMethod === "pickup" ? t("Pickup") : t("Entrega")}
           </dt>
           <dd>
             {o.state === "Delivered" && due.tone === "late"
@@ -313,7 +367,8 @@ export function OrderCard({
         {(o.pickup?.preferredTime || o.delivery?.slot) && (
           <div>
             <dt>
-              <Clock aria-hidden /> Hora
+              <Clock aria-hidden />
+              {t("Hora")}
             </dt>
             <dd>{o.pickup?.preferredTime ?? o.delivery?.slot}</dd>
           </div>
@@ -321,25 +376,25 @@ export function OrderCard({
         <div>
           <dt>
             <MapPin aria-hidden />{" "}
-            {o.fulfillmentMethod === "pickup" ? "Pickup" : "Zona"}
+            {o.fulfillmentMethod === "pickup" ? t("Pickup") : t("Zona")}
           </dt>
           <dd>
             {o.fulfillmentMethod === "pickup"
-              ? "Pastelerías 3L · Recoger en tienda"
-              : (o.quote?.zoneName ?? "Ubicación pendiente")}
+              ? t("Pastelerías 3L · Recoger en tienda")
+              : (o.quote?.zoneName ?? t("Ubicación pendiente"))}
           </dd>
         </div>
       </dl>
 
       {step >= 0 && (
-        <ol className="ops-oc-steps" aria-label="Preparación">
+        <ol className="ops-oc-steps" aria-label={t("Preparación")}>
           {FULFILMENT.map((s, i) => (
             <li
               key={s.state}
               className={i < step ? "done" : i === step ? "current" : ""}
               aria-current={i === step ? "step" : undefined}
             >
-              {s.label}
+              {t(s.label)}
             </li>
           ))}
         </ol>
@@ -348,7 +403,7 @@ export function OrderCard({
       <div className="ops-oc-actions">
         {o.state === "Paid" && (
           <p className="co-muted">
-            Se confirma automáticamente al conciliar el pago.
+            {t("Se confirma automáticamente al conciliar el pago.")}
           </p>
         )}
         {next &&
@@ -364,7 +419,7 @@ export function OrderCard({
                 })
               }
             >
-              {next.label}
+              {t(next.label)}
             </button>
           ) : canTake ? (
             <button
@@ -378,24 +433,24 @@ export function OrderCard({
                 })
               }
             >
-              Tomar pedido
+              {t("Tomar pedido")}
             </button>
           ) : (
             <p className="co-muted">
               {assignee
                 ? `Asignado a ${assignee}.`
-                : "Reabre la conversación para gestionar este pedido."}
+                : t("Reabre la conversación para gestionar este pedido.")}
             </p>
           ))}
         {!web && c && (
           <button className="co-link" onClick={() => openConversation(c.id)}>
-            Abrir conversación
+            {t("Abrir conversación")}
           </button>
         )}
       </div>
 
       <details className="ops-order-details">
-        <summary>Ver pedido y seguimiento</summary>
+        <summary>{t("Ver pedido y seguimiento")}</summary>
         {details(o)}
       </details>
     </article>

@@ -111,3 +111,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - The official wordmark appears once as an 8% watermark (Joel approved Proposal A) behind the Menu introduction only (`.b-menu-intro-mark`). Never on product photos, cards, galleries, detail pages, or as a repeating or global background.
 - The Pan de Muerto category banner is back (Lisa): the four mixed boards, whole, 3:2, same 3.5 s rotation. No banners on other categories. This supersedes the earlier "banner removed" decision.
 - Pack photos are square by continuing each photo's own background (`extend` in `scripts/official-pan-crops.json`); breads are never copied, moved or redrawn. The filled pack uses its own asset (`official-pan-13-pack`) so Crema diplomática's approved third photo is untouched.
+
+## Operations D1 (11 October 2026)
+- Admin shell uses isolated EN/TL resources and per-user browser preference. Never change customer notification language or stored state enums to localize labels.
+- Products route is an honest unavailable state until PR #7 is integrated; do not connect unfinished catalog APIs.
+- Print Center is preview-only. Known Epson models do not establish connectivity; no print jobs, IP communication or fake success until explicitly authorized hardware integration.
+- Operations CSS stays scoped to `.commerce.ops-shell`; public EN/ES/AR styles and commerce rules are independent.

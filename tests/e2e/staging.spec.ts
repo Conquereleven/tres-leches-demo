@@ -116,11 +116,11 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
     const page = await context.newPage();
     await page.goto(origin);
     await page.getByRole("button", { name: "Gestión", exact: true }).click();
-    await page.getByLabel("Agente", { exact: true }).fill("test-admin");
+    await page.getByLabel("Agent", { exact: true }).fill("test-admin");
     await page
-      .getByLabel("Contraseña", { exact: true })
+      .getByLabel("Password", { exact: true })
       .fill("fixture-password-not-shipped");
-    await page.getByRole("button", { name: "Entrar al workspace" }).click();
+    await page.getByRole("button", { name: "Sign in to workspace" }).click();
     await expect(
       page.getByText("Staging", {
         exact: true,
@@ -172,14 +172,14 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
     for (const width of [390, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
       if (width === 390)
-        await page.getByRole("button", { name: "Abrir menú" }).click();
+        await page.getByRole("button", { name: "Open menu" }).click();
       await expect(
         page
-          .getByRole("navigation", { name: "Operaciones" })
+          .getByRole("navigation", { name: "Operations" })
           .getByRole("button", { name: /Inbox/ }),
       ).toHaveCount(1);
       if (width === 390)
-        await page.getByRole("button", { name: "Cerrar menú" }).click();
+        await page.getByRole("button", { name: "Close menu" }).click();
       await expect(page.locator(".admin-header")).toHaveCount(0);
       await expect(page.locator("body")).not.toContainText("MVP demo");
       await expect(page.locator("body")).not.toContainText("Inbox anterior");
@@ -195,42 +195,40 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
         fullPage: true,
       });
       if (width === 390) {
-        await page.getByRole("button", { name: "Abrir menú" }).click();
+        await page.getByRole("button", { name: "Open menu" }).click();
         await page
-          .getByRole("navigation", { name: "Operaciones" })
+          .getByRole("navigation", { name: "Operations" })
           .screenshot({ path: "work/qa/tl24-mobile-nav.png" });
       }
-      await page.getByRole("button", { name: "Pedidos", exact: true }).click();
+      await page.getByRole("button", { name: "Orders", exact: true }).click();
       await expect(page.getByText(/No orders yet/)).toBeVisible();
       await page.screenshot({
         path: `work/qa/tl24-orders-${width}.png`,
         fullPage: true,
       });
       if (width === 390)
-        await page.getByRole("button", { name: "Abrir menú" }).click();
+        await page.getByRole("button", { name: "Open menu" }).click();
       await page
-        .getByRole("button", { name: "Producción", exact: true })
+        .getByRole("button", { name: "Kitchen / Production", exact: true })
         .click();
       await expect(page.getByText(/No production items yet/)).toBeVisible();
       if (width === 390)
-        await page.getByRole("button", { name: "Abrir menú" }).click();
-      await page
-        .getByRole("button", { name: "Inbox unificado", exact: true })
-        .click();
+        await page.getByRole("button", { name: "Open menu" }).click();
+      await page.getByRole("button", { name: "Inbox", exact: true }).click();
     }
     await page
-      .getByRole("button", { name: "Preparación y UAT", exact: true })
+      .getByRole("button", { name: "Diagnostics / UAT", exact: true })
       .click();
     await page.reload();
     await expect(
       page.getByRole("heading", {
-        name: "Preparación y UAT · INTERNAL READY / EXTERNAL INPUT REQUIRED",
+        name: "Readiness and UAT · INTERNAL READY / EXTERNAL INPUT REQUIRED",
       }),
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Validación con Lisa" }),
+      page.getByRole("heading", { name: "Validation with Lisa" }),
     ).toBeVisible();
-    await page.getByRole("button", { name: "Comprobar Paymennt TEST" }).click();
+    await page.getByRole("button", { name: "Check Paymennt TEST" }).click();
     await expect(page.locator(".commerce")).toHaveAttribute(
       "aria-busy",
       "false",

@@ -228,31 +228,31 @@ test.describe("operations orders board", () => {
       );
       await page.goto("/operations/orders");
       const board = page.locator(".ops-orders");
-      await expect(board.getByText("Pedidos de hoy")).toBeVisible();
+      await expect(board.getByText("Orders due today")).toBeVisible();
       // Today: every paid, due-today order; never the unpaid one.
       const cards = board.locator(".ops-order-list").first().locator("article");
       await expect(cards).toHaveCount(5);
       await expect(board.locator(".ops-order-list").first()).not.toContainText(
         "Hana Pending",
       );
-      await expect(board.locator(".ops-pay-paid").first()).toHaveText("Pagado");
+      await expect(board.locator(".ops-pay-paid").first()).toHaveText("Paid");
       await expect(
-        page.getByRole("button", { name: "Empezar preparación" }),
+        page.getByRole("button", { name: "Start preparation" }),
       ).toBeVisible();
       await expect(board.locator(".ops-unpaid > summary")).toContainText(
-        "Sin pago confirmado · 1",
+        "Payment not confirmed · 1",
       );
-      await page.getByRole("button", { name: /^Próximos/ }).click();
+      await page.getByRole("button", { name: /^Upcoming/ }).click();
       await expect(
         board.locator(".ops-order-list").first().locator("article"),
       ).toHaveCount(1);
-      await page.getByRole("button", { name: /^Todos los pedidos/ }).click();
-      await page.getByRole("button", { name: /^Completados/ }).click();
+      await page.getByRole("button", { name: /^All orders/ }).click();
+      await page.getByRole("button", { name: /^Completed/ }).click();
       await expect(
         board.locator(".ops-order-list").first().locator("article"),
       ).toHaveCount(1);
-      await page.getByRole("button", { name: /^Hoy/ }).click();
-      await page.getByRole("button", { name: /^Todos ·/ }).click();
+      await page.getByRole("button", { name: /^Today/ }).click();
+      await page.getByRole("button", { name: /^All ·/ }).click();
       expect(await noOverflow(page)).toBe(true);
       await shot(page, `operations-orders-${width}`);
     });
