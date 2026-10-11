@@ -80,3 +80,10 @@
 - `tests/e2e/staging.spec.ts`
 - `tests/operations-e2e/dashboard.spec.ts`
 - `docs/operations/d1/files-changed.md`
+
+## Final QA follow-up additions
+
+- `src/commerce/ticket-snapshot.ts`
+- `tests/commerce/ticket-snapshot.test.ts`
+- `tests/commerce/web-checkout.test.ts` (regression only)
+- `tests/e2e/operations-entry.spec.ts`

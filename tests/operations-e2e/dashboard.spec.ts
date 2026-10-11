@@ -187,3 +187,58 @@ for (const language of ["en", "tl"] as const)
       state: "Production",
     });
   });
+
+for (const language of ["en", "tl"] as const) {
+  for (const scenario of [
+    "missing",
+    "incomplete",
+    "duplicate",
+    "changed catalog",
+  ] as const) {
+    test(`${language}: historical ticket ${scenario}`, async ({ page }) => {
+      const data = snapshot();
+      const order = data.orders[0];
+      const originalName = order.catalogSnapshot[0].name;
+      if (scenario === "missing")
+        Reflect.deleteProperty(order, "catalogSnapshot");
+      if (scenario === "incomplete") order.catalogSnapshot = [];
+      if (scenario === "duplicate")
+        order.catalogSnapshot.push({ ...order.catalogSnapshot[0] });
+      data.catalog[0].name = "Current catalog must never replace history";
+      data.catalog[0].priceFils = 99900;
+      await page.route("**/api/**", async (route) => {
+        expect(route.request().method()).toBe("GET");
+        await route.fulfill({ json: data });
+      });
+      await page.addInitScript(
+        ({ id, language }) =>
+          localStorage.setItem(
+            `3l-operations-language:${encodeURIComponent(id)}`,
+            language,
+          ),
+        { id: data.actor.id, language },
+      );
+      await page.goto("/operations/print");
+      await page
+        .getByRole("combobox", { name: tr(language, "Order"), exact: true })
+        .selectOption(order.id);
+      if (scenario === "changed catalog") {
+        await expect(page.locator(".ops-ticket")).toContainText(originalName);
+        await expect(page.locator(".ops-ticket")).not.toContainText(
+          data.catalog[0].name,
+        );
+      } else {
+        await expect(page.getByRole("alert")).toHaveText(
+          tr(
+            language,
+            "Review required: the stored order catalog snapshot is missing or inconsistent. Ticket preview is unavailable.",
+          ),
+        );
+        await expect(page.locator(".ops-ticket")).toHaveCount(0);
+      }
+      await expect(
+        page.getByRole("button", { name: /^(Print|Reprint)$/ }),
+      ).toHaveCount(0);
+    });
+  }
+}

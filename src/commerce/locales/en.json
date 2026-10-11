@@ -433,5 +433,6 @@
   "Unable to complete this action. Refresh and try again.": "Unable to complete this action. Refresh and try again.",
   "Conexión interrumpida. Intenta nuevamente.": "Connection interrupted. Try again.",
   "Ubicación compartida": "Shared location",
-  "unidad": "unit"
+  "unidad": "unit",
+  "Review required: the stored order catalog snapshot is missing or inconsistent. Ticket preview is unavailable.": "Review required: the stored order catalog snapshot is missing or inconsistent. Ticket preview is unavailable."
 }

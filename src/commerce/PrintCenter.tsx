@@ -1,3 +1,4 @@
+import { ticketSnapshot } from "./ticket-snapshot";
 import { useState } from "react";
 import { Printer } from "@phosphor-icons/react";
 import type { Workspace } from "./api";
@@ -9,6 +10,7 @@ export function PrintCenter({ data }: { data: Workspace }) {
   const [selected, setSelected] = useState("");
   const [destination, setDestination] = useState<PrinterDestination>("kitchen");
   const order = data.orders.find((o) => o.id === selected);
+  const ticketLines = order ? ticketSnapshot(order) : null;
   return (
     <div className="ops-print">
       <section className="ops-printer-grid">
@@ -61,7 +63,13 @@ export function PrintCenter({ data }: { data: Workspace }) {
             </select>
           </label>
         </div>
-        {order ? (
+        {order && !ticketLines ? (
+          <p role="alert" className="co-empty">
+            {t(
+              "Review required: the stored order catalog snapshot is missing or inconsistent. Ticket preview is unavailable.",
+            )}
+          </p>
+        ) : order && ticketLines ? (
           <article className="ops-ticket" aria-label={t("Ticket preview")}>
             <p className="ops-kicker">{t("PREVIEW")}</p>
             <h3>Pastelerías 3L · {orderReference(order)}</h3>
@@ -77,12 +85,10 @@ export function PrintCenter({ data }: { data: Workspace }) {
               {t(order.fulfillmentMethod === "pickup" ? "Pickup" : "Entrega")}
             </p>
             <ul>
-              {order.lines.map((l) => (
+              {ticketLines.map((l) => (
                 <li key={l.productId}>
                   <strong>{l.quantity} × </strong>
-                  {(order.catalogSnapshot ?? data.catalog).find(
-                    (p) => p.id === l.productId,
-                  )?.name ?? l.productId}
+                  {l.name}
                 </li>
               ))}
             </ul>
