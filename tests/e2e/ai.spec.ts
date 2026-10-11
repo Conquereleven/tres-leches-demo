@@ -33,20 +33,20 @@ test("TL26 Copilot in canonical WA2 Inbox, handoff, responsive and accessibility
   };
   await inbound("Hi, I want to order a tres leches");
   await page.goto("/operations/inbox");
-  await page.getByLabel("Buscar conversación").fill("AI UAT fixture");
+  await page.getByLabel("Search conversations").fill("AI UAT fixture");
   await page.getByRole("button", { name: /AI UAT fixture/ }).click();
   await page
-    .getByRole("button", { name: "Tomar control humano", exact: true })
+    .getByRole("button", { name: "Human takeover", exact: true })
     .click();
   await expect(page.locator(".commerce")).toHaveAttribute("aria-busy", "false");
   await page
-    .getByRole("button", { name: /Generar sugerencia|Regenerar sugerencia/ })
+    .getByRole("button", { name: /Generate suggestion|Regenerate suggestion/ })
     .click();
-  await expect(page.getByLabel("Sugerencia privada")).toHaveValue(
+  await expect(page.getByLabel("Private suggestion")).toHaveValue(
     /Pastel Tres Leches/,
   );
   await page
-    .getByRole("button", { name: "Aprobar y enviar", exact: true })
+    .getByRole("button", { name: "Approve and send", exact: true })
     .click();
   await expect(page.locator(".commerce")).toHaveAttribute("aria-busy", "false");
   await expect
@@ -74,13 +74,11 @@ test("TL26 Copilot in canonical WA2 Inbox, handoff, responsive and accessibility
     });
   }
   await inbound("I need a custom wedding cake for 120 people.");
-  await page.getByRole("button", { name: "Actualizar", exact: true }).click();
-  await page.getByRole("button", { name: "Regenerar sugerencia" }).click();
-  await expect(
-    page.getByText("Consulta personalizada · cotización humana"),
-  ).toBeVisible();
+  await page.getByRole("button", { name: "Refresh", exact: true }).click();
+  await page.getByRole("button", { name: "Regenerate suggestion" }).click();
+  await expect(page.getByText("Custom enquiry · human quote")).toBeVisible();
   await expect(page.getByText(/120 personas/)).toBeVisible();
-  await page.getByRole("button", { name: "Pausar IA", exact: true }).click();
+  await page.getByRole("button", { name: "Pause AI", exact: true }).click();
   await expect(page.getByText(/AI_PAUSED/)).toBeVisible();
   expect(errors).toEqual([]);
 });
