@@ -1,3 +1,4 @@
+import { catalogReadEnabled, serveCatalogRead } from "./catalog/read-api";
 import { parseExternalAckSince } from "./domain/external-ack";
 import { byteRange } from "./static-range";
 import { mcpRead } from "./domain/mcp";
@@ -362,6 +363,16 @@ export async function startServer(
             429,
             "Demasiadas solicitudes; espera un minuto",
           );
+        if (
+          serveCatalogRead(
+            req,
+            res,
+            url,
+            () => store.read(),
+            catalogReadEnabled(process.env),
+          )
+        )
+          return;
         if (path.startsWith("/api/checkout")) {
           const enabled =
             ((runtime.environment === "staging" &&
