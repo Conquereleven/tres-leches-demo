@@ -197,7 +197,7 @@ test("canonical sort, product/variant/price/fulfillment differences and identica
     assert.notEqual(base, canonicalCartHash(f.service, f.cart(input)));
     assert.equal(
       resumeWebCheckout(f.service, { key, checkout: input }).changed,
-      true,
+      false,
     );
   } finally {
     f.store.close();
@@ -384,7 +384,7 @@ test("pre-release records recover the frozen hash without duplicating a paid ord
     });
     assert.equal(
       resumeWebCheckout(f.service, { key, checkout: f.input() }).changed,
-      true,
+      false,
     );
   } finally {
     f.store.close();

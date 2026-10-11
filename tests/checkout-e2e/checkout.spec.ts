@@ -112,7 +112,13 @@ test("cart → delivery → details → review → payment step", async ({
       body: "<h1>Mock Paymennt TEST checkout</h1>",
     }),
   );
+  const submitted = page.waitForRequest(
+    (r) => r.url().endsWith("/api/checkout/web") && r.method() === "POST",
+  );
   await page.getByRole("button", { name: "PAY AED 50", exact: true }).click();
+  expect((await submitted).headers()["x-checkout-quote-revision"]).toMatch(
+    /^[a-f0-9]{64}$/,
+  );
   await expect(page).toHaveURL(/^https:\/\/pay.test.paymennt.com\/checkout\//);
   await page.goto(ORIGIN + "/checkout/return?status=paid");
   await expect(page.getByRole("heading", { name: "Thank you" })).toHaveCount(0);
