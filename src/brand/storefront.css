@@ -1,8 +1,8 @@
 /* Reference composition measured at 1440/390. Official display font takes priority. */
 .brand-experience.ref-home {
-  --surface-primary: #f6efe3;
-  --text-primary: #33241a;
-  --text-secondary: #735a40;
+  --surface-primary: var(--v2-blush);
+  --text-primary: var(--v2-graphite);
+  --text-secondary: var(--v2-secondary);
 }
 .brand-experience.ref-home h1,
 .brand-experience.ref-home h2 {
@@ -14,11 +14,11 @@
 .brand-experience.ref-home .b-header {
   position: sticky;
   top: 0;
-  background: #f6efe3;
+  background: var(--v2-blush);
   height: 77px;
   padding: 16px 32px;
-  border-bottom: 1px solid #d6cdbc;
-  color: #33241a;
+  border-bottom: 1px solid var(--v2-blush);
+  color: var(--v2-graphite);
 }
 .brand-experience.ref-home .b-logo {
   width: auto;
@@ -45,7 +45,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(transparent 38%, #1e160f70);
+  background: linear-gradient(transparent 38%, #27242d70);
 }
 .ref-micro {
   position: absolute;
@@ -63,7 +63,7 @@
   position: absolute;
   left: 32px;
   bottom: 32px;
-  color: #fffdf8;
+  color: var(--v2-white);
   z-index: 1;
   max-width: 640px;
 }
@@ -182,9 +182,9 @@
   letter-spacing: 0.08em;
 }
 .brand-experience.ref-home .b-button {
-  background: #805b36;
-  border-color: #805b36;
-  color: #fffdf8;
+  background: var(--v2-raspberry);
+  border-color: var(--v2-raspberry);
+  color: var(--v2-white);
   text-decoration: none;
   font-size: 13px;
   padding: 12px 32px;
@@ -209,7 +209,7 @@
 }
 .ref-tradition h2 {
   font-size: 52px;
-  color: #fffdf8;
+  color: var(--v2-white);
   margin: 0 0 32px;
 }
 .ref-tradition p {
@@ -252,7 +252,7 @@
 }
 .ref-family .b-button {
   background: var(--3l-blush);
-  border-color: var(--3l-gold);
+  border-color: var(--v2-raspberry);
   letter-spacing: 0;
   text-transform: none;
 }
@@ -274,9 +274,9 @@
   width: 70%;
   top: 3%;
   left: 6%;
-  background: #fffdf8;
+  background: var(--v2-white);
   padding: 16px;
-  box-shadow: 0 10px 18px #33241a20;
+  box-shadow: 0 10px 18px #27242d20;
 }
 .ref-flower {
   width: 25%;
@@ -292,9 +292,9 @@
   width: 52%;
   bottom: 0;
   right: 0;
-  background: #fffdf8;
+  background: var(--v2-white);
   padding: 12px;
-  box-shadow: 0 10px 18px #33241a20;
+  box-shadow: 0 10px 18px #27242d20;
 }
 .ref-order-link {
   text-align: center;
@@ -308,13 +308,13 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #fffdf8;
-  border: 1px solid #d6cdc1;
+  background: var(--v2-white);
+  border: 1px solid var(--v2-blush);
   border-radius: 28px;
   padding: 12px 18px;
-  color: #372c27;
+  color: var(--v2-graphite);
   text-decoration: none;
-  box-shadow: 0 2px 12px #372c2712;
+  box-shadow: 0 2px 12px #27242d12;
   font-size: 13px;
   min-height: 48px;
 }
@@ -399,7 +399,7 @@
   }
   .ref-hero-copy {
     position: static;
-    color: #33241a;
+    color: var(--v2-graphite);
     padding: 32px 24px 64px;
   }
   .ref-hero h1 {
@@ -618,7 +618,7 @@
 .ref-star {
   width: 18px;
   height: 18px;
-  color: #8a5a34;
+  color: var(--v2-secondary);
   margin: 0 auto 8px;
   display: block;
 }
@@ -629,7 +629,7 @@
 }
 .ref-featured > p:last-of-type {
   font-size: 15px;
-  color: #8a5a34;
+  color: var(--v2-secondary);
   line-height: 1.225;
 }
 .ref-cakes {
@@ -682,14 +682,14 @@
 .brand-experience.ref-home .ref-tradition h2 {
   font-size: clamp(32px, 3.49vw, 50.24px);
   line-height: 1.06;
-  color: #fbf7ef;
+  color: var(--v2-white);
   margin: 0;
 }
 .ref-rule {
   display: block;
   width: 40px;
   height: 1px;
-  background: #33241a40;
+  background: #27242d40;
   margin: 24px 0 20px;
 }
 .ref-tradition p {
@@ -712,7 +712,7 @@
   width: 48px !important;
   height: 48px !important;
   padding: 14px;
-  border: 1px solid #33241a50;
+  border: 1px solid #27242d50;
   border-radius: 50%;
 }
 .ref-slices {
@@ -820,7 +820,7 @@
 }
 .brand-experience.ref-home .ref-family .b-button {
   background: var(--3l-blush);
-  border-color: var(--3l-gold);
+  border-color: var(--v2-raspberry);
   padding: 16px 32px;
   font-size: 15px;
   text-transform: none;
@@ -1153,8 +1153,8 @@
 /* Preserve blush CTAs with accessible dark copy. */
 .brand-experience.ref-home .ref-family .b-button {
   background: var(--3l-blush);
-  border-color: var(--3l-gold);
-  color: #34231d;
+  border-color: var(--v2-raspberry);
+  color: var(--v2-graphite);
 }
 .b-address-suggestions {
   display: grid;
@@ -1164,9 +1164,9 @@
   text-align: start;
   min-height: 48px;
   padding: 12px;
-  background: var(--b-cream, #faf5ed);
-  color: #34231d;
-  border: 1px solid #b6a99a;
+  background: var(--b-cream, var(--v2-white));
+  color: var(--v2-graphite);
+  border: 1px solid var(--v2-secondary);
 }
 
 /* Measured mobile reference: retain the taller food crop without changing checkout. */
@@ -1177,7 +1177,7 @@
 }
 /* Approved vertical packaging film: keep the full frame and baked-in caption. */
 .ref-home .ref-hero {
-  background: #f6efe3;
+  background: var(--v2-white);
   min-height: 640px;
 }
 .ref-home .ref-hero video {
@@ -1193,7 +1193,7 @@
   background: none;
 }
 .ref-home .ref-hero-copy {
-  color: #33241a;
+  color: var(--v2-graphite);
   max-width: 42%;
   top: 50%;
   bottom: auto;
@@ -1203,7 +1203,7 @@
 .brand-experience.ref-home .ref-hero-copy > p,
 .ref-home .ref-heritage,
 .ref-home .ref-watch {
-  color: #33241a;
+  color: var(--v2-graphite);
 }
 .ref-home .ref-micro {
   display: none;
@@ -1289,7 +1289,7 @@
   display: block;
   margin: 0;
   overflow: hidden;
-  background: #eee7db;
+  background: var(--v2-petal);
 }
 .brand-experience :is(.b-full-menu, .b-product-page) .b-menu-photo picture {
   width: 100%;
@@ -1322,7 +1322,7 @@
 .brand-experience :is(.b-full-menu, .b-product-page) .b-menu-no-photo {
   height: 100%;
   min-height: 0;
-  background: #e9dfcd;
+  background: var(--v2-petal);
   color: var(--text-secondary);
 }
 .b-product-page {
@@ -1354,7 +1354,7 @@
   width: 62px;
   min-height: 44px;
   text-align: center;
-  border: 1px solid #b5a18d;
+  border: 1px solid var(--v2-secondary);
   background: transparent;
   color: inherit;
   border-radius: 0;
@@ -1363,7 +1363,7 @@
   padding: 6px;
 }
 .b-quantity-input:focus-visible {
-  outline: 2px solid #6b4937;
+  outline: 2px solid var(--v2-raspberry);
   outline-offset: 3px;
 }
 .b-menu-preview {
@@ -1384,7 +1384,7 @@
 .b-preview-grid figure {
   margin: 0 0 16px;
   aspect-ratio: 4/3;
-  background: #e9dfcd;
+  background: var(--v2-petal);
   overflow: hidden;
 }
 .b-preview-grid picture {
@@ -1412,7 +1412,7 @@
   flex: none;
 }
 .b-how-guide {
-  background: #ebe3d5;
+  background: var(--v2-petal);
   scroll-margin-top: 110px;
   padding-block: 72px;
 }
@@ -1428,14 +1428,14 @@
 .b-how-guide li {
   position: relative;
   min-width: 0;
-  border-top: 1px solid #c2ac98;
+  border-top: 1px solid var(--v2-blush);
   padding-top: 22px;
 }
 .b-step-number {
   display: block;
   font-family: "3L Abril", serif;
   font-size: 40px;
-  color: #8d604b;
+  color: var(--v2-secondary);
   margin-bottom: 16px;
 }
 .b-how-guide li > svg {
@@ -1808,52 +1808,52 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
    numerals and outlines stay chocolate. */
 .brand-experience ::selection { background: var(--3l-blush); color: var(--text-primary); }
 .brand-experience :is(a, button, input, select, textarea, summary):focus-visible {
-  outline: 2px solid var(--text-primary); outline-offset: 2px; box-shadow: 0 0 0 6px var(--3l-gold);
+  outline: 2px solid var(--v2-raspberry); outline-offset: 2px; box-shadow: 0 0 0 6px var(--3l-blush);
 }
 
 /* BLUSH — warm surfaces and what is currently selected. */
-.brand-experience.ref-home .ref-featured { background: var(--3l-blush); }
-.brand-experience .ref-tradition > .ref-panel { background: var(--3l-blush); border-color: var(--3l-gold); }
+.brand-experience.ref-home .ref-featured { background: var(--v2-white); }
+.brand-experience .ref-tradition > .ref-panel { background: var(--v2-white); border-color: var(--v2-raspberry); }
 .brand-experience .ref-tradition > .ref-panel :is(h2, p, a, span, svg) { color: var(--text-primary); }
 .brand-experience .b-full-menu .b-menu-categories button { padding-inline: 0.9rem; border: 1px solid transparent; border-radius: 999px; }
 .brand-experience .b-full-menu .b-menu-categories button:hover { background: var(--3l-blush); }
-.brand-experience .b-full-menu .b-menu-categories button[aria-pressed="true"] { background: var(--3l-blush); border-color: var(--3l-gold); color: var(--text-primary); }
-.brand-experience.ref-home .ref-family .b-button { background: var(--3l-blush); border-color: var(--3l-gold); color: var(--text-primary); }
+.brand-experience .b-full-menu .b-menu-categories button[aria-pressed="true"] { background: var(--3l-blush); border-color: var(--v2-raspberry); color: var(--text-primary); }
+.brand-experience.ref-home .ref-family .b-button { background: var(--v2-raspberry); border-color: var(--v2-raspberry); color: var(--surface-paper); }
 .brand-experience .b-fulfillment-choice label { padding: 0.55rem 1.15rem; border: 1px solid var(--border-subtle); border-radius: 999px; background: var(--surface-paper); transition: background-color 0.2s ease, border-color 0.2s ease; }
-.brand-experience .b-fulfillment-choice label:has(input:checked) { background: var(--3l-blush); border-color: var(--3l-gold); }
+.brand-experience .b-fulfillment-choice label:has(input:checked) { background: var(--3l-blush); border-color: var(--v2-raspberry); }
 .brand-experience .b-shop-notice,
 .brand-experience .b-product-page .b-product-notice,
 .brand-experience .b-menu-advance { background: var(--3l-blush); border-inline-start: 4px solid var(--3l-gold); }
-.brand-experience .b-how-guide li > svg { box-sizing: content-box; padding: 9px; border-radius: 50%; background: var(--3l-blush); color: var(--text-primary); }
-.brand-experience .b-shopping-wa { background: var(--3l-blush); border-color: var(--3l-blush); }
+.brand-experience .b-how-guide li > svg { box-sizing: content-box; padding: 9px; border-radius: 50%; background: var(--v2-white); color: var(--text-primary); }
+.brand-experience .b-shopping-wa { background: var(--v2-white); border-color: var(--v2-raspberry); }
 .ref-city-label { width: fit-content; margin-inline: auto; padding: 8px 22px; border-radius: 999px; border: 1px solid transparent; transition: background-color 0.4s ease, border-color 0.4s ease; }
 .ref-bridge:is([data-journey="mexico"], [data-journey="travel"]) .ref-mexico .ref-city-label,
-.ref-bridge[data-journey="dubai"] .ref-dubai .ref-city-label { background: var(--3l-blush); border-color: var(--3l-gold); }
+.ref-bridge[data-journey="dubai"] .ref-dubai .ref-city-label { background: var(--3l-blush); border-color: var(--v2-raspberry); }
 
 /* GOLD — rules, markers and active lines. */
 .brand-experience .b-header :is(.b-nav-left, .b-nav-right) > a { text-decoration: underline 3px transparent; text-underline-offset: 8px; transition: text-decoration-color 0.2s ease; }
-.brand-experience .b-header :is(.b-nav-left, .b-nav-right) > a:is(:hover, :focus-visible, [aria-current="page"]) { text-decoration-color: var(--3l-gold); }
+.brand-experience .b-header :is(.b-nav-left, .b-nav-right) > a:is(:hover, :focus-visible, [aria-current="page"]) { text-decoration-color: var(--v2-raspberry); }
 .ref-family-copy { border-inline-start: 3px solid var(--3l-gold); padding-inline-start: 24px; }
 .brand-experience .b-footer { border-top: 4px solid var(--3l-gold); }
-.brand-experience .b-footer nav :is(button, a):hover { color: var(--3l-blush); }
+.brand-experience .b-footer nav :is(button, a):hover { color: var(--v2-raspberry); }
 .brand-experience .b-co-progress li.current .b-co-step-label { text-decoration: underline 3px var(--3l-gold); text-underline-offset: 6px; }
 .brand-experience.ref-home :is(.ref-featured, .b-how-guide, .b-menu-preview) > .b-label { color: var(--text-primary); }
 .brand-experience.ref-home :is(.b-how-guide, .b-menu-preview) > .b-label::before { content: ""; display: inline-block; width: 28px; height: 3px; margin-inline-end: 12px; vertical-align: middle; background: var(--3l-gold); }
 .brand-experience .b-step-number { width: fit-content; color: var(--text-primary); border-bottom: 4px solid var(--3l-gold); padding-bottom: 4px; }
-.brand-experience :is(.b-full-menu, .b-product-page, .b-menu-preview) .b-menu-card:hover { border-color: var(--3l-gold); }
-.brand-experience :is(.b-shop-form, .b-product-page, .b-full-menu) select:has(option:checked:not([value=""])) { border-color: var(--3l-gold); box-shadow: inset 0 -2px 0 var(--3l-gold); }
+.brand-experience :is(.b-full-menu, .b-product-page, .b-menu-preview) .b-menu-card:hover { border-color: var(--v2-raspberry); }
+.brand-experience :is(.b-shop-form, .b-product-page, .b-full-menu) select:has(option:checked:not([value=""])) { border-color: var(--v2-raspberry); box-shadow: inset 0 -2px 0 var(--v2-raspberry); }
 .brand-experience .ref-star { color: var(--3l-gold); }
 .brand-experience .b-how-guide li { border-top-color: var(--3l-gold); }
-.brand-experience .b-link { text-decoration-color: var(--3l-gold); }
+.brand-experience .b-link { text-decoration-color: var(--v2-raspberry); }
 .ref-pencil-body { fill: var(--3l-gold); }
 
 /* Journal: a pencil drawing. Defaults are the finished portrait so no-JS readers see it. */
 .ref-scroll-sketch { position: absolute; display: block; height: auto; aspect-ratio: 640 / 768; }
 .ref-sketch-final { opacity: var(--sketch-final, 1); }
 .ref-sketch-lines { opacity: var(--sketch-lines, 0); }
-.ref-pencil-line { stroke: #3f3733; }
+.ref-pencil-line { stroke: var(--v2-graphite); }
 .ref-pencil-point { opacity: 0; transition: opacity 0.2s ease; }
-.ref-pencil-lead { fill: #3f3733; }
+.ref-pencil-lead { fill: var(--v2-graphite); }
 .ref-pencil-cap { fill: var(--3l-blush); stroke: var(--3l-gold); stroke-width: 1; }
 
 /* Mexico City → Dubai: a gold route on a blush bed, led by a chocolate-ringed marker. */
@@ -1911,7 +1911,7 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
 .b-language-menu {
   position: absolute; z-index: 40; inset-block-start: 100%; inset-inline-end: 0; margin: 4px 0 0; padding: 6px;
   min-width: 168px; list-style: none; background: var(--surface-paper); border: 1px solid var(--border-subtle);
-  border-radius: 12px; box-shadow: 0 12px 28px #2b1b1626;
+  border-radius: 12px; box-shadow: 0 12px 28px #27242d26;
 }
 .b-language-menu[hidden] { display: none; }
 .b-language-menu button {
@@ -1920,8 +1920,8 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
   font: inherit; font-size: 14px; text-align: start; cursor: pointer;
 }
 .b-language-menu button:hover { background: var(--3l-blush); }
-.b-language-menu button[aria-current="true"] { background: var(--3l-blush); font-weight: 700; box-shadow: inset 3px 0 0 var(--3l-gold); }
-[dir="rtl"] .b-language-menu button[aria-current="true"] { box-shadow: inset -3px 0 0 var(--3l-gold); }
+.b-language-menu button[aria-current="true"] { background: var(--3l-blush); font-weight: 700; box-shadow: inset 3px 0 0 var(--v2-raspberry); }
+[dir="rtl"] .b-language-menu button[aria-current="true"] { box-shadow: inset -3px 0 0 var(--v2-raspberry); }
 
 /* Delivery-area typeahead: suggestions are approved areas; the id is what is submitted. */
 .b-field { display: grid; gap: 8px; }
@@ -1931,7 +1931,7 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
 .b-area-options {
   position: absolute; z-index: 30; inset-inline: 0; margin: 4px 0 0; padding: 6px; max-height: 288px; overflow-y: auto;
   list-style: none; background: var(--surface-paper); border: 1px solid var(--border-subtle); border-radius: 12px;
-  box-shadow: 0 12px 28px #2b1b1626;
+  box-shadow: 0 12px 28px #27242d26;
 }
 .b-area-options[hidden] { display: none; }
 .b-area-options li {
@@ -1940,35 +1940,35 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
 }
 .b-area-options li small { color: var(--text-secondary); white-space: nowrap; }
 .b-area-options li:is(:hover, [data-active]) { background: var(--3l-blush); }
-.b-area-options li[aria-selected="true"] { font-weight: 700; box-shadow: inset 3px 0 0 var(--3l-gold); }
-[dir="rtl"] .b-area-options li[aria-selected="true"] { box-shadow: inset -3px 0 0 var(--3l-gold); }
+.b-area-options li[aria-selected="true"] { font-weight: 700; box-shadow: inset 3px 0 0 var(--v2-raspberry); }
+[dir="rtl"] .b-area-options li[aria-selected="true"] { box-shadow: inset -3px 0 0 var(--v2-raspberry); }
 .b-area-field .b-caption { min-height: 1.4em; margin: 6px 0 0; }
 .brand-experience .b-shop-form input[readonly] { background: var(--surface-primary); color: var(--text-secondary); cursor: default; }
 
 /* 9 PM cutoff dialog. */
 .b-co-dialog {
   width: min(480px, calc(100vw - 32px)); padding: 28px; border: 1px solid var(--3l-gold); border-radius: 20px;
-  background: var(--surface-paper); color: var(--text-primary); box-shadow: 0 24px 60px #2b1b1642;
+  background: var(--surface-paper); color: var(--text-primary); box-shadow: 0 24px 60px #27242d42;
 }
-.b-co-dialog::backdrop { background: #2b1b1642; }
+.b-co-dialog::backdrop { background: #27242d42; }
 .b-co-dialog h2 { margin: 0 0 12px; font-family: var(--display-font, "3L Abril", serif); font-weight: 400; font-size: 1.6rem; line-height: 1.15; }
 .b-co-dialog p { margin: 0 0 20px; line-height: 1.6; }
 .b-co-dialog-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
 .b-language-control :is(.b-language span, .b-language-menu button)[lang="ar"] { font-size: 16px; letter-spacing: 0; }
 /* Official Pan de Muerto photography: the whole bread is always shown, centred on the cream card;
    the incoming photo fades in over the last, so there is never a blank frame. */
-.brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo { background: #f6efe3; border-radius: var(--radius-panel); overflow: hidden; aspect-ratio: 1; }
+.brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo { background: var(--v2-white); border-radius: var(--radius-panel); overflow: hidden; aspect-ratio: 1; }
 .brand-experience .b-official-gallery img { border-radius: var(--radius-panel); }
 .brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo img { object-fit: contain; object-position: center; }
-.b-official-rotation { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; background: #f6efe3; }
-.brand-experience .b-official-rotation picture { position: absolute; inset: 0; width: 100%; height: 100%; background: #f6efe3; opacity: 0; transition: opacity 0s linear 800ms; }
+.b-official-rotation { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; background: var(--v2-white); }
+.brand-experience .b-official-rotation picture { position: absolute; inset: 0; width: 100%; height: 100%; background: var(--v2-white); opacity: 0; transition: opacity 0s linear 800ms; }
 .brand-experience .b-official-rotation picture.is-active { opacity: 1; z-index: 1; transition: opacity 800ms ease; }
 .brand-experience .b-official-rotation picture img { width: 100%; height: 100%; object-fit: contain; object-position: center; }
-.b-category-showcase { width: 100%; max-width: 960px; aspect-ratio: 3 / 2; margin: 0 auto 40px; overflow: hidden; background: #f6efe3; }
+.b-category-showcase { width: 100%; max-width: 960px; aspect-ratio: 3 / 2; margin: 0 auto 40px; overflow: hidden; background: var(--v2-white); }
 /* Menu introduction: one large official logo as a quiet watermark, behind the headings only. */
 .b-menu-page main { position: relative; isolation: isolate; }
 .b-menu-intro-mark { position: absolute; z-index: -1; top: 0; left: 0; right: 0; height: 22rem; background: url("/brand/wordmark.png") center / min(88%, 900px) auto no-repeat; opacity: 0.08; pointer-events: none; }
 @media (min-width: 1024px) { .b-menu-intro-mark { height: 29rem; } }
-.b-official-rotation:focus-visible { outline: 2px solid #33241a; outline-offset: 4px; }
-.brand-experience .b-product-page .b-official-gallery img { flex: none; width: min(220px, 60vw); height: auto; max-width: none; aspect-ratio: 1; object-fit: contain; background: #f6efe3; }
+.b-official-rotation:focus-visible { outline: 2px solid var(--v2-graphite); outline-offset: 4px; }
+.brand-experience .b-product-page .b-official-gallery img { flex: none; width: min(220px, 60vw); height: auto; max-width: none; aspect-ratio: 1; object-fit: contain; background: var(--v2-white); }
 @media (prefers-reduced-motion: reduce) { .brand-experience .b-official-rotation picture { transition: none; } }

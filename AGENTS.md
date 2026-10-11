@@ -111,3 +111,11 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - The official wordmark appears once as an 8% watermark (Joel approved Proposal A) behind the Menu introduction only (`.b-menu-intro-mark`). Never on product photos, cards, galleries, detail pages, or as a repeating or global background.
 - The Pan de Muerto category banner is back (Lisa): the four mixed boards, whole, 3:2, same 3.5 s rotation. No banners on other categories. This supersedes the earlier "banner removed" decision.
 - Pack photos are square by continuing each photo's own background (`extend` in `scripts/official-pan-crops.json`); breads are never copied, moved or redrawn. The filled pack uses its own asset (`official-pan-13-pack`) so Crema diplomática's approved third photo is untouched.
+
+## Color Refresh V2 (11 October 2026, authoritative public palette)
+- Supersedes the cream/cacao customer palette: white #FFFFFF, blush #F6DFE0, petal #FBEFF3, dusty rose #D88EA6, raspberry #A93C68, graphite #27242D; secondary text #605660. Gold #A28D5B is decoration/official artwork only.
+- Scope tokens to `.brand-experience`, `.b-modal`, `.b-return`; leave global root/operations tokens intact. No change to geometry, fonts, media, motion, copy or commerce. Lovable reference informs colour only; customer ordering remains native cart/web checkout.
+- PR #6 image frame/rotation changes must be retained when resolving future storefront.css overlaps; apply V2 colour values only. PR #7 metadata/API work is separate. No Production deployment in this sprint.
+
+## Color Refresh V2 correction (11 October 2026, Joel)
+- The dominant customer canvas is blush #F6DFE0, with white details/secondary surfaces. This supersedes the white-base proposal in the same sprint. Keep graphite text and accessible raspberry CTAs, and preserve all existing layout, motion, media, commerce and Operations.
