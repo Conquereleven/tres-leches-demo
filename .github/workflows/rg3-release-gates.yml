@@ -1,7 +1,7 @@
 name: RG3 isolated release evidence
 on:
   pull_request:
-    branches: [main]
+    branches: [main, integration/3l-rg3-release-candidate]
 permissions:
   contents: read
 concurrency:

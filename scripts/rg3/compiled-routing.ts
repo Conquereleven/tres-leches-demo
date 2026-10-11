@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import https from "node:https";
 import http from "node:http";
-import { chromium, webkit } from "@playwright/test";
+import { chromium, webkit, expect } from "@playwright/test";
 import { stagingEnv } from "../../tests/fixtures/staging";
 
 const dir = mkdtempSync(join(tmpdir(), "3l-rg3-routing-"));
@@ -171,10 +171,14 @@ try {
         } else blocked = true;
         anonymousRoutes.push({ route, status, loginVisible });
       }
-      const login = await request.post(origin + "/api/login", {
-        headers: { Origin: origin },
-        data: { id: "test-admin", password: "fixture-password-not-shipped" },
-      });
+      // Exercise the compiled login UI, not just API cookie injection.
+      await page.getByLabel("Agent", { exact: true }).fill("test-admin");
+      await page.getByLabel("Password", { exact: true }).fill("fixture-password-not-shipped");
+      const loggedIn = page.waitForResponse(
+        (response) => response.url() === origin + "/api/login",
+      );
+      await page.getByRole("button", { name: "Sign in to workspace" }).click();
+      const login = await loggedIn;
       if (login.status() !== 200) throw Error("Local admin login failed");
       const entries = [];
       for (const route of routes) {
@@ -189,6 +193,10 @@ try {
         if (status !== 200 || refresh !== 200) blocked = true;
         entries.push({ route, status, refresh, shell: status === 200 });
       }
+      const unknownOperation = (
+        await request.get(origin + "/operations/not-a-route")
+      ).status();
+      if (unknownOperation !== 404) throw Error("Open Operations fallback");
       const agent = await browser.newContext({ ignoreHTTPSErrors: true });
       const agentLogin = await agent.request.post(origin + "/api/login", {
         headers: { Origin: origin },
@@ -204,6 +212,18 @@ try {
         (await agentPage
           .getByRole("button", { name: "Settings", exact: true })
           .count()) === 0;
+      const agentRestrictedRoutes: Record<string, number> = {};
+      for (const [route, heading] of [
+        ["settings", "Settings access is restricted"],
+        ["products", "Product Hub access is restricted"],
+      ]) {
+        const response = await agentPage.goto(origin + "/operations/" + route);
+        agentRestrictedRoutes[route!] = response?.status() ?? 0;
+        await expect(agentPage.getByText(heading!, { exact: true })).toBeVisible();
+        if (response?.status() !== 200) throw Error("Restricted route shell missing");
+        await agentPage.reload();
+        await expect(agentPage.getByText(heading!, { exact: true })).toBeVisible();
+      }
       if (agentLogin.status() !== 200 || diagnostics !== 403 || !settingsHidden)
         throw Error("Role boundary regression");
       (report.routes as unknown[]).push({
@@ -215,11 +235,13 @@ try {
         adminRoutes: entries,
         agentDiagnostics: diagnostics,
         agentSettingsHidden: settingsHidden,
+        agentRestrictedRoutes,
         publicHomepage: publicPage?.status(),
         publicImages,
         publicRoutes,
         staticDirectoryStatus: assets.status(),
         unknownRouteStatus: unknown,
+        unknownOperationStatus: unknownOperation,
         privatePaths,
         unknownApiStatus: unknownApi.status(),
         unknownApiContentType: unknownApi.headers()["content-type"],
@@ -231,7 +253,7 @@ try {
     }
   }
   report.verdict = blocked
-    ? "BLOCKED: compiled Node rejects four D1 routes"
+    ? "BLOCKED: compiled Node route or refresh failed"
     : "PASS";
   writeFileSync(
     "work/rg3/compiled-routing.json",
