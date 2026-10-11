@@ -38,6 +38,8 @@ try {
         checkoutId: "synthetic-checkout",
         status: "PAID",
         receivedAt: "2026-10-10T00:00:00Z",
+        nextAt: "2026-10-10T00:00:00Z",
+        attempts: 0,
       },
     ];
   });

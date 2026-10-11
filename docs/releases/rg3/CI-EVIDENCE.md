@@ -26,6 +26,7 @@ Reproduce from the exact review head:
 ```sh
 npm ci
 npm run typecheck
+npx tsc --project scripts/rg3/tsconfig.json --noEmit
 npm run lint
 npm run build
 npm test
@@ -43,3 +44,11 @@ node --import tsx scripts/rg3/compiled-routing.ts
 ```
 
 Serialize suites sharing a port. Routing exits 2 for the demonstrated defect. Local logs under ignored `work/rg3/` contain only fixtures. Safe aggregate JSON is in [evidence](evidence/); its subject SHA is explicit. The final PR checks independently bind the final head, even when it includes documentation beyond the initial application merge.
+
+## First published-head CI observation
+
+Head `998aa8cd39cfd7be1eb40b52549e184dc9404c61`: standard `checks` SUCCESS. Combined CI passed 487 units, 4 Sites, 34 Operations, 7 workflows and 19 Chromium checkout. WebKit finished 18 passed / 1 failed: `checkout.spec.ts:128` captured an access-control error for `/api/checkout/config` around the mocked external checkout navigation; functional flow reached its expected page. This is unresolved CI evidence, not ignored or relabeled as PASS. Both local full WebKit runs passed 19. One browser-job rerun was requested on that head; final attempt/head results are retained in the PR.
+
+Compiled CI independently reproduced all four route404 failures on the exact head with exit2. Safe logs: [browser run](https://github.com/Conquereleven/tres-leches-demo/actions/runs/38160996856), [standard checks](https://github.com/Conquereleven/tres-leches-demo/actions/runs/38160996775).
+
+An additional strict check exposed missing required nextAt/attempts fields in the synthetic backup receipt, outside the repository's top-level script include. RG3 corrects only that fixture and adds a scoped scripts/rg3/tsconfig.json plus its CI command. No application or original feature change is involved. The new final head must pass its own gates; older results are supplementary evidence only.
