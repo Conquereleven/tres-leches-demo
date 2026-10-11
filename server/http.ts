@@ -563,7 +563,19 @@ export async function startServer(
             return json(
               res,
               200,
-              await createWebCheckout(service, body, key, "web", origin),
+              await createWebCheckout(
+                service,
+                body,
+                key,
+                "web",
+                origin,
+                req.headers["x-checkout-quote-revision"] === undefined
+                  ? undefined
+                  : z
+                      .string()
+                      .regex(/^[a-f0-9]{64}$/)
+                      .parse(req.headers["x-checkout-quote-revision"]),
+              ),
             );
           }
           if (path === "/api/checkout") {

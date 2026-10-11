@@ -1,3 +1,4 @@
+import { frozenCheckout } from "./frozen-checkout";
 import { PaymenntProvider } from "../adapters/paymennt";
 import { orderBillingAddress, toPaymenntDeliveryAddress } from "./billing";
 import {
@@ -1166,23 +1167,7 @@ export class CommerceService {
       "Complete delivery and billing details required",
       409,
     );
-    const quote = quoteOrder(
-      snapshot.zones,
-      order.lines,
-      undefined,
-      undefined,
-      this.geo,
-      order.manualZoneId,
-      snapshot.catalog ?? [],
-      order.fulfillmentMethod,
-    );
-    requireThat(
-      quote.eligible &&
-        quote.totalFils === payment.amountFils &&
-        payment.currency === "AED",
-      "Order changed; checkout held for review",
-      409,
-    );
+    const frozen = frozenCheckout(order, payment);
     const names = customer.customer.trim().split(/\s+/);
     // Names captured separately are sent as given; only older orders are split.
     const firstName = order.customerDetails.firstName ?? names[0]!;
@@ -1192,17 +1177,9 @@ export class CommerceService {
       paymentId: payment.id,
       orderId: order.id,
       amountFils: payment.amountFils,
-      feeFils: quote.feeFils!,
+      feeFils: frozen.feeFils,
       returnUrl: payment.webReturnUrl,
-      items: order.lines.map((line) => {
-        const product = snapshot.catalog!.find((p) => p.id === line.productId)!;
-        return {
-          sku: product.id,
-          name: product.name,
-          quantity: line.quantity,
-          unitPriceFils: product.priceFils,
-        };
-      }),
+      items: frozen.items,
       customer: {
         firstName,
         lastName,
@@ -1290,6 +1267,12 @@ export class CommerceService {
         const snapshot = this.store.read();
         if (claimed.kind === "payment") {
           const p = snapshot.payments.find((p) => p.id === claimed.entityId)!;
+          if (p.checkoutFlow === "web" && p.status !== "creating") {
+            this.store.write((s) => {
+              s.jobs.find((j) => j.id === claimed.id)!.status = "done";
+            });
+            continue;
+          }
           const result = await this.bounded(
             p.checkoutFlow === "web"
               ? this.createHostedWebPayment(p, snapshot)
@@ -1314,6 +1297,11 @@ export class CommerceService {
             )
               return;
             const p = s.payments.find((p) => p.id === claimed.entityId)!;
+            // A late worker must never regress an already reconciled payment.
+            if (p.checkoutFlow === "web" && p.status !== "creating") {
+              job.status = "done";
+              return;
+            }
             p.url = result.url;
             p.providerReference = result.reference;
             p.provider = result.provider ?? this.payment.name;
