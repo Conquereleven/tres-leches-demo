@@ -480,7 +480,7 @@
       "file": "src/brand/storefront.css",
       "key": "|.ref-home .ref-hero|background",
       "before": "#f6efe3",
-      "after": "var(--v2-white)"
+      "after": "var(--v2-blush)"
     },
     {
       "file": "src/brand/storefront.css",

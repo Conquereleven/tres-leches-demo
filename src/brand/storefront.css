@@ -1177,7 +1177,7 @@
 }
 /* Approved vertical packaging film: keep the full frame and baked-in caption. */
 .ref-home .ref-hero {
-  background: var(--v2-white);
+  background: var(--v2-blush);
   min-height: 640px;
 }
 .ref-home .ref-hero video {
