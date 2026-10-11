@@ -1,0 +1,20 @@
+{
+  "scope": "synthetic-only",
+  "productionBackupVerified": false,
+  "integrity": "ok",
+  "fullStateEqual": true,
+  "relationshipsValid": true,
+  "mode": "0600",
+  "counts": {
+    "orders": 7,
+    "payments": 7,
+    "conversations": 7,
+    "receipts": 1,
+    "catalog": 1
+  },
+  "latestSyntheticBackupAt": "2026-10-11T17:33:21.651Z",
+  "localRestoreMilliseconds": 2,
+  "productionRpo": "unverified",
+  "productionRto": "unverified",
+  "removedDisposableFiles": true
+}

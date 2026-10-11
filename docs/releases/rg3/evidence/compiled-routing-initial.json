@@ -1,0 +1,249 @@
+{
+  "expectedRevision": "58d44483cddab3ecc72555b135454e63f85c6913",
+  "environment": "local-production-profile",
+  "providers": "offline",
+  "productionAccessed": false,
+  "routes": [
+    {
+      "browser": "chromium",
+      "health": {
+        "ok": true,
+        "environment": "production",
+        "mode": "offline",
+        "revision": "58d44483cddab3ecc72555b135454e63f85c6913"
+      },
+      "ready": {
+        "storage": true,
+        "environment": "production"
+      },
+      "anonymousWorkspace": 401,
+      "anonymousRoutes": [
+        {
+          "route": "overview",
+          "status": 404,
+          "loginVisible": false
+        },
+        {
+          "route": "orders",
+          "status": 200,
+          "loginVisible": true
+        },
+        {
+          "route": "production",
+          "status": 200,
+          "loginVisible": true
+        },
+        {
+          "route": "delivery",
+          "status": 200,
+          "loginVisible": true
+        },
+        {
+          "route": "inbox",
+          "status": 200,
+          "loginVisible": true
+        },
+        {
+          "route": "products",
+          "status": 404,
+          "loginVisible": false
+        },
+        {
+          "route": "print",
+          "status": 404,
+          "loginVisible": false
+        },
+        {
+          "route": "settings",
+          "status": 404,
+          "loginVisible": false
+        }
+      ],
+      "adminRoutes": [
+        {
+          "route": "overview",
+          "status": 404,
+          "refresh": 404,
+          "shell": false
+        },
+        {
+          "route": "orders",
+          "status": 200,
+          "refresh": 200,
+          "shell": true
+        },
+        {
+          "route": "production",
+          "status": 200,
+          "refresh": 200,
+          "shell": true
+        },
+        {
+          "route": "delivery",
+          "status": 200,
+          "refresh": 200,
+          "shell": true
+        },
+        {
+          "route": "inbox",
+          "status": 200,
+          "refresh": 200,
+          "shell": true
+        },
+        {
+          "route": "products",
+          "status": 404,
+          "refresh": 404,
+          "shell": false
+        },
+        {
+          "route": "print",
+          "status": 404,
+          "refresh": 404,
+          "shell": false
+        },
+        {
+          "route": "settings",
+          "status": 404,
+          "refresh": 404,
+          "shell": false
+        }
+      ],
+      "agentDiagnostics": 403,
+      "agentSettingsHidden": true,
+      "publicHomepage": 200,
+      "publicImages": true,
+      "publicRoutes": {
+        "/menu": 200,
+        "/cart": 200,
+        "/checkout": 200,
+        "/checkout/return": 200
+      },
+      "staticDirectoryStatus": 200,
+      "unknownRouteStatus": 404,
+      "unknownApiStatus": 401,
+      "unknownApiContentType": "application/json"
+    },
+    {
+      "browser": "webkit",
+      "health": {
+        "ok": true,
+        "environment": "production",
+        "mode": "offline",
+        "revision": "58d44483cddab3ecc72555b135454e63f85c6913"
+      },
+      "ready": {
+        "storage": true,
+        "environment": "production"
+      },
+      "anonymousWorkspace": 401,
+      "anonymousRoutes": [
+        {
+          "route": "overview",
+          "status": 404,
+          "loginVisible": false
+        },
+        {
+          "route": "orders",
+          "status": 200,
+          "loginVisible": true
+        },
+        {
+          "route": "production",
+          "status": 200,
+          "loginVisible": true
+        },
+        {
+          "route": "delivery",
+          "status": 200,
+          "loginVisible": true
+        },
+        {
+          "route": "inbox",
+          "status": 200,
+          "loginVisible": true
+        },
+        {
+          "route": "products",
+          "status": 404,
+          "loginVisible": false
+        },
+        {
+          "route": "print",
+          "status": 404,
+          "loginVisible": false
+        },
+        {
+          "route": "settings",
+          "status": 404,
+          "loginVisible": false
+        }
+      ],
+      "adminRoutes": [
+        {
+          "route": "overview",
+          "status": 404,
+          "refresh": 404,
+          "shell": false
+        },
+        {
+          "route": "orders",
+          "status": 200,
+          "refresh": 200,
+          "shell": true
+        },
+        {
+          "route": "production",
+          "status": 200,
+          "refresh": 200,
+          "shell": true
+        },
+        {
+          "route": "delivery",
+          "status": 200,
+          "refresh": 200,
+          "shell": true
+        },
+        {
+          "route": "inbox",
+          "status": 200,
+          "refresh": 200,
+          "shell": true
+        },
+        {
+          "route": "products",
+          "status": 404,
+          "refresh": 404,
+          "shell": false
+        },
+        {
+          "route": "print",
+          "status": 404,
+          "refresh": 404,
+          "shell": false
+        },
+        {
+          "route": "settings",
+          "status": 404,
+          "refresh": 404,
+          "shell": false
+        }
+      ],
+      "agentDiagnostics": 403,
+      "agentSettingsHidden": true,
+      "publicHomepage": 200,
+      "publicImages": true,
+      "publicRoutes": {
+        "/menu": 200,
+        "/cart": 200,
+        "/checkout": 200,
+        "/checkout/return": 200
+      },
+      "staticDirectoryStatus": 200,
+      "unknownRouteStatus": 404,
+      "unknownApiStatus": 401,
+      "unknownApiContentType": "application/json"
+    }
+  ],
+  "verdict": "BLOCKED: compiled Node rejects four D1 routes"
+}
