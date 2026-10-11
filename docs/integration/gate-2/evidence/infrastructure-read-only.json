@@ -1,0 +1,46 @@
+{
+  "observedDate": "2026-10-11",
+  "projectId": "1f9a94c1-0574-49a9-b579-bf6af3aad601",
+  "productionEnvironmentId": "142de30a-4879-4d04-85b9-12e79aa51bda",
+  "serviceId": "fe8c1417-39ca-4038-b94e-68659ab1c659",
+  "deploymentId": "bde0ce90-50d7-4a3b-a10e-2750613a398e",
+  "deploymentStatus": "SUCCESS",
+  "deployedCommit": "e2a82387549d5861e110178d6b9c8b8ae7f84f10",
+  "sourceBranch": "main",
+  "liveBuilder": "RAILPACK",
+  "repoBuilder": "NIXPACKS",
+  "buildCommand": "npm run build",
+  "startCommand": "npm start",
+  "healthcheckPath": "/api/health",
+  "healthcheckTimeout": 120,
+  "healthResponse": {
+    "ok": true,
+    "environment": "production",
+    "mode": "live",
+    "revision": "e2a82387549d5861e110178d6b9c8b8ae7f84f10"
+  },
+  "volumeMount": "/data",
+  "volumeSizeMb": 5000,
+  "replicas": 1,
+  "region": "sfo",
+  "stagedChanges": false,
+  "productionDatabaseAccessed": false,
+  "backupSettingsNamesPresent": [
+    "DB_PATH",
+    "BACKUP_DIR",
+    "BACKUP_INTERVAL_MINUTES",
+    "BACKUP_RETENTION_COUNT"
+  ],
+  "backupSettingValuesRead": false,
+  "liveBackupVerified": false,
+  "disposableBackup": {
+    "integrity": "ok",
+    "equivalent": true,
+    "mode": "600",
+    "catalogCount": 236,
+    "foundationPresent": true
+  },
+  "previousRollbackDeployment": "fb78d470-a648-4fd6-a6f5-3fdc86fdc857",
+  "mainProtected": false,
+  "requiredStatusChecks": []
+}
