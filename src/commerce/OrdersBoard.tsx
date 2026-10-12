@@ -1,3 +1,5 @@
+import { orderProductName, productSearchText } from "./product-names";
+import { OperationalProductName } from "./OperationalProductName";
 import { useOps } from "./ops-i18n";
 import { useState, type ReactNode } from "react";
 import {
@@ -36,7 +38,7 @@ type Run = (body: Record<string, unknown>, path?: string) => Promise<boolean>;
 const customerOf = (data: Data, o: Order) =>
   data.conversations.find((c) => c.id === o.conversationId);
 const productName = (data: Data, o: Order, id: string) =>
-  (o.catalogSnapshot ?? data.catalog).find((p) => p.id === id)?.name ?? id;
+  orderProductName(o, id, data.catalog);
 
 /**
  * Kitchen-first orders board: what needs preparing, when it is due and
@@ -70,7 +72,9 @@ export function OrdersBoard({
           orderReference(o),
           o.id,
           customerOf(data, o)?.customer,
-          ...o.lines.map((l) => productName(data, o, l.productId)),
+          ...o.lines.map((l) =>
+            productSearchText(productName(data, o, l.productId), l.productId),
+          ),
         ]
           .join(" ")
           .toLowerCase()
@@ -335,7 +339,11 @@ export function OrderCard({
       <ul className="ops-oc-lines" aria-label={t("Productos")}>
         {o.lines.map((l) => (
           <li key={l.productId}>
-            <b>{l.quantity}×</b> {productName(data, o, l.productId)}
+            <b>{l.quantity}×</b>{" "}
+            <OperationalProductName
+              product={productName(data, o, l.productId)}
+              id={l.productId}
+            />
           </li>
         ))}
       </ul>

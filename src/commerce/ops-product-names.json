@@ -1,0 +1,946 @@
+{
+  "pan-de-muerto-traditional-azucar-mini-40-g": {
+    "source": "Pan de Muerto tradicional · Azúcar · Mini · 40 g",
+    "en": "Traditional Pan de Muerto · Sugar · Mini · 40 g"
+  },
+  "pan-de-muerto-traditional-azucar-individual-70-g": {
+    "source": "Pan de Muerto tradicional · Azúcar · Individual · 70 g",
+    "en": "Traditional Pan de Muerto · Sugar · Individual · 70 g"
+  },
+  "pan-de-muerto-traditional-ajonjoli-mini-40-g": {
+    "source": "Pan de Muerto tradicional · Ajonjolí · Mini · 40 g",
+    "en": "Traditional Pan de Muerto · Sesame · Mini · 40 g"
+  },
+  "pan-de-muerto-traditional-ajonjoli-individual-70-g": {
+    "source": "Pan de Muerto tradicional · Ajonjolí · Individual · 70 g",
+    "en": "Traditional Pan de Muerto · Sesame · Individual · 70 g"
+  },
+  "pan-de-muerto-filled-crema-diplomatica-vainilla-mini": {
+    "source": "Pan de Muerto relleno · Crema diplomática (vainilla) · Mini",
+    "en": "Filled Pan de Muerto · Vanilla diplomat cream · Mini"
+  },
+  "pan-de-muerto-filled-crema-diplomatica-vainilla-individual": {
+    "source": "Pan de Muerto relleno · Crema diplomática (vainilla) · Individual",
+    "en": "Filled Pan de Muerto · Vanilla diplomat cream · Individual"
+  },
+  "pan-de-muerto-filled-chocolate-mini": {
+    "source": "Pan de Muerto relleno · Chocolate · Mini",
+    "en": "Filled Pan de Muerto · Chocolate · Mini"
+  },
+  "pan-de-muerto-filled-chocolate-individual": {
+    "source": "Pan de Muerto relleno · Chocolate · Individual",
+    "en": "Filled Pan de Muerto · Chocolate · Individual"
+  },
+  "pan-de-muerto-filled-mascarpone-y-cajeta-mini": {
+    "source": "Pan de Muerto relleno · Mascarpone y cajeta · Mini",
+    "en": "Filled Pan de Muerto · Mascarpone and cajeta · Mini"
+  },
+  "pan-de-muerto-filled-mascarpone-y-cajeta-individual": {
+    "source": "Pan de Muerto relleno · Mascarpone y cajeta · Individual",
+    "en": "Filled Pan de Muerto · Mascarpone and cajeta · Individual"
+  },
+  "pan-de-muerto-filled-mascarpone-y-fresas-mini": {
+    "source": "Pan de Muerto relleno · Mascarpone y fresas · Mini",
+    "en": "Filled Pan de Muerto · Mascarpone and strawberries · Mini"
+  },
+  "pan-de-muerto-filled-mascarpone-y-fresas-individual": {
+    "source": "Pan de Muerto relleno · Mascarpone y fresas · Individual",
+    "en": "Filled Pan de Muerto · Mascarpone and strawberries · Individual"
+  },
+  "pan-de-muerto-traditional-pack-6-mini": {
+    "source": "Pan de Muerto · Pack tradicional · 6 mini",
+    "en": "Pan de Muerto · Traditional pack · 6 mini pieces"
+  },
+  "pan-de-muerto-traditional-pack-12-mini": {
+    "source": "Pan de Muerto · Pack tradicional · 12 mini",
+    "en": "Pan de Muerto · Traditional pack · 12 mini pieces"
+  },
+  "pan-de-muerto-traditional-pack-6-individuales": {
+    "source": "Pan de Muerto · Pack tradicional · 6 individuales",
+    "en": "Pan de Muerto · Traditional pack · 6 individual pieces"
+  },
+  "pan-de-muerto-traditional-pack-12-individuales": {
+    "source": "Pan de Muerto · Pack tradicional · 12 individuales",
+    "en": "Pan de Muerto · Traditional pack · 12 individual pieces"
+  },
+  "pan-de-muerto-filled-pack-6-mini": {
+    "source": "Pan de Muerto · Pack relleno · 6 mini",
+    "en": "Pan de Muerto · Filled pack · 6 mini pieces"
+  },
+  "pan-de-muerto-filled-pack-12-mini": {
+    "source": "Pan de Muerto · Pack relleno · 12 mini",
+    "en": "Pan de Muerto · Filled pack · 12 mini pieces"
+  },
+  "pan-de-muerto-filled-pack-6-individuales": {
+    "source": "Pan de Muerto · Pack relleno · 6 individuales",
+    "en": "Pan de Muerto · Filled pack · 6 individual pieces"
+  },
+  "pan-de-muerto-filled-pack-12-individuales": {
+    "source": "Pan de Muerto · Pack relleno · 12 individuales",
+    "en": "Pan de Muerto · Filled pack · 12 individual pieces"
+  },
+  "conchas-traditional-vainilla-mini-40-g": {
+    "source": "Conchas tradicional · Vainilla · Mini · 40 g",
+    "en": "Traditional Conchas · Vanilla · Mini · 40 g"
+  },
+  "conchas-traditional-vainilla-individual-70-g": {
+    "source": "Conchas tradicional · Vainilla · Individual · 70 g",
+    "en": "Traditional Conchas · Vanilla · Individual · 70 g"
+  },
+  "conchas-traditional-chocolate-mini-40-g": {
+    "source": "Concha tradicional de chocolate · Mini · 40 g",
+    "en": "Traditional Chocolate Concha · Mini · 40 g"
+  },
+  "conchas-traditional-chocolate-individual-70-g": {
+    "source": "Concha tradicional de chocolate · Individual · 70 g",
+    "en": "Traditional Chocolate Concha · Individual · 70 g"
+  },
+  "conchas-traditional-pistache-mini-40-g": {
+    "source": "Conchas tradicional · Pistache · Mini · 40 g",
+    "en": "Traditional Conchas · Pistachio · Mini · 40 g"
+  },
+  "conchas-traditional-pistache-individual-70-g": {
+    "source": "Conchas tradicional · Pistache · Individual · 70 g",
+    "en": "Traditional Conchas · Pistachio · Individual · 70 g"
+  },
+  "conchas-traditional-tricolor-mini-40-g": {
+    "source": "Conchas tradicional · Tricolor · Mini · 40 g",
+    "en": "Traditional Conchas · Tricolor · Mini · 40 g"
+  },
+  "conchas-traditional-tricolor-individual-70-g": {
+    "source": "Conchas tradicional · Tricolor · Individual · 70 g",
+    "en": "Traditional Conchas · Tricolor · Individual · 70 g"
+  },
+  "conchas-filled-crema-diplomatica-vainilla-mini": {
+    "source": "Conchas rellenas · Crema diplomática (vainilla) · Mini",
+    "en": "Filled Conchas · Vanilla diplomat cream · Mini"
+  },
+  "conchas-filled-crema-diplomatica-vainilla-individual": {
+    "source": "Conchas rellenas · Crema diplomática (vainilla) · Individual",
+    "en": "Filled Conchas · Vanilla diplomat cream · Individual"
+  },
+  "conchas-filled-chocolate-mini": {
+    "source": "Conchas rellenas · Chocolate · Mini",
+    "en": "Filled Conchas · Chocolate · Mini"
+  },
+  "conchas-filled-chocolate-individual": {
+    "source": "Conchas rellenas · Chocolate · Individual",
+    "en": "Filled Conchas · Chocolate · Individual"
+  },
+  "conchas-filled-mascarpone-y-cajeta-mini": {
+    "source": "Conchas rellenas · Mascarpone y cajeta · Mini",
+    "en": "Filled Conchas · Mascarpone and cajeta · Mini"
+  },
+  "conchas-filled-mascarpone-y-cajeta-individual": {
+    "source": "Conchas rellenas · Mascarpone y cajeta · Individual",
+    "en": "Filled Conchas · Mascarpone and cajeta · Individual"
+  },
+  "conchas-filled-mascarpone-y-fresas-mini": {
+    "source": "Conchas rellenas · Mascarpone y fresas · Mini",
+    "en": "Filled Conchas · Mascarpone and strawberries · Mini"
+  },
+  "conchas-filled-mascarpone-y-fresas-individual": {
+    "source": "Conchas rellenas · Mascarpone y fresas · Individual",
+    "en": "Filled Conchas · Mascarpone and strawberries · Individual"
+  },
+  "conchas-traditional-pack-6-mini": {
+    "source": "Concha tradicional de chocolate · Pack · 6 mini",
+    "en": "Traditional Chocolate Concha · Pack · 6 mini pieces"
+  },
+  "conchas-traditional-pack-12-mini": {
+    "source": "Concha tradicional de chocolate · Pack · 12 mini",
+    "en": "Traditional Chocolate Concha · Pack · 12 mini pieces"
+  },
+  "conchas-traditional-pack-6-individuales": {
+    "source": "Concha tradicional de chocolate · Pack · 6 individuales",
+    "en": "Traditional Chocolate Concha · Pack · 6 individual pieces"
+  },
+  "conchas-traditional-pack-12-individuales": {
+    "source": "Concha tradicional de chocolate · Pack · 12 individuales",
+    "en": "Traditional Chocolate Concha · Pack · 12 individual pieces"
+  },
+  "conchas-filled-pack-6-mini": {
+    "source": "Concha rellena de pistache · Pack · 6 mini",
+    "en": "Pistachio-filled Concha · Pack · 6 mini pieces"
+  },
+  "conchas-filled-pack-12-mini": {
+    "source": "Concha rellena de pistache · Pack · 12 mini",
+    "en": "Pistachio-filled Concha · Pack · 12 mini pieces"
+  },
+  "conchas-filled-pack-6-individuales": {
+    "source": "Concha rellena de pistache · Pack · 6 individuales",
+    "en": "Pistachio-filled Concha · Pack · 6 individual pieces"
+  },
+  "conchas-filled-pack-12-individuales": {
+    "source": "Concha rellena de pistache · Pack · 12 individuales",
+    "en": "Pistachio-filled Concha · Pack · 12 individual pieces"
+  },
+  "tres-leches-vanilla-strawberry-13-personas": {
+    "source": "3 Leches Cake · Vanilla Strawberry · 1–3 personas",
+    "en": "Tres Leches Cake · Vanilla Strawberry · 1–3 people"
+  },
+  "tres-leches-vanilla-strawberry-68-personas": {
+    "source": "3 Leches Cake · Vanilla Strawberry · 6–8 personas",
+    "en": "Tres Leches Cake · Vanilla Strawberry · 6–8 people"
+  },
+  "tres-leches-vanilla-strawberry-1416-personas": {
+    "source": "3 Leches Cake · Vanilla Strawberry · 14–16 personas",
+    "en": "Tres Leches Cake · Vanilla Strawberry · 14–16 people"
+  },
+  "tres-leches-classic-13-personas": {
+    "source": "3 Leches Cake · Classic · 1–3 personas",
+    "en": "Tres Leches Cake · Classic · 1–3 people"
+  },
+  "tres-leches-classic-68-personas": {
+    "source": "3 Leches Cake · Classic · 6–8 personas",
+    "en": "Tres Leches Cake · Classic · 6–8 people"
+  },
+  "tres-leches-classic-1416-personas": {
+    "source": "3 Leches Cake · Classic · 14–16 personas",
+    "en": "Tres Leches Cake · Classic · 14–16 people"
+  },
+  "tres-leches-nutella-13-personas": {
+    "source": "3 Leches Cake · Nutella · 1–3 personas",
+    "en": "Tres Leches Cake · Nutella · 1–3 people"
+  },
+  "tres-leches-nutella-68-personas": {
+    "source": "3 Leches Cake · Nutella · 6–8 personas",
+    "en": "Tres Leches Cake · Nutella · 6–8 people"
+  },
+  "tres-leches-nutella-1416-personas": {
+    "source": "3 Leches Cake · Nutella · 14–16 personas",
+    "en": "Tres Leches Cake · Nutella · 14–16 people"
+  },
+  "tres-leches-caffe-latte-13-personas": {
+    "source": "3 Leches Cake · Caffe Latte · 1–3 personas",
+    "en": "Tres Leches Cake · Caffe Latte · 1–3 people"
+  },
+  "tres-leches-caffe-latte-68-personas": {
+    "source": "3 Leches Cake · Caffe Latte · 6–8 personas",
+    "en": "Tres Leches Cake · Caffe Latte · 6–8 people"
+  },
+  "tres-leches-caffe-latte-1416-personas": {
+    "source": "3 Leches Cake · Caffe Latte · 14–16 personas",
+    "en": "Tres Leches Cake · Caffe Latte · 14–16 people"
+  },
+  "tres-leches-coconut-13-personas": {
+    "source": "3 Leches Cake · Coconut · 1–3 personas",
+    "en": "Tres Leches Cake · Coconut · 1–3 people"
+  },
+  "tres-leches-coconut-68-personas": {
+    "source": "3 Leches Cake · Coconut · 6–8 personas",
+    "en": "Tres Leches Cake · Coconut · 6–8 people"
+  },
+  "tres-leches-coconut-1416-personas": {
+    "source": "3 Leches Cake · Coconut · 14–16 personas",
+    "en": "Tres Leches Cake · Coconut · 14–16 people"
+  },
+  "tres-leches-confetti-13-personas": {
+    "source": "3 Leches Cake · Confetti · 1–3 personas",
+    "en": "Tres Leches Cake · Confetti · 1–3 people"
+  },
+  "tres-leches-confetti-68-personas": {
+    "source": "3 Leches Cake · Confetti · 6–8 personas",
+    "en": "Tres Leches Cake · Confetti · 6–8 people"
+  },
+  "tres-leches-confetti-1416-personas": {
+    "source": "3 Leches Cake · Confetti · 14–16 personas",
+    "en": "Tres Leches Cake · Confetti · 14–16 people"
+  },
+  "tres-leches-lotus-13-personas": {
+    "source": "3 Leches Cake · Lotus · 1–3 personas",
+    "en": "Tres Leches Cake · Lotus · 1–3 people"
+  },
+  "tres-leches-lotus-68-personas": {
+    "source": "3 Leches Cake · Lotus · 6–8 personas",
+    "en": "Tres Leches Cake · Lotus · 6–8 people"
+  },
+  "tres-leches-lotus-1416-personas": {
+    "source": "3 Leches Cake · Lotus · 14–16 personas",
+    "en": "Tres Leches Cake · Lotus · 14–16 people"
+  },
+  "tres-leches-m-ms-13-personas": {
+    "source": "3 Leches Cake · M&Ms · 1–3 personas",
+    "en": "Tres Leches Cake · M&Ms · 1–3 people"
+  },
+  "tres-leches-m-ms-68-personas": {
+    "source": "3 Leches Cake · M&Ms · 6–8 personas",
+    "en": "Tres Leches Cake · M&Ms · 6–8 people"
+  },
+  "tres-leches-m-ms-1416-personas": {
+    "source": "3 Leches Cake · M&Ms · 14–16 personas",
+    "en": "Tres Leches Cake · M&Ms · 14–16 people"
+  },
+  "tres-leches-oreo-13-personas": {
+    "source": "3 Leches Cake · Oreo · 1–3 personas",
+    "en": "Tres Leches Cake · Oreo · 1–3 people"
+  },
+  "tres-leches-oreo-68-personas": {
+    "source": "3 Leches Cake · Oreo · 6–8 personas",
+    "en": "Tres Leches Cake · Oreo · 6–8 people"
+  },
+  "tres-leches-oreo-1416-personas": {
+    "source": "3 Leches Cake · Oreo · 14–16 personas",
+    "en": "Tres Leches Cake · Oreo · 14–16 people"
+  },
+  "tres-leches-premium-dulce-de-leche-13-personas": {
+    "source": "3 Leches Cake · Dulce de Leche · 1–3 personas",
+    "en": "Tres Leches Cake · Dulce de Leche · 1–3 people"
+  },
+  "tres-leches-premium-dulce-de-leche-68-personas": {
+    "source": "3 Leches Cake · Dulce de Leche · 6–8 personas",
+    "en": "Tres Leches Cake · Dulce de Leche · 6–8 people"
+  },
+  "tres-leches-premium-dulce-de-leche-1416-personas": {
+    "source": "3 Leches Cake · Dulce de Leche · 14–16 personas",
+    "en": "Tres Leches Cake · Dulce de Leche · 14–16 people"
+  },
+  "tres-leches-premium-tiramisu-13-personas": {
+    "source": "3 Leches Cake · Tiramisu · 1–3 personas",
+    "en": "Tres Leches Cake · Tiramisu · 1–3 people"
+  },
+  "tres-leches-premium-tiramisu-68-personas": {
+    "source": "3 Leches Cake · Tiramisu · 6–8 personas",
+    "en": "Tres Leches Cake · Tiramisu · 6–8 people"
+  },
+  "tres-leches-premium-tiramisu-1416-personas": {
+    "source": "3 Leches Cake · Tiramisu · 14–16 personas",
+    "en": "Tres Leches Cake · Tiramisu · 14–16 people"
+  },
+  "tres-leches-mango-mango-13-personas": {
+    "source": "3 Leches Cake · Mango · 1–3 personas",
+    "en": "Tres Leches Cake · Mango · 1–3 people"
+  },
+  "tres-leches-mango-mango-68-personas": {
+    "source": "3 Leches Cake · Mango · 6–8 personas",
+    "en": "Tres Leches Cake · Mango · 6–8 people"
+  },
+  "tres-leches-mango-mango-1416-personas": {
+    "source": "3 Leches Cake · Mango · 14–16 personas",
+    "en": "Tres Leches Cake · Mango · 14–16 people"
+  },
+  "special-flavours-cake-berries-mini": {
+    "source": "Special Flavours 3 Leches Cake · Berries · Mini",
+    "en": "Special Flavours Tres Leches Cake · Berries · Mini"
+  },
+  "special-flavours-cake-berries-small": {
+    "source": "Special Flavours 3 Leches Cake · Berries · Small",
+    "en": "Special Flavours Tres Leches Cake · Berries · Small"
+  },
+  "special-flavours-cake-berries-big": {
+    "source": "Special Flavours 3 Leches Cake · Berries · Big",
+    "en": "Special Flavours Tres Leches Cake · Berries · Big"
+  },
+  "special-flavours-cake-chocolate-mini": {
+    "source": "Special Flavours 3 Leches Cake · Chocolate · Mini",
+    "en": "Special Flavours Tres Leches Cake · Chocolate · Mini"
+  },
+  "special-flavours-cake-chocolate-small": {
+    "source": "Special Flavours 3 Leches Cake · Chocolate · Small",
+    "en": "Special Flavours Tres Leches Cake · Chocolate · Small"
+  },
+  "special-flavours-cake-chocolate-big": {
+    "source": "Special Flavours 3 Leches Cake · Chocolate · Big",
+    "en": "Special Flavours Tres Leches Cake · Chocolate · Big"
+  },
+  "special-flavours-cake-half-rosettas-mini": {
+    "source": "Special Flavours 3 Leches Cake · Half Rosettas · Mini",
+    "en": "Special Flavours Tres Leches Cake · Half Rosettas · Mini"
+  },
+  "special-flavours-cake-half-rosettas-small": {
+    "source": "Special Flavours 3 Leches Cake · Half Rosettas · Small",
+    "en": "Special Flavours Tres Leches Cake · Half Rosettas · Small"
+  },
+  "special-flavours-cake-half-rosettas-big": {
+    "source": "Special Flavours 3 Leches Cake · Half Rosettas · Big",
+    "en": "Special Flavours Tres Leches Cake · Half Rosettas · Big"
+  },
+  "special-flavours-cake-matcha-mini": {
+    "source": "Special Flavours 3 Leches Cake · Matcha · Mini",
+    "en": "Special Flavours Tres Leches Cake · Matcha · Mini"
+  },
+  "special-flavours-cake-matcha-small": {
+    "source": "Special Flavours 3 Leches Cake · Matcha · Small",
+    "en": "Special Flavours Tres Leches Cake · Matcha · Small"
+  },
+  "special-flavours-cake-matcha-big": {
+    "source": "Special Flavours 3 Leches Cake · Matcha · Big",
+    "en": "Special Flavours Tres Leches Cake · Matcha · Big"
+  },
+  "special-flavours-cake-pistacchio-mini": {
+    "source": "Special Flavours 3 Leches Cake · Pistacchio · Mini",
+    "en": "Special Flavours Tres Leches Cake · Pistachio · Mini"
+  },
+  "special-flavours-cake-pistacchio-small": {
+    "source": "Special Flavours 3 Leches Cake · Pistacchio · Small",
+    "en": "Special Flavours Tres Leches Cake · Pistachio · Small"
+  },
+  "special-flavours-cake-pistacchio-big": {
+    "source": "Special Flavours 3 Leches Cake · Pistacchio · Big",
+    "en": "Special Flavours Tres Leches Cake · Pistachio · Big"
+  },
+  "special-flavours-cake-raspberry-mini": {
+    "source": "Special Flavours 3 Leches Cake · Raspberry · Mini",
+    "en": "Special Flavours Tres Leches Cake · Raspberry · Mini"
+  },
+  "special-flavours-cake-raspberry-small": {
+    "source": "Special Flavours 3 Leches Cake · Raspberry · Small",
+    "en": "Special Flavours Tres Leches Cake · Raspberry · Small"
+  },
+  "special-flavours-cake-raspberry-big": {
+    "source": "Special Flavours 3 Leches Cake · Raspberry · Big",
+    "en": "Special Flavours Tres Leches Cake · Raspberry · Big"
+  },
+  "special-flavours-cake-rosettas-mini": {
+    "source": "Special Flavours 3 Leches Cake · Rosettas · Mini",
+    "en": "Special Flavours Tres Leches Cake · Rosettas · Mini"
+  },
+  "special-flavours-cake-rosettas-small": {
+    "source": "Special Flavours 3 Leches Cake · Rosettas · Small",
+    "en": "Special Flavours Tres Leches Cake · Rosettas · Small"
+  },
+  "special-flavours-cake-rosettas-big": {
+    "source": "Special Flavours 3 Leches Cake · Rosettas · Big",
+    "en": "Special Flavours Tres Leches Cake · Rosettas · Big"
+  },
+  "special-flavours-cake-saffron-mini": {
+    "source": "Special Flavours 3 Leches Cake · Saffron · Mini",
+    "en": "Special Flavours Tres Leches Cake · Saffron · Mini"
+  },
+  "special-flavours-cake-saffron-small": {
+    "source": "Special Flavours 3 Leches Cake · Saffron · Small",
+    "en": "Special Flavours Tres Leches Cake · Saffron · Small"
+  },
+  "special-flavours-cake-saffron-big": {
+    "source": "Special Flavours 3 Leches Cake · Saffron · Big",
+    "en": "Special Flavours Tres Leches Cake · Saffron · Big"
+  },
+  "cake-jar-classic-110-ml": {
+    "source": "3 Leches Cake Jar · Classic · 110 ml",
+    "en": "Tres Leches Cake Jar · Classic · 110 ml"
+  },
+  "cake-jar-classic-200-ml": {
+    "source": "3 Leches Cake Jar · Classic · 200 ml",
+    "en": "Tres Leches Cake Jar · Classic · 200 ml"
+  },
+  "cake-jar-vanilla-strawberry-110-ml": {
+    "source": "3 Leches Cake Jar · Vanilla Strawberry · 110 ml",
+    "en": "Tres Leches Cake Jar · Vanilla Strawberry · 110 ml"
+  },
+  "cake-jar-vanilla-strawberry-200-ml": {
+    "source": "3 Leches Cake Jar · Vanilla Strawberry · 200 ml",
+    "en": "Tres Leches Cake Jar · Vanilla Strawberry · 200 ml"
+  },
+  "cake-jar-nutella-110-ml": {
+    "source": "3 Leches Cake Jar · Nutella · 110 ml",
+    "en": "Tres Leches Cake Jar · Nutella · 110 ml"
+  },
+  "cake-jar-nutella-200-ml": {
+    "source": "3 Leches Cake Jar · Nutella · 200 ml",
+    "en": "Tres Leches Cake Jar · Nutella · 200 ml"
+  },
+  "cake-jar-lotus-110-ml": {
+    "source": "3 Leches Cake Jar · Lotus · 110 ml",
+    "en": "Tres Leches Cake Jar · Lotus · 110 ml"
+  },
+  "cake-jar-lotus-200-ml": {
+    "source": "3 Leches Cake Jar · Lotus · 200 ml",
+    "en": "Tres Leches Cake Jar · Lotus · 200 ml"
+  },
+  "cake-jar-caffe-latte-110-ml": {
+    "source": "3 Leches Cake Jar · Caffe Latte · 110 ml",
+    "en": "Tres Leches Cake Jar · Caffe Latte · 110 ml"
+  },
+  "cake-jar-caffe-latte-200-ml": {
+    "source": "3 Leches Cake Jar · Caffe Latte · 200 ml",
+    "en": "Tres Leches Cake Jar · Caffe Latte · 200 ml"
+  },
+  "cake-jar-coconut-110-ml": {
+    "source": "3 Leches Cake Jar · Coconut · 110 ml",
+    "en": "Tres Leches Cake Jar · Coconut · 110 ml"
+  },
+  "cake-jar-coconut-200-ml": {
+    "source": "3 Leches Cake Jar · Coconut · 200 ml",
+    "en": "Tres Leches Cake Jar · Coconut · 200 ml"
+  },
+  "cake-jar-oreo-cookies-and-cream-110-ml": {
+    "source": "3 Leches Cake Jar · Oreo (cookies and cream) · 110 ml",
+    "en": "Tres Leches Cake Jar · Oreo (cookies and cream) · 110 ml"
+  },
+  "cake-jar-oreo-cookies-and-cream-200-ml": {
+    "source": "3 Leches Cake Jar · Oreo (cookies and cream) · 200 ml",
+    "en": "Tres Leches Cake Jar · Oreo (cookies and cream) · 200 ml"
+  },
+  "cake-jar-confetti-110-ml": {
+    "source": "3 Leches Cake Jar · Confetti · 110 ml",
+    "en": "Tres Leches Cake Jar · Confetti · 110 ml"
+  },
+  "cake-jar-confetti-200-ml": {
+    "source": "3 Leches Cake Jar · Confetti · 200 ml",
+    "en": "Tres Leches Cake Jar · Confetti · 200 ml"
+  },
+  "cake-jar-m-ms-110-ml": {
+    "source": "3 Leches Cake Jar · M&Ms · 110 ml",
+    "en": "Tres Leches Cake Jar · M&Ms · 110 ml"
+  },
+  "cake-jar-m-ms-200-ml": {
+    "source": "3 Leches Cake Jar · M&Ms · 200 ml",
+    "en": "Tres Leches Cake Jar · M&Ms · 200 ml"
+  },
+  "cake-jar-premium-tiramisu-110-ml": {
+    "source": "3 Leches Cake Jar · Tiramisu · 110 ml",
+    "en": "Tres Leches Cake Jar · Tiramisu · 110 ml"
+  },
+  "cake-jar-premium-tiramisu-200-ml": {
+    "source": "3 Leches Cake Jar · Tiramisu · 200 ml",
+    "en": "Tres Leches Cake Jar · Tiramisu · 200 ml"
+  },
+  "cake-jar-premium-mango-110-ml": {
+    "source": "3 Leches Cake Jar · Mango · 110 ml",
+    "en": "Tres Leches Cake Jar · Mango · 110 ml"
+  },
+  "cake-jar-premium-mango-200-ml": {
+    "source": "3 Leches Cake Jar · Mango · 200 ml",
+    "en": "Tres Leches Cake Jar · Mango · 200 ml"
+  },
+  "cake-jar-premium-dulce-de-leche-110-ml": {
+    "source": "3 Leches Cake Jar · Dulce De Leche · 110 ml",
+    "en": "Tres Leches Cake Jar · Dulce De Leche · 110 ml"
+  },
+  "cake-jar-premium-dulce-de-leche-200-ml": {
+    "source": "3 Leches Cake Jar · Dulce De Leche · 200 ml",
+    "en": "Tres Leches Cake Jar · Dulce De Leche · 200 ml"
+  },
+  "cake-jar-bundle-4-200-ml": {
+    "source": "Cake Jar Bundle · 4 × 200 ml",
+    "en": "Cake Jar Bundle · 4 × 200 ml"
+  },
+  "cake-jar-bundle-6-110-ml": {
+    "source": "Cake Jar Bundle · 6 × 110 ml",
+    "en": "Cake Jar Bundle · 6 × 110 ml"
+  },
+  "special-flavours-jar-raspberry-110-ml": {
+    "source": "Special Flavours Cake Jar · Raspberry · 110 ml",
+    "en": "Special Flavours Cake Jar · Raspberry · 110 ml"
+  },
+  "special-flavours-jar-raspberry-200-ml": {
+    "source": "Special Flavours Cake Jar · Raspberry · 200 ml",
+    "en": "Special Flavours Cake Jar · Raspberry · 200 ml"
+  },
+  "special-flavours-jar-saffron-110-ml": {
+    "source": "Special Flavours Cake Jar · Saffron · 110 ml",
+    "en": "Special Flavours Cake Jar · Saffron · 110 ml"
+  },
+  "special-flavours-jar-saffron-200-ml": {
+    "source": "Special Flavours Cake Jar · Saffron · 200 ml",
+    "en": "Special Flavours Cake Jar · Saffron · 200 ml"
+  },
+  "special-flavours-jar-pistacchio-110-ml": {
+    "source": "Special Flavours Cake Jar · Pistacchio · 110 ml",
+    "en": "Special Flavours Cake Jar · Pistachio · 110 ml"
+  },
+  "special-flavours-jar-pistacchio-200-ml": {
+    "source": "Special Flavours Cake Jar · Pistacchio · 200 ml",
+    "en": "Special Flavours Cake Jar · Pistachio · 200 ml"
+  },
+  "special-flavours-jar-matcha-110-ml": {
+    "source": "Special Flavours Cake Jar · Matcha · 110 ml",
+    "en": "Special Flavours Cake Jar · Matcha · 110 ml"
+  },
+  "special-flavours-jar-matcha-200-ml": {
+    "source": "Special Flavours Cake Jar · Matcha · 200 ml",
+    "en": "Special Flavours Cake Jar · Matcha · 200 ml"
+  },
+  "special-flavours-jar-chocolate-110-ml": {
+    "source": "Special Flavours Cake Jar · Chocolate · 110 ml",
+    "en": "Special Flavours Cake Jar · Chocolate · 110 ml"
+  },
+  "special-flavours-jar-chocolate-200-ml": {
+    "source": "Special Flavours Cake Jar · Chocolate · 200 ml",
+    "en": "Special Flavours Cake Jar · Chocolate · 200 ml"
+  },
+  "special-flavours-jar-berries-110-ml": {
+    "source": "Special Flavours Cake Jar · Berries · 110 ml",
+    "en": "Special Flavours Cake Jar · Berries · 110 ml"
+  },
+  "special-flavours-jar-berries-200-ml": {
+    "source": "Special Flavours Cake Jar · Berries · 200 ml",
+    "en": "Special Flavours Cake Jar · Berries · 200 ml"
+  },
+  "carrot-cake-mono-portion": {
+    "source": "Carrot Cake · Mono portion",
+    "en": "Carrot Cake · Single portion"
+  },
+  "carrot-cake-1012-personas": {
+    "source": "Carrot Cake · 10–12 personas",
+    "en": "Carrot Cake · 10–12 people"
+  },
+  "carrot-cake-6-piezas": {
+    "source": "Carrot Cake · 6 piezas",
+    "en": "Carrot Cake · 6 pieces"
+  },
+  "carrot-cake-12-piezas": {
+    "source": "Carrot Cake · 12 piezas",
+    "en": "Carrot Cake · 12 pieces"
+  },
+  "cheesecake-mono-portion": {
+    "source": "Cheesecake · Mono portion",
+    "en": "Cheesecake · Single portion"
+  },
+  "cheesecake-1012-personas": {
+    "source": "Cheesecake · 10–12 personas",
+    "en": "Cheesecake · 10–12 people"
+  },
+  "cheesecake-6-piezas": {
+    "source": "Cheesecake · 6 piezas",
+    "en": "Cheesecake · 6 pieces"
+  },
+  "cheesecake-12-piezas": {
+    "source": "Cheesecake · 12 piezas",
+    "en": "Cheesecake · 12 pieces"
+  },
+  "jelly-gelatina-fruits-mono-portion": {
+    "source": "Jelly (gelatina) fruits · Mono portion",
+    "en": "Fruit jelly · Single portion"
+  },
+  "jelly-gelatina-fruits-1012-personas": {
+    "source": "Jelly (gelatina) fruits · 10–12 personas",
+    "en": "Fruit jelly · 10–12 people"
+  },
+  "jelly-gelatina-fruits-6-piezas": {
+    "source": "Jelly (gelatina) fruits · 6 piezas",
+    "en": "Fruit jelly · 6 pieces"
+  },
+  "jelly-gelatina-fruits-12-piezas": {
+    "source": "Jelly (gelatina) fruits · 12 piezas",
+    "en": "Fruit jelly · 12 pieces"
+  },
+  "jelly-gelatina-dulce-de-leche-mono-portion": {
+    "source": "Jelly (gelatina) dulce de leche · Mono portion",
+    "en": "Dulce de Leche jelly · Single portion"
+  },
+  "jelly-gelatina-dulce-de-leche-1012-personas": {
+    "source": "Jelly (gelatina) dulce de leche · 10–12 personas",
+    "en": "Dulce de Leche jelly · 10–12 people"
+  },
+  "jelly-gelatina-dulce-de-leche-6-piezas": {
+    "source": "Jelly (gelatina) dulce de leche · 6 piezas",
+    "en": "Dulce de Leche jelly · 6 pieces"
+  },
+  "jelly-gelatina-dulce-de-leche-12-piezas": {
+    "source": "Jelly (gelatina) dulce de leche · 12 piezas",
+    "en": "Dulce de Leche jelly · 12 pieces"
+  },
+  "jelly-gelatina-yogurt-strawberry-mono-portion": {
+    "source": "Jelly (gelatina) yogurt strawberry · Mono portion",
+    "en": "Strawberry yogurt jelly · Single portion"
+  },
+  "jelly-gelatina-yogurt-strawberry-1012-personas": {
+    "source": "Jelly (gelatina) yogurt strawberry · 10–12 personas",
+    "en": "Strawberry yogurt jelly · 10–12 people"
+  },
+  "jelly-gelatina-yogurt-strawberry-6-piezas": {
+    "source": "Jelly (gelatina) yogurt strawberry · 6 piezas",
+    "en": "Strawberry yogurt jelly · 6 pieces"
+  },
+  "jelly-gelatina-yogurt-strawberry-12-piezas": {
+    "source": "Jelly (gelatina) yogurt strawberry · 12 piezas",
+    "en": "Strawberry yogurt jelly · 12 pieces"
+  },
+  "orejas-mini-60-g": {
+    "source": "Orejas · Mini · 60 g",
+    "en": "Orejas · Mini · 60 g"
+  },
+  "orejas-individual-100-g": {
+    "source": "Orejas · Individual · 100 g",
+    "en": "Orejas · Individual · 100 g"
+  },
+  "orejas-6-mini-60-g-cada-uno": {
+    "source": "Orejas · 6 mini · 60 g cada uno",
+    "en": "Orejas · 6 mini pieces · 60 g each"
+  },
+  "orejas-12-mini-60-g-cada-uno": {
+    "source": "Orejas · 12 mini · 60 g cada uno",
+    "en": "Orejas · 12 mini pieces · 60 g each"
+  },
+  "orejas-6-individuales-100-g-cada-uno": {
+    "source": "Orejas · 6 individuales · 100 g cada uno",
+    "en": "Orejas · 6 individual pieces · 100 g each"
+  },
+  "orejas-12-individuales-100-g-cada-uno": {
+    "source": "Orejas · 12 individuales · 100 g cada uno",
+    "en": "Orejas · 12 individual pieces · 100 g each"
+  },
+  "bisquets-mini-60-g": {
+    "source": "Bisquets · Mini · 60 g",
+    "en": "Bisquets · Mini · 60 g"
+  },
+  "bisquets-individual-100-g": {
+    "source": "Bisquets · Individual · 100 g",
+    "en": "Bisquets · Individual · 100 g"
+  },
+  "bisquets-6-mini-60-g-cada-uno": {
+    "source": "Bisquets · 6 mini · 60 g cada uno",
+    "en": "Bisquets · 6 mini pieces · 60 g each"
+  },
+  "bisquets-12-mini-60-g-cada-uno": {
+    "source": "Bisquets · 12 mini · 60 g cada uno",
+    "en": "Bisquets · 12 mini pieces · 60 g each"
+  },
+  "bisquets-6-individuales-100-g-cada-uno": {
+    "source": "Bisquets · 6 individuales · 100 g cada uno",
+    "en": "Bisquets · 6 individual pieces · 100 g each"
+  },
+  "bisquets-12-individuales-100-g-cada-uno": {
+    "source": "Bisquets · 12 individuales · 100 g cada uno",
+    "en": "Bisquets · 12 individual pieces · 100 g each"
+  },
+  "croissant-plain-mini-60-g": {
+    "source": "Croissant · Plain · Mini · 60 g",
+    "en": "Croissant · Plain · Mini · 60 g"
+  },
+  "croissant-plain-individual-100-g": {
+    "source": "Croissant · Plain · Individual · 100 g",
+    "en": "Croissant · Plain · Individual · 100 g"
+  },
+  "croissant-plain-6-mini-60-g-cada-uno": {
+    "source": "Croissant · Plain · 6 mini · 60 g cada uno",
+    "en": "Croissant · Plain · 6 mini pieces · 60 g each"
+  },
+  "croissant-plain-12-mini-60-g-cada-uno": {
+    "source": "Croissant · Plain · 12 mini · 60 g cada uno",
+    "en": "Croissant · Plain · 12 mini pieces · 60 g each"
+  },
+  "croissant-plain-6-individuales-100-g-cada-uno": {
+    "source": "Croissant · Plain · 6 individuales · 100 g cada uno",
+    "en": "Croissant · Plain · 6 individual pieces · 100 g each"
+  },
+  "croissant-plain-12-individuales-100-g-cada-uno": {
+    "source": "Croissant · Plain · 12 individuales · 100 g cada uno",
+    "en": "Croissant · Plain · 12 individual pieces · 100 g each"
+  },
+  "croissant-chocolate-mini-60-g": {
+    "source": "Croissant · Chocolate · Mini · 60 g",
+    "en": "Croissant · Chocolate · Mini · 60 g"
+  },
+  "croissant-chocolate-individual-100-g": {
+    "source": "Croissant · Chocolate · Individual · 100 g",
+    "en": "Croissant · Chocolate · Individual · 100 g"
+  },
+  "croissant-chocolate-6-mini-60-g-cada-uno": {
+    "source": "Croissant · Chocolate · 6 mini · 60 g cada uno",
+    "en": "Croissant · Chocolate · 6 mini pieces · 60 g each"
+  },
+  "croissant-chocolate-12-mini-60-g-cada-uno": {
+    "source": "Croissant · Chocolate · 12 mini · 60 g cada uno",
+    "en": "Croissant · Chocolate · 12 mini pieces · 60 g each"
+  },
+  "croissant-chocolate-6-individuales-100-g-cada-uno": {
+    "source": "Croissant · Chocolate · 6 individuales · 100 g cada uno",
+    "en": "Croissant · Chocolate · 6 individual pieces · 100 g each"
+  },
+  "croissant-chocolate-12-individuales-100-g-cada-uno": {
+    "source": "Croissant · Chocolate · 12 individuales · 100 g cada uno",
+    "en": "Croissant · Chocolate · 12 individual pieces · 100 g each"
+  },
+  "croissant-pistacchio-mini-60-g": {
+    "source": "Croissant · Pistacchio · Mini · 60 g",
+    "en": "Croissant · Pistachio · Mini · 60 g"
+  },
+  "croissant-pistacchio-individual-100-g": {
+    "source": "Croissant · Pistacchio · Individual · 100 g",
+    "en": "Croissant · Pistachio · Individual · 100 g"
+  },
+  "croissant-pistacchio-6-mini-60-g-cada-uno": {
+    "source": "Croissant · Pistacchio · 6 mini · 60 g cada uno",
+    "en": "Croissant · Pistachio · 6 mini pieces · 60 g each"
+  },
+  "croissant-pistacchio-12-mini-60-g-cada-uno": {
+    "source": "Croissant · Pistacchio · 12 mini · 60 g cada uno",
+    "en": "Croissant · Pistachio · 12 mini pieces · 60 g each"
+  },
+  "croissant-pistacchio-6-individuales-100-g-cada-uno": {
+    "source": "Croissant · Pistacchio · 6 individuales · 100 g cada uno",
+    "en": "Croissant · Pistachio · 6 individual pieces · 100 g each"
+  },
+  "croissant-pistacchio-12-individuales-100-g-cada-uno": {
+    "source": "Croissant · Pistacchio · 12 individuales · 100 g cada uno",
+    "en": "Croissant · Pistachio · 12 individual pieces · 100 g each"
+  },
+  "croissant-cherry-mini-60-g": {
+    "source": "Croissant · Cherry · Mini · 60 g",
+    "en": "Croissant · Cherry · Mini · 60 g"
+  },
+  "croissant-cherry-individual-100-g": {
+    "source": "Croissant · Cherry · Individual · 100 g",
+    "en": "Croissant · Cherry · Individual · 100 g"
+  },
+  "croissant-cherry-6-mini-60-g-cada-uno": {
+    "source": "Croissant · Cherry · 6 mini · 60 g cada uno",
+    "en": "Croissant · Cherry · 6 mini pieces · 60 g each"
+  },
+  "croissant-cherry-12-mini-60-g-cada-uno": {
+    "source": "Croissant · Cherry · 12 mini · 60 g cada uno",
+    "en": "Croissant · Cherry · 12 mini pieces · 60 g each"
+  },
+  "croissant-cherry-6-individuales-100-g-cada-uno": {
+    "source": "Croissant · Cherry · 6 individuales · 100 g cada uno",
+    "en": "Croissant · Cherry · 6 individual pieces · 100 g each"
+  },
+  "croissant-cherry-12-individuales-100-g-cada-uno": {
+    "source": "Croissant · Cherry · 12 individuales · 100 g cada uno",
+    "en": "Croissant · Cherry · 12 individual pieces · 100 g each"
+  },
+  "croissant-integral-mini-60-g": {
+    "source": "Croissant · Integral · Mini · 60 g",
+    "en": "Croissant · Whole wheat · Mini · 60 g"
+  },
+  "croissant-integral-individual-100-g": {
+    "source": "Croissant · Integral · Individual · 100 g",
+    "en": "Croissant · Whole wheat · Individual · 100 g"
+  },
+  "croissant-integral-6-mini-60-g-cada-uno": {
+    "source": "Croissant · Integral · 6 mini · 60 g cada uno",
+    "en": "Croissant · Whole wheat · 6 mini pieces · 60 g each"
+  },
+  "croissant-integral-12-mini-60-g-cada-uno": {
+    "source": "Croissant · Integral · 12 mini · 60 g cada uno",
+    "en": "Croissant · Whole wheat · 12 mini pieces · 60 g each"
+  },
+  "croissant-integral-6-individuales-100-g-cada-uno": {
+    "source": "Croissant · Integral · 6 individuales · 100 g cada uno",
+    "en": "Croissant · Whole wheat · 6 individual pieces · 100 g each"
+  },
+  "croissant-integral-12-individuales-100-g-cada-uno": {
+    "source": "Croissant · Integral · 12 individuales · 100 g cada uno",
+    "en": "Croissant · Whole wheat · 12 individual pieces · 100 g each"
+  },
+  "cubilete-cream-individual-100-g": {
+    "source": "Cubilete · Cream · Individual · 100 g",
+    "en": "Cubilete · Cream · Individual · 100 g"
+  },
+  "cubilete-cream-6-individuales-100-g-cada-uno": {
+    "source": "Cubilete · Cream · 6 individuales · 100 g cada uno",
+    "en": "Cubilete · Cream · 6 individual pieces · 100 g each"
+  },
+  "cubilete-cream-12-individuales-100-g-cada-uno": {
+    "source": "Cubilete · Cream · 12 individuales · 100 g cada uno",
+    "en": "Cubilete · Cream · 12 individual pieces · 100 g each"
+  },
+  "cubilete-cheese-individual-100-g": {
+    "source": "Cubilete · Cheese · Individual · 100 g",
+    "en": "Cubilete · Cheese · Individual · 100 g"
+  },
+  "cubilete-cheese-6-individuales-100-g-cada-uno": {
+    "source": "Cubilete · Cheese · 6 individuales · 100 g cada uno",
+    "en": "Cubilete · Cheese · 6 individual pieces · 100 g each"
+  },
+  "cubilete-cheese-12-individuales-100-g-cada-uno": {
+    "source": "Cubilete · Cheese · 12 individuales · 100 g cada uno",
+    "en": "Cubilete · Cheese · 12 individual pieces · 100 g each"
+  },
+  "rosca-de-reyes-mono-portion": {
+    "source": "Rosca de Reyes (3 kings pastry) · Mono portion",
+    "en": "Rosca de Reyes (Three Kings pastry) · Single portion"
+  },
+  "rosca-de-reyes-500-g": {
+    "source": "Rosca de Reyes (3 kings pastry) · 500 g",
+    "en": "Rosca de Reyes (Three Kings pastry) · 500 g"
+  },
+  "rosca-de-reyes-1-kg": {
+    "source": "Rosca de Reyes (3 kings pastry) · 1 kg",
+    "en": "Rosca de Reyes (Three Kings pastry) · 1 kg"
+  },
+  "rosca-de-reyes-1-5-kg": {
+    "source": "Rosca de Reyes (3 kings pastry) · 1.5 kg",
+    "en": "Rosca de Reyes (Three Kings pastry) · 1.5 kg"
+  },
+  "milk-190-ml": {
+    "source": "Milk · 190 ml",
+    "en": "Milk · 190 ml"
+  },
+  "milk-350-ml": {
+    "source": "Milk · 350 ml",
+    "en": "Milk · 350 ml"
+  },
+  "cake-topper-": {
+    "source": "Cake Topper",
+    "en": "Cake Topper"
+  },
+  "candles-": {
+    "source": "Candles",
+    "en": "Candles"
+  },
+  "pan-de-muerto-filled-pistachio-mini": {
+    "source": "Pan de Muerto relleno · Pistachio · Mini",
+    "en": "Filled Pan de Muerto · Pistachio · Mini"
+  },
+  "pan-de-muerto-filled-pistachio-individual": {
+    "source": "Pan de Muerto relleno · Pistachio · Individual",
+    "en": "Filled Pan de Muerto · Pistachio · Individual"
+  },
+  "pan-de-muerto-traditional-azucar-mini-40-g-chocolate-covering": {
+    "source": "Pan de Muerto tradicional · Azúcar · Chocolate covering · Mini · 40 g",
+    "en": "Traditional Pan de Muerto · Sugar · Chocolate covering · Mini · 40 g"
+  },
+  "pan-de-muerto-traditional-azucar-individual-70-g-chocolate-covering": {
+    "source": "Pan de Muerto tradicional · Azúcar · Chocolate covering · Individual · 70 g",
+    "en": "Traditional Pan de Muerto · Sugar · Chocolate covering · Individual · 70 g"
+  },
+  "pan-de-muerto-traditional-ajonjoli-mini-40-g-chocolate-covering": {
+    "source": "Pan de Muerto tradicional · Ajonjolí · Chocolate covering · Mini · 40 g",
+    "en": "Traditional Pan de Muerto · Sesame · Chocolate covering · Mini · 40 g"
+  },
+  "pan-de-muerto-traditional-ajonjoli-individual-70-g-chocolate-covering": {
+    "source": "Pan de Muerto tradicional · Ajonjolí · Chocolate covering · Individual · 70 g",
+    "en": "Traditional Pan de Muerto · Sesame · Chocolate covering · Individual · 70 g"
+  },
+  "pan-de-muerto-filled-crema-diplomatica-vainilla-mini-chocolate-covering": {
+    "source": "Pan de Muerto relleno · Crema diplomática (vainilla) · Chocolate covering · Mini",
+    "en": "Filled Pan de Muerto · Vanilla diplomat cream · Chocolate covering · Mini"
+  },
+  "pan-de-muerto-filled-crema-diplomatica-vainilla-individual-chocolate-covering": {
+    "source": "Pan de Muerto relleno · Crema diplomática (vainilla) · Chocolate covering · Individual",
+    "en": "Filled Pan de Muerto · Vanilla diplomat cream · Chocolate covering · Individual"
+  },
+  "pan-de-muerto-filled-chocolate-mini-chocolate-covering": {
+    "source": "Pan de Muerto relleno · Chocolate · Chocolate covering · Mini",
+    "en": "Filled Pan de Muerto · Chocolate · Chocolate covering · Mini"
+  },
+  "pan-de-muerto-filled-chocolate-individual-chocolate-covering": {
+    "source": "Pan de Muerto relleno · Chocolate · Chocolate covering · Individual",
+    "en": "Filled Pan de Muerto · Chocolate · Chocolate covering · Individual"
+  },
+  "pan-de-muerto-filled-mascarpone-y-cajeta-mini-chocolate-covering": {
+    "source": "Pan de Muerto relleno · Mascarpone y cajeta · Chocolate covering · Mini",
+    "en": "Filled Pan de Muerto · Mascarpone and cajeta · Chocolate covering · Mini"
+  },
+  "pan-de-muerto-filled-mascarpone-y-cajeta-individual-chocolate-covering": {
+    "source": "Pan de Muerto relleno · Mascarpone y cajeta · Chocolate covering · Individual",
+    "en": "Filled Pan de Muerto · Mascarpone and cajeta · Chocolate covering · Individual"
+  },
+  "pan-de-muerto-filled-mascarpone-y-fresas-mini-chocolate-covering": {
+    "source": "Pan de Muerto relleno · Mascarpone y fresas · Chocolate covering · Mini",
+    "en": "Filled Pan de Muerto · Mascarpone and strawberries · Chocolate covering · Mini"
+  },
+  "pan-de-muerto-filled-mascarpone-y-fresas-individual-chocolate-covering": {
+    "source": "Pan de Muerto relleno · Mascarpone y fresas · Chocolate covering · Individual",
+    "en": "Filled Pan de Muerto · Mascarpone and strawberries · Chocolate covering · Individual"
+  },
+  "pan-de-muerto-filled-pistachio-mini-chocolate-covering": {
+    "source": "Pan de Muerto relleno · Pistachio · Chocolate covering · Mini",
+    "en": "Filled Pan de Muerto · Pistachio · Chocolate covering · Mini"
+  },
+  "pan-de-muerto-filled-pistachio-individual-chocolate-covering": {
+    "source": "Pan de Muerto relleno · Pistachio · Chocolate covering · Individual",
+    "en": "Filled Pan de Muerto · Pistachio · Chocolate covering · Individual"
+  },
+  "conchas-filled-pistache-mini": {
+    "source": "Concha rellena de pistache · Mini",
+    "en": "Pistachio-filled Concha · Mini"
+  },
+  "conchas-filled-pistache-individual": {
+    "source": "Concha rellena de pistache · Individual",
+    "en": "Pistachio-filled Concha · Individual"
+  }
+}
