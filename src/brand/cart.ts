@@ -4,6 +4,7 @@
  * quote, and the server re-prices the cart again before any payment.
  */
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { onRevisionChange } from "./live-catalog";
 
 export type CartLine = { productId: string; quantity: number };
 import { MAX_ITEM_QUANTITY } from "../../shared/commerce-policy";
@@ -153,6 +154,19 @@ function loadConfig(force = false) {
       .catch(() => null);
   return configPromise;
 }
+let configGeneration = 0;
+const configListeners = new Set<() => void>();
+const subscribeConfig = (fn: () => void) => {
+  configListeners.add(fn);
+  return () => configListeners.delete(fn);
+};
+/** Fetches the checkout configuration again for every component using it. */
+export function refreshCheckoutConfig() {
+  void loadConfig(true);
+  configGeneration++;
+  configListeners.forEach((l) => l());
+}
+onRevisionChange(refreshCheckoutConfig);
 /** Checkout availability, shared by every component on the page. */
 export function useCheckoutConfig() {
   const [state, setState] = useState<{
@@ -160,6 +174,12 @@ export function useCheckoutConfig() {
     loading: boolean;
   }>({ config: null, loading: true });
   const [attempt, setAttempt] = useState(0);
+  // A newly published catalog revision re-prices every component at once.
+  const generation = useSyncExternalStore(
+    subscribeConfig,
+    () => configGeneration,
+    () => 0,
+  );
   useEffect(() => {
     let active = true;
     void loadConfig(attempt > 0).then((config) => {
@@ -168,7 +188,7 @@ export function useCheckoutConfig() {
     return () => {
       active = false;
     };
-  }, [attempt]);
+  }, [attempt, generation]);
   return { ...state, retry: () => setAttempt((n) => n + 1) };
 }
 

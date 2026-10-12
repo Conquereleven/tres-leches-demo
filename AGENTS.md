@@ -123,3 +123,8 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Off by default: `PRODUCT_HUB_ENABLED` (editor) and `PRODUCT_HUB_PUBLISH_ENABLED` (publish). Publication is refused in Production in code until the storefront reads published data; do not describe the hub as publishing to customers before that integration.
 - Admin edits and publishes; manager is view-only; operator and agent have no access. Roles are enforced in the API.
 - Existing SKU ids, published slugs and removed combinations are permanent: deactivate, never delete or reactivate. Details and remaining steps: `docs/product-hub/product-hub-v2.md`.
+
+## Dynamic storefront catalog (12 October 2026)
+- `STOREFRONT_DYNAMIC_CATALOG_ENABLED` (off by default) makes the menu read the published revision from `GET /api/storefront/catalog`; Production also needs `STOREFRONT_DYNAMIC_CATALOG_PRODUCTION=founder-approved`. Off means the storefront is exactly the build's catalog.
+- With adoption on and no valid revision the endpoint answers 503 and checkout sells nothing; never fall back to bundled data. `State.catalog` stays the price authority; the browser never supplies amounts.
+- Product Hub publication in Production is allowed only while adoption is active there. Keep the storefront's approved look: no new customer copy or CSS for this feature. Details and limits: `docs/product-hub/storefront-dynamic-catalog.md`.

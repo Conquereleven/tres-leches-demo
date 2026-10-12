@@ -93,6 +93,8 @@ per side; SVG and everything else is refused. Images are served with `nosniff` a
 | `PRODUCT_HUB_PUBLISH_ENABLED` | unset (off) | Allows `publish` — **except in Production**, where it is refused in code |
 
 Production is any environment whose `APP_ENV` is not `test`, `development` or `staging`.
+Since the dynamic storefront (`storefront-dynamic-catalog.md`), publication in Production
+is allowed only while dynamic adoption is active there.
 
 ## Storefront integration — the blocker
 

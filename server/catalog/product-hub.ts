@@ -1,3 +1,4 @@
+import { storefrontCatalogMode } from "./storefront-api";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { Actor, CatalogItem, State } from "../domain/model";
@@ -85,7 +86,7 @@ export function hubFlags(env: NodeJS.ProcessEnv): HubFlags {
     ? "Product Hub is disabled"
     : env.PRODUCT_HUB_PUBLISH_ENABLED !== "true"
       ? "Publication is disabled in this environment"
-      : production
+      : production && storefrontCatalogMode(env) !== "on"
         ? "Publication is blocked in Production until the storefront reads published data"
         : null;
   return { enabled, publishEnabled: publishBlocked === null, publishBlocked };

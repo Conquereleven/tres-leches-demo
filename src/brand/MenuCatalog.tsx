@@ -10,17 +10,47 @@ import {
 } from "./media";
 import { CustomerCopy } from "./localization";
 import { availableSku } from "../../shared/commerce-policy";
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { AddToCart } from "./Shop";
-import { useCheckoutConfig, useCheckoutNow } from "./cart";
+import {
+  refreshCheckoutConfig,
+  useCheckoutConfig,
+  useCheckoutNow,
+} from "./cart";
+import { livePhotos, refreshLiveCatalog, type LivePhoto } from "./live-catalog";
 import { formatAed } from "./content";
 import {
-  menuCategories,
-  storefrontProducts,
-  productFamily,
+  menuProductFamily,
   productHref,
+  useMenu,
   type StorefrontProduct,
 } from "./menu";
+
+const PHOTO_SIZES = "(max-width: 640px) 90vw, (max-width: 1000px) 45vw, 30vw";
+/** A photograph published from Product Hub that the build does not know. */
+function PublishedPhoto({ photo, alt }: { photo: LivePhoto; alt: string }) {
+  return (
+    <picture>
+      {photo.avifSrcSet && (
+        <source
+          type="image/avif"
+          srcSet={photo.avifSrcSet}
+          sizes={PHOTO_SIZES}
+        />
+      )}
+      <img
+        src={photo.src}
+        srcSet={photo.srcSet}
+        sizes={photo.srcSet ? PHOTO_SIZES : undefined}
+        width={photo.width}
+        height={photo.height}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+      />
+    </picture>
+  );
+}
 
 export function ProductOptions({
   product,
@@ -31,7 +61,8 @@ export function ProductOptions({
 }) {
   const { text: localize } = useCustomerLanguage();
 
-  const family = productFamily(product),
+  const menu = useMenu();
+  const family = menuProductFamily(menu, product),
     labelId = useId();
   const [sku, setSku] = useState(family.options[0]!.id);
   const { config, loading, retry } = useCheckoutConfig();
@@ -53,15 +84,49 @@ export function ProductOptions({
   const serverProduct = config?.products.find((p) => p.id === option?.id);
   const ready =
     !!option && !!serverProduct && serverProduct.priceFils === option.priceFils;
+  // Published data and checkout disagree only across a publication: reload both, once.
+  const disagreement =
+    menu.status === "live" && option && serverProduct && !ready
+      ? `${option.id}:${option.priceFils}:${serverProduct.priceFils}`
+      : null;
+  const reloaded = useRef<string | null>(null);
+  useEffect(() => {
+    if (!disagreement || reloaded.current === disagreement) return;
+    reloaded.current = disagreement;
+    void refreshLiveCatalog();
+    refreshCheckoutConfig();
+  }, [disagreement]);
+  // Photographs changed in Product Hub replace the build's; unchanged ones keep the
+  // approved presentation (crops, rotation) exactly as authored.
+  const published = livePhotos(product.id);
+  const authored = new Set(
+    [
+      family.image,
+      ...family.options.flatMap(
+        (o) =>
+          selectedProductMedia(
+            product.id,
+            family.id,
+            product.variant,
+            o.size,
+          )?.derivatives.map((d) => d.src) ?? [],
+      ),
+    ].filter(Boolean),
+  );
+  const custom =
+    published.length > 0 &&
+    !published[0]!.sources.some((src) => authored.has(src));
   const gallery = productMediaAssignments.find(
     (p) => p.productId === product.id,
   )?.gallerySourceIds as string[] | undefined;
   return (
     <div className="b-menu-options">
       <figure
-        className={`b-menu-photo ${media ? "" : "b-family-photo"} ${usesMenuReferencePresentation(media) ? "b-official-photo" : ""}`}
+        className={`b-menu-photo ${media || custom ? "" : "b-family-photo"} ${!custom && usesMenuReferencePresentation(media) ? "b-official-photo" : ""}`}
       >
-        {media || fallback ? (
+        {custom ? (
+          <PublishedPhoto photo={published[0]!} alt={localize(product.title)} />
+        ) : media || fallback ? (
           <ResponsiveMedia
             productId={product.id}
             family={family.id}
@@ -168,7 +233,23 @@ export function ProductOptions({
           )}
         </div>
       )}
-      {detail && !!gallery?.length && (
+      {detail && custom && published.length > 1 && (
+        <div
+          className="b-product-gallery"
+          aria-label={localize("Product gallery")}
+        >
+          {published.slice(1).map((photo) => (
+            <img
+              key={photo.src}
+              src={photo.src}
+              alt={localize(photo.alt)}
+              loading="lazy"
+              decoding="async"
+            />
+          ))}
+        </div>
+      )}
+      {detail && !custom && !!gallery?.length && (
         <div
           className={`b-product-gallery ${usesMenuReferencePresentation(media) ? "b-official-gallery" : ""}`}
           aria-label={localize("Product gallery")}
@@ -203,14 +284,49 @@ export function MenuCatalog() {
     typeof location === "undefined"
       ? new URLSearchParams()
       : new URLSearchParams(location.search);
-  const [category, setCategory] = useState(() =>
-    menuCategories.some((c) => c.id === params.get("category"))
-      ? params.get("category")!
-      : "cakes",
+  const menu = useMenu();
+  const [chosen, setCategory] = useState(
+    () => params.get("category") ?? "cakes",
   );
+  const category = menu.categories.some((c) => c.id === chosen)
+    ? chosen
+    : (menu.categories.find((c) => c.id === "cakes") ?? menu.categories[0])?.id;
   const slug = params.get("product");
+  // Dynamic catalog without a published revision yet (or at all): sell nothing.
+  if (menu.status === "loading" || menu.status === "unavailable" || !category)
+    return (
+      <section
+        id="bakery"
+        className="b-section b-full-menu"
+        aria-label={localize("Full menu")}
+        data-catalog-status={menu.status}
+      >
+        <p className="b-label">
+          {" "}
+          <CustomerCopy>THE 3L MENU</CustomerCopy>{" "}
+        </p>
+        <div role="status">
+          <p>
+            <CustomerCopy>
+              {menu.status === "loading"
+                ? "LOADING…"
+                : "Online ordering is unavailable."}
+            </CustomerCopy>
+          </p>
+          {menu.status !== "loading" && (
+            <button
+              className="b-text-button"
+              onClick={() => void refreshLiveCatalog()}
+            >
+              {" "}
+              <CustomerCopy>TRY AGAIN</CustomerCopy>{" "}
+            </button>
+          )}
+        </div>
+      </section>
+    );
   if (slug) {
-    const product = storefrontProducts.find((p) => p.slug === slug);
+    const product = menu.products.find((p) => p.slug === slug);
     return (
       <section
         className="b-product-page b-section"
@@ -220,7 +336,7 @@ export function MenuCatalog() {
           className="b-link"
           href={
             product
-              ? `/menu?category=${productFamily(product).category}`
+              ? `/menu?category=${menuProductFamily(menu, product).category}`
               : "/menu"
           }
         >
@@ -252,13 +368,14 @@ export function MenuCatalog() {
       </section>
     );
   }
-  const current = menuCategories.find((c) => c.id === category)!;
+  const current = menu.categories.find((c) => c.id === category)!;
   const editorial = categoryEditorialMedia(category);
   return (
     <section
       id="bakery"
       className="b-section b-full-menu"
       aria-label={localize("Full menu")}
+      data-catalog-status={menu.status}
     >
       <p className="b-label">
         {" "}
@@ -272,7 +389,7 @@ export function MenuCatalog() {
         className="b-menu-categories"
         aria-label={localize("Menu categories")}
       >
-        {menuCategories.map((c) => (
+        {menu.categories.map((c) => (
           <button
             key={c.id}
             type="button"
@@ -301,8 +418,8 @@ export function MenuCatalog() {
         </figure>
       )}
       <div className="b-menu-grid">
-        {storefrontProducts
-          .filter((p) => productFamily(p).category === category)
+        {menu.products
+          .filter((p) => menuProductFamily(menu, p).category === category)
           .map((p) => (
             <article
               className="b-menu-card"
