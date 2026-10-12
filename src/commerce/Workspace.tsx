@@ -1,8 +1,5 @@
-import {
-  OperationsOverview,
-  ProductsAvailability,
-  OperationsSettings,
-} from "./OperationsOverview";
+import { OperationsOverview, OperationsSettings } from "./OperationsOverview";
+import { ProductHub } from "./ProductHub";
 import { PrintCenter } from "./PrintCenter";
 import { OpsProvider, useOps } from "./ops-i18n";
 import { OperationsShell } from "./OperationsShell";
@@ -168,7 +165,7 @@ function WorkspaceInner() {
             }}
           />
         ) : view === "products" ? (
-          <ProductsAvailability role={data.actor.role} />
+          <ProductHub actor={data.actor} />
         ) : view === "print" ? (
           <PrintCenter data={data} />
         ) : view === "settings" ? (

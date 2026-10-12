@@ -1,4 +1,5 @@
 import { catalogReadEnabled, serveCatalogRead } from "./catalog/read-api";
+import { serveHubMedia, serveProductHub } from "./catalog/product-hub-api";
 import { parseExternalAckSince } from "./domain/external-ack";
 import { byteRange } from "./static-range";
 import { mcpRead } from "./domain/mcp";
@@ -723,6 +724,8 @@ export async function startServer(
           return json(res, 200, { ok: true });
         }
         const current = actor(req);
+        // Product Hub V2: its own module; roles are enforced inside it.
+        if (await serveProductHub(req, res, path, store, current)) return;
         if (path === "/api/mcp") {
           if (process.env.MCP_ENABLED !== "true")
             throw new DomainError(404, "Not found");
@@ -962,6 +965,17 @@ export async function startServer(
       }
       if (req.method !== "GET" && req.method !== "HEAD")
         throw new DomainError(405, "Método no permitido");
+      // Uploaded catalog images live in SQLite, not in the static bundle.
+      if (
+        serveHubMedia(req, res, path, store, () => {
+          try {
+            return actor(req);
+          } catch {
+            return null;
+          }
+        })
+      )
+        return;
       const root = resolve("dist/client"),
         candidate = resolve(root, "." + decodeURIComponent(path));
       if (candidate !== root && !candidate.startsWith(root + "/"))
