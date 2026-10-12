@@ -12,7 +12,7 @@ When a new SKU or renamed definition is approved, add an explicit reviewed mappi
 
 The resolver is shared by order cards, detail panels, production, delivery, Inbox, draft product selection, Copilot product action previews, original/English/SKU order search, and Kitchen/Reception tickets. UI controls retain their selected EN/TL language. Original customer messages and AI customer-facing suggestions are not translated by this presentation layer.
 
-`ticket-snapshot.ts` and its existing missing/incomplete/inconsistent snapshot protections are unchanged. Prices, quantities, accepted names, state machines, RBAC and live data are unchanged. The Products administration page remains its existing unavailable placeholder; this hotfix does not connect Product Hub.
+`ticket-snapshot.ts` and its existing missing/incomplete/inconsistent snapshot protections are unchanged. Prices, quantities, accepted names, state machines, RBAC and live data are unchanged. Since the integration with Product Hub V2 (`docs/product-hub/integration-candidate.md`), English names approved there at publication are accepted by the same resolver under the same rule: SKU plus exact recorded definition, otherwise the original text and the review warning.
 
 ## Screenshot evidence
 

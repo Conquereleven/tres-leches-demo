@@ -140,3 +140,8 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Product Hub publication in Production is allowed only while adoption is active there. Keep the storefront's approved look: no new customer copy or CSS for this feature. Details and limits: `docs/product-hub/storefront-dynamic-catalog.md`.
 - Product photographs resolve only through `selectedProductMedia` / `productGalleryMedia` (`src/brand/media.tsx`); menu, product page and cart must not pick images any other way. Catalog translations are never generated: missing ES/AR wording shows the pending marker.
 - Price rollback is a new publication of the previous price from Product Hub. Never restore a database file or use the storefront flag to undo a price.
+
+## Fronts A and C integrated (12 October 2026)
+- Operations names products through `src/commerce/product-names.ts` only: the reviewed dictionary first, then English names approved in Product Hub (`productNames` from `/api/workspace`), always SKU plus exact recorded definition. Never translate at runtime, never rewrite an order snapshot; unknown definitions keep the original text with the review warning.
+- The variant field "English name for Operations and tickets" is staff-only and must not appear in any public catalog response. Approved names are append-only.
+- Candidate, conflicts and joint QA: `docs/product-hub/integration-candidate.md`.
