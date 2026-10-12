@@ -1,5 +1,6 @@
 import { catalogReadEnabled, serveCatalogRead } from "./catalog/read-api";
 import { serveHubMedia, serveProductHub } from "./catalog/product-hub-api";
+import { approvedOperationsNames } from "./catalog/product-hub";
 import {
   publishedRevision,
   serveStorefrontCatalog,
@@ -930,6 +931,8 @@ export async function startServer(
                 p.availability !== "unavailable" &&
                 availableSku(p.id),
             ),
+            // English names approved in Product Hub, for staff screens and tickets.
+            productNames: approvedOperationsNames(s),
             zones: s.zones,
             conversations: s.conversations,
             orders: s.orders,

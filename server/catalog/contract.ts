@@ -109,6 +109,14 @@ export const foundationSchema = z
             commercialState: status,
             translations: translationsSchema,
             media: z.array(mediaLink).max(50),
+            /** Approved English name for Operations and tickets. Never shown to customers. */
+            operationsName: z
+              .string()
+              .trim()
+              .min(1)
+              .max(300)
+              .nullable()
+              .optional(),
           })
           .strict(),
       )

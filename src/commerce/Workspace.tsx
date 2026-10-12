@@ -1,4 +1,8 @@
-import { orderProductName, productOptionLabel } from "./product-names";
+import {
+  orderProductName,
+  productOptionLabel,
+  setPublishedProductNames,
+} from "./product-names";
 import { OperationalProductName } from "./OperationalProductName";
 import { OperationsOverview, OperationsSettings } from "./OperationsOverview";
 import { ProductHub } from "./ProductHub";
@@ -54,7 +58,10 @@ function WorkspaceInner() {
   const pending = useRef(new Map<string, string>());
   const refresh = useCallback(async () => {
     try {
-      setData(await api<Data>("workspace"));
+      const next = await api<Data>("workspace");
+      // Before rendering: names approved in Product Hub for staff screens and tickets.
+      setPublishedProductNames(next.productNames);
+      setData(next);
       setError((previous) =>
         previous.includes("Inicia sesión") ? "" : previous,
       );

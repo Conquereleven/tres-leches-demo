@@ -285,7 +285,7 @@ test("concurrent changes between audit and apply are refused inside the transact
     assert.equal(store.read().orders.length, 2);
     // Recovery is refused once Product Hub has state built on the foundation.
     store.write((s) => {
-      (s as State & { productHub?: unknown }).productHub = { version: 1 };
+      (s as { productHub?: unknown }).productHub = { version: 1 };
     });
     assert.throws(
       () => revertFoundation(store, expected.plannedRevision),
@@ -400,7 +400,7 @@ test("existing catalog tools keep an initialized foundation consistent or refuse
     assert.deepEqual(store.read(), kept, "rolled back");
     // An open Product Hub draft blocks direct catalog changes.
     store.write((x) => {
-      (x as State & { productHub?: unknown }).productHub = { draft: {} };
+      (x as { productHub?: unknown }).productHub = { draft: {} };
     });
     assert.throws(
       () =>

@@ -849,6 +849,7 @@ function Editor({
         translations: v.translations,
         media: v.media,
         catalogName: v.catalogName.trim(),
+        operationsName: nullable(v.operationsName ?? ""),
         priceFils: parseAed(v.price)!,
         active: v.active,
         availability: v.availability,
@@ -1130,6 +1131,19 @@ function Editor({
                           maxLength={300}
                           onChange={(e) =>
                             setVariant(i, { catalogName: e.target.value })
+                          }
+                        />
+                      </label>
+                      <label>
+                        {t("English name for Operations and tickets")}
+                        <input
+                          value={v.operationsName ?? ""}
+                          maxLength={300}
+                          lang="en"
+                          onChange={(e) =>
+                            setVariant(i, {
+                              operationsName: nullable(e.target.value),
+                            })
                           }
                         />
                       </label>

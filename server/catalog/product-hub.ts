@@ -55,7 +55,21 @@ export type HubState = {
   history: HubHistoryEntry[];
   /** Idempotency receipts: same key and body replays the stored result. */
   commands: Record<string, { hash: string; result: unknown }>;
+  /**
+   * Every English name approved for staff, with the exact catalog name it was approved
+   * for. Append-only, so an order accepted under an earlier name still resolves.
+   */
+  approvedNames?: Record<string, ApprovedName[]>;
 };
+export type ApprovedName = { source: string; en: string; revision: string };
+/** What Operations may use to name products published from Product Hub. */
+export const approvedOperationsNames = (s: State) =>
+  Object.fromEntries(
+    Object.entries(s.productHub?.approvedNames ?? {}).map(([sku, names]) => [
+      sku,
+      names.map(({ source, en }) => ({ source, en })),
+    ]),
+  );
 export type HubFlags = {
   enabled: boolean;
   publishEnabled: boolean;
@@ -112,6 +126,7 @@ const variantInput = z
     commercialState: status,
     translations: translationsSchema,
     media: z.array(mediaLink).max(50),
+    operationsName: text.max(300).nullable().optional(),
     /** Commercial fields; written to the draft copy of State.catalog. */
     catalogName: text.max(300),
     priceFils: z.number().int().positive().max(MAX_PRICE_FILS),
@@ -343,6 +358,13 @@ export function hubChanges(
       "commercialState",
     ] as const)
       add("variant", v.skuId, field, o[field], v[field]);
+    add(
+      "variant",
+      v.skuId,
+      "operationsName",
+      o.operationsName ?? null,
+      v.operationsName ?? null,
+    );
     addContent("variant", v.skuId, o, v);
     if (c && oc) {
       if (c.priceFils !== oc.priceFils)
@@ -447,6 +469,15 @@ export function hubIssues(
   for (const v of next.foundation.variants) {
     if (v.commercialState !== "published") continue;
     const name = nextSkus.get(v.skuId)?.name;
+    // Staff read English. A new or renamed definition has no reviewed English name
+    // unless one is given here; Operations then shows the original with a warning.
+    const previous = live.catalog.find((c) => c.id === v.skuId)?.name;
+    if (name && name !== previous && !v.operationsName)
+      warn(
+        "operations-name-missing",
+        v.skuId,
+        "No approved English name for Operations and tickets",
+      );
     for (const locale of ["es", "ar"] as const) {
       const t = v.translations[locale];
       const missing = [
@@ -826,6 +857,20 @@ export function hubCommand(
       // The only place the published catalog changes. Orders and payments are untouched.
       s.catalog = draft.catalog;
       s.catalogFoundation = foundation;
+      // Record each approved English name with the catalog name it belongs to.
+      for (const v of foundation.variants) {
+        const source = draft.catalog.find((c) => c.id === v.skuId)?.name;
+        if (!v.operationsName || !source) continue;
+        const names = ((h.approvedNames ??= {})[v.skuId] ??= []);
+        if (
+          !names.some((n) => n.source === source && n.en === v.operationsName)
+        )
+          names.push({
+            source,
+            en: v.operationsName,
+            revision: foundation.revision.id,
+          });
+      }
       h.draft = undefined;
       action = "publish";
       summary = `Published ${changes.length} changes (${changes.filter((c) => c.kind === "price").length} prices)`;
