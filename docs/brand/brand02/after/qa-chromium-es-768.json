@@ -1,0 +1,31 @@
+{
+  "width": 768,
+  "locale": "es",
+  "errors": [],
+  "results": {
+    "home": {
+      "broken": [],
+      "violations": []
+    },
+    "category": {
+      "broken": [],
+      "violations": []
+    },
+    "product": {
+      "broken": [],
+      "violations": []
+    },
+    "cart": {
+      "broken": [],
+      "violations": []
+    },
+    "checkout": {
+      "broken": [],
+      "violations": []
+    },
+    "return": {
+      "broken": [],
+      "violations": []
+    }
+  }
+}

@@ -1,11 +1,11 @@
 /* ─── Checkout polish ────────────────────────────────────────────────────
-   Loaded after brand.css. 3L tokens only (cream, cacao, blush,
-   gold). Mobile-first: one column with a collapsible order summary; from
+   Loaded after brand.css. 3L tokens only (white, graphite, blush,
+   raspberry). Mobile-first: one column with a collapsible order summary; from
    960px a two-column layout with a sticky summary. */
 
 .brand-experience.b-shop {
   --co-radius: 1rem;
-  --co-gold-tint: #f4eee0;
+  --co-gold-tint: var(--v2-petal);
   --co-danger: #8a3b3b;
   --co-success: #5b6e4a;
 }
@@ -92,7 +92,7 @@
   color: var(--text-secondary);
 }
 .brand-experience .b-co-progress li.done {
-  border-top-color: var(--brand-gold);
+  border-top-color: var(--v2-raspberry);
 }
 .brand-experience .b-co-progress li.current {
   border-top-color: var(--text-primary);
@@ -110,8 +110,8 @@
   font-size: 0.7rem;
 }
 .brand-experience li.done > .b-co-dot {
-  background: var(--brand-gold);
-  border-color: var(--brand-gold);
+  background: var(--v2-raspberry);
+  border-color: var(--v2-raspberry);
   color: #fff;
 }
 .brand-experience li.current > .b-co-dot {
@@ -201,7 +201,7 @@
   outline: none;
 }
 .brand-experience .b-co-card h2:focus-visible {
-  outline: 2px solid var(--brand-gold);
+  outline: 2px solid var(--v2-raspberry);
   outline-offset: 4px;
 }
 
@@ -622,7 +622,7 @@
   background: var(--co-gold-tint);
 }
 .brand-experience .b-co-state-held_for_review .b-co-state-icon {
-  color: #7a6636;
+  color: var(--v2-secondary);
 }
 .brand-experience .b-co-state-declined,
 .brand-experience .b-co-state-failed {
@@ -710,7 +710,7 @@
   width: 3.5rem;
   height: 3.5rem;
   border-radius: 50%;
-  background: var(--brand-gold);
+  background: var(--v2-raspberry);
   color: #fff;
   font-size: 1.6rem;
 }
@@ -815,7 +815,7 @@
   }
   .brand-experience .b-co-timeline li.done,
   .brand-experience .b-co-timeline li.current {
-    border-top-color: var(--brand-gold);
+    border-top-color: var(--v2-raspberry);
   }
 }
 .brand-experience .b-co-next .b-caption {
@@ -848,5 +848,5 @@
 .b-fulfillment-choice input {
   width: 20px;
   height: 20px;
-  accent-color: var(--b-brown, #442c21);
+  accent-color: var(--v2-raspberry);
 }

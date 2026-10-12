@@ -117,3 +117,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Products route is an honest unavailable state until PR #7 is integrated; do not connect unfinished catalog APIs.
 - Print Center is preview-only. Known Epson models do not establish connectivity; no print jobs, IP communication or fake success until explicitly authorized hardware integration.
 - Operations CSS stays scoped to `.commerce.ops-shell`; public EN/ES/AR styles and commerce rules are independent.
+
+## BRAND-02 integration (12 October 2026, founder)
+- Public Visual Identity V2 supersedes the earlier cream/cacao rule: dominant blush #F6DFE0; white surfaces; graphite #27242D; accessible raspberry #A93C68 CTAs. Scope variables to brand containers only. Operations/global styling remains unchanged. Preserve layout, typography, navigation, responsive behavior and motion.
+- Retain PR #6 square product frames and independent three-frame 3:2 editorial opening gallery. Product/detail/cart/checkout resolve stable source identities; gallery assets must not silently follow product replacement.
+- Current seven Conchas image presentations are interim, NOT final. New media status is AWAITING FOUNDER-APPROVED IMAGES. No generated, sourced or substituted final assets in this task. See docs/brand/brand02/replacement-manifest.json for required sources and media-only follow-up. Historical “final-approved” folder records prior provenance, not current final approval.
+- Do not change SKU/price/availability, checkout/payment behavior, Operations, Product Hub backend, Railway or Production SQLite. No merge/deploy without separate approval.
