@@ -34,6 +34,7 @@ await build({
     "scripts/send-test-email.ts",
     "scripts/update-pan-prices.ts",
     "scripts/activate-conchas.ts",
+    "scripts/catalog-foundation.ts",
   ],
   bundle: true,
   platform: "node",

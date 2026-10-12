@@ -124,6 +124,10 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Current seven Conchas image presentations are interim, NOT final. New media status is AWAITING FOUNDER-APPROVED IMAGES. No generated, sourced or substituted final assets in this task. See docs/brand/brand02/replacement-manifest.json for required sources and media-only follow-up. Historical “final-approved” folder records prior provenance, not current final approval.
 - Do not change SKU/price/availability, checkout/payment behavior, Operations, Product Hub backend, Railway or Production SQLite. No merge/deploy without separate approval.
 
+## Catalog foundation initialization (12 October 2026)
+- `catalog-foundation` audit is read-only on any profile; apply adds only `catalogFoundation`, needs the audited fingerprints, a verified backup and, in Production, an explicit confirmation and founder approval. Never correct the database from repository sources: a difference blocks until resolved with commercial evidence.
+- Tools that write `State.catalog` directly must call `rebaseFoundation` in the same transaction. Procedure, audit results and rollback: `docs/product-hub/foundation-bootstrap.md`.
+
 ## Product Hub V2 (12 October 2026)
 - Operations → Products is a real editor: private draft, before/after review, admin-only publication. `State.catalog` stays the only price and availability authority; the draft (`State.productHub`) is a candidate copy and is never read by checkout.
 - Off by default: `PRODUCT_HUB_ENABLED` (editor) and `PRODUCT_HUB_PUBLISH_ENABLED` (publish). Publication is refused in Production in code until the storefront reads published data; do not describe the hub as publishing to customers before that integration.

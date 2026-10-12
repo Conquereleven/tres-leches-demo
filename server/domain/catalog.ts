@@ -1,3 +1,4 @@
+import { rebaseFoundation } from "../catalog/contract";
 import { z } from "zod";
 import type { CatalogItem } from "./model";
 import type { Store } from "../db/store";
@@ -43,6 +44,7 @@ export async function importCatalog(
   await store.backup(backupPath);
   store.write((s) => {
     s.catalog = products;
+    rebaseFoundation(s, new Date().toISOString());
     s.audit.push({
       at: new Date().toISOString(),
       actor: "catalog-admin",

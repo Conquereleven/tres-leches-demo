@@ -1,3 +1,4 @@
+import { rebaseFoundation } from "../server/catalog/contract";
 import { chmodSync, existsSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { createHash, randomUUID } from "node:crypto";
@@ -45,6 +46,7 @@ try {
           written = next.filter((item,i) => item.active !== current[i]!.active || item.availability !== current[i]!.availability).length;
           if (written !== plan.change.length) throw Error("Concurrent catalog change");
           s.catalog = next;
+          rebaseFoundation(s, new Date().toISOString());
           s.audit.push({ at: new Date().toISOString(), actor: "catalog-admin", action: `Approved Conchas activated: ${written} SKUs; verified backup created` });
         });
         const after = store.read().catalog ?? [];

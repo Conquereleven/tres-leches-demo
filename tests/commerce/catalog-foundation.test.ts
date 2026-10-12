@@ -1,9 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, rmSync, readFileSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { execFileSync } from "node:child_process";
 import { DatabaseSync } from "node:sqlite";
 import { createServer } from "node:http";
 import { Store, seed } from "../../server/db/store";
@@ -236,56 +235,7 @@ test("isolated migration is idempotent; original aggregate, snapshots and recove
     rmSync(dir, { recursive: true });
   }
 });
-test("CLI dry-run is physically read-only and refuses Production, profile mismatch and conflicting sources", () => {
-  const dir = mkdtempSync(join(tmpdir(), "3l-foundation-cli-"));
-  const path = join(dir, "state.sqlite");
-  const store = new Store(path, "test", {
-    ...seed(),
-    catalog: structuredClone(sources.approved),
-  });
-  store.close();
-  const invoke = (mode: string, env = {}) =>
-    execFileSync(
-      process.execPath,
-      ["--import", "tsx", "scripts/catalog-foundation.ts", mode],
-      {
-        env: {
-          ...process.env,
-          APP_ENV: "test",
-          NODE_ENV: "test",
-          DB_PATH: path,
-          ...env,
-        },
-        encoding: "utf8",
-        stdio: ["ignore", "pipe", "pipe"],
-      },
-    );
-  try {
-    const before = readFileSync(path);
-    const out = JSON.parse(invoke("dry-run"));
-    assert.equal(out.valid, true);
-    assert.equal(out.skuCount, 236);
-    assert.deepEqual(readFileSync(path), before);
-    assert.throws(() => invoke("apply", { APP_ENV: "production" }));
-    assert.throws(() => invoke("apply", { NODE_ENV: "production" }));
-    assert.throws(() => invoke("apply", { APP_ENV: "development" }));
-    assert.deepEqual(readFileSync(path), before);
-    invoke("apply");
-    const repeat = invoke("apply").trim().split("\n");
-    assert.equal(JSON.parse(repeat[1]!).applied, false);
-    const db = new DatabaseSync(path, { readOnly: true });
-    try {
-      assert.equal(
-        db.prepare("PRAGMA integrity_check").get()!.integrity_check,
-        "ok",
-      );
-    } finally {
-      db.close();
-    }
-  } finally {
-    rmSync(dir, { recursive: true });
-  }
-});
+// The command line tool is covered by foundation-bootstrap.test.ts.
 test("public projection excludes drafts, archival records and private fields, localizes and retains approved media", () => {
   const s = state();
   s.catalogFoundation.products[0]!.commercialState = "draft";

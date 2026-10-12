@@ -84,7 +84,7 @@ Use a **disposable, already initialized** test/development SQLite database whose
 catalog matches the approved baseline. Never point these commands at LIVE.
 
 ```sh
-APP_ENV=test NODE_ENV=test DB_PATH=/absolute/disposable/state.sqlite npm run catalog:foundation -- dry-run
+APP_ENV=test NODE_ENV=test DB_PATH=/absolute/disposable/state.sqlite npm run catalog:foundation -- audit
 APP_ENV=test NODE_ENV=test DB_PATH=/absolute/disposable/state.sqlite npm run catalog:foundation -- apply
 ```
 
