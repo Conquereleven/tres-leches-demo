@@ -348,16 +348,29 @@ export function OrderCard({
         ))}
       </ul>
 
-      {o.delivery?.addressVerification === "UNVERIFIED" && (
-        <p role="status" className="ops-address-review">
-          <strong>{t("ADDRESS NOT VERIFIED")}</strong>
-          {t("· Revisión manual de dirección requerida")}
-        </p>
-      )}
+      {o.fulfillmentMethod !== "pickup" &&
+        (!o.delivery?.address?.trim() || !o.delivery?.building?.trim()) && (
+          <p role="alert" className="ops-address-review">
+            <strong>{t("Address incomplete")}</strong> ·{" "}
+            {t("Review address before dispatch")}
+          </p>
+        )}
+      {o.fulfillmentMethod !== "pickup" &&
+        o.delivery?.addressVerification !== "VERIFIED" && (
+          <p role="status" className="ops-address-review">
+            <strong>{t("ADDRESS NOT VERIFIED")}</strong>
+            {t("· Revisión manual de dirección requerida")}
+          </p>
+        )}
       {o.customerDetails?.instructions && (
         <p className="ops-order-instructions">
           <strong>{t("Preparation instructions")}</strong>{" "}
           {o.customerDetails.instructions}
+        </p>
+      )}
+      {o.delivery?.notes && (
+        <p className="ops-order-instructions">
+          <strong>{t("Delivery notes")}</strong> {o.delivery.notes}
         </p>
       )}
       <dl className="ops-oc-meta">
@@ -378,7 +391,9 @@ export function OrderCard({
               <Clock aria-hidden />
               {t("Hora")}
             </dt>
-            <dd>{o.pickup?.preferredTime ?? o.delivery?.slot}</dd>
+            <dd>
+              <strong>{o.pickup?.preferredTime ?? o.delivery?.slot}</strong>
+            </dd>
           </div>
         )}
         <div>
@@ -392,6 +407,26 @@ export function OrderCard({
               : (o.quote?.zoneName ?? t("Ubicación pendiente"))}
           </dd>
         </div>
+        {o.fulfillmentMethod !== "pickup" && (
+          <>
+            <div>
+              <dt>{t("Full address")}</dt>
+              <dd>{o.address || t("Not stored")}</dd>
+            </div>
+            <div>
+              <dt>{t("Street / address")}</dt>
+              <dd>{o.delivery?.address || t("Not stored")}</dd>
+            </div>
+            <div>
+              <dt>{t("Building / villa")}</dt>
+              <dd>{o.delivery?.building || t("Not stored")}</dd>
+            </div>
+            <div>
+              <dt>{t("Apartment / unit")}</dt>
+              <dd>{o.delivery?.unit || t("Not stored")}</dd>
+            </div>
+          </>
+        )}
       </dl>
 
       {step >= 0 && (

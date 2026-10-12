@@ -1,3 +1,7 @@
+import {
+  deliveryStreet,
+  deliveryBuilding,
+} from "./domain/delivery-address-input";
 import { catalogReadEnabled, serveCatalogRead } from "./catalog/read-api";
 import { serveHubMedia, serveProductHub } from "./catalog/product-hub-api";
 import { approvedOperationsNames } from "./catalog/product-hub";
@@ -60,7 +64,7 @@ import {
   UnconfiguredPaymentProvider,
 } from "./adapters/blocked";
 import { PaymenntProvider } from "./adapters/paymennt";
-import { resendFromEnv } from "./adapters/resend";
+import { operationsResendFromEnv, resendFromEnv } from "./adapters/resend";
 import {
   dispatchCustomerNotifications,
   recoverInterruptedCustomerNotifications,
@@ -228,6 +232,14 @@ export async function startServer(
   const emailProvider =
     overrides.email ?? (isolatedTest ? null : resendFromEnv(process.env));
   recoverInterruptedCustomerNotifications(store);
+  const operationsEmail = isolatedTest
+    ? null
+    : operationsResendFromEnv(process.env);
+  service.operationsEmailRecipients = operationsEmail?.recipients ?? [];
+  recoverInterruptedCustomerNotifications(
+    store,
+    "operationsEmailNotifications",
+  );
   if (!overrides.geo)
     service.geo = attachVerifiedAddresses(
       service.geo,
@@ -581,8 +593,8 @@ export async function startServer(
             const input = z
               .object({
                 zoneId: z.string().max(100),
-                address: z.string().min(5).max(300),
-                building: z.string().min(1).max(120),
+                address: deliveryStreet,
+                building: deliveryBuilding,
                 addressRef: z
                   .string()
                   .regex(/^[a-f0-9]{64}$/)
@@ -940,6 +952,18 @@ export async function startServer(
             operationsNotifications: s.operationsNotifications ?? [],
             customerNotifications: s.customerNotifications ?? [],
             customerEmailProvider: emailProvider?.name ?? null,
+            operationsEmailProvider: operationsEmail?.provider.name ?? null,
+            operationsEmailNotifications: (
+              s.operationsEmailNotifications ?? []
+            ).map((n) => ({
+              id: n.id,
+              orderId: n.orderId,
+              status: n.status,
+              attemptCount: n.attemptCount,
+              createdAt: n.createdAt,
+              sentAt: n.sentAt,
+              lastError: n.lastError,
+            })),
             operationsOutboundEnabled,
             readiness:
               staging && current.role === "admin"
@@ -1173,6 +1197,13 @@ export async function startServer(
         }),
       )
       .then(() => dispatchCustomerNotifications(store, emailProvider))
+      .then(() =>
+        dispatchCustomerNotifications(
+          store,
+          operationsEmail?.provider ?? null,
+          "operationsEmailNotifications",
+        ),
+      )
       .catch(() => {
         safeLog("worker.failed");
       })

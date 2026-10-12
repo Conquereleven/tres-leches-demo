@@ -61,3 +61,35 @@ export function resendFromEnv(env: NodeJS.ProcessEnv) {
     from: env.CUSTOMER_EMAIL_FROM,
   });
 }
+
+/** Independently enabled internal paid-order alerts; never assume recipients. */
+export function operationsEmailConfig(env: NodeJS.ProcessEnv) {
+  if (env.OPERATIONS_EMAIL_ENABLED !== "true") return null;
+  const recipients = z
+    .array(z.email())
+    .min(1)
+    .max(20)
+    .parse([
+      ...new Set(
+        (env.OPERATIONS_EMAIL_TO ?? "")
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean),
+      ),
+    ]);
+  const from = env.OPERATIONS_EMAIL_FROM || env.CUSTOMER_EMAIL_FROM;
+  if (!env.RESEND_API_KEY || !from)
+    throw new Error(
+      "Operations email requires provider key and sender identity",
+    );
+  return { recipients, from, apiKey: env.RESEND_API_KEY };
+}
+export function operationsResendFromEnv(env: NodeJS.ProcessEnv) {
+  const config = operationsEmailConfig(env);
+  return config
+    ? {
+        recipients: config.recipients,
+        provider: new ResendEmailProvider(config),
+      }
+    : null;
+}

@@ -186,27 +186,30 @@ export const CUSTOMER_EMAIL_MAX_AGE_MS = 2 * 60 * 60 * 1000;
 export async function dispatchCustomerNotifications(
   store: { read(): State; write<T>(fn: (s: State) => T): T },
   provider: CustomerEmailProvider | null,
+  collection:
+    | "customerNotifications"
+    | "operationsEmailNotifications" = "customerNotifications",
 ) {
   if (!provider) return { attempted: 0, skipped: "no-email-provider" as const };
   let attempted = 0;
   const cutoff = Date.now() - CUSTOMER_EMAIL_MAX_AGE_MS;
   if (
-    (store.read().customerNotifications ?? []).some(
+    (store.read()[collection] ?? []).some(
       (n) => n.status === "pending" && Date.parse(n.createdAt) < cutoff,
     )
   )
     store.write((s) => {
-      for (const row of s.customerNotifications ?? [])
+      for (const row of s[collection] ?? [])
         if (row.status === "pending" && Date.parse(row.createdAt) < cutoff) {
           row.status = "failed";
           row.lastError = "Expired before it could be sent; not sent";
         }
     });
-  for (const pending of (store.read().customerNotifications ?? []).filter(
+  for (const pending of (store.read()[collection] ?? []).filter(
     (n) => n.status === "pending",
   )) {
     const claimed = store.write((s) => {
-      const row = s.customerNotifications?.find((r) => r.id === pending.id);
+      const row = s[collection]?.find((r) => r.id === pending.id);
       if (!row || row.status !== "pending") return null;
       row.status = "sending";
       row.attemptCount++;
@@ -224,7 +227,7 @@ export async function dispatchCustomerNotifications(
         idempotencyKey: claimed.id,
       });
       store.write((s) => {
-        const row = s.customerNotifications!.find((r) => r.id === claimed.id)!;
+        const row = s[collection]!.find((r) => r.id === claimed.id)!;
         row.status = "sent";
         row.sentAt = new Date().toISOString();
         row.providerMessageId = result.messageId;
@@ -232,7 +235,7 @@ export async function dispatchCustomerNotifications(
       });
     } catch {
       store.write((s) => {
-        const row = s.customerNotifications!.find((r) => r.id === claimed.id)!;
+        const row = s[collection]!.find((r) => r.id === claimed.id)!;
         row.status = "failed";
         row.lastError = "Delivery failed; review before resending";
       });
@@ -242,12 +245,17 @@ export async function dispatchCustomerNotifications(
 }
 
 /** After a restart, an email left mid-send has an unknown outcome. */
-export function recoverInterruptedCustomerNotifications(store: {
-  write<T>(fn: (s: State) => T): T;
-}) {
+export function recoverInterruptedCustomerNotifications(
+  store: {
+    write<T>(fn: (s: State) => T): T;
+  },
+  collection:
+    | "customerNotifications"
+    | "operationsEmailNotifications" = "customerNotifications",
+) {
   return store.write((s) => {
     let recovered = 0;
-    for (const row of s.customerNotifications ?? [])
+    for (const row of s[collection] ?? [])
       if (row.status === "sending") {
         row.status = "failed";
         row.lastError = "Interrupted while sending; review before resending";
