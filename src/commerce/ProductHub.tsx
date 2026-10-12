@@ -15,6 +15,7 @@ type Content = {
   name: string | null;
   description: string | null;
   variantLabel: string | null;
+  sizeLabel?: string | null;
 };
 type Translations = Record<Locale, Content>;
 const LOCALES: Locale[] = ["en", "es", "ar"];
@@ -747,6 +748,31 @@ function Editor({
         i === index ? { ...v, ...patch } : v,
       ),
     }));
+  // Spanish and Arabic wording of a variant. English is the field above; nothing
+  // is translated automatically.
+  const setVariantText = (
+    index: number,
+    language: "es" | "ar",
+    field: "variantLabel" | "sizeLabel" | "name",
+    value: string,
+  ) =>
+    setD((x) => ({
+      ...x,
+      variants: x.variants.map((v, i) =>
+        i === index
+          ? {
+              ...v,
+              translations: {
+                ...v.translations,
+                [language]: {
+                  ...v.translations[language],
+                  [field]: nullable(value),
+                },
+              },
+            }
+          : v,
+      ),
+    }));
   const setContent = (field: "name" | "description", value: string) =>
     setD((x) => ({
       ...x,
@@ -1202,6 +1228,77 @@ function Editor({
                         {t("Active (can be sold)")}
                       </label>
                     </div>
+                    <details className="ph-variant-i18n">
+                      <summary>
+                        {t("Translations")} · Español · العربية
+                        {(["es", "ar"] as const).some(
+                          (l) =>
+                            (v.flavor && !v.translations[l].variantLabel) ||
+                            (v.size && !v.translations[l].sizeLabel) ||
+                            !v.translations[l].name,
+                        ) && (
+                          <span className="ph-dot" aria-label={t("Missing")} />
+                        )}
+                      </summary>
+                      <p>
+                        <small>
+                          {t(
+                            "Wording the storefront already translates can stay empty. New flavours, sizes and names need a translation here, or customers see “translation pending”.",
+                          )}
+                        </small>
+                      </p>
+                      {(["es", "ar"] as const).map((l) => (
+                        <div
+                          key={l}
+                          className="ph-form"
+                          lang={l}
+                          dir={l === "ar" ? "rtl" : "ltr"}
+                        >
+                          <label>
+                            {t("Flavour")} · {LOCALE_NAME[l]}
+                            <input
+                              value={v.translations[l].variantLabel ?? ""}
+                              maxLength={2000}
+                              disabled={!v.flavor}
+                              onChange={(e) =>
+                                setVariantText(
+                                  i,
+                                  l,
+                                  "variantLabel",
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </label>
+                          <label>
+                            {t("Size")} · {LOCALE_NAME[l]}
+                            <input
+                              value={v.translations[l].sizeLabel ?? ""}
+                              maxLength={2000}
+                              disabled={!v.size}
+                              onChange={(e) =>
+                                setVariantText(
+                                  i,
+                                  l,
+                                  "sizeLabel",
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </label>
+                          <label>
+                            {t("Name in cart")} · {LOCALE_NAME[l]}
+                            <input
+                              value={v.translations[l].name ?? ""}
+                              maxLength={2000}
+                              onChange={(e) =>
+                                setVariantText(i, l, "name", e.target.value)
+                              }
+                            />
+                          </label>
+                        </div>
+                      ))}
+                    </details>
                     <p className="ph-chips">
                       {v.existing ? (
                         <strong className="ph-chip">{t("Existing SKU")}</strong>

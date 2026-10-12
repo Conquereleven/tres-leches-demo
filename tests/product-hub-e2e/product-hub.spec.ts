@@ -84,10 +84,10 @@ test("desktop: edit a price, save the draft, reload, compare and publish", async
     .getByLabel("Description shown to customers")
     .fill("Pan dulce tradicional con azúcar.");
   await page.getByRole("tab", { name: "العربية" }).click();
-  await expect(page.locator('.ph-form[lang="ar"]')).toHaveAttribute(
-    "dir",
-    "rtl",
-  );
+  await expect(
+    // The customer content form; variants have their own translation rows below.
+    page.locator('.ph-form[lang="ar"]').first(),
+  ).toHaveAttribute("dir", "rtl");
   await page
     .getByLabel("Description shown to customers")
     .fill("خبز حلو تقليدي بالسكر.");
@@ -164,8 +164,8 @@ test("desktop: create a product with a new SKU and an uploaded image, then disca
   await variant
     .getByLabel("Catalog name")
     .fill("Pan de Muerto · Canela · Mini");
-  await variant.getByLabel("Flavour").fill("Canela");
-  await variant.getByLabel("Size").fill("Mini · 40 g");
+  await variant.getByLabel("Flavour", { exact: true }).fill("Canela");
+  await variant.getByLabel("Size", { exact: true }).fill("Mini · 40 g");
   await variant.getByLabel("Price (AED)").fill("13");
   // A file that is not an image is refused by the server.
   await page.getByLabel("Upload a new image").setInputFiles({
