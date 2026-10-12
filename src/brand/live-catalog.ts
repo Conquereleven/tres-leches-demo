@@ -98,7 +98,6 @@ let etag: string | null = null;
 let inFlight: Promise<void> | null = null;
 let timer: ReturnType<typeof setTimeout> | undefined;
 const listeners = new Set<() => void>();
-const revisionListeners = new Set<() => void>();
 
 /** Structural check: a malformed answer is treated as no answer. */
 function valid(value: unknown): value is LiveCatalog {
@@ -132,12 +131,9 @@ function valid(value: unknown): value is LiveCatalog {
   );
 }
 function set(next: LiveState) {
-  const before = state.status === "live" ? state.catalog.revision : null;
   state = next;
   overlay = null;
   listeners.forEach((l) => l());
-  const after = next.status === "live" ? next.catalog.revision : null;
-  if (before !== after) revisionListeners.forEach((l) => l());
 }
 function schedule(ms: number) {
   if (timer) clearTimeout(timer);
@@ -192,10 +188,12 @@ export const liveState = () => state;
 export function useLiveCatalog(): LiveState {
   return useSyncExternalStore(subscribe, liveState, () => BUNDLED);
 }
-/** Called when a different published revision arrives (prices may have changed). */
-export function onRevisionChange(fn: () => void) {
-  revisionListeners.add(fn);
-  return () => revisionListeners.delete(fn);
+/** Whether the published catalog offers this SKU now; null when it is not in use. */
+export function liveOrderable(sku: string): boolean | null {
+  if (state.status !== "live") return null;
+  for (const p of state.catalog.products)
+    for (const o of p.options) if (o.id === sku) return o.orderable;
+  return false;
 }
 
 // Published translations for names the build's resources do not know (new or renamed).

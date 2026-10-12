@@ -71,8 +71,7 @@ published data would show them stale prices.
 - The server marks every HTML page with `<html data-catalog="dynamic">` when adoption is
   on. The client knows before rendering, so the build's catalog is never flashed.
 - `src/brand/live-catalog.ts` fetches the catalog, keeps the `ETag`, and revalidates when
-  the tab regains focus or becomes visible and every 60 seconds. A new revision also
-  reloads the checkout configuration for every component.
+  the tab regains focus or becomes visible and every 60 seconds.
 - `src/brand/menu.ts` adapts the published catalog to the shapes the menu already uses
   (`useMenu`). Existing products keep their authored identity, so approved photography,
   crops and rotations render exactly as before.
@@ -84,15 +83,16 @@ published data would show them stale prices.
 - While the first answer is pending the menu shows the existing loading text; with no
   valid revision it shows the existing "Online ordering is unavailable." and a retry.
   No new customer copy and no CSS was added.
-- If the displayed price and the server's ever differ (a publication between two
-  requests) both are reloaded once; the existing rule that blocks an option whose
-  displayed price is not the server's stays in force.
+- If the published catalog and the checkout configuration ever disagree about a price or
+  about whether a size can be ordered (a publication between two requests), that card
+  reloads both, once; the existing rule that blocks an option whose displayed price is
+  not the server's stays in force, and a size the published catalog marks unavailable is
+  never offered.
 
-Files touched in the customer site: `MenuCatalog.tsx`, `menu.ts`, `cart.ts`,
-`localization.tsx`, new `live-catalog.ts`. None of them is changed by the storefront
-agent's open branch (`feature/3l-brand-v2-conchas-media`, PR #14), which changes CSS,
-media manifests and three lines of `media.tsx`; `media.tsx`, `Shop.tsx` and all CSS are
-untouched here.
+Files touched in the customer site: `MenuCatalog.tsx`, `menu.ts`, `localization.tsx`,
+new `live-catalog.ts`. This branch is integrated on top of the storefront agent's merged
+work (BRAND-02, PR #14): `cart.ts`, `Shop.tsx`, `media.tsx`, menu data, locale files and
+all CSS are byte-identical to `main`, and BRAND-02's own guard test passes.
 
 ## Known limits (not hidden)
 
@@ -128,7 +128,7 @@ untouched here.
    every flag unset. No behaviour changes.
 2. Resolve the 12 stored rows reported by the foundation audit and initialize the
    foundation in Production (`foundation-bootstrap.md`), each write approved.
-3. Merge the storefront agent's PR #14 and re-run this suite on the combined build.
+3. (Done) The storefront agent's PR #14 is merged; this suite passes on the combined build.
 4. Validate on staging with `STOREFRONT_DYNAMIC_CATALOG_ENABLED=true` and a real publication
    (Lisa's review of menu, Spanish and Arabic).
 5. With founder approval set both storefront variables in Production; confirm

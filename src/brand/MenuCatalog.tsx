@@ -12,12 +12,13 @@ import { CustomerCopy } from "./localization";
 import { availableSku } from "../../shared/commerce-policy";
 import { useEffect, useId, useRef, useState } from "react";
 import { AddToCart } from "./Shop";
+import { useCheckoutConfig, useCheckoutNow } from "./cart";
 import {
-  refreshCheckoutConfig,
-  useCheckoutConfig,
-  useCheckoutNow,
-} from "./cart";
-import { livePhotos, refreshLiveCatalog, type LivePhoto } from "./live-catalog";
+  liveOrderable,
+  livePhotos,
+  refreshLiveCatalog,
+  type LivePhoto,
+} from "./live-catalog";
 import { formatAed } from "./content";
 import {
   menuProductFamily,
@@ -82,20 +83,31 @@ export function ProductOptions({
       ? "/brand/icon.png"
       : family.image;
   const serverProduct = config?.products.find((p) => p.id === option?.id);
+  // With the published catalog, a size it marks unavailable is never offered.
+  const orderable = option ? liveOrderable(option.id) : null;
   const ready =
-    !!option && !!serverProduct && serverProduct.priceFils === option.priceFils;
-  // Published data and checkout disagree only across a publication: reload both, once.
+    !!option &&
+    !!serverProduct &&
+    serverProduct.priceFils === option.priceFils &&
+    orderable !== false;
+  // The published catalog and checkout disagree only across a publication: this
+  // card reloads both, once per disagreement.
   const disagreement =
-    menu.status === "live" && option && serverProduct && !ready
-      ? `${option.id}:${option.priceFils}:${serverProduct.priceFils}`
+    menu.status === "live" &&
+    option &&
+    config &&
+    !loading &&
+    (orderable !== !!serverProduct ||
+      (serverProduct && serverProduct.priceFils !== option.priceFils))
+      ? `${option.id}:${option.priceFils}:${orderable}:${serverProduct?.priceFils}`
       : null;
   const reloaded = useRef<string | null>(null);
   useEffect(() => {
     if (!disagreement || reloaded.current === disagreement) return;
     reloaded.current = disagreement;
     void refreshLiveCatalog();
-    refreshCheckoutConfig();
-  }, [disagreement]);
+    retry();
+  }, [disagreement, retry]);
   // Photographs changed in Product Hub replace the build's; unchanged ones keep the
   // approved presentation (crops, rotation) exactly as authored.
   const published = livePhotos(product.id);
@@ -201,7 +213,8 @@ export function ProductOptions({
         </p>
       ) : ready ? (
         <AddToCart
-          key={option.id}
+          // Remounts on a new server price so the button never shows the old one.
+          key={`${option.id}:${serverProduct.priceFils}`}
           productId={option.id}
           fallback={
             <p>
