@@ -2926,7 +2926,8 @@
         }
       ],
       "mediaKind": "digital-illustration",
-      "presentation": "menu-reference"
+      "presentation": "menu-reference",
+      "replacementStatus": "AWAITING FOUNDER-APPROVED IMAGES"
     }
   ],
   "editorial": [
@@ -3193,8 +3194,8 @@
     {
       "productId": "conchas-filled--pistache",
       "slug": "conchas-filled--pistache",
-      "status": "PHOTO PENDING FROM LISA",
-      "primarySourceId": null,
+      "status": "APPROVED IMAGE AVAILABLE",
+      "primarySourceId": "3l-conchas-final-conchas_de_pistache_sobre_tabla_de_madera",
       "gallerySourceIds": [],
       "familyId": "conchas-filled",
       "variant": "Pistache"
@@ -3202,8 +3203,8 @@
     {
       "productId": "conchas-traditional-pack",
       "slug": "conchas-traditional-pack",
-      "status": "PHOTO PENDING FROM LISA",
-      "primarySourceId": null,
+      "status": "APPROVED IMAGE AVAILABLE",
+      "primarySourceId": "3l-conchas-final-docena_de_conchas_de_chocolate_envuelta",
       "gallerySourceIds": [],
       "familyId": "conchas-traditional-pack",
       "variant": ""
@@ -3211,8 +3212,8 @@
     {
       "productId": "conchas-filled-pack",
       "slug": "conchas-filled-pack",
-      "status": "PHOTO PENDING FROM LISA",
-      "primarySourceId": null,
+      "status": "APPROVED IMAGE AVAILABLE",
+      "primarySourceId": "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán",
       "gallerySourceIds": [],
       "familyId": "conchas-filled-pack",
       "variant": ""

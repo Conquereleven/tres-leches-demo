@@ -1,0 +1,28 @@
+[WebServer] (node:33778) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 19 tests using 1 worker
+
+(node:33782) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [webkit] › tests/checkout-e2e/checkout.spec.ts:8:1 › cart → delivery → details → review → payment step (9.1s)
+  ✓   2 [webkit] › tests/checkout-e2e/checkout.spec.ts:150:1 › confirmation comes from the server, never from the URL (803ms)
+  ✓   3 [webkit] › tests/checkout-e2e/checkout.spec.ts:202:1 › a paid checkout in this session cannot be paid again (1.7s)
+  ✓   4 [webkit] › tests/checkout-e2e/delivery-pickup.spec.ts:7:3 › delivery and pickup 390px: all zones, minima, separate billing and accurate totals (2.5s)
+  ✓   5 [webkit] › tests/checkout-e2e/delivery-pickup.spec.ts:7:3 › delivery and pickup 1440px: all zones, minima, separate billing and accurate totals (1.4s)
+  ✓   6 [webkit] › tests/checkout-e2e/stale-checkout.spec.ts:7:3 › 150 → 375: returning shopper gets a fresh checkout (4.8s)
+  ✓   7 [webkit] › tests/checkout-e2e/stale-checkout.spec.ts:7:3 › 36 → 108: returning shopper gets a fresh checkout (4.5s)
+  ✓   8 [webkit] › tests/checkout-e2e/ux-states.spec.ts:30:3 › customer payment states › paid confirmation only from an authoritative PAID + Confirmed record (718ms)
+  ✓   9 [webkit] › tests/checkout-e2e/ux-states.spec.ts:59:3 › customer payment states › paid payment on an order not yet confirmed is still processing (1.1s)
+  ✓  10 [webkit] › tests/checkout-e2e/ux-states.spec.ts:72:3 › customer payment states › held for review never invites a second payment (622ms)
+  ✓  11 [webkit] › tests/checkout-e2e/ux-states.spec.ts:88:5 › customer payment states › confirmed declined payment (626ms)
+  ✓  12 [webkit] › tests/checkout-e2e/ux-states.spec.ts:88:5 › customer payment states › confirmed failed payment (813ms)
+  ✓  13 [webkit] › tests/checkout-e2e/ux-states.spec.ts:100:3 › customer payment states › 3-D Secure step keeps the customer on the bank's page (790ms)
+  ✓  14 [webkit] › tests/checkout-e2e/ux-states.spec.ts:166:3 › payment step › ready, then processing locks the pay button (3.4s)
+  ✓  15 [webkit] › tests/checkout-e2e/ux-states.spec.ts:183:3 › payment step › an unverifiable result is held and the pay button disappears (4.1s)
+  ✓  16 [webkit] › tests/checkout-e2e/ux-states.spec.ts:201:3 › payment step › a rejected checkout creation shows a recoverable failure (3.9s)
+  ✓  17 [webkit] › tests/checkout-e2e/ux-states.spec.ts:224:5 › operations orders board › paid queue at 390px (840ms)
+  ✓  18 [webkit] › tests/checkout-e2e/ux-states.spec.ts:224:5 › operations orders board › paid queue at 768px (1.0s)
+  ✓  19 [webkit] › tests/checkout-e2e/ux-states.spec.ts:224:5 › operations orders board › paid queue at 1440px (965ms)
+
+  19 passed (46.5s)
