@@ -1,0 +1,18 @@
+[WebServer] (node:33545) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 1 worker
+
+(node:33547) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 [webkit] › tests/brand02-e2e/visual.spec.ts:8:5 › after storefront en 390 (15.5s)
+  ✓  2 [webkit] › tests/brand02-e2e/visual.spec.ts:8:5 › after storefront es 390 (11.3s)
+  ✓  3 [webkit] › tests/brand02-e2e/visual.spec.ts:8:5 › after storefront ar 390 (11.7s)
+  ✓  4 [webkit] › tests/brand02-e2e/visual.spec.ts:8:5 › after storefront en 768 (13.4s)
+  ✓  5 [webkit] › tests/brand02-e2e/visual.spec.ts:8:5 › after storefront es 768 (12.7s)
+  ✓  6 [webkit] › tests/brand02-e2e/visual.spec.ts:8:5 › after storefront ar 768 (12.1s)
+  ✓  7 [webkit] › tests/brand02-e2e/visual.spec.ts:8:5 › after storefront en 1440 (12.3s)
+  ✓  8 [webkit] › tests/brand02-e2e/visual.spec.ts:8:5 › after storefront es 1440 (11.2s)
+  ✓  9 [webkit] › tests/brand02-e2e/visual.spec.ts:8:5 › after storefront ar 1440 (10.7s)
+
+  9 passed (1.9m)

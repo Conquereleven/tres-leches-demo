@@ -1,0 +1,40 @@
+{
+  "pan": {
+    "bannerRatio": 150,
+    "bannerMargin": "40px",
+    "cardRatio": 100,
+    "cardRadius": "20px",
+    "cardBackground": "rgb(255, 255, 255)",
+    "cardOverflow": "hidden",
+    "cardWidth": 350,
+    "cardHeight": 350,
+    "imageWidth": 350,
+    "sourceRatio": 1,
+    "imageHeight": 350,
+    "cardMargin": "0px",
+    "titleMargin": "20px 0px 12px",
+    "selectorHeight": "21px",
+    "imageFit": "contain",
+    "gridGap": "42px",
+    "transition": "opacity 0.8s"
+  },
+  "conchas": {
+    "bannerRatio": 150,
+    "bannerMargin": "40px",
+    "cardRatio": 100,
+    "cardRadius": "20px",
+    "cardBackground": "rgb(255, 255, 255)",
+    "cardOverflow": "hidden",
+    "cardWidth": 350,
+    "cardHeight": 350,
+    "imageWidth": 350,
+    "sourceRatio": 1,
+    "imageHeight": 350,
+    "cardMargin": "0px",
+    "titleMargin": "20px 0px 12px",
+    "selectorHeight": "21px",
+    "imageFit": "contain",
+    "gridGap": "42px",
+    "transition": "opacity 0.8s"
+  }
+}

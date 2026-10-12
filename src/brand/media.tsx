@@ -40,7 +40,8 @@ type MediaAsset = (typeof approvedMedia)[number];
 export const usesMenuReferencePresentation = (asset: MediaAsset | undefined) =>
   !!asset &&
   (asset.sourceId.startsWith("official-pan-") ||
-    ("presentation" in asset && asset.presentation === "menu-reference"));
+    ("presentation" in asset &&
+      asset.presentation?.startsWith("menu-reference") === true));
 /** Mixed boards shown for a whole category; never tied to a flavour or pack. */
 export const categoryEditorialMedia = (category: string) =>
   (
