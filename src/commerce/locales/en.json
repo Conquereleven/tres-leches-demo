@@ -589,5 +589,8 @@
   "Building / villa": "Building / villa",
   "Apartment / unit": "Apartment / unit",
   "Not stored": "Not stored",
-  "Internal email · new paid order": "Internal email · new paid order"
+  "Internal email · new paid order": "Internal email · new paid order",
+  "WhatsApp receipt read": "Read",
+  "WhatsApp alert not eligible": "Not sent · outside activation",
+  "WhatsApp sending requires review": "Sending · review if interrupted"
 }

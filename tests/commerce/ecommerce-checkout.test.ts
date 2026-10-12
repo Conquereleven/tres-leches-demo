@@ -477,6 +477,7 @@ test("outbound disabled: the dispatcher never calls a provider and the alert sta
     // No notifier configured is equally inert even if the flag were on.
     await dispatchOperationsNotifications(f.store, {
       outboundEnabled: true,
+      activationSince: "1970-01-01T00:00:00.000Z",
       notifier: null,
     });
     assert.equal(notifications(f)[0]!.status, "pending-whatsapp-delivery");
@@ -498,10 +499,12 @@ test("once outbound is enabled later, each paid order is sent exactly once", asy
     };
     await dispatchOperationsNotifications(f.store, {
       outboundEnabled: true,
+      activationSince: "1970-01-01T00:00:00.000Z",
       notifier: spy,
     });
     await dispatchOperationsNotifications(f.store, {
       outboundEnabled: true,
+      activationSince: "1970-01-01T00:00:00.000Z",
       notifier: spy,
     });
     assert.equal(calls, 1);
@@ -524,10 +527,12 @@ test("a failed send is not retried automatically", async () => {
     };
     await dispatchOperationsNotifications(f.store, {
       outboundEnabled: true,
+      activationSince: "1970-01-01T00:00:00.000Z",
       notifier: failing,
     });
     await dispatchOperationsNotifications(f.store, {
       outboundEnabled: true,
+      activationSince: "1970-01-01T00:00:00.000Z",
       notifier: failing,
     });
     assert.equal(calls, 1);

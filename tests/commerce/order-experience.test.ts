@@ -139,6 +139,7 @@ function fixture(path = ":memory:") {
     provider,
     fixtureAddressGeo,
   );
+  service.operationsOrigin = "https://3l.example";
   // As in Production: the customer's chosen area id is the authority.
   service.deliveryAddressMode = "legacy";
   const place = async (input: unknown, key = randomUUID()) => {
@@ -1063,6 +1064,7 @@ test("an alert is never sent from the business number to itself", async () => {
     // Outbound explicitly enabled here, with a fake provider, to exercise the guard.
     await dispatchOperationsNotifications(f.store, {
       outboundEnabled: true,
+      activationSince: "1970-01-01T00:00:00.000Z",
       notifier,
     });
     const rows = f.store.read().operationsNotifications!;

@@ -589,5 +589,8 @@
   "Building / villa": "Gusali / villa",
   "Apartment / unit": "Apartment / unit",
   "Not stored": "Hindi naka-save",
-  "Internal email · new paid order": "Internal email · bagong bayad na order"
+  "Internal email · new paid order": "Internal email · bagong bayad na order",
+  "WhatsApp receipt read": "Nabasa",
+  "WhatsApp alert not eligible": "Hindi ipinadala · wala sa activation",
+  "WhatsApp sending requires review": "Ipinapadala · suriin kung naputol"
 }

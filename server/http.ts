@@ -91,6 +91,8 @@ import { HmacVerifier } from "./adapters/providers";
 import {
   createWhatsAppOperationsNotifier,
   dispatchOperationsNotifications,
+  parseNotificationCutoff,
+  PAID_ALERT_BODY,
 } from "./domain/notifications";
 /** Public customer policy/contact routes; keep in sync with src/brand/business.ts. */
 export const customerPages = [
@@ -297,8 +299,10 @@ export async function startServer(
     : null;
   // Paid-order alerts for the team. Built now, delivered only when outbound is
   // explicitly enabled, Meta can send, and an approved template is configured.
-  const operationsOutboundEnabled =
-    process.env.META_OUTBOUND_ENABLED === "true" && !!meta?.outboundReady;
+  const operationsPermissionEnabled =
+    process.env.META_OUTBOUND_ENABLED === "true" &&
+    !!meta?.outboundReady &&
+    process.env.OPERATIONS_WHATSAPP_SEND_PERMISSION_CONFIRMED === "true";
   const operationsTemplate = process.env.OPERATIONS_WHATSAPP_TEMPLATE_JSON
     ? z
         .object({
@@ -308,12 +312,38 @@ export async function startServer(
         .strict()
         .parse(JSON.parse(process.env.OPERATIONS_WHATSAPP_TEMPLATE_JSON))
     : null;
+  const operationsActivationSince = parseNotificationCutoff(
+    process.env.OPERATIONS_WHATSAPP_ACTIVATION_SINCE,
+  );
+  const operationsSender = meta?.numbers.find(
+    (n) => n.id === process.env.OPERATIONS_WHATSAPP_SOURCE_ID,
+  );
+  const operationsOutboundEnabled = !!(
+    operationsPermissionEnabled &&
+    operationsActivationSince &&
+    operationsSender &&
+    operationsTemplate &&
+    /^\+[1-9]\d{7,14}$/.test(
+      service.operationsManagerPhone?.replace(/[\s-]/g, "") ?? "",
+    )
+  );
   const operationsNotifier =
-    operationsOutboundEnabled && meta && operationsTemplate && meta.numbers[0]
+    operationsOutboundEnabled &&
+    operationsActivationSince &&
+    meta &&
+    operationsTemplate &&
+    operationsSender &&
+    service.operationsManagerPhone
       ? createWhatsAppOperationsNotifier(
           meta,
-          { id: meta.numbers[0].id, phone: meta.numbers[0].phone },
+          { id: operationsSender.id, phone: operationsSender.phone },
           operationsTemplate,
+          () =>
+            meta.validateOperationsConfiguration(
+              operationsSender.id,
+              operationsTemplate,
+              PAID_ALERT_BODY,
+            ),
         )
       : null;
   function actor(req: http.IncomingMessage): Actor {
@@ -1194,6 +1224,11 @@ export async function startServer(
         dispatchOperationsNotifications(store, {
           outboundEnabled: operationsOutboundEnabled,
           notifier: operationsNotifier,
+          activationSince: operationsActivationSince,
+          sourcePhone: operationsSender?.phone,
+          recipientPhones: service.operationsManagerPhone
+            ? [service.operationsManagerPhone]
+            : [],
         }),
       )
       .then(() => dispatchCustomerNotifications(store, emailProvider))
