@@ -1,0 +1,980 @@
+{
+  "schemaVersion": 1,
+  "status": "AWAITING FOUNDER-APPROVED IMAGES",
+  "sourceBaseline": "5d47c9d09b629bec73d47b34026848ca9ccca72a",
+  "products": [
+    {
+      "productId": "conchas-traditional--chocolate",
+      "slug": "conchas-traditional--chocolate",
+      "name": "Concha tradicional de chocolate",
+      "variant": "Chocolate",
+      "skuIds": [
+        "conchas-traditional-chocolate-mini-40-g",
+        "conchas-traditional-chocolate-individual-70-g"
+      ],
+      "sizes": [
+        {
+          "skuId": "conchas-traditional-chocolate-mini-40-g",
+          "size": "Mini · 40 g"
+        },
+        {
+          "skuId": "conchas-traditional-chocolate-individual-70-g",
+          "size": "Individual · 70 g"
+        }
+      ],
+      "currentSourceId": "3l-ai-concha-traditional-chocolate-20261010",
+      "currentDerivatives": [
+        {
+          "src": "/brand/approved/concha-tradicional-chocolate-320.avif",
+          "width": 320,
+          "height": 320,
+          "bytes": 15025,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/concha-tradicional-chocolate-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 26092,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/concha-tradicional-chocolate-640.avif",
+          "width": 640,
+          "height": 640,
+          "bytes": 51705,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/concha-tradicional-chocolate-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 86244,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/concha-tradicional-chocolate-960.avif",
+          "width": 960,
+          "height": 960,
+          "bytes": 96680,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/concha-tradicional-chocolate-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 158302,
+          "format": "webp"
+        }
+      ],
+      "currentSourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "replacementStatus": "AWAITING FOUNDER-APPROVED IMAGES",
+      "replacementFileNeeded": "conchas-traditional--chocolate.png",
+      "aspectRatio": "1:1",
+      "preferredSourceDimensions": {
+        "width": 2048,
+        "height": 2048
+      },
+      "minimumSourceDimensions": {
+        "width": 960,
+        "height": 960
+      },
+      "derivativeWidths": [
+        320,
+        640,
+        960
+      ],
+      "formats": [
+        "avif",
+        "webp"
+      ],
+      "quality": {
+        "avif": 65,
+        "webp": 82
+      },
+      "transformation": "Auto-orient, convert to sRGB/RGB and proportionally resize with Lanczos. Preserve source bytes; no crop, distortion, background generation or artificial upscaling. AVIF with WebP fallback.",
+      "cacheVersioning": "Keep currentSourceId and product/sku IDs. Write conchas-conchas-traditional--chocolate-<source-sha256-12>-<width>.<format>, then update only derivative references and source dimensions.",
+      "fallback": "/brand/menu/conchas-traditional.webp",
+      "altText": "Use the exact existing localized product title in EN/ES/AR. No new flavour/ingredient/photography claims.",
+      "placements": [
+        "menu card",
+        "product detail",
+        "cart thumbnail",
+        "checkout thumbnail"
+      ],
+      "galleryPlacement": "None. Product replacement must not replace the independent editorial opening gallery."
+    },
+    {
+      "productId": "conchas-traditional--vainilla",
+      "slug": "conchas-traditional--vainilla",
+      "name": "Concha tradicional de vainilla",
+      "variant": "Vainilla",
+      "skuIds": [
+        "conchas-traditional-vainilla-mini-40-g",
+        "conchas-traditional-vainilla-individual-70-g"
+      ],
+      "sizes": [
+        {
+          "skuId": "conchas-traditional-vainilla-mini-40-g",
+          "size": "Mini · 40 g"
+        },
+        {
+          "skuId": "conchas-traditional-vainilla-individual-70-g",
+          "size": "Individual · 70 g"
+        }
+      ],
+      "currentSourceId": "3l-conchas-editorial-concha-tradicional-vainilla",
+      "currentDerivatives": [
+        {
+          "width": 320,
+          "height": 320,
+          "bytes": 11840,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-vainilla-320.avif"
+        },
+        {
+          "width": 320,
+          "height": 320,
+          "bytes": 19138,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-vainilla-320.webp"
+        },
+        {
+          "width": 640,
+          "height": 640,
+          "bytes": 38207,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-vainilla-640.avif"
+        },
+        {
+          "width": 640,
+          "height": 640,
+          "bytes": 57990,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-vainilla-640.webp"
+        },
+        {
+          "width": 960,
+          "height": 960,
+          "bytes": 73448,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-vainilla-960.avif"
+        },
+        {
+          "width": 960,
+          "height": 960,
+          "bytes": 105594,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-vainilla-960.webp"
+        }
+      ],
+      "currentSourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "replacementStatus": "AWAITING FOUNDER-APPROVED IMAGES",
+      "replacementFileNeeded": "conchas-traditional--vainilla.png",
+      "aspectRatio": "1:1",
+      "preferredSourceDimensions": {
+        "width": 2048,
+        "height": 2048
+      },
+      "minimumSourceDimensions": {
+        "width": 960,
+        "height": 960
+      },
+      "derivativeWidths": [
+        320,
+        640,
+        960
+      ],
+      "formats": [
+        "avif",
+        "webp"
+      ],
+      "quality": {
+        "avif": 65,
+        "webp": 82
+      },
+      "transformation": "Auto-orient, convert to sRGB/RGB and proportionally resize with Lanczos. Preserve source bytes; no crop, distortion, background generation or artificial upscaling. AVIF with WebP fallback.",
+      "cacheVersioning": "Keep currentSourceId and product/sku IDs. Write conchas-conchas-traditional--vainilla-<source-sha256-12>-<width>.<format>, then update only derivative references and source dimensions.",
+      "fallback": "/brand/menu/conchas-traditional.webp",
+      "altText": "Use the exact existing localized product title in EN/ES/AR. No new flavour/ingredient/photography claims.",
+      "placements": [
+        "menu card",
+        "product detail",
+        "cart thumbnail",
+        "checkout thumbnail"
+      ],
+      "galleryPlacement": "None. Product replacement must not replace the independent editorial opening gallery."
+    },
+    {
+      "productId": "conchas-traditional--pistache",
+      "slug": "conchas-traditional--pistache",
+      "name": "Concha tradicional de pistache",
+      "variant": "Pistache",
+      "skuIds": [
+        "conchas-traditional-pistache-mini-40-g",
+        "conchas-traditional-pistache-individual-70-g"
+      ],
+      "sizes": [
+        {
+          "skuId": "conchas-traditional-pistache-mini-40-g",
+          "size": "Mini · 40 g"
+        },
+        {
+          "skuId": "conchas-traditional-pistache-individual-70-g",
+          "size": "Individual · 70 g"
+        }
+      ],
+      "currentSourceId": "3l-conchas-editorial-concha-tradicional-pistache",
+      "currentDerivatives": [
+        {
+          "width": 320,
+          "height": 320,
+          "bytes": 14078,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-pistache-320.avif"
+        },
+        {
+          "width": 320,
+          "height": 320,
+          "bytes": 24178,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-pistache-320.webp"
+        },
+        {
+          "width": 640,
+          "height": 640,
+          "bytes": 47905,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-pistache-640.avif"
+        },
+        {
+          "width": 640,
+          "height": 640,
+          "bytes": 78440,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-pistache-640.webp"
+        },
+        {
+          "width": 960,
+          "height": 960,
+          "bytes": 91006,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-pistache-960.avif"
+        },
+        {
+          "width": 960,
+          "height": 960,
+          "bytes": 140588,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-pistache-960.webp"
+        }
+      ],
+      "currentSourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "replacementStatus": "AWAITING FOUNDER-APPROVED IMAGES",
+      "replacementFileNeeded": "conchas-traditional--pistache.png",
+      "aspectRatio": "1:1",
+      "preferredSourceDimensions": {
+        "width": 2048,
+        "height": 2048
+      },
+      "minimumSourceDimensions": {
+        "width": 960,
+        "height": 960
+      },
+      "derivativeWidths": [
+        320,
+        640,
+        960
+      ],
+      "formats": [
+        "avif",
+        "webp"
+      ],
+      "quality": {
+        "avif": 65,
+        "webp": 82
+      },
+      "transformation": "Auto-orient, convert to sRGB/RGB and proportionally resize with Lanczos. Preserve source bytes; no crop, distortion, background generation or artificial upscaling. AVIF with WebP fallback.",
+      "cacheVersioning": "Keep currentSourceId and product/sku IDs. Write conchas-conchas-traditional--pistache-<source-sha256-12>-<width>.<format>, then update only derivative references and source dimensions.",
+      "fallback": "/brand/menu/conchas-traditional.webp",
+      "altText": "Use the exact existing localized product title in EN/ES/AR. No new flavour/ingredient/photography claims.",
+      "placements": [
+        "menu card",
+        "product detail",
+        "cart thumbnail",
+        "checkout thumbnail"
+      ],
+      "galleryPlacement": "None. Product replacement must not replace the independent editorial opening gallery."
+    },
+    {
+      "productId": "conchas-traditional--tricolor",
+      "slug": "conchas-traditional--tricolor",
+      "name": "Concha tradicional tricolor",
+      "variant": "Tricolor",
+      "skuIds": [
+        "conchas-traditional-tricolor-mini-40-g",
+        "conchas-traditional-tricolor-individual-70-g"
+      ],
+      "sizes": [
+        {
+          "skuId": "conchas-traditional-tricolor-mini-40-g",
+          "size": "Mini · 40 g"
+        },
+        {
+          "skuId": "conchas-traditional-tricolor-individual-70-g",
+          "size": "Individual · 70 g"
+        }
+      ],
+      "currentSourceId": "3l-conchas-editorial-concha-tradicional-tricolor-mexico",
+      "currentDerivatives": [
+        {
+          "width": 320,
+          "height": 320,
+          "bytes": 14346,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-tricolor-mexico-320.avif"
+        },
+        {
+          "width": 320,
+          "height": 320,
+          "bytes": 25066,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-tricolor-mexico-320.webp"
+        },
+        {
+          "width": 640,
+          "height": 640,
+          "bytes": 49324,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-tricolor-mexico-640.avif"
+        },
+        {
+          "width": 640,
+          "height": 640,
+          "bytes": 81670,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-tricolor-mexico-640.webp"
+        },
+        {
+          "width": 960,
+          "height": 960,
+          "bytes": 93855,
+          "format": "avif",
+          "src": "/brand/approved/concha-tradicional-tricolor-mexico-960.avif"
+        },
+        {
+          "width": 960,
+          "height": 960,
+          "bytes": 148752,
+          "format": "webp",
+          "src": "/brand/approved/concha-tradicional-tricolor-mexico-960.webp"
+        }
+      ],
+      "currentSourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "replacementStatus": "AWAITING FOUNDER-APPROVED IMAGES",
+      "replacementFileNeeded": "conchas-traditional--tricolor.png",
+      "aspectRatio": "1:1",
+      "preferredSourceDimensions": {
+        "width": 2048,
+        "height": 2048
+      },
+      "minimumSourceDimensions": {
+        "width": 960,
+        "height": 960
+      },
+      "derivativeWidths": [
+        320,
+        640,
+        960
+      ],
+      "formats": [
+        "avif",
+        "webp"
+      ],
+      "quality": {
+        "avif": 65,
+        "webp": 82
+      },
+      "transformation": "Auto-orient, convert to sRGB/RGB and proportionally resize with Lanczos. Preserve source bytes; no crop, distortion, background generation or artificial upscaling. AVIF with WebP fallback.",
+      "cacheVersioning": "Keep currentSourceId and product/sku IDs. Write conchas-conchas-traditional--tricolor-<source-sha256-12>-<width>.<format>, then update only derivative references and source dimensions.",
+      "fallback": "/brand/menu/conchas-traditional.webp",
+      "altText": "Use the exact existing localized product title in EN/ES/AR. No new flavour/ingredient/photography claims.",
+      "placements": [
+        "menu card",
+        "product detail",
+        "cart thumbnail",
+        "checkout thumbnail"
+      ],
+      "galleryPlacement": "None. Product replacement must not replace the independent editorial opening gallery."
+    },
+    {
+      "productId": "conchas-filled--pistache",
+      "slug": "conchas-filled--pistache",
+      "name": "Concha rellena de pistache",
+      "variant": "Pistache",
+      "skuIds": [
+        "conchas-filled-pistache-mini",
+        "conchas-filled-pistache-individual"
+      ],
+      "sizes": [
+        {
+          "skuId": "conchas-filled-pistache-mini",
+          "size": "Mini"
+        },
+        {
+          "skuId": "conchas-filled-pistache-individual",
+          "size": "Individual"
+        }
+      ],
+      "currentSourceId": "3l-conchas-final-conchas_de_pistache_sobre_tabla_de_madera",
+      "currentDerivatives": [
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-320.avif",
+          "width": 320,
+          "height": 320,
+          "bytes": 17295,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 25732,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-640.avif",
+          "width": 640,
+          "height": 640,
+          "bytes": 53900,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 74546,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-960.avif",
+          "width": 960,
+          "height": 960,
+          "bytes": 99182,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-square-v2-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 131898,
+          "format": "webp"
+        }
+      ],
+      "currentSourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "replacementStatus": "AWAITING FOUNDER-APPROVED IMAGES",
+      "replacementFileNeeded": "conchas-filled--pistache.png",
+      "aspectRatio": "1:1",
+      "preferredSourceDimensions": {
+        "width": 2048,
+        "height": 2048
+      },
+      "minimumSourceDimensions": {
+        "width": 960,
+        "height": 960
+      },
+      "derivativeWidths": [
+        320,
+        640,
+        960
+      ],
+      "formats": [
+        "avif",
+        "webp"
+      ],
+      "quality": {
+        "avif": 65,
+        "webp": 82
+      },
+      "transformation": "Auto-orient, convert to sRGB/RGB and proportionally resize with Lanczos. Preserve source bytes; no crop, distortion, background generation or artificial upscaling. AVIF with WebP fallback.",
+      "cacheVersioning": "Keep currentSourceId and product/sku IDs. Write conchas-conchas-filled--pistache-<source-sha256-12>-<width>.<format>, then update only derivative references and source dimensions.",
+      "fallback": "/brand/menu/conchas-filled.webp",
+      "altText": "Use the exact existing localized product title in EN/ES/AR. No new flavour/ingredient/photography claims.",
+      "placements": [
+        "menu card",
+        "product detail",
+        "cart thumbnail",
+        "checkout thumbnail"
+      ],
+      "galleryPlacement": "None. Product replacement must not replace the independent editorial opening gallery."
+    },
+    {
+      "productId": "conchas-traditional-pack",
+      "slug": "conchas-traditional-pack",
+      "name": "Concha tradicional de chocolate · Pack",
+      "variant": "",
+      "skuIds": [
+        "conchas-traditional-pack-6-mini",
+        "conchas-traditional-pack-12-mini",
+        "conchas-traditional-pack-6-individuales",
+        "conchas-traditional-pack-12-individuales"
+      ],
+      "sizes": [
+        {
+          "skuId": "conchas-traditional-pack-6-mini",
+          "size": "6 mini"
+        },
+        {
+          "skuId": "conchas-traditional-pack-12-mini",
+          "size": "12 mini"
+        },
+        {
+          "skuId": "conchas-traditional-pack-6-individuales",
+          "size": "6 individuales"
+        },
+        {
+          "skuId": "conchas-traditional-pack-12-individuales",
+          "size": "12 individuales"
+        }
+      ],
+      "currentSourceId": "3l-conchas-final-docena_de_conchas_de_chocolate_envuelta",
+      "currentDerivatives": [
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-320.avif",
+          "width": 320,
+          "height": 320,
+          "bytes": 19628,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 29468,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-640.avif",
+          "width": 640,
+          "height": 640,
+          "bytes": 62288,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 90836,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-960.avif",
+          "width": 960,
+          "height": 960,
+          "bytes": 119203,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-square-v2-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 164044,
+          "format": "webp"
+        }
+      ],
+      "currentSourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "replacementStatus": "AWAITING FOUNDER-APPROVED IMAGES",
+      "replacementFileNeeded": "conchas-traditional-pack.png",
+      "aspectRatio": "1:1",
+      "preferredSourceDimensions": {
+        "width": 2048,
+        "height": 2048
+      },
+      "minimumSourceDimensions": {
+        "width": 960,
+        "height": 960
+      },
+      "derivativeWidths": [
+        320,
+        640,
+        960
+      ],
+      "formats": [
+        "avif",
+        "webp"
+      ],
+      "quality": {
+        "avif": 65,
+        "webp": 82
+      },
+      "transformation": "Auto-orient, convert to sRGB/RGB and proportionally resize with Lanczos. Preserve source bytes; no crop, distortion, background generation or artificial upscaling. AVIF with WebP fallback.",
+      "cacheVersioning": "Keep currentSourceId and product/sku IDs. Write conchas-conchas-traditional-pack-<source-sha256-12>-<width>.<format>, then update only derivative references and source dimensions.",
+      "fallback": "/brand/menu/conchas-pack.webp",
+      "altText": "Use the exact existing localized product title in EN/ES/AR. No new flavour/ingredient/photography claims.",
+      "placements": [
+        "menu card",
+        "product detail",
+        "cart thumbnail",
+        "checkout thumbnail"
+      ],
+      "galleryPlacement": "None. Product replacement must not replace the independent editorial opening gallery."
+    },
+    {
+      "productId": "conchas-filled-pack",
+      "slug": "conchas-filled-pack",
+      "name": "Concha rellena de pistache · Pack",
+      "variant": "",
+      "skuIds": [
+        "conchas-filled-pack-6-mini",
+        "conchas-filled-pack-12-mini",
+        "conchas-filled-pack-6-individuales",
+        "conchas-filled-pack-12-individuales"
+      ],
+      "sizes": [
+        {
+          "skuId": "conchas-filled-pack-6-mini",
+          "size": "6 mini"
+        },
+        {
+          "skuId": "conchas-filled-pack-12-mini",
+          "size": "12 mini"
+        },
+        {
+          "skuId": "conchas-filled-pack-6-individuales",
+          "size": "6 individuales"
+        },
+        {
+          "skuId": "conchas-filled-pack-12-individuales",
+          "size": "12 individuales"
+        }
+      ],
+      "currentSourceId": "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán",
+      "currentDerivatives": [
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-320.avif",
+          "width": 320,
+          "height": 320,
+          "bytes": 22016,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-320.webp",
+          "width": 320,
+          "height": 320,
+          "bytes": 33064,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-640.avif",
+          "width": 640,
+          "height": 640,
+          "bytes": 64657,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-640.webp",
+          "width": 640,
+          "height": 640,
+          "bytes": 93722,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-960.avif",
+          "width": 960,
+          "height": 960,
+          "bytes": 116914,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-square-v2-960.webp",
+          "width": 960,
+          "height": 960,
+          "bytes": 162158,
+          "format": "webp"
+        }
+      ],
+      "currentSourceDimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "replacementStatus": "AWAITING FOUNDER-APPROVED IMAGES",
+      "replacementFileNeeded": "conchas-filled-pack.png",
+      "aspectRatio": "1:1",
+      "preferredSourceDimensions": {
+        "width": 2048,
+        "height": 2048
+      },
+      "minimumSourceDimensions": {
+        "width": 960,
+        "height": 960
+      },
+      "derivativeWidths": [
+        320,
+        640,
+        960
+      ],
+      "formats": [
+        "avif",
+        "webp"
+      ],
+      "quality": {
+        "avif": 65,
+        "webp": 82
+      },
+      "transformation": "Auto-orient, convert to sRGB/RGB and proportionally resize with Lanczos. Preserve source bytes; no crop, distortion, background generation or artificial upscaling. AVIF with WebP fallback.",
+      "cacheVersioning": "Keep currentSourceId and product/sku IDs. Write conchas-conchas-filled-pack-<source-sha256-12>-<width>.<format>, then update only derivative references and source dimensions.",
+      "fallback": "/brand/menu/conchas-pack.webp",
+      "altText": "Use the exact existing localized product title in EN/ES/AR. No new flavour/ingredient/photography claims.",
+      "placements": [
+        "menu card",
+        "product detail",
+        "cart thumbnail",
+        "checkout thumbnail"
+      ],
+      "galleryPlacement": "None. Product replacement must not replace the independent editorial opening gallery."
+    }
+  ],
+  "editorial": [
+    {
+      "sourceId": "3l-conchas-final-conchas_de_pistache_sobre_tabla_de_madera-opening-horizontal",
+      "currentDerivatives": [
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-320.avif",
+          "width": 320,
+          "height": 240,
+          "bytes": 13358,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-320.webp",
+          "width": 320,
+          "height": 240,
+          "bytes": 17816,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-640.avif",
+          "width": 640,
+          "height": 480,
+          "bytes": 43181,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-640.webp",
+          "width": 640,
+          "height": 480,
+          "bytes": 59230,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-960.avif",
+          "width": 960,
+          "height": 720,
+          "bytes": 82596,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_sobre_tabla_de_madera-960.webp",
+          "width": 960,
+          "height": 720,
+          "bytes": 114616,
+          "format": "webp"
+        }
+      ],
+      "currentDimensions": {
+        "width": 1448,
+        "height": 1086
+      },
+      "position": 1,
+      "replacementStatus": "AWAITING FOUNDER-APPROVED IMAGES",
+      "replacementFileNeeded": "conchas-editorial-1.png",
+      "aspectRatio": "3:2 frame",
+      "preferredSourceDimensions": {
+        "width": 2100,
+        "height": 1400
+      },
+      "minimumSourceDimensions": {
+        "width": 1440,
+        "height": 960
+      },
+      "derivativeWidths": [
+        320,
+        640,
+        960
+      ],
+      "formats": [
+        "avif",
+        "webp"
+      ],
+      "transformation": "Proportional resize preserving the whole composition; contain fit. Never bind to or automatically replace a product asset.",
+      "altText": "Use existing localized Conchas category text; no specific assortment claims."
+    },
+    {
+      "sourceId": "3l-conchas-final-docena_de_conchas_de_chocolate_envuelta-opening-horizontal",
+      "currentDerivatives": [
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-320.avif",
+          "width": 320,
+          "height": 240,
+          "bytes": 13952,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-320.webp",
+          "width": 320,
+          "height": 240,
+          "bytes": 20154,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-640.avif",
+          "width": 640,
+          "height": 480,
+          "bytes": 45916,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-640.webp",
+          "width": 640,
+          "height": 480,
+          "bytes": 66300,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-960.avif",
+          "width": 960,
+          "height": 720,
+          "bytes": 92478,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/docena_de_conchas_de_chocolate_envuelta-960.webp",
+          "width": 960,
+          "height": 720,
+          "bytes": 132456,
+          "format": "webp"
+        }
+      ],
+      "currentDimensions": {
+        "width": 1448,
+        "height": 1086
+      },
+      "position": 2,
+      "replacementStatus": "AWAITING FOUNDER-APPROVED IMAGES",
+      "replacementFileNeeded": "conchas-editorial-2.png",
+      "aspectRatio": "3:2 frame",
+      "preferredSourceDimensions": {
+        "width": 2100,
+        "height": 1400
+      },
+      "minimumSourceDimensions": {
+        "width": 1440,
+        "height": 960
+      },
+      "derivativeWidths": [
+        320,
+        640,
+        960
+      ],
+      "formats": [
+        "avif",
+        "webp"
+      ],
+      "transformation": "Proportional resize preserving the whole composition; contain fit. Never bind to or automatically replace a product asset.",
+      "altText": "Use existing localized Conchas category text; no specific assortment claims."
+    },
+    {
+      "sourceId": "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán-opening-horizontal",
+      "currentDerivatives": [
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-320.avif",
+          "width": 320,
+          "height": 240,
+          "bytes": 15475,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-320.webp",
+          "width": 320,
+          "height": 240,
+          "bytes": 21490,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-640.avif",
+          "width": 640,
+          "height": 480,
+          "bytes": 45530,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-640.webp",
+          "width": 640,
+          "height": 480,
+          "bytes": 65754,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-960.avif",
+          "width": 960,
+          "height": 720,
+          "bytes": 84326,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/conchas_de_pistache_envueltas_en_celofán-960.webp",
+          "width": 960,
+          "height": 720,
+          "bytes": 116778,
+          "format": "webp"
+        }
+      ],
+      "currentDimensions": {
+        "width": 1448,
+        "height": 1086
+      },
+      "position": 3,
+      "replacementStatus": "AWAITING FOUNDER-APPROVED IMAGES",
+      "replacementFileNeeded": "conchas-editorial-3.png",
+      "aspectRatio": "3:2 frame",
+      "preferredSourceDimensions": {
+        "width": 2100,
+        "height": 1400
+      },
+      "minimumSourceDimensions": {
+        "width": 1440,
+        "height": 960
+      },
+      "derivativeWidths": [
+        320,
+        640,
+        960
+      ],
+      "formats": [
+        "avif",
+        "webp"
+      ],
+      "transformation": "Proportional resize preserving the whole composition; contain fit. Never bind to or automatically replace a product asset.",
+      "altText": "Use existing localized Conchas category text; no specific assortment claims."
+    }
+  ],
+  "approvalGate": "No replacement is generated or published here. Founder must supply and approve each identity/source. A subsequent media-only PR updates versioned references and derivatives without SKU, price, availability or checkout changes."
+}

@@ -298,7 +298,14 @@ for (const locale of ["en", "ar"])
 
 const official = {
   "--3l-blush": "#f6dfe0", // Pantone 9286 C
-  "--3l-gold": "#a28d5b", // Pantone 8383 C
+  "--3l-gold": "#a28d5b", // Restrained decoration only
+  "--v2-white": "#ffffff",
+  "--v2-blush": "#f6dfe0",
+  "--v2-petal": "#fbeff3",
+  "--v2-dusty": "#d88ea6",
+  "--v2-raspberry": "#a93c68",
+  "--v2-graphite": "#27242d",
+  "--v2-secondary": "#605660",
 } as const;
 // Earlier iterations' brand colours: none may be defined or painted any more.
 const retired = ["--3l-pink", "--3l-lavender", "--3l-lavender-soft"];
@@ -424,22 +431,23 @@ test("final colours are what components actually render", async ({ page }) => {
         property,
       );
   const blush = rgb(official["--3l-blush"]),
-    gold = rgb(official["--3l-gold"]);
+    gold = rgb(official["--3l-gold"]),
+    raspberry = rgb(official["--v2-raspberry"]);
   expect(await painted(".ref-route-ink", "stroke")).toBe(gold);
   expect(await painted(".ref-route-dot", "fill")).toBe(gold);
   expect(await painted(".ref-family .b-button", "background-color")).toBe(
-    blush,
+    raspberry,
   );
-  expect(await painted(".ref-featured", "background-color")).toBe(blush);
+  expect(await painted(".ref-featured", "background-color")).toBe(rgb(official["--v2-white"]));
   expect(await painted(".ref-tradition > .ref-panel", "background-color")).toBe(
-    blush,
+    rgb(official["--v2-white"]),
   );
   expect(await painted(".b-how-guide li > svg", "background-color")).toBe(
-    blush,
+    rgb(official["--v2-white"]),
   );
   expect(await painted(".ref-star", "color")).toBe(gold);
-  // Cream remains the canvas.
-  expect(await painted(".brand-experience", "background-color")).not.toBe(
+  // Founder correction: blush is the public canvas; white is a detail surface.
+  expect(await painted(".brand-experience", "background-color")).toBe(
     blush,
   );
   await page.goto("/menu");

@@ -1,0 +1,37 @@
+[WebServer] (node:35360) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 28 tests using 1 worker
+
+(node:35361) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [webkit] › tests/polish-e2e/polish.spec.ts:6:5 › en scroll drawing, journey, palette contrast 390 (4.2s)
+  ✓   2 [webkit] › tests/polish-e2e/polish.spec.ts:6:5 › es scroll drawing, journey, palette contrast 390 (3.2s)
+  ✓   3 [webkit] › tests/polish-e2e/polish.spec.ts:6:5 › ar scroll drawing, journey, palette contrast 390 (2.9s)
+  ✓   4 [webkit] › tests/polish-e2e/polish.spec.ts:6:5 › en scroll drawing, journey, palette contrast 768 (3.1s)
+  ✓   5 [webkit] › tests/polish-e2e/polish.spec.ts:6:5 › es scroll drawing, journey, palette contrast 768 (3.1s)
+  ✓   6 [webkit] › tests/polish-e2e/polish.spec.ts:6:5 › ar scroll drawing, journey, palette contrast 768 (3.2s)
+  ✓   7 [webkit] › tests/polish-e2e/polish.spec.ts:6:5 › en scroll drawing, journey, palette contrast 1024 (3.0s)
+  ✓   8 [webkit] › tests/polish-e2e/polish.spec.ts:6:5 › es scroll drawing, journey, palette contrast 1024 (3.0s)
+  ✓   9 [webkit] › tests/polish-e2e/polish.spec.ts:6:5 › ar scroll drawing, journey, palette contrast 1024 (3.7s)
+  ✓  10 [webkit] › tests/polish-e2e/polish.spec.ts:6:5 › en scroll drawing, journey, palette contrast 1440 (3.2s)
+  ✓  11 [webkit] › tests/polish-e2e/polish.spec.ts:6:5 › es scroll drawing, journey, palette contrast 1440 (3.1s)
+  ✓  12 [webkit] › tests/polish-e2e/polish.spec.ts:6:5 › ar scroll drawing, journey, palette contrast 1440 (2.9s)
+  ✓  13 [webkit] › tests/polish-e2e/polish.spec.ts:171:3 › delivery UI reflects server cutoff without device timezone (733ms)
+  ✓  14 [webkit] › tests/polish-e2e/polish.spec.ts:171:3 › pickup UI reflects server cutoff without device timezone (681ms)
+  ✓  15 [webkit] › tests/polish-e2e/polish.spec.ts:215:3 › en journey travels Mexico to Dubai and the portrait is drawn in stages (943ms)
+  ✓  16 [webkit] › tests/polish-e2e/polish.spec.ts:215:3 › ar journey travels Mexico to Dubai and the portrait is drawn in stages (1.3s)
+  ✓  17 [webkit] › tests/polish-e2e/polish.spec.ts:334:3 › final 3L palette is locked on / (1.2s)
+  ✓  18 [webkit] › tests/polish-e2e/polish.spec.ts:334:3 › final 3L palette is locked on /menu (1.3s)
+  ✓  19 [webkit] › tests/polish-e2e/polish.spec.ts:334:3 › final 3L palette is locked on /menu?product=conchas-filled--pistache (1.3s)
+  ✓  20 [webkit] › tests/polish-e2e/polish.spec.ts:334:3 › final 3L palette is locked on /cart (1.2s)
+  ✓  21 [webkit] › tests/polish-e2e/polish.spec.ts:334:3 › final 3L palette is locked on /checkout (1.5s)
+  ✓  22 [webkit] › tests/polish-e2e/polish.spec.ts:334:3 › final 3L palette is locked on /contact (1.1s)
+  ✓  23 [webkit] › tests/polish-e2e/polish.spec.ts:334:3 › final 3L palette is locked on /how-to-order (1.2s)
+  ✓  24 [webkit] › tests/polish-e2e/polish.spec.ts:334:3 › final 3L palette is locked on /terms (1.2s)
+  ✓  25 [webkit] › tests/polish-e2e/polish.spec.ts:334:3 › final 3L palette is locked on /privacy (1.2s)
+  ✓  26 [webkit] › tests/polish-e2e/polish.spec.ts:334:3 › final 3L palette is locked on /refund-policy (1.2s)
+  ✓  27 [webkit] › tests/polish-e2e/polish.spec.ts:334:3 › final 3L palette is locked on /delivery-policy (1.2s)
+  ✓  28 [webkit] › tests/polish-e2e/polish.spec.ts:422:1 › final colours are what components actually render (628ms)
+
+  28 passed (58.7s)

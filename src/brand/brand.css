@@ -12,20 +12,33 @@
   font-style: normal;
   font-display: swap;
 }
-/* Corporate anchors; the neutrals below are documented web extensions, not manual colors. */
+/* Public Color Refresh V2. Scoped away from operations; legacy global tokens remain untouched. */
 .brand-experience,
 .b-modal,
 .b-return {
-  --brand-blush: var(--3l-blush);
+  --v2-white: #ffffff;
+  --v2-blush: #f6dfe0;
+  --v2-petal: #fbeff3;
+  --v2-dusty: #d88ea6;
+  --v2-raspberry: #a93c68;
+  --v2-graphite: #27242d;
+  --v2-secondary: #605660;
+  --3l-blush: var(--v2-blush);
+  --cream: var(--v2-blush);
+  --paper: var(--v2-white);
+  --cacao: var(--v2-graphite);
+  --ink: var(--v2-graphite);
+  --muted: var(--v2-secondary);
+  --brand-blush: var(--v2-blush);
   --brand-gold: var(--3l-gold);
-  --surface-primary: #f8f4ed;
-  --surface-paper: #fffdf8;
-  --text-primary: #372c27;
-  --text-secondary: #66554b;
+  --surface-primary: var(--v2-blush);
+  --surface-paper: var(--v2-white);
+  --text-primary: var(--v2-graphite);
+  --text-secondary: var(--v2-secondary);
   --accent-rose: var(--brand-blush);
   --accent-gold: var(--brand-gold);
-  --border-subtle: #d6cdc1;
-  --pattern-color: #ebe4d9;
+  --border-subtle: var(--v2-blush);
+  --pattern-color: var(--v2-petal);
   --display-font: "3L Abril", Georgia, serif;
   --body-font: "3L Montserrat", Arial, sans-serif;
   --display-xl: clamp(3rem, 7.7vw, 7rem);
@@ -49,9 +62,9 @@
   --radius-panel: 1.25rem;
   --radius-button: 3rem;
   --border: 1px solid var(--border-subtle);
-  --shadow: 0 20px 80px #372c2726;
-  --shadow-floating: 0 2px 12px #372c2712;
-  --backdrop: #372c2770;
+  --shadow: 0 20px 80px #27242d26;
+  --shadow-floating: 0 2px 12px #27242d12;
+  --backdrop: #27242d70;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-soft: cubic-bezier(0.76, 0, 0.24, 1);
   --micro: 240ms;
@@ -157,9 +170,9 @@
   gap: 1rem;
   min-height: 48px;
   padding: 0.8rem 1.5rem;
-  border: 1px solid var(--text-primary);
+  border: 1px solid var(--v2-raspberry);
   border-radius: var(--radius-button);
-  background: var(--text-primary);
+  background: var(--v2-raspberry);
   color: var(--surface-paper);
   font-size: var(--button);
   font-weight: 600;
@@ -172,7 +185,7 @@
 }
 .brand-experience .b-button:hover,
 .b-modal .b-button:hover {
-  background: var(--text-secondary);
+  background: var(--v2-graphite);
   transform: translateY(-2px);
 }
 .brand-experience .b-link,
@@ -1936,7 +1949,7 @@ a.b-return {
   margin-top: 0.4rem;
 }
 .brand-experience .b-policy article li::marker {
-  color: var(--brand-gold);
+  color: var(--v2-raspberry);
 }
 .brand-experience .b-policy-channels {
   list-style: none !important;
@@ -2644,16 +2657,16 @@ a.b-return {
    Scoped away from .b-shop so the canonical cart and checkout retain their
    dedicated ecommerce presentation and behavior. */
 .brand-experience:not(.b-shop) {
-  --surface-primary: #f4efe6;
-  --surface-paper: #fffaf2;
-  --text-primary: #2b1b16;
-  --text-secondary: #715e54;
-  --border-subtle: #cfc3b4;
+  --surface-primary: var(--v2-blush);
+  --surface-paper: var(--v2-white);
+  --text-primary: var(--v2-graphite);
+  --text-secondary: var(--v2-secondary);
+  --border-subtle: var(--v2-blush);
 }
 .brand-experience:not(.b-shop) .b-header {
   height: 92px;
   padding: 0 clamp(1.25rem, 3.5vw, 4rem);
-  background: color-mix(in srgb, var(--surface-primary) 90%, transparent);
+  background: var(--surface-primary);
   border-bottom: 1px solid transparent;
   backdrop-filter: blur(18px);
 }
@@ -2692,7 +2705,7 @@ a.b-return {
   margin: 0 clamp(0.75rem, 1.5vw, 1.5rem);
   border-radius: 0 0 1.75rem 1.75rem;
   overflow: hidden;
-  background: #2b1b16;
+  background: var(--v2-graphite);
   color: var(--surface-paper);
 }
 .brand-experience:not(.b-shop) .b-hero::after {
@@ -2702,8 +2715,8 @@ a.b-return {
   z-index: 1;
   background: linear-gradient(
     90deg,
-    #24130fba 0%,
-    #24130f52 46%,
+    #27242dba 0%,
+    #27242d52 46%,
     transparent 72%
   );
   pointer-events: none;
@@ -2876,8 +2889,8 @@ a.b-return {
 }
 .brand-experience:not(.b-shop) .b-button-secondary,
 .b-modal .b-button-secondary {
-  background: transparent;
-  color: var(--text-primary);
+  background: var(--surface-paper);
+  color: var(--v2-raspberry);
 }
 .brand-experience:not(.b-shop)
   :is(.b-discovery, .b-occasions, .b-dubai, .b-family) {
@@ -2885,8 +2898,8 @@ a.b-return {
 }
 .brand-experience:not(.b-shop) .b-footer {
   border-radius: 0;
-  background: #2b1b16;
-  color: var(--surface-paper);
+  background: var(--v2-white);
+  color: var(--text-primary);
 }
 .brand-experience:not(.b-shop) .b-footer :is(a, button, p, span),
 .brand-experience:not(.b-shop) .b-footer .b-caption,
@@ -2906,7 +2919,7 @@ a.b-return {
   border-color: color-mix(in srgb, var(--text-primary) 24%, transparent);
   background: color-mix(in srgb, var(--surface-paper) 94%, transparent);
   color: var(--text-primary);
-  box-shadow: 0 4px 18px #2b1b1617;
+  box-shadow: 0 4px 18px #27242d17;
   backdrop-filter: blur(12px);
 }
 .brand-experience:not(.b-shop) .b-support-wa:hover {
@@ -2919,11 +2932,11 @@ a.b-return {
   padding: clamp(1.5rem, 4vw, 4rem);
   border: 0;
   border-radius: 1.25rem;
-  background: #fffaf2;
-  box-shadow: 0 30px 100px #2b1b1642;
+  background: var(--v2-white);
+  box-shadow: 0 30px 100px #27242d42;
 }
 .b-modal::backdrop {
-  background: #21120eb8;
+  background: #27242db8;
   backdrop-filter: blur(4px);
 }
 .b-product-dialog {
@@ -2983,7 +2996,7 @@ a.b-return {
     border-radius: 0 0 1.25rem 1.25rem;
   }
   .brand-experience:not(.b-shop) .b-hero::after {
-    background: linear-gradient(0deg, #24130fd6 0%, #24130f2e 70%);
+    background: linear-gradient(0deg, #27242dd6 0%, #27242d2e 70%);
   }
   .brand-experience:not(.b-shop) .b-hero-media :is(video, img),
   .brand-experience:not(.b-shop) .b-hero-poster {
@@ -3179,7 +3192,7 @@ a.b-return {
   min-width: 0;
   min-height: 48px;
   padding: 0.65rem 1.7rem 0.65rem 0.65rem;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--v2-secondary);
   border-radius: 0;
   background: var(--surface-paper);
   color: var(--text-primary);
@@ -3244,3 +3257,6 @@ a.b-return {
   font-size: 0.7rem;
   color: var(--text-secondary);
 }
+
+html:has(.brand-experience),
+body:has(.brand-experience) { background: #f6dfe0; }
