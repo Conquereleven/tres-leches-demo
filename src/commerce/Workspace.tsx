@@ -1,3 +1,5 @@
+import { orderProductName, productOptionLabel } from "./product-names";
+import { OperationalProductName } from "./OperationalProductName";
 import { OperationsOverview, OperationsSettings } from "./OperationsOverview";
 import { ProductHub } from "./ProductHub";
 import { PrintCenter } from "./PrintCenter";
@@ -684,9 +686,10 @@ function OrderPanel({
             <li key={l.productId}>
               <span>
                 {l.quantity} ×{" "}
-                {(o.catalogSnapshot ?? data.catalog).find(
-                  (p) => p.id === l.productId,
-                )?.name ?? l.productId}
+                <OperationalProductName
+                  product={orderProductName(o, l.productId, data.catalog)}
+                  id={l.productId}
+                />
               </span>
               <span>
                 {t(
@@ -726,7 +729,8 @@ function OrderPanel({
                 >
                   {data.catalog.map((p) => (
                     <option value={p.id} key={p.id}>
-                      {p.name} · {t(money(p.priceFils))}
+                      {productOptionLabel(p.id, p.name)} ·{" "}
+                      {t(money(p.priceFils))}
                     </option>
                   ))}
                 </select>
