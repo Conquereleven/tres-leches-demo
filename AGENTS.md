@@ -145,3 +145,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Operations names products through `src/commerce/product-names.ts` only: the reviewed dictionary first, then English names approved in Product Hub (`productNames` from `/api/workspace`), always SKU plus exact recorded definition. Never translate at runtime, never rewrite an order snapshot; unknown definitions keep the original text with the review warning.
 - The variant field "English name for Operations and tickets" is staff-only and must not appear in any public catalog response. Approved names are append-only.
 - Candidate, conflicts and joint QA: `docs/product-hub/integration-candidate.md`.
+
+## TL-OMS-01 order management (13 October 2026, Joel)
+- Operations → Orders is a list (`OrdersList`) plus one page per order at `/operations/orders/:orderId` (`OrderDetails`), keyed by the internal id; `?order=` links are rewritten to it. Kitchen, Deliveries and Inbox keep `OrderCard` / `OrderPanel`.
+- Presentation rules live in `src/commerce/order-view.ts` (pure, tested). Never duplicate state-machine or permission logic in components; actions reuse the existing commands and the server stays the authority.
+- Operations palette is now blush-light `#F6DFE0`, blush `#FFC0C8`, gold `#A28D5B`, white and ink only; this supersedes "Operations keeps its TL-27 styling". No purple or green. Gold never carries white text (ink on gold). `operations-shell.css` may differ from the baseline in colour declarations only; new order styles go in `oms.css`, scoped to `.commerce.ops-shell`.
+- Show stored facts only: prices from the order snapshot (unknown stays "Not stored"), customer name from checkout before the conversation label and never a delivery area, notifications "Sent" only with provider evidence. Internal notes and product thumbnails are deferred: no backend field exists. Details: `docs/operations/oms/README.md`.
