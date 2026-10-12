@@ -55,8 +55,9 @@ for (const width of [390, 1440]) {
       return r.fulfill({ json: data });
     });
     await page.setViewportSize({ width, height: 1000 });
-    await page.goto("/operations/orders");
-    const card = page.locator(".ops-order-card");
+    // Address facts and warnings are shown on the dedicated order page.
+    await page.goto(`/operations/orders/${order.id}`);
+    const card = page.locator(".oms-details");
     for (const v of [
       order.address!,
       "Fixture Tower",
@@ -95,7 +96,7 @@ for (const width of [390, 1440]) {
       preferredTime: "1:00 PM – 4:00 PM",
     };
     await page.reload();
-    await expect(card).toContainText("PICKUP");
+    await expect(card).toContainText("Pickup point");
     await expect(card).not.toContainText("Address incomplete");
     await expect(card).not.toContainText("ADDRESS NOT VERIFIED");
     await expect(card).not.toContainText("Full address");

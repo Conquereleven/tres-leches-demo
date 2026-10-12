@@ -219,41 +219,44 @@ test.describe("payment step", () => {
   });
 });
 
-test.describe("operations orders board", () => {
+test.describe("operations orders list", () => {
   for (const width of [390, 768, 1440])
-    test(`paid queue at ${width}px`, async ({ page }) => {
+    test(`all orders at ${width}px`, async ({ page }) => {
       await page.setViewportSize({ width, height: 1000 });
       await page.route("**/api/workspace", (r) =>
         r.fulfill({ json: workspace() }),
       );
       await page.goto("/operations/orders");
-      const board = page.locator(".ops-orders");
-      await expect(board.getByText("Orders due today")).toBeVisible();
-      // Today: every paid, due-today order; never the unpaid one.
-      const cards = board.locator(".ops-order-list").first().locator("article");
-      await expect(cards).toHaveCount(5);
-      await expect(board.locator(".ops-order-list").first()).not.toContainText(
-        "Hana Pending",
-      );
-      await expect(board.locator(".ops-pay-paid").first()).toHaveText("Paid");
+      const rows = page.locator(".oms-table tbody tr");
+      // Every order is listed; the unpaid one is marked, not hidden.
+      await expect(rows).toHaveCount(7);
+      const unpaid = rows.filter({ hasText: "Hana Pending" });
+      await expect(unpaid).toHaveAttribute("data-unpaid", "true");
+      await expect(unpaid).toContainText("Not in the kitchen queue");
+      await expect(
+        rows
+          .filter({ hasText: "Layla Fixture" })
+          .locator('[data-kind="payment"]'),
+      ).toHaveText("Paid");
+      await page.getByRole("button", { name: /^Delivered/ }).click();
+      await expect(rows).toHaveCount(1);
+      await page.getByRole("button", { name: /^Awaiting payment/ }).click();
+      await expect(rows).toHaveCount(1);
+      await page.getByRole("button", { name: /^All/ }).click();
+      await expect(rows).toHaveCount(7);
+      expect(await noOverflow(page)).toBe(true);
+      await shot(page, `operations-orders-${width}`);
+      // Fulfilment actions are on the order page, for paid orders only.
+      await rows.filter({ hasText: "Layla Fixture" }).locator("a").click();
       await expect(
         page.getByRole("button", { name: "Start preparation" }),
       ).toBeVisible();
-      await expect(board.locator(".ops-unpaid > summary")).toContainText(
-        "Payment not confirmed · 1",
-      );
-      await page.getByRole("button", { name: /^Upcoming/ }).click();
-      await expect(
-        board.locator(".ops-order-list").first().locator("article"),
-      ).toHaveCount(1);
-      await page.getByRole("button", { name: /^All orders/ }).click();
-      await page.getByRole("button", { name: /^Completed/ }).click();
-      await expect(
-        board.locator(".ops-order-list").first().locator("article"),
-      ).toHaveCount(1);
-      await page.getByRole("button", { name: /^Today/ }).click();
-      await page.getByRole("button", { name: /^All ·/ }).click();
       expect(await noOverflow(page)).toBe(true);
-      await shot(page, `operations-orders-${width}`);
+      // The kitchen queue still excludes the unpaid order.
+      await page.goto("/operations/production");
+      await expect(page.locator(".ops-order-card").first()).toBeVisible();
+      await expect(page.locator(".ops-content")).not.toContainText(
+        "Hana Pending",
+      );
     });
 });
