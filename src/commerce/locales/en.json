@@ -576,5 +576,8 @@
   "flavor": "Flavour",
   "size": "Size",
   "packQuantity": "Pack quantity",
-  "changed": "Changed"
+  "changed": "Changed",
+  "Translations": "Translations",
+  "Name in cart": "Name in cart",
+  "Wording the storefront already translates can stay empty. New flavours, sizes and names need a translation here, or customers see “translation pending”.": "Wording the storefront already translates can stay empty. New flavours, sizes and names need a translation here, or customers see “translation pending”."
 }

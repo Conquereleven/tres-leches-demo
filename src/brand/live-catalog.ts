@@ -16,6 +16,7 @@ type Content = {
   name: string | null;
   description: string | null;
   variantLabel: string | null;
+  sizeLabel?: string | null;
 };
 type Translations = Record<Locale, Content>;
 type MediaLink = {
@@ -36,6 +37,8 @@ export type LiveAsset = {
 };
 export type LiveOption = {
   id: string;
+  /** The SKU's catalog name: what the cart shows. */
+  name: string;
   flavor: string | null;
   size: string | null;
   packQuantity: number | null;
@@ -204,7 +207,7 @@ function translations() {
   if (state.status !== "live") return overlay;
   const add = (
     source: string | null | undefined,
-    pick: (c: Content) => string | null,
+    pick: (c: Content) => string | null | undefined,
     t: Translations,
   ) => {
     if (!source) return;
@@ -221,10 +224,11 @@ function translations() {
   for (const p of catalog.products) {
     add(p.content.en.name, (x) => x.name, p.content);
     add(p.content.en.description, (x) => x.description, p.content);
+    // Keyed by the English wording customers see: flavour, size and cart name.
     for (const o of p.options) {
       add(o.flavor, (x) => x.variantLabel, o.content);
-      // The cart shows the SKU's own catalog name.
-      add(o.content.en.name, (x) => x.name, o.content);
+      add(o.size, (x) => x.sizeLabel, o.content);
+      add(o.name, (x) => x.name, o.content);
     }
   }
   return overlay;
@@ -233,50 +237,4 @@ function translations() {
 export function liveCopy(source: string, locale: string): string | null {
   if (state.status !== "live" || locale === "en") return null;
   return translations().get(source)?.[locale as Locale] ?? null;
-}
-
-export type LivePhoto = {
-  src: string;
-  srcSet?: string;
-  avifSrcSet?: string;
-  width?: number;
-  height?: number;
-  alt: string;
-  sources: string[];
-};
-const primaryFirst = (media: MediaLink[]) =>
-  [...media].sort(
-    (a, b) =>
-      Number(b.role === "primary") - Number(a.role === "primary") ||
-      a.order - b.order,
-  );
-function photo(asset: LiveAsset): LivePhoto {
-  const set = (format: string) =>
-    asset.derivatives
-      .filter((d) => d.format === format && d.width)
-      .map((d) => `${d.src} ${d.width}w`)
-      .join(", ") || undefined;
-  const webp = asset.derivatives.filter((d) => d.format === "webp");
-  const main =
-    webp.find((d) => d.width === 640) ?? webp[0] ?? asset.derivatives[0]!;
-  return {
-    src: main.src,
-    srcSet: set("webp"),
-    avifSrcSet: set("avif"),
-    width: main.width ?? undefined,
-    height: main.height ?? undefined,
-    alt: asset.alt.en.name ?? "",
-    sources: asset.derivatives.map((d) => d.src),
-  };
-}
-/** Published photographs of a product, primary first. Empty when none or not live. */
-export function livePhotos(productId: string): LivePhoto[] {
-  if (state.status !== "live") return [];
-  const { catalog } = state;
-  const product = catalog.products.find((p) => p.id === productId);
-  if (!product) return [];
-  return primaryFirst(product.media)
-    .map((m) => catalog.assets.find((a) => a.id === m.assetId))
-    .filter((a): a is LiveAsset => !!a)
-    .map(photo);
 }

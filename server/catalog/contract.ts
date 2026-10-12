@@ -9,6 +9,8 @@ const content = z
     name: text.nullable(),
     description: text.nullable(),
     variantLabel: text.nullable(),
+    /** Variants only: the size wording in this language. Optional: older revisions lack it. */
+    sizeLabel: text.nullable().optional(),
   })
   .strict();
 export const translationsSchema = z

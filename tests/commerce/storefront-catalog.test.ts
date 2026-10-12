@@ -497,3 +497,214 @@ test("checkout after publication uses the published price; accepted orders keep 
     store.close();
   }
 });
+
+test("new flavours, sizes and variant names carry their own translations; none is invented", () => {
+  const { store, view, payload, save, publish, cake } = setup();
+  try {
+    const target = cake();
+    const untouched = storefrontCatalog(store.read());
+    // Existing wording is translated by the storefront already: no stored size label,
+    // and re-saving a product unchanged raises no translation warning.
+    for (const o of untouched.products.flatMap((x) => x.options))
+      assert.equal(o.content.es.sizeLabel ?? null, null);
+    save(payload(target));
+    assert.deepEqual(view().changes, [], "an unchanged save changes nothing");
+    assert.deepEqual(
+      view().issues.filter((i) => i.code === "translation-missing"),
+      [],
+    );
+
+    const p = payload(target);
+    const base = p.variants[0]!;
+    p.variants.push({
+      ...base,
+      skuId: `${target.id}-lavender-petite`,
+      catalogName: "Tres Leches · Lavender · Petite",
+      flavor: "Lavender",
+      size: "Petite · 2 people",
+      priceFils: 6400,
+      commercialState: "published",
+      active: true,
+      availability: "available",
+      translations: { en: empty, es: empty, ar: empty },
+      media: [],
+    });
+    save(p);
+    const warnings = () =>
+      view()
+        .issues.filter((i) => i.code === "translation-missing")
+        .map((i) => `${i.target}: ${i.message}`);
+    assert.deepEqual(warnings(), [
+      `${target.id}-lavender-petite: Missing ES flavour, size, name`,
+      `${target.id}-lavender-petite: Missing AR flavour, size, name`,
+    ]);
+    // Published as is, the storefront receives no translation: it shows its
+    // "translation pending" marker rather than a guess.
+    const q = payload(view().products.find((x) => x.id === target.id)!);
+    const added = q.variants.find((v) => v.skuId.endsWith("lavender-petite"))!;
+    added.translations = {
+      en: empty,
+      es: {
+        ...empty,
+        name: "Tres Leches · Lavanda · Petite",
+        variantLabel: "Lavanda",
+        sizeLabel: "Petite · 2 personas",
+      },
+      ar: { ...empty, variantLabel: "لافندر" },
+    };
+    save(q);
+    assert.deepEqual(warnings(), [
+      `${target.id}-lavender-petite: Missing AR size, name`,
+    ]);
+    assert.ok(
+      view().changes.some(
+        (c) =>
+          c.target.endsWith("lavender-petite") ||
+          (c.field === "sizeLabel · ES" && c.after === "Petite · 2 personas"),
+      ),
+    );
+    publish();
+    const option = storefrontCatalog(store.read())
+      .products.find((x) => x.id === target.id)!
+      .options.find((o) => o.id.endsWith("lavender-petite"))!;
+    assert.equal(option.name, "Tres Leches · Lavender · Petite");
+    assert.equal(option.flavor, "Lavender");
+    assert.equal(option.size, "Petite · 2 people");
+    assert.equal(option.content.es.variantLabel, "Lavanda");
+    assert.equal(option.content.es.sizeLabel, "Petite · 2 personas");
+    assert.equal(option.content.es.name, "Tres Leches · Lavanda · Petite");
+    assert.equal(option.content.ar.variantLabel, "لافندر");
+    assert.equal(option.content.ar.sizeLabel ?? null, null, "not invented");
+    assert.equal(option.content.ar.name, null, "not invented");
+  } finally {
+    store.close();
+  }
+});
+
+test("commercial rollback: publishing the previous price restores the previous revision everywhere, without restoring a database", async () => {
+  const { store, view, payload, save, publish, cake } = setup();
+  const checkouts = new Map<string, Record<string, unknown>>();
+  const provider = new PaymenntProvider(
+    { apiKey: "fixture", apiSecret: "fixture", environment: "test" },
+    async (url, init) => {
+      if (init?.method === "POST") {
+        const id = randomUUID();
+        checkouts.set(id, {
+          ...JSON.parse(String(init.body)),
+          id,
+          status: "PENDING",
+          redirectUrl: `https://pay.test.paymennt.com/checkout/${id}`,
+        });
+        return Response.json({ success: true, result: checkouts.get(id) });
+      }
+      return Response.json({
+        success: true,
+        result: checkouts.get(String(url).split("/").at(-1)!),
+      });
+    },
+  );
+  const service = new CommerceService(
+    store,
+    new DisabledWhatsAppProvider(),
+    provider,
+    fixtureAddressGeo,
+  );
+  service.drain = async () => {};
+  try {
+    const target = cake();
+    const sku = target.variants.find((v) => v.active)!;
+    const original = sku.priceFils;
+    const input = {
+      lines: [{ productId: sku.skuId, quantity: 1 }],
+      delivery: {
+        zoneId: "jlt-cluster-c",
+        address: "Fixture only address",
+        building: "Fixture Tower",
+        date: addDays(dubaiToday(), 3),
+        slot: "4:00 PM – 9:00 PM",
+      },
+      customer: {
+        name: "Fixture Customer",
+        phone: "0500000000",
+        email: "fixture@example.invalid",
+      },
+      billing: { sameAsDelivery: true },
+    };
+    const cart = { lines: input.lines, zoneId: input.delivery.zoneId };
+    const origin = "https://fixture.invalid";
+    const order = async () =>
+      createWebCheckout(
+        service,
+        input,
+        randomUUID(),
+        "web",
+        origin,
+        quoteWebCheckout(service, cart).quoteRevision,
+      );
+    const shown = () =>
+      storefrontCatalog(store.read())
+        .products.flatMap((x) => x.options)
+        .find((o) => o.id === sku.skuId)!.priceFils;
+    const charged = () =>
+      store.read().catalog!.find((c) => c.id === sku.skuId)!.priceFils;
+    const setPrice = (priceFils: number) => {
+      const p = payload(view().products.find((x) => x.id === target.id)!);
+      p.variants.find((v) => v.skuId === sku.skuId)!.priceFils = priceFils;
+      save(p);
+      publish();
+    };
+    const before = await order();
+    const firstRevision = view().published.id;
+
+    // The new price goes live and somebody orders at it.
+    setPrice(original + 1500);
+    const raisedRevision = view().published.id;
+    assert.notEqual(raisedRevision, firstRevision);
+    assert.equal(shown(), original + 1500);
+    assert.equal(charged(), shown());
+    const during = await order();
+    assert.equal(during.amountFils, before.amountFils + 1500);
+    const staleQuote = quoteWebCheckout(service, cart).quoteRevision;
+    const frozen = JSON.stringify(store.read().orders);
+    const frozenPayments = JSON.stringify(store.read().payments);
+
+    // Rollback: the previous price is published as a new, reviewed publication.
+    setPrice(original);
+    assert.equal(
+      view().published.id,
+      firstRevision,
+      "identical content is the identical revision: the rollback is verifiable",
+    );
+    assert.equal(shown(), original);
+    assert.equal(charged(), shown(), "the visible price is the charged price");
+    assert.equal(publishedRevision(store.read(), "on").sellable, true);
+    // Orders taken at the higher price are history, not rewritten.
+    assert.equal(JSON.stringify(store.read().orders), frozen);
+    assert.equal(JSON.stringify(store.read().payments), frozenPayments);
+    // A cart still showing the higher price cannot be paid at it.
+    await assert.rejects(
+      createWebCheckout(
+        service,
+        input,
+        randomUUID(),
+        "web",
+        origin,
+        staleQuote,
+      ),
+      /price or availability changed/,
+    );
+    const after = await order();
+    assert.equal(after.amountFils, before.amountFils);
+    // Both publications are on record with who made them.
+    const published = view().history.filter((h) => h.action === "publish");
+    assert.equal(published.length, 2);
+    assert.ok(published.every((h) => h.actor === "liza"));
+    assert.equal(
+      store.read().audit.filter((a) => /catalog published/.test(a.action))
+        .length,
+      2,
+    );
+  } finally {
+    store.close();
+  }
+});

@@ -273,13 +273,18 @@ export function hubChanges(
     after: Owner,
   ) => {
     for (const locale of ["en", "es", "ar"] as const)
-      for (const field of ["name", "description", "variantLabel"] as const)
+      for (const field of [
+        "name",
+        "description",
+        "variantLabel",
+        "sizeLabel",
+      ] as const)
         add(
           kind,
           target,
           `${field} · ${locale.toUpperCase()}`,
-          before.translations[locale][field],
-          after.translations[locale][field],
+          before.translations[locale][field] ?? null,
+          after.translations[locale][field] ?? null,
         );
     const images = (o: Owner) =>
       [...o.media]
@@ -429,6 +434,33 @@ export function hubIssues(
           "price-jump",
           v.skuId,
           `Price changes by more than 50% (${aed(before.priceFils)} → ${aed(c.priceFils)})`,
+        );
+    }
+  }
+  // Wording customers have never seen has no translation anywhere: the storefront
+  // would show "translation pending". Nothing is ever translated automatically.
+  const known = {
+    flavor: new Set(live.foundation.variants.map((v) => v.flavor)),
+    size: new Set(live.foundation.variants.map((v) => v.size)),
+    name: new Set(live.catalog.map((c) => c.name)),
+  };
+  for (const v of next.foundation.variants) {
+    if (v.commercialState !== "published") continue;
+    const name = nextSkus.get(v.skuId)?.name;
+    for (const locale of ["es", "ar"] as const) {
+      const t = v.translations[locale];
+      const missing = [
+        v.flavor && !known.flavor.has(v.flavor) && !t.variantLabel
+          ? "flavour"
+          : null,
+        v.size && !known.size.has(v.size) && !t.sizeLabel ? "size" : null,
+        name && !known.name.has(name) && !t.name ? "name" : null,
+      ].filter(Boolean);
+      if (missing.length)
+        warn(
+          "translation-missing",
+          v.skuId,
+          `Missing ${locale.toUpperCase()} ${missing.join(", ")}`,
         );
     }
   }

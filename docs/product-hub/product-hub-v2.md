@@ -12,6 +12,8 @@ Inside Operations → Products an administrator can:
 - create products and edit existing ones: name, category, family, description, publication status;
 - manage variants: SKU, catalog name, flavour, size, pack quantity, price in AED, active, availability;
 - edit customer content in English, Spanish and Arabic (Arabic is edited right-to-left);
+- give each variant its Spanish and Arabic flavour, size and cart name (never filled in
+  automatically; new wording without one is flagged before publishing);
 - choose images from the library or upload new ones, set the primary image, and see a customer-style preview;
 - review every pending change as a before/after comparison with validation results, then publish or discard.
 

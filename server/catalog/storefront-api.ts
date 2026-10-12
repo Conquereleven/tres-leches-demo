@@ -80,6 +80,7 @@ export function storefrontCatalog(state: State, now = new Date()) {
           const c = commercial.get(v.skuId)!;
           return {
             id: v.skuId,
+            name: c.name,
             flavor: v.flavor,
             size: v.size,
             packQuantity: v.packQuantity,

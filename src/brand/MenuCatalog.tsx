@@ -4,8 +4,7 @@ import {
   MediaRotation,
   categoryEditorialMedia,
   selectedProductMedia,
-  productMediaAssignments,
-  approvedMedia,
+  productGalleryMedia,
   usesMenuReferencePresentation,
 } from "./media";
 import { CustomerCopy } from "./localization";
@@ -13,12 +12,7 @@ import { availableSku } from "../../shared/commerce-policy";
 import { useEffect, useId, useRef, useState } from "react";
 import { AddToCart } from "./Shop";
 import { useCheckoutConfig, useCheckoutNow } from "./cart";
-import {
-  liveOrderable,
-  livePhotos,
-  refreshLiveCatalog,
-  type LivePhoto,
-} from "./live-catalog";
+import { liveOrderable, refreshLiveCatalog } from "./live-catalog";
 import { formatAed } from "./content";
 import {
   menuProductFamily,
@@ -26,32 +20,6 @@ import {
   useMenu,
   type StorefrontProduct,
 } from "./menu";
-
-const PHOTO_SIZES = "(max-width: 640px) 90vw, (max-width: 1000px) 45vw, 30vw";
-/** A photograph published from Product Hub that the build does not know. */
-function PublishedPhoto({ photo, alt }: { photo: LivePhoto; alt: string }) {
-  return (
-    <picture>
-      {photo.avifSrcSet && (
-        <source
-          type="image/avif"
-          srcSet={photo.avifSrcSet}
-          sizes={PHOTO_SIZES}
-        />
-      )}
-      <img
-        src={photo.src}
-        srcSet={photo.srcSet}
-        sizes={photo.srcSet ? PHOTO_SIZES : undefined}
-        width={photo.width}
-        height={photo.height}
-        alt={alt}
-        loading="lazy"
-        decoding="async"
-      />
-    </picture>
-  );
-}
 
 export function ProductOptions({
   product,
@@ -108,37 +76,14 @@ export function ProductOptions({
     void refreshLiveCatalog();
     retry();
   }, [disagreement, retry]);
-  // Photographs changed in Product Hub replace the build's; unchanged ones keep the
-  // approved presentation (crops, rotation) exactly as authored.
-  const published = livePhotos(product.id);
-  const authored = new Set(
-    [
-      family.image,
-      ...family.options.flatMap(
-        (o) =>
-          selectedProductMedia(
-            product.id,
-            family.id,
-            product.variant,
-            o.size,
-          )?.derivatives.map((d) => d.src) ?? [],
-      ),
-    ].filter(Boolean),
-  );
-  const custom =
-    published.length > 0 &&
-    !published[0]!.sources.some((src) => authored.has(src));
-  const gallery = productMediaAssignments.find(
-    (p) => p.productId === product.id,
-  )?.gallerySourceIds as string[] | undefined;
+  // Resolved in media.tsx: a photograph replaced in Product Hub, else the authored one.
+  const gallery = productGalleryMedia(product.id, family.id, product.variant);
   return (
     <div className="b-menu-options">
       <figure
-        className={`b-menu-photo ${media || custom ? "" : "b-family-photo"} ${!custom && usesMenuReferencePresentation(media) ? "b-official-photo" : ""}`}
+        className={`b-menu-photo ${media ? "" : "b-family-photo"} ${usesMenuReferencePresentation(media) ? "b-official-photo" : ""}`}
       >
-        {custom ? (
-          <PublishedPhoto photo={published[0]!} alt={localize(product.title)} />
-        ) : media || fallback ? (
+        {media || fallback ? (
           <ResponsiveMedia
             productId={product.id}
             family={family.id}
@@ -246,45 +191,26 @@ export function ProductOptions({
           )}
         </div>
       )}
-      {detail && custom && published.length > 1 && (
-        <div
-          className="b-product-gallery"
-          aria-label={localize("Product gallery")}
-        >
-          {published.slice(1).map((photo) => (
-            <img
-              key={photo.src}
-              src={photo.src}
-              alt={localize(photo.alt)}
-              loading="lazy"
-              decoding="async"
-            />
-          ))}
-        </div>
-      )}
-      {detail && !custom && !!gallery?.length && (
+      {detail && gallery.length > 0 && (
         <div
           className={`b-product-gallery ${usesMenuReferencePresentation(media) ? "b-official-gallery" : ""}`}
           aria-label={localize("Product gallery")}
         >
-          {gallery.map((id) => {
-            const asset = approvedMedia.find(
-              (a) => a.sourceId === id && a.status === "assigned",
-            );
-            return asset ? (
-              <img
-                key={id}
-                src={
+          {gallery.map((asset) => (
+            <img
+              key={asset.sourceId}
+              src={
+                (
                   asset.derivatives.find(
                     (d) => d.format === "webp" && d.width === 640,
-                  )?.src
-                }
-                alt={localize(asset.alt)}
-                loading="lazy"
-                decoding="async"
-              />
-            ) : null;
-          })}
+                  ) ?? asset.derivatives[0]
+                )?.src
+              }
+              alt={localize(asset.alt)}
+              loading="lazy"
+              decoding="async"
+            />
+          ))}
         </div>
       )}
     </div>

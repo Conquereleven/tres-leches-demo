@@ -75,11 +75,16 @@ published data would show them stale prices.
 - `src/brand/menu.ts` adapts the published catalog to the shapes the menu already uses
   (`useMenu`). Existing products keep their authored identity, so approved photography,
   crops and rotations render exactly as before.
-- A photograph replaced in Product Hub is shown instead of the build's; an unchanged one
-  keeps the approved presentation.
-- Published translations take precedence for catalog strings; a name with no ES/AR
-  translation shows the existing "translation pending" marker (Product Hub warns before
-  publishing).
+- Product photographs are resolved in one place (`media.tsx`) for the menu, the product
+  page and the cart: a photograph replaced in Product Hub is shown everywhere, and an
+  open page picks it up with the next revision. An unchanged one keeps the approved
+  presentation (crops, rotation). Category banners and the editorial gallery are
+  authored and never follow a product's photograph.
+- Published translations take precedence for catalog strings: product names and
+  descriptions, and per variant the flavour, the size and the name shown in the cart.
+  Wording the build already translates needs nothing. New wording with no ES/AR
+  translation shows the existing "translation pending" marker; nothing is translated
+  automatically, and Product Hub warns before publishing.
 - While the first answer is pending the menu shows the existing loading text; with no
   valid revision it shows the existing "Online ordering is unavailable." and a retry.
   No new customer copy and no CSS was added.
@@ -90,18 +95,19 @@ published data would show them stale prices.
   never offered.
 
 Files touched in the customer site: `MenuCatalog.tsx`, `menu.ts`, `localization.tsx`,
-new `live-catalog.ts`. This branch is integrated on top of the storefront agent's merged
-work (BRAND-02, PR #14): `cart.ts`, `Shop.tsx`, `media.tsx`, menu data, locale files and
-all CSS are byte-identical to `main`, and BRAND-02's own guard test passes.
+`media.tsx` (product photograph resolution only) and new `live-catalog.ts`. Integrated on
+top of the storefront agent's merged work (BRAND-02, PR #14): `cart.ts`, `Shop.tsx`, menu
+data, locale files and all CSS are byte-identical to `main`, and BRAND-02's own guard
+test passes.
 
 ## Known limits (not hidden)
 
-- **Cart thumbnails** (`Shop.tsx`) still use the build's photograph for a product whose
-  photograph was replaced; the menu and product page show the new one.
 - **Homepage menu preview** is authored editorial content (six fixed tiles, no prices)
   and does not come from the catalog.
-- **New size or flavour wording** has no translation field in Product Hub yet; text the
-  build does not know shows the "translation pending" marker in ES/AR.
+- **Translations are keyed by the English wording.** Two variants with the same English
+  size or flavour share one translation; give them the same wording in Product Hub.
+- **Gallery-only changes** to a product whose main photograph is still the authored one
+  are not shown: the approved gallery applies until the main photograph is replaced.
 - **Without JavaScript** the prerendered home and policy pages are readable; the menu
   needs JavaScript (as it does today for ordering).
 - A category or family created only in Product Hub appears, with the published name;
@@ -135,10 +141,38 @@ all CSS are byte-identical to `main`, and BRAND-02's own guard test passes.
    `/api/checkout/config` reports `catalog.dynamic: true` with a revision.
 6. Only then `PRODUCT_HUB_PUBLISH_ENABLED=true` in Production.
 
-## Rollback
+## Commercial rollback after a published price
+
+The safe way back is forward: **publish the previous price again from Product Hub**.
+
+1. Open the product, set the price back, save the draft.
+2. Review: the comparison shows the current price and the one being restored.
+3. Publish.
+
+What this guarantees (tested in `storefront-catalog.test.ts` and in the browser test):
+
+- The storefront, the cart and checkout change together, because all three read the
+  same published record. There is no moment in which the visible price and the charged
+  price differ: a cart or tab still showing the other price is refused at payment
+  ("price or availability changed") and reloads.
+- When nothing else changed, the restored catalog has the **same revision id** as before
+  the price change, so the rollback can be verified by comparing ids.
+- Orders and payments accepted at the other price are not touched. They are history.
+- Both publications stay in the activity list and the audit trail, with who made them.
+
+To stop selling a product immediately while deciding, set the size to **Unavailable**
+and publish; that is also a publication and equally reversible.
+
+**Never** restore an older database file to undo a price: it would discard every order
+and payment recorded since. **Do not** use the feature flag as a price rollback either
+(next section).
+
+## Turning the feature off
 
 Unset `STOREFRONT_DYNAMIC_CATALOG_ENABLED` and restart: the storefront returns to the
 catalog shipped with the build and Product Hub publication is refused again. No data
-migration is involved. If a publication already changed prices, the build's catalog may
-then differ from the server's; the existing rule blocks those options until a build with
-matching data is deployed, so nothing is sold at a wrong price.
+migration is involved. Prices already published stay in `State.catalog`, so the build's
+catalog may then differ from the server's; the existing rule blocks those options until
+a build with matching data is deployed. Nothing is sold at a wrong price, but those
+options cannot be bought. Restore prices with a publication **before** turning the
+feature off.

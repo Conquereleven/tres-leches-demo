@@ -76,6 +76,8 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   const name = `Celebration ${info.project.name}`;
   const nameEs = `Celebración ${info.project.name}`;
   const price = first!.priceFils + 700;
+  const sizeEs = `Porción ${info.project.name}`;
+  const cartEs = `Pastel de celebración ${info.project.name}`;
 
   // The storefront shows the published catalog, not the build's.
   await shop.goto("/menu?category=cakes");
@@ -113,6 +115,10 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   await variant(second!.id)
     .getByLabel("Availability")
     .selectOption("unavailable");
+  // Spanish wording for this size and for the name the cart shows.
+  await variant(first!.id).locator("summary").click();
+  await variant(first!.id).getByLabel("Size · Español").fill(sizeEs);
+  await variant(first!.id).getByLabel("Name in cart · Español").fill(cartEs);
   const images = hub.locator(".ph-media li");
   const existing = await images.count();
   await hub.getByLabel("Upload a new image").setInputFiles({
@@ -152,7 +158,8 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   await revisit(shop);
   await expect(card.locator("h4")).toHaveText(name);
   await expect(card.locator(".b-menu-price")).toHaveText(aed(price));
-  await expect(card.locator(".b-menu-photo img")).toHaveAttribute(
+  // The card rotates the published photographs; the new main one comes first.
+  await expect(card.locator(".b-menu-photo img").first()).toHaveAttribute(
     "src",
     /^\/brand\/hub\/[a-f0-9]{64}\.png$/,
   );
@@ -160,6 +167,7 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
     .poll(() =>
       card
         .locator(".b-menu-photo img")
+        .first()
         .evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth),
     )
     .toBeGreaterThan(0);
@@ -182,14 +190,27 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
     "src",
     /^\/brand\/hub\//,
   );
+  // The published Spanish size wording, where the build has none of its own.
+  await shop.locator("main select").selectOption(first!.size);
+  await expect(shop.locator(".b-menu-option-summary")).toHaveText(sizeEs);
   await shop.goto(`/menu?product=${target.slug}&lang=ar`);
   await expect(shop.locator("html")).toHaveAttribute("dir", "rtl");
   await expect(shop.locator(".b-product-title")).not.toBeEmpty();
   await shop.screenshot({ path: `${shots}/${info.project.name}-3-detail.png` });
 
-  // The cart made before the publication is charged the published price.
-  await shop.goto("/cart?lang=en");
+  // The cart made before the publication: published name, photograph and price.
+  await shop.goto("/cart?lang=es");
   const line = shop.locator(".b-co-item").first();
+  await expect(line).toContainText(cartEs);
+  await expect(line.locator("img.b-co-thumb")).toHaveAttribute(
+    "src",
+    /^\/brand\/hub\/[a-f0-9]{64}\.png$/,
+  );
+  await shop.goto("/cart?lang=en");
+  await expect(line.locator("img.b-co-thumb")).toHaveAttribute(
+    "src",
+    /^\/brand\/hub\//,
+  );
   await expect(line).toContainText(aed(price));
   await expect(shop.locator("main")).not.toContainText(aed(first!.priceFils), {
     timeout: 1000,
@@ -197,6 +218,38 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   expect(await checkoutPrice(shop, first!.id)).toBe(price);
   expect(await checkoutPrice(shop, second!.id)).toBeUndefined();
   await shop.screenshot({ path: `${shots}/${info.project.name}-4-cart.png` });
+
+  // Commercial rollback: the administrator publishes the previous price again.
+  await hub.getByRole("button", { name: "Catalog", exact: true }).click();
+  await hub.getByLabel("Search").fill(target.id);
+  await hub.locator(".ph-row").first().click();
+  await variant(first!.id)
+    .getByLabel("Price (AED)")
+    .fill((first!.priceFils / 100).toFixed(2));
+  await hub.getByRole("button", { name: "Save draft" }).click();
+  await expect(hub.getByText("Draft saved")).toBeVisible();
+  await hub.getByRole("button", { name: /Review & publish/ }).click();
+  await expect(hub.locator(".ph-diff-price")).toContainText(
+    aed(first!.priceFils).replace(/^AED (\d+)$/, "AED $1.00"),
+  );
+  await hub.getByLabel(/I reviewed every change/).check();
+  await hub.getByRole("button", { name: "Publish catalog" }).click();
+  await expect(hub.getByText("Catalog published")).toBeVisible();
+  // The cart, the menu and checkout agree on the restored price; nothing shows the other.
+  await revisit(shop);
+  await shop.goto("/cart?lang=en");
+  await expect(line).toContainText(aed(first!.priceFils));
+  await shop.goto("/menu?category=cakes");
+  await select.selectOption(first!.size);
+  await expect(card.locator(".b-menu-price")).toHaveText(aed(first!.priceFils));
+  await expect(card.getByRole("button", { name: /ADD TO CART/ })).toContainText(
+    aed(first!.priceFils),
+  );
+  await expect(card).not.toContainText(aed(price), { timeout: 1000 });
+  expect(await checkoutPrice(shop, first!.id)).toBe(first!.priceFils);
+  await shop.screenshot({
+    path: `${shots}/${info.project.name}-5-rollback.png`,
+  });
   expect(errors).toEqual([]);
 });
 
