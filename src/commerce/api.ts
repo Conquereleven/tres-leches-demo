@@ -59,6 +59,17 @@ export type Workspace = {
   operationsOutboundEnabled?: boolean;
   /** Customer emails recorded by state transitions; pending until a provider sends them. */
   customerNotifications?: CustomerNotification[];
+  operationsEmailProvider?: string | null;
+  operationsEmailNotifications?: Pick<
+    import("../../server/domain/model").OperationsEmailNotification,
+    | "id"
+    | "orderId"
+    | "status"
+    | "attemptCount"
+    | "createdAt"
+    | "sentAt"
+    | "lastError"
+  >[];
   /** Name of the configured email provider, or null when none is configured. */
   customerEmailProvider?: string | null;
 };

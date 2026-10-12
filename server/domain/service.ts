@@ -30,6 +30,7 @@ import {
   paymentEventSchema,
 } from "./commands";
 import { type GeoService, quoteOrder } from "./zones";
+import { recordPaidOperationsEmail } from "./operations-email";
 import { recordOrderPaid } from "./notifications";
 import { recordCustomerEvent } from "./customer-notifications";
 import { assignPublicOrderNumber } from "./order-number";
@@ -110,6 +111,7 @@ export class CommerceService {
   operationsOrigin?: string;
   /** Private configuration; absent until the manager's number is supplied. */
   operationsManagerPhone?: string;
+  operationsEmailRecipients: string[] = [];
   /**
    * Activation timestamp for external-only Paymennt acknowledgements.
    * When absent, no unmatched checkout can be auto-closed as external.
@@ -1127,6 +1129,13 @@ export class CommerceService {
           // branch runs once per payment (paidAt guard) and only when the
           // order was genuinely awaiting this payment; recordOrderPaid is
           // additionally idempotent per order.
+          recordPaidOperationsEmail(
+            s,
+            o,
+            p,
+            this.operationsEmailRecipients,
+            this.operationsOrigin,
+          );
           recordOrderPaid(
             s,
             o,

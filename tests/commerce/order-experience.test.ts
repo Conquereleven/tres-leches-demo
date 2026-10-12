@@ -1125,3 +1125,101 @@ test("turning the email provider on never releases a backlog of old emails", asy
     f.store.close();
   }
 });
+
+test("new authoritative paid order queues one internal email; duplicates and historical orders do not replay", async () => {
+  const f = fixture();
+  const sent: { to: string; text: string; idempotencyKey: string }[] = [];
+  const provider: CustomerEmailProvider = {
+    name: "fixture-email",
+    async send(email) {
+      sent.push(email);
+      return { messageId: "fixture-delivered" };
+    },
+  };
+  f.service.operationsEmailRecipients = ["ops@example.invalid"];
+  f.service.operationsOrigin = "https://test.example.invalid";
+  try {
+    const input = delivery();
+    input.delivery = {
+      ...input.delivery,
+      unit: "1121",
+      notes: "Call reception",
+    } as typeof input.delivery;
+    const key = await f.place(input);
+    assert.equal(f.store.read().operationsEmailNotifications?.length ?? 0, 0);
+    await f.pay(key);
+    await reconcileEmbeddedPayment(f.service, key);
+    const rows = f.store.read().operationsEmailNotifications!;
+    assert.equal(rows.length, 1);
+    for (const detail of [
+      "NEW PAID ORDER #001",
+      "Fixture street only",
+      "Fixture Tower",
+      "1121",
+      "Call reception",
+      "UNVERIFIED",
+      "AED 66.00",
+      "6 ×",
+      "https://test.example.invalid/operations/orders?order=",
+    ])
+      assert.ok(rows[0]!.body.includes(detail), detail);
+    const frozen = rows[0]!.body;
+    f.store.write((s) => {
+      s.catalog![0]!.name = "Later renamed catalog";
+    });
+    await Promise.all([
+      dispatchCustomerNotifications(
+        f.store,
+        provider,
+        "operationsEmailNotifications",
+      ),
+      dispatchCustomerNotifications(
+        f.store,
+        provider,
+        "operationsEmailNotifications",
+      ),
+    ]);
+    await dispatchCustomerNotifications(
+      f.store,
+      provider,
+      "operationsEmailNotifications",
+    );
+    const payment = f.store
+      .read()
+      .payments.find((p) => p.orderId === f.order(key).id)!;
+    const callback = {
+      id: payment.providerReference ?? payment.providerCheckoutId!,
+      status: "PAID",
+    };
+    await f.service.acceptPaymentNotification(callback);
+    assert.equal(
+      (await f.service.acceptPaymentNotification(callback)).duplicate,
+      true,
+    );
+    await dispatchCustomerNotifications(
+      f.store,
+      provider,
+      "operationsEmailNotifications",
+    );
+    assert.equal(sent.length, 1);
+    assert.equal(sent[0]!.text, frozen);
+    assert.equal(
+      f.store.read().operationsEmailNotifications![0]!.status,
+      "sent",
+    );
+    // A checkout paid while internal alerts were disabled is never backfilled.
+    f.service.operationsEmailRecipients = [];
+    const historical = await f.place(pickup());
+    await f.pay(historical);
+    f.service.operationsEmailRecipients = ["ops@example.invalid"];
+    await reconcileEmbeddedPayment(f.service, historical);
+    assert.equal(f.store.read().operationsEmailNotifications!.length, 1);
+    const pickupKey = await f.place(pickup());
+    await f.pay(pickupKey);
+    const pickupBody = f.store.read().operationsEmailNotifications![1]!.body;
+    assert.match(pickupBody, /Fulfillment: Pickup/);
+    assert.doesNotMatch(pickupBody, /Full address:/);
+  } finally {
+    f.store.close();
+  }
+});

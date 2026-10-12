@@ -580,5 +580,14 @@
   "Translations": "Translations",
   "Name in cart": "Name in cart",
   "Wording the storefront already translates can stay empty. New flavours, sizes and names need a translation here, or customers see “translation pending”.": "Wording the storefront already translates can stay empty. New flavours, sizes and names need a translation here, or customers see “translation pending”.",
-  "English name for Operations and tickets": "English name for Operations and tickets"
+  "English name for Operations and tickets": "English name for Operations and tickets",
+  "Address incomplete": "Address incomplete",
+  "Review address before dispatch": "Review address before dispatch",
+  "Delivery notes": "Delivery notes",
+  "Full address": "Full address",
+  "Street / address": "Street / address",
+  "Building / villa": "Building / villa",
+  "Apartment / unit": "Apartment / unit",
+  "Not stored": "Not stored",
+  "Internal email · new paid order": "Internal email · new paid order"
 }

@@ -213,6 +213,13 @@ export type CustomerNotification = {
   sentAt?: string;
   lastError?: string;
 };
+export type OperationsEmailNotification = Omit<
+  CustomerNotification,
+  "event"
+> & {
+  event: "ORDER_PAID";
+  paymentId: string;
+};
 export type Payment = {
   supersededAt?: string;
   checkoutFlow?: "web";
@@ -316,6 +323,7 @@ export type State = {
   /** Last public order number issued. Only ever increases. */
   orderNumberSequence?: number;
   customerNotifications?: CustomerNotification[];
+  operationsEmailNotifications?: OperationsEmailNotification[];
   operationsNotifications?: OperationsNotification[];
   webCheckouts?: Record<
     string,

@@ -1,3 +1,4 @@
+import { deliveryStreet, deliveryBuilding } from "./delivery-address-input";
 import { frozenCheckout } from "./frozen-checkout";
 import {
   availableSku,
@@ -140,8 +141,8 @@ export const cartCheckoutSchema = z
     delivery: z
       .object({
         zoneId: z.string().min(1).max(100),
-        address: z.string().trim().min(5).max(300),
-        building: z.string().trim().min(1).max(120),
+        address: deliveryStreet,
+        building: deliveryBuilding,
         addressRef: z
           .string()
           .regex(/^[a-f0-9]{64}$/)

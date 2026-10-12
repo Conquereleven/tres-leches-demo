@@ -1475,7 +1475,10 @@ function OrderNotifications({ order, data }: { order: Order; data: Data }) {
   const emails = (data.customerNotifications ?? []).filter(
     (n) => n.orderId === order.id,
   );
-  if (!whatsapp.length && !emails.length) return null;
+  const internalEmails = (data.operationsEmailNotifications ?? []).filter(
+    (n) => n.orderId === order.id,
+  );
+  if (!whatsapp.length && !emails.length && !internalEmails.length) return null;
   return (
     <ul className="co-notifications" aria-label={t("Notificaciones")}>
       {whatsapp.map((n) => (
@@ -1490,6 +1493,20 @@ function OrderNotifications({ order, data }: { order: Order; data: Data }) {
               : data.operationsOutboundEnabled
                 ? t("Pendiente")
                 : t("Pendiente · envío de WhatsApp desactivado")}
+        </li>
+      ))}
+      {internalEmails.map((n) => (
+        <li key={n.id} data-status={n.status}>
+          <b>{t("Internal email · new paid order")}</b>{" "}
+          {n.status === "sent"
+            ? t("Enviado")
+            : n.status === "failed"
+              ? t("Falló · revisar")
+              : n.status === "sending"
+                ? t("Enviando")
+                : data.operationsEmailProvider
+                  ? t("Pendiente")
+                  : t("Pendiente · proveedor de email no configurado")}
         </li>
       ))}
       {emails.map((n) => (
