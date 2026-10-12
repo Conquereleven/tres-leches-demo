@@ -18,9 +18,12 @@ async function body(req: IncomingMessage, limit: number) {
   for await (const chunk of req) {
     const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
     size += bytes.length;
-    if (size > limit) throw new DomainError(413, "Request too large");
-    chunks.push(bytes);
+    // Leaving the loop early destroys the socket, so the 413 may never reach the
+    // caller. Read a bounded excess without keeping it, then refuse.
+    if (size > limit * 8) throw new DomainError(413, "Request too large");
+    if (size <= limit) chunks.push(bytes);
   }
+  if (size > limit) throw new DomainError(413, "Request too large");
   return Buffer.concat(chunks);
 }
 const send = (res: ServerResponse, status: number, value: unknown) => {
