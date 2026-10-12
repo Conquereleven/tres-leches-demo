@@ -248,3 +248,30 @@ export function validateFoundation(
     throw new Error("Catalog revision mismatch");
   return f;
 }
+/**
+ * Commercial tools that change `State.catalog` directly call this in the same
+ * transaction, so an initialized foundation never points at a stale catalog.
+ * Structure it cannot represent (added or removed SKUs) is refused, not guessed.
+ */
+export function rebaseFoundation(
+  s: {
+    catalog?: CatalogItem[];
+    catalogFoundation?: CatalogFoundation;
+    productHub?: { draft?: unknown };
+  },
+  at: string,
+) {
+  if (!s.catalogFoundation) return;
+  if (s.productHub?.draft)
+    throw new Error(
+      "A Product Hub draft is open; publish or discard it before changing the catalog directly",
+    );
+  const { revision: _revision, ...metadata } = s.catalogFoundation;
+  const hash = revisionFingerprint(metadata, s.catalog ?? []);
+  if (hash === s.catalogFoundation.revision.fingerprint) return;
+  s.catalogFoundation = {
+    ...metadata,
+    revision: { id: `catalog-v1-${hash}`, fingerprint: hash, publishedAt: at },
+  };
+  validateFoundation(s.catalogFoundation, s.catalog ?? []);
+}

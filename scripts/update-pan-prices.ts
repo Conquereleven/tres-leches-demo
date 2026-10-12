@@ -1,3 +1,4 @@
+import { rebaseFoundation } from "../server/catalog/contract";
 import { chmodSync, existsSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { createHash, randomUUID } from "node:crypto";
@@ -96,6 +97,7 @@ try {
             (p, i) => p.priceFils !== current[i]!.priceFils,
           ).length;
           s.catalog = next;
+          rebaseFoundation(s, new Date().toISOString());
           s.audit.push({
             at: new Date().toISOString(),
             actor: "catalog-admin",

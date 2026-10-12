@@ -117,3 +117,7 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Products route is an honest unavailable state until PR #7 is integrated; do not connect unfinished catalog APIs.
 - Print Center is preview-only. Known Epson models do not establish connectivity; no print jobs, IP communication or fake success until explicitly authorized hardware integration.
 - Operations CSS stays scoped to `.commerce.ops-shell`; public EN/ES/AR styles and commerce rules are independent.
+
+## Catalog foundation initialization (12 October 2026)
+- `catalog-foundation` audit is read-only on any profile; apply adds only `catalogFoundation`, needs the audited fingerprints, a verified backup and, in Production, an explicit confirmation and founder approval. Never correct the database from repository sources: a difference blocks until resolved with commercial evidence.
+- Tools that write `State.catalog` directly must call `rebaseFoundation` in the same transaction. Procedure, audit results and rollback: `docs/product-hub/foundation-bootstrap.md`.
