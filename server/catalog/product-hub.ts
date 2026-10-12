@@ -260,6 +260,33 @@ export function hubChanges(
   };
   const byId = <T extends { id: string }>(list: T[]) =>
     new Map(list.map((x) => [x.id, x]));
+  type Owner = {
+    translations: CatalogFoundation["products"][number]["translations"];
+    media: CatalogFoundation["products"][number]["media"];
+  };
+  // One readable line per language and field, and per image list, instead of raw structures.
+  const addContent = (
+    kind: HubChange["kind"],
+    target: string,
+    before: Owner,
+    after: Owner,
+  ) => {
+    for (const locale of ["en", "es", "ar"] as const)
+      for (const field of ["name", "description", "variantLabel"] as const)
+        add(
+          kind,
+          target,
+          `${field} · ${locale.toUpperCase()}`,
+          before.translations[locale][field],
+          after.translations[locale][field],
+        );
+    const images = (o: Owner) =>
+      [...o.media]
+        .sort((x, y) => x.role.localeCompare(y.role) * -1 || x.order - y.order)
+        .map((m) => `${m.role}: ${m.assetId}`)
+        .join(", ") || null;
+    add(kind, target, "media", images(before), images(after));
+  };
   const oldProducts = byId(live.foundation.products);
   for (const p of next.foundation.products) {
     const o = oldProducts.get(p.id);
@@ -280,10 +307,9 @@ export function hubChanges(
       "familyId",
       "categoryId",
       "commercialState",
-      "translations",
-      "media",
     ] as const)
       add("product", p.id, field, o[field], p[field]);
+    addContent("product", p.id, o, p);
   }
   const oldVariants = new Map(
     live.foundation.variants.map((v) => [v.skuId, v]),
@@ -309,10 +335,9 @@ export function hubChanges(
       "size",
       "packQuantity",
       "commercialState",
-      "translations",
-      "media",
     ] as const)
       add("variant", v.skuId, field, o[field], v[field]);
+    addContent("variant", v.skuId, o, v);
     if (c && oc) {
       if (c.priceFils !== oc.priceFils)
         changes.push({
@@ -542,7 +567,13 @@ export function hubView(
         };
       }),
     assets: next.foundation.assets,
-    issues: h?.draft ? hubIssues(live, next) : [],
+    // Errors always; warnings only for what this draft touches, so the review
+    // is about the pending change and not about long-standing gaps.
+    issues: h?.draft
+      ? hubIssues(live, next).filter(
+          (i) => i.level === "error" || touched.has(i.target),
+        )
+      : [],
     changes,
     history: (h?.history ?? []).slice(-30).reverse(),
   };

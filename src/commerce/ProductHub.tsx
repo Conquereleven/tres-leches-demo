@@ -177,11 +177,17 @@ export function ProductHub({ actor }: { actor: Actor }) {
         {error ? <p className="co-error">{error}</p> : t("Loading catalog…")}
       </section>
     );
-  if (!data.available)
+  // Anything that is not an explicit, available catalog is shown as unavailable.
+  if (data.available !== true)
     return (
       <section className="ops-panel ph-unavailable" role="status">
         <h2>{t("Product Hub")}</h2>
-        <p>{t(data.reason)}</p>
+        <p>
+          {t(
+            (data as Partial<Unavailable>).reason ??
+              "Product Hub is disabled in this environment",
+          )}
+        </p>
         <p>{t("The approved catalog remains unchanged.")}</p>
       </section>
     );
@@ -643,7 +649,12 @@ function Review({
                     <td>
                       <code>{c.target}</code>
                     </td>
-                    <td>{t(c.field)}</td>
+                    <td>
+                      {c.field
+                        .split(" · ")
+                        .map((part, i) => (i ? part : t(part)))
+                        .join(" · ")}
+                    </td>
                     <td>{c.before ?? "—"}</td>
                     <td>{c.after ?? "—"}</td>
                   </tr>

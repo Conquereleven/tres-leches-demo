@@ -117,3 +117,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Products route is an honest unavailable state until PR #7 is integrated; do not connect unfinished catalog APIs.
 - Print Center is preview-only. Known Epson models do not establish connectivity; no print jobs, IP communication or fake success until explicitly authorized hardware integration.
 - Operations CSS stays scoped to `.commerce.ops-shell`; public EN/ES/AR styles and commerce rules are independent.
+
+## Product Hub V2 (12 October 2026)
+- Operations → Products is a real editor: private draft, before/after review, admin-only publication. `State.catalog` stays the only price and availability authority; the draft (`State.productHub`) is a candidate copy and is never read by checkout.
+- Off by default: `PRODUCT_HUB_ENABLED` (editor) and `PRODUCT_HUB_PUBLISH_ENABLED` (publish). Publication is refused in Production in code until the storefront reads published data; do not describe the hub as publishing to customers before that integration.
+- Admin edits and publishes; manager is view-only; operator and agent have no access. Roles are enforced in the API.
+- Existing SKU ids, published slugs and removed combinations are permanent: deactivate, never delete or reactivate. Details and remaining steps: `docs/product-hub/product-hub-v2.md`.

@@ -155,6 +155,8 @@
 }
 .commerce.ops-shell .ph .ph-check {
   display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
   align-items: center;
   gap: 10px;
   min-height: 44px;
