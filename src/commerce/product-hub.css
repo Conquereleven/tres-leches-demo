@@ -22,7 +22,7 @@
   font-size: 12px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #5d6763;
+  color: #5a565f;
 }
 .commerce.ops-shell .ph-revision {
   margin: 0;
@@ -33,7 +33,7 @@
 }
 .commerce.ops-shell .ph code {
   font-size: 12px;
-  background: #f1f3f2;
+  background: #f7f6f4;
   border-radius: 6px;
   padding: 2px 6px;
   overflow-wrap: anywhere;
@@ -55,8 +55,8 @@
   border-color: #c9dbe6;
 }
 .commerce.ops-shell .ph-banner-ok {
-  background: #e9f5ee;
-  border-color: #bcdcc9;
+  background: #f6dfe0;
+  border-color: #e6e2df;
 }
 .commerce.ops-shell .ph-banner-error {
   background: #fdecea;
@@ -70,13 +70,13 @@
 .commerce.ops-shell .ph-tabs button {
   border-radius: 999px;
   background: #fff;
-  border: 1px solid #dce1de;
+  border: 1px solid #e6e2df;
   padding: 0 18px;
 }
 .commerce.ops-shell .ph-tabs button[aria-pressed="true"],
 .commerce.ops-shell .ph-tabs button[aria-selected="true"] {
-  background: #202523;
-  border-color: #202523;
+  background: #27242d;
+  border-color: #27242d;
   color: #fff;
 }
 .commerce.ops-shell .ph-tabs-small {
@@ -97,13 +97,13 @@
   margin: 0 0 20px;
 }
 .commerce.ops-shell .ph-metrics div {
-  background: #f7f8f7;
+  background: #f7f6f4;
   border-radius: 10px;
   padding: 12px 14px;
 }
 .commerce.ops-shell .ph-metrics dt {
   font-size: 12px;
-  color: #5d6763;
+  color: #5a565f;
 }
 .commerce.ops-shell .ph-metrics dd {
   margin: 2px 0 0;
@@ -127,7 +127,7 @@
 .commerce.ops-shell .ph label small,
 .commerce.ops-shell .ph small {
   font-weight: 400;
-  color: #5d6763;
+  color: #5a565f;
 }
 .commerce.ops-shell .ph input:not([type="checkbox"]):not([type="file"]),
 .commerce.ops-shell .ph select,
@@ -135,7 +135,7 @@
   width: 100%;
   min-height: 44px;
   padding: 8px 12px;
-  border: 1px solid #c9d0cc;
+  border: 1px solid #e6e2df;
   border-radius: 8px;
   background: #fff;
   font: inherit;
@@ -147,8 +147,8 @@
 }
 .commerce.ops-shell .ph input:disabled,
 .commerce.ops-shell .ph select:disabled {
-  background: #f1f3f2;
-  color: #5d6763;
+  background: #f7f6f4;
+  color: #5a565f;
 }
 .commerce.ops-shell .ph .ph-wide {
   grid-column: 1 / -1;
@@ -169,7 +169,7 @@
 }
 .commerce.ops-shell .ph-count {
   margin: 16px 0 8px;
-  color: #5d6763;
+  color: #5a565f;
 }
 .commerce.ops-shell .ph-list,
 .commerce.ops-shell .ph-history,
@@ -191,12 +191,12 @@
   text-align: start;
   padding: 10px 12px;
   background: #fff;
-  border: 1px solid #dce1de;
+  border: 1px solid #e6e2df;
   border-radius: 10px;
   min-height: 76px;
 }
 .commerce.ops-shell .ph-row:hover {
-  border-color: #176346;
+  border-color: #a28d5b;
 }
 .commerce.ops-shell .ph-row-main,
 .commerce.ops-shell .ph-row-meta,
@@ -210,13 +210,13 @@
 }
 .commerce.ops-shell .ph-row-meta {
   font-size: 13px;
-  color: #3d4642;
+  color: #27242d;
 }
 .commerce.ops-shell .ph-thumb {
   width: 56px;
   height: 56px;
   border-radius: 8px;
-  background: #f1f3f2;
+  background: #f7f6f4;
   overflow: hidden;
   flex: none;
 }
@@ -245,15 +245,15 @@
   min-height: 24px;
   padding: 0 10px;
   border-radius: 999px;
-  background: #eceeed;
-  color: #202523;
+  background: #f7f6f4;
+  color: #27242d;
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
 .commerce.ops-shell .ph-chip-live {
-  background: #dff0e6;
-  color: #0f4a33;
+  background: #f6dfe0;
+  color: #27242d;
 }
 .commerce.ops-shell .ph-chip-draft {
   background: #e6ecf7;
@@ -270,7 +270,7 @@
   gap: 12px;
   align-items: center;
   padding: 10px 12px;
-  border: 1px solid #dce1de;
+  border: 1px solid #e6e2df;
   border-radius: 10px;
 }
 .commerce.ops-shell .ph-issue-error {
@@ -290,7 +290,7 @@
 .commerce.ops-shell .ph-diff td {
   text-align: start;
   padding: 8px 10px;
-  border-bottom: 1px solid #e4e8e6;
+  border-bottom: 1px solid #f7f6f4;
   vertical-align: top;
   overflow-wrap: anywhere;
   max-width: 360px;
@@ -304,7 +304,7 @@
   gap: 12px;
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid #dce1de;
+  border-top: 1px solid #e6e2df;
 }
 .commerce.ops-shell .ph-actions {
   display: flex;
@@ -349,7 +349,7 @@
   display: grid;
   gap: 10px;
   padding: 14px;
-  border: 1px solid #dce1de;
+  border: 1px solid #e6e2df;
   border-radius: 10px;
 }
 .commerce.ops-shell .ph-variants .ph-chips {
@@ -364,7 +364,7 @@
   gap: 12px;
   align-items: center;
   padding: 10px;
-  border: 1px solid #dce1de;
+  border: 1px solid #e6e2df;
   border-radius: 10px;
 }
 .commerce.ops-shell .ph-media + .ph-form,
@@ -452,7 +452,7 @@
 
 .commerce.ops-shell .ph-variant-i18n {
   margin-top: 12px;
-  border-top: 1px solid #e6eae7;
+  border-top: 1px solid #f7f6f4;
   padding-top: 10px;
 }
 .commerce.ops-shell .ph-variant-i18n summary {

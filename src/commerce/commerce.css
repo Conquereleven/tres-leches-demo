@@ -180,8 +180,8 @@
   border-left: 3px solid var(--orange);
 }
 .co-source {
-  background: #e6ece7;
-  color: #315640;
+  background: #f7f6f4;
+  color: #27242d;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
@@ -231,7 +231,7 @@
 }
 .co-message.out {
   align-self: flex-end;
-  background: #e5ede5;
+  background: #f6dfe0;
   border-radius: 12px 0 12px 12px;
 }
 .co-translation {
@@ -271,10 +271,10 @@
 }
 .co-state {
   font-size: 12px;
-  border: 1px solid #76927b;
+  border: 1px solid #a28d5b;
   padding: 6px 8px;
   border-radius: 5px;
-  background: #eaf0e9;
+  background: #f6dfe0;
   text-align: center;
 }
 .co-lines {
@@ -303,8 +303,8 @@
   font-size: 14px;
 }
 .co-quote.eligible {
-  background: #edf3ec;
-  border-color: #8ca18b;
+  background: #f6dfe0;
+  border-color: #a28d5b;
 }
 .co-quote dl {
   display: grid;
