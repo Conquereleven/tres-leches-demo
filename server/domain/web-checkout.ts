@@ -1,3 +1,4 @@
+import { frozenCheckout } from "./frozen-checkout";
 import {
   availableSku,
   RETIRED_SKUS,
@@ -408,6 +409,85 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
       input.delivery.addressVerification =
         service.deliveryAddressMode === "legacy" ? "UNVERIFIED" : "VERIFIED";
     }
+    const snapshot = service.store.read();
+    const record = snapshot.webCheckouts?.[digest(key)];
+    const order = snapshot.orders.find((o) => o.id === record?.orderId);
+    const payment = snapshot.payments.find((p) => p.id === order?.paymentId);
+    if (record) {
+      requireThat(order && payment, "Checkout not found", 409);
+      const frozen = frozenCheckout(order, payment);
+      // Recover a missing pre-release hash only from validated frozen records.
+      if (!record.cartHash) {
+        record.cartHash = digest(
+          JSON.stringify({
+            lines: frozen.items
+              .map((i) => ({
+                sku: i.sku,
+                quantity: i.quantity,
+                unitPriceFils: i.unitPriceFils,
+              }))
+              .sort((a, b) => a.sku.localeCompare(b.sku)),
+            fulfillment: {
+              delivery: order.delivery ?? null,
+              pickup: order.pickup ?? null,
+            },
+            fulfillmentMethod: order.fulfillmentMethod ?? "delivery",
+            zoneId:
+              order.fulfillmentMethod === "pickup"
+                ? null
+                : (order.manualZoneId ?? order.delivery?.zoneId ?? null),
+            subtotalFils: frozen.subtotalFils,
+            feeFils: frozen.feeFils,
+            totalFils: frozen.totalFils,
+          }),
+        );
+        service.store.write((s) => {
+          s.webCheckouts![digest(key)]!.cartHash = record.cartHash;
+        });
+      }
+      const intent = (
+        lines: Order["lines"],
+        method: string | undefined,
+        zoneId: string | undefined,
+        delivery: unknown,
+        pickup: unknown,
+      ) =>
+        JSON.stringify({
+          lines: [...lines].sort((a, b) =>
+            a.productId.localeCompare(b.productId),
+          ),
+          method: method ?? "delivery",
+          zoneId: zoneId ?? null,
+          delivery: delivery ?? null,
+          pickup: pickup ?? null,
+        });
+      const same =
+        intent(
+          input.lines,
+          input.fulfillmentMethod,
+          input.zoneId,
+          input.delivery,
+          input.pickup,
+        ) ===
+        intent(
+          order.lines,
+          order.fulfillmentMethod,
+          order.manualZoneId ?? order.delivery?.zoneId,
+          order.delivery,
+          order.pickup,
+        );
+      if (
+        !record.supersededAt &&
+        same &&
+        !["failed", "cancelled", "expired"].includes(payment.status)
+      )
+        return {
+          key,
+          cartHash: record.cartHash,
+          changed: false,
+          status: readWebCheckoutStatus(service, key),
+        };
+    }
     const cartHash = canonicalCartHash(
       service,
       {
@@ -418,55 +498,8 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
       },
       { delivery: input.delivery ?? null, pickup: input.pickup ?? null },
     );
-    const snapshot = service.store.read();
-    const record = snapshot.webCheckouts?.[digest(key)];
     if (!record) return { key: randomUUID(), cartHash, changed: false };
-    const order = snapshot.orders.find((o) => o.id === record.orderId)!;
-    const payment = snapshot.payments.find((p) => p.id === order.paymentId)!;
-    // Recover pre-release hashes from the frozen order, never today's prices.
-    if (!record.cartHash && order.quote && order.catalogSnapshot?.length) {
-      const frozenLines = order.lines.map((line) => {
-        const product = order.catalogSnapshot!.find(
-          (p) => p.id === line.productId,
-        );
-        return product
-          ? {
-              sku: line.productId,
-              quantity: line.quantity,
-              unitPriceFils: product.priceFils,
-            }
-          : null;
-      });
-      if (frozenLines.every((line) => line !== null)) {
-        record.cartHash = digest(
-          JSON.stringify({
-            lines: frozenLines.sort((a, b) => a!.sku.localeCompare(b!.sku)),
-            fulfillment: {
-              delivery: order.delivery ?? null,
-              pickup: order.pickup ?? null,
-            },
-            fulfillmentMethod: order.fulfillmentMethod ?? "delivery",
-            zoneId:
-              order.fulfillmentMethod === "pickup"
-                ? null
-                : (order.manualZoneId ?? order.delivery?.zoneId ?? null),
-            subtotalFils: order.quote.subtotalFils,
-            feeFils: order.quote.feeFils,
-            totalFils: order.quote.totalFils,
-          }),
-        );
-        service.store.write((s) => {
-          s.webCheckouts![digest(key)]!.cartHash = record.cartHash;
-        });
-      }
-    }
-    if (!record.supersededAt && record.cartHash === cartHash)
-      return {
-        key,
-        cartHash,
-        changed: false,
-        status: readWebCheckoutStatus(service, key),
-      };
+    requireThat(order && payment, "Checkout not found", 409);
     requireThat(
       record.cartHash || payment.status !== "paid",
       "The previous paid order must be reviewed before updating checkout.",
@@ -555,7 +588,7 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
     "Delivery zone is not supported",
     400,
   );
-  return quoteOrder(
+  const quote = quoteOrder(
     s.zones,
     input.lines,
     undefined,
@@ -565,6 +598,19 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
     s.catalog ?? [],
     method,
   );
+  // Opaque comparison token only: catalog/quote remain the sole price authority.
+  const quoteRevision = digest(
+    JSON.stringify({
+      lines: [...input.lines]
+        .sort((a, b) => a.productId.localeCompare(b.productId))
+        .map((l) => ({
+          ...l,
+          product: s.catalog?.find((p) => p.id === l.productId),
+        })),
+      quote,
+    }),
+  );
+  return { ...quote, quoteRevision };
 }
 
 export type WebCheckoutSummary = {
@@ -611,10 +657,12 @@ export function readWebCheckoutStatus(
   const order = s.orders.find((o) => o.id === record?.orderId);
   const payment = s.payments.find((p) => p.id === order?.paymentId);
   requireThat(order && payment, "Checkout not found", 404);
-  const catalog = order.catalogSnapshot ?? s.catalog ?? [];
-  const zone = s.zones.find(
-    (z) => z.id === (order.delivery?.zoneId ?? order.manualZoneId),
-  );
+  let frozen: ReturnType<typeof frozenCheckout> | undefined;
+  try {
+    frozen = frozenCheckout(order, payment);
+  } catch {
+    /* Legacy financial status remains readable; no invented line prices. */
+  }
   return {
     cartHash: record?.cartHash,
     superseded: !!record?.supersededAt,
@@ -627,45 +675,49 @@ export function readWebCheckoutStatus(
     ...(payment.checkoutFlow === "web" ? { paymentFlow: "web" as const } : {}),
     amountFils: payment.amountFils,
     currency: payment.currency,
-    actionRequired: record?.supersededAt
-      ? "review_payment"
-      : payment.checkoutFlow === "web" &&
-          !payment.url &&
-          !["paid", "failed", "cancelled", "expired"].includes(payment.status)
+    actionRequired:
+      record?.supersededAt || (!frozen && payment.status !== "paid")
         ? "review_payment"
-        : payment.directAttempt === "unknown" ||
-            (payment.directAttempt === "submitted" &&
-              Date.now() - Date.parse(payment.updatedAt) > 30000)
+        : payment.checkoutFlow === "web" &&
+            !payment.url &&
+            !["paid", "failed", "cancelled", "expired"].includes(payment.status)
           ? "review_payment"
-          : payment.directAttempt === "ready"
-            ? "complete_payment"
-            : null,
+          : payment.directAttempt === "unknown" ||
+              (payment.directAttempt === "submitted" &&
+                Date.now() - Date.parse(payment.updatedAt) > 30000)
+            ? "review_payment"
+            : payment.directAttempt === "ready"
+              ? "complete_payment"
+              : null,
     url:
-      !record?.supersededAt && payment.status === "pending"
+      frozen && !record?.supersededAt && payment.status === "pending"
         ? (payment.url ?? null)
         : null,
-    summary: {
-      items: order.lines.map((l) => {
-        const p = catalog.find((c) => c.id === l.productId);
-        return {
-          productId: l.productId,
-          name: p?.name ?? l.productId,
-          quantity: l.quantity,
-          lineFils: (p?.priceFils ?? 0) * l.quantity,
-        };
-      }),
-      subtotalFils: order.quote?.subtotalFils ?? 0,
-      feeFils: order.quote?.feeFils ?? 0,
-      fulfillmentMethod: order.fulfillmentMethod ?? "delivery",
-      pickup: order.pickup,
-      delivery:
-        order.fulfillmentMethod !== "pickup" && order.delivery
-          ? { ...order.delivery, zoneName: zone?.name }
-          : undefined,
-      customerName: s.conversations.find((c) => c.id === order.conversationId)
-        ?.customer,
-      customerFirstName: order.customerDetails?.firstName,
-    },
+    summary: frozen
+      ? {
+          items: frozen.items.map((i) => ({
+            productId: i.sku,
+            name: i.name,
+            quantity: i.quantity,
+            lineFils: i.unitPriceFils * i.quantity,
+          })),
+          subtotalFils: frozen.subtotalFils,
+          feeFils: frozen.feeFils,
+          fulfillmentMethod: order.fulfillmentMethod ?? "delivery",
+          pickup: order.pickup,
+          delivery:
+            order.fulfillmentMethod !== "pickup" && order.delivery
+              ? {
+                  ...order.delivery,
+                  zoneName: order.quote?.zoneName ?? undefined,
+                }
+              : undefined,
+          customerName: s.conversations.find(
+            (c) => c.id === order.conversationId,
+          )?.customer,
+          customerFirstName: order.customerDetails?.firstName,
+        }
+      : undefined,
   };
 }
 
@@ -676,6 +728,7 @@ export async function createWebCheckout(
   key: string,
   embedded: boolean | "web" = false,
   origin?: string,
+  expectedQuoteRevision?: string,
 ): Promise<WebCheckoutResult> {
   if (embedded === "web") {
     const url = new URL(origin ?? "");
@@ -705,6 +758,25 @@ export async function createWebCheckout(
   }
   const inputHash = digest(JSON.stringify(input));
   service.store.transaction(() => {
+    const snapshot = service.store.read();
+    const previous = snapshot.webCheckouts?.[receiptKey];
+    if (previous) {
+      requireThat(
+        !previous.supersededAt,
+        "Cart changed; checkout key already used with different details",
+        409,
+      );
+      requireThat(
+        previous.inputHash === inputHash,
+        "Checkout key already used with different details",
+        409,
+      );
+      const order = snapshot.orders.find((o) => o.id === previous.orderId);
+      const payment = snapshot.payments.find((p) => p.id === order?.paymentId);
+      requireThat(order && payment, "Checkout not found", 409);
+      frozenCheckout(order, payment);
+      return;
+    }
     const cartHash = canonicalCartHash(
       service,
       {
@@ -715,26 +787,20 @@ export async function createWebCheckout(
       },
       { delivery: input.delivery ?? null, pickup: input.pickup ?? null },
     );
-    const previous = service.store.read().webCheckouts?.[receiptKey];
-    if (previous) {
-      requireThat(
-        !previous.supersededAt && previous.cartHash === cartHash,
-        "Cart changed; checkout key already used with different details",
-        409,
-      );
-      requireThat(
-        previous.inputHash === inputHash,
-        "Checkout key already used with different details",
-        409,
-      );
-      return;
-    }
     const quote = quoteWebCheckout(service, {
       lines: input.lines,
       ...(input.fulfillmentMethod === "pickup"
         ? { fulfillmentMethod: "pickup" }
         : { zoneId: input.zoneId }),
     });
+    if (expectedQuoteRevision !== undefined) {
+      requireThat(
+        /^[a-f0-9]{64}$/.test(expectedQuoteRevision) &&
+          expectedQuoteRevision === quote.quoteRevision,
+        "Your cart price or availability changed. Please return to delivery and review the updated total.",
+        409,
+      );
+    }
     requireThat(quote.eligible, quote.reason, 422);
     // A checkout owns its own conversation: knowing a phone cannot seize an
     // existing order. It is not unread — an unpaid website order is not

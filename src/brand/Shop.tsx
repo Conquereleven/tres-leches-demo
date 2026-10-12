@@ -22,8 +22,8 @@ import { menuFamilyForSku, storefrontProductForSku } from "./menu";
  * The 3L online store: cart → delivery → details → payment → confirmation.
  *
  * Prices shown here are for display only. The server re-prices the cart from
- * the approved catalog and delivery zone at quote, at checkout creation and
- * again before checkout creation. Card details are entered only on Paymennt.
+ * the approved catalog and delivery zone until checkout acceptance. The accepted
+ * quote is frozen for payment creation. Card details are entered only on Paymennt.
  */
 import {
   useEffect,
@@ -81,6 +81,7 @@ import {
 // ── Shared ───────────────────────────────────────────────────────────────
 
 type Quote = {
+  quoteRevision?: string;
   eligible: boolean;
   minimumMet: boolean;
   reason: string;
@@ -198,12 +199,18 @@ function billingLines(billing: Billing, delivery: Delivery, name: string) {
 const billingComplete = (b: Billing) =>
   b.sameAsDelivery || !!(b.address1?.trim() && b.city?.trim());
 
-async function post<T>(path: string, body: unknown, key?: string): Promise<T> {
+async function post<T>(
+  path: string,
+  body: unknown,
+  key?: string,
+  quoteRevision?: string,
+): Promise<T> {
   const res = await fetch(path, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       ...(key ? { "Idempotency-Key": key } : {}),
+      ...(quoteRevision ? { "X-Checkout-Quote-Revision": quoteRevision } : {}),
     },
     body: JSON.stringify(body),
   });
@@ -2017,7 +2024,12 @@ function PaymentStep({
           ? saved.key
           : crypto.randomUUID();
       sessionStorage.setItem(CAPABILITY, JSON.stringify({ key, fingerprint }));
-      const result = await post<Status>("/api/checkout/web", body, key);
+      const result = await post<Status>(
+        "/api/checkout/web",
+        body,
+        key,
+        quote?.quoteRevision,
+      );
       if (result.paymentStatus === "paid") {
         cart.clear();
         setLeaving("PAID");

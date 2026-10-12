@@ -330,6 +330,7 @@ export type State = {
   >;
   ai?: import("../agents/model").AgentData;
   catalog?: CatalogItem[];
+  catalogFoundation?: import("../catalog/contract").CatalogFoundation;
   paymentNotifications?: NotificationReceipt[];
   uatScenarios?: {
     id: number;

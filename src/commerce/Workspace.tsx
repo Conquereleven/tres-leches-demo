@@ -1,3 +1,10 @@
+import {
+  OperationsOverview,
+  ProductsAvailability,
+  OperationsSettings,
+} from "./OperationsOverview";
+import { PrintCenter } from "./PrintCenter";
+import { OpsProvider, useOps } from "./ops-i18n";
 import { OperationsShell } from "./OperationsShell";
 import { ChatsCircle, Receipt, Oven, Truck } from "@phosphor-icons/react";
 import { AgentPanel, AgentKnowledgeEditor } from "./AgentPanel";
@@ -16,10 +23,18 @@ import "./commerce.css";
 import "./operations-shell.css";
 type Run = (body: Record<string, unknown>, path?: string) => Promise<boolean>;
 export function CommerceWorkspace() {
+  return (
+    <OpsProvider>
+      <WorkspaceInner />
+    </OpsProvider>
+  );
+}
+function WorkspaceInner() {
+  const { t, formatDate, setUser, language, errorText } = useOps();
   const [data, setData] = useState<Data | null>(null),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
-    [view, setView] = useState(location.pathname.split("/")[2] || "inbox"),
+    [view, setView] = useState(location.pathname.split("/")[2] || "overview"),
     [selected, setSelected] = useState(""),
     [filter, setFilter] = useState("all"),
     [search, setSearch] = useState(""),
@@ -30,10 +45,13 @@ export function CommerceWorkspace() {
       () => new URLSearchParams(location.search).get("order") ?? "",
     );
   useEffect(() => {
-    const sync = () => setView(location.pathname.split("/")[2] || "inbox");
+    const sync = () => setView(location.pathname.split("/")[2] || "overview");
     window.addEventListener("popstate", sync);
     return () => window.removeEventListener("popstate", sync);
   }, []);
+  useEffect(() => {
+    setUser(data?.actor.id ?? null);
+  }, [data?.actor.id, setUser]);
   const pending = useRef(new Map<string, string>());
   const refresh = useCallback(async () => {
     try {
@@ -76,16 +94,18 @@ export function CommerceWorkspace() {
     return <Login onLogin={refresh} />;
   if (!data)
     return (
-      <main className="commerce">
-        <h1>Workspace de operaciones</h1>
+      <main className="commerce ops-shell ops-auth" lang={language}>
+        <h1>{t("Workspace de operaciones")}</h1>
         {error ? (
           <div role="alert">
-            {error}
-            <button onClick={() => void refresh()}>Reintentar conexión</button>
+            {errorText(error)}
+            <button onClick={() => void refresh()}>
+              {t("Reintentar conexión")}
+            </button>
           </div>
         ) : (
           <div aria-busy="true" className="co-skeleton">
-            Cargando conversaciones y pedidos…
+            {t("Cargando conversaciones y pedidos…")}
           </div>
         )}
       </main>
@@ -121,284 +141,323 @@ export function CommerceWorkspace() {
     >
       {data.integrationHealth?.inboundFailed ? (
         <p className="co-error" role="alert">
-          Hay {data.integrationHealth.inboundFailed} notificaciones pendientes
-          de revisión técnica.
+          {t("Hay")} {data.integrationHealth.inboundFailed}{" "}
+          {t("notificaciones pendientes de revisión técnica.")}
         </p>
       ) : null}
       {error && (
         <div className="co-error" role="alert">
-          {error}
+          {errorText(error)}
           <button
             onClick={() => {
               setError("");
               void refresh();
             }}
           >
-            Actualizar datos
+            {t("Actualizar datos")}
           </button>
         </div>
       )}
       <fieldset className="co-fieldset" disabled={busy}>
-        {view === "readiness" &&
-        data.environment === "staging" &&
-        data.actor.role === "admin" ? (
-          <ReadinessPanel data={data} run={run} />
-        ) : view === "zones" ? (
-          <Zones key="zones" data={data} run={run} />
-        ) : view === "inbox" ? (
-          <div className="co-grid">
-            <aside
-              aria-label="Conversaciones"
-              className={`co-list${shown.length ? "" : " co-list-empty"}`}
-            >
-              <div className="co-filters">
-                <div className="co-number-tabs">
-                  {["all", ...data.numbers.map((n) => n.id)].map((id) => (
-                    <button
-                      key={id}
-                      aria-pressed={filter === id}
-                      onClick={() => setFilter(id)}
-                    >
-                      {id === "all" ? "All" : id.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-                <label>
-                  Buscar conversación
-                  <input
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Cliente, teléfono o mensaje"
-                  />
-                </label>
-                <div className="co-two">
-                  <label>
-                    Agente
-                    <select
-                      value={agent}
-                      onChange={(e) => setAgent(e.target.value)}
-                    >
-                      <option value="all">Todos</option>
-                      <option value="none">Sin asignar</option>
-                      {data.agents.map((a) => (
-                        <option key={a.id} value={a.id}>
-                          {a.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label>
-                    Estado
-                    <select
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
-                    >
-                      <option value="all">Todos</option>
-                      <option value="open">Abierta</option>
-                      <option value="closed">Cerrada</option>
-                    </select>
-                  </label>
-                </div>
-                <label className="co-check">
-                  <input
-                    type="checkbox"
-                    checked={unread}
-                    onChange={(e) => setUnread(e.target.checked)}
-                  />
-                  Solo no leídas
-                </label>
-              </div>
-              {shown.length === 0 && (
-                <p className="co-empty">
-                  {data.conversations.length
-                    ? "Sin conversaciones para estos filtros."
-                    : "No conversations yet. Las conversaciones aparecerán aquí al recibir mensajes en los números conectados."}
-                </p>
-              )}
-              {shown.map((item) => (
-                <button
-                  className={
-                    "co-conversation " +
-                    (item.id === selected ? "selected" : "")
-                  }
-                  key={item.id}
-                  onClick={() => {
-                    setSelected(item.id);
-                    if (item.unread)
-                      void run({
-                        type: "read",
-                        id: item.id,
-                        version: item.version,
-                      });
-                  }}
-                >
-                  <span className="co-row">
-                    <b>{item.customer}</b>
-                    <span className="co-source">
-                      {item.sourceNumberId.toUpperCase()}
-                    </span>
-                  </span>
-                  <span>
-                    {item.messages.at(-1)?.text || "Ubicación compartida"}
-                  </span>
-                  <small>
-                    {item.assignedAgent ?? "Sin asignar"} ·{" "}
-                    {item.unread ? "● No leída" : "Leída"} ·{" "}
-                    {data.orders.find(
-                      (o) =>
-                        o.conversationId === item.id &&
-                        !["Delivered", "Cancelled"].includes(o.state),
-                    )?.state ?? item.status}
-                  </small>
-                </button>
-              ))}
-            </aside>
-            {c ? (
-              <>
-                <ConversationPanel key={c.id} c={c} data={data} run={run} />
-                <aside aria-label="Pedido y cliente" className="co-order-side">
-                  <div className="co-section">
-                    <p className="eyebrow">PEDIDOS VINCULADOS</p>
-                    <h2>Pedido y entrega</h2>
-                    <p>
-                      {c.customer} · {c.phone}
-                    </p>
-                    <button
-                      className="primary"
-                      disabled={
-                        !c.assignedAgent ||
-                        c.assignedAgent !== data.actor.id ||
-                        orders.some(
-                          (o) => !["Delivered", "Cancelled"].includes(o.state),
-                        )
-                      }
-                      onClick={() =>
-                        void run({
-                          type: "createOrder",
-                          id: c.id,
-                          version: c.version,
-                        })
-                      }
-                    >
-                      Crear pedido
-                    </button>
-                  </div>
-                  {orders.length === 0 ? (
-                    <p className="co-empty">
-                      Toma la conversación y crea el primer pedido.
-                    </p>
-                  ) : (
-                    orders.map((o) => (
-                      <OrderPanel key={o.id} order={o} data={data} run={run} />
-                    ))
-                  )}
-                  <div className="ops-copilot-slot">
-                    <AgentPanel key={c.id} c={c} data={data} run={run} />
-                  </div>
-                  <div className="co-section">
-                    <h3>Actividad de conversación</h3>
-                    <ul className="co-audit">
-                      {c.audit.map((a, i) => (
-                        <li key={i}>
-                          {a.action}
-                          <small>
-                            {a.actor} · {new Date(a.at).toLocaleString()}
-                          </small>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </aside>
-              </>
-            ) : (
-              <div className="ops-inbox-welcome">
-                <span className="ops-empty-icon">
-                  <ChatsCircle size={32} aria-hidden="true" />
-                </span>
-                <p className="ops-kicker">TU ESPACIO DE ATENCIÓN</p>
-                <h2>Cada conversación, bien atendida.</h2>
-                <p>
-                  Selecciona una conversación para gestionar mensajes, pedidos y
-                  asistencia de AI Copilot en un solo lugar.
-                </p>
-                <div className="ops-welcome-foot">
-                  Conversación · Pedido · Seguimiento
-                </div>
-              </div>
-            )}
-          </div>
-        ) : view === "orders" && !focusOrder ? (
-          <OrdersBoard
+        {view === "overview" ? (
+          <OperationsOverview
             data={data}
-            run={run}
-            details={(o) => <OrderPanel order={o} data={data} run={run} />}
-            openConversation={(id) => {
-              setSelected(id);
-              setView("inbox");
+            onNavigate={(id) => {
+              history.pushState({}, "", `/operations/${id}`);
+              setView(id);
             }}
           />
+        ) : view === "products" ? (
+          <ProductsAvailability role={data.actor.role} />
+        ) : view === "print" ? (
+          <PrintCenter data={data} />
+        ) : view === "settings" ? (
+          <OperationsSettings data={data} />
         ) : (
-          <div className="co-board">
-            {focusOrder && (
-              <div className="ops-order-filters">
-                <button
-                  className="co-link"
-                  onClick={() => {
-                    setFocusOrder("");
-                    history.replaceState({}, "", "/operations/orders");
-                  }}
+          <>
+            {view === "readiness" &&
+            data.environment === "staging" &&
+            data.actor.role === "admin" ? (
+              <ReadinessPanel data={data} run={run} />
+            ) : view === "zones" ? (
+              <Zones key="zones" data={data} run={run} />
+            ) : view === "inbox" ? (
+              <div className="co-grid">
+                <aside
+                  aria-label={t("Conversaciones")}
+                  className={`co-list${shown.length ? "" : " co-list-empty"}`}
                 >
-                  ← Ver todos los pedidos
-                </button>
-              </div>
-            )}
-            {boardOrders(data, view, focusOrder).length > 0 && (
-              <ul className="ops-order-list" aria-label="Pedidos">
-                {boardOrders(data, view, focusOrder).map((o) => (
-                  <li key={o.id}>
-                    <OrderCard
-                      order={o}
-                      data={data}
-                      run={run}
-                      today={dubaiDate()}
-                      details={(o) => (
-                        <OrderPanel order={o} data={data} run={run} />
-                      )}
-                      openConversation={(id) => {
-                        setSelected(id);
-                        setView("inbox");
-                      }}
-                    />
-                  </li>
-                ))}
-              </ul>
-            )}
-            {boardOrders(data, view, focusOrder).length === 0 && (
-              <div className="ops-board-empty">
-                <span className="ops-empty-icon">
-                  {view === "production" ? (
-                    <Oven size={30} />
-                  ) : view === "delivery" ? (
-                    <Truck size={30} />
-                  ) : (
-                    <Receipt size={30} />
+                  <div className="co-filters">
+                    <div className="co-number-tabs">
+                      {["all", ...data.numbers.map((n) => n.id)].map((id) => (
+                        <button
+                          key={id}
+                          aria-pressed={filter === id}
+                          onClick={() => setFilter(id)}
+                        >
+                          {id === "all" ? t("All") : id.toUpperCase()}
+                        </button>
+                      ))}
+                    </div>
+                    <label>
+                      {t("Buscar conversación")}
+                      <input
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder={t("Cliente, teléfono o mensaje")}
+                      />
+                    </label>
+                    <div className="co-two">
+                      <label>
+                        {t("Agente")}
+                        <select
+                          value={agent}
+                          onChange={(e) => setAgent(e.target.value)}
+                        >
+                          <option value="all">{t("Todos")}</option>
+                          <option value="none">{t("Sin asignar")}</option>
+                          {data.agents.map((a) => (
+                            <option key={a.id} value={a.id}>
+                              {a.name}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        {t("Estado")}
+                        <select
+                          value={status}
+                          onChange={(e) => setStatus(e.target.value)}
+                        >
+                          <option value="all">{t("Todos")}</option>
+                          <option value="open">{t("Abierta")}</option>
+                          <option value="closed">{t("Cerrada")}</option>
+                        </select>
+                      </label>
+                    </div>
+                    <label className="co-check">
+                      <input
+                        type="checkbox"
+                        checked={unread}
+                        onChange={(e) => setUnread(e.target.checked)}
+                      />
+                      {t("Solo no leídas")}
+                    </label>
+                  </div>
+                  {shown.length === 0 && (
+                    <p className="co-empty">
+                      {data.conversations.length
+                        ? t("Sin conversaciones para estos filtros.")
+                        : t(
+                            "No conversations yet. Las conversaciones aparecerán aquí al recibir mensajes en los números conectados.",
+                          )}
+                    </p>
                   )}
-                </span>
-                <h2>
-                  {view === "production"
-                    ? "La cocina está al día"
-                    : view === "delivery"
-                      ? "Las próximas entregas, aquí"
-                      : "Todo listo para el primer pedido"}
-                </h2>
-                <p className="co-empty">
-                  {view === "production"
-                    ? "No production items yet. Los pedidos confirmados aparecerán aquí al pasar a producción."
-                    : "No orders yet. Los pedidos aparecerán aquí cuando el equipo los registre."}
-                </p>
+                  {shown.map((item) => (
+                    <button
+                      className={
+                        "co-conversation " +
+                        (item.id === selected ? "selected" : "")
+                      }
+                      key={item.id}
+                      onClick={() => {
+                        setSelected(item.id);
+                        if (item.unread)
+                          void run({
+                            type: "read",
+                            id: item.id,
+                            version: item.version,
+                          });
+                      }}
+                    >
+                      <span className="co-row">
+                        <b>{item.customer}</b>
+                        <span className="co-source">
+                          {item.sourceNumberId.toUpperCase()}
+                        </span>
+                      </span>
+                      <span>
+                        {item.messages.at(-1)?.text ||
+                          t("Ubicación compartida")}
+                      </span>
+                      <small>
+                        {item.assignedAgent ?? t("Sin asignar")} ·{" "}
+                        {item.unread ? t("● No leída") : t("Leída")} ·{" "}
+                        {t(
+                          data.orders.find(
+                            (o) =>
+                              o.conversationId === item.id &&
+                              !["Delivered", "Cancelled"].includes(o.state),
+                          )?.state ?? item.status,
+                        )}
+                      </small>
+                    </button>
+                  ))}
+                </aside>
+                {c ? (
+                  <>
+                    <ConversationPanel key={c.id} c={c} data={data} run={run} />
+                    <aside
+                      aria-label={t("Pedido y cliente")}
+                      className="co-order-side"
+                    >
+                      <div className="co-section">
+                        <p className="eyebrow">{t("PEDIDOS VINCULADOS")}</p>
+                        <h2>{t("Pedido y entrega")}</h2>
+                        <p>
+                          {c.customer} · {c.phone}
+                        </p>
+                        <button
+                          className="primary"
+                          disabled={
+                            !c.assignedAgent ||
+                            c.assignedAgent !== data.actor.id ||
+                            orders.some(
+                              (o) =>
+                                !["Delivered", "Cancelled"].includes(o.state),
+                            )
+                          }
+                          onClick={() =>
+                            void run({
+                              type: "createOrder",
+                              id: c.id,
+                              version: c.version,
+                            })
+                          }
+                        >
+                          {t("Crear pedido")}
+                        </button>
+                      </div>
+                      {orders.length === 0 ? (
+                        <p className="co-empty">
+                          {t("Toma la conversación y crea el primer pedido.")}
+                        </p>
+                      ) : (
+                        orders.map((o) => (
+                          <OrderPanel
+                            key={o.id}
+                            order={o}
+                            data={data}
+                            run={run}
+                          />
+                        ))
+                      )}
+                      <div className="ops-copilot-slot">
+                        <AgentPanel key={c.id} c={c} data={data} run={run} />
+                      </div>
+                      <div className="co-section">
+                        <h3>{t("Actividad de conversación")}</h3>
+                        <ul className="co-audit">
+                          {c.audit.map((a, i) => (
+                            <li key={i}>
+                              {a.action}
+                              <small>
+                                {a.actor} · {formatDate(a.at)}
+                              </small>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </aside>
+                  </>
+                ) : (
+                  <div className="ops-inbox-welcome">
+                    <span className="ops-empty-icon">
+                      <ChatsCircle size={32} aria-hidden="true" />
+                    </span>
+                    <p className="ops-kicker">{t("TU ESPACIO DE ATENCIÓN")}</p>
+                    <h2>{t("Cada conversación, bien atendida.")}</h2>
+                    <p>
+                      {t(
+                        "Selecciona una conversación para gestionar mensajes, pedidos y asistencia de AI Copilot en un solo lugar.",
+                      )}
+                    </p>
+                    <div className="ops-welcome-foot">
+                      {t("Conversación · Pedido · Seguimiento")}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : view === "orders" && !focusOrder ? (
+              <OrdersBoard
+                data={data}
+                run={run}
+                details={(o) => <OrderPanel order={o} data={data} run={run} />}
+                openConversation={(id) => {
+                  setSelected(id);
+                  setView("inbox");
+                  history.pushState({}, "", "/operations/inbox");
+                }}
+              />
+            ) : (
+              <div className="co-board">
+                {focusOrder && (
+                  <div className="ops-order-filters">
+                    <button
+                      className="co-link"
+                      onClick={() => {
+                        setFocusOrder("");
+                        history.replaceState({}, "", "/operations/orders");
+                      }}
+                    >
+                      {t("← Ver todos los pedidos")}
+                    </button>
+                  </div>
+                )}
+                {boardOrders(data, view, focusOrder).length > 0 && (
+                  <ul className="ops-order-list" aria-label={t("Pedidos")}>
+                    {boardOrders(data, view, focusOrder).map((o) => (
+                      <li key={o.id}>
+                        <OrderCard
+                          order={o}
+                          data={data}
+                          run={run}
+                          today={dubaiDate()}
+                          details={(o) => (
+                            <OrderPanel order={o} data={data} run={run} />
+                          )}
+                          openConversation={(id) => {
+                            setSelected(id);
+                            setView("inbox");
+                            history.pushState({}, "", "/operations/inbox");
+                          }}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {boardOrders(data, view, focusOrder).length === 0 && (
+                  <div className="ops-board-empty">
+                    <span className="ops-empty-icon">
+                      {view === "production" ? (
+                        <Oven size={30} />
+                      ) : view === "delivery" ? (
+                        <Truck size={30} />
+                      ) : (
+                        <Receipt size={30} />
+                      )}
+                    </span>
+                    <h2>
+                      {view === "production"
+                        ? t("La cocina está al día")
+                        : view === "delivery"
+                          ? t("Las próximas entregas, aquí")
+                          : t("Todo listo para el primer pedido")}
+                    </h2>
+                    <p className="co-empty">
+                      {view === "production"
+                        ? t(
+                            "No production items yet. Los pedidos confirmados aparecerán aquí al pasar a producción.",
+                          )
+                        : t(
+                            "No orders yet. Los pedidos aparecerán aquí cuando el equipo los registre.",
+                          )}
+                    </p>
+                  </div>
+                )}
               </div>
             )}
-          </div>
+          </>
         )}
       </fieldset>
     </OperationsShell>
@@ -413,6 +472,7 @@ function ConversationPanel({
   data: Data;
   run: Run;
 }) {
+  const { t, formatDate } = useOps();
   const [draft, setDraft] = useState(""),
     [translation, setTranslation] = useState(true);
   const owned = c.assignedAgent === data.actor.id;
@@ -436,12 +496,12 @@ function ConversationPanel({
             })
           }
         >
-          {owned ? "Liberar conversación" : "Tomar conversación"}
+          {owned ? t("Liberar conversación") : t("Tomar conversación")}
         </button>
       </header>
       <div className="co-two co-chat-tools">
         <label>
-          Asignar agente
+          {t("Asignar agente")}
           <select
             value={c.assignedAgent ?? ""}
             onChange={(e) =>
@@ -453,7 +513,7 @@ function ConversationPanel({
               })
             }
           >
-            <option value="">Sin asignar</option>
+            <option value="">{t("Sin asignar")}</option>
             {data.agents.map((a) => (
               <option key={a.id} value={a.id}>
                 {a.name}
@@ -462,7 +522,7 @@ function ConversationPanel({
           </select>
         </label>
         <label>
-          Conversación
+          {t("Conversación")}
           <select
             disabled={!owned}
             value={c.status}
@@ -475,8 +535,8 @@ function ConversationPanel({
               })
             }
           >
-            <option value="open">Abierta</option>
-            <option value="closed">Cerrada</option>
+            <option value="open">{t("Abierta")}</option>
+            <option value="closed">{t("Cerrada")}</option>
           </select>
         </label>
       </div>
@@ -485,27 +545,23 @@ function ConversationPanel({
           className="co-link"
           onClick={() => setTranslation(!translation)}
         >
-          {translation ? "Ocultar traducción" : "Ver traducción"}
+          {translation ? t("Ocultar traducción") : t("Ver traducción")}
         </button>
         {c.messages.map((m) => (
           <div key={m.id} className={"co-message " + m.direction}>
             <p>{m.text}</p>
             {m.location && (
               <p>
-                GPS · {m.location.lat}, {m.location.lng}
+                {t("GPS ·")} {m.location.lat}, {m.location.lng}
               </p>
             )}
             {translation && m.translation && (
               <p className="co-translation">
-                Internal English · {m.translation}
+                {t("Internal English ·")} {m.translation}
               </p>
             )}
             <small>
-              {new Date(m.at).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}{" "}
-              · {m.status}{" "}
+              {formatDate(m.at)} · {t(m.status)}{" "}
               {m.direction === "out" && `· ${c.sourceNumberId.toUpperCase()}`}
             </small>
           </div>
@@ -514,18 +570,18 @@ function ConversationPanel({
       <div className="co-chat-bottom">
         <div className="co-compose">
           <label className="sr-only" htmlFor="co-draft">
-            Mensaje
+            {t("Mensaje")}
           </label>
           <textarea
             id="co-draft"
             value={draft}
             disabled={!owned || c.status === "closed"}
             onChange={(e) => setDraft(e.target.value)}
-            placeholder={
+            placeholder={t(
               owned
                 ? "Escribe tu respuesta…"
-                : "Toma la conversación para responder"
-            }
+                : "Toma la conversación para responder",
+            )}
           />
           <button
             className="primary"
@@ -541,12 +597,12 @@ function ConversationPanel({
               });
             }}
           >
-            Enviar
+            {t("Enviar")}
           </button>
         </div>
         <p className="co-muted">
-          Las respuestas salen desde {c.sourceNumberId.toUpperCase()}.
-          Traducciones solo para uso interno.
+          {t("Las respuestas salen desde")} {c.sourceNumberId.toUpperCase()}{" "}
+          {t(". Traducciones solo para uso interno.")}
         </p>
 
         {data.jobs
@@ -557,12 +613,16 @@ function ConversationPanel({
           )
           .map((j) => (
             <p className="co-error" key={j.id}>
-              {j.lastError}
+              {t("Operation needs review")}{" "}
+              <details>
+                <summary>{t("Technical details")}</summary>
+                {j.lastError}
+              </details>
               {j.status === "failed" && (
                 <button
                   onClick={() => void run({ type: "retryJob", id: j.id })}
                 >
-                  Reintentar envío
+                  {t("Reintentar envío")}
                 </button>
               )}
             </p>
@@ -580,6 +640,7 @@ function OrderPanel({
   data: Data;
   run: Run;
 }) {
+  const { t, formatDate } = useOps();
   const [address, setAddress] = useState(""),
     [product, setProduct] = useState(data.catalog[0]?.id ?? ""),
     [quantity, setQuantity] = useState(1),
@@ -602,11 +663,14 @@ function OrderPanel({
       <div className="co-row">
         <h3>{orderReference(o)}</h3>
         <span className="co-state">
-          {o.fulfillmentMethod === "pickup" ? "PICKUP" : "DELIVERY"} · {o.state}
+          {o.fulfillmentMethod === "pickup" ? t("PICKUP") : t("DELIVERY")} ·{" "}
+          {t(o.state)}
         </span>
       </div>
       {o.publicOrderNumber && (
-        <p className="co-internal-ref">Referencia interna: {o.id}</p>
+        <p className="co-internal-ref">
+          {t("Referencia interna:")} {o.id}
+        </p>
       )}
       <OrderNotifications order={o} data={data} />
       {p?.provider === "paymennt" &&
@@ -614,7 +678,7 @@ function OrderPanel({
           <button
             onClick={() => void run({ paymentId: p.id }, "payments/reconcile")}
           >
-            Check Status · conciliar pago
+            {t("Check Status · conciliar pago")}
           </button>
         )}
       <fieldset className="co-fieldset" disabled={!owned}>
@@ -628,15 +692,17 @@ function OrderPanel({
                 )?.name ?? l.productId}
               </span>
               <span>
-                {money(
-                  ((o.catalogSnapshot ?? data.catalog).find(
-                    (p) => p.id === l.productId,
-                  )?.priceFils ?? 0) * l.quantity,
+                {t(
+                  money(
+                    ((o.catalogSnapshot ?? data.catalog).find(
+                      (p) => p.id === l.productId,
+                    )?.priceFils ?? 0) * l.quantity,
+                  ),
                 )}
               </span>
               {editable && (
                 <button
-                  aria-label={"Quitar " + l.productId}
+                  aria-label={t("Remove item") + " " + l.productId}
                   onClick={() =>
                     void run({
                       type: "editOrder",
@@ -656,20 +722,20 @@ function OrderPanel({
           <>
             <div className="co-two">
               <label>
-                Producto
+                {t("Producto")}
                 <select
                   value={product}
                   onChange={(e) => setProduct(e.target.value)}
                 >
                   {data.catalog.map((p) => (
                     <option value={p.id} key={p.id}>
-                      {p.name} · {money(p.priceFils)}
+                      {p.name} · {t(money(p.priceFils))}
                     </option>
                   ))}
                 </select>
               </label>
               <label>
-                Cantidad
+                {t("Cantidad")}
                 <input
                   type="number"
                   min="1"
@@ -681,8 +747,9 @@ function OrderPanel({
             </div>
             {!data.catalog.length && (
               <p className="co-empty">
-                Catálogo pendiente de aprobación. Los productos estarán
-                disponibles cuando se configure el catálogo oficial.
+                {t(
+                  "Catálogo pendiente de aprobación. Los productos estarán disponibles cuando se configure el catálogo oficial.",
+                )}
               </p>
             )}
             <button
@@ -697,16 +764,16 @@ function OrderPanel({
                 });
               }}
             >
-              Guardar producto
+              {t("Guardar producto")}
             </button>
             {o.fulfillmentMethod !== "pickup" && (
               <>
                 <label>
-                  Dirección / zona manual
+                  {t("Dirección / zona manual")}
                   <input
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Zona, edificio y apartamento"
+                    placeholder={t("Zona, edificio y apartamento")}
                   />
                 </label>
                 <button
@@ -720,21 +787,22 @@ function OrderPanel({
                     })
                   }
                 >
-                  Resolver dirección
+                  {t("Resolver dirección")}
                 </button>
                 <details>
-                  <summary>Revisar y seleccionar zona</summary>
+                  <summary>{t("Revisar y seleccionar zona")}</summary>
                   <p>
-                    Confirma la ubicación con el cliente. La selección queda
-                    registrada.
+                    {t(
+                      "Confirma la ubicación con el cliente. La selección queda registrada.",
+                    )}
                   </p>
                   <label>
-                    Zona confirmada
+                    {t("Zona confirmada")}
                     <select
                       value={manualZone}
                       onChange={(e) => setManualZone(e.target.value)}
                     >
-                      <option value="">Seleccionar zona</option>
+                      <option value="">{t("Seleccionar zona")}</option>
                       {data.zones
                         .filter((z) => z.active)
                         .map((z) => (
@@ -745,7 +813,7 @@ function OrderPanel({
                     </select>
                   </label>
                   <label>
-                    Motivo de la selección
+                    {t("Motivo de la selección")}
                     <input
                       value={manualReason}
                       onChange={(e) => setManualReason(e.target.value)}
@@ -763,7 +831,7 @@ function OrderPanel({
                       })
                     }
                   >
-                    Confirmar zona manual
+                    {t("Confirmar zona manual")}
                   </button>
                 </details>
               </>
@@ -773,37 +841,41 @@ function OrderPanel({
         <div className={"co-quote " + (o.quote?.eligible ? "eligible" : "")}>
           <b>
             {o.fulfillmentMethod === "pickup"
-              ? "Pickup · Pastelerías 3L"
-              : (o.quote?.zoneName ?? "Ubicación pendiente")}
+              ? t("Pickup · Pastelerías 3L")
+              : (o.quote?.zoneName ?? t("Ubicación pendiente"))}
           </b>
           <p>
             {o.fulfillmentMethod === "pickup"
-              ? `${o.pickup?.pickupDate} · ${o.pickup?.preferredTime}`
+              ? `${o.pickup?.pickupDate ? formatDate(o.pickup.pickupDate, false) : t("Sin fecha")} · ${o.pickup?.preferredTime}`
               : o.location
                 ? `GPS ${o.location.lat}, ${o.location.lng}`
                 : (o.address ??
-                  "Espera la ubicación del cliente o ingresa su dirección.")}
+                  t("Espera la ubicación del cliente o ingresa su dirección."))}
           </p>
           <dl>
             <dt>
               {o.fulfillmentMethod === "pickup"
-                ? "Mínimo de zona"
-                : "Mínimo de compra"}
+                ? t("Mínimo de zona")
+                : t("Mínimo de compra")}
             </dt>
             <dd>
-              {money(
-                o.quote?.minOrderAed == null ? null : o.quote.minOrderAed * 100,
+              {t(
+                money(
+                  o.quote?.minOrderAed == null
+                    ? null
+                    : o.quote.minOrderAed * 100,
+                ),
               )}
             </dd>
-            <dt>Productos</dt>
-            <dd>{money(o.quote?.subtotalFils)}</dd>
-            <dt>Total</dt>
-            <dd>{money(o.quote?.totalFils)}</dd>
+            <dt>{t("Productos")}</dt>
+            <dd>{t(money(o.quote?.subtotalFils))}</dd>
+            <dt>{t("Total")}</dt>
+            <dd>{t(money(o.quote?.totalFils))}</dd>
           </dl>
           <strong>
             {editable
-              ? (o.quote?.reason ?? "Agrega productos y ubicación")
-              : "Regla aplicada al pedido"}
+              ? (o.quote?.reason ?? t("Agrega productos y ubicación"))
+              : t("Regla aplicada al pedido")}
           </strong>
         </div>
         {editable && (
@@ -814,24 +886,28 @@ function OrderPanel({
               void run({ type: "requestPayment", id: o.id, version: o.version })
             }
           >
-            Request Payment
+            {t("Request Payment")}
           </button>
         )}
         {!p && (
           <p className="co-empty">
-            No payments yet. El estado aparecerá aquí al solicitar el pago del
-            pedido.
+            {t(
+              "No payments yet. El estado aparecerá aquí al solicitar el pago del pedido.",
+            )}
           </p>
         )}
         {p && (
           <div className="co-payment">
-            <h4>Pago · {p.status}</h4>
+            <h4>
+              {t("Pago ·")} {t(p.status)}
+            </h4>
             <p>
-              {money(p.amountFils)} · {p.currency}
+              {t(money(p.amountFils))} · {p.currency}
             </p>
             {p.url && (
               <p className="co-payment-url">
-                Enlace generado y encolado por {c.sourceNumberId.toUpperCase()}.
+                {t("Enlace generado y encolado por")}{" "}
+                {c.sourceNumberId.toUpperCase()}.
                 <br />
                 <code>{p.url}</code>
               </p>
@@ -847,17 +923,17 @@ function OrderPanel({
                     })
                   }
                 >
-                  Reenviar enlace
+                  {t("Reenviar enlace")}
                 </button>
               </>
             )}
             {p.provider === "paymennt" && (
               <>
                 <p>
-                  Última conciliación:{" "}
+                  {t("Última conciliación:")}{" "}
                   {p.lastReconciledAt
-                    ? new Date(p.lastReconciledAt).toLocaleString()
-                    : "Pendiente"}
+                    ? formatDate(p.lastReconciledAt)
+                    : t("Pendiente")}
                 </p>
               </>
             )}
@@ -866,18 +942,26 @@ function OrderPanel({
                 <li key={i}>
                   {a.action}
                   <small>
-                    {a.actor} · {new Date(a.at).toLocaleString()}
+                    {a.actor} · {formatDate(a.at)}
                   </small>
                 </li>
               ))}
             </ul>
-            {p.transactionId && <small>Transacción: {p.transactionId}</small>}
+            {p.transactionId && (
+              <small>
+                {t("Transacción:")} {p.transactionId}
+              </small>
+            )}
             {data.jobs
               .filter((j) => j.entityId === p.id && j.status === "unknown")
               .map((j) => (
                 <p key={j.id} className="co-error">
-                  {j.lastError}. Usa Check Status para buscar el checkout
-                  existente.
+                  {t("Operation needs review")}{" "}
+                  <details>
+                    <summary>{t("Technical details")}</summary>
+                    {j.lastError}
+                  </details>{" "}
+                  {t(". Usa Check Status para buscar el checkout existente.")}
                 </p>
               ))}
             {data.jobs
@@ -887,7 +971,7 @@ function OrderPanel({
                   key={j.id}
                   onClick={() => void run({ type: "retryJob", id: j.id })}
                 >
-                  Reintentar creación del enlace
+                  {t("Reintentar creación del enlace")}
                 </button>
               ))}
           </div>
@@ -904,7 +988,7 @@ function OrderPanel({
               })
             }
           >
-            Avanzar a {next[o.state]}
+            {t("Avanzar a")} {t(next[o.state] ?? "")}
           </button>
         )}
         {editable && (
@@ -919,18 +1003,20 @@ function OrderPanel({
               })
             }
           >
-            Cancelar pedido
+            {t("Cancelar pedido")}
           </button>
         )}
       </fieldset>
       <details className="co-history">
-        <summary>Historial del pedido · {o.audit.length} eventos</summary>
+        <summary>
+          {t("Historial del pedido ·")} {o.audit.length} {t("eventos")}
+        </summary>
         <ol className="co-audit">
           {o.audit.map((a, i) => (
             <li key={i}>
               {a.action}
               <small>
-                {a.actor} · {new Date(a.at).toLocaleString()}
+                {a.actor} · {formatDate(a.at)}
               </small>
             </li>
           ))}
@@ -938,26 +1024,27 @@ function OrderPanel({
       </details>
       {!owned && (
         <p className="co-muted">
-          Toma o reabre la conversación para gestionar este pedido.
+          {t("Toma o reabre la conversación para gestionar este pedido.")}
         </p>
       )}
     </section>
   );
 }
 function Zones({ data, run }: { data: Data; run: Run }) {
+  const { t } = useOps();
   const [search, setSearch] = useState(""),
     [id, setId] = useState("jvc");
-  const zone = data.zones.find((z) => z.id === id)!;
+  const zone = data.zones.find((z) => z.id === id) ?? data.zones[0];
   return (
     <section className="co-zones">
       <aside>
-        <h2>Zonas de entrega</h2>
+        <h2>{t("Zonas de entrega")}</h2>
         <p>
-          Tabla aprobada · {data.zones.length} reglas de mínimo. Sin cargos de
-          entrega.
+          {t("Tabla aprobada ·")} {data.zones.length}{" "}
+          {t("reglas de mínimo. Sin cargos de entrega.")}
         </p>
         <label>
-          Buscar zona
+          {t("Buscar zona")}
           <input value={search} onChange={(e) => setSearch(e.target.value)} />
         </label>
         <div className="co-zone-list">
@@ -976,22 +1063,27 @@ function Zones({ data, run }: { data: Data; run: Run }) {
                 <span>{z.name}</span>
                 <b>
                   {z.minOrderAed === null
-                    ? "Revisar mínimo"
-                    : money(z.minOrderAed * 100)}
+                    ? t("Revisar mínimo")
+                    : t(money(z.minOrderAed * 100))}
                 </b>
                 <small>
-                  Sin cargo adicional · {z.active ? "Activa" : "Inactiva"}
+                  {t("Sin cargo adicional ·")}{" "}
+                  {z.active ? t("Activa") : t("Inactiva")}
                 </small>
               </button>
             ))}
         </div>
       </aside>
-      <ZoneEditor
-        key={`${zone.id}-${zone.version}`}
-        zone={zone}
-        disabled={data.actor.role !== "admin"}
-        run={run}
-      />
+      {zone ? (
+        <ZoneEditor
+          key={`${zone.id}-${zone.version}`}
+          zone={zone}
+          disabled={data.actor.role !== "admin"}
+          run={run}
+        />
+      ) : (
+        <p className="co-empty">{t("No delivery areas configured")}</p>
+      )}
     </section>
   );
 }
@@ -1004,6 +1096,7 @@ function ZoneEditor({
   disabled: boolean;
   run: Run;
 }) {
+  const { t, errorText } = useOps();
   const [draft, setDraft] = useState(zone),
     [polygon, setPolygon] = useState(
       zone.polygon ? JSON.stringify(zone.polygon) : "",
@@ -1036,17 +1129,18 @@ function ZoneEditor({
         }
       }}
     >
-      <p className="eyebrow">REGLA CONFIGURABLE</p>
+      <p className="eyebrow">{t("REGLA CONFIGURABLE")}</p>
       <h2>{zone.name}</h2>
       {zone.minOrderAed == null && (
         <p className="ops-rule-warning">
-          Regla pendiente de revisión. Esta zona no permite solicitar el pago
-          hasta confirmar los valores comerciales.
+          {t(
+            "Regla pendiente de revisión. Esta zona no permite solicitar el pago hasta confirmar los valores comerciales.",
+          )}
         </p>
       )}
       <fieldset className="co-fieldset" disabled={disabled}>
         <label>
-          Nombre
+          {t("Nombre")}
           <input
             required
             value={draft.name}
@@ -1054,7 +1148,7 @@ function ZoneEditor({
           />
         </label>
         <label>
-          Aliases · uno por línea
+          {t("Aliases · uno por línea")}
           <textarea
             value={draft.aliases.join("\n")}
             onChange={(e) =>
@@ -1064,7 +1158,7 @@ function ZoneEditor({
         </label>
         <div className="co-two">
           <label>
-            Mínimo AED
+            {t("Mínimo AED")}
             <input
               type="number"
               min="0"
@@ -1081,8 +1175,9 @@ function ZoneEditor({
           </label>
         </div>
         <p>
-          Sin cargos de entrega. La logística está incluida en el mínimo del
-          área.
+          {t(
+            "Sin cargos de entrega. La logística está incluida en el mínimo del área.",
+          )}
         </p>
         <label className="co-check">
           <input
@@ -1090,10 +1185,10 @@ function ZoneEditor({
             checked={draft.active}
             onChange={(e) => setDraft({ ...draft, active: e.target.checked })}
           />
-          Zona activa
+          {t("Zona activa")}
         </label>
         <label>
-          Prioridad
+          {t("Prioridad")}
           <input
             type="number"
             min="0"
@@ -1105,16 +1200,16 @@ function ZoneEditor({
           />
         </label>
         <label>
-          Nota de revisión
+          {t("Nota de revisión")}
           <textarea
             value={draft.review ?? ""}
             onChange={(e) => setDraft({ ...draft, review: e.target.value })}
           />
         </label>
         <details>
-          <summary>Límites geográficos · configuración avanzada</summary>
+          <summary>{t("Límites geográficos · configuración avanzada")}</summary>
           <label>
-            Identificadores geográficos verificados · uno por línea
+            {t("Identificadores geográficos verificados · uno por línea")}
             <textarea
               value={(draft.canonicalIds ?? []).join("\n")}
               onChange={(e) =>
@@ -1129,22 +1224,22 @@ function ZoneEditor({
             />
           </label>
           <label>
-            Polígono JSON · puntos lat/lng
+            {t("Polígono JSON · puntos lat/lng")}
             <textarea
               value={polygon}
               onChange={(e) => setPolygon(e.target.value)}
-              placeholder="Polígono aprobado en formato JSON"
+              placeholder={t("Polígono aprobado en formato JSON")}
             />
           </label>
           <p>
-            La ubicación se verificará con el proveedor geográfico o con límites
-            aprobados. Sin cobertura verificada, se requiere revisión del
-            operador.
+            {t(
+              "La ubicación se verificará con el proveedor geográfico o con límites aprobados. Sin cobertura verificada, se requiere revisión del operador.",
+            )}
           </p>
         </details>
-        {error && <p role="alert">{error}</p>}
+        {error && <p role="alert">{errorText(error)}</p>}
         <button className="primary" type="submit">
-          Guardar regla
+          {t("Guardar regla")}
         </button>
       </fieldset>
     </form>
@@ -1152,11 +1247,12 @@ function ZoneEditor({
 }
 
 function Login({ onLogin }: { onLogin: () => Promise<void> }) {
+  const { t, errorText } = useOps();
   const [id, setId] = useState("liza"),
     [password, setPassword] = useState(""),
     [error, setError] = useState("");
   return (
-    <main className="commerce">
+    <main className="commerce ops-shell ops-auth">
       <form
         className="co-zone-editor"
         onSubmit={(e) => {
@@ -1170,9 +1266,9 @@ function Login({ onLogin }: { onLogin: () => Promise<void> }) {
             );
         }}
       >
-        <h1>Inicia sesión</h1>
+        <h1>{t("Inicia sesión")}</h1>
         <label>
-          Agente
+          {t("Agente")}
           <input
             value={id}
             onChange={(e) => setId(e.target.value)}
@@ -1181,7 +1277,7 @@ function Login({ onLogin }: { onLogin: () => Promise<void> }) {
           />
         </label>
         <label>
-          Contraseña
+          {t("Contraseña")}
           <input
             type="password"
             autoComplete="current-password"
@@ -1189,14 +1285,15 @@ function Login({ onLogin }: { onLogin: () => Promise<void> }) {
             onChange={(e) => setPassword(e.target.value)}
           />
         </label>
-        {error && <p role="alert">{error}</p>}
-        <button className="primary">Entrar al workspace</button>
+        {error && <p role="alert">{errorText(error)}</p>}
+        <button className="primary">{t("Entrar al workspace")}</button>
       </form>
     </main>
   );
 }
 
 function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
+  const { t, formatDate } = useOps();
   const [latitude, setLatitude] = useState(""),
     [longitude, setLongitude] = useState("");
   const labels: Record<string, string> = {
@@ -1218,11 +1315,14 @@ function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
   };
   return (
     <section className="co-zone-editor co-readiness-panel">
-      <p className="eyebrow">STAGING / TEST</p>
-      <h2>Preparación y UAT · {data.readiness?.overall ?? "NOT READY"}</h2>
+      <p className="eyebrow">{t("STAGING / TEST")}</p>
+      <h2>
+        {t("Preparación y UAT ·")} {data.readiness?.overall ?? t("NOT READY")}
+      </h2>
       <p>
-        Los estados indican lo comprobado. Una configuración presente no
-        confirma onboarding ni aceptación del cliente.
+        {t(
+          "Los estados indican lo comprobado. Una configuración presente no confirma onboarding ni aceptación del cliente.",
+        )}
       </p>
       {[
         ["Infraestructura", /^(APP_ENV|HTTPS|authentication|UAT)$/],
@@ -1242,16 +1342,16 @@ function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
               .some(([, previous]) => (previous as RegExp).test(name)),
         );
         return checks.length ? (
-          <section className="ops-readiness-group" key={String(group)}>
-            <h2>{String(group)}</h2>
+          <section className="ops-readiness-group" key={t(String(group))}>
+            <h2>{t(String(group))}</h2>
             <div className="co-readiness-grid">
               {checks.map(([name, check]) => (
                 <article className="co-quote" key={name}>
-                  <h3>{labels[name] ?? name}</h3>
-                  <strong data-status={check.status}>{check.status}</strong>
+                  <h3>{t(labels[name] ?? name)}</h3>
+                  <strong data-status={check.status}>{t(check.status)}</strong>
                   <p>{check.detail}</p>
                   {check.checkedAt && (
-                    <small>{new Date(check.checkedAt).toLocaleString()}</small>
+                    <small>{formatDate(check.checkedAt)}</small>
                   )}
                 </article>
               ))}
@@ -1266,26 +1366,26 @@ function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
               void run({ provider: "paymennt" }, "admin/diagnostics")
             }
           >
-            Comprobar Paymennt TEST
+            {t("Comprobar Paymennt TEST")}
           </button>
           <button
             onClick={() => void run({ provider: "meta" }, "admin/diagnostics")}
           >
-            Validar configuración Meta
+            {t("Validar configuración Meta")}
           </button>
           <label>
-            Latitud real
+            {t("Latitud real")}
             <input
-              aria-label="Latitud real"
+              aria-label={t("Latitud real")}
               inputMode="decimal"
               value={latitude}
               onChange={(e) => setLatitude(e.target.value)}
             />
           </label>
           <label>
-            Longitud real
+            {t("Longitud real")}
             <input
-              aria-label="Longitud real"
+              aria-label={t("Longitud real")}
               inputMode="decimal"
               value={longitude}
               onChange={(e) => setLongitude(e.target.value)}
@@ -1309,25 +1409,27 @@ function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
               )
             }
           >
-            Comprobar Mapbox
+            {t("Comprobar Mapbox")}
           </button>
         </div>
       )}
       <p>
-        Solo lectura: estas comprobaciones no crean cobros ni envían mensajes.
-        Pueden consumir una consulta del proveedor.
+        {t(
+          "Solo lectura: estas comprobaciones no crean cobros ni envían mensajes. Pueden consumir una consulta del proveedor.",
+        )}
       </p>
       <AgentKnowledgeEditor data={data} run={run} />
-      <h3>Validación con Lisa</h3>
+      <h3>{t("Validación con Lisa")}</h3>
       <p>
-        Completa las pruebas con cuentas reales siguiendo el runbook de
-        activación. Esta pantalla no acredita aceptación del cliente.
+        {t(
+          "Completa las pruebas con cuentas reales siguiendo el runbook de activación. Esta pantalla no acredita aceptación del cliente.",
+        )}
       </p>
       <ol className="co-audit">
         {data.uatScenarios?.map((s) => (
           <li key={s.id}>
             {s.title}
-            <strong> · {s.status}</strong>
+            <strong> · {t(s.status)}</strong>
             <p>{s.reason}</p>
           </li>
         ))}
@@ -1358,6 +1460,7 @@ const EMAIL_EVENT: Record<string, string> = {
  * only ever "Enviado" when a provider confirmed it; otherwise it says why not.
  */
 function OrderNotifications({ order, data }: { order: Order; data: Data }) {
+  const { t } = useOps();
   const whatsapp = (data.operationsNotifications ?? []).filter(
     (n) => n.orderId === order.id,
   );
@@ -1366,33 +1469,37 @@ function OrderNotifications({ order, data }: { order: Order; data: Data }) {
   );
   if (!whatsapp.length && !emails.length) return null;
   return (
-    <ul className="co-notifications" aria-label="Notificaciones">
+    <ul className="co-notifications" aria-label={t("Notificaciones")}>
       {whatsapp.map((n) => (
         <li key={n.id} data-status={n.status}>
-          <b>WhatsApp interno · {n.recipient.name}</b>{" "}
+          <b>
+            {t("WhatsApp interno ·")} {n.recipient.name}
+          </b>{" "}
           {n.status === "sent"
-            ? "Enviado"
+            ? t("Enviado")
             : n.status === "failed"
-              ? "Falló · revisar"
+              ? t("Falló · revisar")
               : data.operationsOutboundEnabled
-                ? "Pendiente"
-                : "Pendiente · envío de WhatsApp desactivado"}
+                ? t("Pendiente")
+                : t("Pendiente · envío de WhatsApp desactivado")}
         </li>
       ))}
       {emails.map((n) => (
         <li key={n.id} data-status={n.status}>
-          <b>Email al cliente · {EMAIL_EVENT[n.event] ?? n.event}</b>{" "}
+          <b>
+            {t("Email al cliente ·")} {t(EMAIL_EVENT[n.event] ?? n.event)}
+          </b>{" "}
           {n.status === "sent"
-            ? "Enviado"
+            ? t("Enviado")
             : n.status === "failed"
               ? n.lastError?.startsWith("Expired")
-                ? "No enviado · caducó"
-                : "Falló · revisar"
+                ? t("No enviado · caducó")
+                : t("Falló · revisar")
               : n.status === "sending"
-                ? "Enviando"
+                ? t("Enviando")
                 : data.customerEmailProvider
-                  ? "Pendiente"
-                  : "Pendiente · proveedor de email no configurado"}
+                  ? t("Pendiente")
+                  : t("Pendiente · proveedor de email no configurado")}
         </li>
       ))}
     </ul>

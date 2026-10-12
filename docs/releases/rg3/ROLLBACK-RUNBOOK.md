@@ -1,0 +1,13 @@
+# Incident and rollback runbook — preparation only
+
+Last known good deployed SHA `e2a82387549d5861e110178d6b9c8b8ae7f84f10`, deployment `bde0ce90-50d7-4a3b-a10e-2750613a398e`. Metadata indicates rollback/redeploy available; refresh availability immediately before release. No rollback was executed or promised executable without owner authorization.
+
+1. Incident operator records severity/revision/safe diagnostics. Stop further merges/deployments; halt autodeploy through an explicitly authorized environment-scoped control, inspecting staged changes. Do not introduce an unrelated staged configuration patch.
+2. For healthcheck failure, wrong SHA, auth bypass, unreconciled totals or checkout regression, notify owner and invoke the pre-authorized code rollback to the recorded artifact; retain the active `/data` volume and all legitimate newer transactions.
+3. Verify source/profile/native SQLite and persistent state compatibility. Code rollback is NOT a DB rollback. The existing schema is unchanged by the candidate, but state additions/queued jobs and external secret-file custody still require review.
+4. Health/ready/static/auth/routes must pass after rollback. Privately reconcile natural events since baseline; compare accepted quote/payment fingerprints and receipt timestamps without resetting them.
+5. **Rolling back Checkout Safety reintroduces the pre-#9 live-catalog worker hazard.** The current rollback anchor lacks #9; do not treat it as financially equivalent. Pause unreviewed dynamic catalog edits/imports immediately. If accepted checkout creation/totals are unsafe, owner must explicitly approve a narrowly scoped checkout/worker pause; existing reconciliation and legitimate receipts need separate consideration. Do not improvise provider credential rotation, webhook deletion, cutoff reset or full database replacement.
+6. Prefer a reviewed forward route-only repair once #9 is live rather than unnecessarily removing its financial protection. A safety-preserving rollback artifact must be validated before the release; otherwise this fallback risk remains an owner decision.
+7. Data restoration requires a separate approved incident plan, a fresh private consistent backup of active state, reconstruction/reconciliation of all newer legitimate transactions, identity/receipt preservation and an audited targeted procedure. Never blindly restore an old whole SQLite over newer orders/payments.
+
+Configuration pause, code rollback and data recovery are independently authorized operations. No cutoffs, secrets, prices, catalog, provider registrations or live data are changed under this document. Services with a volume can experience downtime during a code release/rollback; communicate a staffed recovery window.

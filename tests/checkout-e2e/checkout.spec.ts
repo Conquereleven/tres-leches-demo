@@ -11,15 +11,20 @@ test("cart → delivery → details → review → payment step", async ({
 }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  // The payment frame is served by the provider; it is stubbed so the test
-  // never reaches the network and no card data is ever entered.
-  await context.route("https://pay.test.paymennt.com/**", (r) =>
-    r.fulfill({ body: "", contentType: "application/javascript" }),
-  );
+  // Hosted checkout is intercepted below; no provider request or card entry.
 
   // Preserve the original financial regression using its explicitly retired fixture.
   // Current menu selectors and new SKUs are exercised in menu-e2e separately.
+  // Seed cart only after homepage hydration/config has completed. Navigating
+  // away immediately after `load` can destroy WebKit's document before its
+  // React effect starts fetch(), producing an access-control page error.
+  const homepageConfig = page.waitForResponse(
+    (response) => response.url() === ORIGIN + "/api/checkout/config",
+  );
   await page.goto("/");
+  const configResponse = await homepageConfig;
+  expect(configResponse.status()).toBe(200);
+  expect(await configResponse.finished()).toBeNull();
   await page.evaluate(() =>
     localStorage.setItem(
       "3l-cart",
@@ -112,9 +117,29 @@ test("cart → delivery → details → review → payment step", async ({
       body: "<h1>Mock Paymennt TEST checkout</h1>",
     }),
   );
+  const submitted = page.waitForRequest(
+    (r) => r.url().endsWith("/api/checkout/web") && r.method() === "POST",
+  );
   await page.getByRole("button", { name: "PAY AED 50", exact: true }).click();
+  expect((await submitted).headers()["x-checkout-quote-revision"]).toMatch(
+    /^[a-f0-9]{64}$/,
+  );
+  // URL polling can pass at navigation commit, before WebKit has finished
+  // replacing the 3L document. Returning immediately races that navigation
+  // and its same-origin config fetch. Complete the simulated hosted visit
+  // before starting the independent return navigation, as a customer would.
+  await page.waitForURL(/^https:\/\/pay.test.paymennt.com\/checkout\//, {
+    waitUntil: "load",
+  });
   await expect(page).toHaveURL(/^https:\/\/pay.test.paymennt.com\/checkout\//);
+  await expect(
+    page.getByRole("heading", { name: "Mock Paymennt TEST checkout" }),
+  ).toBeVisible();
+  const reconciled = page.waitForResponse(
+    (response) => response.url() === ORIGIN + "/api/checkout/reconcile",
+  );
   await page.goto(ORIGIN + "/checkout/return?status=paid");
+  expect((await reconciled).status()).toBe(200);
   await expect(page.getByRole("heading", { name: "Thank you" })).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "Complete your payment" }),

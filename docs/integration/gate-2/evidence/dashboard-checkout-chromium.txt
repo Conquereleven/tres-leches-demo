@@ -1,0 +1,28 @@
+[WebServer] (node:27763) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 19 tests using 1 worker
+
+(node:27764) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › tests/checkout-e2e/checkout.spec.ts:8:1 › cart → delivery → details → review → payment step (7.2s)
+  ✓   2 [chromium] › tests/checkout-e2e/checkout.spec.ts:131:1 › confirmation comes from the server, never from the URL (240ms)
+  ✓   3 [chromium] › tests/checkout-e2e/checkout.spec.ts:183:1 › a paid checkout in this session cannot be paid again (1.9s)
+  ✓   4 [chromium] › tests/checkout-e2e/delivery-pickup.spec.ts:7:3 › delivery and pickup 390px: all zones, minima, separate billing and accurate totals (1.5s)
+  ✓   5 [chromium] › tests/checkout-e2e/delivery-pickup.spec.ts:7:3 › delivery and pickup 1440px: all zones, minima, separate billing and accurate totals (1.8s)
+  ✓   6 [chromium] › tests/checkout-e2e/stale-checkout.spec.ts:7:3 › 150 → 375: returning shopper gets a fresh checkout (5.5s)
+  ✓   7 [chromium] › tests/checkout-e2e/stale-checkout.spec.ts:7:3 › 36 → 108: returning shopper gets a fresh checkout (5.4s)
+  ✓   8 [chromium] › tests/checkout-e2e/ux-states.spec.ts:30:3 › customer payment states › paid confirmation only from an authoritative PAID + Confirmed record (399ms)
+  ✓   9 [chromium] › tests/checkout-e2e/ux-states.spec.ts:59:3 › customer payment states › paid payment on an order not yet confirmed is still processing (261ms)
+  ✓  10 [chromium] › tests/checkout-e2e/ux-states.spec.ts:72:3 › customer payment states › held for review never invites a second payment (262ms)
+  ✓  11 [chromium] › tests/checkout-e2e/ux-states.spec.ts:88:5 › customer payment states › confirmed declined payment (267ms)
+  ✓  12 [chromium] › tests/checkout-e2e/ux-states.spec.ts:88:5 › customer payment states › confirmed failed payment (304ms)
+  ✓  13 [chromium] › tests/checkout-e2e/ux-states.spec.ts:100:3 › customer payment states › 3-D Secure step keeps the customer on the bank's page (275ms)
+  ✓  14 [chromium] › tests/checkout-e2e/ux-states.spec.ts:166:3 › payment step › ready, then processing locks the pay button (4.0s)
+  ✓  15 [chromium] › tests/checkout-e2e/ux-states.spec.ts:183:3 › payment step › an unverifiable result is held and the pay button disappears (4.0s)
+  ✓  16 [chromium] › tests/checkout-e2e/ux-states.spec.ts:201:3 › payment step › a rejected checkout creation shows a recoverable failure (4.0s)
+  ✓  17 [chromium] › tests/checkout-e2e/ux-states.spec.ts:224:5 › operations orders board › paid queue at 390px (425ms)
+  ✓  18 [chromium] › tests/checkout-e2e/ux-states.spec.ts:224:5 › operations orders board › paid queue at 768px (438ms)
+  ✓  19 [chromium] › tests/checkout-e2e/ux-states.spec.ts:224:5 › operations orders board › paid queue at 1440px (441ms)
+
+  19 passed (39.7s)

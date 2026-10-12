@@ -1,3 +1,4 @@
+import { catalogReadEnabled, serveCatalogRead } from "./catalog/read-api";
 import { parseExternalAckSince } from "./domain/external-ack";
 import { byteRange } from "./static-range";
 import { mcpRead } from "./domain/mcp";
@@ -362,6 +363,16 @@ export async function startServer(
             429,
             "Demasiadas solicitudes; espera un minuto",
           );
+        if (
+          serveCatalogRead(
+            req,
+            res,
+            url,
+            () => store.read(),
+            catalogReadEnabled(process.env),
+          )
+        )
+          return;
         if (path.startsWith("/api/checkout")) {
           const enabled =
             ((runtime.environment === "staging" &&
@@ -563,7 +574,19 @@ export async function startServer(
             return json(
               res,
               200,
-              await createWebCheckout(service, body, key, "web", origin),
+              await createWebCheckout(
+                service,
+                body,
+                key,
+                "web",
+                origin,
+                req.headers["x-checkout-quote-revision"] === undefined
+                  ? undefined
+                  : z
+                      .string()
+                      .regex(/^[a-f0-9]{64}$/)
+                      .parse(req.headers["x-checkout-quote-revision"]),
+              ),
             );
           }
           if (path === "/api/checkout") {
@@ -972,6 +995,10 @@ export async function startServer(
           "/cart",
           "/checkout",
           "/checkout/return",
+          "/operations/overview",
+          "/operations/products",
+          "/operations/print",
+          "/operations/settings",
           "/operations/inbox",
           "/operations/orders",
           "/operations/production",
