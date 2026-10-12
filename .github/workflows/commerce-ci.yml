@@ -1,7 +1,7 @@
 name: Commerce validation
 on:
   pull_request:
-    branches: [main]
+    branches: [main, integration/3l-rg3-release-candidate]
   push:
     branches: [main]
 permissions:

@@ -42,6 +42,10 @@ for (const width of [390, 768, 1440])
     test(`${language} ${width}: workspace, RBAC and preview`, async ({
       page,
     }, info) => {
+      // Nine full pages, axe scans and desktop evidence screenshots share one
+      // test budget. Keep per-assertion timeouts unchanged; Linux CI exceeded
+      // the default 30s cumulative budget at the final routes/reload.
+      test.setTimeout(90_000);
       const data = snapshot();
       const errors: string[] = [];
       page.on("pageerror", (e) => errors.push(e.message));
