@@ -1083,7 +1083,10 @@ export async function startServer(
           "/operations/delivery",
           "/operations/zones",
           ...(staging ? ["/operations/readiness"] : []),
-        ].includes(path)
+        ].includes(path) &&
+        // One order page per internal id. Only the app shell is served here:
+        // order data still comes from the authenticated workspace API.
+        !/^\/operations\/orders\/[A-Za-z0-9_-]{1,100}$/.test(path)
       )
         throw new DomainError(404, "Ruta no encontrada");
       const file =

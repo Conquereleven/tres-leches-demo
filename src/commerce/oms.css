@@ -1,0 +1,883 @@
+/*
+ * TL-OMS-01: order management. Scoped to the Operations shell; the customer
+ * site is untouched. Colours are the approved set only: blush-light #F6DFE0,
+ * blush #FFC0C8, gold #A28D5B, white and ink. State is never colour alone:
+ * every badge carries an icon and a label.
+ */
+.commerce.ops-shell {
+  --oms-blush-light: #f6dfe0;
+  --oms-blush: #ffc0c8;
+  --oms-gold: #a28d5b;
+  --oms-white: #ffffff;
+  --oms-ink: #27242d;
+  --oms-muted: #5a565f;
+  --oms-line: #e6e2df;
+}
+/* Gold cannot carry white text at AA: primary actions are ink on gold. */
+.commerce.ops-shell button.primary {
+  font-weight: 600;
+}
+.commerce.ops-shell button.primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+.commerce.ops-shell .oms {
+  container-type: inline-size;
+  display: grid;
+  gap: 20px;
+  color: var(--oms-ink);
+}
+.commerce.ops-shell .oms :where(h2, h3, p, dl, dd, ul, ol) {
+  margin: 0;
+}
+.commerce.ops-shell .oms :where(ul, ol) {
+  padding: 0;
+  list-style: none;
+}
+.commerce.ops-shell .oms :where(th, td) {
+  background: none;
+  color: inherit;
+}
+.commerce.ops-shell .oms svg {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+.commerce.ops-shell .oms-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.commerce.ops-shell .oms-muted {
+  color: var(--oms-muted);
+  font-weight: 400;
+}
+.commerce.ops-shell .oms-ref {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: var(--oms-muted);
+  overflow-wrap: anywhere;
+}
+.commerce.ops-shell .oms-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.commerce.ops-shell .oms-card {
+  background: var(--oms-white);
+  border: 1px solid var(--oms-line);
+  border-radius: 12px;
+  padding: 20px;
+  min-width: 0;
+}
+.commerce.ops-shell .oms-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.commerce.ops-shell .oms-card-head h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.commerce.ops-shell .oms-card-head h3 svg {
+  color: var(--oms-gold);
+}
+
+/* Buttons */
+.commerce.ops-shell .oms .oms-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--oms-line);
+  border-radius: 8px;
+  background: var(--oms-white);
+  color: var(--oms-ink);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.commerce.ops-shell .oms .oms-button:hover:not(:disabled) {
+  background: var(--oms-blush-light);
+  border-color: var(--oms-gold);
+}
+.commerce.ops-shell .oms .oms-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.commerce.ops-shell .oms .oms-primary-action {
+  background: var(--oms-gold);
+  border-color: var(--oms-gold);
+  color: var(--oms-ink);
+}
+.commerce.ops-shell .oms .oms-primary-action:hover:not(:disabled) {
+  background: var(--oms-gold);
+  filter: brightness(1.08);
+}
+.commerce.ops-shell .oms .oms-link,
+.commerce.ops-shell .oms .oms-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--oms-ink);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--oms-gold);
+  text-underline-offset: 3px;
+  cursor: pointer;
+  justify-self: start;
+}
+.commerce.ops-shell .oms .oms-link:hover:not(:disabled),
+.commerce.ops-shell .oms .oms-back:hover:not(:disabled) {
+  background: none;
+  text-decoration-thickness: 2px;
+}
+.commerce.ops-shell .oms :focus-visible {
+  outline: 3px solid var(--oms-ink);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--oms-blush);
+}
+.commerce.ops-shell .oms-count {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: var(--oms-gold);
+  color: var(--oms-ink);
+  font-size: 11px;
+}
+
+/* Badges: icon + label + shape; colour only reinforces. */
+.commerce.ops-shell .oms-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px 3px 8px;
+  border: 1px solid var(--oms-line);
+  border-radius: 999px;
+  background: var(--oms-white);
+  color: var(--oms-ink);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.commerce.ops-shell .oms-badge svg {
+  width: 15px;
+  height: 15px;
+}
+.commerce.ops-shell .oms-badge[data-tone="paid"],
+.commerce.ops-shell .oms-badge[data-tone="confirmed"],
+.commerce.ops-shell .oms-badge[data-tone="sent"] {
+  background: var(--oms-blush-light);
+  border-color: var(--oms-blush-light);
+}
+.commerce.ops-shell .oms-badge[data-tone="preparing"] {
+  background: var(--oms-blush);
+  border-color: var(--oms-blush);
+}
+.commerce.ops-shell .oms-badge[data-tone="ready"] {
+  background: var(--oms-gold);
+  border-color: var(--oms-gold);
+}
+.commerce.ops-shell .oms-badge[data-tone="pending"],
+.commerce.ops-shell .oms-badge[data-tone="to-confirm"],
+.commerce.ops-shell .oms-badge[data-tone="sending"] {
+  border-color: var(--oms-gold);
+}
+.commerce.ops-shell .oms-badge[data-tone="unpaid"],
+.commerce.ops-shell .oms-badge[data-tone="review"],
+.commerce.ops-shell .oms-badge[data-tone="draft"],
+.commerce.ops-shell .oms-badge[data-tone="disabled"],
+.commerce.ops-shell .oms-badge[data-tone="expired"] {
+  border-style: dashed;
+  border-color: var(--oms-ink);
+}
+.commerce.ops-shell .oms-badge[data-tone="out"],
+.commerce.ops-shell .oms-badge[data-tone="completed"] {
+  border-color: var(--oms-ink);
+}
+.commerce.ops-shell .oms-badge[data-tone="issue"],
+.commerce.ops-shell .oms-badge[data-tone="failed"] {
+  background: var(--oms-ink);
+  border-color: var(--oms-ink);
+  color: var(--oms-white);
+}
+.commerce.ops-shell .oms-badge[data-tone="none"],
+.commerce.ops-shell .oms-badge[data-tone="cancelled"] {
+  color: var(--oms-muted);
+}
+.commerce.ops-shell .oms-badge[data-tone="cancelled"] {
+  text-decoration: line-through;
+}
+
+/* Orders list */
+.commerce.ops-shell .oms-toolbar {
+  display: grid;
+  gap: 14px;
+  padding: 14px 16px;
+}
+.commerce.ops-shell .oms-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+}
+.commerce.ops-shell .oms .oms-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  color: var(--oms-muted);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.commerce.ops-shell .oms .oms-tabs button span {
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.commerce.ops-shell .oms .oms-tabs button:hover:not(:disabled) {
+  background: var(--oms-blush-light);
+}
+.commerce.ops-shell .oms .oms-tabs button[aria-pressed="true"] {
+  background: var(--oms-blush);
+  color: var(--oms-ink);
+  box-shadow: inset 0 -3px 0 var(--oms-gold);
+}
+.commerce.ops-shell .oms-search-row {
+  display: flex;
+  gap: 10px;
+}
+.commerce.ops-shell .oms-search {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: block;
+}
+.commerce.ops-shell .oms-search svg {
+  position: absolute;
+  left: 12px;
+  top: 13px;
+  color: var(--oms-muted);
+}
+.commerce.ops-shell .oms .oms-search input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px 0 38px;
+  border: 1px solid var(--oms-line);
+  border-radius: 8px;
+  background: var(--oms-white);
+  font-size: 14px;
+}
+.commerce.ops-shell .oms-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--oms-line);
+}
+.commerce.ops-shell .oms-filters > label,
+.commerce.ops-shell .oms-filters legend {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--oms-muted);
+  padding: 0;
+}
+.commerce.ops-shell .oms-filters fieldset {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.commerce.ops-shell .oms-filters legend {
+  margin-bottom: 6px;
+}
+.commerce.ops-shell .oms-filters fieldset label {
+  flex: 1;
+  min-width: 120px;
+}
+.commerce.ops-shell .oms .oms-filters :is(select, input) {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--oms-line);
+  border-radius: 8px;
+  background: var(--oms-white);
+  font-size: 13px;
+  padding: 0 10px;
+}
+.commerce.ops-shell .oms-table-card {
+  padding: 0;
+  overflow: hidden;
+}
+.commerce.ops-shell .oms-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.commerce.ops-shell .oms-table th,
+.commerce.ops-shell .oms-table td {
+  padding: 14px 12px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--oms-line);
+  font-weight: 400;
+}
+.commerce.ops-shell .oms-table :is(th, td):first-child {
+  padding-left: 20px;
+}
+.commerce.ops-shell .oms-table :is(th, td):last-child {
+  padding-right: 20px;
+}
+.commerce.ops-shell .oms-table .oms-num {
+  text-align: right;
+}
+.commerce.ops-shell .oms-table thead th {
+  background: var(--oms-blush-light);
+  color: var(--oms-ink);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding-top: 11px;
+  padding-bottom: 11px;
+}
+.commerce.ops-shell .oms-table tbody tr {
+  cursor: pointer;
+}
+.commerce.ops-shell .oms-table tbody tr:hover,
+.commerce.ops-shell .oms-table tbody tr:focus-within {
+  background: var(--oms-blush-light);
+}
+.commerce.ops-shell .oms-table tbody tr[data-unpaid] {
+  box-shadow: inset 3px 0 0 var(--oms-ink);
+}
+.commerce.ops-shell .oms-table small {
+  display: block;
+  font-size: 12px;
+  margin-top: 2px;
+}
+.commerce.ops-shell .oms-order-link {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--oms-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--oms-gold);
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+.commerce.ops-shell .oms-where {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.commerce.ops-shell .oms-where svg {
+  color: var(--oms-gold);
+}
+.commerce.ops-shell .oms-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 20px;
+  font-size: 13px;
+}
+.commerce.ops-shell .oms-pagination > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.commerce.ops-shell .oms-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 56px 20px;
+}
+.commerce.ops-shell .oms-empty > svg {
+  width: 30px;
+  height: 30px;
+  color: var(--oms-gold);
+}
+.commerce.ops-shell .oms-empty :is(h2, h3) {
+  font-size: 18px;
+}
+
+/* Order page */
+.commerce.ops-shell .oms-details-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.commerce.ops-shell .oms-details-head h2 {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.commerce.ops-shell .oms-details-head > div:first-child {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+.commerce.ops-shell .oms-badges,
+.commerce.ops-shell .oms-head-actions,
+.commerce.ops-shell .oms-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.commerce.ops-shell .oms-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: 20px;
+  align-items: start;
+}
+.commerce.ops-shell .oms-primary,
+.commerce.ops-shell .oms-secondary {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+.commerce.ops-shell .oms-notice {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  border: 1px solid var(--oms-gold);
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: var(--oms-white);
+  color: var(--oms-ink);
+  font-size: 13px;
+}
+.commerce.ops-shell .oms-notice svg {
+  color: var(--oms-gold);
+  margin-top: 1px;
+}
+.commerce.ops-shell .oms-notice[role="alert"] {
+  border-color: var(--oms-ink);
+  background: var(--oms-blush-light);
+}
+.commerce.ops-shell .oms-notice[role="alert"] svg {
+  color: var(--oms-ink);
+}
+.commerce.ops-shell .oms-steps {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+.commerce.ops-shell .oms-steps li {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+  padding-top: 10px;
+  border-top: 4px solid var(--oms-line);
+  font-size: 12px;
+  color: var(--oms-muted);
+}
+.commerce.ops-shell .oms-steps li[data-status="done"] {
+  border-color: var(--oms-gold);
+  color: var(--oms-ink);
+}
+.commerce.ops-shell .oms-steps li[data-status="current"] {
+  border-color: var(--oms-ink);
+  color: var(--oms-ink);
+  font-weight: 700;
+}
+.commerce.ops-shell .oms-steps li[data-status="done"] svg,
+.commerce.ops-shell .oms-steps li[data-status="current"] svg {
+  color: var(--oms-gold);
+}
+.commerce.ops-shell .oms-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px 20px;
+}
+.commerce.ops-shell .oms-facts.oms-stack {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+.commerce.ops-shell .oms-facts dt,
+.commerce.ops-shell .oms-totals dt {
+  font-size: 12px;
+  color: var(--oms-muted);
+}
+.commerce.ops-shell .oms-facts dd {
+  font-size: 14px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.commerce.ops-shell .oms-facts + .oms-muted,
+.commerce.ops-shell .oms-facts + .oms-facts,
+.commerce.ops-shell .oms-totals + .oms-facts {
+  margin-top: 16px;
+}
+.commerce.ops-shell .oms-items {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.commerce.ops-shell .oms-items th,
+.commerce.ops-shell .oms-items td {
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--oms-line);
+  text-align: left;
+  vertical-align: top;
+  font-weight: 400;
+}
+.commerce.ops-shell .oms-items :is(th, td):first-child {
+  padding-left: 0;
+}
+.commerce.ops-shell .oms-items :is(th, td):last-child {
+  padding-right: 0;
+}
+.commerce.ops-shell .oms-items .oms-num {
+  text-align: right;
+}
+.commerce.ops-shell .oms-items thead th {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--oms-muted);
+  padding-top: 0;
+}
+.commerce.ops-shell .oms-items tbody th {
+  font-weight: 600;
+}
+.commerce.ops-shell .oms-items tbody th small {
+  display: block;
+  font-weight: 400;
+  margin-top: 2px;
+}
+.commerce.ops-shell .oms-items tbody tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+.commerce.ops-shell .oms-items + .oms-notice {
+  margin: 14px 0 0;
+}
+.commerce.ops-shell .oms-totals {
+  display: grid;
+  gap: 8px;
+}
+.commerce.ops-shell .oms-totals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-variant-numeric: tabular-nums;
+}
+.commerce.ops-shell .oms-totals dt {
+  font-size: 14px;
+}
+.commerce.ops-shell .oms-totals .oms-total {
+  padding-top: 10px;
+  margin-top: 2px;
+  border-top: 1px solid var(--oms-line);
+  font-size: 16px;
+  font-weight: 700;
+}
+.commerce.ops-shell .oms-totals .oms-total dt {
+  color: var(--oms-ink);
+  font-size: 16px;
+}
+.commerce.ops-shell .oms-advanced {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--oms-line);
+}
+.commerce.ops-shell .oms-advanced summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.commerce.ops-shell .oms-advanced .oms-actions {
+  margin-top: 16px;
+}
+.commerce.ops-shell .oms-customer-name {
+  font-size: 18px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+.commerce.ops-shell .oms-contact {
+  display: grid;
+  gap: 4px;
+  margin: 12px 0 16px;
+}
+.commerce.ops-shell .oms-contact li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.commerce.ops-shell .oms-contact svg {
+  color: var(--oms-gold);
+}
+.commerce.ops-shell .oms-contact a {
+  color: var(--oms-ink);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-decoration-color: var(--oms-gold);
+  text-underline-offset: 3px;
+}
+.commerce.ops-shell .oms-note {
+  display: grid;
+  gap: 4px;
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--oms-blush-light);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.commerce.ops-shell .oms-note strong {
+  font-size: 12px;
+}
+.commerce.ops-shell .oms-notifications {
+  display: grid;
+  gap: 12px;
+}
+.commerce.ops-shell .oms-notifications li {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.commerce.ops-shell .oms-notifications li > span:first-child {
+  display: grid;
+  font-size: 13px;
+}
+.commerce.ops-shell .oms-notifications .oms-badge {
+  white-space: normal;
+  border-radius: 8px;
+}
+.commerce.ops-shell .oms-timeline {
+  display: grid;
+  gap: 0;
+}
+.commerce.ops-shell .oms-timeline li {
+  position: relative;
+  padding: 0 0 16px 22px;
+  border-left: 2px solid var(--oms-line);
+  margin-left: 5px;
+}
+.commerce.ops-shell .oms-timeline li:last-child {
+  padding-bottom: 0;
+  border-left-color: transparent;
+}
+.commerce.ops-shell .oms-timeline li::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--oms-white);
+  border: 2px solid var(--oms-gold);
+}
+.commerce.ops-shell .oms-timeline li[data-kind="payment"]::before {
+  background: var(--oms-gold);
+}
+.commerce.ops-shell .oms-timeline li[data-kind="notification"]::before {
+  border-color: var(--oms-ink);
+  border-radius: 2px;
+}
+.commerce.ops-shell .oms-timeline p {
+  font-size: 14px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.commerce.ops-shell .oms-timeline small {
+  font-size: 12px;
+}
+/* The existing draft builder keeps its controls; only its frame is aligned. */
+.commerce.ops-shell .oms .co-order {
+  margin-top: 14px;
+  border: 0;
+  padding: 0;
+  background: none;
+}
+
+/* Tablet and narrow desktop: single column details, card rows in the list. */
+@container (max-width: 900px) {
+  .commerce.ops-shell .oms-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .commerce.ops-shell .oms-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .commerce.ops-shell .oms-table,
+  .commerce.ops-shell .oms-table tbody {
+    display: block;
+  }
+  .commerce.ops-shell .oms-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px 16px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--oms-line);
+  }
+  .commerce.ops-shell .oms-table tbody :is(th, td) {
+    display: block;
+    padding: 0;
+    border: 0;
+    text-align: left;
+    min-width: 0;
+    white-space: normal;
+  }
+  .commerce.ops-shell .oms-table tbody :is(th, td)::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--oms-muted);
+    margin-bottom: 2px;
+  }
+  .commerce.ops-shell .oms-table tbody .oms-num {
+    text-align: left;
+  }
+  .commerce.ops-shell .oms-table .oms-badge {
+    white-space: normal;
+    border-radius: 14px;
+  }
+  .commerce.ops-shell .oms-table tbody th {
+    grid-column: 1 / -1;
+  }
+  .commerce.ops-shell .oms-table tbody th::before {
+    display: none;
+  }
+  .commerce.ops-shell .oms-table tbody td:last-child {
+    grid-column: 1 / -1;
+  }
+}
+@container (max-width: 560px) {
+  .commerce.ops-shell .oms-card {
+    padding: 16px;
+  }
+  .commerce.ops-shell .oms-table-card {
+    padding: 0;
+  }
+  .commerce.ops-shell .oms-table tbody tr {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 14px 16px;
+  }
+  .commerce.ops-shell .oms-search-row {
+    flex-wrap: wrap;
+  }
+  .commerce.ops-shell .oms-search {
+    flex-basis: 100%;
+  }
+  .commerce.ops-shell .oms-details-head h2 {
+    font-size: 24px;
+  }
+  .commerce.ops-shell .oms-head-actions,
+  .commerce.ops-shell .oms-head-actions .oms-button {
+    width: 100%;
+  }
+  .commerce.ops-shell .oms-steps {
+    flex-direction: column;
+    gap: 0;
+  }
+  .commerce.ops-shell .oms-steps li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0 8px 12px;
+    border-top: 0;
+    border-left: 4px solid var(--oms-line);
+  }
+  .commerce.ops-shell .oms-items thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .commerce.ops-shell .oms-items,
+  .commerce.ops-shell .oms-items tbody {
+    display: block;
+  }
+  .commerce.ops-shell .oms-items tbody tr {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--oms-line);
+  }
+  .commerce.ops-shell .oms-items tbody tr:last-child {
+    border-bottom: 0;
+  }
+  .commerce.ops-shell .oms-items tbody :is(th, td) {
+    display: block;
+    padding: 0;
+    border: 0;
+    text-align: left;
+  }
+  .commerce.ops-shell .oms-items tbody th {
+    grid-column: 1 / -1;
+  }
+  .commerce.ops-shell .oms-items tbody td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 11px;
+    color: var(--oms-muted);
+  }
+  .commerce.ops-shell .oms-pagination,
+  .commerce.ops-shell .oms-pagination > div {
+    justify-content: flex-start;
+  }
+}
+.commerce.ops-shell .oms-toolbar-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
