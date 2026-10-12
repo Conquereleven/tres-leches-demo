@@ -1,0 +1,465 @@
+/* Product Hub V2. Everything is scoped to the operations shell; nothing here reaches the storefront. */
+.commerce.ops-shell .ph {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.commerce.ops-shell .ph h2,
+.commerce.ops-shell .ph h3 {
+  margin: 0 0 12px;
+}
+.commerce.ops-shell .ph h3 {
+  font-size: 16px;
+}
+.commerce.ops-shell .ph-status {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 16px 32px;
+  align-items: center;
+}
+.commerce.ops-shell .ph-eyebrow {
+  margin: 0 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5d6763;
+}
+.commerce.ops-shell .ph-revision {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+}
+.commerce.ops-shell .ph code {
+  font-size: 12px;
+  background: #f1f3f2;
+  border-radius: 6px;
+  padding: 2px 6px;
+  overflow-wrap: anywhere;
+}
+.commerce.ops-shell .ph-status-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.commerce.ops-shell .ph-banner {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #fff8e6;
+  border: 1px solid #ecd9a3;
+}
+.commerce.ops-shell .ph-banner-info {
+  background: #eef4f8;
+  border-color: #c9dbe6;
+}
+.commerce.ops-shell .ph-banner-ok {
+  background: #e9f5ee;
+  border-color: #bcdcc9;
+}
+.commerce.ops-shell .ph-banner-error {
+  background: #fdecea;
+  border-color: #f0bdb7;
+}
+.commerce.ops-shell .ph-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.commerce.ops-shell .ph-tabs button {
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid #dce1de;
+  padding: 0 18px;
+}
+.commerce.ops-shell .ph-tabs button[aria-pressed="true"],
+.commerce.ops-shell .ph-tabs button[aria-selected="true"] {
+  background: #202523;
+  border-color: #202523;
+  color: #fff;
+}
+.commerce.ops-shell .ph-tabs-small {
+  margin-bottom: 12px;
+}
+.commerce.ops-shell .ph-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-inline-start: 8px;
+  border-radius: 50%;
+  background: #c9862b;
+}
+.commerce.ops-shell .ph-metrics {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 20px;
+}
+.commerce.ops-shell .ph-metrics div {
+  background: #f7f8f7;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.commerce.ops-shell .ph-metrics dt {
+  font-size: 12px;
+  color: #5d6763;
+}
+.commerce.ops-shell .ph-metrics dd {
+  margin: 2px 0 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+.commerce.ops-shell .ph-filters,
+.commerce.ops-shell .ph-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 12px 16px;
+  align-items: end;
+}
+.commerce.ops-shell .ph label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 0;
+}
+.commerce.ops-shell .ph label small,
+.commerce.ops-shell .ph small {
+  font-weight: 400;
+  color: #5d6763;
+}
+.commerce.ops-shell .ph input:not([type="checkbox"]):not([type="file"]),
+.commerce.ops-shell .ph select,
+.commerce.ops-shell .ph textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #c9d0cc;
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-weight: 400;
+}
+.commerce.ops-shell .ph input[aria-invalid="true"] {
+  border-color: #b3261e;
+  outline: 2px solid #f0bdb7;
+}
+.commerce.ops-shell .ph input:disabled,
+.commerce.ops-shell .ph select:disabled {
+  background: #f1f3f2;
+  color: #5d6763;
+}
+.commerce.ops-shell .ph .ph-wide {
+  grid-column: 1 / -1;
+}
+.commerce.ops-shell .ph .ph-check {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-weight: 500;
+}
+.commerce.ops-shell .ph .ph-check input {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+.commerce.ops-shell .ph-count {
+  margin: 16px 0 8px;
+  color: #5d6763;
+}
+.commerce.ops-shell .ph-list,
+.commerce.ops-shell .ph-history,
+.commerce.ops-shell .ph-issues,
+.commerce.ops-shell .ph-variants,
+.commerce.ops-shell .ph-media {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.commerce.ops-shell .ph-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 2fr) minmax(0, 1.2fr) auto;
+  gap: 14px;
+  align-items: center;
+  text-align: start;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid #dce1de;
+  border-radius: 10px;
+  min-height: 76px;
+}
+.commerce.ops-shell .ph-row:hover {
+  border-color: #176346;
+}
+.commerce.ops-shell .ph-row-main,
+.commerce.ops-shell .ph-row-meta,
+.commerce.ops-shell .ph-media-meta {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.commerce.ops-shell .ph-row-main strong {
+  overflow-wrap: anywhere;
+}
+.commerce.ops-shell .ph-row-meta {
+  font-size: 13px;
+  color: #3d4642;
+}
+.commerce.ops-shell .ph-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  background: #f1f3f2;
+  overflow: hidden;
+  flex: none;
+}
+.commerce.ops-shell .ph-thumb-large {
+  width: 88px;
+  height: 88px;
+}
+.commerce.ops-shell .ph-thumb img,
+.commerce.ops-shell .ph-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.commerce.ops-shell .ph-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+  margin: 0;
+  align-items: center;
+}
+.commerce.ops-shell .ph-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #eceeed;
+  color: #202523;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.commerce.ops-shell .ph-chip-live {
+  background: #dff0e6;
+  color: #0f4a33;
+}
+.commerce.ops-shell .ph-chip-draft {
+  background: #e6ecf7;
+  color: #1f3a6b;
+}
+.commerce.ops-shell .ph-chip-warn {
+  background: #fbe9cf;
+  color: #6b4208;
+}
+.commerce.ops-shell .ph-history li,
+.commerce.ops-shell .ph-issues li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid #dce1de;
+  border-radius: 10px;
+}
+.commerce.ops-shell .ph-issue-error {
+  background: #fdecea;
+  border-color: #f0bdb7 !important;
+}
+.commerce.ops-shell .ph-issue-warn {
+  background: #fff8e6;
+  border-color: #ecd9a3 !important;
+}
+.commerce.ops-shell .ph-diff {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.commerce.ops-shell .ph-diff th,
+.commerce.ops-shell .ph-diff td {
+  text-align: start;
+  padding: 8px 10px;
+  border-bottom: 1px solid #e4e8e6;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  max-width: 360px;
+}
+.commerce.ops-shell .ph-diff-price td {
+  background: #f4f8fd;
+  font-weight: 600;
+}
+.commerce.ops-shell .ph-publish {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #dce1de;
+}
+.commerce.ops-shell .ph-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.commerce.ops-shell .ph-editor {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.commerce.ops-shell .ph-editor-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+.commerce.ops-shell .ph-editor-head h2 {
+  margin: 0;
+  flex: 1 1 240px;
+  overflow-wrap: anywhere;
+}
+.commerce.ops-shell .ph-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.commerce.ops-shell .ph-editor-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+}
+.commerce.ops-shell .ph-editor-main {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.commerce.ops-shell .ph-variants li {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid #dce1de;
+  border-radius: 10px;
+}
+.commerce.ops-shell .ph-variants .ph-chips {
+  justify-content: flex-start;
+}
+.commerce.ops-shell .ph-variant-retired {
+  background: #faf6ee;
+}
+.commerce.ops-shell .ph-media li {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #dce1de;
+  border-radius: 10px;
+}
+.commerce.ops-shell .ph-media + .ph-form,
+.commerce.ops-shell .ph-variants + button {
+  margin-top: 12px;
+}
+.commerce.ops-shell .ph-link {
+  min-height: 32px !important;
+  border: 0;
+  background: none;
+  color: #9a2a20;
+  text-decoration: underline;
+  padding: 0 4px;
+}
+.commerce.ops-shell .ph-preview {
+  position: sticky;
+  top: 16px;
+}
+.commerce.ops-shell .ph-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  background: #f6efe3;
+  color: #33241a;
+}
+.commerce.ops-shell .ph-card-image {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #eee3d0;
+  color: #6b5a48;
+}
+.commerce.ops-shell .ph-card p {
+  margin: 0;
+}
+.commerce.ops-shell .ph-card-price {
+  font-weight: 600;
+}
+.commerce.ops-shell .ph-card ul {
+  margin: 0;
+  padding-inline-start: 18px;
+  font-size: 13px;
+}
+@media (max-width: 1100px) {
+  .commerce.ops-shell .ph-editor-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .commerce.ops-shell .ph-preview {
+    position: static;
+  }
+  .commerce.ops-shell .ph-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 720px) {
+  .commerce.ops-shell .ph-status {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .commerce.ops-shell .ph-status-actions {
+    justify-content: flex-start;
+  }
+  .commerce.ops-shell .ph-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .commerce.ops-shell .ph-row {
+    grid-template-columns: 56px minmax(0, 1fr);
+  }
+  .commerce.ops-shell .ph-row-meta,
+  .commerce.ops-shell .ph-row .ph-chips {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+  .commerce.ops-shell .ph-history li,
+  .commerce.ops-shell .ph-issues li,
+  .commerce.ops-shell .ph-media li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .commerce.ops-shell .ph-tabs button {
+    flex: 1 1 auto;
+  }
+}
+
+.commerce.ops-shell .ph-variant-i18n {
+  margin-top: 12px;
+  border-top: 1px solid #e6eae7;
+  padding-top: 10px;
+}
+.commerce.ops-shell .ph-variant-i18n summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 32px;
+}
+.commerce.ops-shell .ph-variant-i18n .ph-form {
+  margin-top: 10px;
+}

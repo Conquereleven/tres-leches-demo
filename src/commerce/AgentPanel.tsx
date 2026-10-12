@@ -1,3 +1,5 @@
+import { operationalProductName } from "./product-names";
+import { OperationalProductName } from "./OperationalProductName";
 import { useOps } from "./ops-i18n";
 import { useEffect, useState } from "react";
 import type { Conversation } from "../../server/domain/model";
@@ -223,7 +225,10 @@ export function AgentPanel({
           {args.productId && (
             <p>
               {args.quantity ? `${args.quantity} × ` : ""}
-              {product?.name ?? args.productId}
+              <OperationalProductName
+                product={operationalProductName(args.productId, product?.name)}
+                id={args.productId}
+              />
               {product
                 ? ` · ${t(money(product.priceFils))} / ${t("unidad")}`
                 : ""}

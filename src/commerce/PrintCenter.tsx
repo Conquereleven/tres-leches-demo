@@ -1,12 +1,15 @@
+import { operationalProductName } from "./product-names";
+import { OperationalProductName } from "./OperationalProductName";
 import { ticketSnapshot } from "./ticket-snapshot";
 import { useState } from "react";
 import { Printer } from "@phosphor-icons/react";
 import type { Workspace } from "./api";
 import { PRINTER_TARGETS, type PrinterDestination } from "./print-contract";
-import { useOps } from "./ops-i18n";
+import { useOps, translateOps, formatOpsDate } from "./ops-i18n";
 import { orderReference } from "../../shared/order-number";
 export function PrintCenter({ data }: { data: Workspace }) {
-  const { t, formatDate } = useOps();
+  const { t } = useOps();
+  const ticketText = (key: string) => translateOps("en", key);
   const [selected, setSelected] = useState("");
   const [destination, setDestination] = useState<PrinterDestination>("kitchen");
   const order = data.orders.find((o) => o.id === selected);
@@ -70,39 +73,54 @@ export function PrintCenter({ data }: { data: Workspace }) {
             )}
           </p>
         ) : order && ticketLines ? (
-          <article className="ops-ticket" aria-label={t("Ticket preview")}>
-            <p className="ops-kicker">{t("PREVIEW")}</p>
+          <article className="ops-ticket" lang="en" aria-label="Ticket preview">
+            <p className="ops-kicker">{ticketText("PREVIEW")}</p>
             <h3>Pastelerías 3L · {orderReference(order)}</h3>
             <p>
-              {t(
+              {ticketText(
                 destination === "kitchen"
                   ? "Kitchen ticket"
                   : "Reception ticket",
               )}{" "}
-              · {t(order.state)}
+              · {ticketText(order.state)}
             </p>
             <p>
-              {t(order.fulfillmentMethod === "pickup" ? "Pickup" : "Entrega")}
+              {ticketText(
+                order.fulfillmentMethod === "pickup" ? "Pickup" : "Entrega",
+              )}
             </p>
             <ul>
               {ticketLines.map((l) => (
                 <li key={l.productId}>
                   <strong>{l.quantity} × </strong>
-                  {l.name}
+                  <OperationalProductName
+                    product={operationalProductName(l.productId, l.name)}
+                    id={l.productId}
+                  />
                 </li>
               ))}
             </ul>
             <p>
               {order.pickup?.pickupDate || order.delivery?.date
-                ? formatDate(
+                ? formatOpsDate(
                     order.pickup?.pickupDate ?? order.delivery!.date!,
+                    "en",
                     false,
                   )
-                : t("Sin fecha")}{" "}
+                : ticketText("Sin fecha")}{" "}
               · {order.pickup?.preferredTime ?? order.delivery?.slot}
             </p>
             {order.customerDetails?.instructions && (
-              <p>{order.customerDetails?.instructions}</p>
+              <p>
+                <strong>Original customer notes: </strong>
+                {order.customerDetails.instructions}
+              </p>
+            )}
+            {order.delivery?.notes && (
+              <p>
+                <strong>Original delivery notes: </strong>
+                {order.delivery.notes}
+              </p>
             )}
             {destination === "reception" && (
               <p>

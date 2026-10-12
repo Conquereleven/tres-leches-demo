@@ -331,6 +331,8 @@ export type State = {
   ai?: import("../agents/model").AgentData;
   catalog?: CatalogItem[];
   catalogFoundation?: import("../catalog/contract").CatalogFoundation;
+  /** Product Hub V2 editing session: draft, history and command receipts. Never a price authority. */
+  productHub?: import("../catalog/product-hub").HubState;
   paymentNotifications?: NotificationReceipt[];
   uatScenarios?: {
     id: number;

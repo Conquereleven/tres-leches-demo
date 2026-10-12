@@ -241,12 +241,13 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
       await expect.poll(shown, { timeout: 9000 }).not.toBe(seen.at(-1)![0]);
       seen.push([await shown(), Date.now()]);
       if (seen.length === 3) {
-        // The cutout keeps its transparency and sits on the cream card, never black.
+        // The cutout keeps its transparency and sits on the card surface, never black.
+        // BRAND-02 (approved 12 October 2026) made product surfaces white.
         expect(
           await crema
             .locator("picture.is-active")
             .evaluate((p) => getComputedStyle(p).backgroundColor),
-        ).toBe("rgb(246, 239, 227)");
+        ).toBe("rgb(255, 255, 255)");
       }
       if (seen.at(-1)![0] === "13")
         expect(
@@ -303,7 +304,7 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
       await choc
         .locator("picture.is-active")
         .evaluate((p) => getComputedStyle(p).backgroundColor),
-    ).toBe("rgb(246, 239, 227)");
+    ).toBe("rgb(255, 255, 255)");
     // The traditional pack has four photos and rotates; the filled pack has one and stays static.
     await expect(
       page.locator(

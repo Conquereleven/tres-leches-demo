@@ -136,6 +136,40 @@ export class Store {
       restored.close();
     }
   }
+  /** Content-addressed image bytes. Inside Store.write it joins that transaction. */
+  putMedia(media: {
+    sha256: string;
+    contentType: string;
+    bytes: Buffer;
+    width: number;
+    height: number;
+    createdAt: string;
+    createdBy: string;
+  }) {
+    this.db
+      .prepare(
+        "INSERT OR IGNORE INTO product_hub_media VALUES (?, ?, ?, ?, ?, ?, ?)",
+      )
+      .run(
+        media.sha256,
+        media.contentType,
+        media.bytes,
+        media.width,
+        media.height,
+        media.createdAt,
+        media.createdBy,
+      );
+  }
+  getMedia(sha256: string) {
+    const row = this.db
+      .prepare(
+        "SELECT content_type, bytes FROM product_hub_media WHERE sha256=?",
+      )
+      .get(sha256) as { content_type: string; bytes: Uint8Array } | undefined;
+    return row
+      ? { contentType: row.content_type, bytes: Buffer.from(row.bytes) }
+      : null;
+  }
   healthy() {
     return !!this.db.prepare("SELECT 1 FROM commerce_state WHERE id=1").get();
   }

@@ -123,3 +123,25 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Retain PR #6 square product frames and independent three-frame 3:2 editorial opening gallery. Product/detail/cart/checkout resolve stable source identities; gallery assets must not silently follow product replacement.
 - Current seven Conchas image presentations are interim, NOT final. New media status is AWAITING FOUNDER-APPROVED IMAGES. No generated, sourced or substituted final assets in this task. See docs/brand/brand02/replacement-manifest.json for required sources and media-only follow-up. Historical “final-approved” folder records prior provenance, not current final approval.
 - Do not change SKU/price/availability, checkout/payment behavior, Operations, Product Hub backend, Railway or Production SQLite. No merge/deploy without separate approval.
+
+## Catalog foundation initialization (12 October 2026)
+- `catalog-foundation` audit is read-only on any profile; apply adds only `catalogFoundation`, needs the audited fingerprints, a verified backup and, in Production, an explicit confirmation and founder approval. Never correct the database from repository sources: a difference blocks until resolved with commercial evidence.
+- Tools that write `State.catalog` directly must call `rebaseFoundation` in the same transaction. Procedure, audit results and rollback: `docs/product-hub/foundation-bootstrap.md`.
+
+## Product Hub V2 (12 October 2026)
+- Operations → Products is a real editor: private draft, before/after review, admin-only publication. `State.catalog` stays the only price and availability authority; the draft (`State.productHub`) is a candidate copy and is never read by checkout.
+- Off by default: `PRODUCT_HUB_ENABLED` (editor) and `PRODUCT_HUB_PUBLISH_ENABLED` (publish). Publication is refused in Production in code until the storefront reads published data; do not describe the hub as publishing to customers before that integration.
+- Admin edits and publishes; manager is view-only; operator and agent have no access. Roles are enforced in the API.
+- Existing SKU ids, published slugs and removed combinations are permanent: deactivate, never delete or reactivate. Details and remaining steps: `docs/product-hub/product-hub-v2.md`.
+
+## Dynamic storefront catalog (12 October 2026)
+- `STOREFRONT_DYNAMIC_CATALOG_ENABLED` (off by default) makes the menu read the published revision from `GET /api/storefront/catalog`; Production also needs `STOREFRONT_DYNAMIC_CATALOG_PRODUCTION=founder-approved`. Off means the storefront is exactly the build's catalog.
+- With adoption on and no valid revision the endpoint answers 503 and checkout sells nothing; never fall back to bundled data. `State.catalog` stays the price authority; the browser never supplies amounts.
+- Product Hub publication in Production is allowed only while adoption is active there. Keep the storefront's approved look: no new customer copy or CSS for this feature. Details and limits: `docs/product-hub/storefront-dynamic-catalog.md`.
+- Product photographs resolve only through `selectedProductMedia` / `productGalleryMedia` (`src/brand/media.tsx`); menu, product page and cart must not pick images any other way. Catalog translations are never generated: missing ES/AR wording shows the pending marker.
+- Price rollback is a new publication of the previous price from Product Hub. Never restore a database file or use the storefront flag to undo a price.
+
+## Fronts A and C integrated (12 October 2026)
+- Operations names products through `src/commerce/product-names.ts` only: the reviewed dictionary first, then English names approved in Product Hub (`productNames` from `/api/workspace`), always SKU plus exact recorded definition. Never translate at runtime, never rewrite an order snapshot; unknown definitions keep the original text with the review warning.
+- The variant field "English name for Operations and tickets" is staff-only and must not appear in any public catalog response. Approved names are append-only.
+- Candidate, conflicts and joint QA: `docs/product-hub/integration-candidate.md`.

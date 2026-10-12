@@ -47,6 +47,8 @@ export type Workspace = {
   agents: { id: string; name: string }[];
   numbers: { id: string; label: string; phone: string }[];
   catalog: { id: string; name: string; priceFils: number }[];
+  /** English names approved in Product Hub: SKU → recognized definitions. */
+  productNames?: Record<string, { source: string; en: string }[]>;
   zones: DeliveryZone[];
   conversations: Conversation[];
   orders: Order[];

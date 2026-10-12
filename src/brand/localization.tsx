@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import customerCopy from "./locales/customer-copy.json";
+import { liveCopy, useLiveCatalog } from "./live-catalog";
 import { I18nextProvider } from "react-i18next";
 import {
   isLocale,
@@ -94,6 +95,8 @@ const Context = createContext({
 });
 export function LocalizationProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Locale>(initialLocale);
+  // Re-render translated copy when a new published revision arrives.
+  useLiveCatalog();
   useEffect(() => {
     void storefrontI18n.changeLanguage(language);
     const publicPage = !location.pathname.startsWith("/operations");
@@ -120,7 +123,9 @@ export function LocalizationProvider({ children }: { children: ReactNode }) {
           language,
           setLanguage: change,
           t: (key) => localizedSource(english[key], language),
-          text: (source) => translatedCopy(source, language),
+          // Published catalog translations win over the build's for catalog strings.
+          text: (source) =>
+            liveCopy(source, language) ?? translatedCopy(source, language),
         }}
       >
         {children}

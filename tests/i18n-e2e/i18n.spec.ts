@@ -109,7 +109,8 @@ for (const locale of ["en", "es", "ar"] as const)
       expect(axe.violations).toEqual([]);
       await page.goto("/menu?category=conchas");
       await shot("menu");
-      await expect(page.locator("[data-product-id]")).toHaveCount(4);
+      // The approved catalog lists seven Conchas products (BRAND-02).
+      await expect(page.locator("[data-product-id]")).toHaveCount(7);
       await page.goto("/menu?product=conchas-filled--pistache");
       await shot("product");
       await page.locator("main select").selectOption("Mini");

@@ -1,8 +1,11 @@
 import {
-  OperationsOverview,
-  ProductsAvailability,
-  OperationsSettings,
-} from "./OperationsOverview";
+  orderProductName,
+  productOptionLabel,
+  setPublishedProductNames,
+} from "./product-names";
+import { OperationalProductName } from "./OperationalProductName";
+import { OperationsOverview, OperationsSettings } from "./OperationsOverview";
+import { ProductHub } from "./ProductHub";
 import { PrintCenter } from "./PrintCenter";
 import { OpsProvider, useOps } from "./ops-i18n";
 import { OperationsShell } from "./OperationsShell";
@@ -55,7 +58,10 @@ function WorkspaceInner() {
   const pending = useRef(new Map<string, string>());
   const refresh = useCallback(async () => {
     try {
-      setData(await api<Data>("workspace"));
+      const next = await api<Data>("workspace");
+      // Before rendering: names approved in Product Hub for staff screens and tickets.
+      setPublishedProductNames(next.productNames);
+      setData(next);
       setError((previous) =>
         previous.includes("Inicia sesión") ? "" : previous,
       );
@@ -168,7 +174,7 @@ function WorkspaceInner() {
             }}
           />
         ) : view === "products" ? (
-          <ProductsAvailability role={data.actor.role} />
+          <ProductHub actor={data.actor} />
         ) : view === "print" ? (
           <PrintCenter data={data} />
         ) : view === "settings" ? (
@@ -687,9 +693,10 @@ function OrderPanel({
             <li key={l.productId}>
               <span>
                 {l.quantity} ×{" "}
-                {(o.catalogSnapshot ?? data.catalog).find(
-                  (p) => p.id === l.productId,
-                )?.name ?? l.productId}
+                <OperationalProductName
+                  product={orderProductName(o, l.productId, data.catalog)}
+                  id={l.productId}
+                />
               </span>
               <span>
                 {t(
@@ -729,7 +736,8 @@ function OrderPanel({
                 >
                   {data.catalog.map((p) => (
                     <option value={p.id} key={p.id}>
-                      {p.name} · {t(money(p.priceFils))}
+                      {productOptionLabel(p.id, p.name)} ·{" "}
+                      {t(money(p.priceFils))}
                     </option>
                   ))}
                 </select>

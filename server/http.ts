@@ -1,4 +1,11 @@
 import { catalogReadEnabled, serveCatalogRead } from "./catalog/read-api";
+import { serveHubMedia, serveProductHub } from "./catalog/product-hub-api";
+import { approvedOperationsNames } from "./catalog/product-hub";
+import {
+  publishedRevision,
+  serveStorefrontCatalog,
+  storefrontCatalogMode,
+} from "./catalog/storefront-api";
 import { parseExternalAckSince } from "./domain/external-ack";
 import { byteRange } from "./static-range";
 import { mcpRead } from "./domain/mcp";
@@ -89,6 +96,18 @@ export const customerPages = [
   "/delivery-policy",
   "/contact",
 ] as const;
+/**
+ * Tells the storefront, before any script runs, that its catalog is the published
+ * revision and the one shipped with the build must not be shown.
+ */
+function markDynamicCatalog(file: string) {
+  const body = readFileSync(file);
+  if (!file.endsWith(".html") || storefrontCatalogMode(process.env) !== "on")
+    return body;
+  return Buffer.from(
+    body.toString("utf8").replace(/<html\b/, '<html data-catalog="dynamic"'),
+  );
+}
 const customerCsp =
   "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; script-src 'self' https://pay.paymennt.com; frame-src https://pay.test.paymennt.com; frame-ancestors 'none'";
 export async function startServer(
@@ -373,8 +392,22 @@ export async function startServer(
           )
         )
           return;
+        const storefrontMode = storefrontCatalogMode(process.env);
+        if (
+          serveStorefrontCatalog(
+            req,
+            res,
+            path,
+            () => store.read(),
+            storefrontMode,
+          )
+        )
+          return;
         if (path.startsWith("/api/checkout")) {
+          // Dynamic adoption without a valid published revision sells nothing.
+          const published = publishedRevision(store.read(), storefrontMode);
           const enabled =
+            published.sellable &&
             ((runtime.environment === "staging" &&
               process.env.PROVIDER_MODE === "test" &&
               !!paymennt) ||
@@ -392,7 +425,7 @@ export async function startServer(
                 p.active !== false &&
                 p.availability !== "unavailable",
             );
-            const products = (s.catalog ?? [])
+            const products = (published.sellable ? (s.catalog ?? []) : [])
               .filter(
                 (p) =>
                   p.active !== false &&
@@ -409,6 +442,10 @@ export async function startServer(
             return json(res, 200, {
               enabled: enabled && products.length > 0,
               catalogAvailable: products.length > 0,
+              catalog: {
+                dynamic: published.dynamic,
+                revision: published.revision,
+              },
               paymentFlow: "web",
               mode: enabled ? (paymennt?.environment ?? "test") : "offline",
               products,
@@ -723,6 +760,8 @@ export async function startServer(
           return json(res, 200, { ok: true });
         }
         const current = actor(req);
+        // Product Hub V2: its own module; roles are enforced inside it.
+        if (await serveProductHub(req, res, path, store, current)) return;
         if (path === "/api/mcp") {
           if (process.env.MCP_ENABLED !== "true")
             throw new DomainError(404, "Not found");
@@ -892,6 +931,8 @@ export async function startServer(
                 p.availability !== "unavailable" &&
                 availableSku(p.id),
             ),
+            // English names approved in Product Hub, for staff screens and tickets.
+            productNames: approvedOperationsNames(s),
             zones: s.zones,
             conversations: s.conversations,
             orders: s.orders,
@@ -962,6 +1003,17 @@ export async function startServer(
       }
       if (req.method !== "GET" && req.method !== "HEAD")
         throw new DomainError(405, "Método no permitido");
+      // Uploaded catalog images live in SQLite, not in the static bundle.
+      if (
+        serveHubMedia(req, res, path, store, () => {
+          try {
+            return actor(req);
+          } catch {
+            return null;
+          }
+        })
+      )
+        return;
       const root = resolve("dist/client"),
         candidate = resolve(root, "." + decodeURIComponent(path));
       if (candidate !== root && !candidate.startsWith(root + "/"))
@@ -984,7 +1036,9 @@ export async function startServer(
           "Referrer-Policy": "same-origin",
           "Content-Security-Policy": customerCsp,
         });
-        return res.end(req.method === "HEAD" ? undefined : readFileSync(file));
+        return res.end(
+          req.method === "HEAD" ? undefined : markDynamicCatalog(file),
+        );
       }
       if (
         !existsSync(candidate) &&
@@ -1030,7 +1084,7 @@ export async function startServer(
         ".mp4": "video/mp4",
         ".ico": "image/x-icon",
       };
-      const body = readFileSync(file);
+      const body = markDynamicCatalog(file);
       const headers = {
         "Content-Type": mime[extname(file)] ?? "application/octet-stream",
         "X-Content-Type-Options": "nosniff",
