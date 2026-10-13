@@ -183,10 +183,10 @@ test("view reconciles with every existing catalog id and never exposes a second 
   }
 });
 
-test("RBAC: managers read only; operators and agents get nothing; every write needs an admin", () => {
+test("RBAC: managers edit drafts; operators and agents get nothing; only administrators publish", () => {
   const { store, view } = setup();
   try {
-    assert.equal(view(manager).permissions.canEdit, false);
+    assert.equal(view(manager).permissions.canEdit, true);
     assert.equal(view(manager).permissions.canPublish, false);
     assert.equal(view(admin).permissions.canEdit, true);
     assert.equal(view(admin, EDIT_ONLY).permissions.canPublish, false);
@@ -198,7 +198,7 @@ test("RBAC: managers read only; operators and agents get nothing; every write ne
       expectedVersion: 0,
       ...payload(azucar(view())),
     };
-    for (const actor of [manager, operator, agent]) {
+    for (const actor of [operator, agent]) {
       assert.throws(() => hubCommand(store, actor, key(), cmd, ON), {
         status: 403,
       });
@@ -1053,6 +1053,41 @@ test("families: create a draft family; a published family keeps its category and
     assert.ok(
       view().changes.some((c) => c.kind === "family" && c.field === "created"),
     );
+  } finally {
+    store.close();
+  }
+});
+
+test("manager prepares a private draft but cannot publish, including replaying an administrator key", () => {
+  const { store, view } = setup();
+  try {
+    const before = structuredClone(store.read());
+    const data = payload(azucar(view(manager)));
+    data.variants[0]!.priceFils += 100;
+    const saveKey = key();
+    const command = { type: "saveProduct", expectedVersion: 0, ...data };
+    hubCommand(store, manager, saveKey, command, ON);
+    hubCommand(store, manager, saveKey, command, ON);
+    assert.equal(view(manager).version, 1);
+    assert.deepEqual(store.read().catalog, before.catalog);
+    assert.deepEqual(store.read().catalogFoundation, before.catalogFoundation);
+    const publish = {
+      type: "publish",
+      expectedVersion: 1,
+      expectedPublishedRevision: view().published.id,
+    };
+    assert.throws(() => hubCommand(store, manager, key(), publish, ON), {
+      status: 403,
+    });
+    const adminKey = key();
+    hubCommand(store, admin, adminKey, publish, ON);
+    const published = JSON.stringify(store.read());
+    assert.throws(() => hubCommand(store, manager, adminKey, publish, ON), {
+      status: 403,
+    });
+    assert.equal(JSON.stringify(store.read()), published);
+    assert.deepEqual(store.read().orders, before.orders);
+    assert.deepEqual(store.read().payments, before.payments);
   } finally {
     store.close();
   }

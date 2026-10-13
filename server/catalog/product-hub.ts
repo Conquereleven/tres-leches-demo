@@ -561,7 +561,7 @@ export function hubView(
   if (!["admin", "manager"].includes(actor.role))
     throw new DomainError(403, "Product Hub access is restricted");
   const permissions = {
-    canEdit: flags.enabled && actor.role === "admin",
+    canEdit: flags.enabled && ["admin", "manager"].includes(actor.role),
     canPublish: flags.publishEnabled && actor.role === "admin",
   };
   if (!flags.enabled || !s.catalogFoundation)
@@ -773,7 +773,7 @@ function applySaveProduct(
 }
 
 /**
- * The single write entry point. Admin only; idempotent by key; rejected when
+ * The single write entry point. Admin/manager drafts, admin publication; idempotent by key; rejected when
  * the caller's version is stale. Runs entirely inside one Store.write, so a
  * failure at any point leaves the database exactly as it was.
  */
@@ -785,12 +785,15 @@ export function hubCommand(
   flags: HubFlags,
   now = new Date(),
 ) {
-  if (actor.role !== "admin")
-    throw new DomainError(403, "Only an administrator can change the catalog");
+  if (!["admin", "manager"].includes(actor.role))
+    throw new DomainError(403, "Only catalog staff can edit drafts");
   if (!flags.enabled) throw new DomainError(404, "Not found");
   if (!/^[A-Za-z0-9_-]{8,128}$/.test(key))
     throw new DomainError(400, "Idempotency-Key required");
   const cmd = hubCommandSchema.parse(raw);
+  // Authorize before looking up idempotency receipts or opening a write transaction.
+  if (cmd.type === "publish" && actor.role !== "admin")
+    throw new DomainError(403, "Only an administrator can publish the catalog");
   const hash = createHash("sha256")
     .update(JSON.stringify([actor.id, cmd]))
     .digest("hex");
@@ -1069,8 +1072,8 @@ export function hubUpload(
   flags: HubFlags,
   now = new Date(),
 ) {
-  if (actor.role !== "admin")
-    throw new DomainError(403, "Only an administrator can change the catalog");
+  if (!["admin", "manager"].includes(actor.role))
+    throw new DomainError(403, "Only catalog staff can edit drafts");
   if (!flags.enabled) throw new DomainError(404, "Not found");
   if (!/^[A-Za-z0-9_-]{8,128}$/.test(key))
     throw new DomainError(400, "Idempotency-Key required");

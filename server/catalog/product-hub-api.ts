@@ -38,8 +38,8 @@ const send = (res: ServerResponse, status: number, value: unknown) => {
  * Authenticated Product Hub routes. The caller has already enforced the
  * same-origin rule for writes and resolved the signed-in actor.
  *   GET  /api/product-hub            admin, manager
- *   POST /api/product-hub/commands   admin
- *   POST /api/product-hub/media      admin (raw image body)
+ *   POST /api/product-hub/commands   admin/manager drafts; admin publish
+ *   POST /api/product-hub/media      admin, manager (raw image body)
  */
 export async function serveProductHub(
   req: IncomingMessage,
@@ -68,11 +68,8 @@ export async function serveProductHub(
   }
   if (req.method === "POST" && path === "/api/product-hub/media") {
     // Refuse before reading megabytes from someone who cannot upload.
-    if (actor.role !== "admin")
-      throw new DomainError(
-        403,
-        "Only an administrator can change the catalog",
-      );
+    if (!["admin", "manager"].includes(actor.role))
+      throw new DomainError(403, "Only catalog staff can edit drafts");
     let meta: unknown;
     try {
       meta = JSON.parse(

@@ -159,7 +159,7 @@ test("HTTP RBAC: sessions, roles, origin and idempotency are enforced by the API
       await s.call("/api/product-hub", manager)
     ).json();
     assert.deepEqual(managerView.permissions, {
-      canEdit: false,
+      canEdit: true,
       canPublish: false,
     });
     assert.equal(managerView.products.length, adminView.products.length);
@@ -196,8 +196,8 @@ test("HTTP RBAC: sessions, roles, origin and idempotency are enforced by the API
         availability: v.availability,
       })),
     };
-    // Manager and operator cannot write, whatever they send.
-    for (const cookie of [manager, operator]) {
+    // Operators cannot edit or publish, whatever they send.
+    for (const cookie of [operator]) {
       assert.equal(
         (await s.call("/api/product-hub/commands", cookie, command)).status,
         403,
@@ -405,5 +405,123 @@ test("HTTP flags: disabled by default; publication can be off while editing is o
     );
   } finally {
     await editOnly.close();
+  }
+});
+
+test("HTTP manager draft/media access stays private; publish and privilege injection are refused", async () => {
+  const s = await server(3328, {
+    PRODUCT_HUB_ENABLED: "true",
+    PRODUCT_HUB_PUBLISH_ENABLED: "true",
+  });
+  try {
+    const manager = await s.login("manager");
+    const admin = await s.login("admin");
+    const view = await (await s.call("/api/product-hub", manager)).json();
+    const baseline = await (
+      await fetch(s.base + "/api/checkout/config")
+    ).json();
+    const product = view.products.find(
+      (p: { id: string }) => p.id === "pan-de-muerto-traditional--azucar",
+    );
+    const command = {
+      type: "saveProduct",
+      expectedVersion: 0,
+      product: Object.fromEntries(
+        [
+          "id",
+          "slug",
+          "familyId",
+          "categoryId",
+          "name",
+          "description",
+          "commercialState",
+          "translations",
+          "media",
+        ].map((k) => [k, product[k]]),
+      ),
+      variants: product.variants.map((v: Record<string, unknown>) =>
+        Object.fromEntries(
+          [
+            "skuId",
+            "flavor",
+            "size",
+            "packQuantity",
+            "commercialState",
+            "translations",
+            "media",
+            "catalogName",
+            "priceFils",
+            "active",
+            "availability",
+          ].map((k) => [k, k === "priceFils" ? (v[k] as number) + 100 : v[k]]),
+        ),
+      ),
+    };
+    const saveKey = randomUUID();
+    assert.equal(
+      (
+        await s.call("/api/product-hub/commands", manager, command, {
+          "Idempotency-Key": saveKey,
+        })
+      ).status,
+      200,
+    );
+    assert.equal(
+      (
+        await s.call("/api/product-hub/commands", manager, command, {
+          "Idempotency-Key": saveKey,
+        })
+      ).status,
+      200,
+    );
+    const checkout = await (
+      await fetch(s.base + "/api/checkout/config")
+    ).json();
+    assert.deepEqual(checkout.products, baseline.products);
+    assert.deepEqual(checkout.catalog, baseline.catalog);
+    assert.equal(
+      (
+        await s.call("/api/product-hub/media", manager, png(400, 400), {
+          "Content-Type": "image/png",
+          "X-Hub-Meta": meta(1),
+        })
+      ).status,
+      200,
+    );
+    const draft = await (await s.call("/api/product-hub", manager)).json();
+    const publish = {
+      type: "publish",
+      expectedVersion: draft.version,
+      expectedPublishedRevision: view.published.id,
+    };
+    assert.equal(
+      (await s.call("/api/product-hub/commands", manager, publish)).status,
+      403,
+    );
+    assert.equal(
+      (
+        await s.call("/api/product-hub/commands", manager, {
+          ...publish,
+          role: "admin",
+          permissions: { canPublish: true },
+        })
+      ).status,
+      400,
+    );
+    assert.equal(
+      (
+        await s.call("/api/product-hub/commands", manager, {
+          type: "discardDraft",
+          expectedVersion: 0,
+        })
+      ).status,
+      409,
+    );
+    assert.equal(
+      (await s.call("/api/product-hub/commands", admin, publish)).status,
+      200,
+    );
+  } finally {
+    await s.close();
   }
 });
