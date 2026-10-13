@@ -97,7 +97,8 @@ publication. No role-management or permission-granting command is exposed by Pro
 - Added domain and HTTP manager regressions: draft/media accepted, published checkout
   prices unchanged until admin publication, duplicate save replay, stale version refusal,
   manager publish refusal, role injection refusal and admin-key replay refusal.
-- Product Hub Chromium/WebKit: **8/8**, overview/editor at 1440,390,768px and axe.
+- Product Hub Chromium/WebKit: **8/8**, admin overview/editor at 1440,390,768px and axe.
+  Manager-specific permissions are proven by domain and real HTTP tests; browser fixtures use admin.
 - Dynamic catalog publication/forward-price-rollback Chromium/WebKit: **4/4 PASS**.
 - Secret scan: **0 findings**. Dependency audit: **0 vulnerabilities**.
 - C2 owns paid-order-publication protection and checkout stability evidence; no duplicated
@@ -107,7 +108,7 @@ Local evidence: `work/c1/*.log`, `work/qa/product-hub/`,
 `work/qa/storefront-dynamic/` (ignored). No broad checkout/browser repetition required
 for this Product Hub-only patch; hotfix evidence remains current and C2 audits gaps.
 
-## Founder-authorized activation plan (not executed)
+## Activation plan requiring founder authorization (not executed)
 
 1. Review/merge/deploy this scoped permission PR separately, keeping all flags off.
 2. Immediately before authorized database work, repeat live read-only audit and integrity
