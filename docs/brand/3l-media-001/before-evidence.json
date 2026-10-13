@@ -1,0 +1,38 @@
+[
+  {
+    "width": 390,
+    "src": "http://127.0.0.1:3227/brand/official-pan/official-pan-13-pack-640.avif",
+    "alt": "Pan de Muerto · Pack relleno",
+    "loading": "lazy",
+    "natural": [
+      351,
+      351
+    ],
+    "box": [
+      350,
+      350
+    ],
+    "errors": [],
+    "broken": [],
+    "stableCardBox": true,
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "src": "http://127.0.0.1:3227/brand/official-pan/official-pan-13-pack-640.avif",
+    "alt": "Pan de Muerto · Pack relleno",
+    "loading": "lazy",
+    "natural": [
+      432,
+      432
+    ],
+    "box": [
+      386.65625,
+      386.65625
+    ],
+    "errors": [],
+    "broken": [],
+    "stableCardBox": true,
+    "overflow": false
+  }
+]
