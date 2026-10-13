@@ -177,7 +177,7 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     expect([...new Set(frames.map(([, , fit]) => fit))]).toEqual(["contain"]);
     for (const [id, source] of [
       ["pan-de-muerto-traditional-pack", /official-pan-02-/],
-      ["pan-de-muerto-filled-pack", /official-pan-13-pack-/],
+      ["pan-de-muerto-filled-pack", /official-pan-02-/],
     ] as const) {
       const card = page.locator(`[data-product-id="${id}"] .b-menu-photo`);
       await card.scrollIntoViewIfNeeded();

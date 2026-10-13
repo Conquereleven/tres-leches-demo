@@ -110,7 +110,7 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 ## Menu watermark, restored banner and square pack photos (9 October 2026, Joel and Lisa)
 - The official wordmark appears once as an 8% watermark (Joel approved Proposal A) behind the Menu introduction only (`.b-menu-intro-mark`). Never on product photos, cards, galleries, detail pages, or as a repeating or global background.
 - The Pan de Muerto category banner is back (Lisa): the four mixed boards, whole, 3:2, same 3.5 s rotation. No banners on other categories. This supersedes the earlier "banner removed" decision.
-- Pack photos are square by continuing each photo's own background (`extend` in `scripts/official-pan-crops.json`); breads are never copied, moved or redrawn. The filled pack uses its own asset (`official-pan-13-pack`) so Crema diplomática's approved third photo is untouched.
+- Pack photos are square by continuing each photo's own background (`extend` in `scripts/official-pan-crops.json`); breads are never copied, moved or redrawn. 3L-MEDIA-001 supersedes the filled pack's primary with founder-approved `02.png` (`official-pan-02`). Retain the historical `official-pan-13-pack` asset and Crema diplomática's unchanged approved third photo (`official-pan-13`).
 
 ## Operations D1 (11 October 2026)
 - Admin shell uses isolated EN/TL resources and per-user browser preference. Never change customer notification language or stored state enums to localize labels.

@@ -155,7 +155,10 @@ for product, family, variant, names, evidence in assignments:
                        "width": image.width, "height": image.height,
                        "originalBytes": path.stat().st_size, "derivatives": derivatives})
         assets[-1]["sourceFilename"] = source(name)
-    products.append({"productId": product, "primarySourceId": ids[0], "gallerySourceIds": ids[1:]})
+    # 3L-MEDIA-001: founder-approved 02.png replaces only the filled-pack primary.
+    # Keep deriving the historical 13-pack asset; other approved media stays intact.
+    primary = "official-pan-02" if product == f"{F}-pack" else ids[0]
+    products.append({"productId": product, "primarySourceId": primary, "gallerySourceIds": ids[1:]})
 for index, name in enumerate(banner):
     sid = identifier(name).replace("official-pan-", "official-pan-banner-")
     image, transparent, derivatives, path = derive(name, (640, 960, 1536), whole=sid)

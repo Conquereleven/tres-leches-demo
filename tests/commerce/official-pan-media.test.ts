@@ -64,7 +64,7 @@ test("all 50 official photos are accounted for and only reviewed ones are public
     "official-pan-03",
     "official-pan-04",
   ]);
-  assert.deepEqual(pack("pan-de-muerto-filled-pack"), ["official-pan-13-pack"]);
+  assert.deepEqual(pack("pan-de-muerto-filled-pack"), ["official-pan-02"]);
   // Restored category banner: the four boards, whole, in their original 3:2 frame.
   const boards = categoryEditorialMedia("pan");
   assert.deepEqual(
