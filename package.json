@@ -7,7 +7,7 @@
     "dev": "node scripts/dev.mjs",
     "build": "npm run audit:i18n && npm run audit:customer-copy && vite build && node scripts/prerender-brand.mjs && node scripts/prepare-sites-build.mjs && node scripts/build-server.mjs",
     "preview": "vite preview",
-    "start": "node dist/node/server.mjs",
+    "start": "node scripts/start-price-correction.mjs",
     "test:sites": "node --test tests/sites-worker.test.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",

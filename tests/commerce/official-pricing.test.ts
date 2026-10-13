@@ -46,14 +46,14 @@ test("official Pan de Muerto price list: every approved row", () => {
     ["pan-de-muerto-filled-pistachio-mini", 23],
     ["pan-de-muerto-filled-pistachio-individual", 26],
     ...["pan-de-muerto"].flatMap((c): [string, number][] => [
-      [`${c}-traditional-pack-6-mini`, 72],
-      [`${c}-traditional-pack-12-mini`, 140],
-      [`${c}-traditional-pack-6-individuales`, 80],
-      [`${c}-traditional-pack-12-individuales`, 155],
-      [`${c}-filled-pack-6-mini`, 120],
-      [`${c}-filled-pack-12-mini`, 235],
-      [`${c}-filled-pack-6-individuales`, 130],
-      [`${c}-filled-pack-12-individuales`, 255],
+      [`${c}-traditional-pack-6-mini`, 60],
+      [`${c}-traditional-pack-12-mini`, 115],
+      [`${c}-traditional-pack-6-individuales`, 72],
+      [`${c}-traditional-pack-12-individuales`, 140],
+      [`${c}-filled-pack-6-mini`, 100],
+      [`${c}-filled-pack-12-mini`, 190],
+      [`${c}-filled-pack-6-individuales`, 120],
+      [`${c}-filled-pack-12-individuales`, 235],
     ]),
   ];
   assert.equal(rows.length, 22);
@@ -66,14 +66,14 @@ test("official Pan de Muerto price list: every approved row", () => {
       assert.equal(storefront.get(id)?.priceFils, price * 100, `menu ${id}`);
     else assert.equal(storefront.has(id), false, `${id} must stay unlisted`);
   }
-  // The sugar bread with chocolate covering follows the traditional price.
+  // October 13 covering prices are independent of traditional plain bread.
   assert.equal(
     aed("pan-de-muerto-traditional-azucar-mini-40-g-chocolate-covering"),
-    13,
+    18,
   );
   assert.equal(
     aed("pan-de-muerto-traditional-azucar-individual-70-g-chocolate-covering"),
-    15,
+    21,
   );
   assert.equal(Object.keys(OFFICIAL_PRICES_FILS).length, 24);
 });
@@ -114,7 +114,13 @@ test("nothing outside the official list changed price, availability or identity"
       ["show", "4838030:data-imports/liza-current-menu.json"],
       { encoding: "utf8", maxBuffer: 1 << 26 },
     ),
-  ).items as { id: string; priceAed: string; active: boolean; availability: string; name: string }[];
+  ).items as {
+    id: string;
+    priceAed: string;
+    active: boolean;
+    availability: string;
+    name: string;
+  }[];
   const now = JSON.parse(
     readFileSync("data-imports/liza-current-menu.json", "utf8"),
   ).items as typeof released;
@@ -128,17 +134,36 @@ test("nothing outside the official list changed price, availability or identity"
     if (!(before.id in OFFICIAL_PRICES_FILS))
       assert.equal(after.priceAed, before.priceAed, before.id);
     // Only six approved traditional Conchas were activated; retired Pan stays retired.
-    assert.equal(after.active, ACTIVATED_CONCHAS.has(before.id) ? true : RETIRED_SKUS.has(before.id) ? false : before.active, before.id);
+    assert.equal(
+      after.active,
+      ACTIVATED_CONCHAS.has(before.id)
+        ? true
+        : RETIRED_SKUS.has(before.id)
+          ? false
+          : before.active,
+      before.id,
+    );
     if (ACTIVATED_CONCHAS.has(before.id)) {
       assert.equal(after.availability, "available");
       assert.equal(before.active, false);
-      assert.equal(storefront.get(before.id)?.priceFils, Number(before.priceAed) * 100);
+      assert.equal(
+        storefront.get(before.id)?.priceFils,
+        Number(before.priceAed) * 100,
+      );
     }
   }
   // Exactly six existing Concha records changed availability, not prices or identity.
-  const conchas = (items: typeof released) => items.filter((i) => i.id.startsWith("conchas"));
+  const conchas = (items: typeof released) =>
+    items.filter((i) => i.id.startsWith("conchas"));
   assert.equal(conchas(now).length, 26);
-  assert.deepEqual(conchas(now).map((item) => ACTIVATED_CONCHAS.has(item.id) ? { ...item, active: false, availability: "unavailable" } : item), conchas(released));
+  assert.deepEqual(
+    conchas(now).map((item) =>
+      ACTIVATED_CONCHAS.has(item.id)
+        ? { ...item, active: false, availability: "unavailable" }
+        : item,
+    ),
+    conchas(released),
+  );
   assert.ok(
     Object.keys(OFFICIAL_PRICES_FILS).every((id) =>
       id.startsWith("pan-de-muerto-"),

@@ -25,8 +25,13 @@ test("approved full menu has 236 unique authoritative SKUs and retires AED25 Pan
       const expectedName =
         family.id === "conchas-traditional" && option.variant !== "Chocolate"
           ? `Conchas tradicional · ${option.variant} · ${option.size}`
-          : [family.name, family.id.startsWith("conchas-") ? "" : option.variant, option.size]
-              .filter(Boolean).join(" · ");
+          : [
+              family.name,
+              family.id.startsWith("conchas-") ? "" : option.variant,
+              option.size,
+            ]
+              .filter(Boolean)
+              .join(" · ");
       assert.equal(item.name, expectedName);
       assert.equal(item.active, true);
       assert.equal(
@@ -54,7 +59,12 @@ test("latest images override old bakery prices and weights without inventing pac
       ],
       prefix === "conchas"
         ? ["Individual · 70 g:1300", "Mini · 40 g:1100"]
-        : ["Individual · 70 g:1500", "Mini · 40 g:1300"],
+        : [
+            "Individual · 70 g:2100",
+            "Mini · 40 g:1800",
+            "Individual · 70 g:1500",
+            "Mini · 40 g:1300",
+          ],
     );
     assert.deepEqual(
       [
@@ -88,13 +98,13 @@ test("latest images override old bakery prices and weights without inventing pac
         "traditional",
         prefix === "conchas"
           ? [6000, 11500, 7200, 14000]
-          : [7200, 14000, 8000, 15500],
+          : [6000, 11500, 7200, 14000],
       ],
       [
         "filled",
         prefix === "conchas"
           ? [10000, 19000, 12000, 23500]
-          : [12000, 23500, 13000, 25500],
+          : [10000, 19000, 12000, 23500],
       ],
     ] as const) {
       const pack = menuFamilies.find(

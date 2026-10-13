@@ -24,6 +24,10 @@ const released = () =>
         { encoding: "utf8", maxBuffer: 1 << 26 },
       ),
     ),
+  ).map((p) =>
+    p.id in PAN_PRICE_CHANGES
+      ? { ...p, priceFils: PAN_PRICE_CHANGES[p.id]![0] }
+      : p,
   );
 const run = (mode: string, env: Record<string, string>) =>
   spawnSync(
