@@ -433,7 +433,7 @@ change when those are addressed.
 | `npm run lint` | pass, 0 problems |
 | `npm run build` | pass |
 | `npm test` | 581 passed, 0 failed, 0 skipped (572 before, plus 9 new) |
-| `npm run scan:secrets` | 1325 files scanned, 0 findings |
+| `npm run scan:secrets` | 1326 files scanned, 0 findings |
 
 Playwright suites were not run: no UI or server code changed.
 
