@@ -1548,13 +1548,23 @@ function OrderNotifications({ order, data }: { order: Order; data: Data }) {
           <b>
             {t("WhatsApp interno ·")} {n.recipient.name}
           </b>{" "}
-          {n.status === "sent"
-            ? t("Enviado")
-            : n.status === "failed"
-              ? t("Falló · revisar")
-              : data.operationsOutboundEnabled
-                ? t("Pendiente")
-                : t("Pendiente · envío de WhatsApp desactivado")}
+          {n.status === "accepted"
+            ? t("WhatsApp API accepted")
+            : n.status === "delivered"
+              ? t("Entregado")
+              : n.status === "read"
+                ? t("WhatsApp receipt read")
+                : n.status === "suppressed"
+                  ? t("WhatsApp alert not eligible")
+                  : n.status === "sending"
+                    ? t("WhatsApp sending requires review")
+                    : n.status === "sent"
+                      ? t("Enviado")
+                      : n.status === "failed"
+                        ? t("Falló · revisar")
+                        : data.operationsOutboundEnabled
+                          ? t("Pendiente")
+                          : t("Pendiente · envío de WhatsApp desactivado")}
         </li>
       ))}
       {internalEmails.map((n) => (

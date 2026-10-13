@@ -12,6 +12,7 @@
  * branch of CommerceService.applyCheckout, behind its once-only paidAt guard.
  */
 import { randomUUID } from "node:crypto";
+import { z } from "zod";
 import type {
   CatalogItem,
   Conversation,
@@ -26,24 +27,18 @@ import { orderReference } from "../../shared/order-number";
 import { PICKUP_LOCATION } from "../../shared/pickup-location";
 import { customerName } from "./order-number";
 
-/** Confirmed operations recipient for paid-order alerts. */
-export const OPERATIONS_RECIPIENT = {
-  name: "Liza",
-  phone: "+971521683319",
-} as const;
-/**
- * Who is told about a paid order: one row per configured recipient. Liza's
- * number is confirmed; the manager's is private configuration and is included
- * only when a valid number has been supplied.
- */
+/** Exactly one private recipient; no implicit recipient and no source fallback. */
 export function operationsRecipients(managerPhone?: string) {
   const phone = managerPhone?.replace(/[\s-]/g, "") ?? "";
-  return [
-    { ...OPERATIONS_RECIPIENT },
-    ...(/^\+[1-9]\d{7,14}$/.test(phone) ? [{ name: "3L Manager", phone }] : []),
-  ];
+  return /^\+[1-9]\d{7,14}$/.test(phone) ? [{ name: "3L Manager", phone }] : [];
 }
 
+export const PAID_ALERT_BODY =
+  "3L Pastelerías: A new order has been paid. Order: {{1}}. Total: AED {{2}}. Fulfillment: {{3}}. Please review the order in Operations and coordinate production. Order details (staff login required): {{4}}.";
+export function parseNotificationCutoff(value?: string): string | undefined {
+  if (!value) return undefined;
+  return z.iso.datetime().parse(value);
+}
 const aed = (fils: number) => (fils / 100).toFixed(2);
 
 /** Concise by design: no card, payment-provider or address detail. */
@@ -100,6 +95,16 @@ export function recordOrderPaid(
   origin?: string,
   managerPhone?: string,
 ): OperationsNotification[] {
+  if (
+    payment.status !== "paid" ||
+    !payment.lastReconciledAt ||
+    !payment.paidAt ||
+    order.paidAt !== payment.paidAt ||
+    order.paymentId !== payment.id ||
+    payment.orderId !== order.id ||
+    order.state !== "Confirmed"
+  )
+    return [];
   const key = `order-paid:${order.id}`;
   if (s.events[key]) return [];
   s.events[key] = payment.id;
@@ -114,6 +119,21 @@ export function recordOrderPaid(
     ),
     origin,
   });
+  const fulfillment = message
+    .split("\n")
+    .filter((line) => /^(PICKUP|DELIVERY|When:)/.test(line))
+    .join("; ");
+  let operationsLink: string | undefined;
+  try {
+    const url = new URL(
+      `/operations/orders?order=${encodeURIComponent(order.id)}`,
+      origin,
+    );
+    if (url.protocol === "https:" && !url.username && !url.password)
+      operationsLink = url.href;
+  } catch {
+    /* Without a canonical secure origin, alerts cannot dispatch. */
+  }
   const notifications = operationsRecipients(managerPhone).map(
     (recipient): OperationsNotification => ({
       id: randomUUID(),
@@ -124,6 +144,15 @@ export function recordOrderPaid(
       paymentId: payment.id,
       recipient,
       message,
+      paidAt: payment.paidAt,
+      templateParameters: operationsLink
+        ? [
+            orderReference(order),
+            aed(payment.amountFils),
+            fulfillment,
+            operationsLink,
+          ]
+        : undefined,
       status: "pending-whatsapp-delivery",
       attempts: 0,
       createdAt,
@@ -134,7 +163,7 @@ export function recordOrderPaid(
   s.audit.push({
     at: createdAt,
     actor: "system",
-    action: `ORDER_PAID ${order.id}: operations notification queued`,
+    action: `ORDER_PAID ${order.id}: ${notifications.length ? "operations notification queued" : "no configured WhatsApp recipient; no alert queued"}`,
   });
   return notifications;
 }
@@ -154,10 +183,21 @@ export async function dispatchOperationsNotifications(
     read(): State;
     write<T>(fn: (s: State) => T): T;
   },
-  options: { outboundEnabled: boolean; notifier: OperationsNotifier | null },
+  options: {
+    outboundEnabled: boolean;
+    notifier: OperationsNotifier | null;
+    activationSince?: string;
+    sourcePhone?: string;
+    recipientPhones?: string[];
+  },
 ) {
   if (!options.outboundEnabled || !options.notifier)
     return { attempted: 0, skipped: "outbound-disabled" as const };
+  const cutoff = options.activationSince
+    ? Date.parse(options.activationSince)
+    : NaN;
+  if (!Number.isFinite(cutoff) || cutoff > Date.now())
+    return { attempted: 0, skipped: "activation-cutoff-required" as const };
   let attempted = 0;
   const pending = (store.read().operationsNotifications ?? []).filter(
     (n) => n.status === "pending-whatsapp-delivery",
@@ -167,9 +207,33 @@ export async function dispatchOperationsNotifications(
     const claimed = store.write((s) => {
       const row = s.operationsNotifications?.find((r) => r.id === n.id);
       if (!row || row.status !== "pending-whatsapp-delivery") return null;
+      const payment = s.payments.find((p) => p.id === row.paymentId);
+      const order = s.orders.find((o) => o.id === row.orderId);
+      const eligible =
+        row.paidAt &&
+        Date.parse(row.paidAt) > cutoff &&
+        Date.parse(row.createdAt) > cutoff &&
+        Date.now() - Date.parse(row.createdAt) >= 0 &&
+        Date.now() - Date.parse(row.createdAt) <= 15 * 60 * 1000 &&
+        payment?.status === "paid" &&
+        payment.paidAt === row.paidAt &&
+        !!payment.lastReconciledAt &&
+        order?.paidAt === row.paidAt &&
+        order.paymentId === payment.id &&
+        (!options.sourcePhone ||
+          digits(row.recipient.phone) !== digits(options.sourcePhone)) &&
+        (!options.recipientPhones ||
+          options.recipientPhones.some(
+            (p) => digits(p) === digits(row.recipient.phone),
+          ));
+      if (!eligible) {
+        row.status = "suppressed";
+        row.lastError = "Not eligible for this activation; no send";
+        return null;
+      }
       row.attempts++;
-      row.status = "failed";
-      row.lastError = "in-flight";
+      row.status = "sending";
+      row.lastError = "in-flight; interrupted sends require manual review";
       return structuredClone(row);
     });
     if (!claimed) continue;
@@ -178,8 +242,8 @@ export async function dispatchOperationsNotifications(
       const result = await options.notifier.send(claimed);
       store.write((s) => {
         const row = s.operationsNotifications!.find((r) => r.id === n.id)!;
-        row.status = "sent";
-        row.sentAt = new Date().toISOString();
+        row.status = "accepted";
+        row.acceptedAt = new Date().toISOString();
         row.providerId = result.providerId;
         row.lastError = undefined;
       });
@@ -187,6 +251,7 @@ export async function dispatchOperationsNotifications(
       // No automatic resend: an ambiguous send is surfaced for a human.
       store.write((s) => {
         const row = s.operationsNotifications!.find((r) => r.id === n.id)!;
+        row.status = "failed";
         row.lastError =
           error instanceof SelfRecipientError
             ? "Not sent: the recipient is the sending WhatsApp number"
@@ -211,6 +276,7 @@ export function createWhatsAppOperationsNotifier(
   provider: import("../adapters/providers").WhatsAppProvider,
   origin: { id: string; phone: string },
   template: { name: string; language: string },
+  validate?: () => Promise<void>,
 ): OperationsNotifier {
   return {
     async send(n) {
@@ -219,13 +285,9 @@ export function createWhatsAppOperationsNotifier(
       // message would be sent to itself: refuse rather than assume it works.
       if (digits(n.recipient.phone) === digits(origin.phone))
         throw new SelfRecipientError();
-      const total = /Total paid: AED ([0-9.]+)/.exec(n.message)?.[1] ?? "";
-      const reference = n.publicOrderNumber
-        ? orderReference({
-            id: n.orderId,
-            publicOrderNumber: n.publicOrderNumber,
-          })
-        : n.orderId;
+      if (!n.templateParameters || n.templateParameters.length !== 4)
+        throw new Error("Alert parameters missing; historical row cannot send");
+      if (validate) await validate();
       return provider.send({
         sourceNumberId: origin.id,
         sourcePhoneNumber: origin.phone,
@@ -234,10 +296,39 @@ export function createWhatsAppOperationsNotifier(
         template: {
           name: template.name,
           language: template.language,
-          parameters: [reference, total],
+          parameters: n.templateParameters,
         },
         idempotencyKey: n.id,
       });
     },
   };
+}
+
+/** Receipts change the outbox only; never an operational order state. */
+export function applyOperationsReceipt(
+  s: State,
+  providerId: string,
+  status: "sent" | "delivered" | "read" | "failed",
+): boolean {
+  const row = s.operationsNotifications?.find(
+    (n) => n.providerId === providerId,
+  );
+  if (!row) return false;
+  if (status === "failed") {
+    if (row.status !== "delivered" && row.status !== "read") {
+      row.status = "failed";
+      row.lastError = "Provider reported failure; review required";
+    }
+  } else {
+    const rank = { sent: 1, delivered: 2, read: 3 };
+    const current =
+      row.status in rank ? rank[row.status as keyof typeof rank] : 0;
+    if (rank[status] > current) {
+      row.status = status;
+      if (status === "sent") row.sentAt = new Date().toISOString();
+      row.lastError = undefined;
+      row.statusAt = new Date().toISOString();
+    }
+  }
+  return true;
 }

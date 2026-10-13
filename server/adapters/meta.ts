@@ -209,6 +209,89 @@ export class MetaWhatsAppProvider implements WhatsAppProvider {
         throw new ProviderFailure("rejected", false);
     }
   }
+  /** Read-only activation proof, never registers or changes a number/template. */
+  async validateOperationsConfiguration(
+    sourceId: string,
+    template: { name: string; language: string },
+    expectedBody: string,
+    expectedCategory: "UTILITY" | "MARKETING",
+  ) {
+    const n = this.numbers.find((number) => number.id === sourceId);
+    if (!n)
+      throw new ProviderFailure("rejected", false, "ORIGIN_NOT_CONFIGURED");
+    const token = this.requireToken();
+    const get = async (path: string) => {
+      const response = await this.fetcher(
+        `https://graph.facebook.com/${this.config.version}/${path}`,
+        {
+          method: "GET",
+          redirect: "error",
+          signal: AbortSignal.timeout(8000),
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      if (!response.ok) throw new ProviderFailure("rejected", false);
+      return response.json();
+    };
+    const numbers = z
+      .object({
+        data: z.array(
+          z.object({
+            id: z.string(),
+            display_phone_number: z.string(),
+            code_verification_status: z.string(),
+            platform_type: z.string(),
+            status: z.string(),
+          }),
+        ),
+      })
+      .parse(
+        await get(
+          `${n.wabaId}/phone_numbers?fields=id,display_phone_number,code_verification_status,platform_type,status&limit=100`,
+        ),
+      );
+    const sender = numbers.data.find((number) => number.id === n.phoneNumberId);
+    if (
+      !sender ||
+      sender.display_phone_number.replace(/\D/g, "") !==
+        n.phone.replace(/\D/g, "") ||
+      sender.code_verification_status !== "VERIFIED" ||
+      sender.platform_type !== "CLOUD_API" ||
+      sender.status !== "CONNECTED"
+    )
+      throw new ProviderFailure("rejected", false);
+    const templates = z
+      .object({
+        data: z.array(
+          z.object({
+            name: z.string(),
+            language: z.string(),
+            status: z.string(),
+            category: z.string(),
+            components: z.array(
+              z.object({ type: z.string(), text: z.string().optional() }),
+            ),
+          }),
+        ),
+      })
+      .parse(
+        await get(
+          `${n.wabaId}/message_templates?name=${encodeURIComponent(template.name)}&fields=name,language,status,category,components&limit=100`,
+        ),
+      );
+    const approved = templates.data.find(
+      (t) => t.name === template.name && t.language === template.language,
+    );
+    if (
+      !approved ||
+      approved.status !== "APPROVED" ||
+      approved.category !== expectedCategory ||
+      approved.components.length !== 1 ||
+      approved.components[0]?.type !== "BODY" ||
+      approved.components[0].text !== expectedBody
+    )
+      throw new ProviderFailure("rejected", false);
+  }
   async send(input: Parameters<WhatsAppProvider["send"]>[0]) {
     const token = this.requireToken();
     const n = this.numbers.find(

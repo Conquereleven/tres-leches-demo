@@ -694,5 +694,9 @@
   "Customer email": "Customer email",
   "New paid order": "New paid order",
   "Order created": "Order created",
-  "Card · Paymennt": "Card · Paymennt"
+  "Card · Paymennt": "Card · Paymennt",
+  "WhatsApp receipt read": "Read",
+  "WhatsApp alert not eligible": "Not sent · outside activation",
+  "WhatsApp sending requires review": "Sending · review if interrupted",
+  "WhatsApp API accepted": "Accepted by WhatsApp · delivery pending"
 }

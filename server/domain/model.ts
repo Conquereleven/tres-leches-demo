@@ -58,6 +58,7 @@ export type Message = {
     | "received"
     | "queued"
     | "sending"
+    | "accepted"
     | "sent"
     | "delivered"
     | "read"
@@ -171,7 +172,19 @@ export type OperationsNotification = {
   paymentId: string;
   recipient: { name: string; phone: string };
   message: string;
-  status: "pending-whatsapp-delivery" | "sent" | "failed";
+  status:
+    | "pending-whatsapp-delivery"
+    | "accepted"
+    | "sending"
+    | "sent"
+    | "delivered"
+    | "read"
+    | "failed"
+    | "suppressed";
+  paidAt?: string;
+  templateParameters?: string[];
+  statusAt?: string;
+  acceptedAt?: string;
   attempts: number;
   createdAt: string;
   sentAt?: string;

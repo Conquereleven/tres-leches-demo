@@ -460,7 +460,14 @@ export function orderActivity(data: Data, o: Order): ActivityEntry[] {
       text: "Internal WhatsApp alert recorded",
       detail: n.recipient.name,
     });
-    if (n.status === "sent" && n.sentAt)
+    if (n.acceptedAt)
+      entries.push({
+        at: n.acceptedAt,
+        kind: "notification",
+        text: "WhatsApp API accepted",
+        detail: n.recipient.name,
+      });
+    if (n.sentAt)
       entries.push({
         at: n.sentAt,
         kind: "notification",
@@ -510,7 +517,17 @@ export type NotificationRow = {
   id: string;
   channel: "Internal WhatsApp" | "Internal email" | "Customer email";
   subject: string;
-  status: "sent" | "failed" | "sending" | "pending" | "disabled" | "expired";
+  status:
+    | "accepted"
+    | "sent"
+    | "delivered"
+    | "read"
+    | "suppressed"
+    | "failed"
+    | "sending"
+    | "pending"
+    | "disabled"
+    | "expired";
   label: string;
 };
 /** What was recorded for the order and what actually happened to it. */
@@ -519,27 +536,31 @@ export function orderNotifications(data: Data, o: Order): NotificationRow[] {
   for (const n of (data.operationsNotifications ?? []).filter(
     (n) => n.orderId === o.id,
   )) {
-    const status =
-      n.status === "sent"
-        ? "sent"
-        : n.status === "failed"
-          ? "failed"
-          : data.operationsOutboundEnabled
-            ? "pending"
-            : "disabled";
+    const labels: Record<string, string> = {
+      accepted: "WhatsApp API accepted",
+      sent: "Enviado",
+      delivered: "Entregado",
+      read: "WhatsApp receipt read",
+      suppressed: "WhatsApp alert not eligible",
+      failed: "Falló · revisar",
+      sending: "WhatsApp sending requires review",
+    };
+    const status: NotificationRow["status"] =
+      n.status !== "pending-whatsapp-delivery"
+        ? n.status
+        : data.operationsOutboundEnabled
+          ? "pending"
+          : "disabled";
     rows.push({
       id: n.id,
       channel: "Internal WhatsApp",
       subject: n.recipient.name,
       status,
       label:
-        status === "sent"
-          ? "Enviado"
-          : status === "failed"
-            ? "Falló · revisar"
-            : status === "pending"
-              ? "Pendiente"
-              : "Pendiente · envío de WhatsApp desactivado",
+        labels[status] ??
+        (status === "pending"
+          ? "Pendiente"
+          : "Pendiente · envío de WhatsApp desactivado"),
     });
   }
   const email = (

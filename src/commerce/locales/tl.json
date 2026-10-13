@@ -694,5 +694,9 @@
   "Customer email": "Email sa customer",
   "New paid order": "Bagong bayad na order",
   "Order created": "Nagawa ang order",
-  "Card · Paymennt": "Card · Paymennt"
+  "Card · Paymennt": "Card · Paymennt",
+  "WhatsApp receipt read": "Nabasa",
+  "WhatsApp alert not eligible": "Hindi ipinadala · wala sa activation",
+  "WhatsApp sending requires review": "Ipinapadala · suriin kung naputol",
+  "WhatsApp API accepted": "Tinanggap ng WhatsApp · hindi pa naihahatid"
 }

@@ -139,6 +139,8 @@ function fixture(path = ":memory:") {
     provider,
     fixtureAddressGeo,
   );
+  service.operationsManagerPhone = "+971500000001";
+  service.operationsOrigin = "https://3l.example";
   // As in Production: the customer's chosen area id is the authority.
   service.deliveryAddressMode = "legacy";
   const place = async (input: unknown, key = randomUUID()) => {
@@ -653,18 +655,15 @@ test("a paid order records one WhatsApp alert per configured recipient and sends
   const manager = "+971500000001";
   assert.deepEqual(
     operationsRecipients().map((r) => r.name),
-    ["Liza"],
+    [],
   );
   assert.deepEqual(
     operationsRecipients("not a number").map((r) => r.name),
-    ["Liza"],
+    [],
   );
   assert.deepEqual(
     operationsRecipients("+971 50 000 0001").map((r) => [r.name, r.phone]),
-    [
-      ["Liza", "+971521683319"],
-      ["3L Manager", manager],
-    ],
+    [["3L Manager", manager]],
   );
   const f = fixture();
   f.service.operationsManagerPhone = manager;
@@ -675,7 +674,7 @@ test("a paid order records one WhatsApp alert per configured recipient and sends
     const rows = f.store.read().operationsNotifications!;
     assert.deepEqual(
       rows.map((r) => r.recipient.name),
-      ["Liza", "3L Manager"],
+      ["3L Manager"],
     );
     assert.ok(
       rows.every(
@@ -1063,13 +1062,12 @@ test("an alert is never sent from the business number to itself", async () => {
     // Outbound explicitly enabled here, with a fake provider, to exercise the guard.
     await dispatchOperationsNotifications(f.store, {
       outboundEnabled: true,
+      activationSince: "1970-01-01T00:00:00.000Z",
       notifier,
     });
     const rows = f.store.read().operationsNotifications!;
-    const liza = rows.find((r) => r.recipient.name === "Liza")!;
     const manager = rows.find((r) => r.recipient.name === "3L Manager")!;
-    assert.deepEqual(sent, ["+971521683319"]);
-    assert.equal(liza.status, "sent");
+    assert.deepEqual(sent, []);
     assert.equal(manager.status, "failed");
     assert.equal(manager.sentAt, undefined);
     assert.match(

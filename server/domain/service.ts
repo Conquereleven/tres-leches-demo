@@ -31,7 +31,7 @@ import {
 } from "./commands";
 import { type GeoService, quoteOrder } from "./zones";
 import { recordPaidOperationsEmail } from "./operations-email";
-import { recordOrderPaid } from "./notifications";
+import { recordOrderPaid, applyOperationsReceipt } from "./notifications";
 import { recordCustomerEvent } from "./customer-notifications";
 import { assignPublicOrderNumber } from "./order-number";
 import { transition } from "./workflow";
@@ -645,7 +645,12 @@ export class CommerceService {
         );
         return { duplicate: true };
       }
-      if (e.type === "status") {
+      if (
+        e.type === "status" &&
+        applyOperationsReceipt(s, e.providerId, e.status)
+      ) {
+        // Existing signed/idempotent inbound transaction owns this receipt.
+      } else if (e.type === "status") {
         const m = s.conversations
           .flatMap((c) => c.messages)
           .find((m) => m.providerId === e.providerId);
