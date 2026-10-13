@@ -367,6 +367,27 @@ test("OMS styles use only the approved palette and stay scoped to Operations", (
         selector.trim().startsWith(".commerce.ops-shell"),
         selector.trim(),
       );
+  // Across every Operations stylesheet the only chromatic colours are the
+  // three brand colours plus the ink and grey neutrals.
+  const chromatic = new Set<string>();
+  for (const file of ["operations-shell", "commerce", "product-hub", "oms"])
+    for (const [, hex] of readFileSync(
+      `src/commerce/${file}.css`,
+      "utf8",
+    ).matchAll(/#([0-9a-f]{6})(?:[0-9a-f]{2})?\b/gi)) {
+      const [r, g, b] = [0, 2, 4].map((i) =>
+        parseInt(hex!.slice(i, i + 2), 16),
+      );
+      if (Math.max(r!, g!, b!) - Math.min(r!, g!, b!) >= 9)
+        chromatic.add(hex!.toLowerCase());
+    }
+  assert.deepEqual([...chromatic].sort(), [
+    "27242d",
+    "5a565f",
+    "a28d5b",
+    "f6dfe0",
+    "ffc0c8",
+  ]);
   for (const file of ["operations-shell", "commerce", "product-hub", "oms"])
     assert.doesNotMatch(
       readFileSync(`src/commerce/${file}.css`, "utf8"),

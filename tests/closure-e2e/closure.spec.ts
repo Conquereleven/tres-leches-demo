@@ -134,7 +134,7 @@ test("actual Pan variants persist selector → cart → checkout → database �
     .locator("a")
     .click();
   const details = page.locator(".oms-details");
-  await expect(details).toContainText(data.orderId);
+  await expect(page.locator(".oms-page-heading")).toContainText(data.orderId);
   await expect(details).toContainText("+525512345678");
   await expect(page.locator(".oms-items")).toContainText("Pistachio");
   await expect(page.locator(".oms-items")).toContainText("Chocolate covering");

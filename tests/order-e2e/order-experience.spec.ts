@@ -251,9 +251,9 @@ test("delivery: names, area typeahead, billing, #001 confirmation, operations an
   await expect(listed).toContainText("Ana María López Ortega");
   await listed.locator("a").click();
   const card = page.locator(".oms-details");
-  await expect(card.locator("h2")).toHaveText("#001");
+  await expect(page.locator(".oms-page-heading h1")).toHaveText("#001");
   // The internal reference stays available for audit.
-  await expect(card).toContainText(paid.orderId);
+  await expect(page.locator(".oms-page-heading")).toContainText(paid.orderId);
   await expect(card).toContainText("Ana María López Ortega");
   await page.screenshot({
     path: `${shots}/operations-orders-1440.png`,
@@ -261,9 +261,7 @@ test("delivery: names, area typeahead, billing, #001 confirmation, operations an
   });
   // Producción lists the confirmed order under its public number.
   await page.goto("/operations/production");
-  await expect(
-    page.getByRole("article", { name: "Order #001" }),
-  ).toBeVisible();
+  await expect(page.getByRole("article", { name: "Order #001" })).toBeVisible();
   await page.screenshot({ path: `${shots}/operations-production-1440.png` });
   // Opening and reloading operations pages records no customer email.
   await page.reload();
@@ -316,9 +314,7 @@ test("delivery: names, area typeahead, billing, #001 confirmation, operations an
   expect(await events()).toEqual(["ORDER_PRODUCTION_STARTED"]);
   // Entregas shows the ready order under the same number.
   await page.goto("/operations/delivery");
-  await expect(
-    page.getByRole("article", { name: "Order #001" }),
-  ).toBeVisible();
+  await expect(page.getByRole("article", { name: "Order #001" })).toBeVisible();
   await page.screenshot({ path: `${shots}/operations-delivery-1440.png` });
   await move("Out for Delivery");
   expect(await events()).toEqual([
@@ -341,7 +337,7 @@ test("delivery: names, area typeahead, billing, #001 confirmation, operations an
   await page.goto(`/operations/orders?order=${order.id}`);
   // The earlier ?order= link now lands on the order page.
   await expect(page).toHaveURL(new RegExp(`/operations/orders/${order.id}$`));
-  await expect(page.locator(".oms-details")).toContainText(paid.orderId);
+  await expect(page.locator(".oms-page-heading")).toContainText(paid.orderId);
   await expect(page.locator(".oms-notifications")).toContainText(
     "Pending · email provider not configured",
   );

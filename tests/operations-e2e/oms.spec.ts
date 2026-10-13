@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
+import AxeBuilder from "@axe-core/playwright";
 import { omsWorkspace } from "../fixtures/oms";
 
 const SHOTS = "docs/operations/oms/screenshots";
@@ -116,7 +117,7 @@ test("row opens the order page; Back restores filters, search and page", async (
   await expect(page).toHaveURL(/q=layla/);
   await expect(page.getByRole("searchbox")).toHaveValue("layla");
   await page.goForward();
-  await expect(page.locator(".oms-details h2")).toHaveText("#012");
+  await expect(page.locator(".oms-page-heading h1")).toHaveText("#012");
 });
 
 test("direct URL, refresh, legacy link, missing order and polling stability", async ({
@@ -124,9 +125,9 @@ test("direct URL, refresh, legacy link, missing order and polling stability", as
 }) => {
   const { data } = await serve(page);
   await page.goto("/operations/orders/TL-FIX00001");
-  await expect(page.locator(".oms-details h2")).toHaveText("#012");
+  await expect(page.locator(".oms-page-heading h1")).toHaveText("#012");
   await page.reload();
-  await expect(page.locator(".oms-details h2")).toHaveText("#012");
+  await expect(page.locator(".oms-page-heading h1")).toHaveText("#012");
   // Opened without the list: Back still lands on the list.
   await page.getByRole("button", { name: "Back to orders" }).click();
   await expect(page).toHaveURL(/\/operations\/orders$/);
@@ -135,14 +136,14 @@ test("direct URL, refresh, legacy link, missing order and polling stability", as
   // Links from earlier emails and alerts keep working.
   await page.goto("/operations/orders?order=TL-FIX00003");
   await expect(page).toHaveURL(/\/operations\/orders\/TL-FIX00003$/);
-  await expect(page.locator(".oms-details h2")).toHaveText("#013");
+  await expect(page.locator(".oms-page-heading h1")).toHaveText("#013");
 
   // The open order survives workspace refreshes, including a state change.
   await page.getByText("Reconciliation details").click();
   data.orders.find((o: { id: string }) => o.id === "TL-FIX00003")!.version = 9;
   await page.waitForResponse("**/api/workspace");
   await page.waitForResponse("**/api/workspace");
-  await expect(page.locator(".oms-details h2")).toHaveText("#013");
+  await expect(page.locator(".oms-page-heading h1")).toHaveText("#013");
   await expect(page.locator(".oms-advanced")).toHaveAttribute("open", "");
 
   await page.goto("/operations/orders/TL-DOESNOTEXIST");
@@ -160,9 +161,11 @@ test("order page shows stored facts only: customer, items, payment, delivery", a
   data.catalog[0].name = "Current catalog must never replace history";
   await page.goto("/operations/orders/TL-FIX00001");
   const details = page.locator(".oms-details");
+  // The internal reference stays visible, under the order number.
+  await expect(page.locator(".oms-page-heading")).toContainText(
+    /Internal reference\s*TL-FIX00001/,
+  );
   for (const text of [
-    "Internal reference",
-    "TL-FIX00001",
     "Layla Fixture",
     "+971500000101",
     "layla.fixture@example.invalid",
@@ -328,6 +331,118 @@ test("draft orders keep the existing builder on their page", async ({
   await expect(
     page.getByRole("button", { name: "Request Payment" }),
   ).toBeVisible();
+});
+
+test("order number is the page title; review flags stay out of product titles", async ({
+  page,
+}) => {
+  await serve(page);
+  await page.goto("/operations/orders/TL-FIX00001");
+  // One page title: the order number, not a second "Orders" heading.
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("#012");
+  await expect(page.locator(".ops-page-header")).not.toContainText(
+    "Manage orders from payment to fulfillment",
+  );
+  // The fixture product has no reviewed English name: flagged, title untouched.
+  const title = page.locator(".oms-item-name");
+  await expect(title).toHaveText("Pan de Muerto");
+  await expect(page.locator(".oms-item-review")).toHaveText(
+    "Product translation requires review",
+  );
+  await expect(page.locator(".oms-items")).toContainText("pan-de-muerto");
+  // The list keeps the section title.
+  await page.goto("/operations/orders");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Orders");
+});
+
+test("address problems are stated beside the dispatch action, which stays the operator's decision", async ({
+  page,
+}) => {
+  const { data, writes } = await serve(page);
+  const order = (id: string) =>
+    data.orders.find((o: { id: string }) => o.id === id)!;
+  // Ready for dispatch with an incomplete, unverified address.
+  order("TL-FIX00004").state = "Ready";
+  await page.goto("/operations/orders/TL-FIX00004");
+  const warning = page.locator(".oms-dispatch-warning");
+  await expect(warning).toContainText("Address incomplete");
+  await expect(warning).toContainText("Review address before dispatch");
+  const send = page.getByRole("button", { name: "Send for delivery" });
+  // Existing behaviour: the state machine allows it; the UI does not block.
+  await expect(send).toBeEnabled();
+  // Complete but unverified.
+  Object.assign(order("TL-FIX00004").delivery, {
+    address: "Sample Street",
+    building: "Fixture Villa 4",
+  });
+  await page.reload();
+  await expect(warning).toContainText("ADDRESS NOT VERIFIED");
+  // Verified and complete: no warning. Pickup: never.
+  order("TL-FIX00001").state = "Ready";
+  await page.goto("/operations/orders/TL-FIX00001");
+  await expect(send).toBeVisible();
+  await expect(warning).toHaveCount(0);
+  await page.goto("/operations/orders/TL-FIX00003");
+  await expect(
+    page.getByRole("button", { name: "Confirm pickup" }),
+  ).toBeVisible();
+  await expect(warning).toHaveCount(0);
+  // Earlier steps are not dispatch: no warning while preparing.
+  order("TL-FIX00004").state = "Production";
+  Object.assign(order("TL-FIX00004").delivery, { address: "", building: "" });
+  await page.goto("/operations/orders/TL-FIX00004");
+  await expect(page.getByRole("button", { name: "Mark ready" })).toBeVisible();
+  await expect(warning).toHaveCount(0);
+  expect(writes).toEqual([]);
+});
+
+for (const width of [390, 1440])
+  test(`accessibility scan (contrast included) at ${width}px`, async ({
+    page,
+  }) => {
+    await serve(page);
+    await page.setViewportSize({ width, height: 1000 });
+    for (const path of [
+      "/operations/orders",
+      "/operations/orders/TL-FIX00001",
+      "/operations/orders/TL-FIX00004",
+      "/operations/orders/TL-FIX00007",
+      "/operations/orders/TL-FIX00008",
+      "/operations/production",
+    ]) {
+      await page.goto(path);
+      await expect(page.locator(".ops-content")).toBeVisible();
+      await page.waitForTimeout(150);
+      const { violations } = await new AxeBuilder({ page }).analyze();
+      expect(
+        violations.map((v) => `${v.id}: ${v.nodes[0]?.html.slice(0, 120)}`),
+        path,
+      ).toEqual([]);
+    }
+  });
+
+test("mobile: fulfilment tabs show there is more and keep the selection in view", async ({
+  page,
+}) => {
+  await serve(page);
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto("/operations/orders");
+  const wrap = page.locator(".oms-tabs-wrap");
+  await expect(wrap).toHaveAttribute("data-more-right", "true");
+  await expect(wrap).not.toHaveAttribute("data-more-left", "true");
+  await wrap.locator('.oms-tabs-nudge[data-side="right"]').click();
+  await expect(wrap).toHaveAttribute("data-more-left", "true");
+  // A deep link to a status at the far end scrolls that tab into view.
+  await page.goto("/operations/orders?status=cancelled");
+  const active = page.getByRole("button", { name: /^Cancelled/ });
+  await expect(active).toHaveAttribute("aria-pressed", "true");
+  await expect(active).toBeInViewport({ ratio: 1 });
+  expect(await noOverflow(page)).toBe(true);
+  // Desktop shows every tab: no scroll affordance.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(wrap).not.toHaveAttribute("data-more-right", "true");
+  await expect(page.locator(".oms-tabs-nudge")).toHaveCount(0);
 });
 
 for (const width of [390, 768, 1440])
