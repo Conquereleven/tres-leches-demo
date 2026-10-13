@@ -21,7 +21,7 @@ import type {
 import { api, money, type Workspace as Data } from "./api";
 import { OrderCard } from "./OrdersBoard";
 import { OrdersList } from "./OrdersList";
-import { OrderDetailsPage } from "./OrderDetails";
+import { OrderDetailsPage, OrderPageHeading } from "./OrderDetails";
 import {
   orderPath,
   parseListQuery,
@@ -186,6 +186,20 @@ function WorkspaceInner() {
       onNavigate={(id) => go(`/operations/${id}`)}
       onRefresh={() => void refresh()}
       onLogout={() => void run({}, "logout")}
+      heading={
+        view === "orders" && route.orderId ? (
+          <OrderPageHeading
+            data={data}
+            orderId={route.orderId}
+            onBack={() => {
+              // Came from the list: Back restores its filters and position.
+              if ((history.state as { omsList?: boolean } | null)?.omsList)
+                history.back();
+              else go(`/operations/orders${serializeListQuery(listQuery)}`);
+            }}
+          />
+        ) : undefined
+      }
     >
       {data.integrationHealth?.inboundFailed ? (
         <p className="co-error" role="alert">
@@ -429,12 +443,6 @@ function WorkspaceInner() {
                 orderId={route.orderId}
                 run={run}
                 busy={busy}
-                onBack={() => {
-                  // Came from the list: Back restores its filters and position.
-                  if ((history.state as { omsList?: boolean } | null)?.omsList)
-                    history.back();
-                  else go(`/operations/orders${serializeListQuery(listQuery)}`);
-                }}
                 openConversation={(id) => {
                   setSelected(id);
                   go("/operations/inbox");

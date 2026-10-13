@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CaretLeft,
   CaretRight,
@@ -77,27 +77,12 @@ export function OrdersList({
   return (
     <div className="oms oms-list">
       <div className="oms-card oms-toolbar">
-        <div
-          className="oms-tabs"
-          role="group"
-          aria-label={t("Filter by fulfillment status")}
-        >
-          {FULFILMENT_FILTERS.filter(
-            ([id]) => id === "any" || counts.get(id) || query.fulfilment === id,
-          ).map(([id, label]) => (
-            <button
-              type="button"
-              key={id}
-              aria-pressed={query.fulfilment === id}
-              onClick={() => set({ fulfilment: id })}
-            >
-              {t(id === "any" ? "All" : label)}
-              <span>
-                {id === "any" ? data.orders.length : (counts.get(id) ?? 0)}
-              </span>
-            </button>
-          ))}
-        </div>
+        <FulfilmentTabs
+          query={query}
+          counts={counts}
+          total={data.orders.length}
+          onSelect={(fulfilment) => set({ fulfilment })}
+        />
         <div className="oms-search-row">
           <label className="oms-search">
             <span className="oms-sr">{t("Search orders")}</span>
@@ -306,6 +291,111 @@ export function OrdersList({
             </button>
           )}
         </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Fulfilment status tabs. On narrow screens the row scrolls sideways: an edge
+ * fade and arrow show there is more, and the selected tab is kept in view.
+ */
+function FulfilmentTabs({
+  query,
+  counts,
+  total,
+  onSelect,
+}: {
+  query: ListQuery;
+  counts: Map<string, number>;
+  total: number;
+  onSelect: (id: ListQuery["fulfilment"]) => void;
+}) {
+  const { t } = useOps();
+  const strip = useRef<HTMLDivElement>(null);
+  const [more, setMore] = useState({ left: false, right: false });
+  const measure = useCallback(() => {
+    const el = strip.current;
+    if (!el) return;
+    const left = el.scrollLeft > 4;
+    const right = el.scrollLeft + el.clientWidth < el.scrollWidth - 4;
+    setMore((m) =>
+      m.left === left && m.right === right ? m : { left, right },
+    );
+  }, []);
+  useEffect(() => {
+    const el = strip.current;
+    if (!el) return;
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [measure]);
+  useEffect(() => {
+    const el = strip.current;
+    const active = el?.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (!el || !active) return;
+    // Horizontal only: never moves the page.
+    const target =
+      active.offsetLeft - (el.clientWidth - active.offsetWidth) / 2;
+    el.scrollTo({ left: Math.max(0, target) });
+    measure();
+  }, [query.fulfilment, measure]);
+  const nudge = (direction: 1 | -1) =>
+    strip.current?.scrollBy({
+      left: direction * strip.current.clientWidth * 0.7,
+      behavior: "smooth",
+    });
+  return (
+    <div
+      className="oms-tabs-wrap"
+      data-more-left={more.left || undefined}
+      data-more-right={more.right || undefined}
+    >
+      {more.left && (
+        <button
+          type="button"
+          className="oms-tabs-nudge"
+          data-side="left"
+          tabIndex={-1}
+          aria-hidden="true"
+          onClick={() => nudge(-1)}
+        >
+          <CaretLeft />
+        </button>
+      )}
+      <div
+        ref={strip}
+        className="oms-tabs"
+        role="group"
+        aria-label={t("Filter by fulfillment status")}
+        onScroll={measure}
+      >
+        {FULFILMENT_FILTERS.filter(
+          ([id]) => id === "any" || counts.get(id) || query.fulfilment === id,
+        ).map(([id, label]) => (
+          <button
+            type="button"
+            key={id}
+            aria-pressed={query.fulfilment === id}
+            onClick={() => onSelect(id)}
+          >
+            {t(id === "any" ? "All" : label)}
+            <span>{id === "any" ? total : (counts.get(id) ?? 0)}</span>
+          </button>
+        ))}
+      </div>
+      {more.right && (
+        <button
+          type="button"
+          className="oms-tabs-nudge"
+          data-side="right"
+          tabIndex={-1}
+          aria-hidden="true"
+          onClick={() => nudge(1)}
+        >
+          <CaretRight />
+        </button>
       )}
     </div>
   );

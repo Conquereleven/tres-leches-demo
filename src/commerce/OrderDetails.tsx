@@ -10,6 +10,7 @@ import {
   Phone,
   Receipt,
   Storefront,
+  Translate,
   Truck,
   User,
   WarningCircle,
@@ -18,7 +19,7 @@ import {
 import type { Conversation, Order, Payment } from "../../server/domain/model";
 import { orderReference } from "../../shared/order-number";
 import type { Workspace as Data } from "./api";
-import { OperationalProductName } from "./OperationalProductName";
+import { TRANSLATION_REVIEW } from "./product-names";
 import { FulfilmentBadge, PaymentBadge } from "./OrderBadges";
 import { aed } from "./OrdersList";
 import { useOps } from "./ops-i18n";
@@ -60,10 +61,10 @@ function Card({
   return (
     <section className="oms-card" aria-labelledby={`oms-${id}`}>
       <header className="oms-card-head">
-        <h3 id={`oms-${id}`}>
+        <h2 id={`oms-${id}`}>
           {icon}
           {title}
-        </h3>
+        </h2>
         {aside}
       </header>
       {children}
@@ -79,13 +80,59 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
+/**
+ * Page heading for one order: the order number is the page title, replacing
+ * the section title the shell shows for every other Operations view.
+ */
+export function OrderPageHeading({
+  data,
+  orderId,
+  onBack,
+}: {
+  data: Data;
+  orderId: string;
+  onBack: () => void;
+}) {
+  const { t, formatDate } = useOps();
+  const o = data.orders.find((o) => o.id === orderId);
+  const placed = o && createdAt(o);
+  return (
+    <div className="oms-page-heading">
+      <button type="button" className="oms-back" onClick={onBack}>
+        <ArrowLeft aria-hidden />
+        {t("Back to orders")}
+      </button>
+      <h1>{o ? orderReference(o) : t("Order not found")}</h1>
+      {o && (
+        <>
+          <p className="oms-muted">
+            {placed
+              ? t("Created {{date}}", { date: formatDate(placed) })
+              : t("Creation time not stored")}
+            {o.publicOrderNumber && (
+              <>
+                {" · "}
+                {t("Referencia interna")}{" "}
+                <span className="oms-ref">{o.id}</span>
+              </>
+            )}
+          </p>
+          <div className="oms-badges">
+            <PaymentBadge payment={paymentOf(data, o)} />
+            <FulfilmentBadge order={o} />
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 /** Dedicated page for one order, looked up by its immutable internal id. */
 export function OrderDetailsPage({
   data,
   orderId,
   run,
   busy,
-  onBack,
   openConversation,
   builder,
 }: {
@@ -93,23 +140,15 @@ export function OrderDetailsPage({
   orderId: string;
   run: Run;
   busy: boolean;
-  onBack: () => void;
   openConversation: (conversationId: string) => void;
   /** Existing order builder, shown only while an order is still a draft. */
   builder: (order: Order) => ReactNode;
 }) {
-  const { t, formatDate } = useOps();
+  const { t } = useOps();
   const o = data.orders.find((o) => o.id === orderId);
-  const back = (
-    <button type="button" className="oms-back" onClick={onBack}>
-      <ArrowLeft aria-hidden />
-      {t("Back to orders")}
-    </button>
-  );
   if (!o)
     return (
       <div className="oms oms-details">
-        {back}
         <div className="oms-card oms-empty" role="alert">
           <Receipt size={30} aria-hidden />
           <h2>{t("Order not found")}</h2>
@@ -125,10 +164,24 @@ export function OrderDetailsPage({
   const c = conversationOf(data, o);
   const p = paymentOf(data, o);
   const permissions = orderPermissions(data, o, c, p);
-  const placed = createdAt(o);
+  const check = addressCheck(o);
+  // Dispatch is the step an address problem affects; say so next to the button.
+  const dispatchWarning =
+    permissions.next?.to === "Out for Delivery" &&
+    (check.incomplete || check.unverified);
   const act = (body: Record<string, unknown>, path?: string) => {
     if (!busy) void run(body, path);
   };
+  const conversationButton = c && c.sourceNumberId !== "web" && (
+    <button
+      type="button"
+      className="oms-button"
+      onClick={() => openConversation(c.id)}
+    >
+      <ChatsCircle aria-hidden />
+      {t("Abrir conversación")}
+    </button>
+  );
   return (
     <article
       className="oms oms-details"
@@ -136,48 +189,34 @@ export function OrderDetailsPage({
       data-state={o.state}
       aria-label={`${t("Order")} ${orderReference(o)}`}
     >
-      {back}
-      <header className="oms-details-head">
-        <div>
-          <h2>{orderReference(o)}</h2>
-          <p className="oms-muted">
-            {placed
-              ? t("Created {{date}}", { date: formatDate(placed) })
-              : t("Creation time not stored")}
-            {o.publicOrderNumber && (
-              <>
-                {" · "}
-                {t("Referencia interna")}{" "}
-                <span className="oms-ref">{o.id}</span>
-              </>
-            )}
-          </p>
-          <div className="oms-badges">
-            <PaymentBadge payment={p} />
-            <FulfilmentBadge order={o} />
+      {(permissions.next || conversationButton) && (
+        <div className="oms-action-bar">
+          {dispatchWarning && (
+            <p className="oms-notice oms-dispatch-warning" role="alert">
+              <WarningCircle aria-hidden />
+              <span>
+                <strong>
+                  {check.incomplete
+                    ? t("Address incomplete")
+                    : t("ADDRESS NOT VERIFIED")}
+                </strong>{" "}
+                · {t("Review address before dispatch")}
+              </span>
+            </p>
+          )}
+          <div className="oms-head-actions">
+            <NextAction
+              order={o}
+              conversation={c}
+              permissions={permissions}
+              actorId={data.actor.id}
+              busy={busy}
+              act={act}
+            />
+            {conversationButton}
           </div>
         </div>
-        <div className="oms-head-actions">
-          <NextAction
-            order={o}
-            conversation={c}
-            permissions={permissions}
-            actorId={data.actor.id}
-            busy={busy}
-            act={act}
-          />
-          {c && c.sourceNumberId !== "web" && (
-            <button
-              type="button"
-              className="oms-button"
-              onClick={() => openConversation(c.id)}
-            >
-              <ChatsCircle aria-hidden />
-              {t("Abrir conversación")}
-            </button>
-          )}
-        </div>
-      </header>
+      )}
 
       <div className="oms-columns">
         <div className="oms-primary">
@@ -419,11 +458,17 @@ export function OrderItemsCard({ order: o, data }: CardProps) {
             {lines.map((l) => (
               <tr key={l.productId}>
                 <th scope="row">
-                  <OperationalProductName
-                    product={l.product}
-                    id={l.productId}
-                  />
+                  {/* Title stays the product; the review flag is a separate line. */}
+                  <span lang="en" className="oms-item-name">
+                    {l.product.name}
+                  </span>
                   <small className="oms-ref">{l.productId}</small>
+                  {l.product.reviewRequired && (
+                    <small className="oms-item-review">
+                      <Translate aria-hidden />
+                      {TRANSLATION_REVIEW}
+                    </small>
+                  )}
                 </th>
                 <td className="oms-num" data-label={t("Unit price")}>
                   {aed(l.unitFils) ?? (

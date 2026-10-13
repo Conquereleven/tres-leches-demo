@@ -80,7 +80,7 @@
   flex-wrap: wrap;
   margin-bottom: 16px;
 }
-.commerce.ops-shell .oms-card-head h3 {
+.commerce.ops-shell .oms-card-head h2 {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -88,7 +88,7 @@
   font-weight: 600;
   letter-spacing: 0;
 }
-.commerce.ops-shell .oms-card-head h3 svg {
+.commerce.ops-shell .oms-card-head h2 svg {
   color: var(--oms-gold);
 }
 
@@ -434,24 +434,6 @@
 }
 
 /* Order page */
-.commerce.ops-shell .oms-details-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.commerce.ops-shell .oms-details-head h2 {
-  font-size: 30px;
-  font-weight: 700;
-  line-height: 1.15;
-  overflow-wrap: anywhere;
-}
-.commerce.ops-shell .oms-details-head > div:first-child {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-}
 .commerce.ops-shell .oms-badges,
 .commerce.ops-shell .oms-head-actions,
 .commerce.ops-shell .oms-actions {
@@ -813,9 +795,6 @@
   .commerce.ops-shell .oms-search {
     flex-basis: 100%;
   }
-  .commerce.ops-shell .oms-details-head h2 {
-    font-size: 24px;
-  }
   .commerce.ops-shell .oms-head-actions,
   .commerce.ops-shell .oms-head-actions .oms-button {
     width: 100%;
@@ -880,4 +859,162 @@
   gap: 12px;
   flex-wrap: wrap;
   font-size: 13px;
+}
+
+/* Refinement pass: order number as page title, action bar, item review flag. */
+.commerce.ops-shell .oms-page-heading {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.commerce.ops-shell .oms-page-heading h1 {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.commerce.ops-shell .oms-page-heading .oms-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #27242d;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: #a28d5b;
+  text-underline-offset: 3px;
+  justify-self: start;
+  cursor: pointer;
+}
+.commerce.ops-shell .oms-page-heading .oms-back:hover:not(:disabled) {
+  background: none;
+  text-decoration-thickness: 2px;
+}
+.commerce.ops-shell .oms-page-heading .oms-back svg {
+  width: 18px;
+  height: 18px;
+}
+.commerce.ops-shell .oms-page-heading .oms-muted {
+  margin: 0;
+  font-size: 13px;
+}
+.commerce.ops-shell .oms-page-heading .oms-badges {
+  margin-top: 4px;
+}
+.commerce.ops-shell .ops-page-header:has(.oms-page-heading) {
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.commerce.ops-shell .oms-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.commerce.ops-shell .oms-action-bar .oms-notice {
+  flex: 1 1 260px;
+  margin: 0;
+}
+.commerce.ops-shell .oms-item-name {
+  display: block;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.commerce.ops-shell .oms-items tbody th .oms-item-review {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border: 1px dashed #27242d;
+  border-radius: 999px;
+  color: #27242d;
+  font-size: 11px;
+  font-weight: 600;
+}
+.commerce.ops-shell .oms-item-review svg {
+  width: 13px;
+  height: 13px;
+}
+.commerce.ops-shell .oms-tabs-wrap {
+  position: relative;
+  min-width: 0;
+}
+.commerce.ops-shell .oms-tabs {
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+.commerce.ops-shell .oms-tabs::-webkit-scrollbar {
+  display: none;
+}
+.commerce.ops-shell .oms .oms-tabs button {
+  scroll-snap-align: start;
+}
+.commerce.ops-shell .oms-tabs-wrap::before,
+.commerce.ops-shell .oms-tabs-wrap::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 64px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+}
+.commerce.ops-shell .oms-tabs-wrap::before {
+  left: 0;
+  background: linear-gradient(to left, transparent, #ffffff 60%);
+}
+.commerce.ops-shell .oms-tabs-wrap::after {
+  right: 0;
+  background: linear-gradient(to right, transparent, #ffffff 60%);
+}
+.commerce.ops-shell .oms-tabs-wrap[data-more-left]::before,
+.commerce.ops-shell .oms-tabs-wrap[data-more-right]::after {
+  opacity: 1;
+}
+.commerce.ops-shell .oms .oms-tabs-nudge {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  width: 36px;
+  min-height: 44px;
+  height: 44px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid #e6e2df;
+  border-radius: 50%;
+  background: #ffffff;
+  color: #27242d;
+  cursor: pointer;
+}
+.commerce.ops-shell .oms .oms-tabs-nudge[data-side="left"] {
+  left: 0;
+}
+.commerce.ops-shell .oms .oms-tabs-nudge[data-side="right"] {
+  right: 0;
+}
+.commerce.ops-shell .oms .oms-tabs-nudge:hover:not(:disabled) {
+  background: #f6dfe0;
+  border-color: #a28d5b;
+}
+@container (max-width: 560px) {
+  .commerce.ops-shell .oms-action-bar,
+  .commerce.ops-shell .oms-action-bar .oms-head-actions {
+    width: 100%;
+  }
+}
+@media (max-width: 640px) {
+  .commerce.ops-shell .ops-page-header:has(.oms-page-heading) {
+    margin-bottom: 12px;
+  }
+  .commerce.ops-shell .ops-page-header:has(.oms-page-heading) .ops-refresh {
+    align-self: flex-start;
+  }
 }
