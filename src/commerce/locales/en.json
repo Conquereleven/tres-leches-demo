@@ -443,7 +443,7 @@
   "{{count}} unpublished changes": "{{count}} unpublished changes",
   "No unpublished changes": "No unpublished changes",
   "New product": "New product",
-  "View only. Only an administrator can edit or publish the catalog.": "View only. Only an administrator can edit or publish the catalog.",
+  "View only. Catalog staff can edit drafts; only an administrator can publish.": "View only. Catalog staff can edit drafts; only an administrator can publish.",
   "Changes stay in a private draft until published. The public storefront still ships its catalog with each build, so publishing here does not yet change what customers see.": "Changes stay in a private draft until published. The public storefront still ships its catalog with each build, so publishing here does not yet change what customers see.",
   "The published catalog changed after this draft was started. Discard the draft and re-apply your changes.": "The published catalog changed after this draft was started. Discard the draft and re-apply your changes.",
   "Product Hub sections": "Product Hub sections",
@@ -698,5 +698,7 @@
   "WhatsApp receipt read": "Read",
   "WhatsApp alert not eligible": "Not sent · outside activation",
   "WhatsApp sending requires review": "Sending · review if interrupted",
-  "WhatsApp API accepted": "Accepted by WhatsApp · delivery pending"
+  "WhatsApp API accepted": "Accepted by WhatsApp · delivery pending",
+  "Only catalog staff can edit drafts": "Only catalog staff can edit drafts",
+  "Only an administrator can publish the catalog": "Only an administrator can publish the catalog"
 }

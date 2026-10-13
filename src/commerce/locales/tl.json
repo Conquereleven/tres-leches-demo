@@ -443,7 +443,7 @@
   "{{count}} unpublished changes": "{{count}} pagbabagong hindi pa naka-publish",
   "No unpublished changes": "Walang pagbabagong hindi pa naka-publish",
   "New product": "Bagong produkto",
-  "View only. Only an administrator can edit or publish the catalog.": "Tingin lamang. Administrator lang ang puwedeng mag-edit o mag-publish ng catalog.",
+  "View only. Catalog staff can edit drafts; only an administrator can publish.": "Tingin lamang. Catalog staff ang puwedeng mag-edit ng draft; administrator lang ang puwedeng mag-publish.",
   "Changes stay in a private draft until published. The public storefront still ships its catalog with each build, so publishing here does not yet change what customers see.": "Nananatili sa pribadong draft ang mga pagbabago hanggang i-publish. Kasama pa rin sa bawat build ang catalog ng pampublikong tindahan, kaya hindi pa nito binabago ang nakikita ng customer.",
   "The published catalog changed after this draft was started. Discard the draft and re-apply your changes.": "Nagbago ang naka-publish na catalog matapos simulan ang draft na ito. I-discard ang draft at ulitin ang mga pagbabago.",
   "Product Hub sections": "Mga seksiyon ng Product Hub",
@@ -698,5 +698,7 @@
   "WhatsApp receipt read": "Nabasa",
   "WhatsApp alert not eligible": "Hindi ipinadala · wala sa activation",
   "WhatsApp sending requires review": "Ipinapadala · suriin kung naputol",
-  "WhatsApp API accepted": "Tinanggap ng WhatsApp · hindi pa naihahatid"
+  "WhatsApp API accepted": "Tinanggap ng WhatsApp · hindi pa naihahatid",
+  "Only catalog staff can edit drafts": "Catalog staff lang ang puwedeng mag-edit ng mga draft",
+  "Only an administrator can publish the catalog": "Administrator lang ang puwedeng mag-publish ng catalog"
 }

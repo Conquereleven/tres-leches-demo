@@ -243,7 +243,7 @@ export function ProductHub({ actor }: { actor: Actor }) {
       {!canEdit && (
         <p className="ph-banner" role="status">
           {t(
-            "View only. Only an administrator can edit or publish the catalog.",
+            "View only. Catalog staff can edit drafts; only an administrator can publish.",
           )}
         </p>
       )}

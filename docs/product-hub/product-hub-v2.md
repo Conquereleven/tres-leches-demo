@@ -6,7 +6,7 @@ Nothing here was run against Production, a live database or a payment provider.
 
 ## What it does
 
-Inside Operations → Products an administrator can:
+Inside Operations → Products administrators and managers can prepare drafts:
 
 - browse and filter the whole catalog (category, publication status, availability, draft changes, free search);
 - create products and edit existing ones: name, category, family, description, publication status;
@@ -75,8 +75,8 @@ All routes need a signed-in session. Writes also need the same-origin `Origin` h
 | Route                            | Roles                                            | Purpose                                                                                                                                                             |
 | -------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `GET /api/product-hub`           | admin, manager                                   | Flags, permissions, version, published revision, draft status, categories, families, products with variants and commercial fields, assets, checks, changes, history |
-| `POST /api/product-hub/commands` | admin                                            | JSON body ≤ 512 KB: `saveProduct`, `saveFamily`, `saveAsset`, `discardDraft`, `publish`, each with `expectedVersion`                                                |
-| `POST /api/product-hub/media`    | admin                                            | Raw image body ≤ 3 MB; `Content-Type` must match the bytes; `X-Hub-Meta` is base64url JSON `{ expectedVersion, alt }`                                               |
+| `POST /api/product-hub/commands` | admin/manager drafts; admin publish                                            | JSON body ≤ 512 KB: `saveProduct`, `saveFamily`, `saveAsset`, `discardDraft`, `publish`, each with `expectedVersion`                                                |
+| `POST /api/product-hub/media`    | admin, manager                                            | Raw image body ≤ 3 MB; `Content-Type` must match the bytes; `X-Hub-Meta` is base64url JSON `{ expectedVersion, alt }`                                               |
 | `GET /brand/hub/<sha256>.<ext>`  | public once published; admin/manager while draft | Uploaded image. Published: `immutable`, one year. Draft: `private, no-store`                                                                                        |
 
 Operators and agents receive 403 on every route. Errors: 400 invalid input or missing key, 403 role or
@@ -149,3 +149,11 @@ No shared storefront file is changed in this branch.
 `tests/commerce/product-hub.test.ts` (domain), `tests/commerce/product-hub-http.test.ts` (real server,
 real sessions and roles), `tests/product-hub-e2e/product-hub.spec.ts` (Chromium and WebKit; 390, 768 and
 1440 px; axe). Run the browser suite with `npm run build && npx playwright test -c playwright.product-hub.config.ts`.
+
+## Activation audit update — 13 October 2026
+
+See `PRODUCT_HUB_ACTIVATION_READINESS.md` for current deployed evidence. Earlier
+activation/blocker sections above record the original implementation phase; dynamic
+storefront adoption has since been integrated. Managers now prepare/save/discard the
+shared private draft and upload its media. Only administrators publish. Granting Lisa
+the manager role and switching Production flags remain separately authorized actions.
