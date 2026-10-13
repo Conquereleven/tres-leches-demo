@@ -94,6 +94,7 @@ import {
   PAID_ALERT_BODY,
 } from "./domain/notifications";
 import { operationsWhatsAppConfig } from "./domain/operations-whatsapp-config";
+import { robotsDirective, trailingSlashTarget } from "../shared/seo";
 /** Public customer policy/contact routes; keep in sync with src/brand/business.ts. */
 export const customerPages = [
   "/terms",
@@ -102,6 +103,15 @@ export const customerPages = [
   "/delivery-policy",
   "/contact",
 ] as const;
+/** Public pages prerendered to <page>.html with their own head and content. */
+export const prerenderedPages = [
+  ...customerPages,
+  "/menu",
+  "/how-to-order",
+] as const;
+/** Vite content-hashed bundles: the name changes whenever the bytes do. */
+export const immutableAsset = (path: string) =>
+  /^\/assets\/[^/]+-[A-Za-z0-9_-]{8}\.(?:js|css)$/.test(path);
 /**
  * Tells the storefront, before any script runs, that its catalog is the published
  * revision and the one shipped with the build must not be shown.
@@ -361,6 +371,8 @@ export async function startServer(
       "Content-Type": "application/json",
       "Cache-Control": "no-store",
       "X-Content-Type-Options": "nosniff",
+      // API answers are data for the site's own pages, never search results.
+      "X-Robots-Tag": "noindex",
     });
     res.end(JSON.stringify(value));
   }
@@ -1035,6 +1047,19 @@ export async function startServer(
       }
       if (req.method !== "GET" && req.method !== "HEAD")
         throw new DomainError(405, "Método no permitido");
+      // One URL per page: `/menu/` and `/menu` must not both answer.
+      const withoutSlash = trailingSlashTarget(path, url.search);
+      if (withoutSlash) {
+        res.writeHead(301, {
+          Location: withoutSlash,
+          "Cache-Control": "public, max-age=3600",
+        });
+        return res.end();
+      }
+      // Staff, cart and payment pages, and any non-public deployment, stay
+      // out of search indexes.
+      const robots = robotsDirective(path, process.env.APP_ENV);
+      if (robots) res.setHeader("X-Robots-Tag", robots);
       // Uploaded catalog images live in SQLite, not in the static bundle.
       if (
         serveHubMedia(req, res, path, store, () => {
@@ -1051,9 +1076,7 @@ export async function startServer(
       if (candidate !== root && !candidate.startsWith(root + "/"))
         throw new DomainError(404, "No encontrado");
       // Public customer pages are prerendered to <page>.html at build time.
-      const customerPage = customerPages.find(
-        (p) => p === path.replace(/\/+$/, ""),
-      );
+      const customerPage = prerenderedPages.find((p) => p === path);
       if (customerPage) {
         const page = resolve(root, `.${customerPage}.html`);
         const file = existsSync(page) ? page : resolve(root, "index.html");
@@ -1118,6 +1141,8 @@ export async function startServer(
         ".woff2": "font/woff2",
         ".mp4": "video/mp4",
         ".ico": "image/x-icon",
+        ".txt": "text/plain; charset=utf-8",
+        ".xml": "application/xml; charset=utf-8",
       };
       const body = markDynamicCatalog(file);
       const headers = {
@@ -1126,6 +1151,9 @@ export async function startServer(
         "Referrer-Policy": "same-origin",
         "Content-Security-Policy": customerCsp,
         "Accept-Ranges": "bytes",
+        ...(file === candidate && immutableAsset(path)
+          ? { "Cache-Control": "public, max-age=31536000, immutable" }
+          : {}),
       };
       const range = byteRange(
         typeof req.headers.range === "string" ? req.headers.range : undefined,
