@@ -30,6 +30,7 @@ import {
   dubaiToday,
   quoteWebCheckout,
 } from "../../server/domain/web-checkout";
+import { reconcileEmbeddedPayment } from "../../server/domain/embedded-checkout";
 import { RETIRED_SKUS } from "../../shared/commerce-policy";
 
 const sources = loadBootstrapSources(process.cwd());
@@ -403,7 +404,8 @@ test("fail closed: with adoption on, no valid revision means nothing is offered"
   }
 });
 
-test("checkout after publication uses the published price; accepted orders keep theirs", async () => {
+for (const paymentState of ["pending", "paid"] as const)
+  test(`checkout after publication uses the published price; ${paymentState} orders keep theirs`, async () => {
   const { store, view, payload, save, publish, cake } = setup();
   const checkouts = new Map<string, Record<string, unknown>>();
   const provider = new PaymenntProvider(
@@ -431,7 +433,6 @@ test("checkout after publication uses the published price; accepted orders keep 
     provider,
     fixtureAddressGeo,
   );
-  service.drain = async () => {};
   try {
     const target = cake();
     const sku = target.variants.find((v) => v.active)!;
@@ -453,14 +454,20 @@ test("checkout after publication uses the published price; accepted orders keep 
     };
     const cart = { lines: input.lines, zoneId: input.delivery.zoneId };
     const origin = "https://fixture.invalid";
+    const checkoutKey = randomUUID();
     const accepted = await createWebCheckout(
       service,
       input,
-      randomUUID(),
+      checkoutKey,
       "web",
       origin,
       quoteWebCheckout(service, cart).quoteRevision,
     );
+    if (paymentState === "paid") {
+      for (const checkout of checkouts.values()) checkout.status = "PAID";
+      await reconcileEmbeddedPayment(service, checkoutKey);
+      assert.equal(store.read().payments[0]!.status, "paid");
+    }
     const frozenOrder = JSON.stringify(store.read().orders[0]);
     const frozenPayment = JSON.stringify(store.read().payments[0]);
     const displayed = quoteWebCheckout(service, cart).quoteRevision;
@@ -473,6 +480,12 @@ test("checkout after publication uses the published price; accepted orders keep 
     // History is not rewritten.
     assert.equal(JSON.stringify(store.read().orders[0]), frozenOrder);
     assert.equal(JSON.stringify(store.read().payments[0]), frozenPayment);
+    if (paymentState === "paid") {
+      const eventsBefore = JSON.stringify([store.read().customerNotifications, store.read().operationsNotifications]);
+      await reconcileEmbeddedPayment(service, checkoutKey);
+      assert.equal(JSON.stringify(store.read().orders[0]), frozenOrder);
+      assert.equal(JSON.stringify([store.read().customerNotifications, store.read().operationsNotifications]), eventsBefore);
+    }
     // A cart priced before the publication cannot be paid at the old price.
     await assert.rejects(
       createWebCheckout(service, input, randomUUID(), "web", origin, displayed),
