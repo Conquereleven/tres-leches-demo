@@ -4,7 +4,7 @@
   --ink: #27242d;
   --paper: #fffefa;
   --line: #e4e0dc;
-  --orange: #6b5a2e;
+  --orange: #5a565f;
   --rail: 252px;
   max-width: none;
   margin: 0;
@@ -56,12 +56,12 @@
   border-color: #a28d5b;
 }
 .ops-shell button.primary {
-  background: #6b5a2e;
-  border-color: #6b5a2e;
+  background: #5a565f;
+  border-color: #5a565f;
   color: #fff;
 }
 .ops-shell button.primary:hover:not(:disabled) {
-  background: #57491f;
+  background: #27242d;
 }
 .ops-shell :focus-visible {
   outline: 3px solid #27242d;
@@ -81,7 +81,7 @@
   background: #fffefa;
 }
 .ops-shell .co-check input {
-  accent-color: #6b5a2e;
+  accent-color: #5a565f;
 }
 .ops-sidebar {
   position: fixed;
@@ -190,8 +190,8 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #ece7e0;
-  color: #655539;
+  background: #f7f6f4;
+  color: #5a565f;
   display: grid;
   place-items: center;
   font-size: 11px;
@@ -306,7 +306,7 @@
   color: #27242d;
 }
 .ops-drawer::backdrop {
-  background: rgb(38 31 43 / 0.4);
+  background: rgb(39 36 45 / 0.4);
 }
 .ops-drawer-inner {
   min-height: 100%;
@@ -391,7 +391,7 @@
 .ops-shell .co-number-tabs [aria-pressed="true"] {
   background: #fffefa;
   color: #5a565f;
-  box-shadow: 0 1px 4px #392e421a;
+  box-shadow: 0 1px 4px #27242d1a;
 }
 .ops-shell .co-conversation {
   padding: 16px;
@@ -407,7 +407,7 @@
 }
 .ops-shell .co-source {
   background: #f6dfe0;
-  color: #6b5a2e;
+  color: #5a565f;
   font-size: 10px;
 }
 .ops-shell .co-messages {
@@ -416,7 +416,7 @@
 }
 .ops-shell .co-message {
   font-size: 13px;
-  box-shadow: 0 2px 3px #382e3b05;
+  box-shadow: 0 2px 3px #27242d05;
 }
 .ops-shell .co-message.out {
   background: #f6dfe0;
@@ -433,8 +433,8 @@
   white-space: normal;
 }
 .ops-shell .co-quote {
-  background: #faf6ed;
-  border: 1px solid #dfd0ae;
+  background: #f7f6f4;
+  border: 1px solid #a28d5b;
   border-radius: 9px;
   margin: 14px 0;
 }
@@ -544,8 +544,8 @@
 .ops-shell .co-readiness-grid article strong {
   display: inline-block;
   font-size: 10px;
-  color: #735f30;
-  background: #f5efdf;
+  color: #5a565f;
+  background: #f6dfe0;
   padding: 4px 7px;
   border-radius: 4px;
 }
@@ -737,8 +737,8 @@
 }
 .ops-shell .co-readiness-grid article strong[data-status="BLOCKED"],
 .ops-shell .co-readiness-grid article strong[data-status="FAILED"] {
-  background: #f6eae5;
-  color: #90432d;
+  background: #f7f6f4;
+  color: #27242d;
 }
 .ops-order-summary {
   padding: 20px 20px 12px;
@@ -780,10 +780,10 @@
 }
 .ops-rule-warning {
   border-left: 3px solid #a28d5b;
-  background: #f8f3e8;
+  background: #f7f6f4;
   padding: 12px 15px;
   font-size: 12px;
-  color: #746034;
+  color: #5a565f;
   border-radius: 0 6px 6px 0;
 }
 .ops-nav-tooltip {
@@ -796,7 +796,7 @@
   color: #fff;
   border-radius: 6px;
   font-size: 12px;
-  box-shadow: 0 3px 12px #30223722;
+  box-shadow: 0 3px 12px #27242d22;
   pointer-events: none;
 }
 .ops-collapsed .ops-nav-tooltip {
@@ -866,7 +866,7 @@
   height: 30px;
   border-radius: 9px;
   background: #f6dfe0;
-  color: #6b5a2e;
+  color: #5a565f;
   font-size: 17px;
 }
 .ops-metric p {
@@ -1007,17 +1007,17 @@
   font-size: 14px;
 }
 .ops-pay-review {
-  background: #f4ecd8;
-  color: #6b5620;
+  background: #f6dfe0;
+  color: #27242d;
 }
 .ops-pay-issue {
-  background: #f6e1e0;
-  color: #8a3b3b;
+  background: #f6dfe0;
+  color: #27242d;
 }
 .ops-oc-state {
   font-size: 12px;
   font-weight: 600;
-  color: #6b5a2e;
+  color: #5a565f;
 }
 .ops-oc-total {
   margin-left: auto;
@@ -1077,10 +1077,10 @@
   overflow-wrap: anywhere;
 }
 .ops-oc-meta [data-tone="today"] dd {
-  color: #6b5a2e;
+  color: #5a565f;
 }
 .ops-oc-meta [data-tone="late"] dd {
-  color: #8a3b3b;
+  color: #27242d;
 }
 .ops-oc-steps {
   list-style: none;
@@ -1103,7 +1103,7 @@
   color: #5a565f;
 }
 .ops-oc-steps li.current {
-  border-top-color: #6b5a2e;
+  border-top-color: #5a565f;
   color: var(--ink);
 }
 .ops-oc-actions {
@@ -1214,7 +1214,7 @@
 .commerce.ops-shell select,
 .commerce.ops-shell textarea {
   background: #fff;
-  border-color: #c9c4c0;
+  border-color: #e6e2df;
   min-height: 44px;
   color: #27242d;
 }

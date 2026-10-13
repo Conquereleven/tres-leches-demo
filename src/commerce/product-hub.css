@@ -47,20 +47,20 @@
   margin: 0;
   padding: 12px 16px;
   border-radius: 10px;
-  background: #fff8e6;
-  border: 1px solid #ecd9a3;
+  background: #f6dfe0;
+  border: 1px solid #a28d5b;
 }
 .commerce.ops-shell .ph-banner-info {
-  background: #eef4f8;
-  border-color: #c9dbe6;
+  background: #f7f6f4;
+  border-color: #e6e2df;
 }
 .commerce.ops-shell .ph-banner-ok {
   background: #f6dfe0;
   border-color: #e6e2df;
 }
 .commerce.ops-shell .ph-banner-error {
-  background: #fdecea;
-  border-color: #f0bdb7;
+  background: #f7f6f4;
+  border-color: #ffc0c8;
 }
 .commerce.ops-shell .ph-tabs {
   display: flex;
@@ -88,7 +88,7 @@
   height: 8px;
   margin-inline-start: 8px;
   border-radius: 50%;
-  background: #c9862b;
+  background: #a28d5b;
 }
 .commerce.ops-shell .ph-metrics {
   display: grid;
@@ -142,8 +142,8 @@
   font-weight: 400;
 }
 .commerce.ops-shell .ph input[aria-invalid="true"] {
-  border-color: #b3261e;
-  outline: 2px solid #f0bdb7;
+  border-color: #27242d;
+  outline: 2px solid #ffc0c8;
 }
 .commerce.ops-shell .ph input:disabled,
 .commerce.ops-shell .ph select:disabled {
@@ -256,12 +256,12 @@
   color: #27242d;
 }
 .commerce.ops-shell .ph-chip-draft {
-  background: #e6ecf7;
-  color: #1f3a6b;
+  background: #f7f6f4;
+  color: #27242d;
 }
 .commerce.ops-shell .ph-chip-warn {
-  background: #fbe9cf;
-  color: #6b4208;
+  background: #f6dfe0;
+  color: #27242d;
 }
 .commerce.ops-shell .ph-history li,
 .commerce.ops-shell .ph-issues li {
@@ -274,12 +274,12 @@
   border-radius: 10px;
 }
 .commerce.ops-shell .ph-issue-error {
-  background: #fdecea;
-  border-color: #f0bdb7 !important;
+  background: #f7f6f4;
+  border-color: #ffc0c8 !important;
 }
 .commerce.ops-shell .ph-issue-warn {
-  background: #fff8e6;
-  border-color: #ecd9a3 !important;
+  background: #f6dfe0;
+  border-color: #a28d5b !important;
 }
 .commerce.ops-shell .ph-diff {
   width: 100%;
@@ -296,7 +296,7 @@
   max-width: 360px;
 }
 .commerce.ops-shell .ph-diff-price td {
-  background: #f4f8fd;
+  background: #f7f6f4;
   font-weight: 600;
 }
 .commerce.ops-shell .ph-publish {
@@ -356,7 +356,7 @@
   justify-content: flex-start;
 }
 .commerce.ops-shell .ph-variant-retired {
-  background: #faf6ee;
+  background: #f7f6f4;
 }
 .commerce.ops-shell .ph-media li {
   display: grid;
@@ -375,7 +375,7 @@
   min-height: 32px !important;
   border: 0;
   background: none;
-  color: #9a2a20;
+  color: #27242d;
   text-decoration: underline;
   padding: 0 4px;
 }
@@ -388,8 +388,8 @@
   gap: 8px;
   padding: 12px;
   border-radius: 14px;
-  background: #f6efe3;
-  color: #33241a;
+  background: #f7f6f4;
+  color: #27242d;
 }
 .commerce.ops-shell .ph-card-image {
   display: grid;
@@ -397,8 +397,8 @@
   aspect-ratio: 1;
   border-radius: 12px;
   overflow: hidden;
-  background: #eee3d0;
-  color: #6b5a48;
+  background: #e6e2df;
+  color: #5a565f;
 }
 .commerce.ops-shell .ph-card p {
   margin: 0;
