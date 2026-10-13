@@ -19,7 +19,7 @@ const PRIVATE_PREFIXES = ["/operations", "/cart", "/checkout", "/api"] as const;
 export const isPrivatePath = (path: string) =>
   PRIVATE_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));
 
-/** Environments that are never the public site. Unset means Production. */
+/** Runtime environments (`runtimeConfig`, reported by /api/health) that are never the public site. */
 const NON_PUBLIC_ENVIRONMENTS = new Set(["test", "development", "staging"]);
 
 export const NOINDEX = "noindex, nofollow";
@@ -31,9 +31,9 @@ export const NOINDEX = "noindex, nofollow";
  */
 export function robotsDirective(
   path: string,
-  appEnv: string | undefined,
+  environment: string,
 ): string | null {
-  if (NON_PUBLIC_ENVIRONMENTS.has(appEnv ?? "")) return NOINDEX;
+  if (NON_PUBLIC_ENVIRONMENTS.has(environment)) return NOINDEX;
   return isPrivatePath(path) ? NOINDEX : null;
 }
 

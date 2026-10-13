@@ -51,13 +51,12 @@ test("private routes and non-public deployments are never indexable", () => {
     "/api/health",
   ]) {
     assert.ok(isPrivatePath(path), path);
-    for (const env of [undefined, "production", "staging", "test"])
+    for (const env of ["production", "staging", "test"])
       assert.equal(robotsDirective(path, env), NOINDEX, path);
   }
   for (const path of ["/", "/menu", "/how-to-order", "/contact", "/terms"]) {
     assert.equal(isPrivatePath(path), false);
-    // Unset APP_ENV is Production, as in the storefront catalog contract.
-    assert.equal(robotsDirective(path, undefined), null);
+    // Only the validated runtime environment "production" is indexable.
     assert.equal(robotsDirective(path, "production"), null);
     for (const env of ["test", "development", "staging"])
       assert.equal(robotsDirective(path, env), NOINDEX);

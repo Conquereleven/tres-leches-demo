@@ -1058,7 +1058,7 @@ export async function startServer(
       }
       // Staff, cart and payment pages, and any non-public deployment, stay
       // out of search indexes.
-      const robots = robotsDirective(path, process.env.APP_ENV);
+      const robots = robotsDirective(path, runtime.environment);
       if (robots) res.setHeader("X-Robots-Tag", robots);
       // Uploaded catalog images live in SQLite, not in the static bundle.
       if (
