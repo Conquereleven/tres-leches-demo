@@ -1,0 +1,22 @@
+{
+  "reviewStatus": "CANDIDATE_NOT_SUBMITTED",
+  "categoryDecision": "PENDING_META_AND_FOUNDER_REVIEW",
+  "name": "3l_new_paid_order_alert",
+  "language": "en_US",
+  "components": [
+    {
+      "type": "BODY",
+      "text": "3L Pastelerías: A new order has been paid. Order: {{1}}. Total: AED {{2}}. Fulfillment: {{3}}. Please review the order in Operations and coordinate production. Order details (staff login required): {{4}}.",
+      "example": {
+        "body_text": [
+          [
+            "#001",
+            "108.00",
+            "PICKUP at 3L Pastelerías; When: 2026-10-15, 4 PM",
+            "https://www.3ldubai.ae/operations/orders?order=synthetic"
+          ]
+        ]
+      }
+    }
+  ]
+}

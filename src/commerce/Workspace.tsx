@@ -19,12 +19,30 @@ import type {
   OrderState,
 } from "../../server/domain/model";
 import { api, money, type Workspace as Data } from "./api";
-import { OrderCard, OrdersBoard } from "./OrdersBoard";
+import { OrderCard } from "./OrdersBoard";
+import { OrdersList } from "./OrdersList";
+import { OrderDetailsPage, OrderPageHeading } from "./OrderDetails";
+import {
+  orderPath,
+  parseListQuery,
+  parseOperationsPath,
+  serializeListQuery,
+  type ListQuery,
+} from "./order-view";
 import { byDue, dubaiDate } from "./orders-board";
 import { orderReference } from "../../shared/order-number";
 import "./commerce.css";
 import "./operations-shell.css";
+import "./oms.css";
 type Run = (body: Record<string, unknown>, path?: string) => Promise<boolean>;
+const LIST_SCROLL = "3l-oms-list-scroll";
+/** Current view and order from the address bar; old `?order=` links are upgraded in place. */
+function readRoute() {
+  const route = parseOperationsPath(location.pathname, location.search);
+  if (route.legacy)
+    history.replaceState(history.state, "", orderPath(route.orderId));
+  return { view: route.view, orderId: route.orderId };
+}
 export function CommerceWorkspace() {
   return (
     <OpsProvider>
@@ -37,21 +55,48 @@ function WorkspaceInner() {
   const [data, setData] = useState<Data | null>(null),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
-    [view, setView] = useState(location.pathname.split("/")[2] || "overview"),
+    [route, setRoute] = useState(readRoute),
+    [listQuery, setListQuery] = useState<ListQuery>(() =>
+      parseListQuery(location.search),
+    ),
     [selected, setSelected] = useState(""),
     [filter, setFilter] = useState("all"),
     [search, setSearch] = useState(""),
     [unread, setUnread] = useState(false),
     [agent, setAgent] = useState("all"),
-    [status, setStatus] = useState("all"),
-    [focusOrder, setFocusOrder] = useState(
-      () => new URLSearchParams(location.search).get("order") ?? "",
-    );
+    [status, setStatus] = useState("all");
+  const view = route.view;
+  // One place reads the address bar, so Back, Forward and direct links agree.
+  const sync = useCallback(() => {
+    const next = readRoute();
+    setRoute(next);
+    if (next.view === "orders" && !next.orderId)
+      setListQuery(parseListQuery(location.search));
+  }, []);
+  const go = useCallback(
+    (path: string, state: Record<string, unknown> = {}) => {
+      history.pushState(state, "", path);
+      sync();
+    },
+    [sync],
+  );
   useEffect(() => {
-    const sync = () => setView(location.pathname.split("/")[2] || "overview");
     window.addEventListener("popstate", sync);
     return () => window.removeEventListener("popstate", sync);
-  }, []);
+  }, [sync]);
+  // Returning to the list puts the operator back where they were.
+  const onList = view === "orders" && !route.orderId;
+  useEffect(() => {
+    if (!onList) return;
+    let top: string | null = null;
+    try {
+      top = sessionStorage.getItem(LIST_SCROLL);
+      sessionStorage.removeItem(LIST_SCROLL);
+    } catch {
+      /* Scroll restore is a convenience only. */
+    }
+    if (top) requestAnimationFrame(() => window.scrollTo(0, Number(top)));
+  }, [onList]);
   useEffect(() => {
     setUser(data?.actor.id ?? null);
   }, [data?.actor.id, setUser]);
@@ -138,12 +183,23 @@ function WorkspaceInner() {
       data={data}
       view={view}
       busy={busy}
-      onNavigate={(id) => {
-        history.pushState({}, "", `/operations/${id}`);
-        setView(id);
-      }}
+      onNavigate={(id) => go(`/operations/${id}`)}
       onRefresh={() => void refresh()}
       onLogout={() => void run({}, "logout")}
+      heading={
+        view === "orders" && route.orderId ? (
+          <OrderPageHeading
+            data={data}
+            orderId={route.orderId}
+            onBack={() => {
+              // Came from the list: Back restores its filters and position.
+              if ((history.state as { omsList?: boolean } | null)?.omsList)
+                history.back();
+              else go(`/operations/orders${serializeListQuery(listQuery)}`);
+            }}
+          />
+        ) : undefined
+      }
     >
       {data.integrationHealth?.inboundFailed ? (
         <p className="co-error" role="alert">
@@ -168,10 +224,7 @@ function WorkspaceInner() {
         {view === "overview" ? (
           <OperationsOverview
             data={data}
-            onNavigate={(id) => {
-              history.pushState({}, "", `/operations/${id}`);
-              setView(id);
-            }}
+            onNavigate={(id) => go(`/operations/${id}`)}
           />
         ) : view === "products" ? (
           <ProductHub actor={data.actor} />
@@ -384,35 +437,45 @@ function WorkspaceInner() {
                   </div>
                 )}
               </div>
-            ) : view === "orders" && !focusOrder ? (
-              <OrdersBoard
+            ) : view === "orders" && route.orderId ? (
+              <OrderDetailsPage
                 data={data}
+                orderId={route.orderId}
                 run={run}
-                details={(o) => <OrderPanel order={o} data={data} run={run} />}
+                busy={busy}
                 openConversation={(id) => {
                   setSelected(id);
-                  setView("inbox");
-                  history.pushState({}, "", "/operations/inbox");
+                  go("/operations/inbox");
+                }}
+                builder={(o) => <OrderPanel order={o} data={data} run={run} />}
+              />
+            ) : view === "orders" ? (
+              <OrdersList
+                data={data}
+                query={listQuery}
+                onQuery={(next) => {
+                  history.replaceState(
+                    history.state,
+                    "",
+                    `/operations/orders${serializeListQuery(next)}`,
+                  );
+                  setListQuery(next);
+                }}
+                onOpen={(id) => {
+                  try {
+                    sessionStorage.setItem(LIST_SCROLL, String(window.scrollY));
+                  } catch {
+                    /* Scroll restore is a convenience only. */
+                  }
+                  go(orderPath(id), { omsList: true });
+                  window.scrollTo(0, 0);
                 }}
               />
             ) : (
               <div className="co-board">
-                {focusOrder && (
-                  <div className="ops-order-filters">
-                    <button
-                      className="co-link"
-                      onClick={() => {
-                        setFocusOrder("");
-                        history.replaceState({}, "", "/operations/orders");
-                      }}
-                    >
-                      {t("← Ver todos los pedidos")}
-                    </button>
-                  </div>
-                )}
-                {boardOrders(data, view, focusOrder).length > 0 && (
+                {boardOrders(data, view).length > 0 && (
                   <ul className="ops-order-list" aria-label={t("Pedidos")}>
-                    {boardOrders(data, view, focusOrder).map((o) => (
+                    {boardOrders(data, view).map((o) => (
                       <li key={o.id}>
                         <OrderCard
                           order={o}
@@ -424,15 +487,15 @@ function WorkspaceInner() {
                           )}
                           openConversation={(id) => {
                             setSelected(id);
-                            setView("inbox");
-                            history.pushState({}, "", "/operations/inbox");
+                            go("/operations/inbox");
                           }}
+                          openOrder={(id) => go(orderPath(id))}
                         />
                       </li>
                     ))}
                   </ul>
                 )}
-                {boardOrders(data, view, focusOrder).length === 0 && (
+                {boardOrders(data, view).length === 0 && (
                   <div className="ops-board-empty">
                     <span className="ops-empty-icon">
                       {view === "production" ? (
@@ -1446,8 +1509,7 @@ function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
   );
 }
 
-function boardOrders(data: Data, view: string, focus: string) {
-  if (focus) return data.orders.filter((o) => o.id === focus);
+function boardOrders(data: Data, view: string) {
   return data.orders
     .filter((o) =>
       (view === "production"
@@ -1486,21 +1548,23 @@ function OrderNotifications({ order, data }: { order: Order; data: Data }) {
           <b>
             {t("WhatsApp interno ·")} {n.recipient.name}
           </b>{" "}
-          {n.status === "delivered"
-            ? t("Entregado")
-            : n.status === "read"
-              ? t("WhatsApp receipt read")
-              : n.status === "suppressed"
-                ? t("WhatsApp alert not eligible")
-                : n.status === "sending"
-                  ? t("WhatsApp sending requires review")
-                  : n.status === "sent"
-                    ? t("Enviado")
-                    : n.status === "failed"
-                      ? t("Falló · revisar")
-                      : data.operationsOutboundEnabled
-                        ? t("Pendiente")
-                        : t("Pendiente · envío de WhatsApp desactivado")}
+          {n.status === "accepted"
+            ? t("WhatsApp API accepted")
+            : n.status === "delivered"
+              ? t("Entregado")
+              : n.status === "read"
+                ? t("WhatsApp receipt read")
+                : n.status === "suppressed"
+                  ? t("WhatsApp alert not eligible")
+                  : n.status === "sending"
+                    ? t("WhatsApp sending requires review")
+                    : n.status === "sent"
+                      ? t("Enviado")
+                      : n.status === "failed"
+                        ? t("Falló · revisar")
+                        : data.operationsOutboundEnabled
+                          ? t("Pendiente")
+                          : t("Pendiente · envío de WhatsApp desactivado")}
         </li>
       ))}
       {internalEmails.map((n) => (

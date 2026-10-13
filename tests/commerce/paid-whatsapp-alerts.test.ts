@@ -52,7 +52,7 @@ const spy = (sent: string[]) => ({
   },
 });
 test("recipient normalization deduplicates and malformed cutoff fails", () => {
-  assert.equal(operationsRecipients("+971 52 168 3319").length, 1);
+  assert.equal(operationsRecipients("+971 50 000 0001").length, 1);
   assert.throws(() => parseNotificationCutoff("yesterday"));
 });
 test("disabled/missing cutoff never calls a provider; historical rows are suppressed", async () => {
@@ -90,7 +90,7 @@ test("concurrent dispatch is once-only; template has frozen total, pickup and au
   const store = fixture(),
     sent: string[] = [];
   try {
-    assert.equal(store.read().operationsNotifications!.length, 2);
+    assert.equal(store.read().operationsNotifications!.length, 1);
     const args = {
       outboundEnabled: true,
       notifier: spy(sent),
@@ -104,7 +104,7 @@ test("concurrent dispatch is once-only; template has frozen total, pickup and au
     assert.equal(sent.length, 1);
     const row = store
       .read()
-      .operationsNotifications!.find((n) => n.status === "sent")!;
+      .operationsNotifications!.find((n) => n.status === "accepted")!;
     assert.deepEqual(row.templateParameters, [
       "synthetic",
       "108.00",
@@ -167,7 +167,7 @@ test("ambiguous failure is not retried", async () => {
     };
     await dispatchOperationsNotifications(store, options);
     await dispatchOperationsNotifications(store, options);
-    assert.equal(calls, 2);
+    assert.equal(calls, 1);
     assert.ok(
       store.read().operationsNotifications!.every((n) => n.status === "failed"),
     );
@@ -243,6 +243,7 @@ test("Meta preflight verifies WABA membership, actual phone, Cloud registration 
         "wa1",
         { name: "order_paid", language: "en_US" },
         PAID_ALERT_BODY,
+        "UTILITY",
       );
     else
       await assert.rejects(
@@ -250,6 +251,7 @@ test("Meta preflight verifies WABA membership, actual phone, Cloud registration 
           "wa1",
           { name: "order_paid", language: "en_US" },
           PAID_ALERT_BODY,
+          "UTILITY",
         ),
       );
     assert.ok(calls.length >= 1);
@@ -365,7 +367,7 @@ test("accepted outbox state survives SQLite restart without resend", async () =>
       activationSince: cutoff,
       notifier: spy(sent),
     });
-    assert.equal(sent.length, 2);
+    assert.equal(sent.length, 1);
     assert.ok(
       disk
         .read()

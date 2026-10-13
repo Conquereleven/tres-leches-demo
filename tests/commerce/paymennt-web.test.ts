@@ -123,6 +123,7 @@ function fixture(
     provider,
     fixtureAddressGeo,
   );
+  service.operationsManagerPhone = "+971500000001";
   return {
     store,
     service,

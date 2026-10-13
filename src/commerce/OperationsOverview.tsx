@@ -1,4 +1,5 @@
 import type { Workspace } from "./api";
+import { orderPath } from "./order-view";
 import { useOps } from "./ops-i18n";
 import { overviewMetrics } from "./operations-overview";
 import { orderReference } from "../../shared/order-number";
@@ -75,11 +76,7 @@ export function OperationsOverview({
                   {orders.map((o) => (
                     <tr key={o.id}>
                       <td>
-                        <a
-                          href={`/operations/orders?order=${encodeURIComponent(o.id)}`}
-                        >
-                          {orderReference(o)}
-                        </a>
+                        <a href={orderPath(o.id)}>{orderReference(o)}</a>
                       </td>
                       <td>
                         <span className="ops-status-pill">{t(o.state)}</span>

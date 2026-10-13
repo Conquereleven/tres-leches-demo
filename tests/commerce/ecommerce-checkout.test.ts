@@ -28,7 +28,6 @@ import {
 } from "../../server/domain/embedded-checkout";
 import {
   dispatchOperationsNotifications,
-  OPERATIONS_RECIPIENT,
   type OperationsNotifier,
 } from "../../server/domain/notifications";
 
@@ -103,6 +102,7 @@ function fixture(initial = "CAPTURED") {
     provider,
     fixtureAddressGeo,
   );
+  service.operationsManagerPhone = "+971500000001";
   service.operationsOrigin = "https://3l.example";
   return {
     store,
@@ -358,7 +358,7 @@ test("CAPTURED confirms the order and queues exactly one alert for the team", as
     assert.equal(n[0]!.event, "ORDER_PAID");
     assert.equal(n[0]!.kind, "notify_operations_whatsapp");
     assert.equal(n[0]!.status, "pending-whatsapp-delivery");
-    assert.equal(n[0]!.recipient.phone, OPERATIONS_RECIPIENT.phone);
+    assert.equal(n[0]!.recipient.phone, "+971500000001");
     const m = n[0]!.message;
     // Concise by design (Order Experience V2): reference, who, how, when, total, items.
     for (const expected of [
@@ -508,7 +508,7 @@ test("once outbound is enabled later, each paid order is sent exactly once", asy
       notifier: spy,
     });
     assert.equal(calls, 1);
-    assert.equal(notifications(f)[0]!.status, "sent");
+    assert.equal(notifications(f)[0]!.status, "accepted");
   } finally {
     f.store.close();
   }

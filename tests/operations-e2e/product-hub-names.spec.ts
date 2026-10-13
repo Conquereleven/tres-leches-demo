@@ -72,11 +72,19 @@ for (const language of ["en", "tl"] as const)
       { id: data.actor.id, language },
     );
     await page.setViewportSize({ width: 1440, height: 1000 });
+    // Product names are shown on each order page; the list searches them.
+    expect(data.orders).toHaveLength(3);
+    const names: string[] = [];
+    for (const o of data.orders) {
+      await page.goto(`/operations/orders/${o.id}`);
+      await expect(page.locator(".ops-shell")).toHaveAttribute(
+        "lang",
+        language,
+      );
+      names.push(await page.locator(".oms-items tbody").innerText());
+    }
+    const text = names.join("\n");
     await page.goto("/operations/orders");
-    await expect(page.locator(".ops-shell")).toHaveAttribute("lang", language);
-    const lines = page.locator(".ops-oc-lines");
-    await expect(lines).toHaveCount(3);
-    const text = (await lines.allTextContents()).join("\n");
     expect(text).toContain("3 Leches Cake · Cinnamon · Small");
     expect(text).toContain("3 Leches Cake · Cinnamon");
     expect(text).toContain("Pastel 3 Leches · Receta nueva");
@@ -86,7 +94,7 @@ for (const language of ["en", "tl"] as const)
     // Search finds the product by its approved English name and by the original.
     for (const query of ["Cinnamon · Small", "Canela · Chico"]) {
       await page.getByLabel(tr(language, "Search orders")).fill(query);
-      await expect(page.locator(".ops-order-card")).toHaveCount(1);
+      await expect(page.locator(".oms-table tbody tr")).toHaveCount(1);
     }
 
     await page.goto("/operations/print");

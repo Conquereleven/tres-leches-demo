@@ -214,6 +214,7 @@ export class MetaWhatsAppProvider implements WhatsAppProvider {
     sourceId: string,
     template: { name: string; language: string },
     expectedBody: string,
+    expectedCategory: "UTILITY" | "MARKETING",
   ) {
     const n = this.numbers.find((number) => number.id === sourceId);
     if (!n)
@@ -284,7 +285,7 @@ export class MetaWhatsAppProvider implements WhatsAppProvider {
     if (
       !approved ||
       approved.status !== "APPROVED" ||
-      approved.category !== "UTILITY" ||
+      approved.category !== expectedCategory ||
       approved.components.length !== 1 ||
       approved.components[0]?.type !== "BODY" ||
       approved.components[0].text !== expectedBody

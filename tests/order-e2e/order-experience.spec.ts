@@ -243,12 +243,17 @@ test("delivery: names, area typeahead, billing, #001 confirmation, operations an
   expect(data.customerNotifications).toEqual([]);
 
   // ---- Operations ----
+  // TL-OMS-01: orders list, then the dedicated order page.
   await page.goto("/operations/orders");
-  await page.getByRole("button", { name: /^Todos los pedidos/ }).click();
-  const card = page.getByRole("article", { name: "Pedido #001" });
-  await expect(card.locator(".ops-oc-number")).toHaveText("#001");
+  const listed = page
+    .locator(".oms-table tbody tr")
+    .filter({ hasText: "#001" });
+  await expect(listed).toContainText("Ana María López Ortega");
+  await listed.locator("a").click();
+  const card = page.locator(".oms-details");
+  await expect(page.locator(".oms-page-heading h1")).toHaveText("#001");
   // The internal reference stays available for audit.
-  await expect(card).toContainText(paid.orderId);
+  await expect(page.locator(".oms-page-heading")).toContainText(paid.orderId);
   await expect(card).toContainText("Ana María López Ortega");
   await page.screenshot({
     path: `${shots}/operations-orders-1440.png`,
@@ -256,9 +261,7 @@ test("delivery: names, area typeahead, billing, #001 confirmation, operations an
   });
   // Producción lists the confirmed order under its public number.
   await page.goto("/operations/production");
-  await expect(
-    page.getByRole("article", { name: "Pedido #001" }),
-  ).toBeVisible();
+  await expect(page.getByRole("article", { name: "Order #001" })).toBeVisible();
   await page.screenshot({ path: `${shots}/operations-production-1440.png` });
   // Opening and reloading operations pages records no customer email.
   await page.reload();
@@ -311,9 +314,7 @@ test("delivery: names, area typeahead, billing, #001 confirmation, operations an
   expect(await events()).toEqual(["ORDER_PRODUCTION_STARTED"]);
   // Entregas shows the ready order under the same number.
   await page.goto("/operations/delivery");
-  await expect(
-    page.getByRole("article", { name: "Pedido #001" }),
-  ).toBeVisible();
+  await expect(page.getByRole("article", { name: "Order #001" })).toBeVisible();
   await page.screenshot({ path: `${shots}/operations-delivery-1440.png` });
   await move("Out for Delivery");
   expect(await events()).toEqual([
@@ -334,16 +335,16 @@ test("delivery: names, area typeahead, billing, #001 confirmation, operations an
     emails.every((n) => n.status === "pending" && n.attemptCount === 0),
   ).toBe(true);
   await page.goto(`/operations/orders?order=${order.id}`);
-  await expect(page.locator("main")).toContainText(
-    "Referencia interna: " + paid.orderId,
+  // The earlier ?order= link now lands on the order page.
+  await expect(page).toHaveURL(new RegExp(`/operations/orders/${order.id}$`));
+  await expect(page.locator(".oms-page-heading")).toContainText(paid.orderId);
+  await expect(page.locator(".oms-notifications")).toContainText(
+    "Pending · email provider not configured",
   );
-  await expect(page.locator(".co-notifications")).toContainText(
-    "Pendiente · proveedor de email no configurado",
+  await expect(page.locator(".oms-notifications")).toContainText(
+    "Pending · WhatsApp sending disabled",
   );
-  await expect(page.locator(".co-notifications")).toContainText(
-    "Pendiente · envío de WhatsApp desactivado",
-  );
-  await expect(page.locator(".co-notifications")).not.toContainText("Enviado");
+  await expect(page.locator(".oms-notifications")).not.toContainText("Sent");
   await page.screenshot({
     path: `${shots}/operations-order-detail-1440.png`,
     fullPage: true,

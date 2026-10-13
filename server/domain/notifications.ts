@@ -27,29 +27,14 @@ import { orderReference } from "../../shared/order-number";
 import { PICKUP_LOCATION } from "../../shared/pickup-location";
 import { customerName } from "./order-number";
 
-/** Confirmed operations recipient for paid-order alerts. */
-export const OPERATIONS_RECIPIENT = {
-  name: "Liza",
-  phone: "+971521683319",
-} as const;
-/**
- * Who is told about a paid order: one row per configured recipient. Liza's
- * number is confirmed; the manager's is private configuration and is included
- * only when a valid number has been supplied.
- */
+/** Exactly one private recipient; no implicit recipient and no source fallback. */
 export function operationsRecipients(managerPhone?: string) {
   const phone = managerPhone?.replace(/[\s-]/g, "") ?? "";
-  const recipients = [
-    { ...OPERATIONS_RECIPIENT },
-    ...(/^\+[1-9]\d{7,14}$/.test(phone) ? [{ name: "3L Manager", phone }] : []),
-  ];
-  return recipients.filter(
-    (r, i) => recipients.findIndex((x) => x.phone === r.phone) === i,
-  );
+  return /^\+[1-9]\d{7,14}$/.test(phone) ? [{ name: "3L Manager", phone }] : [];
 }
 
 export const PAID_ALERT_BODY =
-  "New paid order {{1}}. Total paid: AED {{2}}. Fulfillment: {{3}}. View in Operations (staff login required): {{4}}.";
+  "3L Pastelerías: A new order has been paid. Order: {{1}}. Total: AED {{2}}. Fulfillment: {{3}}. Please review the order in Operations and coordinate production. Order details (staff login required): {{4}}.";
 export function parseNotificationCutoff(value?: string): string | undefined {
   if (!value) return undefined;
   return z.iso.datetime().parse(value);
@@ -178,7 +163,7 @@ export function recordOrderPaid(
   s.audit.push({
     at: createdAt,
     actor: "system",
-    action: `ORDER_PAID ${order.id}: operations notification queued`,
+    action: `ORDER_PAID ${order.id}: ${notifications.length ? "operations notification queued" : "no configured WhatsApp recipient; no alert queued"}`,
   });
   return notifications;
 }
@@ -257,9 +242,8 @@ export async function dispatchOperationsNotifications(
       const result = await options.notifier.send(claimed);
       store.write((s) => {
         const row = s.operationsNotifications!.find((r) => r.id === n.id)!;
-        row.status = "sent";
-        row.sentAt = new Date().toISOString();
-        row.acceptedAt = row.sentAt;
+        row.status = "accepted";
+        row.acceptedAt = new Date().toISOString();
         row.providerId = result.providerId;
         row.lastError = undefined;
       });
@@ -341,6 +325,7 @@ export function applyOperationsReceipt(
       row.status in rank ? rank[row.status as keyof typeof rank] : 0;
     if (rank[status] > current) {
       row.status = status;
+      if (status === "sent") row.sentAt = new Date().toISOString();
       row.lastError = undefined;
       row.statusAt = new Date().toISOString();
     }

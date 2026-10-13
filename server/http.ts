@@ -91,9 +91,9 @@ import { HmacVerifier } from "./adapters/providers";
 import {
   createWhatsAppOperationsNotifier,
   dispatchOperationsNotifications,
-  parseNotificationCutoff,
   PAID_ALERT_BODY,
 } from "./domain/notifications";
+import { operationsWhatsAppConfig } from "./domain/operations-whatsapp-config";
 /** Public customer policy/contact routes; keep in sync with src/brand/business.ts. */
 export const customerPages = [
   "/terms",
@@ -298,42 +298,19 @@ export async function startServer(
     ? canonicalHost.slice(4)
     : null;
   // Paid-order alerts for the team. Built now, delivered only when outbound is
-  // explicitly enabled, Meta can send, and an approved template is configured.
-  const operationsPermissionEnabled =
-    process.env.META_OUTBOUND_ENABLED === "true" &&
-    !!meta?.outboundReady &&
-    process.env.OPERATIONS_WHATSAPP_SEND_PERMISSION_CONFIRMED === "true";
-  const operationsTemplate = process.env.OPERATIONS_WHATSAPP_TEMPLATE_JSON
-    ? z
-        .object({
-          name: z.string().regex(/^[a-z0-9_]+$/),
-          language: z.string().min(2).max(10),
-        })
-        .strict()
-        .parse(JSON.parse(process.env.OPERATIONS_WHATSAPP_TEMPLATE_JSON))
-    : null;
-  const operationsActivationSince = parseNotificationCutoff(
-    process.env.OPERATIONS_WHATSAPP_ACTIVATION_SINCE,
+  // independently enabled, Meta can send, and a reviewed approved template is configured.
+  const operationsConfig = operationsWhatsAppConfig(
+    process.env,
+    meta?.numbers ?? [],
+    !!(meta?.outboundReady && meta.inboundReady),
   );
-  const operationsSender = meta?.numbers.find(
-    (n) => n.id === process.env.OPERATIONS_WHATSAPP_SOURCE_ID,
-  );
-  const operationsOutboundEnabled = !!(
-    operationsPermissionEnabled &&
-    operationsActivationSince &&
-    operationsSender &&
-    operationsTemplate &&
-    /^\+[1-9]\d{7,14}$/.test(
-      service.operationsManagerPhone?.replace(/[\s-]/g, "") ?? "",
-    )
-  );
+  const operationsOutboundEnabled =
+    operationsConfig.enabled && operationsConfig.configured;
+  const operationsActivationSince = operationsConfig.activationSince;
+  const operationsSender = operationsConfig.sender;
+  const operationsTemplate = operationsConfig.template;
   const operationsNotifier =
-    operationsOutboundEnabled &&
-    operationsActivationSince &&
-    meta &&
-    operationsTemplate &&
-    operationsSender &&
-    service.operationsManagerPhone
+    operationsOutboundEnabled && meta && operationsSender && operationsTemplate
       ? createWhatsAppOperationsNotifier(
           meta,
           { id: operationsSender.id, phone: operationsSender.phone },
@@ -343,6 +320,7 @@ export async function startServer(
               operationsSender.id,
               operationsTemplate,
               PAID_ALERT_BODY,
+              operationsTemplate.category,
             ),
         )
       : null;
@@ -1113,7 +1091,10 @@ export async function startServer(
           "/operations/delivery",
           "/operations/zones",
           ...(staging ? ["/operations/readiness"] : []),
-        ].includes(path)
+        ].includes(path) &&
+        // One order page per internal id. Only the app shell is served here:
+        // order data still comes from the authenticated workspace API.
+        !/^\/operations\/orders\/[A-Za-z0-9_-]{1,100}$/.test(path)
       )
         throw new DomainError(404, "Ruta no encontrada");
       const file =

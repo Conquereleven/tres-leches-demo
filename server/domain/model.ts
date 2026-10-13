@@ -58,6 +58,7 @@ export type Message = {
     | "received"
     | "queued"
     | "sending"
+    | "accepted"
     | "sent"
     | "delivered"
     | "read"
@@ -173,6 +174,7 @@ export type OperationsNotification = {
   message: string;
   status:
     | "pending-whatsapp-delivery"
+    | "accepted"
     | "sending"
     | "sent"
     | "delivered"
