@@ -1,3 +1,4 @@
+import { PAN_OCT13_CORRECTION } from "./pan-price-correction";
 import type { CatalogItem } from "./model";
 
 /**
@@ -46,6 +47,8 @@ export const PAN_PRICE_CHANGES: Readonly<Record<string, [number, number]>> = {
   "pan-de-muerto-filled-pack-12-mini": [19000, 23500],
   "pan-de-muerto-filled-pack-6-individuales": [12000, 13000],
   "pan-de-muerto-filled-pack-12-individuales": [23500, 25500],
+  // Supersedes the October 9 targets for these ten SKUs only.
+  ...PAN_OCT13_CORRECTION,
 };
 
 export type PanPricePlan = {
@@ -58,9 +61,12 @@ export type PanPricePlan = {
 };
 
 /** Read-only: what a targeted update would do to this catalog. */
-export function planPanPriceUpdate(catalog: CatalogItem[]): PanPricePlan {
+export function planPanPriceUpdate(
+  catalog: CatalogItem[],
+  changes = PAN_PRICE_CHANGES,
+): PanPricePlan {
   const plan: PanPricePlan = { change: [], current: [], blocked: [] };
-  for (const [id, [from, to]] of Object.entries(PAN_PRICE_CHANGES)) {
+  for (const [id, [from, to]] of Object.entries(changes)) {
     const found = catalog.filter((p) => p.id === id);
     if (found.length !== 1)
       plan.blocked.push({ id, reason: `found ${found.length} records` });
@@ -79,8 +85,11 @@ export function planPanPriceUpdate(catalog: CatalogItem[]): PanPricePlan {
  * The same catalog with only the approved price fields changed. Every other
  * record and every other field is returned untouched; a blocked plan throws.
  */
-export function applyPanPriceUpdate(catalog: CatalogItem[]): CatalogItem[] {
-  const plan = planPanPriceUpdate(catalog);
+export function applyPanPriceUpdate(
+  catalog: CatalogItem[],
+  changes = PAN_PRICE_CHANGES,
+): CatalogItem[] {
+  const plan = planPanPriceUpdate(catalog, changes);
   if (plan.blocked.length) throw new Error("Pan price update blocked");
   const next = new Map(plan.change.map((c) => [c.id, c.to]));
   return catalog.map((p) =>

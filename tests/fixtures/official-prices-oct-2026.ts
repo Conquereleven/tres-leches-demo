@@ -30,9 +30,9 @@ export const OFFICIAL_PRICES_FILS: Record<string, number> = {
   // Pan de Muerto — traditional, sugar or sesame: mini 13, individual 15.
   ...single("pan-de-muerto-traditional", "azucar", 1300, 1500, true),
   ...single("pan-de-muerto-traditional", "ajonjoli", 1300, 1500, true),
-  // The sugar bread with chocolate covering has always carried the traditional price.
-  "pan-de-muerto-traditional-azucar-mini-40-g-chocolate-covering": 1300,
-  "pan-de-muerto-traditional-azucar-individual-70-g-chocolate-covering": 1500,
+  // October 13 founder correction supersedes these October 9 prices.
+  "pan-de-muerto-traditional-azucar-mini-40-g-chocolate-covering": 1800,
+  "pan-de-muerto-traditional-azucar-individual-70-g-chocolate-covering": 2100,
   // Pan de Muerto — filled, standard flavours: mini 21, individual 23.
   ...Object.assign(
     {},
@@ -43,6 +43,6 @@ export const OFFICIAL_PRICES_FILS: Record<string, number> = {
   // Pan de Muerto — pistachio (confirmed by Joel): mini 23, individual 26.
   ...single("pan-de-muerto-filled", "pistachio", 2300, 2600, false),
   // Packs: 6 mini, 12 mini, 6 individual, 12 individual.
-  ...packs("pan-de-muerto-traditional", [7200, 14000, 8000, 15500]),
-  ...packs("pan-de-muerto-filled", [12000, 23500, 13000, 25500]),
+  ...packs("pan-de-muerto-traditional", [6000, 11500, 7200, 14000]),
+  ...packs("pan-de-muerto-filled", [10000, 19000, 12000, 23500]),
 };

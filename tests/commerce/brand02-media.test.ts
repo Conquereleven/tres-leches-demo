@@ -1,3 +1,4 @@
+import { PAN_OCT13_CORRECTION } from "../../server/domain/pan-price-correction";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
@@ -46,6 +47,32 @@ test("BRAND02 leaves commercial identifiers, prices, availability, translations 
     "src/brand/locales/ar/menu.json",
   ]) {
     const old = execFileSync("git", ["show", `${baseline}:${path}`]);
-    assert.deepEqual(readFileSync(path), old, path);
+    if (
+      [
+        "data-imports/liza-current-menu.json",
+        "src/brand/menu-data.json",
+      ].includes(path)
+    ) {
+      const current = JSON.parse(readFileSync(path, "utf8"));
+      const undoPrices = (value: unknown): void => {
+        if (Array.isArray(value)) value.forEach(undoPrices);
+        else if (value && typeof value === "object") {
+          const row = value as Record<string, unknown>;
+          const pair = PAN_OCT13_CORRECTION[String(row.id)];
+          if (pair) {
+            if ("priceFils" in row) {
+              assert.equal(row.priceFils, pair[1]);
+              row.priceFils = pair[0];
+            } else if ("priceAed" in row) {
+              assert.equal(Number(row.priceAed) * 100, pair[1]);
+              row.priceAed = (pair[0] / 100).toFixed(2);
+            }
+          }
+          Object.values(row).forEach(undoPrices);
+        }
+      };
+      undoPrices(current);
+      assert.deepEqual(current, JSON.parse(old.toString()), path);
+    } else assert.deepEqual(readFileSync(path), old, path);
   }
 });

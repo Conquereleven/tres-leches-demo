@@ -154,7 +154,7 @@ test("only six approved Conchas SKUs join the preserved catalog and pricing", ()
   for (const [variant, family, price] of [
     ["Azúcar", "pan-de-muerto-traditional", 1500],
     ["Ajonjolí", "pan-de-muerto-traditional", 1500],
-    ["Azúcar · Chocolate covering", "pan-de-muerto-traditional", 1500],
+    ["Azúcar · Chocolate covering", "pan-de-muerto-traditional", 2100],
     ["Crema diplomática (vainilla)", "pan-de-muerto-filled", 2300],
     ["Chocolate", "pan-de-muerto-filled", 2300],
     ["Mascarpone y cajeta", "pan-de-muerto-filled", 2300],

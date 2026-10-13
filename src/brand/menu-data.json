@@ -69,13 +69,13 @@
           "id": "pan-de-muerto-traditional-azucar-mini-40-g-chocolate-covering",
           "variant": "Azúcar · Chocolate covering",
           "size": "Mini · 40 g",
-          "priceFils": 1300
+          "priceFils": 1800
         },
         {
           "id": "pan-de-muerto-traditional-azucar-individual-70-g-chocolate-covering",
           "variant": "Azúcar · Chocolate covering",
           "size": "Individual · 70 g",
-          "priceFils": 1500
+          "priceFils": 2100
         }
       ],
       "image": "/brand/menu/pan-traditional.webp",
@@ -163,25 +163,25 @@
           "id": "pan-de-muerto-traditional-pack-6-mini",
           "variant": "",
           "size": "6 mini",
-          "priceFils": 7200
+          "priceFils": 6000
         },
         {
           "id": "pan-de-muerto-traditional-pack-12-mini",
           "variant": "",
           "size": "12 mini",
-          "priceFils": 14000
+          "priceFils": 11500
         },
         {
           "id": "pan-de-muerto-traditional-pack-6-individuales",
           "variant": "",
           "size": "6 individuales",
-          "priceFils": 8000
+          "priceFils": 7200
         },
         {
           "id": "pan-de-muerto-traditional-pack-12-individuales",
           "variant": "",
           "size": "12 individuales",
-          "priceFils": 15500
+          "priceFils": 14000
         }
       ],
       "image": "/brand/menu/pan-pack.webp",
@@ -198,25 +198,25 @@
           "id": "pan-de-muerto-filled-pack-6-mini",
           "variant": "",
           "size": "6 mini",
-          "priceFils": 12000
+          "priceFils": 10000
         },
         {
           "id": "pan-de-muerto-filled-pack-12-mini",
           "variant": "",
           "size": "12 mini",
-          "priceFils": 23500
+          "priceFils": 19000
         },
         {
           "id": "pan-de-muerto-filled-pack-6-individuales",
           "variant": "",
           "size": "6 individuales",
-          "priceFils": 13000
+          "priceFils": 12000
         },
         {
           "id": "pan-de-muerto-filled-pack-12-individuales",
           "variant": "",
           "size": "12 individuales",
-          "priceFils": 25500
+          "priceFils": 23500
         }
       ],
       "image": "/brand/menu/pan-pack.webp",
