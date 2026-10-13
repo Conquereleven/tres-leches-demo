@@ -126,20 +126,18 @@ test("actual Pan variants persist selector → cart → checkout → database �
       fullPage: true,
     });
   }
+  // TL-OMS-01: the order has its own page, opened from the orders list.
   await page.goto("/operations/orders");
-  await page.getByRole("button", { name: /^Todos los pedidos/ }).click();
-  await expect(page.locator("main")).toContainText(data.orderId);
-  await expect(
-    page.getByRole("article", { name: `Pedido ${data.orderNumber}` }),
-  ).toContainText("+525512345678");
   await page
-    .getByRole("article", { name: `Pedido ${data.orderNumber}` })
-    .getByText("Ver pedido y seguimiento", { exact: true })
+    .locator(".oms-table tbody tr")
+    .filter({ hasText: data.orderNumber })
+    .locator("a")
     .click();
-  await expect(page.getByTestId("order-panel")).toContainText("Pistachio");
-  await expect(page.getByTestId("order-panel")).toContainText(
-    "Chocolate covering",
-  );
+  const details = page.locator(".oms-details");
+  await expect(page.locator(".oms-page-heading")).toContainText(data.orderId);
+  await expect(details).toContainText("+525512345678");
+  await expect(page.locator(".oms-items")).toContainText("Pistachio");
+  await expect(page.locator(".oms-items")).toContainText("Chocolate covering");
   await page.screenshot({
     path: `${shots}/variant-dashboard-1440.png`,
     fullPage: true,
@@ -729,10 +727,14 @@ test("pickup golden path completes mock reconciliation, confirmation, tracking a
   expect(order.quote.feeFils).toBe(0);
   expect(order.state).toBe("Confirmed");
   await page.goto("/operations/orders");
-  await page.getByRole("button", { name: /^Todos los pedidos/ }).click();
-  await expect(
-    page.getByRole("article", { name: `Pedido ${result.orderNumber}` }),
-  ).toContainText("Recoger en tienda");
+  await page
+    .locator(".oms-table tbody tr")
+    .filter({ hasText: result.orderNumber })
+    .locator("a")
+    .click();
+  await expect(page.locator(".oms-details")).toContainText(
+    "Pastelerías 3L · Collect in store",
+  );
   await page.screenshot({
     path: `${shots}/pickup-dashboard-1440.png`,
     fullPage: true,

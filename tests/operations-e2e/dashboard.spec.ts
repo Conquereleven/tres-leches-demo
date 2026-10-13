@@ -93,10 +93,9 @@ for (const width of [390, 768, 1440])
             ),
         ).toBe(true);
         const results = await new AxeBuilder({ page }).analyze();
-        expect(
-          results.violations,
-          JSON.stringify(results.violations),
-        ).toEqual([]);
+        expect(results.violations, JSON.stringify(results.violations)).toEqual(
+          [],
+        );
         if (screen === "print") {
           await expect(
             page.getByText(tr(language, "Printer connection not configured"), {
@@ -117,9 +116,7 @@ for (const width of [390, 768, 1440])
         }
         if (screen === "orders") {
           await page.getByLabel(tr(language, "Search orders")).fill("Omar");
-          await expect(
-            page.locator(".ops-order-list").first().locator(".ops-order-card"),
-          ).toHaveCount(1);
+          await expect(page.locator(".oms-table tbody tr")).toHaveCount(1);
           await page.getByLabel(tr(language, "Search orders")).fill("");
         }
         if (info.project.name === "chromium")
@@ -174,7 +171,8 @@ for (const language of ["en", "tl"] as const)
         await r.fulfill({ json: { ok: true } });
       } else await r.fulfill({ json: data });
     });
-    await page.goto("/operations/orders");
+    // Fulfilment actions live on the dedicated order page.
+    await page.goto(`/operations/orders/${data.orders[0].id}`);
     await expect(page.locator(".ops-shell")).toHaveAttribute("lang", language);
     await page
       .getByRole("button", {

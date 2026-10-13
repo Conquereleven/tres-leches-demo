@@ -1,36 +1,22 @@
-import { orderProductName, productSearchText } from "./product-names";
+import { orderProductName } from "./product-names";
 import { OperationalProductName } from "./OperationalProductName";
 import { useOps } from "./ops-i18n";
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import {
   CalendarBlank,
   CheckCircle,
   Clock,
-  CurrencyCircleDollar,
   MapPin,
-  Oven,
-  Receipt,
-  Truck,
 } from "@phosphor-icons/react";
 import type { Order } from "../../server/domain/model";
 import { money, type Workspace as Data } from "./api";
 import { orderReference } from "../../shared/order-number";
 import {
-  BOARD_FILTERS,
-  BOARD_VIEWS,
   FULFILMENT,
   FULFILMENT_LABEL,
   NEXT_ACTION,
-  boardMetrics,
-  byDue,
-  dubaiDate,
   fulfilmentIndex,
-  inQueue,
-  matchesFilter,
-  matchesView,
   paymentBadge,
-  type BoardFilter,
-  type BoardView,
 } from "./orders-board";
 
 type Run = (body: Record<string, unknown>, path?: string) => Promise<boolean>;
@@ -41,212 +27,9 @@ const productName = (data: Data, o: Order, id: string) =>
   orderProductName(o, id, data.catalog);
 
 /**
- * Kitchen-first orders board: what needs preparing, when it is due and
- * whether it is paid. Only paid orders are in the queue; orders still
- * waiting for payment sit in a separate, collapsed list.
+ * Compact order card for the Kitchen and Deliveries queues. The Orders page
+ * itself is the list and the dedicated order page (OrdersList, OrderDetails).
  */
-export function OrdersBoard({
-  data,
-  run,
-  details,
-  openConversation,
-}: {
-  data: Data;
-  run: Run;
-  details: (o: Order) => ReactNode;
-  openConversation: (conversationId: string) => void;
-}) {
-  const { t } = useOps();
-  const [view, setView] = useState<BoardView>("today");
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<BoardFilter>("any");
-  const today = dubaiDate();
-  const metrics = boardMetrics(data.orders, data.payments, today);
-  const queue = data.orders.filter(inQueue);
-  const inView = queue.filter((o) => matchesView(o, view, today));
-  const shown = inView
-    .filter(
-      (o) =>
-        matchesFilter(o, filter) &&
-        [
-          orderReference(o),
-          o.id,
-          customerOf(data, o)?.customer,
-          ...o.lines.map((l) =>
-            productSearchText(productName(data, o, l.productId), l.productId),
-          ),
-        ]
-          .join(" ")
-          .toLowerCase()
-          .includes(search.toLowerCase()),
-    )
-    .sort(byDue);
-  const unpaid = data.orders
-    .filter((o) => o.state === "Awaiting Payment")
-    .sort(byDue);
-  const upcoming = queue.filter((o) => matchesView(o, "upcoming", today));
-  return (
-    <div className="ops-orders">
-      <section className="ops-metrics" aria-label={t("Resumen de hoy")}>
-        <Metric
-          icon={<Receipt aria-hidden />}
-          label={t("Pedidos de hoy")}
-          value={String(metrics.todayOrders)}
-          hint={t("Con entrega hoy")}
-        />
-        <Metric
-          icon={<CurrencyCircleDollar aria-hidden />}
-          label={t("Confirmed payments today")}
-          value={t(money(metrics.todayRevenueFils))}
-          hint={t("Pagos confirmados hoy")}
-        />
-        <Metric
-          icon={<Oven aria-hidden />}
-          label={t("En preparación")}
-          value={String(metrics.preparing)}
-        />
-        <Metric
-          icon={<Truck aria-hidden />}
-          label={t("En camino")}
-          value={String(metrics.outForDelivery)}
-        />
-      </section>
-
-      <label className="ops-order-search">
-        {t("Search orders")}
-        <input
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={t("Order, customer or product")}
-        />
-      </label>
-      <div className="ops-board-controls">
-        <div
-          className="ops-views"
-          role="group"
-          aria-label={t("Vista de pedidos")}
-        >
-          {BOARD_VIEWS.map(([id, label]) => (
-            <button
-              key={id}
-              aria-pressed={view === id}
-              onClick={() => setView(id)}
-            >
-              {t(label)}
-              <span>
-                {queue.filter((o) => matchesView(o, id, today)).length}
-              </span>
-            </button>
-          ))}
-        </div>
-        <div
-          className="ops-chips"
-          role="group"
-          aria-label={t("Filtrar por estado")}
-        >
-          {BOARD_FILTERS.map(([id, label]) => (
-            <button
-              key={id}
-              aria-pressed={filter === id}
-              onClick={() => setFilter(id)}
-            >
-              {t(label)} · {inView.filter((o) => matchesFilter(o, id)).length}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {shown.length ? (
-        <ul className="ops-order-list" aria-label={t("Pedidos")}>
-          {shown.map((o) => (
-            <li key={o.id}>
-              <OrderCard
-                order={o}
-                data={data}
-                run={run}
-                today={today}
-                details={details}
-                openConversation={openConversation}
-              />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <div className="ops-board-empty">
-          <span className="ops-empty-icon">
-            <Receipt size={30} aria-hidden />
-          </span>
-          <h2>
-            {queue.length
-              ? view === "today"
-                ? t("Nada pendiente para hoy")
-                : t("Sin pedidos en esta vista")
-              : t("Todo listo para el primer pedido")}
-          </h2>
-          <p className="co-empty">
-            {queue.length
-              ? t("Cambia la vista o el filtro para ver otros pedidos.")
-              : t(
-                  "No orders yet. Los pedidos pagados aparecerán aquí automáticamente.",
-                )}
-          </p>
-          {view === "today" && upcoming.length > 0 && (
-            <button className="co-link" onClick={() => setView("upcoming")}>
-              {t("View upcoming orders", { count: upcoming.length })}
-            </button>
-          )}
-        </div>
-      )}
-
-      {unpaid.length > 0 && (
-        <details className="ops-unpaid">
-          <summary>
-            {t("Sin pago confirmado ·")} {unpaid.length}
-            <small>{t("Fuera de la cola de producción")}</small>
-          </summary>
-          <ul className="ops-order-list">
-            {unpaid.map((o) => (
-              <li key={o.id}>
-                <OrderCard
-                  order={o}
-                  data={data}
-                  run={run}
-                  today={today}
-                  details={details}
-                  openConversation={openConversation}
-                />
-              </li>
-            ))}
-          </ul>
-        </details>
-      )}
-    </div>
-  );
-}
-
-function Metric({
-  icon,
-  label,
-  value,
-  hint,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-  hint?: string;
-}) {
-  const { t } = useOps();
-  return (
-    <div className="ops-metric">
-      <span className="ops-metric-icon">{icon}</span>
-      <p>{t(label)}</p>
-      <strong>{value}</strong>
-      {hint && <small>{hint}</small>}
-    </div>
-  );
-}
-
 export function OrderCard({
   order: o,
   data,
@@ -254,6 +37,7 @@ export function OrderCard({
   today,
   details,
   openConversation,
+  openOrder,
 }: {
   order: Order;
   data: Data;
@@ -261,6 +45,7 @@ export function OrderCard({
   today: string;
   details: (o: Order) => ReactNode;
   openConversation: (conversationId: string) => void;
+  openOrder?: (orderId: string) => void;
 }) {
   const { t, formatDate } = useOps();
   const c = customerOf(data, o);
@@ -488,6 +273,11 @@ export function OrderCard({
         {!web && c && (
           <button className="co-link" onClick={() => openConversation(c.id)}>
             {t("Abrir conversación")}
+          </button>
+        )}
+        {openOrder && (
+          <button className="co-link" onClick={() => openOrder(o.id)}>
+            {t("Open order page")}
           </button>
         )}
       </div>

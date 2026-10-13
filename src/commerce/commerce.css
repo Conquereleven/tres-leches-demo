@@ -61,7 +61,7 @@
   width: 100%;
   min-width: 0;
   padding: 10px;
-  border: 1px solid #c8b9a9;
+  border: 1px solid #e6e2df;
   background: var(--paper);
   border-radius: 5px;
   color: var(--ink);
@@ -76,7 +76,7 @@
   line-height: 1.5;
 }
 .commerce :focus-visible {
-  outline: 3px solid #ad490d;
+  outline: 3px solid #27242d;
   outline-offset: 3px;
 }
 .co-heading,
@@ -88,10 +88,10 @@
 }
 .co-pill {
   font-size: 12px;
-  border: 1px solid #bf763b;
+  border: 1px solid #a28d5b;
   padding: 9px 12px;
   border-radius: 20px;
-  background: #fff5e8;
+  background: #f6dfe0;
 }
 .co-tabs {
   display: flex;
@@ -169,19 +169,19 @@
   overflow-wrap: anywhere;
 }
 .co-conversation > span:not(.co-row) {
-  color: #695548;
+  color: #5a565f;
   font-size: 14px;
 }
 .co-conversation .co-row {
   width: 100%;
 }
 .commerce .selected {
-  background: #f4e8d7;
+  background: #f6dfe0;
   border-left: 3px solid var(--orange);
 }
 .co-source {
-  background: #e6ece7;
-  color: #315640;
+  background: #f7f6f4;
+  color: #27242d;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
@@ -213,7 +213,7 @@
   max-height: 460px;
   overflow: auto;
   padding: 20px;
-  background: #f5eee2;
+  background: #f7f6f4;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -231,14 +231,14 @@
 }
 .co-message.out {
   align-self: flex-end;
-  background: #e5ede5;
+  background: #f6dfe0;
   border-radius: 12px 0 12px 12px;
 }
 .co-translation {
   padding-top: 10px;
   border-top: 1px solid var(--line);
   font-size: 13px;
-  color: #665444;
+  color: #5a565f;
 }
 .co-chat-bottom {
   padding: 16px;
@@ -254,7 +254,7 @@
 }
 .co-muted {
   font-size: 13px;
-  color: #6b594b;
+  color: #5a565f;
 }
 .co-order-side {
   min-width: 0;
@@ -271,10 +271,10 @@
 }
 .co-state {
   font-size: 12px;
-  border: 1px solid #76927b;
+  border: 1px solid #a28d5b;
   padding: 6px 8px;
   border-radius: 5px;
-  background: #eaf0e9;
+  background: #f6dfe0;
   text-align: center;
 }
 .co-lines {
@@ -295,16 +295,16 @@
   white-space: nowrap;
 }
 .co-quote {
-  background: #fff3e3;
-  border: 1px solid #d7ad75;
+  background: #f6dfe0;
+  border: 1px solid #a28d5b;
   border-radius: 6px;
   padding: 15px;
   margin: 20px 0;
   font-size: 14px;
 }
 .co-quote.eligible {
-  background: #edf3ec;
-  border-color: #8ca18b;
+  background: #f6dfe0;
+  border-color: #a28d5b;
 }
 .co-quote dl {
   display: grid;
@@ -342,7 +342,7 @@
 }
 .co-audit small {
   display: block;
-  color: #705c4f;
+  color: #5a565f;
 }
 .commerce details {
   margin: 15px 0;
@@ -361,8 +361,8 @@
 }
 .co-error {
   padding: 14px;
-  background: #fff0eb;
-  border: 1px solid #bb6148;
+  background: #f7f6f4;
+  border: 1px solid #a28d5b;
   border-radius: 6px;
   margin-bottom: 16px;
   display: flex;
@@ -372,7 +372,7 @@
 }
 .co-empty {
   padding: 30px;
-  color: #705c4f;
+  color: #5a565f;
 }
 .co-board {
   display: grid;
@@ -414,7 +414,7 @@
 }
 .co-skeleton {
   padding: 60px;
-  background: linear-gradient(90deg, #f2e8db, #fffdf8, #f2e8db);
+  background: linear-gradient(90deg, #f6dfe0, #fffdf8, #f6dfe0);
   border-radius: 8px;
 }
 .commerce code {
@@ -536,8 +536,8 @@
 }
 
 .co-ai-panel {
-  background: #f6f0e7;
-  border: 1px solid #c8b9a9;
+  background: #f7f6f4;
+  border: 1px solid #e6e2df;
   border-radius: 8px;
   margin: 16px 0;
   padding: 16px;
@@ -572,11 +572,11 @@
   margin: 0;
 }
 .co-ai-handoff {
-  border-left: 3px solid #ad490d;
+  border-left: 3px solid #27242d;
   padding-left: 10px;
 }
 .co-ai-action {
-  border-top: 1px solid #c8b9a9;
+  border-top: 1px solid #e6e2df;
   margin-top: 14px;
   padding-top: 12px;
 }
@@ -598,13 +598,13 @@
 }
 .co-ai-knowledge {
   margin: 20px 0;
-  border-top: 1px solid #c8b9a9;
+  border-top: 1px solid #e6e2df;
   padding-top: 10px;
 }
 
 /* AA contrast for small white operator button labels. */
 .commerce button.primary {
-  background: #b84608;
+  background: #27242d;
 }
 
 /* Orders board filters */

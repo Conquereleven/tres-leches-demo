@@ -112,6 +112,8 @@ type Props = {
   onNavigate: (id: string) => void;
   onRefresh: () => void;
   onLogout: () => void;
+  /** Replaces the section title, for a view that is one record's own page. */
+  heading?: ReactNode;
   children: ReactNode;
 };
 export function OperationsShell({
@@ -121,6 +123,7 @@ export function OperationsShell({
   onNavigate,
   onRefresh,
   onLogout,
+  heading,
   children,
 }: Props) {
   const { t, language, setLanguage } = useOps();
@@ -373,13 +376,15 @@ export function OperationsShell({
           className={`ops-content ops-view-${view}`}
         >
           <header className="ops-page-header">
-            <div>
-              <p className="ops-kicker">
-                {t("PASTELERÍAS 3L /")} {t(current.group)}
-              </p>
-              <h1>{t(current.title)}</h1>
-              <p>{t(current.description)}</p>
-            </div>
+            {heading ?? (
+              <div>
+                <p className="ops-kicker">
+                  {t("PASTELERÍAS 3L /")} {t(current.group)}
+                </p>
+                <h1>{t(current.title)}</h1>
+                <p>{t(current.description)}</p>
+              </div>
+            )}
             <button className="ops-refresh" onClick={onRefresh} disabled={busy}>
               <ArrowClockwise size={18} aria-hidden="true" />
               {t("Actualizar")}

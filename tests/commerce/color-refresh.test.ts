@@ -29,9 +29,12 @@ test("public colour refresh preserves geometry, typography, motion and media CSS
     assert.deepEqual(geometry(readFileSync(f, "utf8")), geometry(previous), f);
   }
 });
-test("operations and global theme stay byte-identical to the verified baseline", () => {
-  for (const f of ["src/styles.css", "src/commerce/operations-shell.css"])
-    assert.equal(readFileSync(f, "utf8"), old(f));
+test("global theme stays byte-identical; Operations changed colours only (TL-OMS-01)", () => {
+  assert.equal(readFileSync("src/styles.css", "utf8"), old("src/styles.css"));
+  // TL-OMS-01 moved Operations to the approved blush/gold palette. Layout,
+  // typography, spacing and motion declarations are unchanged from the baseline.
+  const shell = "src/commerce/operations-shell.css";
+  assert.deepEqual(geometry(readFileSync(shell, "utf8")), geometry(old(shell)));
 });
 test("public colour literals remove legacy brown/cream UI and preserve semantic statuses", () => {
   const s = css.map((f) => readFileSync(f, "utf8")).join("\n");

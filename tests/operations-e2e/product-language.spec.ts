@@ -60,25 +60,22 @@ for (const language of ["en", "tl"] as const) {
     await page.goto("/operations/orders");
     const english = "Filled Pan de Muerto · Vanilla diplomat cream · Mini";
     await expect(page.locator(".ops-shell")).toHaveAttribute("lang", language);
-    await expect(page.locator(".ops-oc-lines").first()).toContainText(english);
-    await expect(page.locator(".ops-oc-lines").first()).not.toContainText(
-      "Crema diplomática",
-    );
     for (const query of [
       "Crema diplomática",
       "Vanilla diplomat cream",
       item.id,
     ]) {
       await page.getByLabel(tr(language, "Search orders")).fill(query);
-      await expect(page.locator(".ops-order-card")).toHaveCount(1);
+      await expect(page.locator(".oms-table tbody tr")).toHaveCount(1);
     }
     await page.getByLabel(tr(language, "Search orders")).fill("");
-    await page.locator(".ops-order-details summary").first().click();
-    await expect(page.locator(".co-lines")).toContainText(english);
-    await expect(page.locator(".co-lines")).toContainText("36");
-    await expect(page.locator(".co-lines")).not.toContainText(
-      "Changed current recipe",
-    );
+    // The order page names the product in English from the order's own snapshot.
+    await page.locator(".oms-table tbody tr").first().click();
+    const items = page.locator(".oms-items");
+    await expect(items).toContainText(english);
+    await expect(items).not.toContainText("Crema diplomática");
+    await expect(items).toContainText("36");
+    await expect(items).not.toContainText("Changed current recipe");
     const dir = "docs/operations/english-products/screenshots";
     mkdirSync(dir, { recursive: true });
     if (info.project.name === "chromium")
@@ -214,8 +211,8 @@ for (const language of ["en", "tl"] as const) {
       "Vanilla diplomat cream",
     );
     order.state = "Building";
+    // A legacy link opens the order page, where a draft keeps its builder.
     await page.goto(`/operations/orders?order=${order.id}`);
-    await page.locator(".ops-order-details > summary").click();
     const option = page
       .getByRole("combobox", { name: tr(language, "Producto"), exact: true })
       .locator("option");
