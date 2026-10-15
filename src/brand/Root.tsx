@@ -17,11 +17,13 @@ function RoutedApp() {
   useEffect(() => {
     const publicPage = !path.startsWith("/operations");
     document.documentElement.lang = publicPage ? language : "en";
-    document.documentElement.dir = publicPage && language === "ar" ? "rtl" : "ltr";
+    document.documentElement.dir =
+      publicPage && language === "ar" ? "rtl" : "ltr";
   }, [path, language]);
   if (path.startsWith("/operations")) return <CommerceWorkspace />;
   const page = path.replace(/\/+$/, "");
-  if (page === "/menu") return <MenuPage />;
+  // `/menu/<slug>` is a product's permanent URL (3L-SEO-AEO-002).
+  if (page === "/menu" || page.startsWith("/menu/")) return <MenuPage />;
   if (page === "/how-to-order") return <HowToOrder />;
   if (page === "/checkout/return") return <CheckoutReturn />;
   if (page === "/cart") return <CartPage />;
