@@ -1,3 +1,13 @@
+import {
+  commerceLineSchema,
+  distinctLines,
+  lineKey,
+} from "../../shared/pack-composition";
+import {
+  validatePackLines,
+  packBuilderEnabled,
+  publishedPackRules,
+} from "./packs";
 import { deliveryStreet, deliveryBuilding } from "./delivery-address-input";
 import { frozenCheckout } from "./frozen-checkout";
 import {
@@ -82,20 +92,11 @@ export function configuredSlots(_env = process.env): string[] {
   return DELIVERY_WINDOWS.map((w) => w.label);
 }
 
-const line = z
-  .object({
-    productId: z.string().min(1).max(100),
-    quantity: z.number().int().min(1).max(MAX_ITEM_QUANTITY),
-  })
-  .strict();
 const lines = z
-  .array(line)
+  .array(commerceLineSchema)
   .min(1)
   .max(20)
-  .refine(
-    (ls) => new Set(ls.map((l) => l.productId)).size === ls.length,
-    "Each product may appear once",
-  );
+  .refine(distinctLines, "Duplicate composition or maximum quantity exceeded");
 
 /** Legacy single-product quote shape, kept for existing clients. */
 export const webQuoteSchema = z
@@ -204,7 +205,7 @@ const pickupCheckoutSchema = cartCheckoutSchema
 export type CartCheckoutInput = z.infer<typeof cartCheckoutSchema>;
 
 type Normalized = {
-  lines: { productId: string; quantity: number }[];
+  lines: Order["lines"];
   zoneId?: string;
   fulfillmentMethod?: "delivery" | "pickup";
   pickup?: Order["pickup"];
@@ -377,11 +378,22 @@ export function canonicalCartHash(
       requireThat(product?.active, "Product unavailable", 422);
       return {
         sku: line.productId,
+        ...(line.composition ? { composition: line.composition } : {}),
         quantity: line.quantity,
         unitPriceFils: product.priceFils,
       };
     })
-    .sort((a, b) => a.sku.localeCompare(b.sku));
+    .sort((a, b) =>
+      lineKey({
+        productId: a.sku,
+        composition: "composition" in a ? a.composition : undefined,
+      }).localeCompare(
+        lineKey({
+          productId: b.sku,
+          composition: "composition" in b ? b.composition : undefined,
+        }),
+      ),
+    );
   return digest(
     JSON.stringify({
       lines: priced,
@@ -417,6 +429,7 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
     if (record) {
       requireThat(order && payment, "Checkout not found", 409);
       const frozen = frozenCheckout(order, payment);
+      if (payment.status !== "paid") validatePackLines(snapshot, input.lines);
       // Recover a missing pre-release hash only from validated frozen records.
       if (!record.cartHash) {
         record.cartHash = digest(
@@ -424,10 +437,21 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
             lines: frozen.items
               .map((i) => ({
                 sku: i.sku,
+                ...(i.composition ? { composition: i.composition } : {}),
                 quantity: i.quantity,
                 unitPriceFils: i.unitPriceFils,
               }))
-              .sort((a, b) => a.sku.localeCompare(b.sku)),
+              .sort((a, b) =>
+                lineKey({
+                  productId: a.sku,
+                  composition: "composition" in a ? a.composition : undefined,
+                }).localeCompare(
+                  lineKey({
+                    productId: b.sku,
+                    composition: "composition" in b ? b.composition : undefined,
+                  }),
+                ),
+              ),
             fulfillment: {
               delivery: order.delivery ?? null,
               pickup: order.pickup ?? null,
@@ -454,9 +478,9 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
         pickup: unknown,
       ) =>
         JSON.stringify({
-          lines: [...lines].sort((a, b) =>
-            a.productId.localeCompare(b.productId),
-          ),
+          lines: lines
+            .map(({ packSnapshot: _snapshot, ...l }) => l)
+            .sort((a, b) => lineKey(a).localeCompare(lineKey(b))),
           method: method ?? "delivery",
           zoneId: zoneId ?? null,
           delivery: delivery ?? null,
@@ -571,6 +595,7 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
         };
       })();
   const s = service.store.read();
+  validatePackLines(s, input.lines);
   requireThat(
     !input.lines.some((l) => RETIRED_SKUS.has(l.productId)),
     "Product unavailable",
@@ -602,8 +627,11 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
   // Opaque comparison token only: catalog/quote remain the sole price authority.
   const quoteRevision = digest(
     JSON.stringify({
+      ...(packBuilderEnabled()
+        ? { packEligibility: publishedPackRules(s) }
+        : {}),
       lines: [...input.lines]
-        .sort((a, b) => a.productId.localeCompare(b.productId))
+        .sort((a, b) => lineKey(a).localeCompare(lineKey(b)))
         .map((l) => ({
           ...l,
           product: s.catalog?.find((p) => p.id === l.productId),
@@ -617,6 +645,8 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
 export type WebCheckoutSummary = {
   items: {
     productId: string;
+    composition?: Order["lines"][number]["composition"];
+    packSnapshot?: Order["lines"][number]["packSnapshot"];
     name: string;
     quantity: number;
     lineFils: number;
@@ -698,6 +728,9 @@ export function readWebCheckoutStatus(
       ? {
           items: frozen.items.map((i) => ({
             productId: i.sku,
+            ...(i.composition
+              ? { composition: i.composition, packSnapshot: i.packSnapshot }
+              : {}),
             name: i.name,
             quantity: i.quantity,
             lineFils: i.unitPriceFils * i.quantity,

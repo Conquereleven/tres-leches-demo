@@ -1,11 +1,20 @@
+import { useLiveCatalog } from "./live-catalog";
+import {
+  commerceLineSchema,
+  lineKey,
+  normalizeComposition,
+  type CommerceLine,
+  type Composition,
+  type PackEligibility,
+} from "../../shared/pack-composition";
 /**
- * Shopping cart. Holds product ids and quantities only — never prices. Every
+ * Shopping cart. Holds product ids, quantities and preparation choices — never prices. Every
  * amount shown to the customer comes from the server's checkout config and
  * quote, and the server re-prices the cart again before any payment.
  */
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
-export type CartLine = { productId: string; quantity: number };
+export type CartLine = CommerceLine;
 import { MAX_ITEM_QUANTITY } from "../../shared/commerce-policy";
 export const MAX_QTY = MAX_ITEM_QUANTITY;
 const KEY = "3l-cart";
@@ -17,17 +26,10 @@ function read(): CartLine[] {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) ?? "[]");
     return Array.isArray(raw)
-      ? raw
-          .filter(
-            (l) =>
-              typeof l?.productId === "string" &&
-              Number.isInteger(l?.quantity) &&
-              l.quantity >= 1,
-          )
-          .map((l) => ({
-            productId: l.productId,
-            quantity: Math.min(MAX_QTY, l.quantity),
-          }))
+      ? raw.flatMap((l) => {
+          const parsed = commerceLineSchema.safeParse(l);
+          return parsed.success ? [parsed.data] : [];
+        })
       : [];
   } catch {
     return [];
@@ -51,33 +53,74 @@ if (typeof window !== "undefined")
   });
 
 export const cart = {
-  add(productId: string, quantity = 1) {
+  add(productId: string, quantity = 1, composition?: Composition) {
     if (!productId || !Number.isInteger(quantity) || quantity < 1) return;
-    const current = lines.find((l) => l.productId === productId);
+    const entry = {
+      productId,
+      quantity,
+      ...(composition
+        ? { composition: normalizeComposition(composition) }
+        : {}),
+    };
+    const key = lineKey(entry);
+    const total = lines
+      .filter((l) => l.productId === productId)
+      .reduce((n, l) => n + l.quantity, 0);
+    if (total + quantity > MAX_QTY) return;
+    const current = lines.find((l) => lineKey(l) === key);
     commit(
       current
         ? lines.map((l) =>
-            l.productId === productId
+            lineKey(l) === key
               ? { ...l, quantity: Math.min(MAX_QTY, l.quantity + quantity) }
               : l,
           )
-        : [...lines, { productId, quantity: Math.min(MAX_QTY, quantity) }],
+        : [...lines, entry],
     );
   },
-  set(productId: string, quantity: number) {
+  set(key: string, quantity: number) {
     if (!Number.isInteger(quantity) || quantity < 0) return;
+    const target = lines.find((l) => lineKey(l) === key);
+    if (
+      !target ||
+      lines
+        .filter((l) => l.productId === target.productId && lineKey(l) !== key)
+        .reduce((n, l) => n + l.quantity, 0) +
+        quantity >
+        MAX_QTY
+    )
+      return;
     commit(
       quantity < 1
-        ? lines.filter((l) => l.productId !== productId)
+        ? lines.filter((l) => lineKey(l) !== key)
         : lines.map((l) =>
-            l.productId === productId
+            lineKey(l) === key
               ? { ...l, quantity: Math.min(MAX_QTY, quantity) }
               : l,
           ),
     );
   },
-  remove(productId: string) {
-    commit(lines.filter((l) => l.productId !== productId));
+  edit(key: string, composition: Composition) {
+    const target = lines.find((l) => lineKey(l) === key);
+    if (!target) return;
+    const entry = { ...target, composition: normalizeComposition(composition) };
+    const existing = lines.find(
+      (l) => lineKey(l) !== key && lineKey(l) === lineKey(entry),
+    );
+    commit(
+      existing
+        ? lines
+            .filter((l) => lineKey(l) !== key)
+            .map((l) =>
+              lineKey(l) === lineKey(entry)
+                ? { ...l, quantity: l.quantity + target.quantity }
+                : l,
+            )
+        : lines.map((l) => (lineKey(l) === key ? entry : l)),
+    );
+  },
+  remove(key: string) {
+    commit(lines.filter((l) => lineKey(l) !== key));
   },
   clear() {
     commit([]);
@@ -118,6 +161,7 @@ export function cartSubtotalFils(ls: CartLine[], products: CatalogEntry[]) {
 }
 
 export type CheckoutConfig = {
+  personalizedPacks?: { enabled: boolean; rules: PackEligibility };
   enabled: boolean;
   catalogAvailable?: boolean;
   addressVerificationRequired?: boolean;
@@ -155,6 +199,7 @@ function loadConfig(force = false) {
 }
 /** Checkout availability, shared by every component on the page. */
 export function useCheckoutConfig() {
+  const published = useLiveCatalog();
   const [state, setState] = useState<{
     config: CheckoutConfig | null;
     loading: boolean;
@@ -169,7 +214,17 @@ export function useCheckoutConfig() {
       active = false;
     };
   }, [attempt]);
-  return { ...state, retry: () => setAttempt((n) => n + 1) };
+  const packSettings =
+    published.status === "live"
+      ? published.catalog.personalizedPacks
+      : undefined;
+  const config = useMemo(() => {
+    if (!state.config || !packSettings) return state.config;
+    const merged = { ...state.config, personalizedPacks: packSettings };
+    receivedAt.set(merged, receivedAt.get(state.config) ?? Date.now());
+    return merged;
+  }, [state.config, packSettings]);
+  return { ...state, config, retry: () => setAttempt((n) => n + 1) };
 }
 
 /** Advance the server clock snapshot by elapsed local time; backend revalidates. */

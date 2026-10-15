@@ -105,6 +105,9 @@ export function storefrontCatalog(state: State, now = new Date()) {
     ),
   ]);
   return {
+    ...(process.env.PERSONALIZED_PACKS_ENABLED === "true"
+      ? { personalizedPacks: { enabled: true, rules: f.packEligibility ?? [] } }
+      : {}),
     schemaVersion: 1 as const,
     revision: f.revision.id,
     publishedAt: f.revision.publishedAt,

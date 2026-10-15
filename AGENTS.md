@@ -155,3 +155,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 
 ## October 13 founder price correction
 - Exactly ten Pan de Muerto SKUs now use `PAN_OCT13_CORRECTION`: chocolate covering 18/21, traditional packs 60/115/72/140, filled packs 100/190/120/235 AED. This supersedes October 9 only for these IDs; other prices and commercial rules stay unchanged. Never calculate packs from unit prices. Historical accepted order snapshots/payments are immutable.
+
+## PACK-001 personalized Pan de Muerto packs (15 October 2026)
+- `PERSONALIZED_PACKS_ENABLED` defaults off. Preserve the eight fixed-price pack SKUs. Components are preparation identities only: no individual-price sums, surcharges, presets or automatic distributions.
+- Published Foundation `packEligibility` is the only component-approval source, independently of seasonal retail-single availability. Absent/empty rules approve nothing. Lisa must confirm actual production availability before release; test-fixture approvals are never commercial defaults.
+- Preserve normalized composition in cart identity, quotation, idempotency and immutable accepted preparation snapshots. Historical kitchen/ticket text must use stored preparation names, not current catalog settings. Managers draft; only admins publish. No real roles change as part of PACK-001.
+- The proposed illustrative-image disclaimer remains internal documentation until separately approved. Release and rollback: `docs/packs/personalized-packs.md`.

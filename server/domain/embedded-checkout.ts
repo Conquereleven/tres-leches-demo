@@ -115,7 +115,7 @@ export async function submitEmbeddedPayment(
   // Re-price from the current catalog and zone rule: the charged amount must
   // still equal the payment created at checkout, or nothing is charged.
   const quote = quoteWebCheckout(service, {
-    lines: order.lines,
+    lines: order.lines.map(({ packSnapshot: _snapshot, ...line }) => line),
     zoneId: order.manualZoneId,
   });
   requireThat(

@@ -177,5 +177,10 @@
   "copy_3b653968d5a63081": "Elegir {0}",
   "copy_e53477c894279e40": "3L Pastelerías",
   "copy_b32f970b25f3fef5": "Dirección de facturación de tu tarjeta",
-  "copy_31fbef162594de01": "Continuar"
+  "copy_31fbef162594de01": "Continuar",
+  "pack_b0e8cad404360edf": "Sabor del pack no disponible; revisa tu selección",
+  "pack_9a5d3ce941dea12b": "Elige todos los sabores del pack antes de continuar",
+  "pack_5d72f458fd143e86": "La composición debe completar exactamente el pack",
+  "pack_37bb19baa264e645": "Los packs personalizados no están habilitados",
+  "pack_1c2a4497f4a430a3": "Composición duplicada o cantidad máxima de cajas superada"
 }
