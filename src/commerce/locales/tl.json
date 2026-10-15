@@ -700,5 +700,9 @@
   "WhatsApp sending requires review": "Ipinapadala · suriin kung naputol",
   "WhatsApp API accepted": "Tinanggap ng WhatsApp · hindi pa naihahatid",
   "Only catalog staff can edit drafts": "Catalog staff lang ang puwedeng mag-edit ng mga draft",
-  "Only an administrator can publish the catalog": "Administrator lang ang puwedeng mag-publish ng catalog"
+  "Only an administrator can publish the catalog": "Administrator lang ang puwedeng mag-publish ng catalog",
+  "Archivo recibido; revisar en WhatsApp": "Metadata lang; tingnan sa WhatsApp",
+  "Enviado desde WhatsApp Business App": "Ipinadala mula sa WhatsApp Business App",
+  "Historial importado": "Na-import na history",
+  "Un operador respondió desde Business App; respuestas automáticas en pausa.": "Sumagot ang operator mula sa Business App; naka-pause ang awtomatikong sagot."
 }

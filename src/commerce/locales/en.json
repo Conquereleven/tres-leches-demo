@@ -700,5 +700,9 @@
   "WhatsApp sending requires review": "Sending · review if interrupted",
   "WhatsApp API accepted": "Accepted by WhatsApp · delivery pending",
   "Only catalog staff can edit drafts": "Only catalog staff can edit drafts",
-  "Only an administrator can publish the catalog": "Only an administrator can publish the catalog"
+  "Only an administrator can publish the catalog": "Only an administrator can publish the catalog",
+  "Archivo recibido; revisar en WhatsApp": "Media metadata only; view in WhatsApp",
+  "Enviado desde WhatsApp Business App": "Sent from WhatsApp Business App",
+  "Historial importado": "Imported history",
+  "Un operador respondió desde Business App; respuestas automáticas en pausa.": "An operator replied from Business App; automatic replies are paused."
 }

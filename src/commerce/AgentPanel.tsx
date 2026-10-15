@@ -144,7 +144,12 @@ export function AgentPanel({
       {(session?.handoffReason || latest?.handoffReason) && (
         <p className="co-ai-handoff" role="status">
           {t("Revisión humana:")}{" "}
-          {session?.handoffReason ?? latest?.handoffReason}
+          {(session?.handoffReason ?? latest?.handoffReason) ===
+          "BUSINESS_APP_OPERATOR"
+            ? t(
+                "Un operador respondió desde Business App; respuestas automáticas en pausa.",
+              )
+            : (session?.handoffReason ?? latest?.handoffReason)}
         </p>
       )}
       {latest?.status === "running" && (

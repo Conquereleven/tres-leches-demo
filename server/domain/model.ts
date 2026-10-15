@@ -49,6 +49,21 @@ export type Audit = {
   from?: OrderState;
   to?: OrderState;
 };
+export const whatsAppMediaSchema = z.object({
+  type: z.enum([
+    "image",
+    "audio",
+    "video",
+    "document",
+    "sticker",
+    "media_placeholder",
+  ]),
+  id: z.string().min(1).max(256).optional(),
+  mimeType: z.string().max(120).optional(),
+  filename: z.string().max(255).optional(),
+  sha256: z.string().max(128).optional(),
+  voice: z.boolean().optional(),
+});
 export type Message = {
   id: string;
   direction: "in" | "out";
@@ -65,6 +80,8 @@ export type Message = {
     | "failed"
     | "unknown";
   providerId?: string;
+  origin?: "cloud" | "business-app" | "history";
+  media?: z.infer<typeof whatsAppMediaSchema>;
   sentAt?: string;
   agentGuard?: {
     runId: string;
@@ -333,6 +350,14 @@ export type NotificationReceipt = {
   attempts: number;
 };
 export type State = {
+  /** Observed contacts only; importing/removing a contact never erases chats. */
+  whatsappContacts?: {
+    sourceNumberId: string;
+    phone: string;
+    name?: string;
+    at: string;
+    removed: boolean;
+  }[];
   /** Last public order number issued. Only ever increases. */
   orderNumberSequence?: number;
   customerNotifications?: CustomerNotification[];

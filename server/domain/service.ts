@@ -1,3 +1,8 @@
+import {
+  applyWhatsAppContact,
+  applyWhatsAppMessage,
+  latestCustomerInbound,
+} from "./whatsapp-inbound";
 import { frozenCheckout } from "./frozen-checkout";
 import { PaymenntProvider } from "../adapters/paymennt";
 import { orderBillingAddress, toPaymenntDeliveryAddress } from "./billing";
@@ -73,7 +78,7 @@ export class CommerceService {
         "AI send aborted: context changed",
         409,
       );
-      const inbound = c.messages.filter((m) => m.direction === "in").at(-1);
+      const inbound = latestCustomerInbound(c);
       requireThat(
         inbound &&
           Date.now() - Date.parse(inbound.at) < 86400000 &&
@@ -610,7 +615,12 @@ export class CommerceService {
     for (const delivery of due) {
       try {
         const event = inboundSchema.parse(delivery.event);
-        if (event.type === "message" && event.location) {
+        if (
+          event.type === "message" &&
+          event.location &&
+          event.origin !== "history" &&
+          event.direction !== "out"
+        ) {
           // A geocoder outage must not lose the customer's message; unresolved GPS stays blocked for manual review.
           try {
             await this.geo.prepare?.(event.location);
@@ -652,6 +662,9 @@ export class CommerceService {
         // Existing signed/idempotent inbound transaction owns this receipt.
       } else if (e.type === "status") {
         const m = s.conversations
+          .filter(
+            (c) => !e.sourceNumberId || c.sourceNumberId === e.sourceNumberId,
+          )
           .flatMap((c) => c.messages)
           .find((m) => m.providerId === e.providerId);
         requireThat(m, "Mensaje todavía no disponible; reintentar", 503);
@@ -661,42 +674,11 @@ export class CommerceService {
         if (e.status === "failed") {
           if (current < 2) m.status = "failed";
         } else if (ranks[e.status] > current) m.status = e.status;
+      } else if (e.type === "contact") {
+        applyWhatsAppContact(s, e, this.operationalNumbers);
       } else {
-        const n = this.operationalNumbers.find(
-          (n) => n.id === e.sourceNumberId,
-        );
-        requireThat(n, "Número de origen desconocido", 400);
-        let c = s.conversations.find(
-          (c) => c.sourceNumberId === n.id && c.phone === e.phone,
-        );
-        if (!c) {
-          c = {
-            id: randomUUID(),
-            customer: e.customer,
-            phone: e.phone,
-            sourceNumberId: n.id,
-            sourcePhoneNumber: n.phone,
-            assignedAgent: null,
-            status: "open",
-            unread: true,
-            version: 0,
-            messages: [],
-            audit: [],
-          };
-          s.conversations.push(c);
-        }
-        c.messages.push({
-          id: e.eventId,
-          direction: "in",
-          text: e.text,
-          location: e.location,
-          status: "received",
-          at: e.at ?? now(),
-        });
-        c.unread = true;
-        c.status = "open";
-        c.version++;
-        if (e.location) {
+        const c = applyWhatsAppMessage(s, e, this.operationalNumbers);
+        if (c && e.location) {
           c.location = e.location;
           c.address = undefined;
           for (const o of s.orders.filter(
@@ -1346,9 +1328,7 @@ export class CommerceService {
               const current = this.conversation(s, c.id),
                 session = s.ai?.sessions[c.id],
                 run = s.ai?.runs.find((r) => r.id === m.agentGuard!.runId);
-              const incoming = current.messages
-                .filter((m) => m.direction === "in")
-                .at(-1);
+              const incoming = latestCustomerInbound(current);
               const origin = this.operationalNumbers.find(
                 (n) =>
                   n.id === current.sourceNumberId &&
@@ -1388,11 +1368,7 @@ export class CommerceService {
               ...sourceOf(c),
               text: m.text,
               paymentContext: m.paymentContext,
-              lastInboundAt: c.messages
-                .filter((m) => m.direction === "in")
-                .map((m) => m.at)
-                .sort()
-                .at(-1),
+              lastInboundAt: latestCustomerInbound(c)?.at,
               idempotencyKey: m.id,
             }),
           );

@@ -1,0 +1,62 @@
+# 3L-META-002 — QA evidence
+
+Baseline: `a75a0fa1637f4511ed0237e2b4fff621489e619a`. Isolated worktree/branch `feature/3l-meta-coexistence-inbound`. Original Pack Builder and SEO branches/worktrees were not edited or integrated.
+
+| Check | Result |
+|---|---|
+| TypeScript strict (`npm run typecheck`) | PASS |
+| ESLint (`npm run lint`) | PASS |
+| Build (`npm run build`) | PASS; existing chunk-size/pending-business-information warnings |
+| Complete commerce/unit/HTTP suite (`npm test`) | 606 passed, 0 failed |
+| New coexistence unit/HTTP scenarios (included in commerce suite; also run separately) | 12 passed, 0 failed |
+| Inbox Chromium/WebKit (`npx playwright test --config playwright.meta-inbound.config.ts`) | 8 passed; EN/TL × 390/1440 px × both engines |
+| Checkout Chromium (`npx playwright test --config playwright.checkout.config.ts --browser=chromium`) | 21 passed |
+| Checkout WebKit (same config, `--browser=webkit`) | 21 passed |
+| Existing Sites packaging (`npm run test:sites`) | 4 passed |
+| Dependency audit (`npm run audit`) | 0 vulnerabilities |
+| Source/client bundle heuristic secret scan (`npm run scan:secrets`) | 0 findings |
+| `git diff --check` | PASS |
+
+## What was actually verified
+
+- Good challenge returns exact plaintext; wrong token 403; changed raw bytes with original signature 401; unknown WABA/phone returns safe 400.
+- Text and safe image/audio/video/document/sticker metadata normalize, without persisting media URLs. Bad time/echo sender/history thread and undocumented contact action are refused.
+- Duplicate webhook deliveries persist once. Live, Business App echo and imported history deduplicate by original provider message ID. History-first live delivery, delayed mobile echo and overlapping history receipt states are covered.
+- History is chronological and labeled, never a new live API window or AI candidate. Imported GPS cannot update delivery/order data. Contact sync does not create chats or clear assignment/unread; removal never deletes chats.
+- Out-of-order read receipts retry until the observed message exists, preserve read against later sent/failed receipts and cannot match another conversation origin. Queue replay/restart does not duplicate messages.
+- A real local HTTP fixture, real raw HMAC boundary and disposable SQLite process the documented envelopes; a >64 KiB synthetic history batch is accepted under the isolated WhatsApp limit. Both flags are false; the fixture blocks all external fetches and asserts **zero provider calls**, zero outgoing jobs, byte-identical historical order/payment snapshots.
+- Synthetic AI inference enqueues a reply; a Business App echo changes the epoch/human state and the dispatcher aborts it before transport. This is a fake-model/local test, not live AI or WhatsApp.
+- Browser Inbox labels distinguish Business App and imported history; media is honestly shown as metadata. All 8 scenarios have no console/page errors, horizontal overflow or axe violations, and no API writes. The browser layer uses a synthetic workspace snapshot produced through the normalizer/domain helpers; the HTTP fixture separately verifies actual persistence/worker behavior. No live auth/session or actual Meta receipt is claimed by these tests.
+- Checkout scenarios preserve hosted payment/authoritative return behavior, stale-cart replacement, paid-state handling and historical Operations previews. All payment transport in that suite is the existing mock fixture.
+
+## Visual evidence
+
+Both images contain synthetic data only; no storefront/OMS redesign.
+
+- [Mobile Inbox, 390 px](evidence/inbox-390.png)
+- [Desktop Inbox, 1440 px](evidence/inbox-1440.png)
+
+## Execution notes and limits
+
+The first full run was started before compiling this new worktree; two pre-existing compiled-artifact tests failed for missing build output, and two developing tests used the wrong worker method name. After building/correcting those tests, the full suite passed. No failures were waived. The original Operations browser port was occupied by another task: it was left untouched and this PR adds an independent port/config (3278). No existing server was killed/reused.
+
+The last read-only refresh of the existing Production configuration confirmed both outgoing flags false and Graph v26.0. GET of the existing number again returned ON_PREMISE/DISCONNECTED/NOT_VERIFIED/is_on_biz_app=true. No onboarding/subscription, template, token, account, number, configuration, real message, charge or production-data mutation occurred.
+
+This evidence proves local direct-Meta contract handling, not number eligibility, compatible provider forwarding, complete history sync, real delivery or Production readiness. The [activation checklist](README.md) explicitly retains those founder/Lisa/Meta/provider gates.
+
+## Changed files
+
+- `server/adapters/meta.ts`: delegates only inbound normalization; outbound adapter preserved.
+- `server/adapters/meta-inbound.ts`: documented envelopes/identity/media validation.
+- `server/domain/commands.ts`, `server/domain/model.ts`: additive event/contact/media types.
+- `server/domain/whatsapp-inbound.ts`: observation application, matching, deduplication, provenance and mobile takeover.
+- `server/domain/service.ts`: reuses existing durable queue/worker and calls those helpers; excludes history from send windows and GPS order effects.
+- `server/domain/agent-gateway.ts`, `server/agents/context.ts`: live-only inbound trigger/window.
+- `server/readiness.ts`: imported history cannot masquerade as last live inbound.
+- `server/http.ts`: WhatsApp-only batch cap and sanitized normalization rejection; financial requests unchanged.
+- `src/commerce/Workspace.tsx`, `src/commerce/AgentPanel.tsx`, `src/commerce/locales/{en,tl}.json`: provenance/media/pause labels in existing Inbox.
+- `tests/fixtures/{meta-coexistence.ts,meta-inbound-server.ts}` and `tests/commerce/{meta-coexistence.test.ts,meta-coexistence-http.test.ts}`: synthetic contract/security/recovery/race evidence.
+- `tests/operations-e2e/meta-coexistence.spec.ts`, `playwright.meta-inbound.config.ts`: isolated browser evidence.
+- `docs/meta/coexistence-inbound/{README.md,QA.md,evidence/inbox-390.png,evidence/inbox-1440.png}`: decision, checklist and review evidence.
+
+No edits to Paymennt/Resend adapters, paid-order notification dispatcher, order workflow, catalog/prices, delivery rules, storefront, dependencies, Railway or env files. No SQL migration/backfill. Optional JSON fields are applied only when an authenticated observed event is received.
