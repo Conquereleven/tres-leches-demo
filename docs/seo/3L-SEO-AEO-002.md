@@ -47,25 +47,27 @@ Tests: `tests/commerce/seo-technical.test.ts` (new) and one deliberate update in
 
 ## 3. Apex domain `3ldubai.ae` — correction plan (no DNS change made)
 
-Read-only DNS (15 Oct 2026):
+Read-only DNS (re-checked 15 Oct 2026):
 
-| Name             | Record | Value                                |
-| ---------------- | ------ | ------------------------------------ |
-| `3ldubai.ae`     | A      | `165.22.30.248` (not Railway)        |
-| `www.3ldubai.ae` | CNAME  | `agpvjymd.up.railway.app`            |
-| Nameservers      | NS     | `ns1–3.rrpproxy.net` (registrar DNS) |
+| Item                                   | Value                                                                  |
+| -------------------------------------- | ---------------------------------------------------------------------- |
+| Registrar                              | AEserver (`whois`: Registrar ID `AESERVER`, status `ok`)               |
+| Authoritative DNS (delegated by `.ae`) | `dns1–3.aeserver.com` → edit records in the **AEserver panel**         |
+| `3ldubai.ae` A                         | `165.22.30.248`: Apache "AEserver Parking Page"; no HTTPS              |
+| `www.3ldubai.ae`                       | CNAME `agpvjymd.up.railway.app` (correct, HTTPS works, http→https 301) |
+| TXT / MX / CAA at apex                 | none (no Google/Bing verification yet; no CAA blocking certificates)   |
 
-`http://3ldubai.ae/` answers 200 from that other host (previously identified as a registrar parking page); `https://3ldubai.ae/` does not answer. Visitors and links using the bare domain never reach the shop, and the server's apex→www redirect never runs.
+Effect: anyone typing `3ldubai.ae` sees a parking page, and the server's apex→www redirect never runs.
 
-Owner steps (registrar DNS panel, founder access needed):
+Owner steps:
 
-1. In Railway (Production service → Settings → Domains) add custom domain `3ldubai.ae` and note the record Railway asks for.
-2. At the registrar, replace the apex `A 165.22.30.248` with what Railway specifies. Apex CNAME is not allowed by DNS; use the registrar's ALIAS/ANAME/CNAME-flattening if offered, otherwise use URL forwarding (301) `3ldubai.ae → https://www.3ldubai.ae` with HTTPS.
-3. Wait for Railway to issue the certificate, then verify:
-   `curl -sI http://3ldubai.ae/menu` and `curl -sI https://3ldubai.ae/menu` → `301` to `https://www.3ldubai.ae/menu`.
-4. Rollback: restore the previous `A` record.
+1. Railway → Production service → Settings → Networking → Custom domain → add `3ldubai.ae`; copy the record Railway shows.
+2. AEserver panel → DNS for `3ldubai.ae`: delete `A 165.22.30.248`; add what Railway asks for. A CNAME is not allowed at the apex: use AEserver's ALIAS/ANAME/flattened-CNAME record if offered. If not offered, use AEserver URL forwarding: `3ldubai.ae` → `https://www.3ldubai.ae` as a **301**, path preserved.
+3. Leave the `www` CNAME unchanged.
+4. Verify after propagation: `curl -sI http://3ldubai.ae/menu` and `curl -sI https://3ldubai.ae/menu` → `301` to `https://www.3ldubai.ae/menu`.
+5. Rollback: re-create `A 165.22.30.248`.
 
-Keep `www` as canonical (already baked into canonicals, sitemap and JSON-LD).
+Keep `www` as the canonical host (already in canonicals, sitemap and JSON-LD).
 
 ## 4. Search Console, Bing and monitoring — activation checklist
 
