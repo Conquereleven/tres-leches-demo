@@ -116,6 +116,11 @@ export function ProductOptions({
           </a>
         </h4>
       )}
+      {detail && product.description && (
+        <p className="b-product-description">
+          <CustomerCopy>{product.description}</CustomerCopy>
+        </p>
+      )}
       <p className="b-menu-price" aria-live="polite">
         <CustomerCopy>{formatAed(display.priceFils)}</CustomerCopy>
       </p>

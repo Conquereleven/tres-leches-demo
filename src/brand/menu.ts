@@ -44,7 +44,9 @@ export function selectMenuOption(
 // Authored immutable identities; never derive URLs from mutable display names at runtime.
 import products from "../../shared/storefront-products.json";
 export const storefrontProducts = products;
-export type StorefrontProduct = (typeof products)[number];
+export type StorefrontProduct = (typeof products)[number] & {
+  description?: string | null;
+};
 export function productFamily(product: StorefrontProduct): MenuFamily {
   const family = menuFamilies.find((f) => f.id === product.familyId)!;
   return {
@@ -99,6 +101,7 @@ function fromLive(catalog: LiveCatalog): Menu {
     slug: p.slug,
     familyId: p.familyId,
     title: p.content.en.name ?? p.id,
+    description: p.content.en.description,
     // Existing products keep their authored variant: it selects approved photography.
     variant: authored.get(p.id)?.variant ?? p.options[0]?.flavor ?? "",
     optionIds: p.options.map((o) => o.id),

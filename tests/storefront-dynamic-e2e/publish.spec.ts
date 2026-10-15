@@ -75,6 +75,9 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   const [first, second] = target.options;
   const name = `Celebration ${info.project.name}`;
   const nameEs = `Celebración ${info.project.name}`;
+  const description = `Published description ${info.project.name}`;
+  const descriptionEs = `Descripción publicada ${info.project.name}`;
+  const descriptionAr = `وصف منشور ${info.project.name}`;
   const price = first!.priceFils + 700;
   const sizeEs = `Porción ${info.project.name}`;
   const cartEs = `Pastel de celebración ${info.project.name}`;
@@ -98,13 +101,21 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
     path: `${shots}/${info.project.name}-1-before.png`,
   });
 
+  const detail = await context.newPage();
+  await detail.goto(`/menu?product=${target.slug}&lang=en`);
+
   // Administrator: rename, translate, reprice, pause a size, replace the photograph.
   await hub.goto("/operations/products");
   await hub.getByLabel("Search").fill(target.id);
   await hub.locator(".ph-row").first().click();
   await hub.getByLabel("Name shown to customers").fill(name);
+  await hub.getByLabel("Description shown to customers").fill(description);
   await hub.getByRole("tab", { name: "Español" }).click();
   await hub.getByLabel("Name shown to customers").fill(nameEs);
+  await hub.getByLabel("Description shown to customers").fill(descriptionEs);
+  await hub.getByRole("tab", { name: "العربية" }).click();
+  await hub.getByLabel("Description shown to customers").fill(descriptionAr);
+  await hub.getByRole("tab", { name: "Español" }).click();
   const variant = (sku: string) =>
     hub
       .locator(".ph-variants li")
@@ -153,6 +164,11 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   const content = published.products.find((p) => p.id === target.id)!.content;
   expect(content.en.name).toBe(name);
   expect(content.es.name).toBe(nameEs);
+  await revisit(detail);
+  await expect(detail.locator(".b-product-description")).toHaveText(
+    description,
+  );
+  await expect(card.locator(".b-product-description")).toHaveCount(0);
 
   // The open storefront tab picks the revision up when it is looked at again.
   await revisit(shop);
@@ -186,6 +202,9 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   // A fresh visit, in Spanish, with the same build.
   await shop.goto(`/menu?product=${target.slug}&lang=es`);
   await expect(shop.locator(".b-product-title")).toHaveText(nameEs);
+  await expect(shop.locator(".b-product-description")).toHaveText(
+    descriptionEs,
+  );
   await expect(shop.locator(".b-menu-photo img")).toHaveAttribute(
     "src",
     /^\/brand\/hub\//,
@@ -196,6 +215,9 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   await shop.goto(`/menu?product=${target.slug}&lang=ar`);
   await expect(shop.locator("html")).toHaveAttribute("dir", "rtl");
   await expect(shop.locator(".b-product-title")).not.toBeEmpty();
+  await expect(shop.locator(".b-product-description")).toHaveText(
+    descriptionAr,
+  );
   await shop.screenshot({ path: `${shots}/${info.project.name}-3-detail.png` });
 
   // The cart made before the publication: published name, photograph and price.
