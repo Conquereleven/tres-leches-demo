@@ -38,5 +38,14 @@ jobs:
       - run: npx playwright test --config=playwright.checkout.config.ts --browser=webkit
       - run: npx playwright test --config=playwright.product-hub.config.ts
       - run: npx playwright test --config=playwright.operations.config.ts
+      - if: failure()
+        name: Synthetic browser failure context
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for p in Path('test-results').rglob('error-context.md'):
+              print(str(p))
+              print(p.read_text())
+          PY
       # Loopback fixtures, disposable SQLite and in-process fake provider only.
       # No secrets, remote data, deployment or provider network requests.

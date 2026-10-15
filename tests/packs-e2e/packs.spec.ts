@@ -192,12 +192,23 @@ test("local hosted checkout carries exact mixture to paid order, kitchen and pre
     data: { id: "admin", password: "pack-fixture-password" },
   });
   expect(login.status()).toBe(200);
-  // The fixture deliberately exercises real production-mode auth over loopback
-  // HTTP. Linux WebKit does not retain its Secure cookie here. Forward only the
-  // server-issued test session explicitly; do not relax application cookie policy.
+  // Authenticate with the real server, then install its fixture-only session in
+  // this HTTP loopback browser context. Linux WebKit rejects Secure cookies and
+  // overrides a manually supplied Cookie header on HTTP. Production still emits
+  // Secure/HttpOnly cookies; no application auth or cookie policy is relaxed.
+  expect(login.headers()["set-cookie"]).toContain("; HttpOnly; Secure;");
   const adminCookie = login.headers()["set-cookie"]?.split(";")[0];
   expect(adminCookie).toBeTruthy();
-  await page.context().setExtraHTTPHeaders({ Cookie: adminCookie! });
+  await page.context().addCookies([
+    {
+      name: "tl_session",
+      value: adminCookie!.slice("tl_session=".length),
+      url: "http://127.0.0.1:3272",
+      httpOnly: true,
+      secure: false,
+      sameSite: "Strict",
+    },
+  ]);
   await page.goto(`/operations/orders/${checkout.orderId}`);
   await expect(page.getByText(/Pistachio × 8/).first()).toBeVisible();
   await expect(page.getByText(/Chocolate × 4/).first()).toBeVisible();
