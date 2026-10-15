@@ -421,9 +421,10 @@ test(
         "public, max-age=31536000, immutable",
       );
       assert.equal((await get("/")).headers["cache-control"], undefined);
+      // Brand media is never immutable: it revalidates (3L-SEO-AEO-002).
       assert.equal(
         (await get("/brand/icon.png", "HEAD")).headers["cache-control"],
-        undefined,
+        "public, max-age=3600, must-revalidate",
       );
     } finally {
       child.kill();

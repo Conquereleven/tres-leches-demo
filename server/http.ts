@@ -94,7 +94,14 @@ import {
   PAID_ALERT_BODY,
 } from "./domain/notifications";
 import { operationsWhatsAppConfig } from "./domain/operations-whatsapp-config";
-import { robotsDirective, trailingSlashTarget } from "../shared/seo";
+import {
+  REVALIDATED_CACHE_CONTROL,
+  htmlAliasTarget,
+  revalidatedAsset,
+  robotsDirective,
+  trailingSlashTarget,
+  weakEtag,
+} from "../shared/seo";
 /** Public customer policy/contact routes; keep in sync with src/brand/business.ts. */
 export const customerPages = [
   "/terms",
@@ -403,6 +410,8 @@ export async function startServer(
       const url = new URL(req.url ?? "/", origin),
         path = url.pathname;
       if (path.startsWith("/api/")) {
+        // API answers are data for the site's own pages, never search results.
+        res.setHeader("X-Robots-Tag", "noindex");
         const rateKey =
             (req.socket.remoteAddress ?? "local") +
             (path === "/api/login" ? ":login" : ""),
@@ -1056,6 +1065,15 @@ export async function startServer(
         });
         return res.end();
       }
+      // `/terms.html` and `/index.html` are the same documents as `/terms` and `/`.
+      const alias = htmlAliasTarget(path, url.search, prerenderedPages);
+      if (alias) {
+        res.writeHead(301, {
+          Location: alias,
+          "Cache-Control": "public, max-age=3600",
+        });
+        return res.end();
+      }
       // Staff, cart and payment pages, and any non-public deployment, stay
       // out of search indexes.
       const robots = robotsDirective(path, runtime.environment);
@@ -1155,6 +1173,20 @@ export async function startServer(
           ? { "Cache-Control": "public, max-age=31536000, immutable" }
           : {}),
       };
+      if (file === candidate && revalidatedAsset(path)) {
+        const stat = statSync(file);
+        const etag = weakEtag(stat.size, stat.mtimeMs);
+        Object.assign(headers, {
+          ETag: etag,
+          "Last-Modified": stat.mtime.toUTCString(),
+          "Cache-Control": REVALIDATED_CACHE_CONTROL,
+        });
+        const match = req.headers["if-none-match"];
+        if (match && match.split(",").some((t) => t.trim() === etag)) {
+          res.writeHead(304, headers);
+          return res.end();
+        }
+      }
       const range = byteRange(
         typeof req.headers.range === "string" ? req.headers.range : undefined,
         body.length,
