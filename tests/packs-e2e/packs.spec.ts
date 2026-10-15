@@ -192,6 +192,12 @@ test("local hosted checkout carries exact mixture to paid order, kitchen and pre
     data: { id: "admin", password: "pack-fixture-password" },
   });
   expect(login.status()).toBe(200);
+  // The fixture deliberately exercises real production-mode auth over loopback
+  // HTTP. Linux WebKit does not retain its Secure cookie here. Forward only the
+  // server-issued test session explicitly; do not relax application cookie policy.
+  const adminCookie = login.headers()["set-cookie"]?.split(";")[0];
+  expect(adminCookie).toBeTruthy();
+  await page.context().setExtraHTTPHeaders({ Cookie: adminCookie! });
   await page.goto(`/operations/orders/${checkout.orderId}`);
   await expect(page.getByText(/Pistachio × 8/).first()).toBeVisible();
   await expect(page.getByText(/Chocolate × 4/).first()).toBeVisible();
