@@ -41,6 +41,8 @@ Source of truth: `storefrontCatalog(state)`, the exact projection behind `GET /a
 
 Browser (Chromium + WebKit, 390 and 1440 px, `storefront-dynamic-server` fixture): no-JS page shows H1, 3 options and AED price; with JS the interactive view renders, add-to-cart works (`CART (1)`), no console errors, no horizontal overflow; ES and AR pack pages keep `lang`/`dir` (`rtl`); `/menu?product=` lands on `/menu/<slug>`; 20 menu links use the new URL; click-through and Back work. Screenshots: `no-js-1440.png`, `product-390.png`, `product-1440.png`, `pack-es-390.png`, `pack-ar-390.png`.
 
+Storefront browser suites on this branch: storefront-dynamic 4/4, i18n 17/17, conchas 52/52, official-media 10/10, checkout 21/21. Menu suite 14/19: the same 5 tests fail identically on clean `main` (pack price expectations), so they are pre-existing and unrelated. The storefront-dynamic suite caught a real defect in this branch (the legacy redirect dropped `lang=`); fixed and covered by a unit assertion.
+
 ## Known limits
 
 - After JavaScript renders, the page H1 is the menu page's "Menu"; the product name is in the interactive card. The server HTML (what non-rendering crawlers and the first paint see) has the product H1. Making the interactive view use the product name as H1 is a `MenuCatalog.tsx` change for after #31.

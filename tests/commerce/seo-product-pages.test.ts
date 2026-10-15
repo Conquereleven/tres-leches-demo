@@ -473,6 +473,16 @@ test(
       const legacy = await get(`/menu?product=${product.slug}`);
       assert.equal(legacy.status, 301);
       assert.equal(legacy.headers.location, `/menu/${product.slug}`);
+      // Other parameters (language) survive the move into the path.
+      assert.equal(
+        (await get(`/menu?product=${product.slug}&lang=es`)).headers.location,
+        `/menu/${product.slug}?lang=es`,
+      );
+      assert.equal(
+        (await get(`/menu?lang=ar&product=${product.slug}&x=1`)).headers
+          .location,
+        `/menu/${product.slug}?lang=ar&x=1`,
+      );
       assert.equal(
         (await get(`/menu/${product.slug}/`)).headers.location,
         `/menu/${product.slug}`,

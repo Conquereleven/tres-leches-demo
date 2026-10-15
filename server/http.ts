@@ -139,6 +139,13 @@ function markDynamicCatalog(file: string) {
 }
 const customerCsp =
   "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; script-src 'self' https://pay.paymennt.com; frame-src https://pay.test.paymennt.com; frame-ancestors 'none'";
+/** The query string without `product`, for redirects to `/menu/<slug>`. */
+function legacyQuery(params: URLSearchParams) {
+  const rest = new URLSearchParams(params);
+  rest.delete("product");
+  const query = rest.toString();
+  return query ? `?${query}` : "";
+}
 export async function startServer(
   overrides: {
     initial?: ReturnType<typeof seed>;
@@ -1079,7 +1086,8 @@ export async function startServer(
         const legacy = url.searchParams.get("product");
         if (path === "/menu" && legacy && SLUG.test(legacy)) {
           res.writeHead(301, {
-            Location: productPath(legacy),
+            // Keep every other parameter (language, category): only `product` moves into the path.
+            Location: productPath(legacy) + legacyQuery(url.searchParams),
             "Cache-Control": "public, max-age=3600",
           });
           return res.end();
