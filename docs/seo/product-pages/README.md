@@ -1,6 +1,6 @@
 # Indexable product pages · `/menu/<slug>` (3L-SEO-AEO-002 Track B)
 
-**Merge after Codex #31 (Pack Builder).** This branch touches files #31 also changes: `src/brand/MenuCatalog.tsx` (1 line), `src/brand/menu.ts`, `src/brand/Root.tsx` (1 line) and `server/http.ts` (one block before static serving). Rebase on `main` once #31 merges, then re-run the gates below.
+**Merge after Codex #31 (Pack Builder).** This branch touches files #31 also changes: `src/brand/MenuCatalog.tsx` (1 line), `src/brand/menu.ts`, `src/brand/Root.tsx` (1 line), `src/brand/StorePages.tsx` (1 condition) and `server/http.ts` (one block before static serving). Rebase on `main` once #31 merges, then re-run the gates below.
 
 ## Behaviour
 
@@ -45,7 +45,7 @@ Storefront browser suites on this branch: storefront-dynamic 4/4, i18n 17/17, co
 
 ## Known limits
 
-- After JavaScript renders, the page H1 is the menu page's "Menu"; the product name is in the interactive card. The server HTML (what non-rendering crawlers and the first paint see) has the product H1. Making the interactive view use the product name as H1 is a `MenuCatalog.tsx` change for after #31.
+- Fixed: the page has one H1 — the product name — before and after JavaScript (`StorePages.tsx`; `tests/storefront-dynamic-e2e/product-page.spec.ts`).
 - Product descriptions are empty in the published catalog; pages show name, photo, options and prices only until approved descriptions are published in Product Hub.
 - English-only documents; no `hreflang` until ES/AR documents exist (see Track A plan, section 8).
 - `lastmod` needs a real `publishedAt` on publication (currently `null` live).
