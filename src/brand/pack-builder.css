@@ -1,0 +1,48 @@
+/* Pack builder uses the existing quantity controls and brand tokens. */
+.brand-experience .b-pack-builder {
+  border: 0;
+  border-block-start: 1px solid currentColor;
+  padding: 1rem 0;
+  margin: 1rem 0;
+  min-inline-size: 0;
+}
+.brand-experience .b-pack-builder legend {
+  font-weight: 600;
+  padding-inline-end: 0.75rem;
+}
+.brand-experience .b-pack-flavor {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-block: 0.65rem;
+}
+.brand-experience .b-pack-flavor .b-qty {
+  flex-shrink: 0;
+}
+.brand-experience .b-pack-flavor input {
+  inline-size: 3rem;
+  text-align: center;
+}
+.brand-experience .b-pack-composition {
+  display: block;
+  font-size: 0.85em;
+  line-height: 1.6;
+  margin-block: 0.4rem;
+}
+.brand-experience .b-pack-edit {
+  margin-block: 0.75rem;
+}
+.brand-experience .b-pack-edit summary {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.brand-experience .b-pack-flavor input[type="number"] {
+  appearance: textfield;
+}
+.brand-experience .b-pack-flavor input::-webkit-inner-spin-button,
+.brand-experience .b-pack-flavor input::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}

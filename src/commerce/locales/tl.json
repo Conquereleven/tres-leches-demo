@@ -700,5 +700,8 @@
   "WhatsApp sending requires review": "Ipinapadala · suriin kung naputol",
   "WhatsApp API accepted": "Tinanggap ng WhatsApp · hindi pa naihahatid",
   "Only catalog staff can edit drafts": "Catalog staff lang ang puwedeng mag-edit ng mga draft",
-  "Only an administrator can publish the catalog": "Administrator lang ang puwedeng mag-publish ng catalog"
+  "Only an administrator can publish the catalog": "Administrator lang ang puwedeng mag-publish ng catalog",
+  "Pack flavor eligibility": "Mga flavor para sa pack",
+  "Enable only flavors confirmed for production, per box size. Changes remain private until an administrator publishes them.": "Paganahin lamang ang mga flavor na kumpirmado para sa produksyon, ayon sa laki ng kahon. Pribado ang mga pagbabago hanggang ilathala ng administrator.",
+  "Save pack eligibility draft": "I-save ang draft ng mga flavor para sa pack"
 }

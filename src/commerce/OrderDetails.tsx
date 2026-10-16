@@ -1,3 +1,4 @@
+import { lineKey, preparationText } from "../../shared/pack-composition";
 import type { ReactNode } from "react";
 import {
   ArrowLeft,
@@ -456,13 +457,14 @@ export function OrderItemsCard({ order: o, data }: CardProps) {
           </thead>
           <tbody>
             {lines.map((l) => (
-              <tr key={l.productId}>
+              <tr key={lineKey(l)}>
                 <th scope="row">
                   {/* Title stays the product; the review flag is a separate line. */}
                   <span lang="en" className="oms-item-name">
                     {l.product.name}
                   </span>
                   <small className="oms-ref">{l.productId}</small>
+                  {l.composition && <p lang="en">{preparationText(l)}</p>}
                   {l.product.reviewRequired && (
                     <small className="oms-item-review">
                       <Translate aria-hidden />

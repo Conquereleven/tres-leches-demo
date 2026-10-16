@@ -1,3 +1,4 @@
+import { packEligibilitySchema } from "../../shared/pack-composition";
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import type { CatalogItem } from "../domain/model";
@@ -44,6 +45,7 @@ const mediaLink = z
 export const foundationSchema = z
   .object({
     schemaVersion: z.literal(1),
+    packEligibility: packEligibilitySchema.optional(),
     revision: z
       .object({
         id: z.string().regex(/^catalog-v1-[a-f0-9]{64}$/),
@@ -240,6 +242,13 @@ export function validateFoundation(
   }
   if (f.variants.length !== catalog.length)
     throw new Error("Unrepresented commercial SKU");
+  for (const rule of f.packEligibility ?? []) {
+    if (
+      !skus.has(rule.packSkuId) ||
+      rule.componentSkuIds.some((id) => !skus.has(id))
+    )
+      throw new Error("Missing pack component SKU");
+  }
   for (const owner of [...f.categories, ...f.products, ...f.variants]) {
     const links = owner.media;
     unique(

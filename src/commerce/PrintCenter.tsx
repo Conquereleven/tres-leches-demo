@@ -1,3 +1,4 @@
+import { lineKey, preparationText } from "../../shared/pack-composition";
 import { operationalProductName } from "./product-names";
 import { OperationalProductName } from "./OperationalProductName";
 import { ticketSnapshot } from "./ticket-snapshot";
@@ -91,12 +92,13 @@ export function PrintCenter({ data }: { data: Workspace }) {
             </p>
             <ul>
               {ticketLines.map((l) => (
-                <li key={l.productId}>
+                <li key={lineKey(l)}>
                   <strong>{l.quantity} × </strong>
                   <OperationalProductName
                     product={operationalProductName(l.productId, l.name)}
                     id={l.productId}
                   />
+                  {l.composition && <p lang="en">{preparationText(l)}</p>}
                 </li>
               ))}
             </ul>
