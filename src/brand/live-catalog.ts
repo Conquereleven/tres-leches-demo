@@ -59,7 +59,11 @@ export type LiveProduct = {
   options: LiveOption[];
 };
 export type LiveCatalog = {
-  personalizedPacks?: { enabled: boolean; rules: PackEligibility };
+  personalizedPacks?: {
+    enabled: boolean;
+    conchasEnabled?: boolean;
+    rules: PackEligibility;
+  };
   schemaVersion: 1;
   revision: string;
   publishedAt: string | null;

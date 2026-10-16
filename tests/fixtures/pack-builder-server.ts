@@ -22,6 +22,8 @@ process.env.AI_ENABLED = "false";
 process.env.OPERATIONS_EMAIL_ENABLED = "false";
 process.env.OPERATIONS_WHATSAPP_ENABLED = "false";
 process.env.PERSONALIZED_PACKS_ENABLED = "true";
+process.env.PERSONALIZED_CONCHAS_PACKS_ENABLED =
+  process.env.CONCHAS_PACK_FIXTURE === "true" ? "true" : "false";
 process.env.PRODUCT_HUB_ENABLED = "true";
 process.env.PRODUCT_HUB_PUBLISH_ENABLED = "true";
 process.env.STOREFRONT_DYNAMIC_CATALOG_ENABLED = "true";
@@ -97,6 +99,13 @@ const app = await startServer({ initial, payment });
 const [handler] = app.server.listeners("request");
 app.server.removeAllListeners("request");
 app.server.on("request", (req, res) => {
+  if (req.url === "/__fixture/conchas-mode" && req.method === "POST") {
+    process.env.PERSONALIZED_CONCHAS_PACKS_ENABLED =
+      req.headers["x-fixture-enabled"] === "true" ? "true" : "false";
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ ok: true }));
+    return;
+  }
   if (req.url === "/__fixture/paid" && req.method === "POST") {
     status = "PAID";
     res.writeHead(200, { "Content-Type": "application/json" });

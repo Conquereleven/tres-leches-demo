@@ -166,3 +166,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Founder selected DIRECT META CLOUD API ONLY; no BSP, intermediary subscription or provider dashboard. GOLOSITALIA/3L own-business access and CornerTech's future Tech Provider registration are separate legal/use cases.
 - Preserve existing app, portfolio, WABA and Business App number. No ordinary `/register` workaround, number linking, permission changes or outbound activation without explicit authorization.
 - Current direct readiness and Meta-native coexistence gates: `docs/meta/direct-cloud-readiness.md`. Code/synthetic tests never prove individual number eligibility or actual signed delivery.
+
+## CONCHAS-PACK-001 (16 October 2026)
+- Conchas reuses PACK_SPECS/PackBuilder and the existing version-1 preparation snapshots, with eight existing fixed-price pack IDs. Never enable compositions merely because the Pan gate is on.
+- `PERSONALIZED_CONCHAS_PACKS_ENABLED` is an independent strict-true gate, default off. Existing `PERSONALIZED_PACKS_ENABLED` retains its Pan de Muerto meaning. Absent Conchas gate preserves legacy Conchas pack purchases.
+- Conchas candidates are exact existing size-specific retail identities, but retail activity is independent of explicit published pack-production eligibility. No implicit approvals or retail reactivation. Existing eight-rule Foundation revisions remain valid; schema admits sixteen distinct format rules.
+- Keep flavor-specific commercial pack names until founder approves neutral replacements; proposals and separate code-release/activation checklist: `docs/packs/conchas-personalized-packs.md`. No Production activation/publication authorized in this sprint.

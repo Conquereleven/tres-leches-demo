@@ -1,7 +1,7 @@
 import { PackBuilder, CompositionDetails, packComplete } from "./PackBuilder";
 import {
   lineKey,
-  packSpec,
+  personalizedPackEnabled,
   type Composition,
   type PackSnapshot,
 } from "../../shared/pack-composition";
@@ -672,7 +672,7 @@ export function AddToCart({
   const inCart = lines
     .filter((l) => l.productId === productId)
     .reduce((n, l) => n + l.quantity, 0);
-  const custom = !!config?.personalizedPacks?.enabled && !!packSpec(productId);
+  const custom = personalizedPackEnabled(productId, config?.personalizedPacks);
   return (
     <div className="b-add-to-cart">
       {custom && (
@@ -798,9 +798,10 @@ function CartItems({
                 <CustomerCopy>{p.name}</CustomerCopy>
               </strong>
               <CompositionDetails line={l} />
-              {config.personalizedPacks?.enabled && packSpec(l.productId) && (
-                <CartPackEditor line={l} config={config} />
-              )}
+              {personalizedPackEnabled(
+                l.productId,
+                config.personalizedPacks,
+              ) && <CartPackEditor line={l} config={config} />}
               {p.description && (
                 <span className="b-caption">
                   <CustomerCopy>{p.description}</CustomerCopy>

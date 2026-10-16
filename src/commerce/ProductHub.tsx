@@ -1622,10 +1622,9 @@ function PackEligibilityEditor({
           disabled={busy || !view.permissions.canEdit}
         >
           <legend>
-            {spec.family === "traditional"
-              ? "Traditional Pan de Muerto"
-              : "Filled Pan de Muerto"}{" "}
-            · {spec.capacity} {spec.size === "mini" ? "mini" : "individual"}
+            {spec.family === "traditional" ? "Traditional" : "Filled"}{" "}
+            {spec.bakery === "conchas" ? "Conchas" : "Pan de Muerto"} ·{" "}
+            {spec.capacity} {spec.size === "mini" ? "mini" : "individual"}
           </legend>
           {spec.components.map((c) => (
             <label key={c.componentSkuId} className="ph-check">

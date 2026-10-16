@@ -2,6 +2,7 @@ import "./pack-builder.css";
 import { useId } from "react";
 import {
   packSpec,
+  personalizedPackEnabled,
   componentName,
   normalizeComposition,
   type Composition,
@@ -24,6 +25,7 @@ export function packComplete(
       ?.componentSkuIds ?? [];
   return (
     !!spec &&
+    personalizedPackEnabled(productId, config.personalizedPacks) &&
     composition.reduce((n, c) => n + c.units, 0) === spec.capacity &&
     composition.every(
       (c) =>

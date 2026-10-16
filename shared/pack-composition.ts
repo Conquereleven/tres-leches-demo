@@ -1,6 +1,17 @@
 import { z } from "zod";
 import { MAX_ITEM_QUANTITY } from "./commerce-policy";
 
+export type PackSpec = {
+  bakery: "pan-de-muerto" | "conchas";
+  packSkuId: string;
+  capacity: number;
+  family: string;
+  size: string;
+  components: {
+    componentSkuId: string;
+    names: Record<"en" | "es" | "ar", string>;
+  }[];
+};
 /** Approved preparation identities, not stock or an additional price list. */
 const traditional = [
   ["azucar", "Sugar", "Azúcar", "سكر"],
@@ -34,26 +45,72 @@ const filled = [
   ],
   ["pistachio", "Pistachio", "Pistache", "فستق"],
 ] as const;
-export const PACK_SPECS = ["traditional", "filled"].flatMap((family) =>
-  [6, 12].flatMap((capacity) =>
-    ["mini", "individuales"].map((size) => ({
-      packSkuId: `pan-de-muerto-${family}-pack-${capacity}-${size}`,
-      capacity,
-      family,
-      size,
-      components: (family === "traditional" ? traditional : filled).map(
-        ([id, en, es, ar]) => {
-          const retailSize = size === "mini" ? "mini" : "individual";
-          const componentSkuId =
-            family === "filled"
-              ? `pan-de-muerto-filled-${id}-${retailSize}`
-              : `pan-de-muerto-traditional-${id === "azucar-chocolate" ? "azucar" : id}-${retailSize}-${size === "mini" ? "40" : "70"}-g${id === "azucar-chocolate" ? "-chocolate-covering" : ""}`;
-          return { componentSkuId, names: { en, es, ar } };
-        },
-      ),
-    })),
-  ),
+export const PAN_PACK_SPECS: PackSpec[] = ["traditional", "filled"].flatMap(
+  (family) =>
+    [6, 12].flatMap((capacity) =>
+      ["mini", "individuales"].map((size) => ({
+        bakery: "pan-de-muerto" as const,
+        packSkuId: `pan-de-muerto-${family}-pack-${capacity}-${size}`,
+        capacity,
+        family,
+        size,
+        components: (family === "traditional" ? traditional : filled).map(
+          ([id, en, es, ar]) => {
+            const retailSize = size === "mini" ? "mini" : "individual";
+            const componentSkuId =
+              family === "filled"
+                ? `pan-de-muerto-filled-${id}-${retailSize}`
+                : `pan-de-muerto-traditional-${id === "azucar-chocolate" ? "azucar" : id}-${retailSize}-${size === "mini" ? "40" : "70"}-g${id === "azucar-chocolate" ? "-chocolate-covering" : ""}`;
+            return { componentSkuId, names: { en, es, ar } };
+          },
+        ),
+      })),
+    ),
 );
+/** Existing approved catalog identities only; this list does not enable any flavor. */
+const conchaTraditional = [
+  ["vainilla", "Vanilla", "Vainilla", "فانيليا"],
+  ["chocolate", "Chocolate", "Chocolate", "شوكولاتة"],
+  ["pistache", "Pistachio", "Pistache", "فستق"],
+  ["tricolor", "Tricolour", "Tricolor", "ثلاثة ألوان"],
+] as const;
+export const CONCHAS_PACK_SPECS: PackSpec[] = ["traditional", "filled"].flatMap(
+  (family) =>
+    [6, 12].flatMap((capacity) =>
+      ["mini", "individuales"].map((size) => ({
+        bakery: "conchas" as const,
+        packSkuId: `conchas-${family}-pack-${capacity}-${size}`,
+        capacity,
+        family,
+        size,
+        components: (family === "traditional" ? conchaTraditional : filled).map(
+          ([id, en, es, ar]) => ({
+            componentSkuId:
+              family === "traditional"
+                ? `conchas-traditional-${id}-${size === "mini" ? "mini-40-g" : "individual-70-g"}`
+                : `conchas-filled-${id === "pistachio" ? "pistache" : id}-${size === "mini" ? "mini" : "individual"}`,
+            names: { en, es, ar },
+          }),
+        ),
+      })),
+    ),
+);
+export const PACK_SPECS = [...PAN_PACK_SPECS, ...CONCHAS_PACK_SPECS];
+export type PackSettings = {
+  /** Existing flag retains its Pan de Muerto meaning. */
+  enabled: boolean;
+  /** Absent on older servers/revisions: fail closed for Conchas. */
+  conchasEnabled?: boolean;
+};
+export function personalizedPackEnabled(sku: string, settings?: PackSettings) {
+  const spec = packSpec(sku);
+  return (
+    !!spec &&
+    (spec.bakery === "conchas"
+      ? settings?.conchasEnabled === true
+      : settings?.enabled === true)
+  );
+}
 export const packSpec = (sku: string) =>
   PACK_SPECS.find((p) => p.packSkuId === sku);
 export const componentName = (sku: string, language = "en") => {
@@ -148,7 +205,7 @@ export const packEligibilitySchema = z
       })
       .strict(),
   )
-  .max(8)
+  .max(PACK_SPECS.length)
   .superRefine((rules, ctx) => {
     if (new Set(rules.map((r) => r.packSkuId)).size !== rules.length)
       ctx.addIssue({ code: "custom", message: "Duplicate pack eligibility" });

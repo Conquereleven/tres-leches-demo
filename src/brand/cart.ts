@@ -161,7 +161,11 @@ export function cartSubtotalFils(ls: CartLine[], products: CatalogEntry[]) {
 }
 
 export type CheckoutConfig = {
-  personalizedPacks?: { enabled: boolean; rules: PackEligibility };
+  personalizedPacks?: {
+    enabled: boolean;
+    conchasEnabled?: boolean;
+    rules: PackEligibility;
+  };
   enabled: boolean;
   catalogAvailable?: boolean;
   addressVerificationRequired?: boolean;
