@@ -32,6 +32,8 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
+      - run: node --import tsx scripts/preview-kitchen-email.ts
+      - run: npx playwright test --config=playwright.email.config.ts
       - run: mkdir -p work/e2e
       - run: npx playwright test --config=playwright.packs.config.ts
       - run: npx playwright test --config=playwright.checkout.config.ts --browser=chromium

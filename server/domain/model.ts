@@ -250,6 +250,8 @@ export type OperationsEmailNotification = Omit<
 > & {
   event: "ORDER_PAID";
   paymentId: string;
+  /** Frozen internal HTML; absent on historical text-only notifications. */
+  html?: string;
 };
 export type Payment = {
   supersededAt?: string;
