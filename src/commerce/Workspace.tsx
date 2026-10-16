@@ -1,4 +1,3 @@
-import { acceptedLinePrice } from "../../shared/pack-pricing";
 import { lineKey, preparationText } from "../../shared/pack-composition";
 import {
   orderProductName,
@@ -26,6 +25,7 @@ import { OrdersList } from "./OrdersList";
 import { OrderDetailsPage, OrderPageHeading } from "./OrderDetails";
 import {
   orderPath,
+  orderLines,
   parseListQuery,
   parseOperationsPath,
   serializeListQuery,
@@ -775,12 +775,10 @@ function OrderPanel({
               </span>
               <span>
                 {(() => {
-                  const product = (o.catalogSnapshot ?? data.catalog).find(
-                    (p) => p.id === l.productId,
-                  );
-                  const price = product
-                    ? acceptedLinePrice(l, product.priceFils)
-                    : null;
+                  const price =
+                    orderLines(data, o).find(
+                      (line) => lineKey(line) === lineKey(l),
+                    )?.unitFils ?? null;
                   return price === null
                     ? t("Review required")
                     : t(money(price * l.quantity));

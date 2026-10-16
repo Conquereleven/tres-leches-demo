@@ -294,6 +294,16 @@ test("fake hosted checkout, duplicate paid reconciliation and frozen preparation
   await expect(
     page.getByText(/Sugar with chocolate covering/).first(),
   ).toBeVisible();
+  await expect(
+    page
+      .getByRole("row")
+      .filter({ hasText: "pan-de-muerto-traditional-pack-6-mini" }),
+  ).toContainText("AED 70.00");
+  await expect(
+    page
+      .getByRole("row")
+      .filter({ hasText: "pan-de-muerto-filled-pack-6-mini" }),
+  ).toContainText("AED 292.00");
   await page.goto("/operations/print");
   await page
     .getByRole("combobox", { name: "Order", exact: true })
@@ -315,4 +325,32 @@ test("fake hosted checkout, duplicate paid reconciliation and frozen preparation
     path: `${shots}/${info.project.name}-premium-ticket.png`,
     fullPage: true,
   });
+  // Read-only response corruption: an accepted order must not reconstruct its
+  // historical money from the mutable catalog when its snapshot is absent.
+  await page.route("**/api/workspace", async (route) => {
+    const response = await route.fetch();
+    const data = await response.json();
+    const order = data.orders.find(
+      (o: { id: string }) => o.id === checkout.orderId,
+    );
+    delete order.catalogSnapshot;
+    // Exercise Inbox's shared accepted-money view with a synthetic conversation;
+    // genuine website conversations correctly remain outside Inbox.
+    const conversation = data.conversations.find(
+      (c: { id: string }) => c.id === order.conversationId,
+    );
+    conversation.sourceNumberId = "fixture-inbox";
+    await route.fulfill({ response, json: data });
+  });
+  await page.goto(`/operations/orders/${checkout.orderId}`);
+  await expect(
+    page
+      .getByRole("status")
+      .filter({ hasText: "Current catalog prices are not substituted" }),
+  ).toBeVisible();
+  await page.goto("/operations/inbox");
+  await page.getByRole("button").filter({ hasText: "Premium Fixture" }).click();
+  await expect(
+    page.getByTestId("order-panel").locator(".co-lines"),
+  ).toContainText("Review required");
 });

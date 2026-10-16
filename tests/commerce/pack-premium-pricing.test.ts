@@ -1,3 +1,4 @@
+import { orderLines } from "../../src/commerce/order-view";
 import test, { after } from "node:test";
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
@@ -164,6 +165,16 @@ test("same SKU compositions freeze independent prices; fake hosted payment, paid
     assert.equal(
       o.catalogSnapshot!.find((p) => p.id === lines[0]!.productId)!.priceFils,
       6000,
+    );
+    assert.deepEqual(
+      orderLines({ catalog: s.catalog! }, o).map((l) => l.unitFils),
+      [6000, 7000, 14600],
+    );
+    assert.ok(
+      orderLines(
+        { catalog: s.catalog! },
+        { ...o, catalogSnapshot: undefined },
+      ).every((l) => l.unitFils === null),
     );
     assert.equal(
       await createWebCheckout(
