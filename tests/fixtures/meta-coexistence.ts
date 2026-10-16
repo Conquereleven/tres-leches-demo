@@ -9,7 +9,10 @@ export const metaNumber = {
 export const contactPhone = "971500000001";
 export const seconds = (offset = 0) =>
   String(Math.floor(Date.now() / 1000) + offset);
-export const webhook = (field: string, value: Record<string, unknown>) => ({
+export const webhook = <T extends Record<string, unknown>>(
+  field: string,
+  value: T,
+) => ({
   object: "whatsapp_business_account",
   entry: [
     {

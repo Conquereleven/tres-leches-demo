@@ -88,11 +88,38 @@ test("inbound-only HTTP: challenge, raw signature, bad origin, durable duplicate
     const wrong = customerPayload();
     wrong.entry[0]!.id = "999";
     assert.equal((await post(wrong)).status, 400);
+    const historical = historyPayload();
+    historical.entry[0]!.changes[0]!.value.history[0]!.threads[0]!.messages[1]!.type =
+      "media_placeholder";
     const payloads = [
       customerPayload(),
       echoPayload(),
-      historyPayload(),
+      historical,
       contactPayload(),
+      webhook("history", {
+        messages: [
+          {
+            ...textMessage("wamid.old-out"),
+            type: "image",
+            image: { id: "synthetic-asset", mime_type: "image/jpeg" },
+          },
+        ],
+      }),
+      webhook("history", { history: [{ errors: [{ code: 2593109 }] }] }),
+      {
+        object: "whatsapp_business_account",
+        entry: [
+          {
+            id: "333",
+            changes: [
+              {
+                field: "account_update",
+                value: { event: "ACCOUNT_OFFBOARDED" },
+              },
+            ],
+          },
+        ],
+      },
     ];
     for (const payload of payloads) {
       assert.equal((await post(payload)).status, 200);
@@ -141,6 +168,13 @@ test("inbound-only HTTP: challenge, raw signature, bad origin, durable duplicate
     assert.deepEqual(after.state.payments, before.state.payments);
     assert.equal(after.state.jobs.length, 0);
     assert.equal(after.providerCalls, 0);
+    assert.equal(after.state.whatsappAccountObservations?.length, 2);
+    assert.equal(
+      after.state.conversations[0]!.messages.find(
+        (m) => m.providerId === "wamid.old-out",
+      )?.media?.id,
+      "synthetic-asset",
+    );
   } finally {
     child.kill("SIGTERM");
     await new Promise<void>((r) => child.once("exit", () => r()));

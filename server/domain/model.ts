@@ -351,6 +351,11 @@ export type NotificationReceipt = {
   attempts: number;
 };
 export type State = {
+  /** Signed observations only: never account control, readiness or outbound authorization. */
+  whatsappAccountObservations?: Extract<
+    import("zod").infer<typeof import("./commands").inboundSchema>,
+    { type: "coexistence" }
+  >[];
   /** Observed contacts only; importing/removing a contact never erases chats. */
   whatsappContacts?: {
     sourceNumberId: string;

@@ -161,3 +161,8 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Published Foundation `packEligibility` is the only component-approval source, independently of seasonal retail-single availability. Absent/empty rules approve nothing. Lisa must confirm actual production availability before release; test-fixture approvals are never commercial defaults.
 - Preserve normalized composition in cart identity, quotation, idempotency and immutable accepted preparation snapshots. Historical kitchen/ticket text must use stored preparation names, not current catalog settings. Managers draft; only admins publish. No real roles change as part of PACK-001.
 - The proposed illustrative-image disclaimer remains internal documentation until separately approved. Release and rollback: `docs/packs/personalized-packs.md`.
+
+## 3L-META-003 direct integration decision (16 October 2026)
+- Founder selected DIRECT META CLOUD API ONLY; no BSP, intermediary subscription or provider dashboard. GOLOSITALIA/3L own-business access and CornerTech's future Tech Provider registration are separate legal/use cases.
+- Preserve existing app, portfolio, WABA and Business App number. No ordinary `/register` workaround, number linking, permission changes or outbound activation without explicit authorization.
+- Current direct readiness and Meta-native coexistence gates: `docs/meta/direct-cloud-readiness.md`. Code/synthetic tests never prove individual number eligibility or actual signed delivery.

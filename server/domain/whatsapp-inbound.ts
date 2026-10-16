@@ -17,6 +17,39 @@ export function latestCustomerInbound(c: Conversation) {
 const digits = (phone: string) => phone.replace(/^\+/, "");
 type Incoming = Extract<z.infer<typeof inboundSchema>, { type: "message" }>;
 type Contact = Extract<z.infer<typeof inboundSchema>, { type: "contact" }>;
+/** Meta sends history media separately; enrich the original, never infer its direction. */
+export function applyWhatsAppHistoryMedia(
+  s: State,
+  e: Extract<z.infer<typeof inboundSchema>, { type: "historyMedia" }>,
+) {
+  const conversation = s.conversations.find(
+    (c) =>
+      c.sourceNumberId === e.sourceNumberId &&
+      digits(c.phone) === digits(e.phone) &&
+      c.messages.some((m) => m.providerId === e.providerMessageId),
+  );
+  requireThat(conversation, "Historial todavía no disponible; reintentar", 503);
+  const existing = conversation.messages.find(
+    (m) => m.providerId === e.providerMessageId,
+  )!;
+  requireThat(
+    existing.media &&
+      (existing.media.type === "media_placeholder" ||
+        existing.media.type === e.media.type),
+    "Identidad multimedia incompatible",
+    400,
+  );
+  if (
+    !existing.media?.id &&
+    (existing.media.type === "media_placeholder" ||
+      existing.media.type === e.media.type)
+  ) {
+    existing.media = e.media;
+    if (existing.origin === "history")
+      existing.text = e.caption || `[${e.media.type}]`;
+    conversation.version++;
+  }
+}
 export function applyWhatsAppContact(
   s: State,
   e: Contact,

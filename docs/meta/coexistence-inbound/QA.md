@@ -1,4 +1,4 @@
-# 3L-META-002 — QA evidence
+# 3L-META-002 — historical QA evidence (15 October)
 
 Baseline: `a75a0fa1637f4511ed0237e2b4fff621489e619a`. Isolated worktree/branch `feature/3l-meta-coexistence-inbound`. Original Pack Builder and SEO branches/worktrees were not edited or integrated.
 
@@ -42,7 +42,7 @@ The first full run was started before compiling this new worktree; two pre-exist
 
 The last read-only refresh of the existing Production configuration confirmed both outgoing flags false and Graph v26.0. GET of the existing number again returned ON_PREMISE/DISCONNECTED/NOT_VERIFIED/is_on_biz_app=true. No onboarding/subscription, template, token, account, number, configuration, real message, charge or production-data mutation occurred.
 
-This evidence proves local direct-Meta contract handling, not number eligibility, compatible provider forwarding, complete history sync, real delivery or Production readiness. The [activation checklist](README.md) explicitly retains those founder/Lisa/Meta/provider gates.
+This historical evidence proves local direct-Meta contract handling, not number eligibility, complete history sync, real delivery or Production readiness. The META-003 direct-only decision and [current activation runbook](../direct-cloud-readiness.md) supersede all earlier provider-selection proposals.
 
 ## Changed files
 
@@ -60,3 +60,15 @@ This evidence proves local direct-Meta contract handling, not number eligibility
 - `docs/meta/coexistence-inbound/{README.md,QA.md,evidence/inbox-390.png,evidence/inbox-1440.png}`: decision, checklist and review evidence.
 
 No edits to Paymennt/Resend adapters, paid-order notification dispatcher, order workflow, catalog/prices, delivery rules, storefront, dependencies, Railway or env files. No SQL migration/backfill. Optional JSON fields are applied only when an authenticated observed event is received.
+
+## 3L-META-003 — current baseline and integration (16 October 2026)
+
+- Original PR #35 head: `36b69a5f993c9262f493c56eaf5b7b6bad58770c`.
+- Deployed main integrated: `8f5cc785fe408b0288a3b8403983787cf57721ec`.
+- Baseline merge commit: `dd69f2b`. A normal merge preserves the existing PR/review history instead of rewriting its published commits. No main or other feature branch was changed.
+- Conflicts resolved: `server/domain/service.ts` imports retain both packs/distinctLines and coexistence helpers; `src/commerce/locales/en.json` and `tl.json` retain pack eligibility and inbound provenance labels. No whole-file side selection.
+- Added actual documented `history.value.messages` attachment metadata and `account_update` observations without phone metadata, plus history-consent-denied evidence. The separate attachment cannot invent direction or replace an unrelated text message. Original source/counterparty/wamid must match; early metadata retries durably. Lifecycle observations never control accounts/outbound/order states.
+- Complete current commerce/unit/HTTP suite: **627 passed, zero failures/skips**. Includes the four new direct-contract cases and the extended raw-body HTTP fixture (16 focused coexistence cases in total).
+- Fresh read-only Meta Graph audit and authenticated official UI/documentation inspection; no mutation or live transport test. All five relevant subscription fields are off. The actual Embedded Signup Manager offers v4/session3 but blocks Production hosting pending App Review/Access Verification; no login configuration exists. See the current runbook for proven blockers versus unknown own-business exception.
+
+Current browser/security result totals are recorded below after completion. Historical totals above are not substituted for current runs.

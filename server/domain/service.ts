@@ -1,5 +1,6 @@
 import {
   applyWhatsAppContact,
+  applyWhatsAppHistoryMedia,
   applyWhatsAppMessage,
   latestCustomerInbound,
 } from "./whatsapp-inbound";
@@ -677,6 +678,19 @@ export class CommerceService {
         } else if (ranks[e.status] > current) m.status = e.status;
       } else if (e.type === "contact") {
         applyWhatsAppContact(s, e, this.operationalNumbers);
+      } else if (e.type === "historyMedia") {
+        requireThat(
+          this.operationalNumbers.some((n) => n.id === e.sourceNumberId),
+          "Número de origen desconocido",
+          400,
+        );
+        applyWhatsAppHistoryMedia(s, e);
+      } else if (e.type === "coexistence") {
+        // Diagnostic observations are not registration/connection state or permission to send.
+        s.whatsappAccountObservations ??= [];
+        s.whatsappAccountObservations.push(e);
+        if (s.whatsappAccountObservations.length > 1000)
+          s.whatsappAccountObservations.shift();
       } else {
         const c = applyWhatsAppMessage(s, e, this.operationalNumbers);
         if (c && e.location) {

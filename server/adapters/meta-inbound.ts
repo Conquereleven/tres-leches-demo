@@ -41,6 +41,7 @@ const envelope = z.object({
     .array(
       z.object({
         id,
+        time: z.union([timestamp, z.number().int().nonnegative()]).optional(),
         changes: z
           .array(z.object({ field: z.string(), value: z.unknown() }))
           .max(100),
@@ -132,7 +133,69 @@ export function normalizeMetaInbound(
     if (!numbers.some((n) => n.wabaId === entry.id))
       throw new ProviderFailure("rejected", false);
     for (const change of entry.changes) {
-      // Lifecycle/template updates are not conversation messages; no invented handling.
+      if (change.field === "account_update") {
+        const account = z
+          .object({
+            event: z.string().max(80),
+            phone_number: phone.optional(),
+            disconnection_info: z
+              .object({
+                reason: z.string().max(100).optional(),
+                initiated_by: z.enum(["USER", "SYSTEM"]).optional(),
+              })
+              .optional(),
+          })
+          .parse(change.value);
+        if (
+          ![
+            "PARTNER_REMOVED",
+            "ACCOUNT_OFFBOARDED",
+            "ACCOUNT_RECONNECTED",
+          ].includes(account.event)
+        )
+          continue;
+        const source = account.phone_number
+          ? numbers.find(
+              (n) =>
+                n.wabaId === entry.id &&
+                digits(n.phone) === digits(account.phone_number!),
+            )
+          : undefined;
+        if (account.phone_number && !source)
+          throw new ProviderFailure("rejected", false);
+        const reason = account.disconnection_info?.reason;
+        result.push(
+          inboundSchema.parse({
+            type: "coexistence",
+            eventId: identity(
+              entry.id,
+              "account_update",
+              JSON.stringify(account),
+              String(entry.time ?? ""),
+            ),
+            wabaId: entry.id,
+            sourceNumberId: source?.id,
+            event: account.event,
+            ...(entry.time === undefined
+              ? {}
+              : { at: instant(String(entry.time)) }),
+            reason: [
+              "ACCOUNT_DISCONNECTED",
+              "BUSINESS_DOWNGRADE",
+              "CHANGE_NUMBER",
+              "COMPANION_INACTIVITY",
+              "PRIMARY_INACTIVITY",
+              "USER_RE_REGISTERED",
+            ].includes(reason ?? "")
+              ? reason
+              : undefined,
+            initiatedBy: account.disconnection_info?.initiated_by,
+          }),
+        );
+        if (result.length > 10000) throw new ProviderFailure("rejected", false);
+        continue;
+      }
+      // Other lifecycle/template fields are not conversation messages.
       if (!supported.has(change.field)) continue;
       const value = valueSchema.parse(change.value);
       const number = numbers.find(
@@ -251,6 +314,62 @@ export function normalizeMetaInbound(
         for (const m of value.message_echoes ?? [])
           pushMessage(m, "business-app");
       } else if (change.field === "history") {
+        // Documented separate history-media delivery uses value.messages, not threads.
+        for (const m of value.messages ?? []) {
+          const type = m.type as
+            "image" | "audio" | "video" | "document" | "sticker";
+          if (
+            !["image", "audio", "video", "document", "sticker"].includes(type)
+          )
+            continue;
+          const asset = m[type];
+          if (!asset?.id) throw new ProviderFailure("rejected", false);
+          instant(m.timestamp);
+          const recipient =
+            digits(m.from) === digits(number.phone) ? m.to : m.from;
+          if (!recipient || digits(recipient) === digits(number.phone))
+            throw new ProviderFailure("rejected", false);
+          const observed = {
+            type,
+            id: asset.id,
+            mimeType: asset.mime_type,
+            sha256: asset.sha256,
+            filename: asset.filename,
+            voice: asset.voice,
+          };
+          result.push(
+            inboundSchema.parse({
+              type: "historyMedia",
+              eventId: identity(
+                number.id,
+                "history-media",
+                m.id,
+                JSON.stringify(observed),
+                asset.caption ?? "",
+              ),
+              sourceNumberId: number.id,
+              providerMessageId: m.id,
+              phone: digits(recipient),
+              media: observed,
+              caption: asset.caption,
+            }),
+          );
+        }
+        if (
+          value.history?.some((batch) =>
+            batch.errors?.some((e) => e.code === 2593109),
+          )
+        ) {
+          result.push(
+            inboundSchema.parse({
+              type: "coexistence",
+              eventId: identity(number.id, "history-sharing-declined"),
+              wabaId: entry.id,
+              sourceNumberId: number.id,
+              event: "HISTORY_SHARING_DECLINED",
+            }),
+          );
+        }
         for (const batch of value.history ?? [])
           for (const thread of batch.threads ?? [])
             for (const m of thread.messages)
