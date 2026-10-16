@@ -4,6 +4,39 @@
  */
 import { test, expect } from "@playwright/test";
 
+test("every fixed pack offer URL selects its actual size and price without inventing composition offers", async ({
+  page,
+}) => {
+  const catalog = await (
+    await page.request.get("/api/storefront/catalog")
+  ).json();
+  const packs = catalog.products.filter((p: { id: string }) =>
+    ["pan-de-muerto-traditional-pack", "pan-de-muerto-filled-pack"].includes(
+      p.id,
+    ),
+  );
+  let checked = 0;
+  for (const product of packs) {
+    for (const option of product.options) {
+      await page.goto(
+        `/menu/${product.slug}?sku=${encodeURIComponent(option.id)}`,
+      );
+      await expect(
+        page.getByRole("combobox", { name: "Pack", exact: true }),
+      ).toHaveValue(option.size);
+      await expect(page.locator(".b-add-to-cart > button")).toContainText(
+        `AED ${option.priceFils / 100}`,
+      );
+      const canonical = await page
+        .locator('link[rel="canonical"]')
+        .getAttribute("href");
+      expect(canonical).toBe(`https://www.3ldubai.ae/menu/${product.slug}`);
+      checked++;
+    }
+  }
+  expect(checked).toBe(8);
+});
+
 test("/menu/<slug> has one H1, the product name, before and after JavaScript", async ({
   page,
   browser,

@@ -133,9 +133,11 @@ export function productJsonLd(
   const url = absoluteUrl(origin, productPath(p.slug));
   const image = primaryImage(catalog, p);
   const brand = { "@type": "Brand", name: BRAND };
+  const variantUrl = (o: Option) =>
+    p.options.length > 1 ? `${url}?sku=${encodeURIComponent(o.id)}` : url;
   const offer = (o: Option) => ({
     "@type": "Offer",
-    url,
+    url: variantUrl(o),
     priceCurrency: catalog.currency,
     price: amount(o.priceFils),
     availability: availability(o),
@@ -163,6 +165,8 @@ export function productJsonLd(
       "@type": "Product",
       name: o.content.en?.name?.trim() || o.name,
       sku: o.id,
+      url: variantUrl(o),
+      inProductGroupWithID: p.id,
       size: optionLabel(o),
       ...(image ? { image: absoluteUrl(origin, image.src) } : {}),
       offers: offer(o),

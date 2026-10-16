@@ -135,11 +135,21 @@ function setup() {
 
 type Ld = Record<string, unknown> & {
   "@type": string;
-  offers?: { price: string; priceCurrency: string; availability: string };
+  offers?: {
+    url: string;
+    price: string;
+    priceCurrency: string;
+    availability: string;
+  };
   sku?: string;
   hasVariant?: {
     sku: string;
-    offers: { price: string; priceCurrency: string; availability: string };
+    offers: {
+      url: string;
+      price: string;
+      priceCurrency: string;
+      availability: string;
+    };
   }[];
 };
 const jsonLd = (html: string) =>
@@ -189,6 +199,11 @@ test("a published product renders crawlable HTML whose prices match the catalog 
       p.options.length > 1 ? "ProductGroup" : "Product",
     );
     const offers = offersOf(product);
+    for (const o of offers)
+      assert.equal(
+        o.url,
+        `${ORIGIN}/menu/${p.slug}${p.options.length > 1 ? `?sku=${encodeURIComponent(o.sku)}` : ""}`,
+      );
     assert.deepEqual(
       offers.map((o) => [o.sku, o.price, o.priceCurrency, o.availability]),
       p.options.map((o) => [
@@ -250,6 +265,8 @@ test("drafts never show; publication updates the page and sitemap without a buil
   const oldPrice = priced!.priceFils;
   priced!.priceFils += 700;
   p.product.translations.en.name = "Draft Name Never Public";
+  p.product.translations.en.description =
+    "Approved published description from Product Hub";
   save(p);
   // Saved but unpublished: the public page and sitemap are unchanged.
   const draft = render(store.read(), target.slug!);
@@ -265,6 +282,9 @@ test("drafts never show; publication updates the page and sitemap without a buil
   assert.equal(after.status, 200);
   if (after.status !== 200) return;
   assert.ok(after.html.includes("<h1>Draft Name Never Public</h1>"));
+  assert.ok(
+    after.html.includes("Approved published description from Product Hub"),
+  );
   const sku = after.product.options.find((o) => o.id === priced!.skuId)!;
   assert.equal(sku.priceFils, oldPrice + 700);
   assert.ok(

@@ -34,7 +34,17 @@ export function ProductOptions({
   const menu = useMenu();
   const family = menuProductFamily(menu, product),
     labelId = useId();
-  const [sku, setSku] = useState(family.options[0]!.id);
+  const [sku, setSku] = useState(() => {
+    // Offer URLs identify a real size SKU, never a pack flavor composition.
+    const requested =
+      detail && typeof location !== "undefined"
+        ? new URLSearchParams(location.search).get("sku")
+        : null;
+    return (
+      family.options.find((o) => o.id === requested)?.id ??
+      family.options[0]!.id
+    );
+  });
   const { config, loading, retry } = useCheckoutConfig();
   const now = useCheckoutNow(config);
   const options = family.options.filter((o) => availableSku(o.id, now));
