@@ -71,4 +71,22 @@ No edits to Paymennt/Resend adapters, paid-order notification dispatcher, order 
 - Complete current commerce/unit/HTTP suite: **627 passed, zero failures/skips**. Includes the four new direct-contract cases and the extended raw-body HTTP fixture (16 focused coexistence cases in total).
 - Fresh read-only Meta Graph audit and authenticated official UI/documentation inspection; no mutation or live transport test. All five relevant subscription fields are off. The actual Embedded Signup Manager offers v4/session3 but blocks Production hosting pending App Review/Access Verification; no login configuration exists. See the current runbook for proven blockers versus unknown own-business exception.
 
-Current browser/security result totals are recorded below after completion. Historical totals above are not substituted for current runs.
+| Current check | Result |
+|---|---|
+| Typecheck / lint / final build | PASS; existing chunk/pending-business-information warnings only |
+| Full commerce / unit / HTTP suite after final build | 627 passed, 0 failed, 0 skipped |
+| Dedicated Inbox Chromium/WebKit | 8 passed (EN/TL × 390/1440) |
+| Personalized packs Chromium/WebKit | 24 passed; fixed prices, mixtures, published eligibility and immutable kitchen/ticket history |
+| Hosted checkout Chromium / WebKit | 21 + 21 passed; fake provider/disposable SQLite only |
+| Full Operations Chromium/WebKit | 91 passed initially; 1 Chromium390 axe test timed out without a violation assertion. Same test, same 30-second limit, no code changes: isolated rerun passed in10.2s. All 92 scenarios covered; initial failure retained in evidence |
+| Sites packaging | 4 passed |
+| npm security audit | 0 vulnerabilities |
+| Secret scan, final source/client build | 1,408 files scanned, 0 findings (heuristic, not a mathematical proof) |
+| Git diff whitespace check | PASS |
+| GitHub Commerce validation | SUCCESS on runtime commit7d5a78d4cdfd4242a9205f4dcb4cbd94c56993ba, run38879246080 |
+| GitHub Personalized packs regression (packs/checkout/Product Hub/Operations) | SUCCESS on same runtime commit, run38879246145 |
+| RG3 jobs | SKIPPED by their existing branch-name guard; not claimed as passed |
+
+No accessibility check was waived, no timeout raised, and no unrelated Operations source was edited. Browser-generated Operations screenshots were restored after review to avoid unrelated PR churn. A subsequent documentation-only commit records these results without changing the tested runtime source. Both applicable GitHub checks were freshly confirmed successful; the CI log-archive download itself encountered a TLS timeout, so detailed CI totals are not invented. Local logs, sanitized Graph observations and read-only UI evidence are retained in the task artifact directory.
+
+No production data/configuration, commercial catalog, Meta subscription/account/number, Paymennt/Resend adapter, payment/order state, real outbound message or charge was changed. The only Production interactions were authorized read-only status/configuration queries.
