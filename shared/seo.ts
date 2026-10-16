@@ -50,6 +50,34 @@ export function trailingSlashTarget(path: string, search = ""): string | null {
   return target + search;
 }
 
+/**
+ * `/index.html` and `/<page>.html` serve the same document as the clean URL.
+ * Returns the clean URL to redirect to, or null. Only known public pages.
+ */
+export function htmlAliasTarget(
+  path: string,
+  search: string,
+  publicPages: readonly string[],
+): string | null {
+  if (path === "/index.html") return "/" + search;
+  const m = /^(\/[a-z0-9-]+)\.html$/.exec(path);
+  return m && publicPages.includes(m[1]!) ? m[1]! + search : null;
+}
+
+/**
+ * Validators for static files that are not content-hashed (photography,
+ * fonts, icons): browsers revalidate with If-None-Match and get a 304 instead
+ * of the whole file, while a replaced file is picked up within the hour.
+ * HTML is excluded: it must always point at the current bundle.
+ */
+export const revalidatedAsset = (path: string) =>
+  /^\/(?:brand|fonts|payments)\//.test(path) ||
+  /^\/[^/]+\.(?:ico|png|svg|webmanifest)$/.test(path);
+export const REVALIDATED_CACHE_CONTROL =
+  "public, max-age=3600, must-revalidate";
+export const weakEtag = (size: number, mtimeMs: number) =>
+  `W/"${size.toString(36)}-${Math.floor(mtimeMs).toString(36)}"`;
+
 export type SeoPage = {
   /** Path without trailing slash; "/" for the home page. */
   path: string;
