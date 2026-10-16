@@ -145,3 +145,13 @@ Today Spanish and Arabic exist only after JavaScript (`?lang=` / stored preferen
 - [ ] AI training crawler policy (GPTBot etc.).
 - [ ] Approval for a factual FAQ and for ES/AR URLs.
 - [ ] A real `publishedAt` on catalog publications (currently `null`, so the sitemap carries no `lastmod`).
+
+## Final integration gate · 16 October 2026
+
+Track A rebased by merge onto deployed main `8f5cc785fe408b0288a3b8403983787cf57721ec` (PR36 personalized packs preserved). No textual conflicts in Track A; Track B combines both SEO import lists in `server/http.ts`. Dynamic catalog, composition identity, quote/payment domain, all eight fixed pack prices and provider gates are unchanged.
+
+Local current-baseline gate: typecheck, lint, build; 615/615 commerce tests; dedicated compiled lazy-chunk/header/cache assertions. Dedicated SEO browser CI now runs on these PRs in addition to the commerce and packs gates. No deployment, DNS edit or commercial publication is part of this work. Final evidence and exact SHAs are recorded in the release report/PR.
+
+**Current DNS correction supersedes section3's guessed root target:** Railway already has `3ldubai.ae` attached to Production port3001; it is unverified and certificate issuance is pending. Required apex target is **`qh7cebps.up.railway.app`**, not the www target. At AEserver replace `@ A 165.22.30.248` with a supported ALIAS/ANAME/flattened CNAME to that target and add the exact `_railway-verify` TXT shown in Railway. Keep `www CNAME agpvjymd.up.railway.app` and every mail/SPF/DKIM/DMARC record unchanged. Do not copy Railway's resolved IP into an A record. If apex flattening is unavailable, ask AEserver for managed HTTPS301 forwarding preserving path/query; no nameserver migration is authorized.
+
+The `.ae` parent and registrar delegate to `dns1–3.aeserver.com`. The child zone/recursive NS answer advertises `ns1–3.rrpproxy.net`, with SOA contact `domains.aeserver.com`. DNS management remains AEserver; do not confuse these two observations with an authorized delegation change. Apex HTTP `/menu` currently404 and HTTPS connection refused; www TLS valid.
