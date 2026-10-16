@@ -620,6 +620,12 @@ function ConversationPanel({
         {c.messages.map((m) => (
           <div key={m.id} className={"co-message " + m.direction}>
             <p>{m.text}</p>
+            {m.media && (
+              <p>
+                {t("Archivo recibido; revisar en WhatsApp")} · {m.media.type}
+                {m.media.filename ? ` · ${m.media.filename}` : ""}
+              </p>
+            )}
             {m.location && (
               <p>
                 {t("GPS ·")} {m.location.lat}, {m.location.lng}
@@ -631,6 +637,9 @@ function ConversationPanel({
               </p>
             )}
             <small>
+              {m.origin === "business-app" &&
+                `${t("Enviado desde WhatsApp Business App")} · `}
+              {m.origin === "history" && `${t("Historial importado")} · `}
               {formatDate(m.at)} · {t(m.status)}{" "}
               {m.direction === "out" && `· ${c.sourceNumberId.toUpperCase()}`}
             </small>

@@ -1,3 +1,4 @@
+import { latestCustomerInbound } from "../domain/whatsapp-inbound";
 import type { Conversation, State } from "../domain/model";
 import type { AgentContext, Summary } from "./model";
 const clean = (text: string) =>
@@ -11,9 +12,7 @@ export class ConversationContextBuilder {
     state: State,
     summary?: Summary,
   ): AgentContext {
-    const incoming =
-      conversation.messages.filter((m) => m.direction === "in").at(-1)?.text ??
-      "";
+    const incoming = latestCustomerInbound(conversation)?.text ?? "";
     const language =
       /[¿¡ñáéíóú]|\b(hola|quiero|pastel|pedido|gracias|entrega|pagar|precio)\b/i.test(
         incoming,

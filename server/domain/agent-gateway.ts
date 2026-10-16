@@ -1,3 +1,4 @@
+import { latestCustomerInbound } from "./whatsapp-inbound";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import type { CommerceService } from "./service";
@@ -56,7 +57,7 @@ export class CommerceAgentGateway implements AgentGateway {
     const s = this.commerce.store.read(),
       c = this.conversation(s, id),
       session = this.session(s, id);
-    const incoming = c.messages.filter((m) => m.direction === "in").at(-1);
+    const incoming = latestCustomerInbound(c);
     requireThat(incoming, "No hay mensaje del cliente", 409);
     return {
       context: this.builder.build(c, s, session.summary),
@@ -77,8 +78,7 @@ export class CommerceAgentGateway implements AgentGateway {
     return this.commerce.store
       .read()
       .conversations.filter(
-        (c) =>
-          c.status === "open" && c.messages.some((m) => m.direction === "in"),
+        (c) => c.status === "open" && !!latestCustomerInbound(c),
       )
       .map((c) => c.id);
   }
