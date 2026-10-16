@@ -7,11 +7,12 @@ import { test, expect, type Page } from "@playwright/test";
 
 const operations = (page: Page) =>
   page.locator(".ops-sidebar, .ops-auth h1, .ops-shell form").first();
-const goToOperations = (page: Page) =>
-  page.evaluate(() => {
-    history.pushState({}, "", "/operations/inbox");
-    dispatchEvent(new PopStateEvent("popstate"));
-  });
+const goToOperations = async (page: Page) => {
+  if (new URL(page.url()).pathname !== "/") await page.goto("/");
+  // Exercise the real React handler; an early synthetic popstate can run
+  // before hydration installs its listener on slower WebKit CI machines.
+  await page.getByRole("button", { name: "Gestión", exact: true }).click();
+};
 
 test("customers do not download Operations; staff get it on demand", async ({
   page,
