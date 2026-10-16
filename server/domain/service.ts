@@ -1,3 +1,5 @@
+import { validatePackLines, snapshotPackLines } from "./packs";
+import { distinctLines } from "../../shared/pack-composition";
 import { frozenCheckout } from "./frozen-checkout";
 import { PaymenntProvider } from "../adapters/paymennt";
 import { orderBillingAddress, toPaymenntDeliveryAddress } from "./billing";
@@ -417,11 +419,7 @@ export class CommerceService {
       );
       if (o.state !== "Building") transition(o, "Building", actor.id);
       if (cmd.type === "editOrder") {
-        requireThat(
-          new Set(cmd.lines.map((l) => l.productId)).size === cmd.lines.length,
-          "Productos duplicados",
-          400,
-        );
+        requireThat(distinctLines(cmd.lines), "Productos duplicados", 400);
         requireThat(
           cmd.lines.every((l) =>
             (s.catalog ?? []).some(
@@ -434,6 +432,7 @@ export class CommerceService {
           "Producto no disponible en catálogo aprobado",
           400,
         );
+        validatePackLines(s, cmd.lines);
         o.lines = cmd.lines;
         o.catalogSnapshot = undefined;
       } else {
@@ -464,6 +463,7 @@ export class CommerceService {
         o.state === "Minimum Check",
         "Completa productos y ubicación primero",
       );
+      validatePackLines(s, o.lines);
       this.quote(s, o);
       requireThat(o.quote?.eligible, o.quote?.reason ?? "Ubicación requerida");
       requireThat(
@@ -496,6 +496,7 @@ export class CommerceService {
           { ...at(), actor: actor.id, action: "Solicitud de pago creada" },
         ],
       };
+      o.lines = snapshotPackLines(s, o.lines);
       o.catalogSnapshot = structuredClone(
         (s.catalog ?? []).filter((p) =>
           o.lines.some((l) => l.productId === p.id),

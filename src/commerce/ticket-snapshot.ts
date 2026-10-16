@@ -1,3 +1,4 @@
+import { lineKey, validPackSnapshot } from "../../shared/pack-composition";
 import type { Order } from "../../server/domain/model";
 
 /** Historical ticket data must come entirely from the accepted order snapshot. */
@@ -12,7 +13,8 @@ export function ticketSnapshot(
     const matches = snapshot.filter((product) => product.id === line.productId);
     const product = matches[0];
     if (
-      seen.has(line.productId) ||
+      seen.has(lineKey(line)) ||
+      !validPackSnapshot(line) ||
       matches.length !== 1 ||
       !product?.name?.trim() ||
       !Number.isSafeInteger(product.priceFils) ||
@@ -21,7 +23,7 @@ export function ticketSnapshot(
       line.quantity <= 0
     )
       return null;
-    seen.add(line.productId);
+    seen.add(lineKey(line));
     lines.push({ ...line, name: product.name, priceFils: product.priceFils });
   }
   return lines;

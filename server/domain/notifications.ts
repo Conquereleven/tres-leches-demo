@@ -1,3 +1,4 @@
+import { preparationText } from "../../shared/pack-composition";
 /**
  * Operations notifications: the paid-order alert for the 3L team.
  *
@@ -55,7 +56,7 @@ export function renderOrderPaidMessage(input: {
     const name =
       (order.catalogSnapshot ?? catalog).find((p) => p.id === l.productId)
         ?.name ?? l.productId;
-    return `${l.quantity} × ${name}`;
+    return `${l.quantity} × ${name}${l.composition ? `\n${preparationText(l)}` : ""}`;
   });
   const pickup = order.fulfillmentMethod === "pickup";
   const when = [

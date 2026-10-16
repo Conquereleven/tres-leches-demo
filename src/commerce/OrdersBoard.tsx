@@ -1,3 +1,4 @@
+import { lineKey, preparationText } from "../../shared/pack-composition";
 import { orderProductName } from "./product-names";
 import { OperationalProductName } from "./OperationalProductName";
 import { useOps } from "./ops-i18n";
@@ -123,12 +124,13 @@ export function OrderCard({
       )}
       <ul className="ops-oc-lines" aria-label={t("Productos")}>
         {o.lines.map((l) => (
-          <li key={l.productId}>
+          <li key={lineKey(l)}>
             <b>{l.quantity}×</b>{" "}
             <OperationalProductName
               product={productName(data, o, l.productId)}
               id={l.productId}
             />
+            {l.composition && <p lang="en">{preparationText(l)}</p>}
           </li>
         ))}
       </ul>

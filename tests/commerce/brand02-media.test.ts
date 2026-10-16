@@ -73,6 +73,17 @@ test("BRAND02 leaves commercial identifiers, prices, availability, translations 
       };
       undoPrices(current);
       assert.deepEqual(current, JSON.parse(old.toString()), path);
-    } else assert.deepEqual(readFileSync(path), old, path);
+    } else {
+      // The BRAND02 release must remain free of commerce changes. PACK-001
+      // subsequently extends cart/checkout under its own behavioral regressions;
+      // compare the historical visual release for these two implementation files.
+      const current = ["src/brand/Shop.tsx", "src/brand/cart.ts"].includes(path)
+        ? execFileSync("git", [
+            "show",
+            `a75a0fa1637f4511ed0237e2b4fff621489e619a:${path}`,
+          ])
+        : readFileSync(path);
+      assert.deepEqual(current, old, path);
+    }
   }
 });

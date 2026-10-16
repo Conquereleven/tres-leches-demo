@@ -1,3 +1,8 @@
+import {
+  PACK_SPECS,
+  componentName,
+  type PackEligibility,
+} from "../../shared/pack-composition";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Actor } from "../../server/domain/model";
 import type { hubView } from "../../server/catalog/product-hub";
@@ -307,7 +312,17 @@ export function ProductHub({ actor }: { actor: Actor }) {
             ))}
           </nav>
           {tab === "catalog" && (
-            <Overview view={data} onOpen={(p) => setEditing(toDraft(p))} />
+            <>
+              <PackEligibilityEditor
+                key={data.version}
+                view={data}
+                busy={busy}
+                onSave={(rules) =>
+                  send({ type: "savePackEligibility", rules }, "Draft saved")
+                }
+              />
+              <Overview view={data} onOpen={(p) => setEditing(toDraft(p))} />
+            </>
           )}
           {tab === "review" && (
             <Review
@@ -1561,5 +1576,83 @@ function Editor({
         </div>
       </fieldset>
     </section>
+  );
+}
+
+function PackEligibilityEditor({
+  view,
+  busy,
+  onSave,
+}: {
+  view: View;
+  busy: boolean;
+  onSave: (rules: PackEligibility) => Promise<boolean>;
+}) {
+  const { t } = useOps();
+  const [rules, setRules] = useState<PackEligibility>(view.packEligibility);
+  const toggle = (
+    packSkuId: string,
+    componentSkuId: string,
+    checked: boolean,
+  ) =>
+    setRules((old) => {
+      const ids =
+        old.find((r) => r.packSkuId === packSkuId)?.componentSkuIds ?? [];
+      return [
+        ...old.filter((r) => r.packSkuId !== packSkuId),
+        {
+          packSkuId,
+          componentSkuIds: checked
+            ? [...ids, componentSkuId]
+            : ids.filter((id) => id !== componentSkuId),
+        },
+      ];
+    });
+  return (
+    <details className="ops-panel">
+      <summary>{t("Pack flavor eligibility")}</summary>
+      <p>
+        {t(
+          "Enable only flavors confirmed for production, per box size. Changes remain private until an administrator publishes them.",
+        )}
+      </p>
+      {PACK_SPECS.map((spec) => (
+        <fieldset
+          key={spec.packSkuId}
+          disabled={busy || !view.permissions.canEdit}
+        >
+          <legend>
+            {spec.family === "traditional"
+              ? "Traditional Pan de Muerto"
+              : "Filled Pan de Muerto"}{" "}
+            · {spec.capacity} {spec.size === "mini" ? "mini" : "individual"}
+          </legend>
+          {spec.components.map((c) => (
+            <label key={c.componentSkuId} className="ph-check">
+              <input
+                type="checkbox"
+                checked={
+                  rules
+                    .find((r) => r.packSkuId === spec.packSkuId)
+                    ?.componentSkuIds.includes(c.componentSkuId) ?? false
+                }
+                onChange={(e) =>
+                  toggle(spec.packSkuId, c.componentSkuId, e.target.checked)
+                }
+              />
+              {componentName(c.componentSkuId, "en")}
+            </label>
+          ))}
+        </fieldset>
+      ))}
+      <button
+        className="co-primary"
+        type="button"
+        disabled={busy || !view.permissions.canEdit}
+        onClick={() => void onSave(rules)}
+      >
+        {t("Save pack eligibility draft")}
+      </button>
+    </details>
   );
 }

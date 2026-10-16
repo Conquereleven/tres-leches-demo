@@ -1,3 +1,4 @@
+import { packBuilderEnabled, publishedPackRules } from "./domain/packs";
 import {
   deliveryStreet,
   deliveryBuilding,
@@ -486,6 +487,13 @@ export async function startServer(
               catalog: {
                 dynamic: published.dynamic,
                 revision: published.revision,
+              },
+              personalizedPacks: {
+                enabled: packBuilderEnabled(),
+                rules:
+                  packBuilderEnabled() && published.sellable
+                    ? publishedPackRules(s)
+                    : [],
               },
               paymentFlow: "web",
               mode: enabled ? (paymennt?.environment ?? "test") : "offline",
