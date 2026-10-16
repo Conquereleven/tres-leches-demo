@@ -34,7 +34,15 @@ for (const [sku, initialQty, currentQty, oldAmount, amount] of [
     expect(initial.ok()).toBe(true);
     const previous = await initial.json();
     expect(previous.amountFils).toBe(oldAmount * 100);
+    // Complete homepage configuration before a fixture storage edit/navigation;
+    // otherwise WebKit may tear down the document during its startup fetch.
+    const configured = page.waitForResponse(
+      (r) => r.url() === "http://127.0.0.1:3189/api/checkout/config",
+    );
     await page.goto("/");
+    const configResponse = await configured;
+    expect(configResponse.status()).toBe(200);
+    expect(await configResponse.finished()).toBeNull();
     await page.evaluate(
       ({ key, body }) => {
         sessionStorage.setItem(
@@ -60,7 +68,13 @@ for (const [sku, initialQty, currentQty, oldAmount, amount] of [
       page.getByRole("link", { name: "CHECK PAYMENT STATUS" }),
     ).toBeVisible();
     // Leave checkout and change the real browser cart.
+    const returnedConfig = page.waitForResponse(
+      (r) => r.url() === "http://127.0.0.1:3189/api/checkout/config",
+    );
     await page.goto("/");
+    const returnedResponse = await returnedConfig;
+    expect(returnedResponse.status()).toBe(200);
+    expect(await returnedResponse.finished()).toBeNull();
     await page.evaluate(
       ({ sku, currentQty }) =>
         localStorage.setItem(

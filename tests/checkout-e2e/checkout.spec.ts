@@ -240,7 +240,15 @@ test("a paid checkout in this session cannot be paid again", async ({
     },
   });
   // Same cart and fulfillment must keep the paid order protected.
+  // Match the first checkout scenario: don't tear down an initializing WebKit
+  // document while its configuration fetch is still in flight.
+  const homepageConfig = page.waitForResponse(
+    (response) => response.url() === ORIGIN + "/api/checkout/config",
+  );
   await page.goto("/");
+  const configResponse = await homepageConfig;
+  expect(configResponse.status()).toBe(200);
+  expect(await configResponse.finished()).toBeNull();
   await page.evaluate(
     ([k, d, c]) => {
       sessionStorage.setItem(
