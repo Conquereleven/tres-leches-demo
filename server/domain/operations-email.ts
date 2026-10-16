@@ -1,3 +1,4 @@
+import { preparationText } from "../../shared/pack-composition";
 import { randomUUID } from "node:crypto";
 import type {
   Order,
@@ -63,7 +64,7 @@ export function recordPaidOperationsEmail(
     const name =
       mapping?.en ??
       `${p?.name ?? line.productId} [translation review required]`;
-    return `${line.quantity} × ${name} (${line.productId}) · ${p ? `AED ${(p.priceFils / 100).toFixed(2)} each · AED ${((p.priceFils * line.quantity) / 100).toFixed(2)}` : "Stored price missing — review required"}`;
+    return `${preparationText(line)}${line.composition ? "\n" : ""}${line.quantity} × ${name} (${line.productId}) · ${p ? `AED ${(p.priceFils / 100).toFixed(2)} each · AED ${((p.priceFils * line.quantity) / 100).toFixed(2)}` : "Stored price missing — review required"}`;
   });
   const pickup = order.fulfillmentMethod === "pickup";
   const body = [

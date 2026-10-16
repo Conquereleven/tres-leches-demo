@@ -1,3 +1,7 @@
+import {
+  distinctLines,
+  validPackSnapshot,
+} from "../../shared/pack-composition";
 import { requireThat, type Order, type Payment } from "./model";
 
 /** Validate the commercial record committed by requestPayment, never live catalog. */
@@ -12,7 +16,8 @@ export function frozenCheckout(order: Order, payment: Payment) {
       quote?.eligible &&
       order.lines.length > 0 &&
       order.catalogSnapshot &&
-      new Set(order.lines.map((l) => l.productId)).size === order.lines.length,
+      distinctLines(order.lines) &&
+      order.lines.every(validPackSnapshot),
     held,
     409,
   );
@@ -34,6 +39,9 @@ export function frozenCheckout(order: Order, payment: Payment) {
     );
     return {
       sku: product.id,
+      ...(line.composition
+        ? { composition: line.composition, packSnapshot: line.packSnapshot }
+        : {}),
       name: product.name,
       quantity: line.quantity,
       unitPriceFils: product.priceFils,

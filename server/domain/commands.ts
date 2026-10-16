@@ -1,3 +1,4 @@
+import { commerceLineSchema } from "../../shared/pack-composition";
 import { z } from "zod";
 import { locationSchema, states, zoneSchema } from "./model";
 const base = {
@@ -25,14 +26,7 @@ export const commandSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("editOrder"),
     ...base,
-    lines: z
-      .array(
-        z.object({
-          productId: z.string().min(1).max(100),
-          quantity: z.number().int().min(1).max(100),
-        }),
-      )
-      .max(30),
+    lines: z.array(commerceLineSchema).max(30),
   }),
   z
     .object({
