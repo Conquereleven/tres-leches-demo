@@ -1,3 +1,4 @@
+import { acceptedLinePrice } from "../../shared/pack-pricing";
 import { lineKey, preparationText } from "../../shared/pack-composition";
 import {
   orderProductName,
@@ -773,13 +774,17 @@ function OrderPanel({
                 {l.composition && <small lang="en">{preparationText(l)}</small>}
               </span>
               <span>
-                {t(
-                  money(
-                    ((o.catalogSnapshot ?? data.catalog).find(
-                      (p) => p.id === l.productId,
-                    )?.priceFils ?? 0) * l.quantity,
-                  ),
-                )}
+                {(() => {
+                  const product = (o.catalogSnapshot ?? data.catalog).find(
+                    (p) => p.id === l.productId,
+                  );
+                  const price = product
+                    ? acceptedLinePrice(l, product.priceFils)
+                    : null;
+                  return price === null
+                    ? t("Review required")
+                    : t(money(price * l.quantity));
+                })()}
               </span>
               {editable && (
                 <button

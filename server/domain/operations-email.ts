@@ -1,3 +1,4 @@
+import { acceptedLinePrice } from "../../shared/pack-pricing";
 import { packSpec, validPackSnapshot } from "../../shared/pack-composition";
 import { renderOperationsEmail } from "./operations-email-template";
 import { randomUUID } from "node:crypto";
@@ -78,7 +79,9 @@ export function recordPaidOperationsEmail(
       sku: line.productId,
       name,
       quantity: line.quantity,
-      priceFils: p?.priceFils,
+      priceFils: p
+        ? (acceptedLinePrice(line, p.priceFils) ?? undefined)
+        : undefined,
       isPack,
       // Never infer historical preparation from current catalog or approvals.
       pack: isPack && line.composition && valid ? line.packSnapshot : undefined,

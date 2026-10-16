@@ -1,3 +1,5 @@
+import { packSpec } from "../../shared/pack-composition";
+import { packCopy } from "../../shared/pack-copy";
 import { useLanguage as useCustomerLanguage } from "./localization";
 import {
   ResponsiveMedia,
@@ -28,7 +30,7 @@ export function ProductOptions({
   product: StorefrontProduct;
   detail?: boolean;
 }) {
-  const { text: localize } = useCustomerLanguage();
+  const { text: localize, language } = useCustomerLanguage();
 
   const menu = useMenu();
   const family = menuProductFamily(menu, product),
@@ -122,6 +124,9 @@ export function ProductOptions({
         </p>
       )}
       <p className="b-menu-price" aria-live="polite">
+        {config?.packPricing && packSpec(display.id) && (
+          <span>{packCopy(language).base}: </span>
+        )}
         <CustomerCopy>{formatAed(display.priceFils)}</CustomerCopy>
       </p>
       {options.length > 1 && (

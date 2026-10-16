@@ -110,7 +110,10 @@ export type Conversation = {
   address?: string;
   audit: Audit[];
 };
-export type Line = CommerceLine & { packSnapshot?: PackSnapshot };
+export type Line = CommerceLine & {
+  packSnapshot?: PackSnapshot;
+  priceSnapshot?: import("../../shared/pack-pricing").PackPriceSnapshot;
+};
 export type Quote = {
   zoneId: string | null;
   zoneName: string | null;

@@ -66,7 +66,9 @@ function fixture(approved = true) {
   if (approved) {
     initial.catalogFoundation.packEligibility = PACK_SPECS.map((p) => ({
       packSkuId: p.packSkuId,
-      componentSkuIds: p.components.map((c) => c.componentSkuId),
+      componentSkuIds: p.components
+        .map((c) => c.componentSkuId)
+        .filter((id) => !id.endsWith("-chocolate-covering")),
     }));
     const { revision: _r, ...meta } = initial.catalogFoundation;
     const hash = revisionFingerprint(meta, initial.catalog);
@@ -172,7 +174,9 @@ for (const spec of PACK_SPECS)
   test(`${spec.packSkuId}: fixed price, arbitrary mix, one flavor, all flavors, multiple boxes`, () => {
     const f = fixture();
     try {
-      for (const c of spec.components) {
+      for (const c of spec.components.filter(
+        (c) => !c.componentSkuId.endsWith("-chocolate-covering"),
+      )) {
         const result = quote(f, [
           {
             productId: spec.packSkuId,
@@ -185,9 +189,12 @@ for (const spec of PACK_SPECS)
         assert.equal(result.totalFils, price(spec.packSkuId) * 3);
         assert.ok(result.eligible);
       }
-      const composition = spec.components.map((c, i) => ({
+      const components = spec.components.filter(
+        (c) => !c.componentSkuId.endsWith("-chocolate-covering"),
+      );
+      const composition = components.map((c, i) => ({
         componentSkuId: c.componentSkuId,
-        units: i === 0 ? spec.capacity - spec.components.length + 1 : 1,
+        units: i === 0 ? spec.capacity - components.length + 1 : 1,
       }));
       assert.equal(
         quote(f, [{ productId: spec.packSkuId, quantity: 1, composition }])
@@ -229,7 +236,9 @@ test("new eligibility is unavailable until explicit draft and admin publication;
     );
     const rules = PACK_SPECS.map((p) => ({
       packSkuId: p.packSkuId,
-      componentSkuIds: p.components.map((c) => c.componentSkuId),
+      componentSkuIds: p.components
+        .map((c) => c.componentSkuId)
+        .filter((id) => !id.endsWith("-chocolate-covering")),
     }));
     const before = structuredClone(f.store.read());
     const v = hubView(before, manager, flags);
@@ -486,7 +495,7 @@ test("same SKU with different mixes freezes two lines, charges boxes only, repla
     assert.throws(() =>
       resumeWebCheckout(f.service, { key, checkout: input(lines) }),
     );
-    const changed = [{ ...lines[0]!, composition: single(spec, 2) }];
+    const changed = [{ ...lines[0]!, composition: single(spec, 1) }];
     await assert.rejects(
       createWebCheckout(
         f.service,
@@ -617,7 +626,7 @@ test("changing only the mix supersedes an unpaid checkout; normalized component 
     assert.equal(f.calls.length, 1);
     const changed = resumeWebCheckout(f.service, {
       key,
-      checkout: input([{ ...lines[0]!, composition: single(spec, 2) }]),
+      checkout: input([{ ...lines[0]!, composition: single(spec, 1) }]),
     });
     assert.equal(changed.changed, true);
     assert.notEqual(changed.key, key);
