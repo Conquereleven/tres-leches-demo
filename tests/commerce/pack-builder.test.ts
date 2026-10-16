@@ -32,7 +32,7 @@ import {
   publishedPackRules,
 } from "../../server/domain/packs";
 import {
-  PACK_SPECS,
+  PAN_PACK_SPECS as PACK_SPECS,
   lineKey,
   preparationText,
   commerceLineSchema,

@@ -1,3 +1,9 @@
+import {
+  packBuilderEnabled,
+  conchasPackBuilderEnabled,
+  anyPackBuilderEnabled,
+  packEnabledForSku,
+} from "../domain/packs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { State } from "../domain/model";
 import { DomainError } from "../domain/model";
@@ -105,8 +111,16 @@ export function storefrontCatalog(state: State, now = new Date()) {
     ),
   ]);
   return {
-    ...(process.env.PERSONALIZED_PACKS_ENABLED === "true"
-      ? { personalizedPacks: { enabled: true, rules: f.packEligibility ?? [] } }
+    ...(anyPackBuilderEnabled()
+      ? {
+          personalizedPacks: {
+            enabled: packBuilderEnabled(),
+            conchasEnabled: conchasPackBuilderEnabled(),
+            rules: (f.packEligibility ?? []).filter((r) =>
+              packEnabledForSku(r.packSkuId),
+            ),
+          },
+        }
       : {}),
     schemaVersion: 1 as const,
     revision: f.revision.id,

@@ -49,3 +49,30 @@ jobs:
           PY
       # Loopback fixtures, disposable SQLite and in-process fake provider only.
       # No secrets, remote data, deployment or provider network requests.
+
+  conchas-browsers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.23.1"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npx playwright test --config=playwright.conchas-packs.config.ts
+      - if: failure()
+        name: Synthetic Conchas failure context
+        run: |
+          python3 - <<'PYTHON'
+          from pathlib import Path
+          for p in Path('test-results/conchas-packs').rglob('error-context.md'):
+              print(str(p))
+              print(p.read_text())
+          PYTHON

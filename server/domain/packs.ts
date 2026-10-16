@@ -1,5 +1,6 @@
 import {
   packSpec,
+  personalizedPackEnabled,
   normalizeComposition,
   componentName,
   distinctLines,
@@ -9,6 +10,15 @@ import { validateFoundation } from "../catalog/contract";
 import { requireThat, type State, type Line } from "./model";
 export const packBuilderEnabled = (env = process.env) =>
   env.PERSONALIZED_PACKS_ENABLED === "true";
+export const conchasPackBuilderEnabled = (env = process.env) =>
+  env.PERSONALIZED_CONCHAS_PACKS_ENABLED === "true";
+export const anyPackBuilderEnabled = (env = process.env) =>
+  packBuilderEnabled(env) || conchasPackBuilderEnabled(env);
+export const packEnabledForSku = (sku: string, env = process.env) =>
+  personalizedPackEnabled(sku, {
+    enabled: packBuilderEnabled(env),
+    conchasEnabled: conchasPackBuilderEnabled(env),
+  });
 /** Published Foundation only. Absence means no component has been commercially approved. */
 export function publishedPackRules(s: State): PackEligibility {
   if (!s.catalogFoundation) return [];
@@ -17,20 +27,23 @@ export function publishedPackRules(s: State): PackEligibility {
     []
   );
 }
-export function validatePackLines(
-  s: State,
-  lines: Line[],
-  enabled = packBuilderEnabled(),
-) {
+/** Inactive-family publication must not change an active family's quote token. */
+export function activePackRules(s: State, env = process.env): PackEligibility {
+  return publishedPackRules(s)
+    .filter((r) => packEnabledForSku(r.packSkuId, env))
+    .map((r) => ({ ...r, componentSkuIds: [...r.componentSkuIds].sort() }))
+    .sort((a, b) => a.packSkuId.localeCompare(b.packSkuId, "en"));
+}
+export function validatePackLines(s: State, lines: Line[], env = process.env) {
   requireThat(
     distinctLines(lines),
     "Duplicate composition or maximum box quantity exceeded",
     422,
   );
-  const rules = enabled ? publishedPackRules(s) : [];
+  const rules = anyPackBuilderEnabled(env) ? publishedPackRules(s) : [];
   for (const line of lines) {
     const spec = packSpec(line.productId);
-    if (!enabled) {
+    if (spec && !packEnabledForSku(line.productId, env)) {
       requireThat(!line.composition, "Personalized packs are not enabled", 422);
       continue;
     }

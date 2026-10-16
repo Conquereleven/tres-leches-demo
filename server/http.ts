@@ -1,4 +1,9 @@
-import { packBuilderEnabled, publishedPackRules } from "./domain/packs";
+import {
+  packBuilderEnabled,
+  conchasPackBuilderEnabled,
+  anyPackBuilderEnabled,
+  activePackRules,
+} from "./domain/packs";
 import {
   deliveryStreet,
   deliveryBuilding,
@@ -482,9 +487,10 @@ export async function startServer(
               },
               personalizedPacks: {
                 enabled: packBuilderEnabled(),
+                conchasEnabled: conchasPackBuilderEnabled(),
                 rules:
-                  packBuilderEnabled() && published.sellable
-                    ? publishedPackRules(s)
+                  anyPackBuilderEnabled() && published.sellable
+                    ? activePackRules(s)
                     : [],
               },
               paymentFlow: "web",

@@ -1,0 +1,37 @@
+packSkuId,capacity,size,family,priceAED,componentSkuId,flavorEN,referenceRetailActive
+conchas-traditional-pack-6-mini,6,mini,traditional,60.00,conchas-traditional-vainilla-mini-40-g,Vanilla,true
+conchas-traditional-pack-6-mini,6,mini,traditional,60.00,conchas-traditional-chocolate-mini-40-g,Chocolate,true
+conchas-traditional-pack-6-mini,6,mini,traditional,60.00,conchas-traditional-pistache-mini-40-g,Pistachio,true
+conchas-traditional-pack-6-mini,6,mini,traditional,60.00,conchas-traditional-tricolor-mini-40-g,Tricolour,true
+conchas-traditional-pack-6-individuales,6,individuales,traditional,72.00,conchas-traditional-vainilla-individual-70-g,Vanilla,true
+conchas-traditional-pack-6-individuales,6,individuales,traditional,72.00,conchas-traditional-chocolate-individual-70-g,Chocolate,true
+conchas-traditional-pack-6-individuales,6,individuales,traditional,72.00,conchas-traditional-pistache-individual-70-g,Pistachio,true
+conchas-traditional-pack-6-individuales,6,individuales,traditional,72.00,conchas-traditional-tricolor-individual-70-g,Tricolour,true
+conchas-traditional-pack-12-mini,12,mini,traditional,115.00,conchas-traditional-vainilla-mini-40-g,Vanilla,true
+conchas-traditional-pack-12-mini,12,mini,traditional,115.00,conchas-traditional-chocolate-mini-40-g,Chocolate,true
+conchas-traditional-pack-12-mini,12,mini,traditional,115.00,conchas-traditional-pistache-mini-40-g,Pistachio,true
+conchas-traditional-pack-12-mini,12,mini,traditional,115.00,conchas-traditional-tricolor-mini-40-g,Tricolour,true
+conchas-traditional-pack-12-individuales,12,individuales,traditional,140.00,conchas-traditional-vainilla-individual-70-g,Vanilla,true
+conchas-traditional-pack-12-individuales,12,individuales,traditional,140.00,conchas-traditional-chocolate-individual-70-g,Chocolate,true
+conchas-traditional-pack-12-individuales,12,individuales,traditional,140.00,conchas-traditional-pistache-individual-70-g,Pistachio,true
+conchas-traditional-pack-12-individuales,12,individuales,traditional,140.00,conchas-traditional-tricolor-individual-70-g,Tricolour,true
+conchas-filled-pack-6-mini,6,mini,filled,100.00,conchas-filled-crema-diplomatica-vainilla-mini,Diplomat cream (vanilla),false
+conchas-filled-pack-6-mini,6,mini,filled,100.00,conchas-filled-chocolate-mini,Chocolate,false
+conchas-filled-pack-6-mini,6,mini,filled,100.00,conchas-filled-mascarpone-y-cajeta-mini,Mascarpone and cajeta,false
+conchas-filled-pack-6-mini,6,mini,filled,100.00,conchas-filled-mascarpone-y-fresas-mini,Mascarpone and strawberries,false
+conchas-filled-pack-6-mini,6,mini,filled,100.00,conchas-filled-pistache-mini,Pistachio,true
+conchas-filled-pack-6-individuales,6,individuales,filled,120.00,conchas-filled-crema-diplomatica-vainilla-individual,Diplomat cream (vanilla),false
+conchas-filled-pack-6-individuales,6,individuales,filled,120.00,conchas-filled-chocolate-individual,Chocolate,false
+conchas-filled-pack-6-individuales,6,individuales,filled,120.00,conchas-filled-mascarpone-y-cajeta-individual,Mascarpone and cajeta,false
+conchas-filled-pack-6-individuales,6,individuales,filled,120.00,conchas-filled-mascarpone-y-fresas-individual,Mascarpone and strawberries,false
+conchas-filled-pack-6-individuales,6,individuales,filled,120.00,conchas-filled-pistache-individual,Pistachio,true
+conchas-filled-pack-12-mini,12,mini,filled,190.00,conchas-filled-crema-diplomatica-vainilla-mini,Diplomat cream (vanilla),false
+conchas-filled-pack-12-mini,12,mini,filled,190.00,conchas-filled-chocolate-mini,Chocolate,false
+conchas-filled-pack-12-mini,12,mini,filled,190.00,conchas-filled-mascarpone-y-cajeta-mini,Mascarpone and cajeta,false
+conchas-filled-pack-12-mini,12,mini,filled,190.00,conchas-filled-mascarpone-y-fresas-mini,Mascarpone and strawberries,false
+conchas-filled-pack-12-mini,12,mini,filled,190.00,conchas-filled-pistache-mini,Pistachio,true
+conchas-filled-pack-12-individuales,12,individuales,filled,235.00,conchas-filled-crema-diplomatica-vainilla-individual,Diplomat cream (vanilla),false
+conchas-filled-pack-12-individuales,12,individuales,filled,235.00,conchas-filled-chocolate-individual,Chocolate,false
+conchas-filled-pack-12-individuales,12,individuales,filled,235.00,conchas-filled-mascarpone-y-cajeta-individual,Mascarpone and cajeta,false
+conchas-filled-pack-12-individuales,12,individuales,filled,235.00,conchas-filled-mascarpone-y-fresas-individual,Mascarpone and strawberries,false
+conchas-filled-pack-12-individuales,12,individuales,filled,235.00,conchas-filled-pistache-individual,Pistachio,true

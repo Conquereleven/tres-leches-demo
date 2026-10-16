@@ -5,8 +5,8 @@ import {
 } from "../../shared/pack-composition";
 import {
   validatePackLines,
-  packBuilderEnabled,
-  publishedPackRules,
+  anyPackBuilderEnabled,
+  activePackRules,
 } from "./packs";
 import { deliveryStreet, deliveryBuilding } from "./delivery-address-input";
 import { frozenCheckout } from "./frozen-checkout";
@@ -627,8 +627,8 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
   // Opaque comparison token only: catalog/quote remain the sole price authority.
   const quoteRevision = digest(
     JSON.stringify({
-      ...(packBuilderEnabled()
-        ? { packEligibility: publishedPackRules(s) }
+      ...(anyPackBuilderEnabled()
+        ? { packEligibility: activePackRules(s) }
         : {}),
       lines: [...input.lines]
         .sort((a, b) => lineKey(a).localeCompare(lineKey(b)))

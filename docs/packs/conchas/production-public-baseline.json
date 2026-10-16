@@ -1,0 +1,64 @@
+{
+  "observedAt": "2026-10-16T14:41:12.220746+00:00",
+  "revision": "catalog-v1-5200a41c411a6409dc5529b76e10f6c95e61b7aaccca3c1b97dfb4c2f9c4e190",
+  "readOnlySources": [
+    "https://www.3ldubai.ae/api/checkout/config",
+    "https://www.3ldubai.ae/api/storefront/catalog"
+  ],
+  "packs": [
+    {
+      "sku": "conchas-traditional-pack-6-mini",
+      "name": "Concha tradicional de chocolate · Pack · 6 mini",
+      "priceFils": 6000,
+      "orderable": true
+    },
+    {
+      "sku": "conchas-traditional-pack-12-mini",
+      "name": "Concha tradicional de chocolate · Pack · 12 mini",
+      "priceFils": 11500,
+      "orderable": true
+    },
+    {
+      "sku": "conchas-traditional-pack-6-individuales",
+      "name": "Concha tradicional de chocolate · Pack · 6 individuales",
+      "priceFils": 7200,
+      "orderable": true
+    },
+    {
+      "sku": "conchas-traditional-pack-12-individuales",
+      "name": "Concha tradicional de chocolate · Pack · 12 individuales",
+      "priceFils": 14000,
+      "orderable": true
+    },
+    {
+      "sku": "conchas-filled-pack-6-mini",
+      "name": "Concha rellena de pistache · Pack · 6 mini",
+      "priceFils": 10000,
+      "orderable": true
+    },
+    {
+      "sku": "conchas-filled-pack-12-mini",
+      "name": "Concha rellena de pistache · Pack · 12 mini",
+      "priceFils": 19000,
+      "orderable": true
+    },
+    {
+      "sku": "conchas-filled-pack-6-individuales",
+      "name": "Concha rellena de pistache · Pack · 6 individuales",
+      "priceFils": 12000,
+      "orderable": true
+    },
+    {
+      "sku": "conchas-filled-pack-12-individuales",
+      "name": "Concha rellena de pistache · Pack · 12 individuales",
+      "priceFils": 23500,
+      "orderable": true
+    }
+  ],
+  "retailAvailableFilledIds": [
+    "conchas-filled-pistache-mini",
+    "conchas-filled-pistache-individual"
+  ],
+  "existingPanEnabled": true,
+  "publishedConchasEligibility": []
+}
