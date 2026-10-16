@@ -1,6 +1,6 @@
 # Indexable product pages · `/menu/<slug>` (3L-SEO-AEO-002 Track B)
 
-**Merge after Codex #31 (Pack Builder).** This branch touches files #31 also changes: `src/brand/MenuCatalog.tsx` (1 line), `src/brand/menu.ts`, `src/brand/Root.tsx` (1 line), `src/brand/StorePages.tsx` (1 condition) and `server/http.ts` (one block before static serving). Rebase on `main` once #31 merges, then re-run the gates below.
+**Integration completed against main `8f5cc785fe408b0288a3b8403983787cf57721ec` (PR36 packs) and current Track A.** The sole textual conflict was the SEO import block in `server/http.ts`; both import lists were preserved. The lazy Operations route and `/menu/<slug>` routing were combined. No pack/cart/payment domain or catalog data was changed.
 
 ## Behaviour
 
@@ -49,3 +49,17 @@ Storefront browser suites on this branch: storefront-dynamic 4/4, i18n 17/17, co
 - Product descriptions are empty in the published catalog; pages show name, photo, options and prices only until approved descriptions are published in Product Hub.
 - English-only documents; no `hreflang` until ES/AR documents exist (see Track A plan, section 8).
 - `lastmod` needs a real `publishedAt` on publication (currently `null` live).
+
+## Final integration gate · 16 October 2026
+
+- Real size offers now link to `/menu/<slug>?sku=<existing SKU>`, selecting only a matching option of that product. Canonical remains the parameter-free product URL. Invalid/cross-product SKU values cannot introduce an option. Pack composition is never a URL variant or a schema offer. The eight approved pack offers retain 60/115/72/140 and 100/190/120/235 AED. This meets Google's distinct variant-URL guidance: https://developers.google.com/search/docs/appearance/structured-data/product-variants#guidelines .
+- Product Hub description regression covers private draft isolation and immediate published HTML/JSON-LD update; existing browser publication tests also check EN/ES/AR descriptions after hydration. No Production content was published.
+- Local combined suite: 625/625 commerce/HTTP checks; typecheck/lint/build PASS; 14/14 SEO/dynamic-catalog/lazy-Operations Chromium/WebKit checks, including all eight size links and canonical consistency. Packs and checkout regression/CI evidence is reported with final PR SHAs.
+- The old statements above about zero descriptions and null publication dates describe 15 October, not a requirement or fallback. Current Production facts are recorded in the final audit report. Server documents remain English and canonicalize language queries; ES/AR interactive behavior stays supported, with no fabricated hreflang.
+
+## Two-step Production release (founder approval required)
+
+1. Approve/merge PR33 first. Require current-head commerce, packs and SEO CI green. Record live deployment, published revision and flags; obtain a consistent private SQLite backup using the existing authorized release procedure and verify restore offline. Deploy only approved Track A; preserve all env vars/provider gates. Smoke health, www/cart/checkout, dynamic revision/prices, API noindex, alias redirects, media304 and Operations lazy load. No provider calls or catalog publication. Roll back code only to the recorded compatible snapshot-capable build if needed; never replace the current database with an old backup.
+2. Refresh PR34 onto the resulting main, preserve the already tested Track A ancestry and re-run checks if the merge tree differs. Approve/merge/deploy Track B separately. Verify published-product SSR/description/canonical/JSON-LD/sitemap, eight fixed pack SKUs, all variant links, multilingual UI, cart/checkout and immutable history. Roll back to released Track A code if needed; keep SQLite/current catalog untouched. Sitemap submission requires verified Search Console/Bing access and is separate from code deploy. No Meta activation.
+
+Apex remediation is separately authorized DNS work, not a silent part of either deploy. www product pages can ship while apex is awaiting DNS, but do not call domain-wide SEO finished until HTTPS apex redirects pass.
