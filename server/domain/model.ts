@@ -1,3 +1,4 @@
+import type { CommerceLine, PackSnapshot } from "../../shared/pack-composition";
 import { z } from "zod";
 export const states = [
   "New",
@@ -109,7 +110,7 @@ export type Conversation = {
   address?: string;
   audit: Audit[];
 };
-export type Line = { productId: string; quantity: number };
+export type Line = CommerceLine & { packSnapshot?: PackSnapshot };
 export type Quote = {
   zoneId: string | null;
   zoneName: string | null;

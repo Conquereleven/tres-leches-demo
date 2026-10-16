@@ -1,3 +1,11 @@
+import { PackBuilder, CompositionDetails, packComplete } from "./PackBuilder";
+import {
+  lineKey,
+  packSpec,
+  type Composition,
+  type PackSnapshot,
+} from "../../shared/pack-composition";
+import { packCopy } from "../../shared/pack-copy";
 import { storefrontI18n } from "./locales/engine";
 import { useLanguage as useCustomerLanguage } from "./localization";
 import { QuantityInput } from "./QuantityInput";
@@ -94,6 +102,8 @@ type Quote = {
 type Summary = {
   items: {
     productId: string;
+    composition?: Composition;
+    packSnapshot?: PackSnapshot;
     name: string;
     quantity: number;
     lineFils: number;
@@ -562,7 +572,7 @@ function OrderSummary({
             const p = config.products.find((p) => p.id === l.productId);
             if (!p) return null;
             return (
-              <li key={l.productId}>
+              <li key={lineKey(l)}>
                 <span className="b-co-thumb-wrap">
                   <Thumb productId={p.id} name={p.name} />
                   <span className="b-co-thumb-qty" aria-hidden>
@@ -573,6 +583,7 @@ function OrderSummary({
                   <strong>
                     <CustomerCopy>{p.name}</CustomerCopy>
                   </strong>
+                  <CompositionDetails line={l} />
                   <span className="b-caption">
                     <CustomerCopy>{formatAed(p.priceFils)}</CustomerCopy> ×{" "}
                     {l.quantity}
@@ -654,12 +665,24 @@ export function AddToCart({
   const lines = useCart();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [composition, setComposition] = useState<Composition>([]);
   const product = config?.products.find((p) => p.id === productId);
   if (loading) return <>{fallback}</>;
   if (!product) return <>{fallback}</>;
-  const inCart = lines.find((l) => l.productId === productId)?.quantity ?? 0;
+  const inCart = lines
+    .filter((l) => l.productId === productId)
+    .reduce((n, l) => n + l.quantity, 0);
+  const custom = !!config?.personalizedPacks?.enabled && !!packSpec(productId);
   return (
     <div className="b-add-to-cart">
+      {custom && (
+        <PackBuilder
+          productId={productId}
+          config={config!}
+          value={composition}
+          onChange={setComposition}
+        />
+      )}
       <div className="b-qty" role="group" aria-label={localize("Quantity")}>
         <button
           type="button"
@@ -686,9 +709,12 @@ export function AddToCart({
       </div>
       <Button
         type="button"
-        disabled={inCart >= MAX_QTY}
+        disabled={
+          inCart >= MAX_QTY ||
+          (custom && !packComplete(productId, composition, config!))
+        }
         onClick={() => {
-          cart.add(productId, quantity);
+          cart.add(productId, quantity, custom ? composition : undefined);
           setAdded(true);
           setQuantity(1);
         }}
@@ -707,6 +733,36 @@ export function AddToCart({
 
 // ── Cart page ────────────────────────────────────────────────────────────
 
+function CartPackEditor({
+  line,
+  config,
+}: {
+  line: CartLine;
+  config: CheckoutConfig;
+}) {
+  const { language } = useCustomerLanguage();
+  const [value, setValue] = useState<Composition>(line.composition ?? []);
+  return (
+    <details className="b-pack-edit">
+      <summary>{packCopy(language).edit}</summary>
+      <PackBuilder
+        productId={line.productId}
+        config={config}
+        value={value}
+        onChange={setValue}
+      />
+      <button
+        type="button"
+        className="b-link"
+        disabled={!packComplete(line.productId, value, config)}
+        onClick={() => cart.edit(lineKey(line), value)}
+      >
+        {packCopy(language).save}
+      </button>
+    </details>
+  );
+}
+
 function CartItems({
   lines,
   config,
@@ -722,25 +778,29 @@ function CartItems({
         const p = config.products.find((p) => p.id === l.productId);
         if (!p)
           return (
-            <li key={l.productId} className="b-cart-unavailable">
+            <li key={lineKey(l)} className="b-cart-unavailable">
               <span>
                 <CustomerCopy>This item is no longer available.</CustomerCopy>
               </span>
               <button
                 className="b-link"
-                onClick={() => cart.remove(l.productId)}
+                onClick={() => cart.remove(lineKey(l))}
               >
                 <CustomerCopy>Remove</CustomerCopy>
               </button>
             </li>
           );
         return (
-          <li key={l.productId} className="b-co-item">
+          <li key={lineKey(l)} className="b-co-item">
             <Thumb productId={p.id} name={p.name} />
             <div className="b-co-item-copy">
               <strong>
                 <CustomerCopy>{p.name}</CustomerCopy>
               </strong>
+              <CompositionDetails line={l} />
+              {config.personalizedPacks?.enabled && packSpec(l.productId) && (
+                <CartPackEditor line={l} config={config} />
+              )}
               {p.description && (
                 <span className="b-caption">
                   <CustomerCopy>{p.description}</CustomerCopy>
@@ -759,7 +819,7 @@ function CartItems({
               <button
                 type="button"
                 aria-label={localize(`Decrease ${p.name}`)}
-                onClick={() => cart.set(l.productId, l.quantity - 1)}
+                onClick={() => cart.set(lineKey(l), l.quantity - 1)}
               >
                 <Minus aria-hidden />
               </button>
@@ -767,13 +827,13 @@ function CartItems({
                 value={l.quantity}
                 max={MAX_QTY}
                 label={`${p.name} quantity`}
-                onChange={(n) => cart.set(l.productId, n)}
+                onChange={(n) => cart.set(lineKey(l), n)}
               />
               <button
                 type="button"
                 aria-label={localize(`Increase ${p.name}`)}
                 disabled={l.quantity >= MAX_QTY}
-                onClick={() => cart.set(l.productId, l.quantity + 1)}
+                onClick={() => cart.set(lineKey(l), l.quantity + 1)}
               >
                 <Plus aria-hidden />
               </button>
@@ -785,7 +845,7 @@ function CartItems({
               type="button"
               className="b-cart-remove"
               aria-label={localize(`Remove ${p.name}`)}
-              onClick={() => cart.remove(l.productId)}
+              onClick={() => cart.remove(lineKey(l))}
             >
               <Trash aria-hidden />
             </button>
@@ -2086,7 +2146,7 @@ function PaymentStep({
                 {lines.map((l) => {
                   const p = config.products.find((p) => p.id === l.productId);
                   return p ? (
-                    <li key={l.productId}>
+                    <li key={lineKey(l)}>
                       <CustomerCopy>{p.name}</CustomerCopy>{" "}
                       <span className="b-caption">× {l.quantity}</span>
                     </li>
@@ -2544,7 +2604,7 @@ function Confirmation({ result }: { result: Status }) {
               </header>
               <ul className="b-co-summary-items">
                 {s.items.map((i) => (
-                  <li key={i.productId}>
+                  <li key={lineKey(i)}>
                     <span className="b-co-thumb-wrap">
                       <Thumb productId={i.productId} name={i.name} />
                       <span className="b-co-thumb-qty" aria-hidden>
@@ -2555,6 +2615,7 @@ function Confirmation({ result }: { result: Status }) {
                       <strong>
                         <CustomerCopy>{i.name}</CustomerCopy>
                       </strong>
+                      <CompositionDetails line={i} />
                       <span className="b-caption">
                         <CustomerCopy>Quantity</CustomerCopy> {i.quantity}
                       </span>

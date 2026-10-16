@@ -1,3 +1,4 @@
+import { lineKey, preparationText } from "../../shared/pack-composition";
 import {
   orderProductName,
   productOptionLabel,
@@ -762,13 +763,14 @@ function OrderPanel({
       <fieldset className="co-fieldset" disabled={!owned}>
         <ul className="co-lines">
           {o.lines.map((l) => (
-            <li key={l.productId}>
+            <li key={lineKey(l)}>
               <span>
                 {l.quantity} ×{" "}
                 <OperationalProductName
                   product={orderProductName(o, l.productId, data.catalog)}
                   id={l.productId}
                 />
+                {l.composition && <small lang="en">{preparationText(l)}</small>}
               </span>
               <span>
                 {t(
@@ -787,7 +789,7 @@ function OrderPanel({
                       type: "editOrder",
                       id: o.id,
                       version: o.version,
-                      lines: o.lines.filter((x) => x.productId !== l.productId),
+                      lines: o.lines.filter((x) => lineKey(x) !== lineKey(l)),
                     })
                   }
                 >

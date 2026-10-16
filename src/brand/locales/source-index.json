@@ -1059,5 +1059,10 @@
   "Continue": "checkout:copy_31fbef162594de01",
   "Concha tradicional de vainilla": "menu:copy_8ac93f91a21b40c1",
   "Concha tradicional de pistache": "menu:copy_8ac93f91a21b40c2",
-  "Concha tradicional tricolor": "menu:copy_8ac93f91a21b40c3"
+  "Concha tradicional tricolor": "menu:copy_8ac93f91a21b40c3",
+  "Pack flavor unavailable; review your selection": "checkout:pack_b0e8cad404360edf",
+  "Choose all pack flavors before continuing": "checkout:pack_9a5d3ce941dea12b",
+  "Pack composition must equal its capacity": "checkout:pack_5d72f458fd143e86",
+  "Personalized packs are not enabled": "checkout:pack_37bb19baa264e645",
+  "Duplicate composition or maximum box quantity exceeded": "checkout:pack_1c2a4497f4a430a3"
 }

@@ -1,3 +1,7 @@
+import {
+  PACK_SPECS,
+  packEligibilitySchema,
+} from "../../shared/pack-composition";
 import { storefrontCatalogMode } from "./storefront-api";
 import { createHash } from "node:crypto";
 import { z } from "zod";
@@ -38,6 +42,7 @@ export type HubHistoryEntry = {
   actor: string;
   action:
     | "draft.product"
+    | "draft.packEligibility"
     | "draft.family"
     | "draft.asset"
     | "draft.media"
@@ -135,6 +140,13 @@ const variantInput = z
   })
   .strict();
 export const hubCommandSchema = z.discriminatedUnion("type", [
+  z
+    .object({
+      type: z.literal("savePackEligibility"),
+      expectedVersion,
+      rules: packEligibilitySchema,
+    })
+    .strict(),
   z
     .object({
       type: z.literal("saveProduct"),
@@ -308,6 +320,18 @@ export function hubChanges(
         .join(", ") || null;
     add(kind, target, "media", images(before), images(after));
   };
+  for (const spec of PACK_SPECS)
+    add(
+      "family",
+      spec.packSkuId,
+      "Pack flavor eligibility",
+      live.foundation.packEligibility?.find(
+        (r) => r.packSkuId === spec.packSkuId,
+      )?.componentSkuIds ?? [],
+      next.foundation.packEligibility?.find(
+        (r) => r.packSkuId === spec.packSkuId,
+      )?.componentSkuIds ?? [],
+    );
   const oldProducts = byId(live.foundation.products);
   for (const p of next.foundation.products) {
     const o = oldProducts.get(p.id);
@@ -600,6 +624,8 @@ export function hubView(
       translations: c.translations,
     })),
     families: next.foundation.families,
+    packEligibility: next.foundation.packEligibility ?? [],
+    packCandidates: PACK_SPECS,
     products: [...next.foundation.products]
       .sort(
         (a, b) =>
@@ -895,6 +921,25 @@ export function hubCommand(
       if (cmd.type === "saveProduct") {
         action = "draft.product";
         summary = applySaveProduct(s, draft, cmd);
+      } else if (cmd.type === "savePackEligibility") {
+        if (
+          cmd.rules.some(
+            (r) =>
+              !draft.catalog.some((c) => c.id === r.packSkuId) ||
+              r.componentSkuIds.some(
+                (id) => !draft.catalog.some((c) => c.id === id),
+              ),
+          )
+        )
+          throw new DomainError(422, "Missing pack component SKU");
+        draft.foundation.packEligibility = cmd.rules
+          .map((r) => ({
+            ...r,
+            componentSkuIds: [...r.componentSkuIds].sort(),
+          }))
+          .sort((a, b) => a.packSkuId.localeCompare(b.packSkuId));
+        action = "draft.packEligibility";
+        summary = "Edited pack flavor eligibility";
       } else if (cmd.type === "saveFamily") {
         if (
           !draft.foundation.categories.some(

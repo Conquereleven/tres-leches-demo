@@ -1,3 +1,4 @@
+import type { Line } from "../../server/domain/model";
 /**
  * Order management presentation rules. Pure functions over the workspace
  * snapshot: they decide what the Orders list and the order page show, never
@@ -302,7 +303,7 @@ export function listOrders(data: Data, query: ListQuery) {
   };
 }
 
-export type LineView = {
+export type LineView = Line & {
   productId: string;
   quantity: number;
   product: ReturnType<typeof orderProductName>;
@@ -322,6 +323,7 @@ export function orderLines(data: Pick<Data, "catalog">, o: Order): LineView[] {
     const price = matches.length === 1 ? matches[0]!.priceFils : undefined;
     const unitFils = Number.isSafeInteger(price) && price! >= 0 ? price! : null;
     return {
+      ...l,
       productId: l.productId,
       quantity: l.quantity,
       product: orderProductName(o, l.productId, data.catalog),
