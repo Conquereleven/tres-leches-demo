@@ -1,4 +1,5 @@
-import { preparationText } from "../../shared/pack-composition";
+import { packSpec, validPackSnapshot } from "../../shared/pack-composition";
+import { renderOperationsEmail } from "./operations-email-template";
 import { randomUUID } from "node:crypto";
 import type {
   Order,
@@ -64,23 +65,44 @@ export function recordPaidOperationsEmail(
     const name =
       mapping?.en ??
       `${p?.name ?? line.productId} [translation review required]`;
-    return `${preparationText(line)}${line.composition ? "\n" : ""}${line.quantity} × ${name} (${line.productId}) · ${p ? `AED ${(p.priceFils / 100).toFixed(2)} each · AED ${((p.priceFils * line.quantity) / 100).toFixed(2)}` : "Stored price missing — review required"}`;
+    const isPack =
+      !!packSpec(line.productId) ||
+      /(?:^|-)(?:pack|bundle)(?:-|$)/.test(line.productId) ||
+      !!line.composition ||
+      !!line.packSnapshot;
+    const valid =
+      Number.isSafeInteger(line.quantity) &&
+      line.quantity > 0 &&
+      validPackSnapshot(line);
+    return {
+      sku: line.productId,
+      name,
+      quantity: line.quantity,
+      priceFils: p?.priceFils,
+      isPack,
+      // Never infer historical preparation from current catalog or approvals.
+      pack: isPack && line.composition && valid ? line.packSnapshot : undefined,
+      review:
+        isPack && (!line.composition || !valid)
+          ? "MANUAL REVIEW REQUIRED: Pack composition missing or invalid. Do not infer included flavors."
+          : undefined,
+    };
   });
   const pickup = order.fulfillmentMethod === "pickup";
-  const body = [
-    `NEW PAID ORDER ${reference} (${order.id})`,
-    `Customer: ${customerName(order, conversation?.customer) || "Not stored"}`,
-    `Phone: ${conversation?.phone ?? "Not stored"}`,
-    `Email: ${order.customerDetails?.email ?? "Not stored"}`,
-    `WhatsApp: ${order.customerDetails?.whatsappNumber ?? "Not stored"}`,
-    "",
-    ...items,
-    "",
-    `Total paid: AED ${(payment.amountFils / 100).toFixed(2)}`,
-    `Fulfillment: ${pickup ? "Pickup" : "Delivery"}`,
-    `Date: ${order.pickup?.pickupDate ?? order.delivery?.date ?? "Not stored"}`,
-    `Time: ${order.pickup?.preferredTime ?? order.delivery?.slot ?? "Not stored"}`,
-    ...(pickup
+  const message = renderOperationsEmail({
+    reference,
+    orderId: order.id,
+    customer: customerName(order, conversation?.customer) || "Not stored",
+    phone: conversation?.phone ?? "Not stored",
+    email: order.customerDetails?.email ?? "Not stored",
+    whatsapp: order.customerDetails?.whatsappNumber ?? "Not stored",
+    items,
+    amountFils: payment.amountFils,
+    quote: order.quote,
+    pickup,
+    date: order.pickup?.pickupDate ?? order.delivery?.date ?? "Not stored",
+    time: order.pickup?.preferredTime ?? order.delivery?.slot ?? "Not stored",
+    address: pickup
       ? [`Pickup: ${PICKUP_LOCATION.name}`, ...PICKUP_LOCATION.lines]
       : [
           `Full address: ${order.address ?? "Not stored — review required"}`,
@@ -89,12 +111,11 @@ export function recordPaidOperationsEmail(
           `Apartment/unit: ${order.delivery?.unit || "Not stored"}`,
           `Area: ${zone?.name ?? order.quote?.zoneName ?? order.delivery?.zoneId ?? "Not stored"}`,
           `Address verification: ${order.delivery?.addressVerification ?? "Not recorded — manual review required"}`,
-        ]),
-    `Original customer instructions: ${order.customerDetails?.instructions || "Not stored"}`,
-    `Original delivery notes: ${order.delivery?.notes || "Not stored"}`,
-    "",
-    `${origin ?? ""}/operations/orders?order=${encodeURIComponent(order.id)}`,
-  ].join("\n");
+        ],
+    instructions: order.customerDetails?.instructions || "Not stored",
+    deliveryNotes: order.delivery?.notes || "Not stored",
+    origin,
+  });
   const createdAt = new Date().toISOString();
   const rows: OperationsEmailNotification[] = [...new Set(recipients)].map(
     (recipient) => ({
@@ -106,7 +127,8 @@ export function recordPaidOperationsEmail(
       publicOrderNumber: order.publicOrderNumber,
       recipient,
       subject: `New paid 3L order ${reference}`,
-      body,
+      body: message.text,
+      html: message.html,
       status: "pending",
       attemptCount: 0,
       createdAt,

@@ -554,7 +554,7 @@ test("paid pack composition and financial snapshots are immutable after publishe
     );
     assert.match(
       before.operationsEmailNotifications?.[0]?.body ?? "",
-      /Sugar × 6/,
+      /6 × Sugar/,
     );
     await f.service.reconcile(payment.id, admin);
     assert.equal(f.store.read().operationsEmailNotifications?.length, 1);

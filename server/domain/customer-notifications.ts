@@ -165,6 +165,7 @@ export interface CustomerEmailProvider {
     to: string;
     subject: string;
     text: string;
+    html?: string;
     idempotencyKey: string;
   }): Promise<{ messageId: string }>;
 }
@@ -224,6 +225,11 @@ export async function dispatchCustomerNotifications(
         to: claimed.recipient,
         subject: claimed.subject,
         text: claimed.body,
+        ...(collection === "operationsEmailNotifications" &&
+        "html" in claimed &&
+        claimed.html
+          ? { html: claimed.html }
+          : {}),
         idempotencyKey: claimed.id,
       });
       store.write((s) => {

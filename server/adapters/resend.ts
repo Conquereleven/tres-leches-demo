@@ -25,6 +25,7 @@ export class ResendEmailProvider implements CustomerEmailProvider {
     to: string;
     subject: string;
     text: string;
+    html?: string;
     idempotencyKey: string;
   }) {
     const response = await this.fetcher("https://api.resend.com/emails", {
@@ -39,6 +40,7 @@ export class ResendEmailProvider implements CustomerEmailProvider {
         to: [email.to],
         subject: email.subject,
         text: email.text,
+        ...(email.html ? { html: email.html } : {}),
       }),
       signal: AbortSignal.timeout(10000),
     });
