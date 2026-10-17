@@ -1,3 +1,4 @@
+import type { PackPricingPolicy } from "../../shared/pack-pricing";
 import type { PackEligibility } from "../../shared/pack-composition";
 /**
  * Published catalog, read at runtime.
@@ -59,6 +60,7 @@ export type LiveProduct = {
   options: LiveOption[];
 };
 export type LiveCatalog = {
+  packPricing?: PackPricingPolicy | null;
   personalizedPacks?: { enabled: boolean; rules: PackEligibility };
   schemaVersion: 1;
   revision: string;

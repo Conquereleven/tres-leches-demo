@@ -1,3 +1,4 @@
+const formatAed = (n: number) => (Number.isFinite(n) ? formatPrice(n) : "—");
 import { PackBuilder, CompositionDetails, packComplete } from "./PackBuilder";
 import {
   lineKey,
@@ -64,7 +65,7 @@ import {
   Textarea,
   WhatsAppCTA,
 } from "./primitives";
-import { collections, formatAed } from "./content";
+import { collections, formatAed as formatPrice } from "./content";
 import { SiteFooter } from "./SiteChrome";
 import {
   FULFILMENT_STEPS,
@@ -79,6 +80,7 @@ import {
 import {
   cart,
   cartSubtotalFils,
+  displayLinePrice,
   MAX_QTY,
   useCart,
   useCheckoutConfig,
@@ -585,13 +587,20 @@ function OrderSummary({
                   </strong>
                   <CompositionDetails line={l} />
                   <span className="b-caption">
-                    <CustomerCopy>{formatAed(p.priceFils)}</CustomerCopy> ×{" "}
-                    {l.quantity}
+                    <CustomerCopy>
+                      {formatAed(
+                        displayLinePrice(l, p.priceFils, config.packPricing),
+                      )}
+                    </CustomerCopy>{" "}
+                    × {l.quantity}
                   </span>
                 </span>
                 <span className="b-co-money">
                   <CustomerCopy>
-                    {formatAed(p.priceFils * l.quantity)}
+                    {formatAed(
+                      displayLinePrice(l, p.priceFils, config.packPricing) *
+                        l.quantity,
+                    )}
                   </CustomerCopy>
                 </span>
               </li>
@@ -720,7 +729,19 @@ export function AddToCart({
         }}
       >
         <CustomerCopy>ADD TO CART ·</CustomerCopy>{" "}
-        <CustomerCopy>{formatAed(product.priceFils * quantity)}</CustomerCopy>
+        <CustomerCopy>
+          {formatAed(
+            displayLinePrice(
+              {
+                productId,
+                quantity,
+                composition: custom ? composition : undefined,
+              },
+              product.priceFils,
+              config?.packPricing,
+            ) * quantity,
+          )}
+        </CustomerCopy>
       </Button>
       {(added || inCart > 0) && (
         <a className="b-link" href="/cart" aria-live="polite">
@@ -807,7 +828,11 @@ function CartItems({
                 </span>
               )}
               <span className="b-caption">
-                <CustomerCopy>{formatAed(p.priceFils)}</CustomerCopy>{" "}
+                <CustomerCopy>
+                  {formatAed(
+                    displayLinePrice(l, p.priceFils, config.packPricing),
+                  )}
+                </CustomerCopy>{" "}
                 <CustomerCopy>each</CustomerCopy>
               </span>
             </div>
@@ -839,7 +864,12 @@ function CartItems({
               </button>
             </div>
             <span className="b-co-money b-co-item-total">
-              <CustomerCopy>{formatAed(p.priceFils * l.quantity)}</CustomerCopy>
+              <CustomerCopy>
+                {formatAed(
+                  displayLinePrice(l, p.priceFils, config.packPricing) *
+                    l.quantity,
+                )}
+              </CustomerCopy>
             </span>
             <button
               type="button"
@@ -878,7 +908,7 @@ export function CartPage() {
   const known = lines.filter((l) =>
     config.products.some((p) => p.id === l.productId),
   );
-  const subtotal = cartSubtotalFils(lines, config.products);
+  const subtotal = cartSubtotalFils(lines, config.products, config.packPricing);
   return (
     <ShopShell step={0} title={localize("Your cart")}>
       {lines.length === 0 ? (
@@ -1023,7 +1053,11 @@ export function CheckoutPage() {
       </ShopShell>
     );
 
-  const subtotal = cartSubtotalFils(cartLines, config.products);
+  const subtotal = cartSubtotalFils(
+    cartLines,
+    config.products,
+    config.packPricing,
+  );
   // Server-calibrated clock, Dubai rules, and this cart's own lead time.
   const earliest = earliestFulfillmentDate(
     now,

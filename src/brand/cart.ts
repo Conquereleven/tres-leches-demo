@@ -1,6 +1,11 @@
+import {
+  calculatePackPrice,
+  type PackPricingPolicy,
+} from "../../shared/pack-pricing";
 import { useLiveCatalog } from "./live-catalog";
 import {
   commerceLineSchema,
+  packSpec,
   lineKey,
   normalizeComposition,
   type CommerceLine,
@@ -153,14 +158,39 @@ export type CatalogEntry = {
   description: string | null;
 };
 /** Display subtotal from server-provided prices; lines for unknown products are ignored. */
-export function cartSubtotalFils(ls: CartLine[], products: CatalogEntry[]) {
+export function cartSubtotalFils(
+  ls: CartLine[],
+  products: CatalogEntry[],
+  policy?: PackPricingPolicy | null,
+) {
   return ls.reduce((sum, l) => {
     const p = products.find((p) => p.id === l.productId);
-    return p ? sum + p.priceFils * l.quantity : sum;
+    return p
+      ? sum + displayLinePrice(l, p.priceFils, policy) * l.quantity
+      : sum;
   }, 0);
 }
 
+export function displayLinePrice(
+  line: CartLine,
+  base: number,
+  policy?: PackPricingPolicy | null,
+) {
+  if (
+    !policy ||
+    !line.productId.startsWith("pan-de-muerto-") ||
+    !line.composition ||
+    !packSpec(line.productId)
+  )
+    return base;
+  try {
+    return calculatePackPrice(line, base, policy).unitPriceFils;
+  } catch {
+    return Number.NaN;
+  }
+}
 export type CheckoutConfig = {
+  packPricing?: PackPricingPolicy | null;
   personalizedPacks?: { enabled: boolean; rules: PackEligibility };
   enabled: boolean;
   catalogAvailable?: boolean;
@@ -218,12 +248,20 @@ export function useCheckoutConfig() {
     published.status === "live"
       ? published.catalog.personalizedPacks
       : undefined;
+  const publishedPricing =
+    published.status === "live" ? published.catalog.packPricing : undefined;
   const config = useMemo(() => {
     if (!state.config || !packSettings) return state.config;
-    const merged = { ...state.config, personalizedPacks: packSettings };
+    const merged = {
+      ...state.config,
+      personalizedPacks: packSettings,
+      ...(publishedPricing !== undefined
+        ? { packPricing: publishedPricing }
+        : {}),
+    };
     receivedAt.set(merged, receivedAt.get(state.config) ?? Date.now());
     return merged;
-  }, [state.config, packSettings]);
+  }, [state.config, packSettings, publishedPricing]);
   return { ...state, config, retry: () => setAttempt((n) => n + 1) };
 }
 

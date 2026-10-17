@@ -1,3 +1,4 @@
+import { packPricingPolicy } from "./domain/pack-pricing";
 import { packBuilderEnabled, publishedPackRules } from "./domain/packs";
 import {
   deliveryStreet,
@@ -480,6 +481,7 @@ export async function startServer(
                 dynamic: published.dynamic,
                 revision: published.revision,
               },
+              packPricing: packPricingPolicy(s.catalog ?? []),
               personalizedPacks: {
                 enabled: packBuilderEnabled(),
                 rules:

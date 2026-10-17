@@ -1,3 +1,5 @@
+import { calculatePackPrice } from "../../shared/pack-pricing";
+import { packPricingPolicy, premiumPricingEnabled } from "./pack-pricing";
 import {
   packSpec,
   normalizeComposition,
@@ -15,7 +17,12 @@ export function publishedPackRules(s: State): PackEligibility {
   return (
     validateFoundation(s.catalogFoundation, s.catalog ?? []).packEligibility ??
     []
-  );
+  ).map((r) => ({
+    ...r,
+    componentSkuIds: r.componentSkuIds.filter(
+      (id) => premiumPricingEnabled() || !id.endsWith("-chocolate-covering"),
+    ),
+  }));
 }
 export function validatePackLines(
   s: State,
@@ -78,6 +85,16 @@ export function snapshotPackLines(s: State, lines: Line[]): Line[] {
       : {
           ...line,
           composition: normalizeComposition(line.composition),
+          ...(line.productId.startsWith("pan-de-muerto-") &&
+          packPricingPolicy(s.catalog ?? [])
+            ? {
+                priceSnapshot: calculatePackPrice(
+                  line,
+                  s.catalog!.find((p) => p.id === line.productId)!.priceFils,
+                  packPricingPolicy(s.catalog ?? [])!,
+                ),
+              }
+            : {}),
           packSnapshot: {
             version: 1,
             revision: s.catalogFoundation!.revision.id,

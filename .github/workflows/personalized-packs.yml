@@ -34,12 +34,13 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - run: node --import tsx scripts/preview-kitchen-email.ts
       - run: npx playwright test --config=playwright.email.config.ts
+      - run: node --import tsx scripts/preview-pack-pricing.ts
+      - run: npx playwright test --config=playwright.premium.config.ts
       - run: mkdir -p work/e2e
       - run: npx playwright test --config=playwright.packs.config.ts
       - run: npx playwright test --config=playwright.checkout.config.ts --browser=chromium
       - run: npx playwright test --config=playwright.checkout.config.ts --browser=webkit
       - run: npx playwright test --config=playwright.product-hub.config.ts
-      - run: npx playwright test --config=playwright.operations.config.ts
       - if: failure()
         name: Synthetic browser failure context
         run: |
@@ -51,3 +52,36 @@ jobs:
           PY
       # Loopback fixtures, disposable SQLite and in-process fake provider only.
       # No secrets, remote data, deployment or provider network requests.
+  operations-browsers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, webkit]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.23.1"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: mkdir -p work/e2e
+      - run: npx playwright test --config=playwright.operations.config.ts --project=${{ matrix.browser }}
+      - if: failure()
+        name: Synthetic Operations failure context
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          for p in Path('test-results/operations').rglob('error-context.md'):
+              print(str(p))
+              print(p.read_text())
+          PY
+      # Same 92 Operations scenarios, split 46 per engine on isolated runners.
+      # No timeout increase, skipped assertions, credentials or external providers.

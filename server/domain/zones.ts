@@ -1,3 +1,4 @@
+import { liveLinePrice } from "./pack-pricing";
 import {
   type DeliveryZone,
   type Location,
@@ -316,9 +317,7 @@ export function quoteOrder(
     ),
   );
   const subtotalFils = lines.reduce(
-    (sum, l) =>
-      sum +
-      (products.find((p) => p.id === l.productId)?.priceFils ?? 0) * l.quantity,
+    (sum, l) => sum + liveLinePrice(l, products) * l.quantity,
     0,
   );
   if (fulfillmentMethod === "pickup")

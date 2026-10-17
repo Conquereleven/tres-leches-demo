@@ -25,6 +25,7 @@ import { OrdersList } from "./OrdersList";
 import { OrderDetailsPage, OrderPageHeading } from "./OrderDetails";
 import {
   orderPath,
+  orderLines,
   parseListQuery,
   parseOperationsPath,
   serializeListQuery,
@@ -773,13 +774,15 @@ function OrderPanel({
                 {l.composition && <small lang="en">{preparationText(l)}</small>}
               </span>
               <span>
-                {t(
-                  money(
-                    ((o.catalogSnapshot ?? data.catalog).find(
-                      (p) => p.id === l.productId,
-                    )?.priceFils ?? 0) * l.quantity,
-                  ),
-                )}
+                {(() => {
+                  const price =
+                    orderLines(data, o).find(
+                      (line) => lineKey(line) === lineKey(l),
+                    )?.unitFils ?? null;
+                  return price === null
+                    ? t("Review required")
+                    : t(money(price * l.quantity));
+                })()}
               </span>
               {editable && (
                 <button

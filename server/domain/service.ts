@@ -1,3 +1,4 @@
+import { acceptedPackPricesCurrent } from "./pack-pricing";
 import {
   applyWhatsAppContact,
   applyWhatsAppHistoryMedia,
@@ -767,6 +768,7 @@ export class CommerceService {
         // A late success is money received, but must never silently resurrect a cancelled/replaced order.
         if (
           o.state === "Awaiting Payment" &&
+          acceptedPackPricesCurrent(s, o) &&
           o.paymentId === p.id &&
           !s.payments.some(
             (other) =>
@@ -1112,6 +1114,7 @@ export class CommerceService {
         p.paidAt = now();
         if (
           o.state === "Awaiting Payment" &&
+          acceptedPackPricesCurrent(s, o) &&
           o.paymentId === p.id &&
           !s.payments.some(
             (other) =>
@@ -1178,6 +1181,11 @@ export class CommerceService {
       409,
     );
     const frozen = frozenCheckout(order, payment);
+    requireThat(
+      acceptedPackPricesCurrent(snapshot, order),
+      "Premium pricing changed; review required",
+      409,
+    );
     const names = customer.customer.trim().split(/\s+/);
     // Names captured separately are sent as given; only older orders are split.
     const firstName = order.customerDetails.firstName ?? names[0]!;

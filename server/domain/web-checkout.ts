@@ -1,4 +1,9 @@
 import {
+  liveLinePrice,
+  packPricingPolicy,
+  acceptedPackPricesCurrent,
+} from "./pack-pricing";
+import {
   commerceLineSchema,
   distinctLines,
   lineKey,
@@ -380,7 +385,7 @@ export function canonicalCartHash(
         sku: line.productId,
         ...(line.composition ? { composition: line.composition } : {}),
         quantity: line.quantity,
-        unitPriceFils: product.priceFils,
+        unitPriceFils: liveLinePrice(line, catalog),
       };
     })
     .sort((a, b) =>
@@ -479,7 +484,9 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
       ) =>
         JSON.stringify({
           lines: lines
-            .map(({ packSnapshot: _snapshot, ...l }) => l)
+            .map(
+              ({ packSnapshot: _snapshot, priceSnapshot: _price, ...l }) => l,
+            )
             .sort((a, b) => lineKey(a).localeCompare(lineKey(b))),
           method: method ?? "delivery",
           zoneId: zoneId ?? null,
@@ -630,6 +637,7 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
       ...(packBuilderEnabled()
         ? { packEligibility: publishedPackRules(s) }
         : {}),
+      packPricing: packPricingPolicy(s.catalog ?? []),
       lines: [...input.lines]
         .sort((a, b) => lineKey(a).localeCompare(lineKey(b)))
         .map((l) => ({
@@ -691,7 +699,18 @@ export function readWebCheckoutStatus(
   let frozen: ReturnType<typeof frozenCheckout> | undefined;
   try {
     frozen = frozenCheckout(order, payment);
+    if (
+      !["paid", "partially_refunded", "refunded", "chargeback"].includes(
+        payment.status,
+      )
+    )
+      requireThat(
+        acceptedPackPricesCurrent(s, order),
+        "Premium pricing changed; review required",
+        409,
+      );
   } catch {
+    frozen = undefined;
     /* Legacy financial status remains readable; no invented line prices. */
   }
   return {
@@ -707,7 +726,11 @@ export function readWebCheckoutStatus(
     amountFils: payment.amountFils,
     currency: payment.currency,
     actionRequired:
-      record?.supersededAt || (!frozen && payment.status !== "paid")
+      record?.supersededAt ||
+      (payment.status === "paid" &&
+        order.state === "Awaiting Payment" &&
+        !acceptedPackPricesCurrent(s, order)) ||
+      (!frozen && payment.status !== "paid")
         ? "review_payment"
         : payment.checkoutFlow === "web" &&
             !payment.url &&
