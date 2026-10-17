@@ -74,3 +74,4 @@
 - `tests/commerce/tricolor.test.ts`
 - `tests/commerce/uat-v2.test.ts`
 - `tests/tricolor-e2e/tricolor.spec.ts`
+- `tests/product-hub-e2e/product-hub.spec.ts`

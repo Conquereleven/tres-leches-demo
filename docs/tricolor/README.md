@@ -32,6 +32,8 @@ Kitchen HTML/plain text retain parent-first pricing and frozen composition. Sing
 - New focused tests: 8/8 (commercial matrix, colors, snapshots, fake paid reconciliation, historical immutability, zone minima, idempotency, and guarded migration rehearsal).
 - Chromium/WebKit Tricolor: 24 scenarios across 390/768/1440px and EN/ES/AR, plus kitchen email, paid confirmation, Operations and preview-only tickets.
 - Existing checkout: 21/21 Chromium, 21/21 WebKit.
+- Product Hub browser workflows/accessibility: 8/8 across Chromium/WebKit.
+- Baseline comparison: all 236 existing commercial rows byte-for-byte equivalent as parsed records; exactly two additions, zero edits/deletions.
 - Existing Pan premium browser regression: 24/24 across both engines.
 - Local secret heuristic: zero findings. Dependency audit: zero vulnerabilities.
 - Images in `screenshots/`; retained representative mobile/tablet/desktop evidence. Browser test regenerates every locale/width combination.
