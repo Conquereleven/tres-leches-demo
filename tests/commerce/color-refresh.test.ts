@@ -29,12 +29,44 @@ test("public colour refresh preserves geometry, typography, motion and media CSS
     assert.deepEqual(geometry(readFileSync(f, "utf8")), geometry(previous), f);
   }
 });
-test("global theme stays byte-identical; Operations changed colours only (TL-OMS-01)", () => {
+test("global theme stays byte-identical; Operations preserves geometry except approved OPS-006 mobile hardening", () => {
   assert.equal(readFileSync("src/styles.css", "utf8"), old("src/styles.css"));
-  // TL-OMS-01 moved Operations to the approved blush/gold palette. Layout,
-  // typography, spacing and motion declarations are unchanged from the baseline.
+  // Preserve the original geometry guard. OPS-006 explicitly authorizes only
+  // these touch/viewport adjustments; unrelated layout changes still fail.
   const shell = "src/commerce/operations-shell.css";
-  assert.deepEqual(geometry(readFileSync(shell, "utf8")), geometry(old(shell)));
+  let approved = old(shell);
+  const adjustments = [
+    ["  min-height: 100dvh;", "  min-height: 100vh;\n  min-height: 100dvh;"],
+    [
+      "  height: 100dvh;",
+      "  height: 100vh;\n  height: 100dvh;\n  overflow-y: auto;\n  overscroll-behavior: contain;",
+    ],
+    [
+      "  padding: 25px 16px 16px;",
+      "  padding: calc(25px + env(safe-area-inset-top, 0px)) 16px\n    calc(16px + env(safe-area-inset-bottom, 0px));",
+    ],
+    ["    min-width: 38px;", "    min-width: 44px;"],
+    [
+      "    height: 58px;\n    padding: 0 14px;",
+      "    min-height: 58px;\n    height: auto;\n    padding: env(safe-area-inset-top, 0px)\n      max(14px, env(safe-area-inset-right, 0px)) 0\n      max(14px, env(safe-area-inset-left, 0px));",
+    ],
+    [
+      "    padding: 24px 16px;",
+      "    padding: 24px max(16px, env(safe-area-inset-right, 0px))\n      max(24px, env(safe-area-inset-bottom, 0px))\n      max(16px, env(safe-area-inset-left, 0px));",
+    ],
+    [
+      ".commerce.ops-shell button {\n  min-height: 44px;\n}",
+      ".commerce.ops-shell button {\n  min-height: 44px;\n  min-width: 44px;\n}\n@media (max-width: 767px) {\n  .commerce.ops-shell input,\n  .commerce.ops-shell select,\n  .commerce.ops-shell textarea {\n    font-size: 16px;\n  }\n}",
+    ],
+  ] as const;
+  for (const [before, after] of adjustments) {
+    assert.ok(
+      approved.includes(before),
+      `Missing geometry baseline: ${before}`,
+    );
+    approved = approved.replace(before, after);
+  }
+  assert.deepEqual(geometry(readFileSync(shell, "utf8")), geometry(approved));
 });
 test("public colour literals remove legacy brown/cream UI and preserve semantic statuses", () => {
   const s = css.map((f) => readFileSync(f, "utf8")).join("\n");

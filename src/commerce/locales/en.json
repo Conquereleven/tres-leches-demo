@@ -708,5 +708,8 @@
   "Un operador respondió desde Business App; respuestas automáticas en pausa.": "An operator replied from Business App; automatic replies are paused.",
   "Pack flavor eligibility": "Pack flavor eligibility",
   "Enable only flavors confirmed for production, per box size. Changes remain private until an administrator publishes them.": "Enable only flavors confirmed for production, per box size. Changes remain private until an administrator publishes them.",
-  "Save pack eligibility draft": "Save pack eligibility draft"
+  "Save pack eligibility draft": "Save pack eligibility draft",
+  "Unable to connect. Try again.": "Unable to connect. Try again.",
+  "Request timed out. Refresh to check the latest status before retrying.": "Request timed out. Refresh to check the latest status before retrying.",
+  "Offline. Showing the last received data. Reconnect before changing orders.": "Offline. Showing the last received data. Reconnect before changing orders."
 }

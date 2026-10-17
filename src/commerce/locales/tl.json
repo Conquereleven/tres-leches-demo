@@ -708,5 +708,8 @@
   "Un operador respondió desde Business App; respuestas automáticas en pausa.": "Sumagot ang operator mula sa Business App; naka-pause ang awtomatikong sagot.",
   "Pack flavor eligibility": "Mga flavor para sa pack",
   "Enable only flavors confirmed for production, per box size. Changes remain private until an administrator publishes them.": "Paganahin lamang ang mga flavor na kumpirmado para sa produksyon, ayon sa laki ng kahon. Pribado ang mga pagbabago hanggang ilathala ng administrator.",
-  "Save pack eligibility draft": "I-save ang draft ng mga flavor para sa pack"
+  "Save pack eligibility draft": "I-save ang draft ng mga flavor para sa pack",
+  "Unable to connect. Try again.": "Hindi makakonekta. Subukan muli.",
+  "Request timed out. Refresh to check the latest status before retrying.": "Nag-time out ang request. I-refresh upang suriin ang pinakabagong status bago subukang muli.",
+  "Offline. Showing the last received data. Reconnect before changing orders.": "Offline. Ipinapakita ang huling natanggap na datos. Kumonekta muli bago baguhin ang mga order."
 }

@@ -19,7 +19,7 @@ import type {
   DeliveryZone,
   OrderState,
 } from "../../server/domain/model";
-import { api, money, type Workspace as Data } from "./api";
+import { api, ApiError, money, type Workspace as Data } from "./api";
 import { OrderCard } from "./OrdersBoard";
 import { OrdersList } from "./OrdersList";
 import { OrderDetailsPage, OrderPageHeading } from "./OrderDetails";
@@ -55,6 +55,8 @@ export function CommerceWorkspace() {
 function WorkspaceInner() {
   const { t, formatDate, setUser, language, errorText } = useOps();
   const [data, setData] = useState<Data | null>(null),
+    [sessionExpired, setSessionExpired] = useState(false),
+    [offline, setOffline] = useState(() => !navigator.onLine),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [route, setRoute] = useState(readRoute),
@@ -103,28 +105,97 @@ function WorkspaceInner() {
     setUser(data?.actor.id ?? null);
   }, [data?.actor.id, setUser]);
   const pending = useRef(new Map<string, string>());
-  const refresh = useCallback(async () => {
-    try {
-      const next = await api<Data>("workspace");
-      // Before rendering: names approved in Product Hub for staff screens and tickets.
-      setPublishedProductNames(next.productNames);
-      setData(next);
-      setError((previous) =>
-        previous.includes("Inicia sesión") ? "" : previous,
-      );
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Error de conexión");
-      if (e instanceof Error && e.message.includes("Inicia sesión"))
-        setData(null);
-    }
+  const mutationActive = useRef(false);
+  const expired = useRef(false);
+  const generation = useRef(0);
+  const reading = useRef<{
+    controller: AbortController;
+    promise: Promise<void>;
+  } | null>(null);
+  const readError = useRef("");
+  const invalidateRead = useCallback(() => {
+    generation.current++;
+    reading.current?.controller.abort();
+    reading.current = null;
+  }, []);
+  const refresh = useCallback((afterMutation = false): Promise<void> => {
+    if (
+      (!afterMutation && mutationActive.current) ||
+      !navigator.onLine ||
+      document.visibilityState === "hidden"
+    )
+      return Promise.resolve();
+    if (reading.current) return reading.current.promise;
+    const controller = new AbortController();
+    const current = ++generation.current;
+    const promise = (async () => {
+      try {
+        const next = await api<Data>("workspace", undefined, undefined, {
+          signal: controller.signal,
+        });
+        if (current !== generation.current || controller.signal.aborted) return;
+        // Before rendering: names approved in Product Hub for staff screens and tickets.
+        setPublishedProductNames(next.productNames);
+        setData(next);
+        const wasExpired = expired.current;
+        expired.current = false;
+        setSessionExpired(false);
+        // Clear recovered transport errors, never hide a rejected command.
+        const previousReadError = readError.current;
+        setError((previous) =>
+          wasExpired || previous === previousReadError ? "" : previous,
+        );
+        readError.current = "";
+      } catch (e) {
+        if (current !== generation.current || controller.signal.aborted) return;
+        if (e instanceof ApiError && e.status === 401) {
+          expired.current = true;
+          setSessionExpired(true);
+          setData(null);
+        } else {
+          readError.current =
+            e instanceof Error ? e.message : "Unable to connect. Try again.";
+          setError(readError.current);
+        }
+      } finally {
+        if (current === generation.current) reading.current = null;
+      }
+    })();
+    reading.current = { controller, promise };
+    return promise;
   }, []);
   useEffect(() => {
     void refresh();
-    const timer = setInterval(() => void refresh(), 3000);
-    return () => clearInterval(timer);
-  }, [refresh]);
+    const tick = () => {
+      if (!expired.current) void refresh();
+    };
+    const visibility = () => {
+      if (document.visibilityState === "hidden") invalidateRead();
+      else tick();
+    };
+    const connection = () => {
+      setOffline(!navigator.onLine);
+      if (navigator.onLine) tick();
+      else invalidateRead();
+    };
+    const timer = setInterval(tick, 3000);
+    window.addEventListener("online", connection);
+    window.addEventListener("offline", connection);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("online", connection);
+      window.removeEventListener("offline", connection);
+      document.removeEventListener("visibilitychange", visibility);
+      invalidateRead();
+    };
+  }, [refresh, invalidateRead]);
   const run: Run = async (body, path = "commands") => {
-    if (busy) return false;
+    // A ref closes the same-event double-tap window before React re-renders.
+    if (mutationActive.current || expired.current || !navigator.onLine)
+      return false;
+    mutationActive.current = true;
+    invalidateRead();
     setBusy(true);
     setError("");
     const signature = path + JSON.stringify(body);
@@ -133,25 +204,33 @@ function WorkspaceInner() {
     try {
       await api(path, body, key);
       pending.current.delete(signature);
-      await refresh();
+      await refresh(true);
       return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
-      await refresh();
+      if (e instanceof ApiError && e.status === 401) {
+        expired.current = true;
+        setSessionExpired(true);
+        setData(null);
+      } else await refresh(true);
       return false;
     } finally {
+      mutationActive.current = false;
       setBusy(false);
     }
   };
-  if (!data && error.includes("Inicia sesión"))
-    return <Login onLogin={refresh} />;
+  if (!data && sessionExpired) return <Login onLogin={refresh} />;
   if (!data)
     return (
       <main className="commerce ops-shell ops-auth" lang={language}>
         <h1>{t("Workspace de operaciones")}</h1>
-        {error ? (
+        {error || offline ? (
           <div role="alert">
-            {errorText(error)}
+            {offline
+              ? t(
+                  "Offline. Showing the last received data. Reconnect before changing orders.",
+                )
+              : errorText(error)}
             <button onClick={() => void refresh()}>
               {t("Reintentar conexión")}
             </button>
@@ -203,6 +282,13 @@ function WorkspaceInner() {
         ) : undefined
       }
     >
+      {offline && (
+        <p className="co-error" role="status">
+          {t(
+            "Offline. Showing the last received data. Reconnect before changing orders.",
+          )}
+        </p>
+      )}
       {data.integrationHealth?.inboundFailed ? (
         <p className="co-error" role="alert">
           {t("Hay")} {data.integrationHealth.inboundFailed}{" "}
@@ -222,7 +308,7 @@ function WorkspaceInner() {
           </button>
         </div>
       )}
-      <fieldset className="co-fieldset" disabled={busy}>
+      <fieldset className="co-fieldset" disabled={busy || offline}>
         {view === "overview" ? (
           <OperationsOverview
             data={data}
@@ -1335,20 +1421,30 @@ function Login({ onLogin }: { onLogin: () => Promise<void> }) {
   const { t, errorText } = useOps();
   const [id, setId] = useState("liza"),
     [password, setPassword] = useState(""),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    [signingIn, setSigningIn] = useState(false);
+  const submitting = useRef(false);
   return (
     <main className="commerce ops-shell ops-auth">
       <form
         className="co-zone-editor"
         onSubmit={(e) => {
           e.preventDefault();
+          if (submitting.current) return;
+          submitting.current = true;
+          setSigningIn(true);
+          setError("");
           void api("login", { id, password })
             .then(() => onLogin())
             .catch((e) =>
               setError(
                 e instanceof Error ? e.message : "No se pudo iniciar sesión",
               ),
-            );
+            )
+            .finally(() => {
+              submitting.current = false;
+              setSigningIn(false);
+            });
         }}
       >
         <h1>{t("Inicia sesión")}</h1>
@@ -1371,7 +1467,9 @@ function Login({ onLogin }: { onLogin: () => Promise<void> }) {
           />
         </label>
         {error && <p role="alert">{errorText(error)}</p>}
-        <button className="primary">{t("Entrar al workspace")}</button>
+        <button className="primary" disabled={signingIn} aria-busy={signingIn}>
+          {t("Entrar al workspace")}
+        </button>
       </form>
     </main>
   );
