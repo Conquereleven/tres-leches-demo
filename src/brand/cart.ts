@@ -21,6 +21,11 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 export type CartLine = CommerceLine;
 import { MAX_ITEM_QUANTITY } from "../../shared/commerce-policy";
+import {
+  isTricolorColor,
+  tricolorSpec,
+  type TricolorColor,
+} from "../../shared/tricolor";
 export const MAX_QTY = MAX_ITEM_QUANTITY;
 const KEY = "3l-cart";
 
@@ -58,11 +63,17 @@ if (typeof window !== "undefined")
   });
 
 export const cart = {
-  add(productId: string, quantity = 1, composition?: Composition) {
+  add(
+    productId: string,
+    quantity = 1,
+    composition?: Composition,
+    color?: TricolorColor,
+  ) {
     if (!productId || !Number.isInteger(quantity) || quantity < 1) return;
     const entry = {
       productId,
       quantity,
+      ...(color ? { color } : {}),
       ...(composition
         ? { composition: normalizeComposition(composition) }
         : {}),
@@ -109,6 +120,26 @@ export const cart = {
     const target = lines.find((l) => lineKey(l) === key);
     if (!target) return;
     const entry = { ...target, composition: normalizeComposition(composition) };
+    const existing = lines.find(
+      (l) => lineKey(l) !== key && lineKey(l) === lineKey(entry),
+    );
+    commit(
+      existing
+        ? lines
+            .filter((l) => lineKey(l) !== key)
+            .map((l) =>
+              lineKey(l) === lineKey(entry)
+                ? { ...l, quantity: l.quantity + target.quantity }
+                : l,
+            )
+        : lines.map((l) => (lineKey(l) === key ? entry : l)),
+    );
+  },
+  editColor(key: string, color: TricolorColor) {
+    if (!isTricolorColor(color)) return;
+    const target = lines.find((l) => lineKey(l) === key);
+    if (!target || tricolorSpec(target.productId)?.kind !== "single") return;
+    const entry = { ...target, color };
     const existing = lines.find(
       (l) => lineKey(l) !== key && lineKey(l) === lineKey(entry),
     );

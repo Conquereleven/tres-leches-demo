@@ -2124,6 +2124,24 @@
       "priceAed": "21.00",
       "active": true,
       "availability": "available"
+    },
+    {
+      "id": "conchas-tricolor-pack-3-mini",
+      "name": "Conchas Tricolor · Pack de 3 · 3 mini · 3 × 40 g",
+      "category": "Conchas",
+      "description": "Conchas Tricolor · Pack de 3 · 3 mini · 3 × 40 g",
+      "priceAed": "33.00",
+      "active": true,
+      "availability": "available"
+    },
+    {
+      "id": "conchas-tricolor-pack-3-individuales",
+      "name": "Conchas Tricolor · Pack de 3 · 3 individuales · 3 × 70 g",
+      "category": "Conchas",
+      "description": "Conchas Tricolor · Pack de 3 · 3 individuales · 3 × 70 g",
+      "priceAed": "39.00",
+      "active": true,
+      "availability": "available"
     }
   ]
 }

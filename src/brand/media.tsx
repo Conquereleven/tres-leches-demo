@@ -107,9 +107,14 @@ export function selectedProductMedia(
   variant: string,
   size?: string,
 ) {
+  const published = publishedProductMedia(productId, family, variant);
+  if (
+    productId === "conchas-traditional--tricolor" ||
+    productId === "conchas-tricolor-pack"
+  )
+    return published?.[0];
   return (
-    publishedProductMedia(productId, family, variant)?.[0] ??
-    authoredProductMedia(productId, family, variant, size)
+    published?.[0] ?? authoredProductMedia(productId, family, variant, size)
   );
 }
 /** Further photographs of a product: published ones when replaced, else the authored gallery. */
@@ -120,6 +125,11 @@ export function productGalleryMedia(
 ): MediaAsset[] {
   const published = publishedProductMedia(productId, family, variant);
   if (published) return published.slice(1);
+  if (
+    productId === "conchas-traditional--tricolor" ||
+    productId === "conchas-tricolor-pack"
+  )
+    return [];
   return (
     productMediaAssignments.find((p) => p.productId === productId)
       ?.gallerySourceIds ?? []

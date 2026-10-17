@@ -77,14 +77,14 @@ test("each traditional Concha retains exact approved artwork alongside the final
         "conchas-traditional",
         label,
       )?.sourceId,
-      source,
+      slug === "tricolor" ? undefined : source,
     );
   assert.equal(
     productMediaAssignments.filter(
       (p) =>
         p.productId.startsWith("conchas-traditional--") && p.primarySourceId,
     ).length,
-    4,
+    3,
   );
   for (const a of index.filter((x) => !x.productId)) {
     assert.ok(!existsSync("public/brand/approved/" + a.source));
@@ -157,6 +157,7 @@ test("all seven Conchas reuse the Pan presentation without a separate frame syst
   ];
   for (const [id, family, variant] of products) {
     const asset = selectedProductMedia(id, family!, variant!);
+    if (id === "conchas-traditional--tricolor") { assert.equal(asset, undefined); continue; }
     assert.ok(asset);
     assert.ok(usesMenuReferencePresentation(asset));
   }

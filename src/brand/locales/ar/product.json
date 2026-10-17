@@ -106,8 +106,8 @@
   "copy_47b7662907d0a0b2": "Concha تقليدية بالشوكولاتة · قطعة فردية · 70 g",
   "copy_39670f2a1e92fa66": "Conchas tradicional · فستق · صغير جداً · 40 g",
   "copy_55eef87cb4b4e940": "Conchas tradicional · فستق · قطعة فردية · 70 g",
-  "copy_53e80c29e9e66e1e": "Conchas tradicional · Tricolor · صغير جداً · 40 g",
-  "copy_000fcf7b6ce9009a": "Conchas tradicional · Tricolor · قطعة فردية · 70 g",
+  "copy_53e80c29e9e66e1e": "كونشا تريكولور · صغيرة · 40 غ",
+  "copy_000fcf7b6ce9009a": "كونشا تريكولور · فردية · 70 غ",
   "copy_c823092f9b633f3a": "Conchas rellenas · كريمة دبلوماسية (فانيليا) · صغير جداً",
   "copy_7b505dddfbe9e8c2": "Conchas rellenas · كريمة دبلوماسية (فانيليا) · قطعة فردية",
   "copy_85477d7c06d61947": "Conchas rellenas · شوكولاتة · صغير جداً",
@@ -313,5 +313,10 @@
   "copy_92849e88500a584b": "Pan de Muerto محشو · فستق · تغطية شوكولاتة · صغير جداً",
   "copy_6bbef88c89bb6181": "Pan de Muerto محشو · فستق · تغطية شوكولاتة · قطعة فردية",
   "copy_fed3156ddbfeac76": "Concha محشوة بالفستق · صغير جداً",
-  "copy_ae1f7053ff6c2e24": "Concha محشوة بالفستق · قطعة فردية"
+  "copy_ae1f7053ff6c2e24": "Concha محشوة بالفستق · قطعة فردية",
+  "copy_adf58bf1aba5a2e5": "كونشا تريكولور · عبوة من 3 قطع",
+  "copy_32c59e545448bffa": "3 صغيرة · 3 × 40 غ",
+  "copy_1a79b68647436e83": "3 فردية · 3 × 70 غ",
+  "copy_91ac66a71231c71d": "كونشا تريكولور · عبوة من 3 قطع صغيرة · 3 × 40 غ",
+  "copy_74e4e59d6fc5f1b5": "كونشا تريكولور · عبوة من 3 قطع فردية · 3 × 70 غ"
 }

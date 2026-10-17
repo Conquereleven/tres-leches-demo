@@ -1,0 +1,22 @@
+# Browser QA generates all locales and widths locally; retain representative evidence.
+*.png
+!chromium-390-es-single-0.png
+!chromium-390-es-single-1.png
+!chromium-390-es-pack-0.png
+!chromium-390-es-pack-1.png
+!chromium-390-es-cart.png
+!chromium-390-es-checkout.png
+!chromium-1440-en-single-0.png
+!chromium-1440-en-single-1.png
+!chromium-1440-en-pack-0.png
+!chromium-1440-en-pack-1.png
+!chromium-1440-en-cart.png
+!chromium-1440-en-checkout.png
+!webkit-768-ar-pack-0.png
+!webkit-768-ar-cart.png
+!webkit-768-ar-checkout.png
+!chromium-390-email.png
+!chromium-1440-email.png
+!webkit-oms.png
+!webkit-ticket.png
+!webkit-confirmation.png

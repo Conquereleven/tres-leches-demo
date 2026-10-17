@@ -1,4 +1,5 @@
 import { acceptedLinePrice } from "../../shared/pack-pricing";
+import { tricolorSpec, tricolorPreparation } from "../../shared/tricolor";
 import { packSpec, validPackSnapshot } from "../../shared/pack-composition";
 import { renderOperationsEmail } from "./operations-email-template";
 import { randomUUID } from "node:crypto";
@@ -67,10 +68,12 @@ export function recordPaidOperationsEmail(
       mapping?.en ??
       `${p?.name ?? line.productId} [translation review required]`;
     const isPack =
-      !!packSpec(line.productId) ||
-      /(?:^|-)(?:pack|bundle)(?:-|$)/.test(line.productId) ||
-      !!line.composition ||
-      !!line.packSnapshot;
+      tricolorSpec(line.productId)?.kind === "single"
+        ? false
+        : !!packSpec(line.productId) ||
+          /(?:^|-)(?:pack|bundle)(?:-|$)/.test(line.productId) ||
+          !!line.composition ||
+          !!line.packSnapshot;
     const valid =
       Number.isSafeInteger(line.quantity) &&
       line.quantity > 0 &&
@@ -83,10 +86,22 @@ export function recordPaidOperationsEmail(
         ? (acceptedLinePrice(line, p.priceFils) ?? undefined)
         : undefined,
       isPack,
+      preparation:
+        tricolorSpec(line.productId)?.kind === "single"
+          ? tricolorPreparation(line)
+          : undefined,
       // Never infer historical preparation from current catalog or approvals.
-      pack: isPack && line.composition && valid ? line.packSnapshot : undefined,
+      pack:
+        isPack &&
+        (line.composition || tricolorSpec(line.productId)?.kind === "fixed") &&
+        valid
+          ? line.packSnapshot
+          : undefined,
       review:
-        isPack && (!line.composition || !valid)
+        isPack &&
+        ((!line.composition &&
+          tricolorSpec(line.productId)?.kind !== "fixed") ||
+          !valid)
           ? "MANUAL REVIEW REQUIRED: Pack composition missing or invalid. Do not infer included flavors."
           : undefined,
     };

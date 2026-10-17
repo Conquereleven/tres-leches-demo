@@ -183,12 +183,16 @@ export function planCatalogBootstrap(
     const assignment = sources.assignments.find(
       (a) => a.productId === product.id,
     );
-    const primary =
-      availableAssets.find((a) => a.sourceId === assignment?.primarySourceId) ??
-      availableAssets.find(
-        (a) =>
-          a.family === family.id && a.variant === product.variant && !a.size,
-      );
+    const neutralTricolor = product.id === "conchas-traditional--tricolor";
+    const primary = neutralTricolor
+      ? undefined
+      : (availableAssets.find(
+          (a) => a.sourceId === assignment?.primarySourceId,
+        ) ??
+        availableAssets.find(
+          (a) =>
+            a.family === family.id && a.variant === product.variant && !a.size,
+        ));
     const media: CatalogFoundation["products"][number]["media"] = primary
       ? [assetLink(primary, "primary", 0)]
       : [];
@@ -199,7 +203,7 @@ export function planCatalogBootstrap(
       if (a) media.push(assetLink(a, "gallery", order));
       else blockers.push(`Missing gallery asset: ${product.id}`);
     }
-    if (!primary && family.image) {
+    if (!primary && family.image && !neutralTricolor) {
       const id = `asset-${catalogDigest(family.image)}`;
       const derivatives = [
         {
@@ -238,18 +242,19 @@ export function planCatalogBootstrap(
         : null;
       if (family.pack && !packQuantity)
         blockers.push(`Ambiguous pack quantity: ${o.id}`);
-      const variantAsset =
-        availableAssets.find(
-          (a) =>
-            a.sourceId === assignment?.primarySourceId &&
-            (!a.size || a.size === o.size),
-        ) ??
-        availableAssets.find(
-          (a) =>
-            a.family === family.id &&
-            a.variant === product.variant &&
-            (!a.size || a.size === o.size),
-        );
+      const variantAsset = neutralTricolor
+        ? undefined
+        : (availableAssets.find(
+            (a) =>
+              a.sourceId === assignment?.primarySourceId &&
+              (!a.size || a.size === o.size),
+          ) ??
+          availableAssets.find(
+            (a) =>
+              a.family === family.id &&
+              a.variant === product.variant &&
+              (!a.size || a.size === o.size),
+          ));
       variants.push({
         skuId: o.id,
         productId: product.id,

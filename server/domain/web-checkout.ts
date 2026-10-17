@@ -383,6 +383,7 @@ export function canonicalCartHash(
       requireThat(product?.active, "Product unavailable", 422);
       return {
         sku: line.productId,
+        ...(line.color ? { color: line.color } : {}),
         ...(line.composition ? { composition: line.composition } : {}),
         quantity: line.quantity,
         unitPriceFils: liveLinePrice(line, catalog),
@@ -391,10 +392,12 @@ export function canonicalCartHash(
     .sort((a, b) =>
       lineKey({
         productId: a.sku,
+        color: a.color,
         composition: "composition" in a ? a.composition : undefined,
       }).localeCompare(
         lineKey({
           productId: b.sku,
+          color: b.color,
           composition: "composition" in b ? b.composition : undefined,
         }),
       ),
@@ -442,6 +445,7 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
             lines: frozen.items
               .map((i) => ({
                 sku: i.sku,
+                ...(i.color ? { color: i.color } : {}),
                 ...(i.composition ? { composition: i.composition } : {}),
                 quantity: i.quantity,
                 unitPriceFils: i.unitPriceFils,
@@ -449,10 +453,12 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
               .sort((a, b) =>
                 lineKey({
                   productId: a.sku,
+                  color: a.color,
                   composition: "composition" in a ? a.composition : undefined,
                 }).localeCompare(
                   lineKey({
                     productId: b.sku,
+                    color: b.color,
                     composition: "composition" in b ? b.composition : undefined,
                   }),
                 ),
@@ -653,6 +659,7 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
 export type WebCheckoutSummary = {
   items: {
     productId: string;
+    color?: Order["lines"][number]["color"];
     composition?: Order["lines"][number]["composition"];
     packSnapshot?: Order["lines"][number]["packSnapshot"];
     name: string;
@@ -751,6 +758,8 @@ export function readWebCheckoutStatus(
       ? {
           items: frozen.items.map((i) => ({
             productId: i.sku,
+            ...(i.color ? { color: i.color } : {}),
+            ...(i.packSnapshot ? { packSnapshot: i.packSnapshot } : {}),
             ...(i.composition
               ? { composition: i.composition, packSnapshot: i.packSnapshot }
               : {}),

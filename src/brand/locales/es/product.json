@@ -106,8 +106,8 @@
   "copy_47b7662907d0a0b2": "Concha tradicional de chocolate · Individual · 70 g",
   "copy_39670f2a1e92fa66": "Conchas tradicional · Pistache · Mini · 40 g",
   "copy_55eef87cb4b4e940": "Conchas tradicional · Pistache · Individual · 70 g",
-  "copy_53e80c29e9e66e1e": "Conchas tradicional · Tricolor · Mini · 40 g",
-  "copy_000fcf7b6ce9009a": "Conchas tradicional · Tricolor · Individual · 70 g",
+  "copy_53e80c29e9e66e1e": "Concha Tricolor · Mini · 40 g",
+  "copy_000fcf7b6ce9009a": "Concha Tricolor · Individual · 70 g",
   "copy_c823092f9b633f3a": "Conchas rellenas · Crema diplomática (vainilla) · Mini",
   "copy_7b505dddfbe9e8c2": "Conchas rellenas · Crema diplomática (vainilla) · Individual",
   "copy_85477d7c06d61947": "Conchas rellenas · Chocolate · Mini",
@@ -313,5 +313,10 @@
   "copy_92849e88500a584b": "Pan de Muerto relleno · Pistache · Cobertura de chocolate · Mini",
   "copy_6bbef88c89bb6181": "Pan de Muerto relleno · Pistache · Cobertura de chocolate · Individual",
   "copy_fed3156ddbfeac76": "Concha rellena de pistache · Mini",
-  "copy_ae1f7053ff6c2e24": "Concha rellena de pistache · Individual"
+  "copy_ae1f7053ff6c2e24": "Concha rellena de pistache · Individual",
+  "copy_adf58bf1aba5a2e5": "Conchas Tricolor · Pack de 3",
+  "copy_32c59e545448bffa": "3 mini · 3 × 40 g",
+  "copy_1a79b68647436e83": "3 individuales · 3 × 70 g",
+  "copy_91ac66a71231c71d": "Conchas Tricolor · Pack de 3 · 3 mini · 3 × 40 g",
+  "copy_74e4e59d6fc5f1b5": "Conchas Tricolor · Pack de 3 · 3 individuales · 3 × 70 g"
 }

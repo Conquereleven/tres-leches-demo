@@ -125,7 +125,7 @@ test("nothing outside the official list changed price, availability or identity"
     readFileSync("data-imports/liza-current-menu.json", "utf8"),
   ).items as typeof released;
   assert.deepEqual(
-    now.map((i) => i.id),
+    now.filter((i) => !i.id.startsWith("conchas-tricolor-pack-3-")).map((i) => i.id),
     released.map((i) => i.id),
   );
   for (const before of released) {
@@ -154,7 +154,7 @@ test("nothing outside the official list changed price, availability or identity"
   }
   // Exactly six existing Concha records changed availability, not prices or identity.
   const conchas = (items: typeof released) =>
-    items.filter((i) => i.id.startsWith("conchas"));
+    items.filter((i) => i.id.startsWith("conchas") && !i.id.startsWith("conchas-tricolor-pack-3-"));
   assert.equal(conchas(now).length, 26);
   assert.deepEqual(
     conchas(now).map((item) =>

@@ -9,6 +9,7 @@ export type KitchenEmailItem = {
   isPack: boolean;
   pack?: PackSnapshot;
   review?: string;
+  preparation?: string;
 };
 export type KitchenEmail = {
   reference: string;
@@ -115,6 +116,10 @@ export function renderOperationsEmail(email: KitchenEmail) {
         : "Stored price or quantity missing/invalid — review required";
       text.push("", `${item.quantity} × ${item.name} (${item.sku}) · ${price}`);
       let preparation = "";
+      if (item.preparation) {
+        text.push(item.preparation);
+        preparation = cellText(item.preparation);
+      }
       if (item.pack) {
         const heading =
           item.quantity === 1 ? "INSIDE THIS BOX:" : "INSIDE EACH BOX:";
