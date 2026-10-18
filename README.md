@@ -1,43 +1,67 @@
-# Pastelerías 3L · Commerce OS
+# Pastelerías 3L | Commerce & Operations Platform
 
-Canonical operations live at `/operations/inbox`; the approved brand site remains at `/`. There is one operational Inbox, no MVP/demo UI and no runtime fixtures. A new database contains source-derived delivery rules and **zero products, conversations, orders or payments**.
+**Owner:** 3L Pastelerías · **Engineering repository:** CornerTech AI collaboration  
+**Audience:** incoming technical leadership, maintainers and reviewers  
+**Important:** repository code, a merged PR, a deployed build and a commercially activated feature are **four different states**. Confirm each in its authoritative release evidence.
 
-TL-25 activation instructions: [today's runbook](docs/today-activation-runbook.md). Catalog handoff: [template and validated import](docs/catalog/README.md). Commercial provenance: [data review](docs/data-review.md). Earlier TL09–TL24 notes are historical; blocked-contract/demo instructions there do not apply to this release.
+## What this system does
 
-## Local validation
+A bilingual/multilingual bakery storefront and an operational commerce backend for the UAE. The customer experience covers product discovery, cart, delivery/pickup and hosted payment checkout; internal workflows cover order intake, kitchen, fulfillment, customer conversations, catalog governance and auditability. 3L is a real client project, **not** a disposable demonstration. Historic "demo" names remain in the repository and some test fixtures.
 
-Node >=22.13, npm, writable local SQLite storage. Development starts empty and has no external send/payment success fallback.
+The architecture prioritizes immutable order/payment history, integer-minor-unit money, server-authoritative catalog prices, idempotent commands, explicit operator permissions and human approval of sensitive integrations.
 
-```sh
+## Technical map
+
+| Layer | Location / technology | Responsibility |
+| --- | --- | --- |
+| Customer web | React 19, Vite, \`src/brand/\`, \`src/main.jsx\` | Storefront, product presentation, cart and checkout UI |
+| Operations UI | \`src/commerce/\` | Inbox, order management and operational workflows |
+| Application runtime | Node.js, \`server/\` | HTTP API, checkout, domain commands, integrations, auth |
+| Shared domain contracts | \`shared/\`, TypeScript, Zod | Catalog/checkout policies, validated state transitions |
+| Transactional data | SQLite on persistent storage | Operational records, payment reconciliation, outbox, audit |
+| Integrations | Paymennt, Meta WhatsApp, Resend | Hosted checkout, messaging and notifications behind configuration gates |
+| Quality gates | \`tests/\`, Playwright, ESLint, TypeScript | Unit/integration, HTTP, browser and release verification |
+| Deployment definition | \`railway.json\` | Node service build, start and health check |
+
+Never deploy the preserved static Sites Worker as the full backend. Never infer a provider's LIVE status from the existence of integration code.
+
+## Quick start (isolated local development)
+
+Requires Node.js **>=22.13**, npm and writable disposable SQLite storage.
+
+~~~bash
 npm ci
 npm run dev
-npm run lint
 npm run typecheck
+npm run lint
 npm test
 npm run build
 npm run test:sites
 npm run test:e2e:build
-npm run audit
 npm run scan:secrets
-```
+~~~
 
-Development serves UI on 5173 and API on 3001. `npm start` serves the compiled frontend/API on 3001. Playwright uses disposable fixture databases and its own local server; never point tests at real operational data. `PLAYWRIGHT_BROWSERS_PATH` may select an existing Chromium installation.
+UI development typically serves port 5173 and the backend 3001. \`npm start\` serves the compiled Node application on the configured port. Tests must use synthetic/disposable databases, **never** Production data, provider keys or customer exports. Obtain local configuration names from [.env.example](.env.example); do not use live credentials for onboarding.
 
-## Operational boundaries
+## Current release interpretation
 
-- Strict TypeScript/Zod domain commands enforce assignment, versions, catalog eligibility, delivery rules and state transitions. Money is integer fils. Issued payments retain the commercial quote and catalog snapshot.
-- SQLite transactions persist commands, inbound receipts, outbound jobs, payment notifications and audit. This release is a single Node/SQLite operational instance with verified online backups; do not run multiple workers against a shared network filesystem.
-- Meta supports three explicit source mappings, raw HMAC verification, batched inbound text/GPS/statuses and persistent outbound processing. Replies use the original number. Unknown send outcome stops for review; outside 24h a configured approved template is required.
-- Paymennt always uses the TEST API. The Base64 HMAC verifier reads exact bytes with the registered private `hmacKey`. Allowed topics trigger durable reconciliation. Only authoritative GET matching checkout/request/order/AED/grand total can mark Paid/Confirmed. Settled payments never regress from older notifications; refunds require operator review without erasing fulfillment history.
-- Approved catalog import supports dry-run, apply and catalog-only rollback with pre-change backups. Empty/unknown products cannot generate a charge. [Catalog contract](docs/catalog/README.md).
-- Provider groups activate independently through server configuration. Secrets must never use `VITE_*` or enter static assets. `.env.example` documents required names without credential defaults. Readiness is admin/staging-only; its public health endpoint contains no provider diagnostics.
+- The repository contains code for controlled LIVE Paymennt operation; see [LIVE release contract](docs/checkout/paymennt-live-release.md). A README is not proof of which configuration is currently deployed.
+- The Tricolor singles / fixed-three-piece pack implementation was merged in PR #42. **New commercial SKUs still require separately authorized Production catalog publication.** See [Tricolor release notes](docs/tricolor/README.md).
+- The Product Hub and dynamic public catalog have explicit enablement and publication controls. Refer to [Product Hub V2](docs/product-hub/product-hub-v2.md) and [dynamic catalog](docs/product-hub/storefront-dynamic-catalog.md); do not presume a feature flag is enabled.
+- Checkout and financial records may be live customer history. No reset, bulk seed, destructive migration, simulated webhook or automatic payment/send operation is acceptable.
 
-## Release boundaries
+## Start reading
 
-Default external outbound is off. Registration is an explicit TEST-only server command that stores the one-time key privately and refuses automatic re-registration after uncertain outcomes. Production and live Paymennt remain deliberately disabled pending real provider tests and Lisa UAT. Automated fixtures never establish PILOT READY.
+1. [CTO technical onboarding and review agenda](docs/CTO_ONBOARDING.md)
+2. [Engineering and safety rules](AGENTS.md)
+3. [Order-management behavior](docs/operations/oms/README.md)
+4. [Checkout LIVE operating contract](docs/checkout/paymennt-live-release.md)
+5. [Catalog and Product Hub](docs/product-hub/product-hub-v2.md)
+6. [Tricolor implementation and release gates](docs/tricolor/README.md)
+7. [AI copilot architecture and policy](docs/ai-agents/architecture.md)
 
-The preserved Sites Worker is static-only: `dist/client`, `dist/server/index.js` and `dist/.openai/hosting.json` remain compatible, but the full operational backend is compiled Node + SQLite. Do not deploy the static Worker as Commerce OS. No push, merge or deployment is part of TL-25.
+## Contribution and safety
 
-### TL-26 AI copilot
+Use a dedicated branch and a reviewed PR. Documentation changes do not authorize merges, payments, catalog publication, provider activation, production deployment, database writes or external messaging. Keep sensitive service identifiers, customer information and environment secrets out of onboarding materials. Obtain a separate, explicit approval for every production-impacting action.
 
-The existing Inbox now supports private, grounded AI suggestions, explicit commercial-action approval, human takeover and approved bilingual knowledge. Runtime AI is disabled by default and never falls back to a mock. See [architecture](docs/ai-agents/architecture.md), [policy](docs/ai-agents/policy.md), [operator guide](docs/ai-agents/operator-guide.md) and [activation runbook](docs/ai-agents/activation-runbook.md).
+**Ownership:** technical review may be delegated; commercial approvals, customer-data access and production release authorization remain separately controlled.
