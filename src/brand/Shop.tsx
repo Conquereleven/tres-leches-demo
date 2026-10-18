@@ -7,6 +7,13 @@ import {
   type PackSnapshot,
 } from "../../shared/pack-composition";
 import { packCopy } from "../../shared/pack-copy";
+import {
+  TRICOLOR_COLORS,
+  isTricolorColor,
+  tricolorSpec,
+  tricolorCopy,
+  type TricolorColor,
+} from "../../shared/tricolor";
 import { storefrontI18n } from "./locales/engine";
 import { useLanguage as useCustomerLanguage } from "./localization";
 import { QuantityInput } from "./QuantityInput";
@@ -104,6 +111,7 @@ type Quote = {
 type Summary = {
   items: {
     productId: string;
+    color?: TricolorColor;
     composition?: Composition;
     packSnapshot?: PackSnapshot;
     name: string;
@@ -350,6 +358,8 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
         sizes="72px"
       />
     );
+  if (tricolorSpec(productId))
+    return <img className="b-co-thumb" src="/brand/icon.png" alt="" />;
   return image ? (
     <img
       className="b-co-thumb"
@@ -668,13 +678,14 @@ export function AddToCart({
   productId: string;
   fallback: ReactNode;
 }) {
-  const { text: localize } = useCustomerLanguage();
+  const { text: localize, language } = useCustomerLanguage();
 
   const { config, loading } = useCheckoutConfig();
   const lines = useCart();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [composition, setComposition] = useState<Composition>([]);
+  const [color, setColor] = useState<TricolorColor | "">("");
   const product = config?.products.find((p) => p.id === productId);
   if (loading) return <>{fallback}</>;
   if (!product) return <>{fallback}</>;
@@ -682,8 +693,36 @@ export function AddToCart({
     .filter((l) => l.productId === productId)
     .reduce((n, l) => n + l.quantity, 0);
   const custom = !!config?.personalizedPacks?.enabled && !!packSpec(productId);
+  const tricolor = tricolorSpec(productId);
   return (
     <div className="b-add-to-cart">
+      {tricolor?.kind === "single" && (
+        <label className="b-menu-selectors">
+          {tricolorCopy[language].color}
+          <select
+            required
+            value={color}
+            onChange={(e) =>
+              setColor(isTricolorColor(e.target.value) ? e.target.value : "")
+            }
+          >
+            <option value="">{tricolorCopy[language].choose}</option>
+            {TRICOLOR_COLORS.map((c) => (
+              <option key={c} value={c}>
+                {tricolorCopy[language][c]}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      {tricolor?.kind === "single" && !color && (
+        <p>{tricolorCopy[language].piece}</p>
+      )}
+      {tricolor && (tricolor.kind === "fixed" || color) && (
+        <CompositionDetails
+          line={{ productId, quantity, ...(color ? { color } : {}) }}
+        />
+      )}
       {custom && (
         <PackBuilder
           productId={productId}
@@ -720,10 +759,16 @@ export function AddToCart({
         type="button"
         disabled={
           inCart >= MAX_QTY ||
+          (tricolor?.kind === "single" && !color) ||
           (custom && !packComplete(productId, composition, config!))
         }
         onClick={() => {
-          cart.add(productId, quantity, custom ? composition : undefined);
+          cart.add(
+            productId,
+            quantity,
+            custom ? composition : undefined,
+            color || undefined,
+          );
           setAdded(true);
           setQuantity(1);
         }}
@@ -784,6 +829,29 @@ function CartPackEditor({
   );
 }
 
+function CartTricolorColor({ line }: { line: CartLine }) {
+  const { language } = useCustomerLanguage();
+  return (
+    <label className="b-menu-selectors">
+      {tricolorCopy[language].color}
+      <select
+        required
+        value={line.color ?? ""}
+        onChange={(e) => {
+          if (isTricolorColor(e.target.value))
+            cart.editColor(lineKey(line), e.target.value);
+        }}
+      >
+        <option value="">{tricolorCopy[language].choose}</option>
+        {TRICOLOR_COLORS.map((c) => (
+          <option key={c} value={c}>
+            {tricolorCopy[language][c]}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
 function CartItems({
   lines,
   config,
@@ -819,6 +887,9 @@ function CartItems({
                 <CustomerCopy>{p.name}</CustomerCopy>
               </strong>
               <CompositionDetails line={l} />
+              {tricolorSpec(l.productId)?.kind === "single" && (
+                <CartTricolorColor line={l} />
+              )}
               {config.personalizedPacks?.enabled && packSpec(l.productId) && (
                 <CartPackEditor line={l} config={config} />
               )}

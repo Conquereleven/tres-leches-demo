@@ -14,12 +14,12 @@ test("UAT V2: every active SKU belongs to exactly one stable single-flavour prod
   const catalog = JSON.parse(
     readFileSync("data-imports/liza-current-menu.json", "utf8"),
   ).items;
-  assert.equal(storefrontProducts.length, 74);
-  assert.equal(new Set(storefrontProducts.map((p) => p.id)).size, 74);
-  assert.equal(new Set(storefrontProducts.map((p) => p.slug)).size, 74);
+  assert.equal(storefrontProducts.length, 75);
+  assert.equal(new Set(storefrontProducts.map((p) => p.id)).size, 75);
+  assert.equal(new Set(storefrontProducts.map((p) => p.slug)).size, 75);
   const ids = storefrontProducts.flatMap((p) => p.optionIds);
-  assert.equal(ids.length, 216);
-  assert.equal(new Set(ids).size, 216);
+  assert.equal(ids.length, 218);
+  assert.equal(new Set(ids).size, 218);
   assert.deepEqual(
     [...ids].sort(),
     catalog

@@ -771,7 +771,9 @@ function OrderPanel({
                   product={orderProductName(o, l.productId, data.catalog)}
                   id={l.productId}
                 />
-                {l.composition && <small lang="en">{preparationText(l)}</small>}
+                {preparationText(l) && (
+                  <small lang="en">{preparationText(l)}</small>
+                )}
               </span>
               <span>
                 {(() => {

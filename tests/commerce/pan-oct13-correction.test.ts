@@ -35,7 +35,7 @@ const approved = () =>
 test("exactly ten price fields change from Production baseline; all other identities and commercial facts are identical", () => {
   assert.equal(Object.keys(PAN_OCT13_CORRECTION).length, 10);
   const before = baseline(),
-    after = approved();
+    after = approved().filter(p => !p.id.startsWith("conchas-tricolor-pack-3-"));
   assert.deepEqual(
     after.map((p) =>
       p.id in PAN_OCT13_CORRECTION

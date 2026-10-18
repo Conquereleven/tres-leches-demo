@@ -1,4 +1,9 @@
 import { calculatePackPrice } from "../../shared/pack-pricing";
+import {
+  isTricolorColor,
+  snapshotTricolor,
+  tricolorSpec,
+} from "../../shared/tricolor";
 import { packPricingPolicy, premiumPricingEnabled } from "./pack-pricing";
 import {
   packSpec,
@@ -36,6 +41,23 @@ export function validatePackLines(
   );
   const rules = enabled ? publishedPackRules(s) : [];
   for (const line of lines) {
+    const tricolor = tricolorSpec(line.productId);
+    if (tricolor) {
+      requireThat(
+        !line.composition &&
+          (tricolor.kind === "single"
+            ? isTricolorColor(line.color)
+            : line.color === undefined),
+        "Choose exactly one valid Tricolor color; fixed packs cannot be customized",
+        422,
+      );
+      continue;
+    }
+    requireThat(
+      line.color === undefined,
+      "This product does not accept a color",
+      422,
+    );
     const spec = packSpec(line.productId);
     if (!enabled) {
       requireThat(!line.composition, "Personalized packs are not enabled", 422);
@@ -80,35 +102,37 @@ export function validatePackLines(
 export function snapshotPackLines(s: State, lines: Line[]): Line[] {
   validatePackLines(s, lines);
   return lines.map((line) =>
-    !line.composition
-      ? { ...line }
-      : {
-          ...line,
-          composition: normalizeComposition(line.composition),
-          ...(line.productId.startsWith("pan-de-muerto-") &&
-          packPricingPolicy(s.catalog ?? [])
-            ? {
-                priceSnapshot: calculatePackPrice(
-                  line,
-                  s.catalog!.find((p) => p.id === line.productId)!.priceFils,
-                  packPricingPolicy(s.catalog ?? [])!,
-                ),
-              }
-            : {}),
-          packSnapshot: {
-            version: 1,
-            revision: s.catalogFoundation!.revision.id,
-            capacity: packSpec(line.productId)!.capacity,
-            components: normalizeComposition(line.composition).map((c) => ({
-              ...c,
-              name: componentName(c.componentSkuId, "en"),
-              names: {
-                en: componentName(c.componentSkuId, "en"),
-                es: componentName(c.componentSkuId, "es"),
-                ar: componentName(c.componentSkuId, "ar"),
-              },
-            })),
+    tricolorSpec(line.productId)
+      ? { ...line, packSnapshot: snapshotTricolor(line) }
+      : !line.composition
+        ? { ...line }
+        : {
+            ...line,
+            composition: normalizeComposition(line.composition),
+            ...(line.productId.startsWith("pan-de-muerto-") &&
+            packPricingPolicy(s.catalog ?? [])
+              ? {
+                  priceSnapshot: calculatePackPrice(
+                    line,
+                    s.catalog!.find((p) => p.id === line.productId)!.priceFils,
+                    packPricingPolicy(s.catalog ?? [])!,
+                  ),
+                }
+              : {}),
+            packSnapshot: {
+              version: 1,
+              revision: s.catalogFoundation!.revision.id,
+              capacity: packSpec(line.productId)!.capacity,
+              components: normalizeComposition(line.composition).map((c) => ({
+                ...c,
+                name: componentName(c.componentSkuId, "en"),
+                names: {
+                  en: componentName(c.componentSkuId, "en"),
+                  es: componentName(c.componentSkuId, "es"),
+                  ar: componentName(c.componentSkuId, "ar"),
+                },
+              })),
+            },
           },
-        },
   );
 }
