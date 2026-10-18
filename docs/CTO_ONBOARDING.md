@@ -61,6 +61,6 @@ Use the sandboxed local fixture database and **test-only payment adapters**. Do 
 
 ## 6. Access and governance
 
-Prospective CTO review should start with repository-level **read-only** permission where possible. No access to customer databases, production secrets, payment consoles or deployment write roles follows automatically. Require explicit agreement on responsibilities, confidentiality, access scope and review ownership before expanding privileges.
+**CEO-approved GitHub access for Eric:** repository collaborator access with **read and write** permissions, including the ability to create branches, commit code and open pull requests. That approval applies to this repository and does not itself authorize merging into `main`, payments, catalog publications, provider activation or production deployment. No access to customer databases, production secrets, payment consoles or deployment write roles follows automatically. All code changes must follow repository-specific review and client-data safeguards.
 
 For technical proposals, open issues or PRs scoped to 3L only. Do not migrate its production data or silently turn the client solution into a shared SaaS infrastructure.
