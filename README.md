@@ -14,14 +14,14 @@ The architecture prioritizes immutable order/payment history, integer-minor-unit
 
 | Layer | Location / technology | Responsibility |
 | --- | --- | --- |
-| Customer web | React 19, Vite, \`src/brand/\`, \`src/main.jsx\` | Storefront, product presentation, cart and checkout UI |
-| Operations UI | \`src/commerce/\` | Inbox, order management and operational workflows |
-| Application runtime | Node.js, \`server/\` | HTTP API, checkout, domain commands, integrations, auth |
-| Shared domain contracts | \`shared/\`, TypeScript, Zod | Catalog/checkout policies, validated state transitions |
+| Customer web | React 19, Vite, `src/brand/`, `src/main.jsx` | Storefront, product presentation, cart and checkout UI |
+| Operations UI | `src/commerce/` | Inbox, order management and operational workflows |
+| Application runtime | Node.js, `server/` | HTTP API, checkout, domain commands, integrations, auth |
+| Shared domain contracts | `shared/`, TypeScript, Zod | Catalog/checkout policies, validated state transitions |
 | Transactional data | SQLite on persistent storage | Operational records, payment reconciliation, outbox, audit |
 | Integrations | Paymennt, Meta WhatsApp, Resend | Hosted checkout, messaging and notifications behind configuration gates |
-| Quality gates | \`tests/\`, Playwright, ESLint, TypeScript | Unit/integration, HTTP, browser and release verification |
-| Deployment definition | \`railway.json\` | Node service build, start and health check |
+| Quality gates | `tests/`, Playwright, ESLint, TypeScript | Unit/integration, HTTP, browser and release verification |
+| Deployment definition | `railway.json` | Node service build, start and health check |
 
 Never deploy the preserved static Sites Worker as the full backend. Never infer a provider's LIVE status from the existence of integration code.
 
@@ -41,7 +41,7 @@ npm run test:e2e:build
 npm run scan:secrets
 ~~~
 
-UI development typically serves port 5173 and the backend 3001. \`npm start\` serves the compiled Node application on the configured port. Tests must use synthetic/disposable databases, **never** Production data, provider keys or customer exports. Obtain local configuration names from [.env.example](.env.example); do not use live credentials for onboarding.
+UI development typically serves port 5173 and the backend 3001. `npm start` serves the compiled Node application on the configured port. Tests must use synthetic/disposable databases, **never** Production data, provider keys or customer exports. Obtain local configuration names from [.env.example](.env.example); do not use live credentials for onboarding.
 
 ## Current release interpretation
 
