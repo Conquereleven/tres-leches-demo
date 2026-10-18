@@ -11,15 +11,15 @@ Review the surfaces separately: public storefront, catalog and checkout; interna
 
 ## 2. Architecture and trust boundaries
 
-- **Storefront:** React/Vite UI in \`src/brand/\`, with commerce interaction code under \`src/commerce/\`.
-- **Backend:** Node server and domain commands in \`server/\`; shared policy and strict types in \`shared/\`.
+- **Storefront:** React/Vite UI in `src/brand/`, with commerce interaction code under `src/commerce/`.
+- **Backend:** Node server and domain commands in `server/`; shared policy and strict types in `shared/`.
 - **Persistence:** SQLite as the operational transaction store with durable receipts, outbox and audit. Understand the single-instance/storage assumptions before proposing horizontal scaling.
 - **Prices and history:** the server owns prices, eligibility, tax/fee rules where configured, order transitions and reconciled payment state. Quotes and accepted orders retain snapshots. Money uses integer fils, not floating point AED.
 - **Paymennt:** hosted checkout and authoritative provider GET reconciliation; webhooks are evidence to reconcile, not stand-alone proof of payment. LIVE activation has a separate auditable contract.
 - **Meta / Resend / AI:** outbound calls are gated and require explicit approval/operating rules. Inspect whether a feature is enabled in the target environment, not simply in source.
 - **Catalog:** historical bundled assets, the Product Hub draft/publish model and live dynamic storefront are distinct concepts. Publishing a catalog revision is a business action.
 
-Suggested code entry points: \`src/main.jsx\`, \`src/brand/\`, \`src/commerce/\`, \`server/\`, \`shared/\`, \`tests/\`.
+Suggested code entry points: `src/main.jsx`, `src/brand/`, `src/commerce/`, `server/`, `shared/`, `tests/`.
 
 ## 3. Status and evidence ledger
 
