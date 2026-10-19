@@ -121,6 +121,8 @@ export class CommerceService {
   /** Private configuration; absent until the manager's number is supplied. */
   operationsManagerPhone?: string;
   operationsEmailRecipients: string[] = [];
+  /** Opt-in subset of Operations recipients; empty means original email for all. */
+  operationsEmailCompactRecipients: string[] = [];
   /**
    * Activation timestamp for external-only Paymennt acknowledgements.
    * When absent, no unmatched checkout can be auto-closed as external.
@@ -1139,6 +1141,7 @@ export class CommerceService {
             p,
             this.operationsEmailRecipients,
             this.operationsOrigin,
+            this.operationsEmailCompactRecipients,
           );
           recordOrderPaid(
             s,
