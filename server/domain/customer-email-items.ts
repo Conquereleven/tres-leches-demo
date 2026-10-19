@@ -10,7 +10,7 @@ import type { Order } from "./model";
 
 export type CustomerEmailItem = {
   name: string;
-  quantity: number;
+  quantity: number | null;
   /** Frozen preparation choices, with counts per box when relevant. */
   components: Array<{ name: string; units: number }>;
   boxCapacity?: number;
@@ -21,54 +21,66 @@ export type CustomerEmailItem = {
 };
 
 export function customerEmailItems(order: Order): CustomerEmailItem[] {
-  return order.lines
-    .filter((line) => Number.isSafeInteger(line.quantity) && line.quantity > 0)
-    .map((line) => {
-      // A paid order's own frozen catalog is authoritative, not the current menu.
-      const matches =
-        order.catalogSnapshot?.filter((p) => p.id === line.productId) ?? [];
-      const product =
-        matches.length === 1 && matches[0]?.name?.trim()
-          ? matches[0]
-          : undefined;
-      // Preserve exactly the accepted product identity. Do not rely on a JSON
-      // import that breaks native ESM email previews or the current catalog.
-      const name = product?.name?.trim() || "Product details unavailable";
-      const spec = tricolorSpec(line.productId);
-      const isBox =
-        spec?.kind === "fixed" ||
-        Boolean(packSpec(line.productId)) ||
-        Boolean(line.composition) ||
-        Boolean(line.packSnapshot && line.packSnapshot.capacity > 1);
-      const snapshotValid = validPackSnapshot(line);
-      const accepted = line.packSnapshot && snapshotValid ? line.packSnapshot : undefined;
-      const components = accepted?.components.map((c) => ({
-        name: c.names?.en?.trim() || c.name.trim(),
+  return order.lines.map((line) => {
+    // A paid order's own frozen catalog is authoritative, not the current menu.
+    const matches =
+      order.catalogSnapshot?.filter((p) => p.id === line.productId) ?? [];
+    const product =
+      matches.length === 1 && matches[0]?.name?.trim() ? matches[0] : undefined;
+    // Preserve exactly the accepted product identity. Do not rely on a JSON
+    // import that breaks native ESM email previews or the current catalog.
+    const name = product?.name?.trim() || "Product details unavailable";
+    const spec = tricolorSpec(line.productId);
+    const isBox =
+      spec?.kind === "single"
+        ? false
+        : spec?.kind === "fixed" ||
+          /(?:^|-)(?:pack|bundle)(?:-|$)/.test(line.productId) ||
+          Boolean(packSpec(line.productId)) ||
+          Boolean(line.composition) ||
+          Boolean(line.packSnapshot && line.packSnapshot.capacity > 1);
+    const snapshotValid = validPackSnapshot(line);
+    const accepted =
+      line.packSnapshot && snapshotValid ? line.packSnapshot : undefined;
+    const components =
+      accepted?.components.map((c) => ({
+        name:
+          (typeof c.names?.en === "string" ? c.names.en.trim() : "") ||
+          c.name.trim(),
         units: c.units,
       })) ?? [];
-      // Legacy Tricolor singles with no frozen colour have no such detail.
-      const contentsUnavailable = isBox && !accepted;
-      return {
-        name,
-        quantity: line.quantity,
-        components,
-        ...(isBox && accepted ? { boxCapacity: accepted.capacity } : {}),
-        isBox,
-        contentsUnavailable,
-      };
-    });
+    // Legacy Tricolor singles with no frozen colour have no such detail.
+    const contentsUnavailable = isBox && !accepted;
+    return {
+      name,
+      quantity:
+        Number.isSafeInteger(line.quantity) && line.quantity > 0
+          ? line.quantity
+          : null,
+      components,
+      ...(isBox && accepted ? { boxCapacity: accepted.capacity } : {}),
+      isBox,
+      contentsUnavailable,
+    };
+  });
 }
 
 export function customerEmailItemsText(items: CustomerEmailItem[]) {
-  if (!items.length) return ["ORDER SUMMARY", "Item details unavailable in this email."];
+  if (!items.length)
+    return ["ORDER SUMMARY", "Item details unavailable in this email."];
   const text = ["ORDER SUMMARY"];
   for (const item of items) {
-    text.push(`- ${item.quantity} × ${item.name}`);
+    text.push(
+      `- ${item.quantity === null ? "Quantity unavailable ·" : `${item.quantity} ×`} ${item.name}`,
+    );
     if (item.isBox && item.boxCapacity !== undefined) {
       text.push(
         `  Each box (${item.boxCapacity} pieces):`,
         ...item.components.map((c) => `    - ${c.units} × ${c.name}`),
-        `  Total: ${item.boxCapacity * item.quantity} pieces in ${item.quantity} ${item.quantity === 1 ? "box" : "boxes"}`,
+        item.quantity !== null &&
+          Number.isSafeInteger(item.boxCapacity * item.quantity)
+          ? `  Total: ${item.boxCapacity * item.quantity} pieces in ${item.quantity} ${item.quantity === 1 ? "box" : "boxes"}`
+          : "  Physical piece total unavailable — quantity needs review",
       );
     } else if (item.contentsUnavailable) {
       text.push("  Box composition unavailable in this email.");

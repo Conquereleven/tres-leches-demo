@@ -2,9 +2,11 @@
 
 ## Purpose and scope
 
-Customer-facing transactional messages now carry responsive, table-based branded HTML plus the **unchanged plain-text fallback**. The rendered HTML is frozen in the durable notification row at the same time as the customer event. No new event, payment confirmation, recipient, sender, or automatic notification was introduced.
+Customer-facing transactional messages now carry responsive, table-based branded HTML plus the a readable plain-text fallback retaining the existing status information. The rendered HTML is frozen in the durable notification row at the same time as the customer event. No new event, payment confirmation, recipient, sender, or automatic notification was introduced.
 
-Each email now includes an order reminder derived only from the accepted, frozen order lines and catalog. Products are listed by quantity and name. Valid frozen pack snapshots list components **per box**, capacities and total piece counts, including distinct mixtures for boxes with the same SKU. Where historical composition is missing or fails validation, the message clearly says that it is unavailable rather than rebuilding it from current inventory. Tricolor single-piece color is shown only when frozen and valid. Price claims are intentionally excluded from status notifications.\n\nThe three existing events are:
+Each email now includes an order reminder derived only from the accepted, frozen order lines and catalog. Products are listed by quantity and name. Valid frozen pack snapshots list components **per box**, capacities and total piece counts, including distinct mixtures for boxes with the same SKU. Where historical composition is missing or fails validation, the message clearly says that it is unavailable rather than rebuilding it from current inventory. Tricolor single-piece color is shown only when frozen and valid. Price claims are intentionally excluded from status notifications.
+
+The three existing events are:
 - `ORDER_PRODUCTION_STARTED`: order preparation, including scheduled delivery/pickup window.
 - `ORDER_READY_FOR_PICKUP`: pickup readiness with the existing verified 3L store location.
 - `ORDER_OUT_FOR_DELIVERY`: on the way, showing only the delivery **area** where available.
@@ -23,9 +25,9 @@ No customer payment-confirmation email is sent by the current application. That 
 
 ## Technical changes
 
-- `renderCustomerEmail` continues returning the exact same subject and plain-text `body`; it additionally returns `html` and appends the frozen order contents to the plain-text fallback.
+- `renderCustomerEmail` retains the subject and existing status copy; it additionally returns `html` and appends the frozen order contents to the plain-text fallback.
 - Customer notification rows gain backward-compatible optional `html`, persisted with existing idempotency/event keys.
-- Dispatcher sends `html` when present for *either* customer or internal notifications, plus the unchanged `text`. Historical rows without HTML continue sending plain text only.
+- Dispatcher sends `html` when present for *either* customer or internal notifications, plus the previously frozen `text`. Historical rows without HTML continue sending plain text only.
 - Independent recipient configurations, `CUSTOMER_EMAIL_ENABLED`, `OPERATIONS_EMAIL_ENABLED`, `OPERATIONS_EMAIL_TO`, sender identities, Resend keys and provider fail/expiry policy are unchanged.
 - Manual `scripts/send-test-email.ts` now includes the actual customer HTML plus a visible *TEST ONLY* watermark. It has no DB access, but only run it with separately authorized recipient/configuration.
 - Internal kitchen notifications, including the separate compact-email rollout for three authorized recipients, are not modified by this change.

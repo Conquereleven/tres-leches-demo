@@ -1,10 +1,16 @@
 import test from "node:test";
+import { seed } from "../../server/db/store";
 import assert from "node:assert/strict";
-import type { CustomerNotification, Order, State } from "../../server/domain/model";
+import type {
+  CustomerNotification,
+  Order,
+  State,
+} from "../../server/domain/model";
 import { PACK_SPECS } from "../../shared/pack-composition";
 import { snapshotTricolor } from "../../shared/tricolor";
 import { customerEmailItems } from "../../server/domain/customer-email-items";
 import {
+  recordCustomerEvent,
   dispatchCustomerNotifications,
   renderCustomerEmail,
 } from "../../server/domain/customer-notifications";
@@ -14,8 +20,16 @@ const fixtureOrder = (pickup: boolean, firstName = "Alex"): Order =>
     id: "TL-FAKE0001",
     publicOrderNumber: 42,
     fulfillmentMethod: pickup ? "pickup" : "delivery",
-    lines: [{ productId: "conchas-traditional-chocolate-mini-40-g", quantity: 2 }],
-    catalogSnapshot: [{ id: "conchas-traditional-chocolate-mini-40-g", name: "Chocolate concha mini", priceFils: 1800 }],
+    lines: [
+      { productId: "conchas-traditional-chocolate-mini-40-g", quantity: 2 },
+    ],
+    catalogSnapshot: [
+      {
+        id: "conchas-traditional-chocolate-mini-40-g",
+        name: "Chocolate concha mini",
+        priceFils: 1800,
+      },
+    ],
     customerDetails: {
       firstName,
       lastName: "PrivateSurname",
@@ -24,7 +38,12 @@ const fixtureOrder = (pickup: boolean, firstName = "Alex"): Order =>
     },
     delivery: pickup
       ? undefined
-      : { date: "2026-10-21", slot: "4:00 PM – 9:00 PM", address: "Private Street", building: "Private Building" },
+      : {
+          date: "2026-10-21",
+          slot: "4:00 PM – 9:00 PM",
+          address: "Private Street",
+          building: "Private Building",
+        },
     pickup: pickup
       ? { pickupDate: "2026-10-21", preferredTime: "4:00 PM – 9:00 PM" }
       : undefined,
@@ -65,42 +84,72 @@ test("all three real customer events have branded accessible HTML and unchanged 
       assert.ok(!mail.html.includes(forbidden), forbidden);
       assert.ok(!mail.body.includes(forbidden), forbidden);
     }
-    assert.ok(!/href=/i.test(mail.html), "No unapproved customer action or tracking link");
+    assert.ok(
+      !/href=/i.test(mail.html),
+      "No unapproved customer action or tracking link",
+    );
     assert.ok(!/<img/i.test(mail.html), "No unapproved or remote image assets");
   }
 });
 
 test("customer email details are event specific and private", () => {
-  const ready = renderCustomerEmail("ORDER_READY_FOR_PICKUP", fixtureOrder(true));
+  const ready = renderCustomerEmail(
+    "ORDER_READY_FOR_PICKUP",
+    fixtureOrder(true),
+  );
   assert.ok(ready.html.includes("Retail Shop C6/A"));
   assert.ok(ready.html.includes("Golositalia JLT"));
-  const delivery = renderCustomerEmail("ORDER_OUT_FOR_DELIVERY", fixtureOrder(false), {
-    zoneName: "JLT Cluster C",
-  });
+  const delivery = renderCustomerEmail(
+    "ORDER_OUT_FOR_DELIVERY",
+    fixtureOrder(false),
+    {
+      zoneName: "JLT Cluster C",
+    },
+  );
   assert.ok(delivery.html.includes("DELIVERY AREA"));
   assert.ok(delivery.html.includes("JLT Cluster C"));
   assert.ok(!delivery.html.includes("Retail Shop C6/A"));
   assert.ok(delivery.html.includes("4:00 PM"));
-  assert.ok(delivery.body.includes("Delivery: Wednesday 21 October, 4:00 PM – 9:00 PM"));
-  const preparing = renderCustomerEmail("ORDER_PRODUCTION_STARTED", fixtureOrder(false));
+  assert.ok(
+    delivery.body.includes("Delivery: Wednesday 21 October, 4:00 PM – 9:00 PM"),
+  );
+  const preparing = renderCustomerEmail(
+    "ORDER_PRODUCTION_STARTED",
+    fixtureOrder(false),
+  );
   assert.ok(preparing.html.includes("4:00 PM"));
   assert.ok(preparing.html.includes("DELIVERY"));
 });
 
 test("customer HTML escapes free-form input without polluting the text fallback", () => {
   const malicious = '<img src=x onerror="alert(1)">&';
-  const mail = renderCustomerEmail("ORDER_OUT_FOR_DELIVERY", fixtureOrder(false, malicious), {
-    zoneName: 'JLT <script>alert(1)</script> & "quote"',
-  });
-  assert.ok(mail.html.includes("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;&amp;"));
-  assert.ok(mail.html.includes("JLT &lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;quote&quot;"));
+  const mail = renderCustomerEmail(
+    "ORDER_OUT_FOR_DELIVERY",
+    fixtureOrder(false, malicious),
+    {
+      zoneName: 'JLT <script>alert(1)</script> & "quote"',
+    },
+  );
+  assert.ok(
+    mail.html.includes("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;&amp;"),
+  );
+  assert.ok(
+    mail.html.includes(
+      "JLT &lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;quote&quot;",
+    ),
+  );
   assert.ok(!mail.html.includes("<script>"));
   assert.ok(!mail.html.includes("<img"));
   assert.ok(mail.body.includes(malicious));
 });
 
 test("outbox freezes and delivers customer HTML with text fallback, including historical text-only rows", async () => {
-  const sent: Array<{ to: string; text: string; html?: string; idempotencyKey: string }> = [];
+  const sent: Array<{
+    to: string;
+    text: string;
+    html?: string;
+    idempotencyKey: string;
+  }> = [];
   const state = {
     customerNotifications: [
       {
@@ -136,7 +185,12 @@ test("outbox freezes and delivers customer HTML with text fallback, including hi
   };
   const provider = {
     name: "fixture-provider",
-    send: async (email: { to: string; text: string; html?: string; idempotencyKey: string }) => {
+    send: async (email: {
+      to: string;
+      text: string;
+      html?: string;
+      idempotencyKey: string;
+    }) => {
       sent.push(email);
       return { messageId: "no-real-send" };
     },
@@ -152,11 +206,17 @@ test("outbox freezes and delivers customer HTML with text fallback, including hi
 });
 
 test("frozen customer pack summaries repeat composition per box and keep different mixtures separate", () => {
-  const spec = PACK_SPECS.find((s) => s.packSkuId === "pan-de-muerto-traditional-pack-6-mini")!;
-  const mixA = [{ componentSkuId: spec.components[0]!.componentSkuId, units: 4 },
-    { componentSkuId: spec.components[1]!.componentSkuId, units: 2 }];
-  const mixB = [{ componentSkuId: spec.components[0]!.componentSkuId, units: 1 },
-    { componentSkuId: spec.components[1]!.componentSkuId, units: 5 }];
+  const spec = PACK_SPECS.find(
+    (s) => s.packSkuId === "pan-de-muerto-traditional-pack-6-mini",
+  )!;
+  const mixA = [
+    { componentSkuId: spec.components[0]!.componentSkuId, units: 4 },
+    { componentSkuId: spec.components[1]!.componentSkuId, units: 2 },
+  ];
+  const mixB = [
+    { componentSkuId: spec.components[0]!.componentSkuId, units: 1 },
+    { componentSkuId: spec.components[1]!.componentSkuId, units: 5 },
+  ];
   const make = (composition: typeof mixA, quantity: number) => ({
     productId: spec.packSkuId,
     quantity,
@@ -168,33 +228,57 @@ test("frozen customer pack summaries repeat composition per box and keep differe
       components: composition.map((c) => ({
         componentSkuId: c.componentSkuId,
         units: c.units,
-        name: spec.components.find((s) => s.componentSkuId === c.componentSkuId)!.names.en,
+        name: spec.components.find(
+          (s) => s.componentSkuId === c.componentSkuId,
+        )!.names.en,
       })),
     },
   });
   const order = fixtureOrder(false);
   order.lines = [make(mixA, 2), make(mixB, 1)];
-  order.catalogSnapshot = [{ id: spec.packSkuId, name: "Traditional Pan de Muerto mixed box", priceFils: 6000 }] as Order["catalogSnapshot"];
+  order.catalogSnapshot = [
+    {
+      id: spec.packSkuId,
+      name: "Traditional Pan de Muerto mixed box",
+      priceFils: 6000,
+    },
+  ] as Order["catalogSnapshot"];
   const details = customerEmailItems(order);
   assert.equal(details.length, 2);
   assert.equal(details[0]!.boxCapacity, 6);
   assert.equal(details[0]!.quantity, 2);
   assert.equal(details[1]!.quantity, 1);
-  assert.deepEqual(details[0]!.components.map((c) => c.units), [4, 2]);
-  assert.deepEqual(details[1]!.components.map((c) => c.units), [1, 5]);
+  assert.deepEqual(
+    details[0]!.components.map((c) => c.units),
+    [4, 2],
+  );
+  assert.deepEqual(
+    details[1]!.components.map((c) => c.units),
+    [1, 5],
+  );
   const mail = renderCustomerEmail("ORDER_PRODUCTION_STARTED", order);
   assert.match(mail.html, /Total: 12 pieces in 2 boxes/);
   assert.match(mail.html, /Total: 6 pieces in 1 box/);
   assert.ok(mail.body.includes("Each box (6 pieces):"));
   assert.ok(mail.body.includes("4 × Sugar"));
   assert.ok(mail.body.includes("5 × Sesame"));
-  assert.equal((mail.html.match(/Traditional Pan de Muerto mixed box/g) ?? []).length, 2);
+  assert.equal(
+    (mail.html.match(/Traditional Pan de Muerto mixed box/g) ?? []).length,
+    2,
+  );
 });
 
 test("missing or invalid historical pack composition is never fabricated from live catalog", () => {
   const order = fixtureOrder(false);
-  order.lines = [{ productId: "pan-de-muerto-traditional-pack-6-mini", quantity: 1 }];
-  order.catalogSnapshot = [{ id: "pan-de-muerto-traditional-pack-6-mini", name: "Historical mixed box" }] as Order["catalogSnapshot"];
+  order.lines = [
+    { productId: "pan-de-muerto-traditional-pack-6-mini", quantity: 1 },
+  ];
+  order.catalogSnapshot = [
+    {
+      id: "pan-de-muerto-traditional-pack-6-mini",
+      name: "Historical mixed box",
+    },
+  ] as Order["catalogSnapshot"];
   const mail = renderCustomerEmail("ORDER_OUT_FOR_DELIVERY", order);
   assert.ok(mail.html.includes("Historical mixed box"));
   assert.ok(mail.html.includes("Box composition unavailable in this email."));
@@ -210,7 +294,9 @@ test("Tricolor single preserves its frozen chosen color", () => {
     color: "green" as const,
   };
   order.lines = [{ ...line, packSnapshot: snapshotTricolor(line) }];
-  order.catalogSnapshot = [{ id: line.productId, name: "Tricolor Concha Mini" }] as Order["catalogSnapshot"];
+  order.catalogSnapshot = [
+    { id: line.productId, name: "Tricolor Concha Mini" },
+  ] as Order["catalogSnapshot"];
   const mail = renderCustomerEmail("ORDER_PRODUCTION_STARTED", order);
   assert.ok(mail.html.includes("3 × Tricolor Concha Mini"));
   assert.ok(mail.html.includes("Green · Mini · 40 g"));
@@ -218,26 +304,121 @@ test("Tricolor single preserves its frozen chosen color", () => {
 });
 
 test("escaped pack-component names cannot become email markup", () => {
-  const spec = PACK_SPECS.find((s) => s.packSkuId === "pan-de-muerto-traditional-pack-6-mini")!;
+  const spec = PACK_SPECS.find(
+    (s) => s.packSkuId === "pan-de-muerto-traditional-pack-6-mini",
+  )!;
   const composition = [
     { componentSkuId: spec.components[0]!.componentSkuId, units: 6 },
   ];
   const order = fixtureOrder(false);
-  order.lines = [{
-    productId: spec.packSkuId,
-    quantity: 1,
-    composition,
-    packSnapshot: {
-      version: 1,
-      revision: "catalog-v1-" + "b".repeat(64),
-      capacity: 6,
-      components: [{ ...composition[0]!, name: "<script>bad</script>" }],
+  order.lines = [
+    {
+      productId: spec.packSkuId,
+      quantity: 1,
+      composition,
+      packSnapshot: {
+        version: 1,
+        revision: "catalog-v1-" + "b".repeat(64),
+        capacity: 6,
+        components: [{ ...composition[0]!, name: "<script>bad</script>" }],
+      },
     },
-  }];
-  order.catalogSnapshot = [{ id: spec.packSkuId, name: '<img src=x onerror="alert(1)">' }] as Order["catalogSnapshot"];
+  ];
+  order.catalogSnapshot = [
+    { id: spec.packSkuId, name: '<img src=x onerror="alert(1)">' },
+  ] as Order["catalogSnapshot"];
   const mail = renderCustomerEmail("ORDER_OUT_FOR_DELIVERY", order);
   assert.ok(!mail.html.includes("<script>"));
   assert.ok(!mail.html.includes("<img"));
   assert.ok(mail.html.includes("&lt;script&gt;bad&lt;/script&gt;"));
-  assert.ok(mail.html.includes("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;"));
+  assert.ok(
+    mail.html.includes("&lt;img src=x onerror=&quot;alert(1)&quot;&gt;"),
+  );
+});
+
+test("legacy Conchas pack with no frozen preparation is flagged as a box, never silently treated as a single", () => {
+  const order = fixtureOrder(false);
+  order.lines = [{ productId: "conchas-filled-pack-6-mini", quantity: 2 }];
+  order.catalogSnapshot = [
+    {
+      id: order.lines[0]!.productId,
+      name: "Historical Concha box",
+      priceFils: 10000,
+    },
+  ] as Order["catalogSnapshot"];
+  const mail = renderCustomerEmail("ORDER_PRODUCTION_STARTED", order);
+  assert.ok(mail.html.includes("2 × Historical Concha box"));
+  assert.ok(mail.html.includes("Box composition unavailable in this email."));
+  assert.ok(mail.body.includes("Box composition unavailable in this email."));
+});
+test("invalid historical quantities retain the product with an explicit unavailable state instead of dropping it", () => {
+  const order = fixtureOrder(false);
+  order.lines[0]!.quantity = 0;
+  const mail = renderCustomerEmail("ORDER_PRODUCTION_STARTED", order);
+  assert.ok(mail.html.includes("Chocolate concha mini"));
+  assert.ok(mail.html.includes("Quantity unavailable"));
+  assert.ok(mail.body.includes("Quantity unavailable"));
+  assert.ok(!mail.html.includes("0 ×"));
+});
+test("customer rendering is immutable and cannot read later catalog prices or replacement product names", () => {
+  const order = fixtureOrder(false);
+  const frozen = structuredClone(order);
+  const a = renderCustomerEmail("ORDER_PRODUCTION_STARTED", order);
+  // No current-catalog argument exists. Rendering cannot mutate accepted facts.
+  assert.deepEqual(order, frozen);
+  const b = renderCustomerEmail(
+    "ORDER_PRODUCTION_STARTED",
+    structuredClone(frozen),
+  );
+  assert.equal(a.html, b.html);
+  assert.equal(a.body, b.body);
+  assert.ok(a.html.includes("2 × Chocolate concha mini"));
+  assert.ok(!a.html.includes("AED"));
+});
+
+test("new outbox HTML/text freeze accepted products and dates before later catalog publication", async () => {
+  const state = seed();
+  const order = fixtureOrder(false);
+  const original = structuredClone(order);
+  state.orders.push(order);
+  const row = recordCustomerEvent(state, order, "Confirmed", "Production")!;
+  const frozen = structuredClone(row);
+  state.catalog = [
+    {
+      id: order.lines[0]!.productId,
+      name: "REPLACEMENT CATALOG",
+      priceFils: 99999,
+      active: true,
+    },
+  ];
+  const sent: { text: string; html?: string; idempotencyKey: string }[] = [];
+  const store = {
+    read: () => state,
+    write: <T>(cb: (s: State) => T) => cb(state),
+  };
+  const provider = {
+    name: "synthetic",
+    send: async (message: {
+      text: string;
+      html?: string;
+      idempotencyKey: string;
+    }) => {
+      sent.push(message);
+      return { messageId: "fake-only" };
+    },
+  };
+  await dispatchCustomerNotifications(store, provider);
+  await dispatchCustomerNotifications(store, provider);
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0]!.html, frozen.html);
+  assert.equal(sent[0]!.text, frozen.body);
+  assert.equal(sent[0]!.idempotencyKey, frozen.id);
+  assert.ok(sent[0]!.html!.includes("2 × Chocolate concha mini"));
+  assert.ok(sent[0]!.html!.includes("Wednesday 21 October"));
+  assert.ok(!sent[0]!.html!.includes("REPLACEMENT CATALOG"));
+  assert.equal(
+    recordCustomerEvent(state, order, "Confirmed", "Production"),
+    null,
+  );
+  assert.deepEqual(order, original);
 });
