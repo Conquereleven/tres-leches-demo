@@ -158,3 +158,23 @@ test("dynamic HTML removes only marked bundled product images before hydration",
   assert.equal((result.match(/b-menu-no-photo/g) || []).length, 2);
   assert.equal(withoutBundledProductMedia(result), result);
 });
+
+test("Conchas category carousel excludes withdrawn pistachio board artwork", () => {
+  const editorial = categoryEditorialMedia("conchas");
+  assert.deepEqual(
+    editorial.map((image) => image.sourceId),
+    [
+      "3l-conchas-final-docena_de_conchas_de_chocolate_envuelta-opening-horizontal",
+      "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán-opening-horizontal",
+    ],
+  );
+  assert.ok(
+    editorial.every((image) =>
+      image.derivatives.every(
+        (derivative) =>
+          !derivative.src.includes("conchas_de_pistache_sobre_tabla_de_madera"),
+      ),
+    ),
+    "withdrawn board photo must not be a category carousel frame",
+  );
+});
