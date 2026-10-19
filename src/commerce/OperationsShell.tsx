@@ -35,7 +35,7 @@ export const operationsNavigation = [
     id: "analytics",
     label: "Analytics & Reports",
     title: "Analytics & Reports",
-    description: "Verified payments and historical product performance",
+    description: "Recorded payment captures and historical product performance",
     group: "Workspace",
     icon: ChartLine,
   },
