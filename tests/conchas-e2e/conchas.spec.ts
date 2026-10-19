@@ -326,8 +326,11 @@ for (const width of [390, 768, 1440])
     await banner.scrollIntoViewIfNeeded();
     await expect(banner.locator("picture.is-active img")).toHaveAttribute(
       "src",
-      /conchas_de_pistache_sobre_tabla_de_madera/,
+      /docena_de_conchas_de_chocolate_envuelta/,
     );
+    await expect(
+      banner.locator('img[src*="conchas_de_pistache_sobre_tabla_de_madera"]'),
+    ).toHaveCount(0);
     const bannerStyle = await banner.evaluate((el) => ({
       ratio: getComputedStyle(el).aspectRatio,
       radius: getComputedStyle(el).borderRadius,
