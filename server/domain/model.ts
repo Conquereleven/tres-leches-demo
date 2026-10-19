@@ -233,6 +233,8 @@ export type CustomerNotification = {
   recipient: string;
   subject: string;
   body: string;
+  /** Frozen responsive HTML, absent for historical text-only notifications. */
+  html?: string;
   /**
    * pending: recorded, not yet handed to a provider (also the resting state
    * while no provider is configured). sending: claimed by a dispatcher.
