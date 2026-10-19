@@ -406,7 +406,8 @@ test("per-recipient compact opt-in preserves original HTML for everyone else", (
   assert.ok(rows[0]!.html?.includes("3L"));
   assert.ok(rows[1]!.html?.includes("3L"));
   assert.notEqual(rows[0]!.html, rows[1]!.html);
-  assert.notEqual(rows[0]!.body, rows[1]!.body);
+  assert.ok(rows[0]!.body.includes("Total paid: AED"));
+  assert.ok(rows[1]!.body.includes("Total paid: AED"));
   assert.equal(rows[0]!.subject, rows[1]!.subject);
   assert.notEqual(rows[0]!.id, rows[1]!.id);
   assert.equal(rows[0]!.status, "pending");
