@@ -234,5 +234,6 @@ export function compactKitchenEmailPreview(
     f.payment,
     ["kitchen@example.invalid"],
     "https://www.3ldubai.ae",
+    ["kitchen@example.invalid"],
   )[0]!;
 }
