@@ -1,3 +1,4 @@
+import { serveAnalytics } from "./analytics/api";
 import { withoutBundledProductMedia } from "./catalog/product-media-html";
 import { packPricingPolicy } from "./domain/pack-pricing";
 import { packBuilderEnabled, publishedPackRules } from "./domain/packs";
@@ -818,6 +819,17 @@ export async function startServer(
         }
         const current = actor(req);
         // Product Hub V2: its own module; roles are enforced inside it.
+        if (
+          serveAnalytics(
+            req,
+            res,
+            path,
+            () => store.read(),
+            current,
+            runtime.environment,
+          )
+        )
+          return;
         if (await serveProductHub(req, res, path, store, current)) return;
         if (path === "/api/mcp") {
           if (process.env.MCP_ENABLED !== "true")
@@ -1130,6 +1142,7 @@ export async function startServer(
           "/checkout",
           "/checkout/return",
           "/operations/overview",
+          "/operations/analytics",
           "/operations/products",
           "/operations/print",
           "/operations/settings",

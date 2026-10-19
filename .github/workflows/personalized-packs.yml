@@ -53,6 +53,14 @@ jobs:
               print(str(p))
               print(p.read_text())
           PY
+      - if: failure()
+        name: Retain synthetic browser traces
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: packs-browser-failure-${{ github.run_attempt }}
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
       # Loopback fixtures, disposable SQLite and in-process fake provider only.
       # No secrets, remote data, deployment or provider network requests.
   operations-browsers:
