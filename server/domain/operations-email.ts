@@ -138,15 +138,18 @@ export function recordPaidOperationsEmail(
   };
   // Frozen recipient-specific formats: an unset allowlist means every
   // recipient receives the original kitchen template, never the compact one.
-  const compactSet = new Set(compactRecipients.map((to) => to.trim().toLowerCase()));
+  const compactSet = new Set(
+    compactRecipients.map((to) => to.trim().toLowerCase()),
+  );
   const oldLayout = renderLegacyOperationsEmail(content);
   const compactLayout = compactSet.size ? renderOperationsEmail(content) : null;
   const createdAt = new Date().toISOString();
   const rows: OperationsEmailNotification[] = [...new Set(recipients)].map(
     (recipient) => {
-      const message = compactSet.has(recipient.trim().toLowerCase()) && compactLayout
-        ? compactLayout
-        : oldLayout;
+      const message =
+        compactSet.has(recipient.trim().toLowerCase()) && compactLayout
+          ? compactLayout
+          : oldLayout;
       return {
         id: randomUUID(),
         event: "ORDER_PAID",

@@ -12,6 +12,10 @@ process.env.PAN_PACK_PREMIUM_PRICING_ENABLED = "true";
 const dir = "docs/pack-pricing";
 mkdirSync(dir, { recursive: true });
 const f = premiumFixture();
+// Synthetic preview opts in explicitly; real recipients remain configuration-only.
+f.service.operationsEmailCompactRecipients = [
+  ...f.service.operationsEmailRecipients,
+];
 const line = (spec: (typeof PACK_SPECS)[number], n: number, q = 1) => ({
   productId: spec.packSkuId,
   quantity: q,

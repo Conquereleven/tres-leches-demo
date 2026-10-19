@@ -1,4 +1,5 @@
 import test from "node:test";
+import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import {
   kitchenEmailFixture,
@@ -398,11 +399,18 @@ test("per-recipient compact opt-in preserves original HTML for everyone else", (
   const f = kitchenEmailFixture();
   const recipients = ["compact@example.invalid", "standard@example.invalid"];
   const rows = recordPaidOperationsEmail(
-    f.state, f.order, f.payment, recipients, "https://www.3ldubai.ae",
+    f.state,
+    f.order,
+    f.payment,
+    recipients,
+    "https://www.3ldubai.ae",
     ["COMPACT@example.invalid"],
   );
   assert.equal(rows.length, 2);
-  assert.deepEqual(rows.map((r) => r.recipient), recipients);
+  assert.deepEqual(
+    rows.map((r) => r.recipient),
+    recipients,
+  );
   assert.ok(rows[0]!.html?.includes("3L"));
   assert.ok(rows[1]!.html?.includes("3L"));
   assert.notEqual(rows[0]!.html, rows[1]!.html);
@@ -412,9 +420,17 @@ test("per-recipient compact opt-in preserves original HTML for everyone else", (
   assert.notEqual(rows[0]!.id, rows[1]!.id);
   assert.equal(rows[0]!.status, "pending");
   assert.equal(rows[1]!.status, "pending");
-  assert.equal(f.state.events[`operations-email-paid:${f.order.id}`], f.payment.id);
+  assert.equal(
+    f.state.events[`operations-email-paid:${f.order.id}`],
+    f.payment.id,
+  );
   const duplicate = recordPaidOperationsEmail(
-    f.state, f.order, f.payment, recipients, undefined, recipients
+    f.state,
+    f.order,
+    f.payment,
+    recipients,
+    undefined,
+    recipients,
   );
   assert.equal(duplicate.length, 0, "No replay when preference changes");
 });
@@ -422,12 +438,66 @@ test("per-recipient compact opt-in preserves original HTML for everyone else", (
 test("without compact allowlist every internal recipient keeps the original email", () => {
   const f = kitchenEmailFixture();
   const rows = recordPaidOperationsEmail(
-    f.state, f.order, f.payment,
-    ["a@example.invalid", "b@example.invalid"], "https://www.3ldubai.ae"
+    f.state,
+    f.order,
+    f.payment,
+    ["a@example.invalid", "b@example.invalid"],
+    "https://www.3ldubai.ae",
   );
   assert.equal(rows.length, 2);
   assert.equal(rows[0]!.html, rows[1]!.html);
   assert.equal(rows[0]!.body, rows[1]!.body);
   const sample = kitchenEmailPreview();
   assert.notEqual(rows[0]!.html, sample.html);
+});
+
+test("unselected recipient HTML is byte-identical to the original frozen renderer control", () => {
+  const f = compactKitchenEmailFixture();
+  const row = recordPaidOperationsEmail(
+    f.state,
+    f.order,
+    f.payment,
+    ["standard@example.invalid"],
+    "https://www.3ldubai.ae",
+  )[0]!;
+  assert.equal(
+    row.html,
+    readFileSync("docs/email/previews/compact-before.html", "utf8"),
+  );
+});
+test("three synthetic opt-ins cannot change the format or destination of any other recipient", () => {
+  const f = kitchenEmailFixture();
+  const compact = [
+    "first@example.invalid",
+    "second@example.invalid",
+    "third@example.invalid",
+  ];
+  const recipients = [...compact, "standard@example.invalid"];
+  const rows = recordPaidOperationsEmail(
+    f.state,
+    f.order,
+    f.payment,
+    recipients,
+    "https://www.3ldubai.ae",
+    compact,
+  );
+  assert.equal(rows.length, 4);
+  assert.deepEqual(
+    rows.map((row) => row.recipient),
+    recipients,
+  );
+  assert.ok(rows.slice(0, 3).every((row) => row.html === rows[0]!.html));
+  assert.notEqual(rows[3]!.html, rows[0]!.html);
+  assert.match(rows[3]!.html!, /3L · KITCHEN ORDER · PAID/);
+  assert.equal(
+    recordPaidOperationsEmail(
+      f.state,
+      f.order,
+      f.payment,
+      recipients,
+      undefined,
+      recipients,
+    ).length,
+    0,
+  );
 });

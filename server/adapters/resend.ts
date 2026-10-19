@@ -79,16 +79,25 @@ export function operationsEmailConfig(env: NodeJS.ProcessEnv) {
           .filter(Boolean),
       ),
     ]);
-  const compactRecipients = z.array(z.email()).max(20).parse([
-    ...new Set(
-      (env.OPERATIONS_EMAIL_COMPACT_TO ?? "")
-        .split(",")
-        .map((v) => v.trim())
-        .filter(Boolean),
-    ),
-  ]);
-  if (compactRecipients.some((to) => !recipients.some((r) => r.toLowerCase() === to.toLowerCase())))
-    throw new Error("Compact kitchen email recipients must belong to OPERATIONS_EMAIL_TO");
+  const compactRecipients = z
+    .array(z.email())
+    .max(20)
+    .parse([
+      ...new Set(
+        (env.OPERATIONS_EMAIL_COMPACT_TO ?? "")
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean),
+      ),
+    ]);
+  if (
+    compactRecipients.some(
+      (to) => !recipients.some((r) => r.toLowerCase() === to.toLowerCase()),
+    )
+  )
+    throw new Error(
+      "Compact kitchen email recipients must belong to OPERATIONS_EMAIL_TO",
+    );
   const from = env.OPERATIONS_EMAIL_FROM || env.CUSTOMER_EMAIL_FROM;
   if (!env.RESEND_API_KEY || !from)
     throw new Error(
