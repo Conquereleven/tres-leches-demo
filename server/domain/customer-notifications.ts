@@ -11,6 +11,7 @@
  */
 import { randomUUID } from "node:crypto";
 import { renderCustomerEmailHtml } from "./customer-email-html";
+import { customerEmailItems, customerEmailItemsText } from "./customer-email-items";
 import { orderReference } from "../../shared/order-number";
 import { PICKUP_LOCATION } from "../../shared/pickup-location";
 import { customerName } from "./order-number";
@@ -66,6 +67,8 @@ export function renderCustomerEmail(
     .filter(Boolean)
     .join(", ");
   const sign = ["", PICKUP_LOCATION.name];
+  const items = customerEmailItems(order);
+  const reminder = ["", ...customerEmailItemsText(items)];
   const html = renderCustomerEmailHtml({
     event,
     first,
@@ -73,6 +76,7 @@ export function renderCustomerEmail(
     when,
     pickup,
     zoneName: context.zoneName,
+    items,
   });
   if (event === "ORDER_PRODUCTION_STARTED")
     return {
@@ -83,6 +87,8 @@ export function renderCustomerEmail(
         "",
         `Good news — your 3L order ${reference} is now being prepared by our team.`,
         ...(when ? ["", `${pickup ? "Pickup" : "Delivery"}: ${when}`] : []),
+        "",
+        ...reminder,
         "",
         "We'll let you know as soon as it's ready.",
         ...sign,
@@ -101,6 +107,8 @@ export function renderCustomerEmail(
         PICKUP_LOCATION.name,
         ...PICKUP_LOCATION.lines,
         "",
+        ...reminder,
+        "",
         "See you soon.",
         ...sign,
       ].join("\n"),
@@ -114,6 +122,9 @@ export function renderCustomerEmail(
       `Your 3L order ${reference} is on the way.`,
       // Area only: a full address does not belong in an email.
       ...(context.zoneName ? ["", `Delivering to: ${context.zoneName}`] : []),
+      "",
+      ...(when ? ["", `${pickup ? "Pickup" : "Delivery"}: ${when}`] : []),
+      ...reminder,
       "",
       "We'll update you once your order has been delivered.",
       ...sign,
