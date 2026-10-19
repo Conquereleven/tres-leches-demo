@@ -113,7 +113,7 @@ export function AnalyticsWorkspace() {
           <strong>{t("Captured payments, not net sales")}</strong>
           <p>
             {t(
-              "Read-only reports from verified payment records and accepted order snapshots. Refund amounts, profit and conversion are unavailable.",
+              "Read-only reports based on stored payment evidence and accepted order snapshots. Refund amounts, profit and conversion are unavailable.",
             )}
           </p>
           <p>
@@ -174,7 +174,7 @@ export function AnalyticsWorkspace() {
         </button>
         <small>{t("Asia/Dubai · up to 366 days")}</small>
       </form>
-      {busy && <p role="status">{t("Loading verified reports…")}</p>}
+      {busy && <p role="status">{t("Loading financial reports…")}</p>}
       {error && (
         <div role="alert" className="an-warning">
           {t(error)}{" "}
@@ -244,7 +244,7 @@ export function AnalyticsWorkspace() {
           {!report.current.paidOrders && (
             <div className="an-empty">
               <Receipt size={32} />
-              <h2>{t("No verified paid orders in this period")}</h2>
+              <h2>{t("No eligible paid orders in this period")}</h2>
               <p>
                 {t(
                   "Try a different date range. Unconfirmed attempts never count as captured payments.",
