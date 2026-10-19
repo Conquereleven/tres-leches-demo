@@ -1,3 +1,5 @@
+import { Login } from "./Login";
+import { AnalyticsWorkspace } from "./Analytics";
 import { lineKey, preparationText } from "../../shared/pack-composition";
 import {
   orderProductName,
@@ -48,7 +50,11 @@ function readRoute() {
 export function CommerceWorkspace() {
   return (
     <OpsProvider>
-      <WorkspaceInner />
+      {location.pathname === "/operations/analytics" ? (
+        <AnalyticsWorkspace />
+      ) : (
+        <WorkspaceInner />
+      )}
     </OpsProvider>
   );
 }
@@ -185,7 +191,11 @@ function WorkspaceInner() {
       data={data}
       view={view}
       busy={busy}
-      onNavigate={(id) => go(`/operations/${id}`)}
+      onNavigate={(id) =>
+        id === "analytics"
+          ? location.assign("/operations/analytics")
+          : go(`/operations/${id}`)
+      }
       onRefresh={() => void refresh()}
       onLogout={() => void run({}, "logout")}
       heading={
@@ -226,7 +236,11 @@ function WorkspaceInner() {
         {view === "overview" ? (
           <OperationsOverview
             data={data}
-            onNavigate={(id) => go(`/operations/${id}`)}
+            onNavigate={(id) =>
+              id === "analytics"
+                ? location.assign("/operations/analytics")
+                : go(`/operations/${id}`)
+            }
           />
         ) : view === "products" ? (
           <ProductHub actor={data.actor} />
@@ -1330,52 +1344,6 @@ function ZoneEditor({
         </button>
       </fieldset>
     </form>
-  );
-}
-
-function Login({ onLogin }: { onLogin: () => Promise<void> }) {
-  const { t, errorText } = useOps();
-  const [id, setId] = useState("liza"),
-    [password, setPassword] = useState(""),
-    [error, setError] = useState("");
-  return (
-    <main className="commerce ops-shell ops-auth">
-      <form
-        className="co-zone-editor"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void api("login", { id, password })
-            .then(() => onLogin())
-            .catch((e) =>
-              setError(
-                e instanceof Error ? e.message : "No se pudo iniciar sesión",
-              ),
-            );
-        }}
-      >
-        <h1>{t("Inicia sesión")}</h1>
-        <label>
-          {t("Agente")}
-          <input
-            value={id}
-            onChange={(e) => setId(e.target.value)}
-            autoComplete="username"
-            required
-          />
-        </label>
-        <label>
-          {t("Contraseña")}
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
-        {error && <p role="alert">{errorText(error)}</p>}
-        <button className="primary">{t("Entrar al workspace")}</button>
-      </form>
-    </main>
   );
 }
 
