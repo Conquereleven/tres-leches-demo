@@ -7,7 +7,6 @@
 import { packSpec, validPackSnapshot } from "../../shared/pack-composition";
 import { tricolorSpec } from "../../shared/tricolor";
 import type { Order } from "./model";
-import names from "../../src/commerce/ops-product-names.json";
 
 export type CustomerEmailItem = {
   name: string;
@@ -22,7 +21,6 @@ export type CustomerEmailItem = {
 };
 
 export function customerEmailItems(order: Order): CustomerEmailItem[] {
-  const dictionary = names as Record<string, { source: string; en: string }>;
   return order.lines
     .filter((line) => Number.isSafeInteger(line.quantity) && line.quantity > 0)
     .map((line) => {
@@ -33,13 +31,9 @@ export function customerEmailItems(order: Order): CustomerEmailItem[] {
         matches.length === 1 && matches[0]?.name?.trim()
           ? matches[0]
           : undefined;
-      const translation = Object.hasOwn(dictionary, line.productId)
-        ? dictionary[line.productId]
-        : undefined;
-      const name =
-        product && translation && [translation.source, translation.en].includes(product.name)
-          ? translation.en
-          : product?.name?.trim() || "Product details unavailable";
+      // Preserve exactly the accepted product identity. Do not rely on a JSON
+      // import that breaks native ESM email previews or the current catalog.
+      const name = product?.name?.trim() || "Product details unavailable";
       const spec = tricolorSpec(line.productId);
       const isBox =
         spec?.kind === "fixed" ||
