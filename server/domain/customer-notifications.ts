@@ -10,6 +10,7 @@
  * nothing and rows stay visibly pending — nothing is reported as sent.
  */
 import { randomUUID } from "node:crypto";
+import { renderCustomerEmailHtml } from "./customer-email-html";
 import { orderReference } from "../../shared/order-number";
 import { PICKUP_LOCATION } from "../../shared/pickup-location";
 import { customerName } from "./order-number";
@@ -65,9 +66,18 @@ export function renderCustomerEmail(
     .filter(Boolean)
     .join(", ");
   const sign = ["", PICKUP_LOCATION.name];
+  const html = renderCustomerEmailHtml({
+    event,
+    first,
+    reference,
+    when,
+    pickup,
+    zoneName: context.zoneName,
+  });
   if (event === "ORDER_PRODUCTION_STARTED")
     return {
       subject: `Your 3L order ${reference} is now being prepared`,
+      html,
       body: [
         `Hi ${first},`,
         "",
@@ -81,6 +91,7 @@ export function renderCustomerEmail(
   if (event === "ORDER_READY_FOR_PICKUP")
     return {
       subject: `Your 3L order ${reference} is ready for pickup`,
+      html,
       body: [
         `Hi ${first},`,
         "",
@@ -96,6 +107,7 @@ export function renderCustomerEmail(
     };
   return {
     subject: `Your 3L order ${reference} is on the way`,
+    html,
     body: [
       `Hi ${first},`,
       "",
@@ -225,11 +237,7 @@ export async function dispatchCustomerNotifications(
         to: claimed.recipient,
         subject: claimed.subject,
         text: claimed.body,
-        ...(collection === "operationsEmailNotifications" &&
-        "html" in claimed &&
-        claimed.html
-          ? { html: claimed.html }
-          : {}),
+        ...(claimed.html ? { html: claimed.html } : {}),
         idempotencyKey: claimed.id,
       });
       store.write((s) => {
