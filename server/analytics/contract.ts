@@ -61,6 +61,10 @@ export type AnalyticsReport = {
   previous: PeriodReport;
   changePercent: number | null;
   issues: Record<string, number>;
-  quality: "reliable" | "partial";
+  /** Financial consistency only; never evidence of a payment's LIVE origin. */
+  qualityScope: "financial_consistency";
+  quality: "internally_consistent" | "partial";
+  /** The current historical model stores no explicit environment provenance. */
+  provenance: "unverified";
   limitations: string[];
 };

@@ -144,10 +144,12 @@ export function calculateReport(
         100
       : null,
     issues: facts.issues,
+    qualityScope: "financial_consistency",
+    provenance: "unverified",
     quality:
       Object.values(facts.issues).some(Boolean) || current.unallocatedOrders > 0
         ? "partial"
-        : "reliable",
+        : "internally_consistent",
     limitations: [
       "Captured volume is not net sales, settlement or profit.",
       "Refund and dispute amounts, conversion, repeat customers and preparation duration are unavailable.",
@@ -168,7 +170,8 @@ export function reportCsv(
   };
   const quality = [
     report.quality,
-    "Gross confirmed captures, not net sales. Product allocations exclude inconsistent snapshots; see Analytics data-quality warnings.",
+    report.provenance,
+    "Gross confirmed captures, not net sales. Financial consistency does not independently certify LIVE origin; historical LIVE/TEST provenance is unverified. Product allocations exclude inconsistent snapshots.",
   ];
   const rows: unknown[][] =
     kind === "sales"
@@ -177,7 +180,8 @@ export function reportCsv(
             "Dubai date",
             "Paid orders",
             "Captured AED fils",
-            "Data quality",
+            "Financial consistency",
+            "LIVE/TEST provenance",
             "Scope note",
           ],
           ...report.current.daily.map((d) => [
@@ -194,7 +198,8 @@ export function reportCsv(
             "Historical category",
             "Purchased units / boxes",
             "Allocated AED fils",
-            "Data quality",
+            "Financial consistency",
+            "LIVE/TEST provenance",
             "Scope note",
           ],
           ...report.current.products.map((p) => [

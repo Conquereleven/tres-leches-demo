@@ -77,6 +77,15 @@ test("real SQLite/API: auth, RBAC, aggregate privacy, bounded dates, CSV parity 
           assert.equal(res.headers.get("cache-control"), "no-store");
           if (allowed) {
             const text = await res.text();
+            if (p !== "session" && !p.startsWith("export")) {
+              const body = JSON.parse(text);
+              assert.equal(body.qualityScope, "financial_consistency");
+              assert.equal(body.provenance, "unverified");
+              assert.ok(
+                ["internally_consistent", "partial"].includes(body.quality),
+              );
+            }
+
             assert.doesNotMatch(
               text,
               /PRIVATE_CUSTOMER|private-fixture|customerDetails|fictional-checkout|providerReference|conversationId|payment-fictional/,

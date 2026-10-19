@@ -78,6 +78,8 @@ export function serveAnalytics(
       range: report.range,
       daily: report.current.daily,
       quality: report.quality,
+      qualityScope: report.qualityScope,
+      provenance: report.provenance,
       issues: report.issues,
     });
   if (path.endsWith("/products"))
@@ -87,6 +89,8 @@ export function serveAnalytics(
       unallocatedOrders: report.current.unallocatedOrders,
       unallocatedFils: report.current.unallocatedFils,
       quality: report.quality,
+      qualityScope: report.qualityScope,
+      provenance: report.provenance,
     });
   if (path.endsWith("/operations"))
     return json({
@@ -95,6 +99,9 @@ export function serveAnalytics(
       fulfillment: report.current.fulfillment,
       attempts: report.current.attempts,
       adjustments: report.current.adjustments,
+      quality: report.quality,
+      qualityScope: report.qualityScope,
+      provenance: report.provenance,
     });
   return json(report);
 }

@@ -21,3 +21,9 @@ Refund/dispute counts are current statuses within the original paid-date cohort,
 4. Rollback code to previous healthy commit; no DB restore and no data rewrite. Reports are computed on demand, so rollback loses no orders or financial facts. Never undo commercial publications or restore SQLite to reverse an analytics UI release.
 
 No merge, deployment or Production operation is authorized in this sprint.
+
+## Remaining final review gates
+
+Technical consistency is not provenance: the API’s `internally_consistent` status has scope `financial_consistency` and always carries historical `provenance=unverified`. Neither a Production runtime nor a LIVE-looking URL upgrades that status. The dashboard and exports explicitly disclose this. Native review is still needed for the two new EN/TL statements and earlier Tagalog reporting labels. Unknown historical SKU definitions retain their original identification with the existing translation-review warning; historical category names remain as stored. Founder-approved exact-definition translations are a separate presentation approval, never a historical financial rewrite.
+
+Founder decisions: approve the revised financial/provenance wording; accept the disclosed limitations for operational reporting or require additional independent evidence; authorize the precise read-only reconciliation scope described in [the plan](production-reconciliation-plan.md); separately authorize merge and deployment after reconciliation. No business decision converts unknown provenance into LIVE evidence. No price, refund, payment-state or catalog decision is required to implement this review fix.

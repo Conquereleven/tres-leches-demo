@@ -116,6 +116,11 @@ export function AnalyticsWorkspace() {
               "Read-only reports from verified payment records and accepted order snapshots. Refund amounts, profit and conversion are unavailable.",
             )}
           </p>
+          <p>
+            {t(
+              "Historical LIVE/TEST provenance is unverified. This report is not independently LIVE-certified.",
+            )}
+          </p>
         </div>
       </div>
       <form
@@ -187,7 +192,7 @@ export function AnalyticsWorkspace() {
               {t(
                 report.quality === "partial"
                   ? "Partial data · review warnings"
-                  : "Verified source records",
+                  : "Internally consistent financial records",
               )}{" "}
               · {t("Updated")} {formatDate(report.generatedAt)}
             </span>

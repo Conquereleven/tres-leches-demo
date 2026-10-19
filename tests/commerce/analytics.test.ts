@@ -314,3 +314,36 @@ test("same SKU with changed historical definition remains separate; previous per
   assert.equal(r.changePercent, 100);
   assert.equal(r.previous.capturedFils, 5000);
 });
+
+test("internally consistent captures never imply independently certified LIVE provenance", () => {
+  const { s, payment } = fixture();
+  payment.url = "https://pay.paymennt.com/hosted/pay?checkoutKey=fictional";
+  const r = report(s);
+  assert.equal(r.current.capturedFils, 7000);
+  assert.equal(r.quality, "internally_consistent");
+  assert.equal(r.qualityScope, "financial_consistency");
+  assert.equal(r.provenance, "unverified");
+  assert.doesNotMatch(JSON.stringify(r), /"reliable"|live_certified/);
+});
+test("partial and empty financial reports retain explicit unverified provenance", () => {
+  const { s, order } = fixture();
+  delete order.catalogSnapshot;
+  const partial = report(s);
+  assert.equal(partial.quality, "partial");
+  assert.equal(partial.provenance, "unverified");
+  assert.equal(partial.current.unallocatedFils, 7000);
+  const empty = report(seed());
+  assert.equal(empty.quality, "internally_consistent");
+  assert.equal(empty.current.paidOrders, 0);
+  assert.equal(empty.provenance, "unverified");
+});
+test("both CSV exports distinguish financial consistency from historical provenance", () => {
+  const { s } = fixture();
+  for (const kind of ["sales", "products"] as const) {
+    const csv = reportCsv(report(s), kind);
+    assert.match(csv, /"Financial consistency","LIVE\/TEST provenance"/);
+    assert.match(csv, /"internally_consistent","unverified"/);
+    assert.match(csv, /not independently certify LIVE origin/);
+    assert.match(csv, /not net sales/);
+  }
+});

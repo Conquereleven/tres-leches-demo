@@ -724,7 +724,6 @@
   "Loading verified reports…": "Loading verified reports…",
   "Retry": "Retry",
   "Partial data · review warnings": "Partial data · review warnings",
-  "Verified source records": "Verified source records",
   "Updated": "Updated",
   "Confirmed captured volume": "Confirmed captured volume",
   "Paid orders": "Paid orders",
@@ -783,5 +782,7 @@
   "delivery": "delivery",
   "Daily report table": "Daily report table",
   "Product report table": "Product report table",
-  "adjustment_amount_unavailable": "Refund/dispute amounts unavailable"
+  "adjustment_amount_unavailable": "Refund/dispute amounts unavailable",
+  "Internally consistent financial records": "Internally consistent financial records",
+  "Historical LIVE/TEST provenance is unverified. This report is not independently LIVE-certified.": "Historical LIVE/TEST provenance is unverified. This report is not independently LIVE-certified."
 }

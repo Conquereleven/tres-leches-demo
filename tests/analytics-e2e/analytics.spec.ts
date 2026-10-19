@@ -68,6 +68,22 @@ for (const width of [320, 375, 390, 430, 768, 1440])
       await expect(
         page.locator(".an-kpis article").nth(1).locator("strong"),
       ).toHaveText("18");
+      await expect(
+        page.getByText(tr("Internally consistent financial records"), {
+          exact: false,
+        }),
+      ).toBeVisible();
+      await expect(
+        page.getByText(
+          tr(
+            "Historical LIVE/TEST provenance is unverified. This report is not independently LIVE-certified.",
+          ),
+          { exact: true },
+        ),
+      ).toBeVisible();
+      await expect(
+        page.getByText("Verified source records", { exact: true }),
+      ).toHaveCount(0);
       await expect(page.locator(".ops-shell")).toHaveAttribute(
         "lang",
         language,

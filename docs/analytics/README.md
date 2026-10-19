@@ -22,7 +22,7 @@ These are entirely fictional fixtures on a local TEST server. They do not repres
 ## Local QA
 
 - `npm run typecheck`, `npm run lint`, `npm run build`: pass. Existing Vite bundle-size and pending business-information notices remain; no new dependencies.
-- `npm test`: **681/681** commerce/domain/HTTP/integration tests pass, including 14 new analytics tests. Existing catalog, premium-pack, Tricolor, immutable order and notification regressions remain in the suite.
+- `npm test`: **684/684** commerce/domain/HTTP/integration tests pass, including 17 analytics tests. Existing catalog, premium-pack, Tricolor, immutable order and notification regressions remain in the suite.
 - Browser login runs through ephemeral localhost TLS, preserving Production `Secure` cookie policy. Initial Linux WebKit CI exposed an HTTP-only fixture mismatch; the fixture now uses HTTPS, without weakening application security or tests.
 - Analytics unit/HTTP tests: accepted historical prices, fees, multiple lines, boxes vs components, premium/Tricolor preparation, missing/inconsistent snapshots, refunds/partial refunds/chargebacks with unavailable amounts, pending/authorized/failed/cancelled, duplicates and ambiguous captures, Dubai midnight, malformed dates, period comparison/zero baseline, safe integer overflow, formula-safe CSV, privacy, real cookie RBAC and SQLite byte equality.
 - Large synthetic ledger: **12,000** orders/payments with deterministic totals, tested against a 5-second ceiling (local execution around 0.1 seconds). No Production performance claim.
@@ -39,3 +39,7 @@ These are entirely fictional fixtures on a local TEST server. They do not repres
 GO for code review, conditional on final CI checks. No Production merge/deploy is included. Review the dictionary and unavailable financial metrics before operational adoption. A separately authorized live reconciliation sample should precede financial reliance. Native review of new Tagalog labels remains advisable.
 
 No commercial catalog, price, payment flow, provider configuration, customer/order/history, Production SQLite, Railway, email or WhatsApp change. No schema migration, tracking, event instrumentation, AI conclusions or dependency added. Rollback is code-only, never restoring the business database.
+
+## Final review follow-up
+
+Financial consistency and historical provenance are now separate API/CSV dimensions. `internally_consistent` replaces `reliable`; no UI badge says “Verified source records”. The unverified LIVE/TEST warning is always visible, including clean and empty reports. Targeted regressions cover these states and all aggregate API projections. [Production reconciliation plan and exact authorization gates](production-reconciliation-plan.md) — prepared only, not executed. New EN/TL wording and existing historical-name/category translation warnings require operational review. No authorization can substitute for missing historical provenance evidence.
