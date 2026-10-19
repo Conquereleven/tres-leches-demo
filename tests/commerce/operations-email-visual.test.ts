@@ -19,6 +19,7 @@ function record(f = kitchenEmailFixture(), origin = "https://www.3ldubai.ae") {
     f.payment,
     ["kitchen@example.invalid"],
     origin,
+    ["kitchen@example.invalid"],
   )[0]!;
 }
 test("HTML and text show each parent before its own frozen composition; boxes never become separate product charges", () => {
@@ -391,4 +392,41 @@ test("compact contact deduplication combines identical phone/WhatsApp only, neve
   assert.match(different.html!, /Phone: \+971500000000/);
   assert.match(different.html!, /WhatsApp: \+971500000002/);
   assert.doesNotMatch(different.html!, /Phone \/ WhatsApp:/);
+});
+
+test("per-recipient compact opt-in preserves original HTML for everyone else", () => {
+  const f = kitchenEmailFixture();
+  const recipients = ["compact@example.invalid", "standard@example.invalid"];
+  const rows = recordPaidOperationsEmail(
+    f.state, f.order, f.payment, recipients, "https://www.3ldubai.ae",
+    ["COMPACT@example.invalid"],
+  );
+  assert.equal(rows.length, 2);
+  assert.deepEqual(rows.map((r) => r.recipient), recipients);
+  assert.ok(rows[0]!.html?.includes("3L"));
+  assert.ok(rows[1]!.html?.includes("3L"));
+  assert.notEqual(rows[0]!.html, rows[1]!.html);
+  assert.notEqual(rows[0]!.body, rows[1]!.body);
+  assert.equal(rows[0]!.subject, rows[1]!.subject);
+  assert.notEqual(rows[0]!.id, rows[1]!.id);
+  assert.equal(rows[0]!.status, "pending");
+  assert.equal(rows[1]!.status, "pending");
+  assert.equal(f.state.events[`operations-email-paid:${f.order.id}`], f.payment.id);
+  const duplicate = recordPaidOperationsEmail(
+    f.state, f.order, f.payment, recipients, undefined, recipients
+  );
+  assert.equal(duplicate.length, 0, "No replay when preference changes");
+});
+
+test("without compact allowlist every internal recipient keeps the original email", () => {
+  const f = kitchenEmailFixture();
+  const rows = recordPaidOperationsEmail(
+    f.state, f.order, f.payment,
+    ["a@example.invalid", "b@example.invalid"], "https://www.3ldubai.ae"
+  );
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0]!.html, rows[1]!.html);
+  assert.equal(rows[0]!.body, rows[1]!.body);
+  const sample = kitchenEmailPreview();
+  assert.notEqual(rows[0]!.html, sample.html);
 });
