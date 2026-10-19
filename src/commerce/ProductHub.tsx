@@ -1,3 +1,4 @@
+import { productListingSizes } from "./product-hub-presentation";
 import {
   PACK_SPECS,
   componentName,
@@ -423,10 +424,6 @@ function Overview({
     () => new Map(view.assets.map((a) => [a.id, a])),
     [view.assets],
   );
-  const families = useMemo(
-    () => new Map(view.families.map((f) => [f.id, f])),
-    [view.families],
-  );
   const categories = useMemo(
     () => new Map(view.categories.map((c) => [c.id, c])),
     [view.categories],
@@ -567,8 +564,10 @@ function Overview({
                   <strong>{p.name}</strong>
                   <small>
                     {categories.get(p.categoryId ?? "")?.name ??
-                      t("No category")}{" "}
-                    · {families.get(p.familyId ?? "")?.name ?? t("No family")}
+                      t("No category")}
+                    {productListingSizes(p.variants)
+                      ? ` · ${productListingSizes(p.variants)}`
+                      : ""}
                   </small>
                 </span>
                 <span className="ph-row-meta">

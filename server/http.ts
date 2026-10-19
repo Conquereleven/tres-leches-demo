@@ -1,3 +1,4 @@
+import { withoutBundledProductMedia } from "./catalog/product-media-html";
 import { packPricingPolicy } from "./domain/pack-pricing";
 import { packBuilderEnabled, publishedPackRules } from "./domain/packs";
 import {
@@ -124,7 +125,10 @@ function markDynamicCatalog(file: string) {
   if (!file.endsWith(".html") || storefrontCatalogMode(process.env) !== "on")
     return body;
   return Buffer.from(
-    body.toString("utf8").replace(/<html\b/, '<html data-catalog="dynamic"'),
+    withoutBundledProductMedia(body.toString("utf8")).replace(
+      /<html\b/,
+      '<html data-catalog="dynamic"',
+    ),
   );
 }
 const customerCsp =

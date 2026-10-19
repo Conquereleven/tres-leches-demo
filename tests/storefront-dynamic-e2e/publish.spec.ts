@@ -241,6 +241,33 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   expect(await checkoutPrice(shop, second!.id)).toBeUndefined();
   await shop.screenshot({ path: `${shots}/${info.project.name}-4-cart.png` });
 
+  // Remove every product image through the actual editor and publication workflow.
+  await hub.getByRole("button", { name: "Catalog", exact: true }).click();
+  await hub.getByLabel("Search").fill(target.id);
+  await hub.locator(".ph-row").first().click();
+  while (await hub.locator(".ph-media li").count())
+    await hub
+      .locator(".ph-media li")
+      .first()
+      .getByRole("button", { name: "Remove", exact: true })
+      .click();
+  await hub.getByRole("button", { name: "Save draft" }).click();
+  await expect(hub.getByText("Draft saved")).toBeVisible();
+  await hub.getByRole("button", { name: /Review & publish/ }).click();
+  await hub.getByLabel(/I reviewed every change/).check();
+  await hub.getByRole("button", { name: "Publish catalog" }).click();
+  await expect(hub.getByText("Catalog published")).toBeVisible();
+  await revisit(shop);
+  await expect(line.locator("img.b-co-thumb")).toHaveCount(0);
+  await expect(line.locator(".b-co-thumb-empty")).toHaveText("3L");
+  await revisit(detail);
+  await expect(detail.locator(".b-menu-photo img")).toHaveCount(0);
+  await expect(detail.locator(".b-menu-no-photo")).toBeVisible();
+  await expect(detail.locator(".b-product-gallery img")).toHaveCount(0);
+  await detail.screenshot({
+    path: `${shots}/${info.project.name}-6-removed.png`,
+  });
+
   // Commercial rollback: the administrator publishes the previous price again.
   await hub.getByRole("button", { name: "Catalog", exact: true }).click();
   await hub.getByLabel("Search").fill(target.id);
