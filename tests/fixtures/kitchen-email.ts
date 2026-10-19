@@ -136,6 +136,7 @@ export function kitchenEmailPreview() {
     payment,
     ["kitchen@example.invalid"],
     "https://www.3ldubai.ae",
+    ["kitchen@example.invalid"],
   )[0]!;
 }
 
