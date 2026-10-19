@@ -28,6 +28,24 @@ test("internal email requires explicit enable, private recipients and sender; no
   assert.throws(() =>
     operationsEmailConfig({ ...env, OPERATIONS_EMAIL_TO: "invalid" }),
   );
+  assert.deepEqual(operationsEmailConfig(env)?.compactRecipients, []);
+  assert.deepEqual(
+    operationsEmailConfig({
+      ...env,
+      OPERATIONS_EMAIL_COMPACT_TO: "ops@example.invalid",
+    })?.compactRecipients,
+    ["ops@example.invalid"],
+  );
+  assert.throws(() =>
+    operationsEmailConfig({
+      ...env,
+      OPERATIONS_EMAIL_COMPACT_TO: "not-in-operations@example.invalid",
+    }),
+  );
+  assert.throws(() =>
+    operationsEmailConfig({ ...env, OPERATIONS_EMAIL_COMPACT_TO: "invalid" }),
+  );
+
 });
 test("manual complete address accepted independently of verification; absent or placeholder fields rejected", () => {
   assert.equal(deliveryStreet.parse("  Amsa 2  "), "Amsa 2");
