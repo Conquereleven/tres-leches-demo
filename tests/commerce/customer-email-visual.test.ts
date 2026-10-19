@@ -185,7 +185,7 @@ test("frozen customer pack summaries repeat composition per box and keep differe
   const mail = renderCustomerEmail("ORDER_PRODUCTION_STARTED", order);
   assert.match(mail.html, /Total: 12 pieces in 2 boxes/);
   assert.match(mail.html, /Total: 6 pieces in 1 box/);
-  assert.match(mail.body, /Each box \\(6 pieces\\)/);
+  assert.ok(mail.body.includes("Each box (6 pieces):"));
   assert.ok(mail.body.includes("4 × Sugar"));
   assert.ok(mail.body.includes("5 × Sesame"));
   assert.equal((mail.html.match(/Traditional Pan de Muerto mixed box/g) ?? []).length, 2);
