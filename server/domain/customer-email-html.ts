@@ -128,6 +128,7 @@ export function renderCustomerEmailHtml(input: CustomerHtmlInput): string {
       " · " +
       reference +
       "</div>",
+    '<div role="main" lang="en" dir="ltr">',
     '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;border-collapse:collapse;background:#F9F6F2;">',
     '<tr><td class="mail-pad" align="center" style="padding:32px 16px;">',
     '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px;width:100%;border-collapse:separate;border-spacing:0;">',
@@ -186,6 +187,6 @@ export function renderCustomerEmailHtml(input: CustomerHtmlInput): string {
       secondary +
       ';font-size:12px;">Dubai, United Arab Emirates</p>',
     "</td></tr>",
-    "</table></td></tr></table></body></html>",
+    "</table></td></tr></table></div></body></html>",
   ].join("");
 }
