@@ -9,6 +9,8 @@ function order(pickup: boolean, firstName = "Alex"): Order {
     publicOrderNumber: 42,
     fulfillmentMethod: pickup ? "pickup" : "delivery",
     customerDetails: { firstName, lastName: "Example", email: "fictional@example.invalid" },
+    lines: [{ productId: "test-product", quantity: 3 }],
+    catalogSnapshot: [{ id: "test-product", name: "Mini chocolate conchas", priceFils: 1800 }],
     ...(pickup
       ? { pickup: { pickupDate: "2026-10-21", preferredTime: "4:00 PM – 9:00 PM" } }
       : { delivery: { date: "2026-10-21", slot: "4:00 PM – 9:00 PM" } }),
@@ -38,6 +40,8 @@ for (const width of [320, 390, 1024]) {
       await page.setContent(email.html);
       await expect(page.getByRole("heading", { name: sample.heading })).toBeVisible();
       await expect(page.getByText("#042", { exact: true })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Your order" })).toBeVisible();
+      await expect(page.getByText("3 × Mini chocolate conchas")).toBeVisible();
       await expect(page.getByText("Hi Alex,")).toBeVisible();
       if (sample.event === "ORDER_READY_FOR_PICKUP") {
         await expect(page.getByText("Retail Shop C6/A")).toBeVisible();
