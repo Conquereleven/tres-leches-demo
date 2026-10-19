@@ -27,10 +27,11 @@ test("BRAND02 accounts for seven interim products and independent editorial repl
       assert.ok(existsSync("public" + d.src), d.src);
   }
   const editorial = categoryEditorialMedia("conchas");
-  assert.equal(editorial.length, 3);
-  assert.deepEqual(
-    plan.editorial.map((a) => a.sourceId),
-    editorial.map((a) => a.sourceId),
+  // The previously planned third frame was explicitly withdrawn.
+  assert.equal(editorial.length, 2);
+  assert.ok(editorial.every((a) => plan.editorial.some((p) => p.sourceId === a.sourceId)));
+  assert.ok(
+    editorial.every((a) => !a.sourceId.includes("conchas_de_pistache_sobre_tabla_de_madera")),
   );
   for (const a of editorial)
     assert.ok(!plan.products.some((p) => p.currentSourceId === a.sourceId));
