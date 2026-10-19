@@ -1,5 +1,28 @@
 # Compact kitchen paid-order email — issue #49
 
+## Per-recipient safe rollout (added during final review)
+
+The compact template is **not** global. The server retains the exact previous
+HTML renderer in `server/domain/operations-email-template-legacy.ts`. The
+existing paid-order transaction freezes the chosen version for each recipient.
+`OPERATIONS_EMAIL_COMPACT_TO` is an **optional private environment variable**
+containing a comma-separated subset of the existing `OPERATIONS_EMAIL_TO`.
+When unset or empty, **everyone gets the original layout**. Only recipients
+explicitly opted in get compact messages; unsupported/mismatched addresses
+fail configuration at startup rather than silently broadening rollout.
+
+For this rollout, the approved compact recipients are Joel, Liza and the
+Golositalia JLT kitchen mailbox. Other configured recipients keep the previous
+format. The exact addresses belong only in the private Railway environment,
+not in source or public documentation. The existing sender, keys, event keys,
+notification count, delivery state machine and provider remain unchanged.
+This rule applies only to newly frozen rows after controlled deployment;
+previously frozen rows never change.
+
+Do **not** activate or merge without confirming the full private allowlist,
+real inbox UAT, the final branch CI and a separate Production release approval.
+
+
 Code baseline: `589a78387c9efb5f4abd6e495d3746435c00dde5` (current main, including Analytics). This is an independent email-only branch/PR; it does not modify PR #46 or PR #48.
 
 The renderer keeps the accepted order/payment/preparation data and sends nothing. HTML uses fluid presentation tables and inline CSS, Arial/Helvetica, 14px body text and 13px bold amounts. It adds no remote images, fonts, scripts or tracking. Redundant headings, technical SKU labels and repeated single-quantity price breakdowns are removed from HTML. Traceable SKU identities and full unit/line-price explanations remain in plain text.
@@ -50,6 +73,6 @@ Representative HTML is well below a conservative 100 KiB budget asserted by test
 ## Controlled release / rollback (requires separate approval)
 
 1. Review the exact PR head, CI and fictional visual evidence; perform approved native-client UAT.
-2. Separately authorize code merge/deployment through the normal release/backup gates. No provider, recipient, flag, catalog, price, order or payment changes are needed.
+2. Separately authorize code merge/deployment through the normal release/backup gates. The sender, original configured recipient set and enabled flags remain unchanged. The new optional private \`OPERATIONS_EMAIL_COMPACT_TO\` must be explicitly reviewed and set for the three approved inboxes before enabling the targeted presentation.
 3. Only notifications newly recorded after deployment use this renderer. Existing pending/sent HTML/text bodies stay frozen; do not regenerate, resend or replay them.
 4. Roll back code to the preceding healthy build if necessary, preserving the active database and outboxes. Already recorded notifications retain their own bodies and idempotency keys. Never restore an older business database or replay notifications to undo presentation.
