@@ -31,3 +31,12 @@ jobs:
       - run: npx playwright install --with-deps chromium webkit
       - run: npx playwright test --config=playwright.analytics.config.ts
       # Disposable synthetic SQLite; no secrets, provider requests or deployment.
+      - if: failure()
+        name: Synthetic failure context
+        run: |
+          python3 - <<'PYLOG'
+          from pathlib import Path
+          for path in Path('test-results/analytics').rglob('error-context.md'):
+              print(path)
+              print(path.read_text())
+          PYLOG

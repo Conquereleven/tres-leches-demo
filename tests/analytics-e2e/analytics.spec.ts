@@ -14,7 +14,7 @@ const cookies = new Map<string, string>();
 test.beforeAll(async ({ request }) => {
   for (const role of ["admin", "manager", "operator", "agent"]) {
     const response = await request.post("/api/login", {
-      headers: { Origin: "http://127.0.0.1:3338" },
+      headers: { Origin: "https://127.0.0.1:3339" },
       data: { id: `fixture-${role}`, password: "fictional-password" },
     });
     expect(response.status()).toBe(200);
@@ -29,8 +29,9 @@ async function login(page: import("@playwright/test").Page, role = "admin") {
     {
       name: "tl_session",
       value: cookies.get(role)!,
-      url: "http://127.0.0.1:3338",
+      url: "https://127.0.0.1:3339",
       httpOnly: true,
+      secure: true,
       sameSite: "Strict",
     },
   ]);
@@ -184,7 +185,19 @@ test("real sign-in form enters Analytics without loading raw workspace", async (
   await page.goto(route);
   await page.getByLabel("Agent", { exact: true }).fill("fixture-admin");
   await page.getByLabel("Password", { exact: true }).fill("fictional-password");
+  const responsePromise = page.waitForResponse(
+    (r) => r.url().endsWith("/api/login") && r.request().method() === "POST",
+  );
   await page.getByRole("button", { name: "Sign in to workspace" }).click();
+  const response = await responsePromise;
+  expect(response.status()).toBe(200);
+  await expect
+    .poll(
+      async () =>
+        (await page.context().cookies()).find((c) => c.name === "tl_session")
+          ?.secure,
+    )
+    .toBe(true);
   await expect(page.locator(".an-kpis")).toBeVisible();
 });
 

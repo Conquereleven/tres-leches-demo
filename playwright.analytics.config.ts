@@ -12,10 +12,15 @@ export default defineConfig({
     { name: "chromium", use: { browserName: "chromium" } },
     { name: "webkit", use: { browserName: "webkit" } },
   ],
-  use: { baseURL: "http://127.0.0.1:3338", headless: true },
+  use: {
+    baseURL: "https://127.0.0.1:3339",
+    headless: true,
+    ignoreHTTPSErrors: true,
+  },
   webServer: {
-    command: `DB_PATH=${dir}/state.sqlite HOST=127.0.0.1 API_PORT=3338 PORT=3338 APP_ORIGIN=http://127.0.0.1:3338 node --import tsx tests/fixtures/analytics-server.ts`,
-    url: "http://127.0.0.1:3338/api/health",
+    command: `DB_PATH=${dir}/state.sqlite HOST=127.0.0.1 API_PORT=3338 PORT=3338 APP_ORIGIN=https://127.0.0.1:3339 node --import tsx tests/fixtures/analytics-tls-server.ts`,
+    url: "https://127.0.0.1:3339/api/health",
+    ignoreHTTPSErrors: true,
     reuseExistingServer: false,
   },
 });
