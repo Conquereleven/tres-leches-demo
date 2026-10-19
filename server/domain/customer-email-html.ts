@@ -145,7 +145,7 @@ export function renderCustomerEmailHtml(input: CustomerHtmlInput): string {
       secondary +
       ';font-size:10px;letter-spacing:1.6px;">MEXICO CITY SINCE 1982</td></tr></table>',
     "</td></tr>",
-    '<tr><td class="inner-pad" style="padding:38px 36px 32px;background:#FFFFFF;text-align:left;">',
+    '<tr><td class="inner-pad" style="padding:38px 36px 32px;background:#FFFFFF;text-align:left;overflow-wrap:anywhere;word-break:break-word;">',
     '<p style="margin:0 0 14px;color:' +
       raspberry +
       ';font-size:12px;font-weight:bold;letter-spacing:1.2px;">' +
@@ -168,7 +168,7 @@ export function renderCustomerEmailHtml(input: CustomerHtmlInput): string {
       "</p>",
     '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;border-collapse:separate;background:#F9F7F4;border-radius:10px;">',
     '<tr><td style="padding:24px 23px;">',
-    '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;border-collapse:collapse;">',
+    '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;border-collapse:collapse;table-layout:fixed;">',
     details.join(""),
     "</table></td></tr></table>",
     '<p style="margin:25px 0 0;color:' +
