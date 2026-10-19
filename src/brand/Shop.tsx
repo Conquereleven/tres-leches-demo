@@ -1,3 +1,4 @@
+import { useLiveCatalog } from "./live-catalog";
 const formatAed = (n: number) => (Number.isFinite(n) ? formatPrice(n) : "—");
 import { PackBuilder, CompositionDetails, packComplete } from "./PackBuilder";
 import {
@@ -18,7 +19,11 @@ import { storefrontI18n } from "./locales/engine";
 import { useLanguage as useCustomerLanguage } from "./localization";
 import { QuantityInput } from "./QuantityInput";
 import { normalizeWhatsAppNumber } from "../../shared/contact";
-import { ResponsiveMedia, selectedProductMedia } from "./media";
+import {
+  ResponsiveMedia,
+  selectedProductMedia,
+  publishedMediaAuthority,
+} from "./media";
 import { AddressAutocomplete } from "./AddressAutocomplete";
 import { CustomerCopy, LanguageSwitcher } from "./localization";
 import { useCheckoutNow } from "./cart";
@@ -329,7 +334,8 @@ function productImage(productId: string) {
   return image?.src ? image : family?.image ? { src: family.image } : null;
 }
 function Thumb({ productId, name }: { productId: string; name: string }) {
-  const image = productImage(productId);
+  useLiveCatalog();
+  const image = publishedMediaAuthority() ? null : productImage(productId);
   const family = menuFamilyForSku(productId);
   const option = family?.options.find((o) => o.id === productId);
   if (
@@ -357,6 +363,12 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
         className="b-co-thumb"
         sizes="72px"
       />
+    );
+  if (publishedMediaAuthority())
+    return (
+      <span className="b-co-thumb b-co-thumb-empty" aria-hidden>
+        <CustomerCopy>3L</CustomerCopy>
+      </span>
     );
   if (tricolorSpec(productId))
     return <img className="b-co-thumb" src="/brand/icon.png" alt="" />;

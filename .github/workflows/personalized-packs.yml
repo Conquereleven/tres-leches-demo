@@ -43,6 +43,7 @@ jobs:
       - run: npx playwright test --config=playwright.checkout.config.ts --browser=chromium
       - run: npx playwright test --config=playwright.checkout.config.ts --browser=webkit
       - run: npx playwright test --config=playwright.product-hub.config.ts
+      - run: npx playwright test --config=playwright.storefront-dynamic.config.ts
       - if: failure()
         name: Synthetic browser failure context
         run: |

@@ -232,6 +232,13 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             ].map(([id, label]) => (
               <a key={id} href="/menu?category=cakes">
                 <ResponsiveMedia
+                  productId={
+                    id === "dulce"
+                      ? "tres-leches-premium--dulce-de-leche"
+                      : id === "mango"
+                        ? "tres-leches-mango--mango"
+                        : "special-flavours-cake--saffron"
+                  }
                   family={
                     id === "dulce"
                       ? "tres-leches-premium"

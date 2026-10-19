@@ -1,3 +1,4 @@
+import { CustomerCopy } from "./localization";
 import { useLanguage as useCustomerLanguage } from "./localization";
 import manifest from "./media-manifest.json";
 import categories from "./category-media.json";
@@ -37,12 +38,10 @@ function authoredProductMedia(
   );
 }
 type MediaAsset = (typeof approvedMedia)[number];
-const HUB_MEDIA = "/brand/hub/";
 /**
- * Photographs published from Product Hub for a product, when an administrator
- * replaced the authored one. Null while the published photograph is still the
- * authored one (or the catalog is the build's): the approved presentation applies.
- * Menu, product page and cart all resolve through here.
+ * null means bundled mode; [] means the published product explicitly has no media.
+ * Product assignments (including removals) are authoritative. Variant/category
+ * images are not an implicit fallback for a removed product photograph.
  */
 function publishedProductMedia(
   productId: string | undefined,
@@ -50,57 +49,48 @@ function publishedProductMedia(
   variant: string,
 ): MediaAsset[] | null {
   const state = liveState();
-  if (state.status !== "live" || !productId) return null;
+  if (state.status === "bundled") return null;
+  if (state.status !== "live") return [];
   const { catalog } = state;
   const product = catalog.products.find((p) => p.id === productId);
-  if (!product) return null;
-  const assigned = productMediaAssignments.find(
-    (p) => p.productId === productId,
-  )?.primarySourceId;
-  const resolve = (asset: LiveAsset) => {
-    const sources = new Set(asset.derivatives.map((d) => d.src));
-    // A photograph from the approved library keeps its authored derivatives.
-    const known = approvedMedia.find((m) =>
-      m.derivatives.some((d) => sources.has(d.src)),
-    );
-    if (known)
-      return {
-        media: known,
-        authored:
-          known.sourceId === assigned ||
-          (known.family === family && known.variant === variant),
-      };
-    // Anything else that was not uploaded is the family image the build already uses.
-    if (!asset.derivatives.some((d) => d.src.startsWith(HUB_MEDIA)))
-      return null;
-    const main = asset.derivatives[0]!;
-    return {
-      media: {
-        sourceId: `published-${asset.id}`,
-        status: "assigned",
-        family,
-        variant,
-        alt: asset.alt.en.name ?? "",
-        width: main.width,
-        height: main.height,
-        derivatives: asset.derivatives,
-      } as unknown as MediaAsset,
-      authored: false,
-    };
-  };
-  const photos = [...product.media]
+  if (!product) return [];
+  return [...product.media]
     .sort(
       (a, b) =>
         Number(b.role === "primary") - Number(a.role === "primary") ||
-        a.order - b.order,
+        a.order - b.order ||
+        a.assetId.localeCompare(b.assetId),
     )
-    .map((link) => catalog.assets.find((a) => a.id === link.assetId))
-    .filter((a): a is LiveAsset => !!a)
-    .map(resolve);
-  const first = photos[0];
-  if (!first || first.authored) return null;
-  return photos.filter((x) => !!x).map((x) => x.media);
+    .flatMap((link) => {
+      const asset: LiveAsset | undefined = catalog.assets.find(
+        (a) => a.id === link.assetId,
+      );
+      if (!asset?.derivatives.length) return [];
+      const sources = new Set(asset.derivatives.map((d) => d.src));
+      const known = approvedMedia.find((m) =>
+        m.derivatives.some((d) => sources.has(d.src)),
+      );
+      const main = asset.derivatives[0]!;
+      // Keep approved presentation metadata, but never expand published links
+      // back into an authored gallery or replace published derivative URLs.
+      return [
+        {
+          ...known,
+          sourceId: `published-${asset.id}-${asset.version}`,
+          authoredSourceId: known?.sourceId,
+          status: "assigned",
+          family,
+          variant,
+          alt: asset.alt.en.name ?? "",
+          width: main.width,
+          height: main.height,
+          derivatives: asset.derivatives,
+        } as unknown as MediaAsset,
+      ];
+    });
 }
+/** No bundled fallback while dynamic adoption is loading, live or unavailable. */
+export const publishedMediaAuthority = () => liveState().status !== "bundled";
 export function selectedProductMedia(
   productId: string | undefined,
   family: string,
@@ -108,14 +98,13 @@ export function selectedProductMedia(
   size?: string,
 ) {
   const published = publishedProductMedia(productId, family, variant);
+  if (published !== null) return published[0];
   if (
     productId === "conchas-traditional--tricolor" ||
     productId === "conchas-tricolor-pack"
   )
-    return published?.[0];
-  return (
-    published?.[0] ?? authoredProductMedia(productId, family, variant, size)
-  );
+    return undefined;
+  return authoredProductMedia(productId, family, variant, size);
 }
 /** Further photographs of a product: published ones when replaced, else the authored gallery. */
 export function productGalleryMedia(
@@ -124,7 +113,7 @@ export function productGalleryMedia(
   variant: string,
 ): MediaAsset[] {
   const published = publishedProductMedia(productId, family, variant);
-  if (published) return published.slice(1);
+  if (published !== null) return published.slice(1);
   if (
     productId === "conchas-traditional--tricolor" ||
     productId === "conchas-tricolor-pack"
@@ -141,6 +130,9 @@ export function productGalleryMedia(
 export const usesMenuReferencePresentation = (asset: MediaAsset | undefined) =>
   !!asset &&
   (asset.sourceId.startsWith("official-pan-") ||
+    ("authoredSourceId" in asset &&
+      typeof asset.authoredSourceId === "string" &&
+      asset.authoredSourceId.startsWith("official-pan-")) ||
     ("presentation" in asset &&
       asset.presentation?.startsWith("menu-reference") === true));
 /** Mixed boards shown for a whole category; never tied to a flavour or pack. */
@@ -157,13 +149,14 @@ const srcSet = (asset: MediaAsset, format: string) =>
     .filter((d) => d.format === format)
     .map((d) => `${d.src} ${d.width}w`)
     .join(", ");
-function MediaPicture({
+export function MediaPicture({
   asset,
   alt,
   sizes,
   className,
   active,
   fallback,
+  bundledProduct = false,
 }: {
   asset: MediaAsset;
   alt: string;
@@ -171,15 +164,37 @@ function MediaPicture({
   className?: string;
   active?: boolean;
   fallback?: string | null;
+  bundledProduct?: boolean;
 }) {
   const [failed, setFailed] = useState(0);
+  const published = asset.sourceId.startsWith("published-");
   const digital =
     "mediaKind" in asset && asset.mediaKind === "digital-illustration";
+  if (published && failed >= 2)
+    return (
+      <picture
+        className={active ? "is-active" : undefined}
+        aria-hidden={active === false || undefined}
+      >
+        <span
+          className={
+            className ? `${className} b-co-thumb-empty` : "b-menu-no-photo"
+          }
+          role={alt ? "img" : undefined}
+          aria-label={alt || undefined}
+          data-media-state="load-error"
+          aria-hidden={!alt || undefined}
+        >
+          <CustomerCopy>3L</CustomerCopy>
+        </span>
+      </picture>
+    );
   const webp = asset.derivatives.filter((d) => d.format === "webp");
   return (
     <picture
       className={active ? "is-active" : undefined}
       aria-hidden={active === false || undefined}
+      data-product-media={bundledProduct ? "bundled" : undefined}
       data-media-kind={digital ? "digital-illustration" : undefined}
     >
       {failed === 0 && asset.derivatives.some((d) => d.format === "avif") && (
@@ -209,8 +224,8 @@ function MediaPicture({
         decoding="async"
         style={digital ? { objectFit: "contain" } : undefined}
         onError={
-          digital && failed < 2
-            ? () => setFailed((value) => value + 1)
+          (digital || published) && failed < 2
+            ? () => setFailed((value) => (published ? 2 : value + 1))
             : undefined
         }
       />
@@ -229,11 +244,13 @@ export function MediaRotation({
   alt,
   sizes,
   className,
+  bundledProduct = false,
 }: {
   frames: MediaAsset[];
   alt: string;
   sizes: string;
   className?: string;
+  bundledProduct?: boolean;
 }) {
   const root = useRef<HTMLSpanElement>(null);
   const [turn, setTurn] = useState(0);
@@ -306,6 +323,7 @@ export function MediaRotation({
             sizes={sizes}
             className={className}
             active={index === current}
+            bundledProduct={bundledProduct}
           />
         ))}
     </span>
@@ -321,6 +339,7 @@ export function ResponsiveMedia({
   className,
   sizes = "(max-width: 640px) 90vw, (max-width: 1000px) 45vw, 30vw",
   rotate = false,
+  editorial = false,
 }: {
   productId?: string;
   family: string;
@@ -331,25 +350,51 @@ export function ResponsiveMedia({
   className?: string;
   sizes?: string;
   rotate?: boolean;
+  /** Explicit category/story imagery, independent of product publications. */
+  editorial?: boolean;
 }) {
   const { text: localize } = useCustomerLanguage();
   // Re-render when a newly published revision replaces a photograph.
   useLiveCatalog();
-  const media = selectedProductMedia(productId, family, variant, size);
+  const media = editorial
+    ? authoredProductMedia(undefined, family, variant, size)
+    : selectedProductMedia(productId, family, variant, size);
+  const effectiveFallback =
+    !editorial && publishedMediaAuthority() ? null : fallback;
   if (!media)
-    return fallback ? (
+    return effectiveFallback ? (
       <img
-        src={fallback}
+        data-product-media={
+          !editorial && !publishedMediaAuthority() ? "bundled" : undefined
+        }
+        src={effectiveFallback}
         alt={localize(alt)}
         className={className}
         loading="lazy"
         decoding="async"
       />
-    ) : null;
-  const gallery = rotate ? productGalleryMedia(productId, family, variant) : [];
+    ) : (
+      <span
+        className={
+          className ? `${className} b-co-thumb-empty` : "b-menu-no-photo"
+        }
+        role={alt ? "img" : undefined}
+        data-media-state="unassigned"
+        aria-label={
+          alt ? localize("Product photograph coming soon") : undefined
+        }
+        aria-hidden={!alt || undefined}
+      >
+        <CustomerCopy>3L</CustomerCopy>
+      </span>
+    );
+  const gallery =
+    rotate && !editorial ? productGalleryMedia(productId, family, variant) : [];
   if (gallery.length)
     return (
       <MediaRotation
+        key={[media, ...gallery].map((a) => a.sourceId).join(":")}
+        bundledProduct={!editorial && !publishedMediaAuthority()}
         frames={[media, ...gallery]}
         alt={localize(alt)}
         sizes={sizes}
@@ -358,11 +403,13 @@ export function ResponsiveMedia({
     );
   return (
     <MediaPicture
+      key={media.sourceId}
+      bundledProduct={!editorial && !publishedMediaAuthority()}
       asset={media}
       alt={localize(alt)}
       sizes={sizes}
       className={className}
-      fallback={fallback}
+      fallback={effectiveFallback}
     />
   );
 }

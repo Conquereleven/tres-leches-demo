@@ -3,6 +3,7 @@ import { packCopy } from "../../shared/pack-copy";
 import { useLanguage as useCustomerLanguage } from "./localization";
 import {
   ResponsiveMedia,
+  MediaPicture,
   MediaRotation,
   categoryEditorialMedia,
   selectedProductMedia,
@@ -49,9 +50,11 @@ export function ProductOptions({
   );
   // Never show the chocolate family fallback for a different Concha flavour.
   const fallback =
-    family.id === "conchas-traditional" && product.variant !== "Chocolate"
-      ? "/brand/icon.png"
-      : family.image;
+    menu.status !== "bundled"
+      ? null
+      : family.id === "conchas-traditional" && product.variant !== "Chocolate"
+        ? "/brand/icon.png"
+        : family.image;
   const serverProduct = config?.products.find((p) => p.id === option?.id);
   // With the published catalog, a size it marks unavailable is never offered.
   const orderable = option ? liveOrderable(option.id) : null;
@@ -78,7 +81,7 @@ export function ProductOptions({
     void refreshLiveCatalog();
     retry();
   }, [disagreement, retry]);
-  // Resolved in media.tsx: a photograph replaced in Product Hub, else the authored one.
+  // Product media and gallery share the published assignment policy.
   const gallery = productGalleryMedia(product.id, family.id, product.variant);
   return (
     <div className="b-menu-options">
@@ -207,18 +210,11 @@ export function ProductOptions({
           aria-label={localize("Product gallery")}
         >
           {gallery.map((asset) => (
-            <img
+            <MediaPicture
               key={asset.sourceId}
-              src={
-                (
-                  asset.derivatives.find(
-                    (d) => d.format === "webp" && d.width === 640,
-                  ) ?? asset.derivatives[0]
-                )?.src
-              }
+              asset={asset}
               alt={localize(asset.alt)}
-              loading="lazy"
-              decoding="async"
+              sizes="(max-width: 640px) 90vw, 45vw"
             />
           ))}
         </div>
