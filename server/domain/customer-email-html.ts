@@ -6,6 +6,7 @@
  */
 import { PICKUP_LOCATION } from "../../shared/pickup-location";
 import type { CustomerEvent } from "./model";
+import type { CustomerEmailItem } from "./customer-email-items";
 
 type CustomerHtmlInput = {
   event: CustomerEvent;
@@ -14,6 +15,7 @@ type CustomerHtmlInput = {
   when: string;
   pickup: boolean;
   zoneName?: string;
+  items: CustomerEmailItem[];
 };
 
 const escapeHtml = (value: string) =>
@@ -74,7 +76,7 @@ export function renderCustomerEmailHtml(input: CustomerHtmlInput): string {
       reference +
       "</td></tr>",
   ];
-  if (when && event !== "ORDER_OUT_FOR_DELIVERY") {
+  if (when) {
     details.push(
       '<tr><td style="padding:0 0 5px;font-size:12px;letter-spacing:1px;color:' +
         secondary +
@@ -114,6 +116,39 @@ export function renderCustomerEmailHtml(input: CustomerHtmlInput): string {
         "</td></tr>",
     );
   }
+
+  const orderItems = input.items.length
+    ? input.items.map((item) => {
+        const details =
+          item.isBox && item.boxCapacity !== undefined
+            ? [
+                '<p style="margin:9px 0 4px;color:' + secondary + ';font-size:13px;font-weight:bold;">',
+                'In each box (' + escapeHtml(String(item.boxCapacity)) + ' pieces):</p>',
+                ...item.components.map(
+                  (part) =>
+                    '<p style="margin:3px 0 3px 14px;color:' + ink +
+                    ';font-size:14px;line-height:1.5;">' +
+                    escapeHtml(String(part.units)) + ' × ' + escapeHtml(part.name) + '</p>',
+                ),
+                '<p style="margin:8px 0 0;color:' + secondary + ';font-size:13px;">Total: ' +
+                  escapeHtml(String(item.boxCapacity * item.quantity)) + ' pieces in ' +
+                  escapeHtml(String(item.quantity)) +
+                  (item.quantity === 1 ? ' box' : ' boxes') + '</p>',
+              ].join('')
+            : item.contentsUnavailable
+              ? '<p style="margin:8px 0 0;color:' + secondary +
+                ';font-size:13px;">Box composition unavailable in this email.</p>'
+              : item.components.length === 1
+                ? '<p style="margin:8px 0 0;color:' + secondary + ';font-size:13px;">Selection: ' +
+                  escapeHtml(item.components[0]!.name) + '</p>'
+                : '';
+        return '<tr><td style="padding:14px 0;border-bottom:1px solid #E9E1DB;overflow-wrap:anywhere;word-break:break-word;">' +
+          '<p style="margin:0;color:' + ink + ';font-size:15px;line-height:1.5;font-weight:bold;">' +
+          escapeHtml(String(item.quantity)) + ' × ' + escapeHtml(item.name) + '</p>' +
+          details + '</td></tr>';
+      }).join('')
+    : '<tr><td style="padding:8px 0;color:' + secondary +
+      ';font-size:14px;">Item details unavailable in this email.</td></tr>';
 
   return [
     '<!doctype html><html lang="en" dir="ltr">',
@@ -172,6 +207,11 @@ export function renderCustomerEmailHtml(input: CustomerHtmlInput): string {
     '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;border-collapse:collapse;table-layout:fixed;">',
     details.join(""),
     "</table></td></tr></table>",
+    '<h2 style="margin:28px 0 10px;color:' + ink +
+      ';font-size:18px;line-height:1.4;">Your order</h2>',
+    '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;border-collapse:collapse;table-layout:fixed;">',
+    orderItems,
+    '</table>',
     '<p style="margin:25px 0 0;color:' +
       secondary +
       ';font-size:15px;line-height:1.6;">' +
