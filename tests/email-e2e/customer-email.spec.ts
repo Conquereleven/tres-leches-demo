@@ -40,7 +40,7 @@ for (const width of [320, 390, 1024]) {
       await page.setContent(email.html);
       await expect(page.getByRole("heading", { name: sample.heading })).toBeVisible();
       await expect(page.getByText("#042", { exact: true })).toBeVisible();
-      await expect(page.getByRole("heading", { name: "Your order" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Your order", exact: true })).toBeVisible();
       await expect(page.getByText("3 × Mini chocolate conchas")).toBeVisible();
       await expect(page.getByText("Hi Alex,")).toBeVisible();
       if (sample.event === "ORDER_READY_FOR_PICKUP") {
