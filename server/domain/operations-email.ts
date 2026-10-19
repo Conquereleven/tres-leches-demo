@@ -2,6 +2,7 @@ import { acceptedLinePrice } from "../../shared/pack-pricing";
 import { tricolorSpec, tricolorPreparation } from "../../shared/tricolor";
 import { packSpec, validPackSnapshot } from "../../shared/pack-composition";
 import { renderOperationsEmail } from "./operations-email-template";
+import { renderLegacyOperationsEmail } from "./operations-email-template-legacy";
 import { randomUUID } from "node:crypto";
 import type {
   Order,
@@ -22,6 +23,7 @@ export function recordPaidOperationsEmail(
   payment: Payment,
   recipients: string[],
   origin?: string,
+  compactRecipients: string[] = [],
 ): OperationsEmailNotification[] {
   if (
     payment.status !== "paid" ||
@@ -107,7 +109,7 @@ export function recordPaidOperationsEmail(
     };
   });
   const pickup = order.fulfillmentMethod === "pickup";
-  const message = renderOperationsEmail({
+  const content = {
     reference,
     orderId: order.id,
     customer: customerName(order, conversation?.customer) || "Not stored",
@@ -133,24 +135,34 @@ export function recordPaidOperationsEmail(
     instructions: order.customerDetails?.instructions || "Not stored",
     deliveryNotes: order.delivery?.notes || "Not stored",
     origin,
-  });
+  };
+  // Frozen recipient-specific formats: an unset allowlist means every
+  // recipient receives the original kitchen template, never the compact one.
+  const compactSet = new Set(compactRecipients.map((to) => to.trim().toLowerCase()));
+  const oldLayout = renderLegacyOperationsEmail(content);
+  const compactLayout = compactSet.size ? renderOperationsEmail(content) : null;
   const createdAt = new Date().toISOString();
   const rows: OperationsEmailNotification[] = [...new Set(recipients)].map(
-    (recipient) => ({
-      id: randomUUID(),
-      event: "ORDER_PAID",
-      channel: "email",
-      orderId: order.id,
-      paymentId: payment.id,
-      publicOrderNumber: order.publicOrderNumber,
-      recipient,
-      subject: `New paid 3L order ${reference}`,
-      body: message.text,
-      html: message.html,
-      status: "pending",
-      attemptCount: 0,
-      createdAt,
-    }),
+    (recipient) => {
+      const message = compactSet.has(recipient.trim().toLowerCase()) && compactLayout
+        ? compactLayout
+        : oldLayout;
+      return {
+        id: randomUUID(),
+        event: "ORDER_PAID",
+        channel: "email",
+        orderId: order.id,
+        paymentId: payment.id,
+        publicOrderNumber: order.publicOrderNumber,
+        recipient,
+        subject: `New paid 3L order ${reference}`,
+        body: message.text,
+        html: message.html,
+        status: "pending",
+        attemptCount: 0,
+        createdAt,
+      };
+    },
   );
   state.operationsEmailNotifications ??= [];
   state.operationsEmailNotifications.push(...rows);
