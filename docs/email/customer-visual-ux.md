@@ -4,7 +4,7 @@
 
 Customer-facing transactional messages now carry responsive, table-based branded HTML plus the **unchanged plain-text fallback**. The rendered HTML is frozen in the durable notification row at the same time as the customer event. No new event, payment confirmation, recipient, sender, or automatic notification was introduced.
 
-The three existing events are:
+Each email now includes an order reminder derived only from the accepted, frozen order lines and catalog. Products are listed by quantity and name. Valid frozen pack snapshots list components **per box**, capacities and total piece counts, including distinct mixtures for boxes with the same SKU. Where historical composition is missing or fails validation, the message clearly says that it is unavailable rather than rebuilding it from current inventory. Tricolor single-piece color is shown only when frozen and valid. Price claims are intentionally excluded from status notifications.\n\nThe three existing events are:
 - `ORDER_PRODUCTION_STARTED`: order preparation, including scheduled delivery/pickup window.
 - `ORDER_READY_FOR_PICKUP`: pickup readiness with the existing verified 3L store location.
 - `ORDER_OUT_FOR_DELIVERY`: on the way, showing only the delivery **area** where available.
@@ -16,14 +16,14 @@ No customer payment-confirmation email is sent by the current application. That 
 - Uses approved public Visual Identity V2: `#F6DFE0` blush, `#A28D5B` gold, `#27242D` ink and `#A93C68` raspberry on readable cream/white surfaces.
 - Text-based 3L wordmark; no invented photographic assets or unverified external-logo URL.
 - Mobile-first fluid 600px maximum-width email-safe tables and inline styles, with responsive adjustments.
-- Clear event status, greeting, reference, schedule, verified pickup address or delivery area, and brand footer.
+- Clear event status, greeting, reference, schedule (including the out-for-delivery email), verified pickup address or delivery area, frozen order contents, and brand footer.
 - No unapproved track-order URL, reply-to, customer-service email, promotional CTA, street/building, private phone, surname, payment identifiers or price claims.
 - No images, remote assets, external fonts or scripts.
 - Escapes all customer and delivery-area HTML-sensitive input; long unbroken strings wrap.
 
 ## Technical changes
 
-- `renderCustomerEmail` continues returning the exact same subject and plain-text `body`; it additionally returns `html`.
+- `renderCustomerEmail` continues returning the exact same subject and plain-text `body`; it additionally returns `html` and appends the frozen order contents to the plain-text fallback.
 - Customer notification rows gain backward-compatible optional `html`, persisted with existing idempotency/event keys.
 - Dispatcher sends `html` when present for *either* customer or internal notifications, plus the unchanged `text`. Historical rows without HTML continue sending plain text only.
 - Independent recipient configurations, `CUSTOMER_EMAIL_ENABLED`, `OPERATIONS_EMAIL_ENABLED`, `OPERATIONS_EMAIL_TO`, sender identities, Resend keys and provider fail/expiry policy are unchanged.
