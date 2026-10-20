@@ -16,6 +16,10 @@ Job118670264977's retained trace shows the delivery time selected, CONTINUE TO D
 
 Eight original local repeats passed, demonstrating that local success alone was insufficient. Ten repeats after synchronization passed. Full checkout passed21/21 Chromium and21/21 WebKit locally, and both passed on diagnostic PR52 head64f2205. A later PR50 diagnostic job failed a different WebKit `goto('/cart')` beforeEach (20/21); its retained trace records a `/api/checkout/config` access-control page error immediately after replacing the still-hydrating homepage. The UX beforeEach now waits for the actual config response200 and completed body before seeding storage and navigating, matching the existing first checkout scenario. This is fixture lifecycle synchronization, not a CORS/payment-rule change. The upgraded-engine exact-head suites remain mandatory.
 
+## Full-suite fixture regression
+
+Final local combined commerce validation exposed an existing clock-boundary error in the synthetic coexistence duplicate-event test (709/710): it generated two different `Date.now()` timestamps for one provider event ID. The production idempotency guard correctly returned409. The test now replays the same frozen envelope, explicitly advancing the mocked reception clock across a second before replay. Its deduplication, assignment, unread, AI and no-job assertions remain. No Meta runtime/configuration changed. This demonstrated test defect is included rather than concealing a failed commercial suite.
+
 ## Product-first email fit
 
 The approved serif identity, centered pink wordmark, rounded Product/Qty/Price panel, gold total and paired secondary information blocks remain. Only vertical whitespace and the duplicate customer introduction were removed; the customer remains in the address/contact block. Product names remain18px, quantities18px, original notes14px, address13px, and the Operations link44px high. Plain text, legacy recipients, frozen outbox data and transport behavior remain unchanged.
