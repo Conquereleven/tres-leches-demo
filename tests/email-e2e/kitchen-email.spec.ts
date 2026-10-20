@@ -17,7 +17,7 @@ for (const width of [390, 1024]) {
       readFileSync("docs/email/previews/fictional-paid-order.html", "utf8"),
     );
     await expect(
-      page.getByRole("heading", { name: "Order #042 · PAID", exact: true }),
+      page.getByRole("heading", { name: "New Order: #042", exact: true }),
     ).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Customer instructions / allergies" }),
@@ -111,7 +111,7 @@ for (const width of [320, 375, 390, 430, 1024]) {
     expect(Buffer.byteLength(html)).toBeLessThan(100 * 1024);
     await page.setContent(html);
     await expect(
-      page.getByRole("heading", { name: /^Order #042/ }),
+      page.getByRole("heading", { name: /^New Order: #042/ }),
     ).toBeVisible();
     const singles = page.locator('[data-kitchen-item="single"]');
     await expect(singles).toHaveCount(3);
@@ -176,7 +176,13 @@ for (const width of [320, 375, 390, 430, 1024]) {
         path: `docs/email/previews/compact-${browserName}-390-screen.png`,
         fullPage: false,
       });
-      expect(dimensions.height).toBeLessThanOrEqual(844);
+      await expect(page.locator("[data-kitchen-summary]")).toHaveCSS(
+        "border-radius",
+        "12px",
+      );
+      await expect(
+        page.getByRole("heading", { name: "New Order: #042" }),
+      ).toHaveCSS("font-size", "32px");
     }
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     expect(requested).toEqual([]);
@@ -217,9 +223,7 @@ for (const kind of ["long", "large", "pickup", "review"] as const) {
         page.getByText(/MANUAL REVIEW REQUIRED: Pack composition/),
       ).toBeVisible();
     if (kind === "pickup")
-      await expect(
-        page.getByRole("heading", { name: /^Pickup ·/ }),
-      ).toBeVisible();
+      await expect(page.locator("[data-kitchen-fulfillment]")).toBeVisible();
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     await page.screenshot({
       path: `docs/email/previews/compact-${kind}-${browserName}-390.png`,
@@ -285,8 +289,17 @@ test("before/after compact brief measurement at iPhone width", async ({
       2,
     ),
   );
-  expect(after).toBeLessThanOrEqual(844);
-  expect(after).toBeLessThan(before * 0.65);
+  // Founder-selected reference replaces the old dense layout/35% target.
+  // Preserve a genuine before/after measurement and verify its visual contract.
+  expect(after).toBeGreaterThan(0);
+  await expect(page.locator("[data-kitchen-summary]")).toHaveCSS(
+    "border-radius",
+    "12px",
+  );
+  await expect(page.locator("[data-kitchen-brand]")).toHaveCSS(
+    "background-color",
+    "rgb(246, 223, 224)",
+  );
   await info.attach("before-after.json", {
     body: JSON.stringify({
       before,

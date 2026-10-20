@@ -321,7 +321,14 @@ test("compact long instructions and every address field are intact, not clamped 
     "Address verification: UNVERIFIED",
   ]) {
     assert.ok(m.body.includes(text));
-    assert.ok(m.html!.includes(text));
+    // Exact structured values already in the visible full address appear once.
+    const visibleValue =
+      text === "Building/villa:"
+        ? "Example Tower"
+        : text === "Apartment/unit: 404"
+          ? "Unit 404"
+          : text;
+    assert.ok(m.html!.includes(visibleValue));
   }
   assert.doesNotMatch(
     m.html!,
@@ -534,4 +541,50 @@ test("product-first presentation retains the previous compact plain-text fallbac
   assert.match(three.body, /Total paid: AED 39.00/);
   assert.doesNotMatch(short.html!, /data-kitchen-item="pack"/);
   assert.doesNotMatch(three.html!, /data-kitchen-item="pack"/);
+});
+
+test("selected reference layout uses frozen financial summary without inventing the mock payment method", () => {
+  const f = kitchenEmailFixture();
+  const before = structuredClone(f);
+  const m = record(f);
+  assert.match(m.html!, /New Order: #042/);
+  assert.match(m.html!, /TRES LECHES/);
+  assert.match(m.html!, /font-family:Georgia/);
+  assert.match(m.html!, /data-kitchen-summary/);
+  assert.match(m.html!, /Subtotal/);
+  assert.match(m.html!, /AED 441\.00/);
+  assert.ok(!m.html!.includes("PAYMENT METHOD"));
+  assert.ok(!m.html!.includes("Nasima") && !m.html!.includes("July 31, 2023"));
+  assert.deepEqual(f.order, before.order);
+  assert.deepEqual(f.payment, before.payment);
+});
+
+test("compact address omits only exact duplicates; contradictory and missing fields remain visible", () => {
+  const f = kitchenEmailFixture();
+  f.order.address = "Fictional Street, Example Tower, Unit 404";
+  f.order.delivery!.address = "Fictional Street";
+  f.order.delivery!.building = "Example Tower";
+  f.order.delivery!.unit = "404";
+  const m = record(f);
+  for (const value of ["Fictional Street", "Example Tower", "Unit 404"])
+    assert.ok(m.html!.includes(value));
+  assert.ok(!m.html!.includes("Street/address: Fictional Street"));
+  assert.ok(!m.html!.includes("Building/villa: Example Tower"));
+  assert.ok(!m.html!.includes("Apartment/unit: 404"));
+  assert.ok(m.body.includes("Building/villa: Example Tower"));
+  assert.match(m.html!, /Address verification: UNVERIFIED/);
+  const conflict = kitchenEmailFixture();
+  conflict.order.address = "Another address";
+  conflict.order.delivery!.building = "Conflicting Tower";
+  conflict.order.delivery!.unit = "";
+  const c = record(conflict);
+  assert.match(c.html!, /Building\/villa: Conflicting Tower/);
+  assert.match(c.html!, /Apartment\/unit: Not stored/);
+  const prefix = kitchenEmailFixture();
+  prefix.order.address = "Fictional Street, Example Towers, Unit 404";
+  prefix.order.delivery!.building = "Example Tower";
+  prefix.order.delivery!.unit = "40";
+  const p = record(prefix);
+  assert.match(p.html!, /Building\/villa: Example Tower/);
+  assert.match(p.html!, /Apartment\/unit: 40/);
 });

@@ -1,3 +1,5 @@
+> SUPERSEDED VISUAL PROPOSAL: The founder has now supplied the actual screenshot. Use [the reference-based implementation](reference-kitchen.md); the previous heights and typography below are historical.
+
 # Product-first kitchen email — final design adjustment
 
 The founder's written specification replaces the previous compact proposal. No screenshot image accompanied the supplied attachment, so exact screenshot fidelity is **not claimed**. This implementation follows the approved written hierarchy and preserves 3L's soft pink, muted gold, white and neutral identity.
