@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { chooseArea, fillName } from "../fixtures/storefront-form";
+import { clickStableControl } from "../helpers/stable-control";
 
 const ORIGIN = "http://127.0.0.1:3189";
 const tomorrow = () =>
@@ -63,7 +64,12 @@ test("cart → delivery → details → review → payment step", async ({
   await page
     .getByRole("combobox", { name: "Delivery time", exact: true })
     .selectOption("4:00 PM – 9:00 PM");
-  await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
+  // WebKit may still be scrolling from the time selector. Settle the pointer
+  // target before one real click, then verify the step actually changed.
+  await clickStableControl(
+    page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
+  );
+  await expect(page.getByLabel("First name", { exact: true })).toBeVisible();
 
   await fillName(page, "UAT", "Reviewer");
   await page.getByLabel("Email for payment receipt").fill("uat@example.com");
