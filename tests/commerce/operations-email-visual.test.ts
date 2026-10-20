@@ -501,3 +501,37 @@ test("three synthetic opt-ins cannot change the format or destination of any oth
     0,
   );
 });
+
+test("product-first HTML gives every accepted line an explicit quantity/price and keeps notes before secondary details", () => {
+  const f = kitchenEmailFixture();
+  const original = structuredClone(f);
+  const m = record(f);
+  assert.match(m.html!, /table aria-label="Products to prepare"/);
+  assert.equal((m.html!.match(/data-kitchen-item=/g) ?? []).length, 4);
+  assert.equal((m.html!.match(/data-kitchen-quantity/g) ?? []).length, 4);
+  assert.equal((m.html!.match(/data-kitchen-price/g) ?? []).length, 4);
+  assert.equal((m.html!.match(/data-kitchen-item="pack"/g) ?? []).length, 3);
+  const product = m.html!.indexOf('table aria-label="Products to prepare"');
+  const notes = m.html!.indexOf("data-kitchen-notes");
+  assert.ok(
+    product < notes && notes < m.html!.indexOf("data-kitchen-customer"),
+  );
+  assert.ok(notes < m.html!.indexOf("data-kitchen-address"));
+  assert.deepEqual(f.order, original.order);
+  assert.deepEqual(f.payment, original.payment);
+  assert.ok(m.body.includes("2 × Traditional Chocolate Concha"));
+});
+
+test("product-first presentation retains the previous compact plain-text fallback exactly", () => {
+  const current = compactKitchenEmailPreview();
+  assert.equal(
+    current.body,
+    readFileSync("docs/email/previews/product-first-text-before.txt", "utf8"),
+  );
+  const short = compactKitchenEmailPreview("short");
+  const three = compactKitchenEmailPreview("three");
+  assert.match(short.body, /Total paid: AED 13.00/);
+  assert.match(three.body, /Total paid: AED 39.00/);
+  assert.doesNotMatch(short.html!, /data-kitchen-item="pack"/);
+  assert.doesNotMatch(three.html!, /data-kitchen-item="pack"/);
+});

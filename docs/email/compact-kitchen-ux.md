@@ -1,3 +1,5 @@
+> Superseded visual proposal: the founder-approved product-first redesign is documented in [product-first-kitchen.md](product-first-kitchen.md). The recipient-scoped architecture below remains in force. Older 784px measurements describe the previous design, not the current renderer.
+
 # Compact kitchen paid-order email — issue #49
 
 ## Per-recipient safe rollout (added during final review)

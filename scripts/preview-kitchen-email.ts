@@ -12,7 +12,15 @@ console.log(
   `Fictional preview only: ${directory}/fictional-paid-order.html (no sends)`,
 );
 
-for (const kind of ["typical", "pickup", "long", "review", "large"] as const) {
+for (const kind of [
+  "short",
+  "three",
+  "typical",
+  "pickup",
+  "long",
+  "review",
+  "large",
+] as const) {
   const preview = compactKitchenEmailPreview(kind);
   writeFileSync(`${directory}/compact-${kind}.html`, preview.html!);
   writeFileSync(`${directory}/compact-${kind}.txt`, preview.body);
