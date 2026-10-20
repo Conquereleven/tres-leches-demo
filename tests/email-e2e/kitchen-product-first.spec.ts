@@ -71,6 +71,7 @@ for (const width of [320, 375, 390, 430]) {
           height: Math.ceil(main.getBoundingClientRect().height),
           width: document.documentElement.scrollWidth,
           productHeight: Math.ceil(products.getBoundingClientRect().height),
+          productTop: Math.ceil(products.getBoundingClientRect().top),
           productsBeforeSecondary: [
             "[data-kitchen-notes]",
             "[data-kitchen-fulfillment]",
@@ -96,6 +97,13 @@ for (const width of [320, 375, 390, 430]) {
           .boundingBox())!.height,
       ).toBeGreaterThanOrEqual(44);
       expect(await page.locator("script, img, iframe, form").count()).toBe(0);
+      if (width === 390 && (kind === "short" || kind === "three")) {
+        // Browser-only whitespace regression budgets, not native mail fit claims.
+        expect(dimensions.height).toBeLessThanOrEqual(
+          kind === "short" ? 740 : 860,
+        );
+        expect(dimensions.productTop).toBeLessThanOrEqual(150);
+      }
       if (kind === "short" || kind === "three") {
         // The supplied serif reference supersedes the earlier dense layout's
         // hard 844px budget. Record actual height/fit; never hide safety content.

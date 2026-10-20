@@ -2,10 +2,11 @@
   {
     "kind": "short",
     "width": 375,
-    "height": 840,
-    "productHeight": 121,
+    "height": 742,
+    "productHeight": 113,
+    "productTop": 140,
     "productsBeforeSecondary": true,
-    "htmlBytes": 8009,
+    "htmlBytes": 7901,
     "fitsRaw844px": true,
     "nativeUsableHeight": null,
     "nativeClient": "PENDING"
@@ -13,10 +14,11 @@
   {
     "kind": "three",
     "width": 375,
-    "height": 1014,
-    "productHeight": 294,
+    "height": 899,
+    "productHeight": 270,
+    "productTop": 140,
     "productsBeforeSecondary": true,
-    "htmlBytes": 9496,
+    "htmlBytes": 9384,
     "fitsRaw844px": false,
     "nativeUsableHeight": null,
     "nativeClient": "PENDING"
@@ -24,10 +26,11 @@
   {
     "kind": "typical",
     "width": 375,
-    "height": 1196,
-    "productHeight": 477,
+    "height": 1074,
+    "productHeight": 445,
+    "productTop": 140,
     "productsBeforeSecondary": true,
-    "htmlBytes": 10649,
+    "htmlBytes": 10535,
     "fitsRaw844px": false,
     "nativeUsableHeight": null,
     "nativeClient": "PENDING"
@@ -35,10 +38,11 @@
   {
     "kind": "large",
     "width": 375,
-    "height": 1409,
-    "productHeight": 671,
+    "height": 1287,
+    "productHeight": 639,
+    "productTop": 140,
     "productsBeforeSecondary": true,
-    "htmlBytes": 11990,
+    "htmlBytes": 11876,
     "fitsRaw844px": false,
     "nativeUsableHeight": null,
     "nativeClient": "PENDING"
@@ -46,10 +50,11 @@
   {
     "kind": "long",
     "width": 375,
-    "height": 2878,
-    "productHeight": 477,
+    "height": 2756,
+    "productHeight": 445,
+    "productTop": 140,
     "productsBeforeSecondary": true,
-    "htmlBytes": 14667,
+    "htmlBytes": 14553,
     "fitsRaw844px": false,
     "nativeUsableHeight": null,
     "nativeClient": "PENDING"
@@ -57,10 +62,11 @@
   {
     "kind": "pickup",
     "width": 375,
-    "height": 1183,
-    "productHeight": 477,
+    "height": 1061,
+    "productHeight": 445,
+    "productTop": 140,
     "productsBeforeSecondary": true,
-    "htmlBytes": 10884,
+    "htmlBytes": 10770,
     "fitsRaw844px": false,
     "nativeUsableHeight": null,
     "nativeClient": "PENDING"
@@ -68,10 +74,11 @@
   {
     "kind": "review",
     "width": 375,
-    "height": 1232,
-    "productHeight": 513,
+    "height": 1110,
+    "productHeight": 481,
+    "productTop": 140,
     "productsBeforeSecondary": true,
-    "htmlBytes": 10720,
+    "htmlBytes": 10606,
     "fitsRaw844px": false,
     "nativeUsableHeight": null,
     "nativeClient": "PENDING"

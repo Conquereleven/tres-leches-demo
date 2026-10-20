@@ -14,15 +14,17 @@ The new visual reference supersedes old 844px/35% reduction assertions. Tests no
 
 |Fixture|Chromium 320|375|390|430|WebKit 320|375|390|430|
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-|short|932|840|820|802|930|840|820|802|
-|three|1147|1014|952|934|1144|1014|952|934|
-|typical|1329|1196|1135|1096|1327|1196|1135|1096|
-|large|1555|1409|1378|1325|1553|1409|1378|1325|
-|long|3206|2878|2781|2509|3271|2912|2815|2543|
-|pickup|1282|1183|1121|1101|1280|1183|1121|1101|
-|review|1383|1232|1171|1095|1381|1232|1171|1095|
+|short|816|742|722|704|813|742|722|704|
+|three|1014|899|838|820|1012|899|838|820|
+|typical|1189|1074|1013|974|1186|1074|1013|974|
+|large|1415|1287|1260|1206|1412|1287|1260|1206|
+|long|3066|2756|2659|2387|3131|2790|2693|2421|
+|pickup|1142|1061|999|979|1139|1061|999|979|
+|review|1243|1110|1048|973|1240|1110|1048|973|
 
-At390px, the one-product fixture fits the raw844px browser viewport; three products with complete allergy/address warnings and larger orders scroll. This is not native iPhone screenshot certification. The extra safety information absent from the mock is deliberately retained.
+At 390px, removing redundant customer-introduction copy and reducing vertical whitespace (not product font size) reduced one product from 820 to 722px, three products from 952 to 838px, and a six-piece box plus three singles from 1135 to 1013px. Customer identity remains in the contact block. All original instructions, warnings, accepted prices, quantities and nested compositions remain complete. Both engines pass accessibility and content checks.
+
+The one/three-product fixtures fit a **raw 390 × 844 browser**, with only 6px spare for three products. They are NOT certified as fitting the actual mail viewport. The founder identified an iPhone 18 Pro, and Apple Mail, but no physical-device mail-client viewport or rendering has been captured. Required usable heights are 722px / 838px / 1013px respectively. Any smaller usable viewport requires scrolling. Larger orders and long safety notes deliberately scroll; no clipping, tiny-font workaround, phone-resolution assumption or inferred client-chrome deduction is used.
 
 [Three-product mobile preview](previews/product-first-three-webkit-390.png) · [Box plus singles](previews/product-first-typical-webkit-390.png). See root `design-qa.md` for visual comparison and expected deviations.
 
