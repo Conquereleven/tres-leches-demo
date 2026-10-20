@@ -159,7 +159,36 @@ test.describe("payment step", () => {
     await expect(page.locator(".b-shop-totals")).not.toContainText("Delivery");
     await shot(page, "checkout-delivery-390");
     await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
-    await page.getByRole("button", { name: "REVIEW ORDER" }).click();
+    const review = page.getByRole("button", { name: "REVIEW ORDER" });
+    // WebKit trace: a completed pointer action during smooth scrolling left
+    // Details unchanged. Require the actual target to be stable and uncovered.
+    await review.evaluate((el) =>
+      el.scrollIntoView({ block: "center", behavior: "instant" }),
+    );
+    await expect
+      .poll(() =>
+        review.evaluate(async (el) => {
+          const before = el.getBoundingClientRect();
+          await new Promise<void>((resolve) =>
+            requestAnimationFrame(() => resolve()),
+          );
+          const after = el.getBoundingClientRect();
+          return (
+            before.x === after.x &&
+            before.y === after.y &&
+            before.height === after.height &&
+            document
+              .elementFromPoint(
+                after.x + after.width / 2,
+                after.y + after.height / 2,
+              )
+              ?.closest("button") === el
+          );
+        }),
+      )
+      .toBe(true);
+    await review.click();
+    await expect(page.getByLabel(/I've reviewed my order/)).toBeVisible();
     await page.getByLabel(/I've reviewed my order/).check();
   });
 

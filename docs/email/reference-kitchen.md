@@ -29,3 +29,7 @@ At390px, the one-product fixture fits the raw844px browser viewport; three produ
 ## Safety / release
 
 Only specifically opted-in internal recipients use this renderer. Empty `OPERATIONS_EMAIL_COMPACT_TO` stays legacy for all. No changes to routing, dispatch, provider IDs, frozen outbox rows, payment logic, customer emails, catalog or Production. No real send, merge or deployment. The previous source/integration heads and their CI cannot validate this follow-up; current exact-head evidence belongs in PR#50/#52. Native UAT, exact private allowlist, current independent backup restore and explicit controlled-release approval remain required.
+
+## Integration regression follow-up
+
+The first combined CI for this reference exposed two unrelated readiness checks. Operations read every image's `complete && naturalWidth > 0` immediately after route-shell visibility. The same predicate now waits within the existing assertion budget; broken images still fail. WebKit's UX payment setup was reproduced locally (1/5 failed): after REVIEW ORDER's pointer action the trace remained on Details and consent never appeared. It now uses the same centered, stable, uncovered-target assertion already used by PAY/Tricolor, followed by one normal click and explicit consent visibility. No forced click, fixed delay, retry, timeout increase, skipped assertion or business-code edit. Ten traced WebKit repeats pass after the correction. These remain in the existing PR, not a new feature/branch.
