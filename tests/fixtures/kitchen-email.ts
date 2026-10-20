@@ -204,10 +204,38 @@ export function compactKitchenEmailFixture() {
 }
 
 export function compactKitchenEmailPreview(
-  kind: "typical" | "pickup" | "long" | "review" | "large" = "typical",
+  kind:
+    | "short"
+    | "three"
+    | "typical"
+    | "pickup"
+    | "long"
+    | "review"
+    | "large" = "typical",
 ) {
   const f =
     kind === "large" ? kitchenEmailFixture() : compactKitchenEmailFixture();
+  if (kind === "short" || kind === "three") {
+    // Reuse already accepted synthetic single lines; no screenshot-derived data.
+    f.order.lines = f.order.lines
+      .filter((line) => !line.packSnapshot)
+      .slice(0, kind === "short" ? 1 : 3);
+    f.order.catalogSnapshot = f.order.catalogSnapshot!.filter((product) =>
+      f.order.lines.some((line) => line.productId === product.id),
+    );
+    const amount = f.order.lines.reduce(
+      (total, line) =>
+        total +
+        f.order.catalogSnapshot!.find(
+          (product) => product.id === line.productId,
+        )!.priceFils *
+          line.quantity,
+      0,
+    );
+    f.order.quote!.subtotalFils = amount;
+    f.order.quote!.totalFils = amount;
+    f.payment.amountFils = amount;
+  }
   if (kind === "long") {
     f.order.customerDetails!.instructions =
       "ALLERGY: peanuts & sesame.\n" +

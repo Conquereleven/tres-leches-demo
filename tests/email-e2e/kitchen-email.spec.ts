@@ -25,9 +25,7 @@ for (const width of [390, 1024]) {
     await expect(
       page.getByText("ALLERGY: peanuts", { exact: false }),
     ).toContainText("Gracias — شكراً.");
-    const boxes = page
-      .getByText("PACK / BOX", { exact: true })
-      .locator("xpath=ancestor::table[1]");
+    const boxes = page.locator('[data-kitchen-item="pack"]');
     await expect(boxes).toHaveCount(3);
     for (const box of await boxes.all()) {
       const structure = await box.evaluate((el) => {
@@ -95,7 +93,7 @@ test("long original notes and malicious customer HTML remain text without overfl
   ).toBe(true);
 });
 
-for (const width of [320, 390, 1024]) {
+for (const width of [320, 375, 390, 430, 1024]) {
   test(`compact typical ${width}px: measured screenshot brief`, async ({
     page,
     browserName,
@@ -115,11 +113,33 @@ for (const width of [320, 390, 1024]) {
     await expect(
       page.getByRole("heading", { name: /^Order #042/ }),
     ).toBeVisible();
-    const titles = await page.locator("h2").allTextContents();
-    expect(titles.filter((t) => /^\d+ ×/.test(t))).toHaveLength(3);
-    const box = page
-      .getByText("PACK / BOX", { exact: true })
-      .locator("xpath=ancestor::table[1]");
+    const singles = page.locator('[data-kitchen-item="single"]');
+    await expect(singles).toHaveCount(3);
+    expect(
+      await singles.locator("[data-kitchen-quantity]").allTextContents(),
+    ).toEqual(["1", "1", "1"]);
+    const table = page.getByRole("table", { name: "Products to prepare" });
+    expect(await table.getByRole("columnheader").allTextContents()).toEqual([
+      "Product",
+      "Qty",
+      "Price",
+    ]);
+    const priority = await table.evaluate((el) =>
+      [
+        "[data-kitchen-notes]",
+        "[data-kitchen-fulfillment]",
+        "[data-kitchen-customer]",
+        "[data-kitchen-address]",
+      ].every(
+        (selector) =>
+          !!(
+            el.compareDocumentPosition(document.querySelector(selector)!) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+          ),
+      ),
+    );
+    expect(priority).toBe(true);
+    const box = page.locator('[data-kitchen-item="pack"]');
     await expect(box.locator("h2")).not.toHaveText(/^\d+ ×/);
     await expect(
       box.getByText("TOTAL: 6 pieces · 1 box", { exact: true }),
