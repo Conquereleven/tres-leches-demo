@@ -1,6 +1,6 @@
-NEW PAID ORDER #001 (TL-C3F48168)
+NEW PAID ORDER #001 (TL-CD3EAAB2)
 Fulfillment: Pickup
-Date: 2026-10-20
+Date: 2026-10-22
 Time: 4:00 PM – 9:00 PM
 
 CUSTOMER INSTRUCTIONS / ALLERGIES — ORIGINAL
@@ -26,7 +26,7 @@ PRODUCTS TO PREPARE
 1 × Traditional Conchas · Tricolor · Individual · 70 g (conchas-traditional-tricolor-individual-70-g) · AED 13.00 each · AED 13.00 line total
 1 piece · 1 × White · Individual · 70 g · Total physical pieces: 1
 
-2 × Tricolor Conchas · Pack of 3 · 3 mini · 3 × 40 g (conchas-tricolor-pack-3-mini) · AED 33.00 per box · AED 66.00 line total
+PACK / BOX: Tricolor Conchas · Pack of 3 · 3 mini · 3 × 40 g (conchas-tricolor-pack-3-mini) · AED 33.00 per box · AED 66.00 line total
 INSIDE EACH BOX:
 - 1 × Red · Mini · 40 g
 - 1 × White · Mini · 40 g
@@ -34,7 +34,7 @@ INSIDE EACH BOX:
 3 pieces per box; repeat this composition for each box.
 TOTAL: 6 pieces · 2 boxes
 
-1 × Tricolor Conchas · Pack of 3 · 3 individual · 3 × 70 g (conchas-tricolor-pack-3-individuales) · AED 39.00 per box · AED 39.00 line total
+PACK / BOX: Tricolor Conchas · Pack of 3 · 3 individual · 3 × 70 g (conchas-tricolor-pack-3-individuales) · AED 39.00 per box · AED 39.00 line total
 INSIDE THIS BOX:
 - 1 × Red · Individual · 70 g
 - 1 × White · Individual · 70 g
@@ -43,4 +43,4 @@ TOTAL: 3 pieces · 1 box
 
 Total paid: AED 140.00
 
-https://example.invalid/operations/orders?order=TL-C3F48168
+https://example.invalid/operations/orders?order=TL-CD3EAAB2

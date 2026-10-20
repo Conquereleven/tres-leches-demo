@@ -91,9 +91,10 @@ test("each traditional Concha retains exact approved artwork alongside the final
     assert.ok(a.derivatives.every((d) => !d.file.startsWith("public/")));
   }
 });
-test("Conchas opens with the three approved final batch frames", () => {
+test("Conchas opens with the two retained approved final batch frames", () => {
   const frames = categoryEditorialMedia("conchas");
-  assert.equal(frames.length, 3);
+  assert.equal(frames.length, 2);
+  assert.ok(frames.every((a) => !a.sourceId.includes("conchas_de_pistache_sobre_tabla_de_madera")));
   assert.ok(frames.every(usesMenuReferencePresentation));
   for (const asset of frames) {
     for (const d of asset.derivatives) {

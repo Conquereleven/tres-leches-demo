@@ -338,6 +338,9 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
   const image = publishedMediaAuthority() ? null : productImage(productId);
   const family = menuFamilyForSku(productId);
   const option = family?.options.find((o) => o.id === productId);
+  const thumbClass = family?.id.startsWith("conchas")
+    ? "b-co-thumb b-co-thumb-contained"
+    : "b-co-thumb";
   if (
     family &&
     option &&
@@ -360,21 +363,21 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
             ? "/brand/icon.png"
             : image?.src
         }
-        className="b-co-thumb"
+        className={thumbClass}
         sizes="72px"
       />
     );
   if (publishedMediaAuthority())
     return (
-      <span className="b-co-thumb b-co-thumb-empty" aria-hidden>
+      <span className={`${thumbClass} b-co-thumb-empty`} aria-hidden>
         <CustomerCopy>3L</CustomerCopy>
       </span>
     );
   if (tricolorSpec(productId))
-    return <img className="b-co-thumb" src="/brand/icon.png" alt="" />;
+    return <img className={thumbClass} src="/brand/icon.png" alt="" />;
   return image ? (
     <img
-      className="b-co-thumb"
+      className={thumbClass}
       src={image.src!}
       alt=""
       width={72}
@@ -383,7 +386,7 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
       decoding="async"
     />
   ) : (
-    <span className="b-co-thumb b-co-thumb-empty" aria-hidden>
+    <span className={`${thumbClass} b-co-thumb-empty`} aria-hidden>
       {name.slice(0, 1)}
     </span>
   );

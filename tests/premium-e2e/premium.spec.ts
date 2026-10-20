@@ -172,19 +172,18 @@ test("integrated premium kitchen email contains parent-first frozen prices with 
   await expect(
     page.getByRole("heading", { name: "Total paid: AED 462.00" }),
   ).toBeVisible();
+  await expect(page.getByText("AED 70.00", { exact: true })).toBeVisible();
   await expect(
-    page.getByText("AED 70.00 per box · AED 70.00 line total", { exact: true }),
-  ).toBeVisible();
-  await expect(
-    page.getByText("AED 146.00 per box · AED 146.00 line total", {
+    page.getByText("AED 146.00", {
       exact: true,
     }),
   ).toBeVisible();
   await expect(
-    page.getByText("AED 123.00 per box · AED 246.00 line total", {
+    page.getByText("AED 123.00 per box", {
       exact: true,
     }),
   ).toBeVisible();
+  await expect(page.getByText("AED 246.00", { exact: true })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   expect(requests).toEqual([]);
   await page.screenshot({

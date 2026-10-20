@@ -4,6 +4,10 @@ import { randomUUID } from "node:crypto";
 import { premiumFixture, premiumInput } from "../tests/fixtures/premium-packs";
 import { createWebCheckout } from "../server/domain/web-checkout";
 const f = premiumFixture();
+// Synthetic preview opts in explicitly; real recipients remain configuration-only.
+f.service.operationsEmailCompactRecipients = [
+  ...f.service.operationsEmailRecipients,
+];
 f.service.operationsOrigin = "https://example.invalid";
 try {
   const lines = [
