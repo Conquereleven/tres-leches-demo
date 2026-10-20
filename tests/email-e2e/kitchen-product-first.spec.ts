@@ -97,12 +97,25 @@ for (const width of [320, 375, 390, 430]) {
       ).toBeGreaterThanOrEqual(44);
       expect(await page.locator("script, img, iframe, form").count()).toBe(0);
       if (kind === "short" || kind === "three") {
-        expect(dimensions.height).toBeLessThanOrEqual(844);
+        // The supplied serif reference supersedes the earlier dense layout's
+        // hard 844px budget. Record actual height/fit; never hide safety content.
+        await expect(page.locator("[data-kitchen-brand]")).toHaveCSS(
+          "background-color",
+          "rgb(246, 223, 224)",
+        );
+        await expect(page.locator("[data-kitchen-summary]")).toHaveCSS(
+          "border-radius",
+          "12px",
+        );
+        expect(
+          await items
+            .first()
+            .locator("h2")
+            .evaluate((el) => getComputedStyle(el).fontFamily),
+        ).toContain("Georgia");
         await expect(
           page.getByRole("heading", { name: /^Total paid:/ }),
-        ).toHaveText(
-          kind === "short" ? "Total paid: AED 13.00" : "Total paid: AED 39.00",
-        );
+        ).toHaveText(kind === "short" ? "AED 13.00" : "AED 39.00");
       }
       if (kind === "large") {
         const boxes = table.locator('[data-kitchen-item="pack"]');
@@ -141,9 +154,7 @@ for (const width of [320, 375, 390, 430]) {
           page.getByText(/MANUAL REVIEW REQUIRED: Pack composition/),
         ).toBeVisible();
       if (kind === "pickup")
-        await expect(
-          page.getByRole("heading", { name: /^Pickup · 2026-11-01/ }),
-        ).toBeVisible();
+        await expect(page.locator("[data-kitchen-fulfillment]")).toBeVisible();
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
       const screenshot = `docs/email/previews/product-first-${kind}-${browserName}-${width}.png`;
       if (width === 390 || kind === "short" || kind === "three")

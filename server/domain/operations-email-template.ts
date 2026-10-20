@@ -154,9 +154,8 @@ export function renderOperationsEmail(email: KitchenEmail) {
         text.push(item.review);
         preparation += warning(item.review);
       }
-      const background = item.isPack ? "#fdf5f5" : "#ffffff";
-      // One row group per accepted line: distinct same-SKU mixtures never merge.
-      return `<tbody data-kitchen-item="${item.isPack ? "pack" : "single"}" style="background:${background};"><tr><th scope="row" style="text-align:left;vertical-align:top;padding:8px 6px 4px;overflow-wrap:anywhere;word-break:break-word;${preparation ? "" : "border-bottom:1px solid #e6dede;"}">${item.isPack ? '<p style="font-size:12px;font-weight:bold;margin:0 0 2px;">PACK / BOX</p>' : ""}<h2 style="font-size:14px;line-height:1.3;margin:0;font-weight:bold;">${escapeHtml(item.name)}</h2>${item.quantity !== 1 ? `<p style="font-size:13px;font-weight:normal;line-height:1.3;margin:3px 0 0;">${escapeHtml(priceValid ? `${money(item.priceFils!)} ${item.isPack ? "per box" : "each"}` : visiblePrice)}</p>` : ""}</th><td data-kitchen-quantity style="vertical-align:top;text-align:center;padding:8px 2px 4px;font-weight:bold;${preparation ? "" : "border-bottom:1px solid #e6dede;"}">${Number.isSafeInteger(item.quantity) && item.quantity > 0 ? item.quantity : "Review"}</td><td data-kitchen-price style="vertical-align:top;text-align:right;padding:8px 6px 4px;font-size:13px;font-weight:bold;${preparation ? "" : "border-bottom:1px solid #e6dede;"}">${escapeHtml(priceValid ? money(item.priceFils! * item.quantity) : "Review required")}</td></tr>${preparation ? `<tr><td colspan="3" style="padding:0 6px 8px;border-bottom:1px solid #e6dede;">${preparation}</td></tr>` : ""}</tbody>`;
+      // Each accepted line owns its row group, including any frozen box contents.
+      return `<tbody data-kitchen-item="${item.isPack ? "pack" : "single"}"><tr><th scope="row" style="text-align:left;vertical-align:top;padding:12px 9px ${preparation ? "3px" : "12px"};font-weight:normal;overflow-wrap:anywhere;word-break:break-word;${preparation ? "" : "border-bottom:1px solid #dbcbb3;"}">${item.isPack ? '<p style="font:10px Arial,Helvetica,sans-serif;letter-spacing:1px;color:#6f5733;margin:0 0 3px;">PACK / BOX</p>' : ""}<h2 style="font-family:Georgia,'Times New Roman',serif;font-size:18px;line-height:1.14;margin:0;font-weight:normal;">${escapeHtml(item.name)}</h2></th><td data-kitchen-quantity style="vertical-align:top;text-align:center;padding:14px 2px 4px;font-size:18px;${preparation ? "" : "border-bottom:1px solid #dbcbb3;"}">${Number.isSafeInteger(item.quantity) && item.quantity > 0 ? item.quantity : "Review"}</td><td style="vertical-align:top;text-align:right;padding:14px 9px 4px;font-size:17px;${preparation ? "" : "border-bottom:1px solid #dbcbb3;"}"><span data-kitchen-price style="white-space:nowrap;">${escapeHtml(priceValid ? money(item.priceFils! * item.quantity) : "Review required")}</span>${item.quantity !== 1 ? `<p style="font-size:13px;line-height:1.25;margin:3px 0 0;color:#6f5733;">${escapeHtml(priceValid ? `${money(item.priceFils!)} ${item.isPack ? "per box" : "each"}` : visiblePrice)}</p>` : ""}</td></tr>${preparation ? `<tr><td colspan="3" style="padding:0 9px 12px;border-bottom:1px solid #dbcbb3;color:#6f5733;">${preparation}</td></tr>` : ""}</tbody>`;
     })
     .join("");
   const review =
@@ -174,29 +173,68 @@ export function renderOperationsEmail(email: KitchenEmail) {
   const paid = validMoney(email.amountFils)
     ? money(email.amountFils)
     : "Review required";
+  const secondary =
+    "font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:1.4;letter-spacing:1.8px;text-transform:uppercase;color:#715633;";
+  // Suppress only structured values already literally present in the full address.
+  // Conflicts, missing values and every review warning remain explicit; text stays exact.
+  const fullAddress = email.address
+    .find((line) => line.startsWith("Full address: "))
+    ?.slice(14);
+  const normalizedFull = fullAddress?.trim().toLowerCase() ?? "";
+  const addressLines = email.address.filter((line) => {
+    const field =
+      /^(Street\/address|Building\/villa|Apartment\/unit): (.+)$/.exec(line);
+    if (!field || /Not stored|Not recorded|review required/i.test(field[2]!))
+      return true;
+    const value = field[2]!.trim().toLowerCase();
+    if (!value) return true;
+    const containsExact = (needle: string) => {
+      const at = normalizedFull.indexOf(needle);
+      if (at < 0) return false;
+      const before = normalizedFull[at - 1];
+      const after = normalizedFull[at + needle.length];
+      return (
+        (!before || /[\s,;·]/.test(before)) &&
+        (!after || /[\s,;·.]/.test(after))
+      );
+    };
+    if (field[1] === "Apartment/unit")
+      return !["unit", "apartment", "flat", "apt"].some((label) =>
+        containsExact(`${label} ${value}`),
+      );
+    return !containsExact(value);
+  });
+  const addressHtml = addressLines
+    .map((line) =>
+      /(?:UNVERIFIED|Not recorded|review required|Not stored)/i.test(line)
+        ? warning(line)
+        : cellText(line.startsWith("Full address: ") ? line.slice(14) : line),
+    )
+    .join("");
   const contacts = [
-    `Customer: ${email.customer}`,
     ...(email.phone === email.whatsapp && email.phone !== "Not stored"
       ? [`Phone / WhatsApp: ${email.phone}`]
       : [`Phone: ${email.phone}`, `WhatsApp: ${email.whatsapp}`]),
     `Email: ${email.email}`,
   ];
-  const addressHtml = email.address
-    .map((line) =>
-      /(?:UNVERIFIED|Not recorded|review required|Not stored)/i.test(line)
-        ? warning(line)
-        : escapeHtml(line),
-    )
-    .join(" · ");
-  const html = `<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="format-detection" content="telephone=no"><title>Paid 3L order ${escapeHtml(email.reference)}</title></head><body style="margin:0;padding:0;background:#ffffff;color:#27242d;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.3;"><div role="main" lang="en" dir="ltr"><table lang="en" dir="ltr" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;"><tr><td align="center" style="padding:8px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;table-layout:fixed;text-align:left;overflow-wrap:anywhere;word-break:break-word;">
-<tr><td style="padding:8px 10px;background:#F6DFE0;border-bottom:2px solid #A28D5B;"><p style="margin:0 0 3px;font-size:12px;font-weight:bold;letter-spacing:1px;">3L PASTELERÍAS</p><h1 style="font-size:18px;line-height:1.2;margin:0;">Order ${escapeHtml(email.reference)} · PAID</h1></td></tr>
-<tr><td style="padding:7px 0 0;"><table aria-label="Products to prepare" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;border-collapse:collapse;"><colgroup><col><col style="width:36px;"><col style="width:80px;"></colgroup><thead><tr style="border-bottom:1px solid #A28D5B;"><th scope="col" style="text-align:left;padding:4px 6px;font-size:13px;">Product</th><th scope="col" style="text-align:center;padding:4px 2px;font-size:13px;">Qty</th><th scope="col" style="text-align:right;padding:4px 6px;font-size:13px;">Price</th></tr></thead>${cards}</table></td></tr>
-<tr><td data-kitchen-notes style="padding:7px 6px;background:#fdf5f5;border-bottom:1px solid #e6dede;"><h2 style="font-size:14px;margin:0 0 3px;">Customer instructions / allergies</h2><p style="margin:0 0 3px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;"><strong>Original customer instructions:</strong> ${escapeHtml(email.instructions)}</p><p style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;"><strong>Original delivery notes:</strong> ${escapeHtml(email.deliveryNotes)}</p></td></tr>
-<tr><td style="padding:7px 6px;">${financialReview ? warning(review) : ""}${validMoney(email.quote?.feeFils) && email.quote.feeFils > 0 ? cellText(`Stored delivery fee: ${money(email.quote.feeFils)}`) : ""}<h2 style="font-size:17px;margin:0;">Total paid: ${paid}</h2></td></tr>
-<tr><td data-kitchen-fulfillment style="padding:5px 6px;border-top:1px solid #e6dede;"><h2 style="font-size:14px;margin:0;">${email.pickup ? "Pickup" : "Delivery"} · ${escapeHtml(email.date)} · ${escapeHtml(email.time)}</h2></td></tr>
-<tr><td data-kitchen-customer style="font-size:13px;padding:4px 6px;line-height:1.35;">${contacts.map(escapeHtml).join(" · ")}</td></tr>
-<tr><td data-kitchen-address style="font-size:13px;padding:4px 6px;line-height:1.35;">${addressHtml}</td></tr>
-<tr><td style="padding:0 6px;">${link ? `<a href="${escapeHtml(link)}" style="display:inline-block;min-height:44px;box-sizing:border-box;padding:12px 0;line-height:20px;color:#27242d;text-decoration:underline;font-weight:bold;">Open order in Operations (sign-in required)</a>` : warning("Operations link unavailable — open the authenticated dashboard and find this order.")}</td></tr>
+  const storedSubtotal =
+    subtotal !== null && Number.isSafeInteger(subtotal)
+      ? money(subtotal)
+      : "Not stored — review required";
+  const fee = validMoney(email.quote?.feeFils)
+    ? money(email.quote.feeFils)
+    : "Not stored — review required";
+  const html = `<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="format-detection" content="telephone=no"><title>Paid 3L order ${escapeHtml(email.reference)}</title></head><body style="margin:0;padding:0;background:#fffcf8;color:#191919;font-family:Georgia,'Times New Roman',serif;font-size:14px;line-height:1.3;"><div role="main" lang="en" dir="ltr"><table lang="en" dir="ltr" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;"><tr><td align="center"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;table-layout:fixed;text-align:left;overflow-wrap:anywhere;word-break:break-word;">
+<tr><td data-kitchen-brand style="text-align:center;background:#F6DFE0;padding:15px 12px 13px;color:#715633;"><p style="font-size:26px;line-height:1.15;letter-spacing:5px;margin:0;">TRES LECHES</p><table role="presentation" width="44%" align="center" cellpadding="0" cellspacing="0"><tr><td style="border-bottom:1px solid #A28D5B;height:9px;font-size:1px;line-height:1px;">&nbsp;</td></tr></table><p style="font:10px Arial,Helvetica,sans-serif;letter-spacing:4px;margin:10px 0 0;">BAKERY</p></td></tr>
+<tr><td style="text-align:center;padding:14px 12px 15px;"><h1 style="font-family:Georgia,'Times New Roman',serif;font-size:32px;font-weight:normal;line-height:1.1;margin:0 0 9px;">New Order: ${escapeHtml(email.reference)}</h1><p style="font-size:14px;margin:0 0 8px;">You’ve received the following order from ${escapeHtml(email.customer)}.</p><p style="${secondary}margin:0;">PAID · ${email.pickup ? "Pickup" : "Delivery"} · ${escapeHtml(email.date)}</p></td></tr>
+<tr><td style="padding:0 12px;"><table data-kitchen-summary role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;border:1px solid #e5d9c9;border-radius:12px;border-spacing:0;"><tr><td><table aria-label="Products to prepare" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;border-spacing:0;"><colgroup><col><col style="width:30px;"><col style="width:104px;"></colgroup><thead><tr style="background:#F6DFE0;"><th scope="col" style="text-align:left;padding:10px 9px;border-radius:11px 0 0 0;${secondary}">Product</th><th scope="col" style="text-align:center;padding:10px 2px;${secondary}">Qty</th><th scope="col" style="text-align:right;padding:10px 9px;border-radius:0 11px 0 0;${secondary}">Price</th></tr></thead>${cards}</table></td></tr>
+<tr><td style="padding:9px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="${secondary}padding:3px 0;">Subtotal</td><td style="text-align:right;font-size:15px;">${escapeHtml(storedSubtotal)}</td></tr><tr><td style="${secondary}padding:3px 0;">${email.pickup ? "Fulfillment fee" : "Delivery fee"}</td><td style="text-align:right;font-size:15px;">${escapeHtml(fee)}</td></tr></table>${financialReview ? warning(review) : ""}</td></tr>
+<tr><td style="padding:10px 9px;border-top:1px solid #dbcbb3;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="${secondary}font-size:11px;">Total paid</td><td style="text-align:right;"><h2 aria-label="Total paid: ${paid}" style="margin:0;font-size:23px;line-height:1.2;font-weight:normal;color:#715633;">${paid}</h2></td></tr></table></td></tr></table></td></tr>
+<tr><td style="padding:7px 12px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F6DFE0;border:1px solid #A28D5B;border-radius:11px;"><tr><td data-kitchen-notes style="padding:9px;"><h2 style="font: bold 12px Arial,Helvetica,sans-serif;margin:0 0 4px;">Customer instructions / allergies</h2><p style="margin:0 0 3px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;"><strong>Original customer instructions:</strong> ${escapeHtml(email.instructions)}</p><p style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;"><strong>Original delivery notes:</strong> ${escapeHtml(email.deliveryNotes)}</p></td></tr></table></td></tr>
+<tr><td style="padding:7px 12px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;border-radius:11px;background:#F6DFE0;"><tr><td data-kitchen-fulfillment style="padding:9px 10px;width:47%;vertical-align:top;"><p style="${secondary}margin:0 0 3px;">${email.pickup ? "Pickup" : "Delivery"} date</p><p style="margin:0;font-size:15px;">${escapeHtml(email.date)}</p></td><td style="padding:9px 10px;border-left:1px solid #dbcbb3;vertical-align:top;"><p style="${secondary}margin:0 0 3px;">${email.pickup ? "Pickup" : "Delivery"} time</p><p style="margin:0;font-size:15px;">${escapeHtml(email.time)}</p></td></tr></table></td></tr>
+<tr><td style="padding:7px 12px 0;"><table data-kitchen-customer role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;background:#f5efe7;border-radius:11px;"><tr><td data-kitchen-address style="width:52%;vertical-align:top;padding:10px 9px;font-size:13px;"><p style="${secondary}margin:0 0 4px;">${email.pickup ? "Pickup location" : "Delivery address"}</p><p style="margin:0 0 3px;">${escapeHtml(email.customer)}</p>${addressHtml}</td><td style="vertical-align:top;padding:10px 9px;border-left:1px solid #dbcbb3;font:12px Arial,Helvetica,sans-serif;">${contacts.map(cellText).join("")}</td></tr></table></td></tr>
+
+<tr><td style="padding:3px 12px 6px;font:12px Arial,Helvetica,sans-serif;">${link ? `<a href="${escapeHtml(link)}" style="display:inline-block;min-height:44px;box-sizing:border-box;padding:12px 0;line-height:20px;color:#27242d;text-decoration:underline;">Open order in Operations (sign-in required)</a>` : warning("Operations link unavailable — open the authenticated dashboard and find this order.")}</td></tr>
 </table></td></tr></table></div></body></html>`;
   return { text: text.join("\n"), html };
 }
