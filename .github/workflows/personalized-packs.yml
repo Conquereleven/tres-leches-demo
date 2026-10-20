@@ -32,6 +32,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
+      - run: node scripts/verify-webkit-runtime.mjs
       - run: node --import tsx scripts/preview-kitchen-email.ts
       - run: npx playwright test --config=playwright.email.config.ts
       - run: node --import tsx scripts/preview-pack-pricing.ts
@@ -83,6 +84,8 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - if: matrix.browser == 'webkit'
+        run: node scripts/verify-webkit-runtime.mjs
       - run: mkdir -p work/e2e
       - name: Compare main WebKit navigation under the same runner conditions
         if: matrix.browser == 'webkit'
@@ -91,11 +94,10 @@ jobs:
         run: |
           baseline=$(mktemp -d)
           git archive "${{ github.event.pull_request.base.sha }}" | tar -x -C "$baseline"
-          ln -s "$GITHUB_WORKSPACE/node_modules" "$baseline/node_modules"
           cp playwright.operations.config.ts "$baseline/playwright.operations.config.ts"
           mkdir -p work/qa/navigation-baseline
           set +e
-          (cd "$baseline" && DEBUG=pw:browser npx playwright test --config=playwright.operations.config.ts --project=webkit --grep 'fulfilment actions|address, verification' --repeat-each=5 --trace=on) > work/qa/navigation-baseline/main.log 2>&1
+          (cd "$baseline" && npm ci && npx playwright install webkit && DEBUG=pw:browser npx playwright test --config=playwright.operations.config.ts --project=webkit --grep 'fulfilment actions|address, verification' --repeat-each=5 --trace=on) > work/qa/navigation-baseline/main.log 2>&1
           result=$?
           set -e
           echo "$result" > work/qa/navigation-baseline/exit-code.txt
