@@ -136,5 +136,104 @@ export function kitchenEmailPreview() {
     payment,
     ["kitchen@example.invalid"],
     "https://www.3ldubai.ae",
+    ["kitchen@example.invalid"],
+  )[0]!;
+}
+
+/** One six-piece box + three single products; fictional mobile screenshot brief. */
+export function compactKitchenEmailFixture() {
+  const f = kitchenEmailFixture();
+  const box = structuredClone(f.order.lines[1]!);
+  box.quantity = 1;
+  // Plain sugar/sesame is a historical accepted composition, not an approval change.
+  const spec = PACK_SPECS.find((s) => s.packSkuId === box.productId)!;
+  const sugar = spec.components.find(
+    (c) =>
+      c.componentSkuId.includes("azucar") &&
+      !c.componentSkuId.includes("covering"),
+  )!.componentSkuId;
+  const sesame = spec.components.find((c) =>
+    c.componentSkuId.includes("ajonjoli"),
+  )!.componentSkuId;
+  box.composition = [
+    { componentSkuId: sugar, units: 4 },
+    { componentSkuId: sesame, units: 2 },
+  ];
+  box.packSnapshot!.components = box.composition.map((c) => ({
+    ...c,
+    name: componentName(c.componentSkuId, "en"),
+  }));
+  f.order.lines = [
+    box,
+    { productId: "conchas-traditional-chocolate-individual-70-g", quantity: 1 },
+    { productId: "pan-de-muerto-traditional-azucar-mini-40-g", quantity: 1 },
+    { productId: "pan-de-muerto-traditional-ajonjoli-mini-40-g", quantity: 1 },
+  ];
+  f.order.catalogSnapshot = f.catalog.filter((p) =>
+    f.order.lines.some((l) => l.productId === p.id),
+  );
+  const amount = f.order.lines.reduce(
+    (sum, l) =>
+      sum +
+      f.order.catalogSnapshot!.find((p) => p.id === l.productId)!.priceFils *
+        l.quantity,
+    0,
+  );
+  f.order.quote!.subtotalFils = amount;
+  f.order.quote!.totalFils = amount;
+  f.payment.amountFils = amount;
+  f.order.customerDetails!.instructions =
+    "ALLERGY: peanuts. Call before preparation.";
+  f.order.delivery!.notes = "Call reception; keep box level.";
+  f.order.delivery!.addressVerification = "UNVERIFIED";
+  f.order.customerDetails!.whatsappNumber = "+971500000000";
+  f.state.conversations.push({
+    id: f.order.conversationId,
+    customer: "Alex Example",
+    phone: "+971500000000",
+    sourceNumberId: "fictional",
+    sourcePhoneNumber: "+971500000001",
+    assignedAgent: null,
+    status: "open",
+    unread: false,
+    version: 1,
+    messages: [],
+    audit: [],
+  });
+  return f;
+}
+
+export function compactKitchenEmailPreview(
+  kind: "typical" | "pickup" | "long" | "review" | "large" = "typical",
+) {
+  const f =
+    kind === "large" ? kitchenEmailFixture() : compactKitchenEmailFixture();
+  if (kind === "long") {
+    f.order.customerDetails!.instructions =
+      "ALLERGY: peanuts & sesame.\n" +
+      "Original instructions must remain complete. ".repeat(45) +
+      "\nEND OF ORIGINAL ALLERGY INSTRUCTIONS";
+    f.order.delivery!.notes =
+      "Long delivery note: " +
+      "FictionalAccessDetail".repeat(60) +
+      "\nEND OF DELIVERY NOTES";
+    f.order.delivery!.building = "LongFictionalBuilding".repeat(30);
+  }
+  if (kind === "review") delete f.order.lines[0]!.packSnapshot;
+  if (kind === "pickup") {
+    f.order.fulfillmentMethod = "pickup";
+    f.order.pickup = {
+      pickupDate: "2026-11-01",
+      preferredTime: "4:00 PM – 9:00 PM",
+    };
+    delete f.order.delivery;
+  }
+  return recordPaidOperationsEmail(
+    f.state,
+    f.order,
+    f.payment,
+    ["kitchen@example.invalid"],
+    "https://www.3ldubai.ae",
+    ["kitchen@example.invalid"],
   )[0]!;
 }

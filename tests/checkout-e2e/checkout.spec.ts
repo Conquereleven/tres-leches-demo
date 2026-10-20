@@ -117,10 +117,44 @@ test("cart → delivery → details → review → payment step", async ({
       body: "<h1>Mock Paymennt TEST checkout</h1>",
     }),
   );
+  const pay = page.getByRole("button", { name: "PAY AED 50", exact: true });
+  const paymentForm = page.locator("form.b-co-payment");
+  await expect(paymentForm).toHaveAttribute("aria-busy", "false");
+  await expect(
+    page.getByRole("checkbox", { name: /I've reviewed/ }),
+  ).toBeChecked();
+  // The scenario has just scrolled between billing, consent and the footer.
+  // Complete that movement before issuing one real pointer action. Enabled
+  // alone does not establish that the same point stays on PAY during scrolling.
+  await pay.evaluate((el) =>
+    el.scrollIntoView({ block: "center", behavior: "instant" }),
+  );
+  await expect
+    .poll(() =>
+      pay.evaluate(async (el) => {
+        const before = el.getBoundingClientRect();
+        await new Promise<void>((resolve) =>
+          requestAnimationFrame(() => resolve()),
+        );
+        const after = el.getBoundingClientRect();
+        return (
+          before.x === after.x &&
+          before.y === after.y &&
+          before.height === after.height &&
+          document
+            .elementFromPoint(
+              after.x + after.width / 2,
+              after.y + after.height / 2,
+            )
+            ?.closest("button") === el
+        );
+      }),
+    )
+    .toBe(true);
   const submitted = page.waitForRequest(
     (r) => r.url().endsWith("/api/checkout/web") && r.method() === "POST",
   );
-  await page.getByRole("button", { name: "PAY AED 50", exact: true }).click();
+  await pay.click();
   expect((await submitted).headers()["x-checkout-quote-revision"]).toMatch(
     /^[a-f0-9]{64}$/,
   );

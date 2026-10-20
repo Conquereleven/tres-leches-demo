@@ -86,7 +86,7 @@ export function ProductOptions({
   return (
     <div className="b-menu-options">
       <figure
-        className={`b-menu-photo ${media ? "" : "b-family-photo"} ${usesMenuReferencePresentation(media) ? "b-official-photo" : ""}`}
+        className={`b-menu-photo ${media ? "" : "b-family-photo"} ${usesMenuReferencePresentation(media) || family.id.startsWith("conchas") ? "b-official-photo" : ""}`}
       >
         {media || fallback ? (
           <ResponsiveMedia

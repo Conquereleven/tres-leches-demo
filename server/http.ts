@@ -256,6 +256,8 @@ export async function startServer(
     ? null
     : operationsResendFromEnv(process.env);
   service.operationsEmailRecipients = operationsEmail?.recipients ?? [];
+  service.operationsEmailCompactRecipients =
+    operationsEmail?.compactRecipients ?? [];
   recoverInterruptedCustomerNotifications(
     store,
     "operationsEmailNotifications",

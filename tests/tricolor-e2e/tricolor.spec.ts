@@ -13,8 +13,51 @@ const readCart = (page: Page): Promise<CartLine[]> =>
   page.evaluate(() => JSON.parse(localStorage.getItem("3l-cart") ?? "[]"));
 async function addAndVerify(page: Page, expected: CartLine[], info: TestInfo) {
   const before = await readCart(page);
-  await expect(page.locator(".b-add-to-cart > button")).toBeEnabled();
-  await page.locator(".b-add-to-cart > button").click();
+  const button = page.locator(".b-add-to-cart > button");
+  const color = expected.at(-1)?.color;
+  if (color) {
+    const lang = new URL(page.url()).searchParams.get(
+      "lang",
+    ) as keyof typeof tricolorCopy;
+    await expect(
+      page.getByRole("combobox", {
+        name: tricolorCopy[lang].color,
+        exact: true,
+      }),
+    ).toHaveValue(color);
+    await expect(page.locator(".b-pack-composition")).toContainText(
+      tricolorCopy[lang][color],
+    );
+  }
+  await expect(button).toBeEnabled();
+  // WebKit can complete a pointer action while smooth scrolling moves the
+  // button between its header-obscured and bottom-edge positions. Centre the
+  // actual control and verify a stable, unobscured hit target before one click.
+  await button.evaluate((el) =>
+    el.scrollIntoView({ block: "center", behavior: "instant" }),
+  );
+  await expect
+    .poll(() =>
+      button.evaluate(async (el) => {
+        const before = el.getBoundingClientRect();
+        await new Promise<void>((resolve) =>
+          requestAnimationFrame(() => resolve()),
+        );
+        const after = el.getBoundingClientRect();
+        const target = document.elementFromPoint(
+          after.x + after.width / 2,
+          after.y + after.height / 2,
+        );
+        return (
+          before.x === after.x &&
+          before.y === after.y &&
+          before.height === after.height &&
+          target?.closest("button") === el
+        );
+      }),
+    )
+    .toBe(true);
+  await button.click();
   // A dispatched click alone does not establish the accepted cart state.
   await expect.poll(() => readCart(page)).toEqual(expected);
   await info.attach(`cart-add-${expected.length}.json`, {
@@ -164,6 +207,42 @@ for (const width of [390, 768, 1440])
       });
       expect(errors).toEqual([]);
     });
+test("active scroll retains three chosen colours and both fixed packs through navigation", async ({
+  page,
+}, info) => {
+  const lang = "ar" as const;
+  await page.setViewportSize({ width: 768, height: 900 });
+  await page.goto(`/menu?product=conchas-traditional--tricolor&lang=${lang}`);
+  const sizes = page.locator(".b-menu-selectors select").first();
+  await expect(sizes.locator("option")).toHaveCount(2);
+  const values = await sizes
+    .locator("option")
+    .evaluateAll((options) =>
+      options.map((option) => (option as HTMLOptionElement).value),
+    );
+  const expected: CartLine[] = [];
+  for (const [i, color] of (["red", "white", "green"] as const).entries()) {
+    const size = values[i % 2]!;
+    await sizes.selectOption(size);
+    await page
+      .getByRole("combobox", { name: tricolorCopy[lang].color, exact: true })
+      .selectOption(color);
+    expected.push({
+      productId: /mini/i.test(size)
+        ? "conchas-traditional-tricolor-mini-40-g"
+        : "conchas-traditional-tricolor-individual-70-g",
+      quantity: 1,
+      color,
+    });
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+    await addAndVerify(page, expected, info);
+  }
+  await page.goto(`/menu?product=conchas-tricolor-pack&lang=${lang}`);
+  await addFixedPacks(page, lang, expected, info, 768);
+  await page.goto(`/cart?lang=${lang}`);
+  await expect(page.locator(".b-co-item")).toHaveCount(5);
+  expect(await readCart(page)).toEqual(expected);
+});
 test("fixed packs wait for delayed published catalog and survive navigation", async ({
   page,
 }, info) => {

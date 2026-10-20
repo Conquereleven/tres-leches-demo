@@ -57,6 +57,7 @@ try {
     to,
     subject: `[TEST] ${email.subject}`,
     text: `This is a test of 3L order emails. No order exists.\n\n${email.body}`,
+    html: email.html.replace("<h1 class=\"mail-heading\"", '<p style="margin:0 0 14px;font-weight:bold;color:#A93C68;">TEST ONLY · NO REAL ORDER EXISTS</p><h1 class="mail-heading"'),
     idempotencyKey: `test-${randomUUID()}`,
   });
   console.log(
