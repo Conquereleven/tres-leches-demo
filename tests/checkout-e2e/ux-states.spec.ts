@@ -125,7 +125,16 @@ test.describe("payment step", () => {
         }),
       }),
     );
+    // Complete homepage config hydration before replacing the document. The
+    // retained CI trace otherwise reports an aborted config fetch/access-control
+    // page error during goto('/cart'), before this payment scenario even starts.
+    const configReady = page.waitForResponse((response) =>
+      response.url().endsWith("/api/checkout/config"),
+    );
     await page.goto("/");
+    const config = await configReady;
+    expect(config.status()).toBe(200);
+    expect(await config.finished()).toBeNull();
     await page.evaluate(() => {
       const date = new Date(Date.now() + 172_800_000)
         .toISOString()
