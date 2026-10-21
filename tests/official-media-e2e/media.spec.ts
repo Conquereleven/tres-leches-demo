@@ -89,11 +89,11 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
       path: `work/qa/official-media/${info.project.name}-product-${width}.png`,
     });
     await visitMenu("/menu?category=pan");
-    // Restored Pan de Muerto banner: whole 3:2 boards, before the product grid.
+    // Pan gallery opens with the 3L-MEDIA-002 photograph M002-080, 3:2, before the product grid.
     const banner = page.locator(".b-category-showcase .b-official-rotation");
     await expect(banner.locator("picture.is-active img")).toHaveAttribute(
       "src",
-      /official-pan-banner-0[1-4]-/,
+      /3l-media-002\/pan-2-m002-080-/,
     );
     const bannerBox = (await page
       .locator(".b-category-showcase")

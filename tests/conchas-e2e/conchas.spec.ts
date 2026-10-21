@@ -335,7 +335,7 @@ for (const width of [390, 768, 1440])
     await banner.scrollIntoViewIfNeeded();
     await expect(banner.locator("picture.is-active img")).toHaveAttribute(
       "src",
-      /docena_de_conchas_de_chocolate_envuelta/,
+      /3l-media-002\/conchas-0-m002-026-/,
     );
     await expect(
       banner.locator('img[src*="conchas_de_pistache_sobre_tabla_de_madera"]'),
