@@ -44,14 +44,14 @@ function state() {
   };
 }
 
-test("foundation reconciles all 236 SKUs and preserves price, identity, status and compatible slugs", () => {
+test("foundation reconciles all 238 SKUs and preserves price, identity, status and compatible slugs", () => {
   const p = plan();
   assert.equal(p.report.valid, true);
-  assert.equal(p.report.preservedPriceCount, 236);
-  assert.equal(p.report.mappedSkuCount, 216);
-  assert.equal(p.foundation.variants.length, 236);
+  assert.equal(p.report.preservedPriceCount, 238);
+  assert.equal(p.report.mappedSkuCount, 218);
+  assert.equal(p.foundation.variants.length, 238);
   assert.equal(p.report.review.length, 20);
-  assert.equal(p.report.publicProductCount, 74);
+  assert.equal(p.report.publicProductCount, 75);
   for (const v of p.foundation.variants) {
     const c = sources.approved.find((c) => c.id === v.skuId)!;
     assert.equal(v.commercialState === "published", c.active);
@@ -248,7 +248,7 @@ test("public projection excludes drafts, archival records and private fields, lo
   const before = catalogDigest(s);
   for (const locale of ["en", "es", "ar"]) {
     const response = publicCatalog(s, { locale, limit: 100 });
-    assert.equal(response.products.length, 73);
+    assert.equal(response.products.length, 74);
     assert.equal(
       response.products.some(
         (p) => p.id === s.catalogFoundation.products[0]!.id,
@@ -350,7 +350,7 @@ test("HTTP read contract supports ETag, bounded queries, no writes, no side effe
       "no-cache, max-age=0, must-revalidate",
     );
     const body = await r.json();
-    assert.equal(body.products.length, 7);
+    assert.equal(body.products.length, 8);
     assert.equal(
       (
         await fetch(base + "/api/catalog?category=conchas&locale=es", {
@@ -464,7 +464,7 @@ test("application routes expose only flagged GET reads and leave SQLite document
     const before = read();
     const r = await fetch(`http://127.0.0.1:${port}/api/catalog?limit=100`);
     assert.equal(r.status, 200);
-    assert.equal((await r.json()).total, 74);
+    assert.equal((await r.json()).total, 75);
     assert.equal(
       (
         await fetch(`http://127.0.0.1:${port}/api/catalog`, {

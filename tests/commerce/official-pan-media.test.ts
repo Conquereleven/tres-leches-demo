@@ -65,13 +65,20 @@ test("all 50 official photos are accounted for and only reviewed ones are public
     "official-pan-04",
   ]);
   assert.deepEqual(pack("pan-de-muerto-filled-pack"), ["official-pan-02"]);
-  // Restored category banner: the four boards, whole, in their original 3:2 frame.
+  // 3L-MEDIA-002 photographs open the gallery; the four restored banner boards
+  // follow, whole, in their original 3:2 frame.
   const boards = categoryEditorialMedia("pan");
   assert.deepEqual(
-    boards.map((b) => b.sourceId),
+    boards.slice(0, 3).map((b) => b.sourceId),
+    ["080", "059", "049"].map((n) => `3l-media-002-pan-m002-${n}`),
+  );
+  assert.deepEqual(
+    boards.slice(3).map((b) => b.sourceId),
     ["01", "02", "03", "04"].map((n) => `official-pan-banner-${n}`),
   );
-  for (const board of boards) assert.equal(board.width! / board.height!, 1.5);
+  assert.equal(boards.length, 7);
+  for (const board of boards)
+    assert.ok(Math.abs(board.width! / board.height! - 1.5) < 0.005);
   for (const other of ["cakes", "jars"])
     assert.deepEqual(categoryEditorialMedia(other), []);
   // Chocolate-covered fillings have no photograph of their own.

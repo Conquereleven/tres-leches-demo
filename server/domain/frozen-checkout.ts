@@ -42,6 +42,8 @@ export function frozenCheckout(order: Order, payment: Payment) {
     requireThat(unitPriceFils !== null, held, 409);
     return {
       sku: product.id,
+      ...(line.color ? { color: line.color } : {}),
+      ...(line.packSnapshot ? { packSnapshot: line.packSnapshot } : {}),
       ...(line.composition
         ? { composition: line.composition, packSnapshot: line.packSnapshot }
         : {}),

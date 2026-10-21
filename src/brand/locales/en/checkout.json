@@ -182,5 +182,7 @@
   "pack_9a5d3ce941dea12b": "Choose all pack flavors before continuing",
   "pack_5d72f458fd143e86": "Pack composition must equal its capacity",
   "pack_37bb19baa264e645": "Personalized packs are not enabled",
-  "pack_1c2a4497f4a430a3": "Duplicate composition or maximum box quantity exceeded"
+  "pack_1c2a4497f4a430a3": "Duplicate composition or maximum box quantity exceeded",
+  "copy_13e45fb4a00a8d71": "Choose exactly one valid Tricolor color; fixed packs cannot be customized",
+  "copy_63b26b3134d6c013": "This product does not accept a color"
 }

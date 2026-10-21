@@ -80,6 +80,7 @@ export function MenuPreview() {
                 </span>
               ) : (
                 <ResponsiveMedia
+                  editorial
                   family={p.family}
                   variant={p.variant}
                   fallback={menuFamilies.find((f) => f.id === p.family)?.image}

@@ -1,0 +1,675 @@
+{
+ "task": "3L-MEDIA-002",
+ "expectedPublishedRevision": "catalog-v1-63d2f003c1f1724d474e3854ad246208dcd03f41987b9eff0d62449bf0f6f05e",
+ "note": "Product media only. Prices, SKUs, availability, translations, descriptions and pack rules are copied unchanged from the Product Hub view at run time.",
+ "products": [
+  {
+   "productId": "bisquets",
+   "alt": {
+    "en": {
+     "name": "Bisquets",
+     "description": null,
+     "variantLabel": null
+    },
+    "es": {
+     "name": "Bisquets",
+     "description": null,
+     "variantLabel": null
+    },
+    "ar": {
+     "name": "Bisquets",
+     "description": null,
+     "variantLabel": null
+    }
+   },
+   "before": [],
+   "uploads": [
+    {
+     "file": "hub-uploads/bisquets-0-m002-006.webp",
+     "sha256": "7c1fb53b30753ee7cb3d033ff8f8f46fbcb19e3afe7e9aa68a1773bb654940d1",
+     "sourceAssetId": "M002-006",
+     "role": "primary"
+    },
+    {
+     "file": "hub-uploads/bisquets-1-m002-003.webp",
+     "sha256": "9d07019b6df5cf7b74e944f30c9f200bc7ddf75a38e868dfa4f1ae369508fb1a",
+     "sourceAssetId": "M002-003",
+     "role": "gallery"
+    },
+    {
+     "file": "hub-uploads/bisquets-2-m002-004.webp",
+     "sha256": "807b2be311708b67d2618541b707a8a8e8fd9c4ecadc1a6cb2dd175b0062cf2a",
+     "sourceAssetId": "M002-004",
+     "role": "gallery"
+    }
+   ],
+   "retainPrevious": []
+  },
+  {
+   "productId": "conchas-traditional--chocolate",
+   "alt": {
+    "en": {
+     "name": "Concha tradicional de chocolate",
+     "description": null,
+     "variantLabel": null
+    },
+    "es": {
+     "name": "Concha tradicional de chocolate",
+     "description": null,
+     "variantLabel": null
+    },
+    "ar": {
+     "name": "Concha تقليدية بالشوكولاتة",
+     "description": null,
+     "variantLabel": null
+    }
+   },
+   "before": [
+    {
+     "assetId": "asset-22442786e5776c57962da28952298b3aa9db0d0b550ef89d673f9e42f997cbef",
+     "role": "primary",
+     "order": 0
+    }
+   ],
+   "uploads": [
+    {
+     "file": "hub-uploads/conchas-traditional--chocolate-0-m002-008.webp",
+     "sha256": "5ad0f54ecf9e34fcd276885a5b580e87d7a9bcd52e707b17a8fc9ada89af74ad",
+     "sourceAssetId": "M002-008",
+     "role": "primary"
+    },
+    {
+     "file": "hub-uploads/conchas-traditional--chocolate-1-m002-013.webp",
+     "sha256": "f4c5ef95478b2b4b78687d147666031ed2a8ec935c2bd48489290c0699cec41f",
+     "sourceAssetId": "M002-013",
+     "role": "gallery"
+    },
+    {
+     "file": "hub-uploads/conchas-traditional--chocolate-2-m002-010.webp",
+     "sha256": "0af28eaf004bebbddc420574f4279c0813ad80da51dfe261bd6881c41ab3449c",
+     "sourceAssetId": "M002-010",
+     "role": "gallery"
+    }
+   ],
+   "retainPrevious": [
+    "asset-22442786e5776c57962da28952298b3aa9db0d0b550ef89d673f9e42f997cbef"
+   ]
+  },
+  {
+   "productId": "conchas-traditional--vainilla",
+   "alt": {
+    "en": {
+     "name": "Traditional vanilla concha",
+     "description": null,
+     "variantLabel": null
+    },
+    "es": {
+     "name": "Concha tradicional de vainilla",
+     "description": null,
+     "variantLabel": null
+    },
+    "ar": {
+     "name": "كونشا تقليدية بالفانيليا",
+     "description": null,
+     "variantLabel": null
+    }
+   },
+   "before": [
+    {
+     "assetId": "asset-c5547d42dcebd7ae4fe3efbce61c0b7c10e363767a4087f232f6369ca4eb369c",
+     "role": "primary",
+     "order": 0
+    }
+   ],
+   "uploads": [
+    {
+     "file": "hub-uploads/conchas-traditional--vainilla-0-m002-023.webp",
+     "sha256": "eff48ccb3f2a26393f84ced28db15f8370e53820cb764dee051192e29ffeb5f9",
+     "sourceAssetId": "M002-023",
+     "role": "primary"
+    },
+    {
+     "file": "hub-uploads/conchas-traditional--vainilla-1-m002-019.webp",
+     "sha256": "d9cec59b544191e98eda27125d3ba6545d05baf7a232cbcc8d45971f2d07b4d9",
+     "sourceAssetId": "M002-019",
+     "role": "gallery"
+    },
+    {
+     "file": "hub-uploads/conchas-traditional--vainilla-2-m002-021.webp",
+     "sha256": "ac1c1a2adac0958d1d3a8c5b9a96ddcdace14db54f7afc3930aea419655e7dc9",
+     "sourceAssetId": "M002-021",
+     "role": "gallery"
+    }
+   ],
+   "retainPrevious": [
+    "asset-c5547d42dcebd7ae4fe3efbce61c0b7c10e363767a4087f232f6369ca4eb369c"
+   ]
+  },
+  {
+   "productId": "orejas",
+   "alt": {
+    "en": {
+     "name": "Orejas",
+     "description": null,
+     "variantLabel": null
+    },
+    "es": {
+     "name": "Orejas",
+     "description": null,
+     "variantLabel": null
+    },
+    "ar": {
+     "name": "Orejas",
+     "description": null,
+     "variantLabel": null
+    }
+   },
+   "before": [],
+   "uploads": [
+    {
+     "file": "hub-uploads/orejas-0-m002-037.webp",
+     "sha256": "8ac51e8cd9335f3b447d17ec79472a731835cd4e661bced4bdfc689689990c02",
+     "sourceAssetId": "M002-037",
+     "role": "primary"
+    },
+    {
+     "file": "hub-uploads/orejas-1-m002-039.webp",
+     "sha256": "e4a7b67e7c17f707411193844acc83c8b60c03d0784e364ffd8506073a2f0b6f",
+     "sourceAssetId": "M002-039",
+     "role": "gallery"
+    },
+    {
+     "file": "hub-uploads/orejas-2-m002-042.webp",
+     "sha256": "3d489a83dd40489c8414971d14454841f06dc92b1c8bc2acf536af9a5c183048",
+     "sourceAssetId": "M002-042",
+     "role": "gallery"
+    }
+   ],
+   "retainPrevious": []
+  },
+  {
+   "productId": "pan-de-muerto-filled--chocolate",
+   "alt": {
+    "en": {
+     "name": "Chocolate Pan de Muerto relleno",
+     "description": null,
+     "variantLabel": null
+    },
+    "es": {
+     "name": "Pan de Muerto relleno · Chocolate",
+     "description": null,
+     "variantLabel": null
+    },
+    "ar": {
+     "name": "Pan de Muerto محشو · شوكولاتة",
+     "description": null,
+     "variantLabel": null
+    }
+   },
+   "before": [
+    {
+     "assetId": "asset-ab6fe9bcedde60179078b24ee895913679fe6fe6c4af64ca7e4bf44423c7ed7b",
+     "role": "primary",
+     "order": 0
+    },
+    {
+     "assetId": "asset-c5a4ef7dd8d95d28bb8dff468cec2616fa4ae98fd8e50570d53b27452542d6f0",
+     "role": "gallery",
+     "order": 0
+    },
+    {
+     "assetId": "asset-1fa9697583b15f1a0d917564cbe22e2a97cec36d68a5a9aac484894bd86d3b6e",
+     "role": "gallery",
+     "order": 1
+    },
+    {
+     "assetId": "asset-1a1926b5ceda57858387d124bcd91fc13a4e50a0e9fb91a6f674b3a7dddd60fb",
+     "role": "gallery",
+     "order": 2
+    },
+    {
+     "assetId": "asset-c01316aaeb3b08dbf2819adbca7403d877a28774cadccdbb3f0ca19fcca60d70",
+     "role": "gallery",
+     "order": 3
+    }
+   ],
+   "uploads": [
+    {
+     "file": "hub-uploads/pan-de-muerto-filled--chocolate-0-m002-088.webp",
+     "sha256": "c9a1631f390f05ec3f5ded85fe7b66c68ba1b483c14c52e5acad9c0981b49d34",
+     "sourceAssetId": "M002-088",
+     "role": "primary"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-filled--chocolate-1-m002-086.webp",
+     "sha256": "979382769b4a8b55d4002b2a3366db21473c68926eabb5932be5957bccf6d53b",
+     "sourceAssetId": "M002-086",
+     "role": "gallery"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-filled--chocolate-2-m002-087.webp",
+     "sha256": "5b79e6ec2f7565d57262ad12996f3736be57654be95639c4a904702b242edf37",
+     "sourceAssetId": "M002-087",
+     "role": "gallery"
+    }
+   ],
+   "retainPrevious": [
+    "asset-ab6fe9bcedde60179078b24ee895913679fe6fe6c4af64ca7e4bf44423c7ed7b",
+    "asset-c5a4ef7dd8d95d28bb8dff468cec2616fa4ae98fd8e50570d53b27452542d6f0",
+    "asset-1fa9697583b15f1a0d917564cbe22e2a97cec36d68a5a9aac484894bd86d3b6e",
+    "asset-1a1926b5ceda57858387d124bcd91fc13a4e50a0e9fb91a6f674b3a7dddd60fb",
+    "asset-c01316aaeb3b08dbf2819adbca7403d877a28774cadccdbb3f0ca19fcca60d70"
+   ]
+  },
+  {
+   "productId": "pan-de-muerto-filled--mascarpone-y-fresas",
+   "alt": {
+    "en": {
+     "name": "Mascarpone y fresas Pan de Muerto relleno",
+     "description": null,
+     "variantLabel": null
+    },
+    "es": {
+     "name": "Pan de Muerto relleno · Mascarpone y fresas",
+     "description": null,
+     "variantLabel": null
+    },
+    "ar": {
+     "name": "Pan de Muerto محشو · ماسكاربوني وفراولة",
+     "description": null,
+     "variantLabel": null
+    }
+   },
+   "before": [
+    {
+     "assetId": "asset-ce3b0f21f95bd5aafda98da18d42de61163b20978e6232c14741b8e5401e4cb4",
+     "role": "primary",
+     "order": 0
+    },
+    {
+     "assetId": "asset-a1fc9675dbc80176d27f1b935c4d259ef1c8f555e055290c17fe4e51fab6315b",
+     "role": "gallery",
+     "order": 0
+    },
+    {
+     "assetId": "asset-74d3170ad27de336961171bea25b2c8b4875f3940ee20b5f2a1aeefa932cde4d",
+     "role": "gallery",
+     "order": 1
+    },
+    {
+     "assetId": "asset-2f8e8f1d36ac45f9bef298ddad3dabaa41c9e953aa0cfc644da594d3f6c4234d",
+     "role": "gallery",
+     "order": 2
+    }
+   ],
+   "uploads": [
+    {
+     "file": "hub-uploads/pan-de-muerto-filled--mascarpone-y-fresas-0-m002-091.webp",
+     "sha256": "7b54a44d47cb909539271b244814f21aa13dc24d3efe262bf0ce15073dfbb30f",
+     "sourceAssetId": "M002-091",
+     "role": "primary"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-filled--mascarpone-y-fresas-1-m002-090.webp",
+     "sha256": "96d5d87379ff01596045ba02c62e1bb41c5e5b2f658aa83512946820f25f17f6",
+     "sourceAssetId": "M002-090",
+     "role": "gallery"
+    }
+   ],
+   "retainPrevious": [
+    "asset-ce3b0f21f95bd5aafda98da18d42de61163b20978e6232c14741b8e5401e4cb4",
+    "asset-a1fc9675dbc80176d27f1b935c4d259ef1c8f555e055290c17fe4e51fab6315b",
+    "asset-74d3170ad27de336961171bea25b2c8b4875f3940ee20b5f2a1aeefa932cde4d",
+    "asset-2f8e8f1d36ac45f9bef298ddad3dabaa41c9e953aa0cfc644da594d3f6c4234d"
+   ]
+  },
+  {
+   "productId": "pan-de-muerto-filled--pistachio",
+   "alt": {
+    "en": {
+     "name": "Pistachio Pan de Muerto relleno",
+     "description": null,
+     "variantLabel": null
+    },
+    "es": {
+     "name": "Pan de Muerto relleno · Pistache",
+     "description": null,
+     "variantLabel": null
+    },
+    "ar": {
+     "name": "Pan de Muerto محشو · فستق",
+     "description": null,
+     "variantLabel": null
+    }
+   },
+   "before": [
+    {
+     "assetId": "asset-94282f0015b24208c3f9288b5e87d2d672fb09291c8552c03303aa7cfac8df65",
+     "role": "primary",
+     "order": 0
+    },
+    {
+     "assetId": "asset-6dd275c9379e32df63de3886a12edeb6bfdcfdd01f34fa455b9f0b46706bc756",
+     "role": "gallery",
+     "order": 0
+    },
+    {
+     "assetId": "asset-93661ed0c09b252250d4635dcb65bad6b132e4300bec72f26be58d0e835a1b41",
+     "role": "gallery",
+     "order": 1
+    },
+    {
+     "assetId": "asset-b8452c58c0dfb613a3bbcbeacf22f085967aa3b9b96370df9b2a7735f8353059",
+     "role": "gallery",
+     "order": 2
+    }
+   ],
+   "uploads": [
+    {
+     "file": "hub-uploads/pan-de-muerto-filled--pistachio-0-m002-084.webp",
+     "sha256": "c72fe24cd142f60f90909ce14f92e863fec23147dd0174030682364311135416",
+     "sourceAssetId": "M002-084",
+     "role": "primary"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-filled--pistachio-1-m002-085.webp",
+     "sha256": "49ad9081bbb240d9f9b749508a4fbb09c20ac11443dfa269290eb27abd3c3e92",
+     "sourceAssetId": "M002-085",
+     "role": "gallery"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-filled--pistachio-2-m002-083.webp",
+     "sha256": "42262e2a5265ab3649f10c3ef8bf5a603087eedc458a233e1bd22e6b94eeb9ac",
+     "sourceAssetId": "M002-083",
+     "role": "gallery"
+    }
+   ],
+   "retainPrevious": [
+    "asset-94282f0015b24208c3f9288b5e87d2d672fb09291c8552c03303aa7cfac8df65",
+    "asset-6dd275c9379e32df63de3886a12edeb6bfdcfdd01f34fa455b9f0b46706bc756",
+    "asset-93661ed0c09b252250d4635dcb65bad6b132e4300bec72f26be58d0e835a1b41",
+    "asset-b8452c58c0dfb613a3bbcbeacf22f085967aa3b9b96370df9b2a7735f8353059"
+   ]
+  },
+  {
+   "productId": "pan-de-muerto-filled-pack",
+   "alt": {
+    "en": {
+     "name": "Pan de Muerto · Pack relleno",
+     "description": null,
+     "variantLabel": null
+    },
+    "es": {
+     "name": "Pan de Muerto · Paquete relleno",
+     "description": null,
+     "variantLabel": null
+    },
+    "ar": {
+     "name": "Pan de Muerto · عبوة محشوة",
+     "description": null,
+     "variantLabel": null
+    }
+   },
+   "before": [
+    {
+     "assetId": "asset-55c83ae62c5b1bb33d5e56822433b52d3c137d1c8c45c84fe27302e5870ce94f",
+     "role": "primary",
+     "order": 0
+    }
+   ],
+   "uploads": [
+    {
+     "file": "hub-uploads/pan-de-muerto-filled-pack-0-m002-094.webp",
+     "sha256": "abd44bceb2b3f9c911d4a26831bf7a5058b8c53bb11007862282e026d3f859b9",
+     "sourceAssetId": "M002-094",
+     "role": "primary"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-filled-pack-1-m002-093.webp",
+     "sha256": "d6d1213f9827192c481cf74a187835b8720d56eafe228c25768a1e2ff014b247",
+     "sourceAssetId": "M002-093",
+     "role": "gallery"
+    }
+   ],
+   "retainPrevious": [
+    "asset-55c83ae62c5b1bb33d5e56822433b52d3c137d1c8c45c84fe27302e5870ce94f"
+   ]
+  },
+  {
+   "productId": "pan-de-muerto-traditional--ajonjoli",
+   "alt": {
+    "en": {
+     "name": "Ajonjolí Pan de Muerto tradicional",
+     "description": null,
+     "variantLabel": null
+    },
+    "es": {
+     "name": "Pan de Muerto tradicional · Ajonjolí",
+     "description": null,
+     "variantLabel": null
+    },
+    "ar": {
+     "name": "Pan de Muerto تقليدي · سمسم",
+     "description": null,
+     "variantLabel": null
+    }
+   },
+   "before": [
+    {
+     "assetId": "asset-b1a23d4aa6f7a1c36999d75c39a0a11e68bc1e4525e37ec296e00e4205b62b16",
+     "role": "primary",
+     "order": 0
+    },
+    {
+     "assetId": "asset-0d91706e81a4da8d69d9e09e787a86de5be2f0f1b7f337c5282502a9663351e2",
+     "role": "gallery",
+     "order": 0
+    }
+   ],
+   "uploads": [
+    {
+     "file": "hub-uploads/pan-de-muerto-traditional--ajonjoli-0-m002-048.webp",
+     "sha256": "fb26ff15f1cbc3d0aac83afb8e0a75011884f99be1eee5a3d50d411092444080",
+     "sourceAssetId": "M002-048",
+     "role": "primary"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-traditional--ajonjoli-1-m002-046.webp",
+     "sha256": "43dbd95099d627d11de19c585e1e0fab56f911fa673b75da98944fa6d66bf238",
+     "sourceAssetId": "M002-046",
+     "role": "gallery"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-traditional--ajonjoli-2-m002-043.webp",
+     "sha256": "e2d2be65efa04f47b3f048e70a62fdf28e8ed4fa91a4ae7ac0eabf7c4de7a72d",
+     "sourceAssetId": "M002-043",
+     "role": "gallery"
+    }
+   ],
+   "retainPrevious": [
+    "asset-b1a23d4aa6f7a1c36999d75c39a0a11e68bc1e4525e37ec296e00e4205b62b16",
+    "asset-0d91706e81a4da8d69d9e09e787a86de5be2f0f1b7f337c5282502a9663351e2"
+   ]
+  },
+  {
+   "productId": "pan-de-muerto-traditional--azucar",
+   "alt": {
+    "en": {
+     "name": "Azúcar Pan de Muerto tradicional",
+     "description": null,
+     "variantLabel": null
+    },
+    "es": {
+     "name": "Pan de Muerto tradicional · Azúcar",
+     "description": null,
+     "variantLabel": null
+    },
+    "ar": {
+     "name": "Pan de Muerto تقليدي · سكر",
+     "description": null,
+     "variantLabel": null
+    }
+   },
+   "before": [
+    {
+     "assetId": "asset-2cf146a2adf003c5cfe6003f64be9477a980e3003dfd6578e983ad9ece0645cf",
+     "role": "primary",
+     "order": 0
+    },
+    {
+     "assetId": "asset-a454de24c603e305cddd029d2b381ae21487020a693f324900544f089bd1d511",
+     "role": "gallery",
+     "order": 0
+    }
+   ],
+   "uploads": [
+    {
+     "file": "hub-uploads/pan-de-muerto-traditional--azucar-0-m002-064.webp",
+     "sha256": "65c4508c019a8f7982122c9ad057efc2efe448e39c011e7f875d8730e5a6283b",
+     "sourceAssetId": "M002-064",
+     "role": "primary"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-traditional--azucar-1-m002-052.webp",
+     "sha256": "8696bcbd23e59a2874791edf3e908fd00167c4f8d4feaae6227b1fb028708eb0",
+     "sourceAssetId": "M002-052",
+     "role": "gallery"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-traditional--azucar-2-m002-058.webp",
+     "sha256": "bc8bb4acf029a8d274656b293253a5174003586474d55e52cfa16eadf69bff65",
+     "sourceAssetId": "M002-058",
+     "role": "gallery"
+    }
+   ],
+   "retainPrevious": [
+    "asset-2cf146a2adf003c5cfe6003f64be9477a980e3003dfd6578e983ad9ece0645cf",
+    "asset-a454de24c603e305cddd029d2b381ae21487020a693f324900544f089bd1d511"
+   ]
+  },
+  {
+   "productId": "pan-de-muerto-traditional--azucar-chocolate-covering",
+   "alt": {
+    "en": {
+     "name": "Azúcar · Chocolate covering Pan de Muerto tradicional",
+     "description": null,
+     "variantLabel": null
+    },
+    "es": {
+     "name": "Pan de Muerto tradicional · Azúcar · Cobertura de chocolate",
+     "description": null,
+     "variantLabel": null
+    },
+    "ar": {
+     "name": "Pan de Muerto تقليدي · سكر · تغطية شوكولاتة",
+     "description": null,
+     "variantLabel": null
+    }
+   },
+   "before": [
+    {
+     "assetId": "asset-cca16152832a1257dbc794cf60c90a377b3e9d3dfbe353d786bb70f6441e7dc9",
+     "role": "primary",
+     "order": 0
+    },
+    {
+     "assetId": "asset-addd762244e96de9ddad276a191b4fa41e0023eb4560de8dae81707128a6dc95",
+     "role": "gallery",
+     "order": 0
+    }
+   ],
+   "uploads": [
+    {
+     "file": "hub-uploads/pan-de-muerto-traditional--azucar-chocolate-covering-0-m002-066.webp",
+     "sha256": "3b05e2483a45d002e5f3ea9dea3f67353d8f0689aee37a659c3e09dc910bdbb9",
+     "sourceAssetId": "M002-066",
+     "role": "primary"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-traditional--azucar-chocolate-covering-1-m002-067.webp",
+     "sha256": "15bab338348d6f3ec3e19dd9aef6f43eb0845ec1999a8fe7576b5a18e983e24a",
+     "sourceAssetId": "M002-067",
+     "role": "gallery"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-traditional--azucar-chocolate-covering-2-m002-068.webp",
+     "sha256": "baafdeda208b069f3099c955d5c991fae7b11e77b65ceecf347277caa05f696f",
+     "sourceAssetId": "M002-068",
+     "role": "gallery"
+    }
+   ],
+   "retainPrevious": [
+    "asset-cca16152832a1257dbc794cf60c90a377b3e9d3dfbe353d786bb70f6441e7dc9",
+    "asset-addd762244e96de9ddad276a191b4fa41e0023eb4560de8dae81707128a6dc95"
+   ]
+  },
+  {
+   "productId": "pan-de-muerto-traditional-pack",
+   "alt": {
+    "en": {
+     "name": "Pan de Muerto · Pack tradicional",
+     "description": null,
+     "variantLabel": null
+    },
+    "es": {
+     "name": "Pan de Muerto · Paquete tradicional",
+     "description": null,
+     "variantLabel": null
+    },
+    "ar": {
+     "name": "Pan de Muerto · عبوة تقليدية",
+     "description": null,
+     "variantLabel": null
+    }
+   },
+   "before": [
+    {
+     "assetId": "asset-55c83ae62c5b1bb33d5e56822433b52d3c137d1c8c45c84fe27302e5870ce94f",
+     "role": "primary",
+     "order": 0
+    },
+    {
+     "assetId": "asset-9bd5964c3648a20de7702c7e349829d75b01fbdf38a0cf6ab889d50f840a2d95",
+     "role": "gallery",
+     "order": 0
+    },
+    {
+     "assetId": "asset-8f5e133e7e9ce13a7f1eeae7023efc73ad7480abd438deb02de67de925c47fac",
+     "role": "gallery",
+     "order": 1
+    },
+    {
+     "assetId": "asset-3cb72fa64c44280c579c1f32a4f062f47e6664afd253013d0560aae4082ffd66",
+     "role": "gallery",
+     "order": 2
+    }
+   ],
+   "uploads": [
+    {
+     "file": "hub-uploads/pan-de-muerto-traditional-pack-0-m002-074.webp",
+     "sha256": "e6018f044585e98c283dedf71e2445e5d9d10ff34f857292166619dad26fc12e",
+     "sourceAssetId": "M002-074",
+     "role": "primary"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-traditional-pack-1-m002-077.webp",
+     "sha256": "12c2e0422acebfd86f30d0f9f76243eb2aa17478f67fab35c1f5d50d56915acf",
+     "sourceAssetId": "M002-077",
+     "role": "gallery"
+    },
+    {
+     "file": "hub-uploads/pan-de-muerto-traditional-pack-2-m002-073.webp",
+     "sha256": "f49dd97911ec707ab138ec3004c1aeebf84fb00c0c710ea07475f86b984992b7",
+     "sourceAssetId": "M002-073",
+     "role": "gallery"
+    }
+   ],
+   "retainPrevious": [
+    "asset-55c83ae62c5b1bb33d5e56822433b52d3c137d1c8c45c84fe27302e5870ce94f",
+    "asset-9bd5964c3648a20de7702c7e349829d75b01fbdf38a0cf6ab889d50f840a2d95",
+    "asset-8f5e133e7e9ce13a7f1eeae7023efc73ad7480abd438deb02de67de925c47fac",
+    "asset-3cb72fa64c44280c579c1f32a4f062f47e6664afd253013d0560aae4082ffd66"
+   ]
+  }
+ ]
+}

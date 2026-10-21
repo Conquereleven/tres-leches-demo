@@ -398,29 +398,29 @@ test("address problems are stated beside the dispatch action, which stays the op
 });
 
 for (const width of [390, 1440])
-  test(`accessibility scan (contrast included) at ${width}px`, async ({
-    page,
-  }) => {
-    await serve(page);
-    await page.setViewportSize({ width, height: 1000 });
-    for (const path of [
-      "/operations/orders",
-      "/operations/orders/TL-FIX00001",
-      "/operations/orders/TL-FIX00004",
-      "/operations/orders/TL-FIX00007",
-      "/operations/orders/TL-FIX00008",
-      "/operations/production",
-    ]) {
+  for (const path of [
+    "/operations/orders",
+    "/operations/orders/TL-FIX00001",
+    "/operations/orders/TL-FIX00004",
+    "/operations/orders/TL-FIX00007",
+    "/operations/orders/TL-FIX00008",
+    "/operations/production",
+  ])
+    test(`accessibility scan (contrast included) at ${width}px: ${path}`, async ({
+      page,
+    }) => {
+      // Independent routes retain the normal assertion/test budgets. Six axe
+      // scans must not compete for one cumulative 30s timeout on a slow runner.
+      await serve(page);
+      await page.setViewportSize({ width, height: 1000 });
       await page.goto(path);
       await expect(page.locator(".ops-content")).toBeVisible();
-      await page.waitForTimeout(150);
       const { violations } = await new AxeBuilder({ page }).analyze();
       expect(
         violations.map((v) => `${v.id}: ${v.nodes[0]?.html.slice(0, 120)}`),
         path,
       ).toEqual([]);
-    }
-  });
+    });
 
 test("mobile: fulfilment tabs show there is more and keep the selection in view", async ({
   page,

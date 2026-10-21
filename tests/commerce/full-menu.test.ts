@@ -11,10 +11,10 @@ import {
 const catalog = validateCatalog(
   JSON.parse(readFileSync("data-imports/liza-current-menu.json", "utf8")),
 );
-test("approved full menu has 236 unique authoritative SKUs and retires AED25 Pan de Muerto", () => {
-  assert.equal(catalog.length, 236);
-  assert.equal(new Set(catalog.map((item) => item.id)).size, 236);
-  assert.equal(menuFamilies.length, 29);
+test("approved full menu has 238 unique authoritative SKUs and retires AED25 Pan de Muerto", () => {
+  assert.equal(catalog.length, 238);
+  assert.equal(new Set(catalog.map((item) => item.id)).size, 238);
+  assert.equal(menuFamilies.length, 30);
   assert.equal(menuCategories.length, 8);
   assert.ok(!catalog.some((item) => item.id === "pan-de-muerto"));
   for (const family of menuFamilies) {

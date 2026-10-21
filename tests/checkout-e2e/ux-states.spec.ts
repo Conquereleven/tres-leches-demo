@@ -4,6 +4,7 @@
  * provider is called and no payment is attempted.
  */
 import { test, expect, type Page } from "@playwright/test";
+import { clickStableControl } from "../helpers/stable-control";
 import { status, workspace } from "../fixtures/ux-states";
 
 const SHOTS = "work/qa/ux";
@@ -124,7 +125,16 @@ test.describe("payment step", () => {
         }),
       }),
     );
+    // Complete homepage config hydration before replacing the document. The
+    // retained CI trace otherwise reports an aborted config fetch/access-control
+    // page error during goto('/cart'), before this payment scenario even starts.
+    const configReady = page.waitForResponse((response) =>
+      response.url().endsWith("/api/checkout/config"),
+    );
     await page.goto("/");
+    const config = await configReady;
+    expect(config.status()).toBe(200);
+    expect(await config.finished()).toBeNull();
     await page.evaluate(() => {
       const date = new Date(Date.now() + 172_800_000)
         .toISOString()
@@ -159,7 +169,11 @@ test.describe("payment step", () => {
     await expect(page.locator(".b-shop-totals")).not.toContainText("Delivery");
     await shot(page, "checkout-delivery-390");
     await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
-    await page.getByRole("button", { name: "REVIEW ORDER" }).click();
+    // Traced WebKit failures leave Details unchanged if this click races scrolling.
+    await clickStableControl(
+      page.getByRole("button", { name: "REVIEW ORDER" }),
+    );
+    await expect(page.getByLabel(/I've reviewed my order/)).toBeVisible();
     await page.getByLabel(/I've reviewed my order/).check();
   });
 

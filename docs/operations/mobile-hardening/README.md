@@ -1,3 +1,5 @@
+> **Current follow-up:** [Sprint02 integration/readiness](SPRINT02.md). The evidence below is the original October17 audit and is historical; use the PR description for final exact-head CI.
+
 # 3L-OPS-006 — Operations mobile hardening
 
 Baseline: `d7bee2793191dd47d8d7f661059d410f657b1ac4` (fresh origin/main). Branch: `fix/3l-ops-mobile-hardening`. Production has not been changed or used for mutation tests.

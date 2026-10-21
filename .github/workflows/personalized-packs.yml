@@ -32,15 +32,19 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
+      - run: node scripts/verify-webkit-runtime.mjs
       - run: node --import tsx scripts/preview-kitchen-email.ts
       - run: npx playwright test --config=playwright.email.config.ts
       - run: node --import tsx scripts/preview-pack-pricing.ts
       - run: npx playwright test --config=playwright.premium.config.ts
+      - run: node --import tsx scripts/preview-tricolor.ts
+      - run: npx playwright test --config=playwright.tricolor.config.ts
       - run: mkdir -p work/e2e
       - run: npx playwright test --config=playwright.packs.config.ts
       - run: npx playwright test --config=playwright.checkout.config.ts --browser=chromium
       - run: npx playwright test --config=playwright.checkout.config.ts --browser=webkit
       - run: npx playwright test --config=playwright.product-hub.config.ts
+      - run: npx playwright test --config=playwright.storefront-dynamic.config.ts
       - if: failure()
         name: Synthetic browser failure context
         run: |
@@ -50,6 +54,14 @@ jobs:
               print(str(p))
               print(p.read_text())
           PY
+      - if: failure()
+        name: Retain synthetic browser traces
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: packs-browser-failure-${{ github.run_attempt }}
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
       # Loopback fixtures, disposable SQLite and in-process fake provider only.
       # No secrets, remote data, deployment or provider network requests.
   operations-browsers:
@@ -72,8 +84,29 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - if: matrix.browser == 'webkit'
+        run: node scripts/verify-webkit-runtime.mjs
       - run: mkdir -p work/e2e
-      - run: npx playwright test --config=playwright.operations.config.ts --project=${{ matrix.browser }}
+      - name: Compare main WebKit navigation under the same runner conditions
+        if: matrix.browser == 'webkit'
+        # Diagnostic baseline only; its result is retained explicitly below.
+        # The candidate's complete suite remains an unconditional release gate.
+        run: |
+          baseline=$(mktemp -d)
+          git archive "${{ github.event.pull_request.base.sha }}" | tar -x -C "$baseline"
+          cp playwright.operations.config.ts "$baseline/playwright.operations.config.ts"
+          mkdir -p work/qa/navigation-baseline
+          set +e
+          (cd "$baseline" && npm ci && npx playwright install webkit && DEBUG=pw:browser npx playwright test --config=playwright.operations.config.ts --project=webkit --grep 'fulfilment actions|address, verification' --repeat-each=5 --trace=on) > work/qa/navigation-baseline/main.log 2>&1
+          result=$?
+          set -e
+          echo "$result" > work/qa/navigation-baseline/exit-code.txt
+          cp -R "$baseline/test-results" work/qa/navigation-baseline/ || true
+          cat work/qa/navigation-baseline/main.log
+      - name: Complete candidate Operations regression
+        env:
+          DEBUG: pw:browser
+        run: /usr/bin/time -v npx playwright test --config=playwright.operations.config.ts --project=${{ matrix.browser }}
       - if: failure()
         name: Synthetic Operations failure context
         run: |
@@ -83,5 +116,15 @@ jobs:
               print(str(p))
               print(p.read_text())
           PY
+      - if: always()
+        name: Retain Operations diagnostics and baseline comparison
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: operations-diagnostics-${{ matrix.browser }}-${{ github.run_attempt }}
+          path: |
+            test-results/operations/
+            work/qa/navigation-baseline/
+          retention-days: 7
+          if-no-files-found: ignore
       # Same 92 Operations scenarios, split 46 per engine on isolated runners.
       # No timeout increase, skipped assertions, credentials or external providers.

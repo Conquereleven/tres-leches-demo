@@ -1,3 +1,5 @@
+import { Login } from "./Login";
+import { AnalyticsWorkspace } from "./Analytics";
 import { lineKey, preparationText } from "../../shared/pack-composition";
 import {
   orderProductName,
@@ -48,7 +50,11 @@ function readRoute() {
 export function CommerceWorkspace() {
   return (
     <OpsProvider>
-      <WorkspaceInner />
+      {location.pathname === "/operations/analytics" ? (
+        <AnalyticsWorkspace />
+      ) : (
+        <WorkspaceInner />
+      )}
     </OpsProvider>
   );
 }
@@ -164,6 +170,15 @@ function WorkspaceInner() {
     reading.current = { controller, promise };
     return promise;
   }, []);
+  const resumeAfterLogin = useCallback(async () => {
+    // The login response may arrive while hidden/offline. Release the expired
+    // session latch so foreground/reconnect can fetch the authorized workspace.
+    // Private data still renders only after a successful workspace response.
+    expired.current = false;
+    setSessionExpired(false);
+    setError("");
+    await refresh();
+  }, [refresh]);
   useEffect(() => {
     void refresh();
     const tick = () => {
@@ -219,7 +234,7 @@ function WorkspaceInner() {
       setBusy(false);
     }
   };
-  if (!data && sessionExpired) return <Login onLogin={refresh} />;
+  if (!data && sessionExpired) return <Login onLogin={resumeAfterLogin} />;
   if (!data)
     return (
       <main className="commerce ops-shell ops-auth" lang={language}>
@@ -264,7 +279,11 @@ function WorkspaceInner() {
       data={data}
       view={view}
       busy={busy}
-      onNavigate={(id) => go(`/operations/${id}`)}
+      onNavigate={(id) =>
+        id === "analytics"
+          ? location.assign("/operations/analytics")
+          : go(`/operations/${id}`)
+      }
       onRefresh={() => void refresh()}
       onLogout={() => void run({}, "logout")}
       heading={
@@ -312,7 +331,11 @@ function WorkspaceInner() {
         {view === "overview" ? (
           <OperationsOverview
             data={data}
-            onNavigate={(id) => go(`/operations/${id}`)}
+            onNavigate={(id) =>
+              id === "analytics"
+                ? location.assign("/operations/analytics")
+                : go(`/operations/${id}`)
+            }
           />
         ) : view === "products" ? (
           <ProductHub actor={data.actor} />
@@ -857,7 +880,9 @@ function OrderPanel({
                   product={orderProductName(o, l.productId, data.catalog)}
                   id={l.productId}
                 />
-                {l.composition && <small lang="en">{preparationText(l)}</small>}
+                {preparationText(l) && (
+                  <small lang="en">{preparationText(l)}</small>
+                )}
               </span>
               <span>
                 {(() => {
@@ -1414,64 +1439,6 @@ function ZoneEditor({
         </button>
       </fieldset>
     </form>
-  );
-}
-
-function Login({ onLogin }: { onLogin: () => Promise<void> }) {
-  const { t, errorText } = useOps();
-  const [id, setId] = useState("liza"),
-    [password, setPassword] = useState(""),
-    [error, setError] = useState(""),
-    [signingIn, setSigningIn] = useState(false);
-  const submitting = useRef(false);
-  return (
-    <main className="commerce ops-shell ops-auth">
-      <form
-        className="co-zone-editor"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (submitting.current) return;
-          submitting.current = true;
-          setSigningIn(true);
-          setError("");
-          void api("login", { id, password })
-            .then(() => onLogin())
-            .catch((e) =>
-              setError(
-                e instanceof Error ? e.message : "No se pudo iniciar sesión",
-              ),
-            )
-            .finally(() => {
-              submitting.current = false;
-              setSigningIn(false);
-            });
-        }}
-      >
-        <h1>{t("Inicia sesión")}</h1>
-        <label>
-          {t("Agente")}
-          <input
-            value={id}
-            onChange={(e) => setId(e.target.value)}
-            autoComplete="username"
-            required
-          />
-        </label>
-        <label>
-          {t("Contraseña")}
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
-        {error && <p role="alert">{errorText(error)}</p>}
-        <button className="primary" disabled={signingIn} aria-busy={signingIn}>
-          {t("Entrar al workspace")}
-        </button>
-      </form>
-    </main>
   );
 }
 

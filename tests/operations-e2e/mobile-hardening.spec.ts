@@ -1,5 +1,6 @@
 import { test, expect, devices, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { mkdirSync } from "node:fs";
 import { omsWorkspace } from "../fixtures/oms";
 
 const orderUrl = "/operations/orders/TL-FIX00001";
@@ -337,6 +338,11 @@ for (const width of [320, 375, 390, 430, 768, 1440, 412]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(orderUrl);
     await expect(page.locator(".oms-details")).toBeVisible();
+    mkdirSync("docs/operations/mobile-hardening/sprint02", { recursive: true });
+    await page.screenshot({
+      path: `docs/operations/mobile-hardening/sprint02/details-${info.project.name}-${width}.png`,
+      fullPage: true,
+    });
     const overflow = () =>
       page.evaluate(() => document.documentElement.scrollWidth > innerWidth);
     expect(await overflow()).toBe(false);
@@ -363,9 +369,13 @@ for (const width of [320, 375, 390, 430, 768, 1440, 412]) {
       expect(await overflow()).toBe(false);
       await page.setViewportSize({ width, height: 900 });
     }
-    expect(await page.locator(".oms-tabs button").evaluateAll((buttons) =>
-      buttons.every((button) => button.scrollWidth <= button.clientWidth),
-    )).toBe(true);
+    expect(
+      await page
+        .locator(".oms-tabs button")
+        .evaluateAll((buttons) =>
+          buttons.every((button) => button.scrollWidth <= button.clientWidth),
+        ),
+    ).toBe(true);
     const axe = await new AxeBuilder({ page }).analyze();
     expect(axe.violations).toEqual([]);
     await page.screenshot({
@@ -375,7 +385,12 @@ for (const width of [320, 375, 390, 430, 768, 1440, 412]) {
   });
 }
 
-for (const profile of ["iPhone 13", "Galaxy S24", "Galaxy S Ultra layout"]) {
+for (const profile of [
+  "iPhone 13",
+  "iPhone 17 Pro",
+  "Galaxy S24",
+  "Galaxy S Ultra layout",
+]) {
   test(`touch profile ${profile}: list, order and mobile navigation (simulation)`, async ({
     browser,
   }, info) => {
@@ -386,7 +401,7 @@ for (const profile of ["iPhone 13", "Galaxy S24", "Galaxy S Ultra layout"]) {
       ...(profile === "Galaxy S Ultra layout"
         ? { viewport: { width: 412, height: 915 } }
         : {}),
-      baseURL: "http://127.0.0.1:3242",
+      baseURL: info.project.use.baseURL,
     });
     const page = await context.newPage();
     const errors: string[] = [];

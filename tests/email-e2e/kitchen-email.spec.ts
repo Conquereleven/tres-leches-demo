@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 
 for (const width of [390, 1024]) {
   test(`frozen kitchen email ${width}px: hierarchy, prices, notes, accessible fluid layout and no network`, async ({
@@ -17,7 +17,7 @@ for (const width of [390, 1024]) {
       readFileSync("docs/email/previews/fictional-paid-order.html", "utf8"),
     );
     await expect(
-      page.getByRole("heading", { name: "Order #042", exact: true }),
+      page.getByRole("heading", { name: "New Order: #042", exact: true }),
     ).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "Customer instructions / allergies" }),
@@ -25,9 +25,7 @@ for (const width of [390, 1024]) {
     await expect(
       page.getByText("ALLERGY: peanuts", { exact: false }),
     ).toContainText("Gracias — شكراً.");
-    const boxes = page
-      .getByText("PACK / BOX", { exact: true })
-      .locator("xpath=ancestor::table[1]");
+    const boxes = page.locator('[data-kitchen-item="pack"]');
     await expect(boxes).toHaveCount(3);
     for (const box of await boxes.all()) {
       const structure = await box.evaluate((el) => {
@@ -93,4 +91,221 @@ test("long original notes and malicious customer HTML remain text without overfl
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
+});
+
+for (const width of [320, 375, 390, 430, 1024]) {
+  test(`compact typical ${width}px: measured screenshot brief`, async ({
+    page,
+    browserName,
+  }, info) => {
+    await page.setViewportSize({ width, height: 844 });
+    const requested: string[] = [];
+    await page.route("**/*", (route) => {
+      requested.push(route.request().url());
+      return route.abort();
+    });
+    const html = readFileSync(
+      "docs/email/previews/compact-typical.html",
+      "utf8",
+    );
+    expect(Buffer.byteLength(html)).toBeLessThan(100 * 1024);
+    await page.setContent(html);
+    await expect(
+      page.getByRole("heading", { name: /^New Order: #042/ }),
+    ).toBeVisible();
+    const singles = page.locator('[data-kitchen-item="single"]');
+    await expect(singles).toHaveCount(3);
+    expect(
+      await singles.locator("[data-kitchen-quantity]").allTextContents(),
+    ).toEqual(["1", "1", "1"]);
+    const table = page.getByRole("table", { name: "Products to prepare" });
+    expect(await table.getByRole("columnheader").allTextContents()).toEqual([
+      "Product",
+      "Qty",
+      "Price",
+    ]);
+    const priority = await table.evaluate((el) =>
+      [
+        "[data-kitchen-notes]",
+        "[data-kitchen-fulfillment]",
+        "[data-kitchen-customer]",
+        "[data-kitchen-address]",
+      ].every(
+        (selector) =>
+          !!(
+            el.compareDocumentPosition(document.querySelector(selector)!) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+          ),
+      ),
+    );
+    expect(priority).toBe(true);
+    const box = page.locator('[data-kitchen-item="pack"]');
+    await expect(box.locator("h2")).not.toHaveText(/^\d+ ×/);
+    await expect(
+      box.getByText("TOTAL: 6 pieces · 1 box", { exact: true }),
+    ).toBeVisible();
+    await expect(page.locator("body")).not.toContainText(
+      "conchas-traditional-chocolate-individual-70-g",
+    );
+    await expect(page.getByText(/ALLERGY: peanuts/)).toBeVisible();
+    await expect(
+      page.getByText("Address verification: UNVERIFIED", { exact: true }),
+    ).toBeVisible();
+    const dimensions = await page.evaluate(() => ({
+      height: Math.ceil(
+        document.querySelector('[role="main"]')!.getBoundingClientRect().height,
+      ),
+      documentHeight: document.documentElement.scrollHeight,
+      width: document.documentElement.scrollWidth,
+      viewport: innerWidth,
+    }));
+    expect(dimensions.width).toBeLessThanOrEqual(width);
+    await info.attach("layout.json", {
+      body: JSON.stringify({
+        ...dimensions,
+        htmlBytes: Buffer.byteLength(html),
+      }),
+      contentType: "application/json",
+    });
+    await page.screenshot({
+      path: `docs/email/previews/compact-${browserName}-${width}.png`,
+      fullPage: true,
+    });
+    if (width === 390) {
+      await page.screenshot({
+        path: `docs/email/previews/compact-${browserName}-390-screen.png`,
+        fullPage: false,
+      });
+      await expect(page.locator("[data-kitchen-summary]")).toHaveCSS(
+        "border-radius",
+        "12px",
+      );
+      await expect(
+        page.getByRole("heading", { name: "New Order: #042" }),
+      ).toHaveCSS("font-size", "32px");
+    }
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    expect(requested).toEqual([]);
+  });
+}
+for (const kind of ["long", "large", "pickup", "review"] as const) {
+  test(`compact ${kind}: complete content and mobile mail constraints`, async ({
+    page,
+    browserName,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.setContent(
+      readFileSync(`docs/email/previews/compact-${kind}.html`, "utf8"),
+    );
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(390);
+    expect(await page.locator("script, img, iframe, form").count()).toBe(0);
+    if (kind === "long") {
+      await expect(
+        page.getByText(/END OF ORIGINAL ALLERGY INSTRUCTIONS/),
+      ).toBeVisible();
+      await expect(page.getByText(/END OF DELIVERY NOTES/)).toBeVisible();
+    }
+    if (kind === "large") {
+      await expect(
+        page.getByText("TOTAL: 12 pieces · 2 boxes", { exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByText(
+          "2 boxes · 6 pieces per box; same contents in each box.",
+          { exact: true },
+        ),
+      ).toBeVisible();
+    }
+    if (kind === "review")
+      await expect(
+        page.getByText(/MANUAL REVIEW REQUIRED: Pack composition/),
+      ).toBeVisible();
+    if (kind === "pickup")
+      await expect(page.locator("[data-kitchen-fulfillment]")).toBeVisible();
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    await page.screenshot({
+      path: `docs/email/previews/compact-${kind}-${browserName}-390.png`,
+      fullPage: true,
+    });
+  });
+}
+test("dark preference and stripped style element keep the complete brief readable", async ({
+  page,
+  browserName,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ colorScheme: "dark" });
+  const html = readFileSync("docs/email/previews/compact-typical.html", "utf8");
+  // Gmail may strip head styles: all layout/content styling must be inline.
+  await page.setContent(html.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ""));
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth),
+  ).toBeLessThanOrEqual(390);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.screenshot({
+    path: `docs/email/previews/compact-dark-${browserName}-390.png`,
+    fullPage: true,
+  });
+});
+
+test("before/after compact brief measurement at iPhone width", async ({
+  page,
+  browserName,
+}, info) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setContent(
+    readFileSync("docs/email/previews/compact-before.html", "utf8"),
+  );
+  const before = await page.evaluate(() =>
+    Math.ceil(
+      document.querySelector('[role="main"]')!.getBoundingClientRect().height,
+    ),
+  );
+  await page.screenshot({
+    path: `docs/email/previews/compact-before-${browserName}-390.png`,
+    fullPage: true,
+  });
+  await page.setContent(
+    readFileSync("docs/email/previews/compact-typical.html", "utf8"),
+  );
+  const after = await page.evaluate(() =>
+    Math.ceil(
+      document.querySelector('[role="main"]')!.getBoundingClientRect().height,
+    ),
+  );
+  writeFileSync(
+    `docs/email/previews/metrics-${browserName}.json`,
+    JSON.stringify(
+      {
+        width: 390,
+        viewportHeight: 844,
+        beforeHeight: before,
+        afterHeight: after,
+        reductionPercent: (1 - after / before) * 100,
+      },
+      null,
+      2,
+    ),
+  );
+  // Founder-selected reference replaces the old dense layout/35% target.
+  // Preserve a genuine before/after measurement and verify its visual contract.
+  expect(after).toBeGreaterThan(0);
+  await expect(page.locator("[data-kitchen-summary]")).toHaveCSS(
+    "border-radius",
+    "12px",
+  );
+  await expect(page.locator("[data-kitchen-brand]")).toHaveCSS(
+    "background-color",
+    "rgb(246, 223, 224)",
+  );
+  await info.attach("before-after.json", {
+    body: JSON.stringify({
+      before,
+      after,
+      reductionPercent: (1 - after / before) * 100,
+    }),
+    contentType: "application/json",
+  });
 });

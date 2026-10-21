@@ -1650,6 +1650,29 @@
       "advanceOrder": false,
       "source": "PDF p.2",
       "pack": false
+    },
+    {
+      "id": "conchas-tricolor-pack",
+      "category": "conchas",
+      "name": "Conchas Tricolor · Pack de 3",
+      "options": [
+        {
+          "id": "conchas-tricolor-pack-3-mini",
+          "variant": "",
+          "size": "3 mini · 3 × 40 g",
+          "priceFils": 3300
+        },
+        {
+          "id": "conchas-tricolor-pack-3-individuales",
+          "variant": "",
+          "size": "3 individuales · 3 × 70 g",
+          "priceFils": 3900
+        }
+      ],
+      "image": "/brand/icon.png",
+      "advanceOrder": false,
+      "source": "Founder Tricolor approval",
+      "pack": true
     }
   ]
 }

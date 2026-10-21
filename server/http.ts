@@ -1,3 +1,5 @@
+import { serveAnalytics } from "./analytics/api";
+import { withoutBundledProductMedia } from "./catalog/product-media-html";
 import { packPricingPolicy } from "./domain/pack-pricing";
 import { packBuilderEnabled, publishedPackRules } from "./domain/packs";
 import {
@@ -124,7 +126,10 @@ function markDynamicCatalog(file: string) {
   if (!file.endsWith(".html") || storefrontCatalogMode(process.env) !== "on")
     return body;
   return Buffer.from(
-    body.toString("utf8").replace(/<html\b/, '<html data-catalog="dynamic"'),
+    withoutBundledProductMedia(body.toString("utf8")).replace(
+      /<html\b/,
+      '<html data-catalog="dynamic"',
+    ),
   );
 }
 const customerCsp =
@@ -251,6 +256,8 @@ export async function startServer(
     ? null
     : operationsResendFromEnv(process.env);
   service.operationsEmailRecipients = operationsEmail?.recipients ?? [];
+  service.operationsEmailCompactRecipients =
+    operationsEmail?.compactRecipients ?? [];
   recoverInterruptedCustomerNotifications(
     store,
     "operationsEmailNotifications",
@@ -814,6 +821,17 @@ export async function startServer(
         }
         const current = actor(req);
         // Product Hub V2: its own module; roles are enforced inside it.
+        if (
+          serveAnalytics(
+            req,
+            res,
+            path,
+            () => store.read(),
+            current,
+            runtime.environment,
+          )
+        )
+          return;
         if (await serveProductHub(req, res, path, store, current)) return;
         if (path === "/api/mcp") {
           if (process.env.MCP_ENABLED !== "true")
@@ -1126,6 +1144,7 @@ export async function startServer(
           "/checkout",
           "/checkout/return",
           "/operations/overview",
+          "/operations/analytics",
           "/operations/products",
           "/operations/print",
           "/operations/settings",

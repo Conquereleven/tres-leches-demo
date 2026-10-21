@@ -220,6 +220,7 @@ export function ResponsiveMedia({
   if (record?.family)
     return (
       <ApprovedImage
+        editorial
         family={record.family}
         variant={record.variant ?? ""}
         size={record.size ?? undefined}

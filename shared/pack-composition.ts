@@ -1,5 +1,11 @@
 import { z } from "zod";
 import { MAX_ITEM_QUANTITY } from "./commerce-policy";
+import {
+  tricolorSpec,
+  tricolorPreparation,
+  validTricolorSnapshot,
+  type TricolorColor,
+} from "./tricolor";
 
 /** Approved preparation identities, not stock or an additional price list. */
 const traditional = [
@@ -86,11 +92,15 @@ export type CommerceLine = {
   productId: string;
   quantity: number;
   composition?: Composition;
+  color?: TricolorColor;
 };
 /** A canonical, browser-independent identity. Box quantity is deliberately excluded. */
-export function lineKey(l: Pick<CommerceLine, "productId" | "composition">) {
+export function lineKey(
+  l: Pick<CommerceLine, "productId" | "composition" | "color">,
+) {
   return (
     l.productId +
+    (l.color ? `~color:${l.color}` : "") +
     (l.composition
       ? `~${normalizeComposition(l.composition)
           .map((c) => `${c.componentSkuId}:${c.units}`)
@@ -103,9 +113,18 @@ export const commerceLineSchema = z
     productId: z.string().min(1).max(100),
     quantity: z.number().int().min(1).max(MAX_ITEM_QUANTITY),
     composition: compositionSchema.optional(),
+    color: z.enum(["red", "white", "green"]).optional(),
   })
   .strict()
   .superRefine((line, ctx) => {
+    if (
+      line.color !== undefined &&
+      tricolorSpec(line.productId)?.kind !== "single"
+    )
+      ctx.addIssue({
+        code: "custom",
+        message: "This product does not accept a color selection",
+      });
     if (line.composition) {
       const spec = packSpec(line.productId);
       if (
@@ -183,6 +202,7 @@ export type PackSnapshot = {
 export function validPackSnapshot(
   line: CommerceLine & { packSnapshot?: PackSnapshot },
 ) {
+  if (tricolorSpec(line.productId)) return validTricolorSnapshot(line);
   const spec = packSpec(line.productId),
     snapshot = line.packSnapshot;
   if (!line.composition) return !snapshot;
@@ -222,8 +242,10 @@ export function validPackSnapshot(
 export const preparationText = (
   line: CommerceLine & { packSnapshot?: PackSnapshot },
 ) =>
-  !line.composition
-    ? ""
-    : !validPackSnapshot(line)
-      ? "Pack composition review required"
-      : `Per box (${line.packSnapshot!.capacity} pieces): ${line.packSnapshot!.components.map((c) => `${c.name} × ${c.units}`).join(", ")}`;
+  tricolorSpec(line.productId)
+    ? tricolorPreparation(line)
+    : !line.composition
+      ? ""
+      : !validPackSnapshot(line)
+        ? "Pack composition review required"
+        : `Per box (${line.packSnapshot!.capacity} pieces): ${line.packSnapshot!.components.map((c) => `${c.name} × ${c.units}`).join(", ")}`;

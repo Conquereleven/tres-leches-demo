@@ -1064,5 +1064,12 @@
   "Choose all pack flavors before continuing": "checkout:pack_9a5d3ce941dea12b",
   "Pack composition must equal its capacity": "checkout:pack_5d72f458fd143e86",
   "Personalized packs are not enabled": "checkout:pack_37bb19baa264e645",
-  "Duplicate composition or maximum box quantity exceeded": "checkout:pack_1c2a4497f4a430a3"
+  "Duplicate composition or maximum box quantity exceeded": "checkout:pack_1c2a4497f4a430a3",
+  "3 individuales · 3 × 70 g": "product:copy_1a79b68647436e83",
+  "3 mini · 3 × 40 g": "product:copy_32c59e545448bffa",
+  "Conchas Tricolor · Pack de 3": "product:copy_adf58bf1aba5a2e5",
+  "Conchas Tricolor · Pack de 3 · 3 mini · 3 × 40 g": "product:copy_91ac66a71231c71d",
+  "Conchas Tricolor · Pack de 3 · 3 individuales · 3 × 70 g": "product:copy_74e4e59d6fc5f1b5",
+  "Choose exactly one valid Tricolor color; fixed packs cannot be customized": "checkout:copy_13e45fb4a00a8d71",
+  "This product does not accept a color": "checkout:copy_63b26b3134d6c013"
 }

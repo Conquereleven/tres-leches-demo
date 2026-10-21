@@ -152,7 +152,7 @@ test("history never opens a window, marks unread, mutates orders or becomes an A
   assert.equal(store.read().jobs.length, 0);
   store.close();
 });
-test("live, app echo and history deduplicate by origin/provider ID and preserve assignment/unread", () => {
+test("live, app echo and history deduplicate by origin/provider ID and preserve assignment/unread", (t) => {
   const { store, ingest } = fixture();
   ingest(customerPayload());
   store.write((s) => {
@@ -161,8 +161,12 @@ test("live, app echo and history deduplicate by origin/provider ID and preserve 
     c.unread = false;
     c.status = "closed";
   });
-  ingest(echoPayload());
-  ingest(echoPayload());
+  // Replay the same immutable event, even when reception crosses a second.
+  // Regenerating it with Date.now() changes its fingerprint and correctly409s.
+  const echo = echoPayload();
+  ingest(echo);
+  t.mock.timers.enable({ apis: ["Date"], now: Date.now() + 1100 });
+  ingest(structuredClone(echo));
   const history = webhook("history", {
     history: [
       {

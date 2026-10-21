@@ -26,7 +26,15 @@ test("public colour refresh preserves geometry, typography, motion and media CSS
       "margin: 0 auto 40px; overflow: hidden; background: #f6efe3;",
       "margin: 0 auto 40px; overflow: hidden; border-radius: var(--radius-panel); background: #f6efe3;",
     );
-    assert.deepEqual(geometry(readFileSync(f, "utf8")), geometry(previous), f);
+    let current = readFileSync(f, "utf8");
+    if (f === "src/brand/checkout.css") {
+      // Closure 01: the only permitted post-refresh media change is scoped
+      // whole-image rendering for Conchas, enforced by the browser geometry suite.
+      const approved = ".brand-experience .b-co-thumb-contained { object-fit: contain; }";
+      assert.equal(current.split(approved).length, 2);
+      current = current.replace(approved, "");
+    }
+    assert.deepEqual(geometry(current), geometry(previous), f);
   }
 });
 test("global theme stays byte-identical; Operations preserves geometry except approved OPS-006 mobile hardening", () => {

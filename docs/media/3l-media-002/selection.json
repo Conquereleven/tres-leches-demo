@@ -1,0 +1,674 @@
+[
+ {
+  "assetId": "M002-002",
+  "source": "BISQUETS/6PCS BISQUETS HORIZONTAL.jpg",
+  "sourceSha256": "d67fd554a2b58d23f2aac9d9e510e52e97f7742f954236065ec95a7dc5260fc2",
+  "kind": "editorial",
+  "target": "bakery",
+  "role": "editorial",
+  "order": 0,
+  "ratio": "3:2",
+  "crop": [
+   229,
+   0,
+   2699,
+   1647
+  ]
+ },
+ {
+  "assetId": "M002-041",
+  "source": "OREJITAS/OREJA 05.jpg",
+  "sourceSha256": "075de97d28b5e1dcb8b1aad8dea1488b0dedaf70ddcf873f3bfdbb38095dff39",
+  "kind": "editorial",
+  "target": "bakery",
+  "role": "editorial",
+  "order": 1,
+  "ratio": "3:2",
+  "crop": [
+   221,
+   0,
+   2606,
+   1590
+  ]
+ },
+ {
+  "assetId": "M002-026",
+  "source": "CONCHAS COLORES/CONCHAS COLORES 02.jpg",
+  "sourceSha256": "8d8e6f8410088a4825669e5fff5ccd2bea13834ef12ba5772dcd41a15b874038",
+  "kind": "editorial",
+  "target": "conchas",
+  "role": "editorial",
+  "order": 0,
+  "ratio": "3:2",
+  "crop": [
+   0,
+   960,
+   1728,
+   2112
+  ]
+ },
+ {
+  "assetId": "M002-027",
+  "source": "CONCHAS COLORES/CONCHAS COLORES.jpg",
+  "sourceSha256": "15e6daf83ce1daa946181faa131d70e7789ca562c37684c9df4d9143cc4cc85a",
+  "kind": "editorial",
+  "target": "conchas",
+  "role": "editorial",
+  "order": 1,
+  "ratio": "3:2",
+  "crop": [
+   0,
+   1636,
+   1728,
+   2788
+  ]
+ },
+ {
+  "assetId": "M002-024",
+  "source": "CONCHA VAINILLA/MIX MINIS.jpg",
+  "sourceSha256": "cdd56575391df75e5afab714947e48a79d2262d3273835d9e11ee39f6b3dbbbb",
+  "kind": "editorial",
+  "target": "conchas",
+  "role": "editorial",
+  "order": 2,
+  "ratio": "3:2",
+  "crop": [
+   0,
+   960,
+   1728,
+   2112
+  ]
+ },
+ {
+  "assetId": "M002-059",
+  "source": "PAN DE MUERTO AZUCAR/PAN DE MUERTO AZUCAR 09.jpg",
+  "sourceSha256": "53ad7dee3da5c26cd92ec59e9a443105712da0c22afa895d8c556c10d2b8b892",
+  "kind": "editorial",
+  "target": "pan",
+  "role": "editorial",
+  "order": 0,
+  "ratio": "3:2",
+  "crop": [
+   300,
+   0,
+   3540,
+   2160
+  ]
+ },
+ {
+  "assetId": "M002-049",
+  "source": "PAN DE MUERTO AJONJOLI/PAN DE MUERTO AJONJOLI 07.jpg",
+  "sourceSha256": "4aa587099746b8610645563c362709c4fd0f24410ae33120f5d127bdc2825ae4",
+  "kind": "editorial",
+  "target": "pan",
+  "role": "editorial",
+  "order": 1,
+  "ratio": "3:2",
+  "crop": [
+   300,
+   0,
+   3540,
+   2160
+  ]
+ },
+ {
+  "assetId": "M002-080",
+  "source": "PAN DE MUERTO PACKS CUBIERTAS/frontal mix 01.jpg",
+  "sourceSha256": "5219708d8fb78a82acf1e87795b30cbe1f9962c3fd9099ffcac7dd44aecdae59",
+  "kind": "editorial",
+  "target": "pan",
+  "role": "editorial",
+  "order": 2,
+  "ratio": "3:2",
+  "crop": [
+   0,
+   374,
+   1728,
+   1526
+  ]
+ },
+ {
+  "assetId": "M002-006",
+  "source": "BISQUETS/BISQUET FRONTAL.jpg",
+  "sourceSha256": "a7711ae20fbbcfee56caf73e905da9eaadfe4790f1ae82f3e26c4ed975c5eae1",
+  "kind": "product",
+  "target": "bisquets",
+  "role": "primary",
+  "order": 0,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   1041,
+   1728,
+   2769
+  ]
+ },
+ {
+  "assetId": "M002-003",
+  "source": "BISQUETS/BISQUET FRONTAL 01.jpg",
+  "sourceSha256": "3b237f800b067267a367a8d9824fbcd8be3a8231ba190003bb2a24861c3c5ec0",
+  "kind": "product",
+  "target": "bisquets",
+  "role": "gallery",
+  "order": 1,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   1011,
+   1502,
+   2513
+  ]
+ },
+ {
+  "assetId": "M002-004",
+  "source": "BISQUETS/BISQUET FRONTAL 02.jpg",
+  "sourceSha256": "65c7de6a2cf7839e891524fefa8ba4941522dc2c82f03fafccc4ffa268943523",
+  "kind": "product",
+  "target": "bisquets",
+  "role": "gallery",
+  "order": 2,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   1043,
+   1472,
+   2515
+  ]
+ },
+ {
+  "assetId": "M002-008",
+  "source": "CONCHA CHOCOLATE/CONCHA CH 02.jpg",
+  "sourceSha256": "26060ae4ef5a92d1b385d78541ff81c222b1dcc0cf6480473954dc31c72c914b",
+  "kind": "product",
+  "target": "conchas-traditional--chocolate",
+  "role": "primary",
+  "order": 0,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   0,
+   1728,
+   1728
+  ]
+ },
+ {
+  "assetId": "M002-013",
+  "source": "CONCHA CHOCOLATE/CONCHAS CH 05.jpg",
+  "sourceSha256": "72972778df8a300815af5f71e4e0bca5725aca1b8aaf018576febf1d8563049a",
+  "kind": "product",
+  "target": "conchas-traditional--chocolate",
+  "role": "gallery",
+  "order": 1,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   0,
+   1728,
+   1728
+  ]
+ },
+ {
+  "assetId": "M002-010",
+  "source": "CONCHA CHOCOLATE/CONCHAS CH 02.jpg",
+  "sourceSha256": "1155ef21209f32c8a33ff8279a2a1d3f3e079c9de05045390ab66f49b8914889",
+  "kind": "product",
+  "target": "conchas-traditional--chocolate",
+  "role": "gallery",
+  "order": 2,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   0,
+   1728,
+   1728
+  ]
+ },
+ {
+  "assetId": "M002-023",
+  "source": "CONCHA VAINILLA/CONCHA VAINILLA.jpg",
+  "sourceSha256": "665977bc9388b60137e6f41ed788ff51d30fbf24fab91ff52609e59a6a8fe5d4",
+  "kind": "product",
+  "target": "conchas-traditional--vainilla",
+  "role": "primary",
+  "order": 0,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   636,
+   1728,
+   2364
+  ]
+ },
+ {
+  "assetId": "M002-019",
+  "source": "CONCHA VAINILLA/CONCHA VAINILLA 03.jpg",
+  "sourceSha256": "cbbf72f7a95d289f2cd707a814ec856eaa0742d9d6363e537f65a51450ae8da5",
+  "kind": "product",
+  "target": "conchas-traditional--vainilla",
+  "role": "gallery",
+  "order": 1,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   587,
+   1728,
+   2315
+  ]
+ },
+ {
+  "assetId": "M002-021",
+  "source": "CONCHA VAINILLA/CONCHA VAINILLA 05.jpg",
+  "sourceSha256": "88d305966d877513276ac60411065ba1f3a01eb3c53c73e4233953263bb6db66",
+  "kind": "product",
+  "target": "conchas-traditional--vainilla",
+  "role": "gallery",
+  "order": 2,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   636,
+   1728,
+   2364
+  ]
+ },
+ {
+  "assetId": "M002-037",
+  "source": "OREJITAS/OREJA 01.jpg",
+  "sourceSha256": "dada0aed0ce1c15eb98bffbb80de7e76f1db688cc241ef1fc83a38d50cf1cf26",
+  "kind": "product",
+  "target": "orejas",
+  "role": "primary",
+  "order": 0,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   0,
+   1728,
+   1728
+  ]
+ },
+ {
+  "assetId": "M002-039",
+  "source": "OREJITAS/OREJA 03.jpg",
+  "sourceSha256": "e84bfcc25d71794a3956a07978fdf3b6fd110adc43e73434e811385b11b9b230",
+  "kind": "product",
+  "target": "orejas",
+  "role": "gallery",
+  "order": 1,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   467,
+   1728,
+   2195
+  ]
+ },
+ {
+  "assetId": "M002-042",
+  "source": "OREJITAS/OREJA.jpg",
+  "sourceSha256": "f2904fa3d72a20cd849dbd739d4ffb663d13ebf8686c0d354c4b8fdc92022f8d",
+  "kind": "product",
+  "target": "orejas",
+  "role": "gallery",
+  "order": 2,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   691,
+   1728,
+   2419
+  ]
+ },
+ {
+  "assetId": "M002-088",
+  "source": "PAN DE MUERTO RELLENO/CHOCOLATE.jpg",
+  "sourceSha256": "2c881d965a3d199edad9ce8838bd7f7fcff0929f96c99f923b63627178449ebe",
+  "kind": "product",
+  "target": "pan-de-muerto-filled--chocolate",
+  "role": "primary",
+  "order": 0,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   979,
+   1728,
+   2707
+  ]
+ },
+ {
+  "assetId": "M002-086",
+  "source": "PAN DE MUERTO RELLENO/CHOCOLATE 01.jpg",
+  "sourceSha256": "5e563d88fabfb6ad904384d813be4a7a15ea1b591c11bf75d4b0df63868f7275",
+  "kind": "product",
+  "target": "pan-de-muerto-filled--chocolate",
+  "role": "gallery",
+  "order": 1,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   918,
+   1728,
+   2646
+  ]
+ },
+ {
+  "assetId": "M002-087",
+  "source": "PAN DE MUERTO RELLENO/CHOCOLATE 02.jpg",
+  "sourceSha256": "df602f1b5784426bfc750a898bc28ac94f250ebd7316639e650d0380432f200b",
+  "kind": "product",
+  "target": "pan-de-muerto-filled--chocolate",
+  "role": "gallery",
+  "order": 2,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   0,
+   1332,
+   1332
+  ]
+ },
+ {
+  "assetId": "M002-091",
+  "source": "PAN DE MUERTO RELLENO/FRESA.jpg",
+  "sourceSha256": "21e1c172507c1f0c8969dbc8c2652868bf9577d9ccea35a1c85c1cf4423e79a9",
+  "kind": "product",
+  "target": "pan-de-muerto-filled--mascarpone-y-fresas",
+  "role": "primary",
+  "order": 0,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   979,
+   1728,
+   2707
+  ]
+ },
+ {
+  "assetId": "M002-090",
+  "source": "PAN DE MUERTO RELLENO/FRESA 02.jpg",
+  "sourceSha256": "cabd201694a8d9a02354df83c4393034ee1c38627cab8cb372997542bc96b48d",
+  "kind": "product",
+  "target": "pan-de-muerto-filled--mascarpone-y-fresas",
+  "role": "gallery",
+  "order": 1,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   0,
+   1728,
+   1728
+  ]
+ },
+ {
+  "assetId": "M002-084",
+  "source": "PAN DE MUERTO PISTACHO/PISTACHO 02.jpg",
+  "sourceSha256": "ad83ee2dea74be5802405ee95b2bb5208a096b3d7215fb7e6ab9cf337eab5509",
+  "kind": "product",
+  "target": "pan-de-muerto-filled--pistachio",
+  "role": "primary",
+  "order": 0,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   432,
+   1728,
+   2160
+  ]
+ },
+ {
+  "assetId": "M002-085",
+  "source": "PAN DE MUERTO PISTACHO/PISTACHO.jpg",
+  "sourceSha256": "924e19a7b1bc26c6178f7ef2a6d8ba91d2a9c89086006a58a4429f0f39ae66aa",
+  "kind": "product",
+  "target": "pan-de-muerto-filled--pistachio",
+  "role": "gallery",
+  "order": 1,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   979,
+   1728,
+   2707
+  ]
+ },
+ {
+  "assetId": "M002-083",
+  "source": "PAN DE MUERTO PISTACHO/PISTACHO 01.jpg",
+  "sourceSha256": "13a173cf5217c1e2f3d58ec089ec08205f279aa5a24b456f8f6e7b08711c9fee",
+  "kind": "product",
+  "target": "pan-de-muerto-filled--pistachio",
+  "role": "gallery",
+  "order": 2,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   918,
+   1728,
+   2646
+  ]
+ },
+ {
+  "assetId": "M002-094",
+  "source": "PAN DE MUERTO RELLENO/MIX.jpg",
+  "sourceSha256": "5afa6ad363076d60d225d034ef554a9a3bb7f1f4acf1271757607b895267c13e",
+  "kind": "product",
+  "target": "pan-de-muerto-filled-pack",
+  "role": "primary",
+  "order": 0,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   1041,
+   1728,
+   2769
+  ]
+ },
+ {
+  "assetId": "M002-093",
+  "source": "PAN DE MUERTO RELLENO/MIX 02.jpg",
+  "sourceSha256": "7342b0390df82b99c6f44578403a9843cd84588a90a980c0c69f32477bae59b8",
+  "kind": "product",
+  "target": "pan-de-muerto-filled-pack",
+  "role": "gallery",
+  "order": 1,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   432,
+   1728,
+   2160
+  ]
+ },
+ {
+  "assetId": "M002-048",
+  "source": "PAN DE MUERTO AJONJOLI/PAN DE MUERTO AJONJOLI 06.jpg",
+  "sourceSha256": "213f1cfac10ba946b2e8046f898d444761e915e3b4c3d077b778ed7abd40410a",
+  "kind": "product",
+  "target": "pan-de-muerto-traditional--ajonjoli",
+  "role": "primary",
+  "order": 0,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   0,
+   1728,
+   1728
+  ]
+ },
+ {
+  "assetId": "M002-046",
+  "source": "PAN DE MUERTO AJONJOLI/PAN DE MUERTO AJONJOLI 04.jpg",
+  "sourceSha256": "c111127de05a2a280192f73ebe62d72f13a88291c5e3ea1a01d657932a0fe6aa",
+  "kind": "product",
+  "target": "pan-de-muerto-traditional--ajonjoli",
+  "role": "gallery",
+  "order": 1,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   432,
+   1728,
+   2160
+  ]
+ },
+ {
+  "assetId": "M002-043",
+  "source": "PAN DE MUERTO AJONJOLI/PAN DE MUERTO AJONJOLI 01.jpg",
+  "sourceSha256": "e90e58b8982c200ce280f99cf6c2ad77c25d50ad24eff7ad834231540f638153",
+  "kind": "product",
+  "target": "pan-de-muerto-traditional--ajonjoli",
+  "role": "gallery",
+  "order": 2,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   0,
+   1728,
+   1728
+  ]
+ },
+ {
+  "assetId": "M002-064",
+  "source": "PAN DE MUERTO AZUCAR/PAN DE MUERTO AZUCAR.jpg",
+  "sourceSha256": "8d8833f84b292efc1dcfbbef0d9965a498460c69aae0230a232987773f86b0e6",
+  "kind": "product",
+  "target": "pan-de-muerto-traditional--azucar",
+  "role": "primary",
+  "order": 0,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   0,
+   1728,
+   1728
+  ]
+ },
+ {
+  "assetId": "M002-052",
+  "source": "PAN DE MUERTO AZUCAR/PAN DE MUERTO AZUCAR 02.jpg",
+  "sourceSha256": "c2f6a330f8835af174393f061e8ae30d46e31402ac5e66b085509aa1936be805",
+  "kind": "product",
+  "target": "pan-de-muerto-traditional--azucar",
+  "role": "gallery",
+  "order": 1,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   432,
+   1728,
+   2160
+  ]
+ },
+ {
+  "assetId": "M002-058",
+  "source": "PAN DE MUERTO AZUCAR/PAN DE MUERTO AZUCAR 08.jpg",
+  "sourceSha256": "c92efb2720a6f3485d6387098ea552824a8cc5d07cf32243ed5e649d43114f2f",
+  "kind": "product",
+  "target": "pan-de-muerto-traditional--azucar",
+  "role": "gallery",
+  "order": 2,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   432,
+   1728,
+   2160
+  ]
+ },
+ {
+  "assetId": "M002-066",
+  "source": "PAN DE MUERTO CUBIERTO DE CHOCOLATE/PAN CUBIERTO CHOCOLATE 02.jpg",
+  "sourceSha256": "7d1f8a43f430feadc9d1a5ed771782068d5e145bb7ade4b4716d5530164f47cd",
+  "kind": "product",
+  "target": "pan-de-muerto-traditional--azucar-chocolate-covering",
+  "role": "primary",
+  "order": 0,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   0,
+   1728,
+   1728
+  ]
+ },
+ {
+  "assetId": "M002-067",
+  "source": "PAN DE MUERTO CUBIERTO DE CHOCOLATE/PAN CUBIERTO CHOCOLATE 03.jpg",
+  "sourceSha256": "1d70adddd6587a8feb5ef71bbea176cc57484a3002ebc4509a59a7b7a264862a",
+  "kind": "product",
+  "target": "pan-de-muerto-traditional--azucar-chocolate-covering",
+  "role": "gallery",
+  "order": 1,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   691,
+   1728,
+   2419
+  ]
+ },
+ {
+  "assetId": "M002-068",
+  "source": "PAN DE MUERTO CUBIERTO DE CHOCOLATE/PAN CUBIERTO CHOCOLATE 04.jpg",
+  "sourceSha256": "aac8f7dc0579911bc3e12c7f4328b2dd75bd7fc261ce7c2f652db2c3a74d8811",
+  "kind": "product",
+  "target": "pan-de-muerto-traditional--azucar-chocolate-covering",
+  "role": "gallery",
+  "order": 2,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   635,
+   1728,
+   2363
+  ]
+ },
+ {
+  "assetId": "M002-074",
+  "source": "PAN DE MUERTO PACKS/MINIS FRONTAL.jpg",
+  "sourceSha256": "83bd43da4361c094c467a135048a9aff1de59a498bfbfc8ab5e8faa96064b090",
+  "kind": "product",
+  "target": "pan-de-muerto-traditional-pack",
+  "role": "primary",
+  "order": 0,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   979,
+   1728,
+   2707
+  ]
+ },
+ {
+  "assetId": "M002-077",
+  "source": "PAN DE MUERTO PACKS/MIX.jpg",
+  "sourceSha256": "88be291f957ea2774add94a0d241ef6f98f272eecfd00a2360e6466824afe1c1",
+  "kind": "product",
+  "target": "pan-de-muerto-traditional-pack",
+  "role": "gallery",
+  "order": 1,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   1041,
+   1728,
+   2769
+  ]
+ },
+ {
+  "assetId": "M002-073",
+  "source": "PAN DE MUERTO PACKS/MINI.jpg",
+  "sourceSha256": "4d1cb31a6c199f49c805acb596454bb788a4078cebb95d9c670dd3aa4fe84da5",
+  "kind": "product",
+  "target": "pan-de-muerto-traditional-pack",
+  "role": "gallery",
+  "order": 2,
+  "ratio": "1:1",
+  "crop": [
+   0,
+   979,
+   1728,
+   2707
+  ]
+ }
+]

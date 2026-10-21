@@ -9,6 +9,7 @@ export type KitchenEmailItem = {
   isPack: boolean;
   pack?: PackSnapshot;
   review?: string;
+  preparation?: string;
 };
 export type KitchenEmail = {
   reference: string;
@@ -40,9 +41,9 @@ const money = (fils: number) => `AED ${(fils / 100).toFixed(2)}`;
 const validMoney = (value: unknown): value is number =>
   typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
 const warning = (text: string) =>
-  `<p style="margin:12px 0;padding:12px;background:#fff0dc;color:#5c2600;border:2px solid #985500;font-weight:bold;">${escapeHtml(text)}</p>`;
+  `<p style="margin:4px 0;padding:6px;background:#F6DFE0;color:#27242d;border:1px solid #A28D5B;font-weight:bold;">${escapeHtml(text)}</p>`;
 const cellText = (text: string) =>
-  `<p style="margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;">${escapeHtml(text)}</p>`;
+  `<p style="margin:2px 0;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;">${escapeHtml(text)}</p>`;
 
 /** Only an HTTP(S) configured origin can become a link; no customer URLs are used. */
 function operationsLink(origin: string | undefined, id: string) {
@@ -113,8 +114,21 @@ export function renderOperationsEmail(email: KitchenEmail) {
       const price = priceValid
         ? `${money(item.priceFils!)} ${item.isPack ? "per box" : "each"} · ${money(item.priceFils! * item.quantity)} line total`
         : "Stored price or quantity missing/invalid — review required";
-      text.push("", `${item.quantity} × ${item.name} (${item.sku}) · ${price}`);
+      const title = item.isPack ? item.name : `${item.quantity} × ${item.name}`;
+      text.push(
+        "",
+        `${item.isPack ? "PACK / BOX: " : ""}${title} (${item.sku}) · ${price}`,
+      );
+      const visiblePrice = priceValid
+        ? item.quantity === 1
+          ? money(item.priceFils!)
+          : price
+        : "Stored price or quantity missing/invalid — review required";
       let preparation = "";
+      if (item.preparation) {
+        text.push(item.preparation);
+        preparation = cellText(item.preparation);
+      }
       if (item.pack) {
         const heading =
           item.quantity === 1 ? "INSIDE THIS BOX:" : "INSIDE EACH BOX:";
@@ -129,13 +143,19 @@ export function renderOperationsEmail(email: KitchenEmail) {
             : []),
           total,
         );
-        preparation = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;border-top:1px solid #b9a78b;"><tr><td style="padding-top:12px;"><h3 style="font-size:14px;margin:0 0 8px;">${heading}</h3><ul style="padding-left:24px;margin:0;">${item.pack.components.map((c) => `<li style="padding:4px 0;">${c.units} × ${escapeHtml(c.name)}</li>`).join("")}</ul>${item.quantity > 1 ? cellText(`${item.pack.capacity} pieces per box; repeat this composition for each box.`) : ""}<p style="font-weight:bold;margin:12px 0 0;">${total}</p></td></tr></table>`;
+        preparation = `<h3 style="font-size:12px;line-height:1.3;margin:4px 0 2px;">${heading}</h3><ul style="padding-left:18px;margin:0;">${item.pack.components.map((c) => `<li style="margin:0;padding:0;">${c.units} × ${escapeHtml(c.name)}</li>`).join("")}</ul>${item.quantity > 1 ? cellText(`${item.quantity} boxes · ${item.pack.capacity} pieces per box; same contents in each box.`) : ""}<p style="font-weight:bold;margin:3px 0 0;">${escapeHtml(total)}</p>`;
+      }
+      if (item.isPack && !item.pack) {
+        const count = `${item.quantity} ${item.quantity === 1 ? "box" : "boxes"} · pieces per box not recorded — manual review required`;
+        text.push(count);
+        preparation += cellText(count);
       }
       if (item.review) {
         text.push(item.review);
         preparation += warning(item.review);
       }
-      return `<tr><td style="padding:0 0 16px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:2px solid ${item.isPack ? "#69543d" : "#d7cdc0"};border-radius:12px;background:${item.isPack ? "#fbf3e7" : "#ffffff"};"><tr><td style="padding:20px;overflow-wrap:anywhere;word-break:break-word;"><p style="font-size:12px;font-weight:bold;margin:0 0 8px;">${item.isPack ? "PACK / BOX" : "INDIVIDUAL PRODUCT"}</p><h2 style="font-size:20px;line-height:1.35;margin:0;">${escapeHtml(String(item.quantity))} × ${escapeHtml(item.name)}</h2><p style="font-size:12px;margin:8px 0;color:#51463d;">${escapeHtml(item.sku)}</p>${cellText(price)}${preparation}</td></tr></table></td></tr>`;
+      // Each accepted line owns its row group, including any frozen box contents.
+      return `<tbody data-kitchen-item="${item.isPack ? "pack" : "single"}"><tr><th scope="row" style="text-align:left;vertical-align:top;padding:8px 9px ${preparation ? "3px" : "8px"};font-weight:normal;overflow-wrap:anywhere;word-break:break-word;${preparation ? "" : "border-bottom:1px solid #dbcbb3;"}">${item.isPack ? '<p style="font:10px Arial,Helvetica,sans-serif;letter-spacing:1px;color:#6f5733;margin:0 0 3px;">PACK / BOX</p>' : ""}<h2 style="font-family:Georgia,'Times New Roman',serif;font-size:18px;line-height:1.14;margin:0;font-weight:normal;">${escapeHtml(item.name)}</h2></th><td data-kitchen-quantity style="vertical-align:top;text-align:center;padding:10px 2px 4px;font-size:18px;${preparation ? "" : "border-bottom:1px solid #dbcbb3;"}">${Number.isSafeInteger(item.quantity) && item.quantity > 0 ? item.quantity : "Review"}</td><td style="vertical-align:top;text-align:right;padding:10px 9px 4px;font-size:17px;${preparation ? "" : "border-bottom:1px solid #dbcbb3;"}"><span data-kitchen-price style="white-space:nowrap;">${escapeHtml(priceValid ? money(item.priceFils! * item.quantity) : "Review required")}</span>${item.quantity !== 1 ? `<p style="font-size:13px;line-height:1.25;margin:3px 0 0;color:#6f5733;">${escapeHtml(priceValid ? `${money(item.priceFils!)} ${item.isPack ? "per box" : "each"}` : visiblePrice)}</p>` : ""}</td></tr>${preparation ? `<tr><td colspan="3" style="padding:0 9px 8px;border-bottom:1px solid #dbcbb3;color:#6f5733;">${preparation}</td></tr>` : ""}</tbody>`;
     })
     .join("");
   const review =
@@ -153,6 +173,68 @@ export function renderOperationsEmail(email: KitchenEmail) {
   const paid = validMoney(email.amountFils)
     ? money(email.amountFils)
     : "Review required";
-  const html = `<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="format-detection" content="telephone=no"><title>Paid 3L order ${escapeHtml(email.reference)}</title></head><body style="margin:0;padding:0;background:#f4eee7;color:#30251e;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.5;"><div role="main" lang="en" dir="ltr"><table lang="en" dir="ltr" role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:16px 12px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;text-align:left;"><tr><td style="padding:24px 20px;background:#30251e;color:#ffffff;border-radius:12px;"><p style="font-size:13px;font-weight:bold;margin:0 0 8px;">3L · KITCHEN ORDER · PAID</p><h1 style="font-size:28px;line-height:1.25;margin:0;">Order ${escapeHtml(email.reference)}</h1>${cellText(email.orderId)}</td></tr><tr><td style="padding:20px 4px;"><h2 style="font-size:22px;margin:0;">${email.pickup ? "Pickup" : "Delivery"} · ${escapeHtml(email.date)}</h2><p style="font-size:20px;font-weight:bold;margin:4px 0;">${escapeHtml(email.time)}</p></td></tr><tr><td style="padding:20px;background:#fff0dc;border:2px solid #985500;border-radius:12px;"><h2 style="font-size:18px;margin:0;">Customer instructions / allergies</h2><p style="font-size:13px;margin:4px 0 12px;">Original customer text — check before preparation</p><h3 style="font-size:15px;margin:8px 0;">Original customer instructions</h3>${cellText(email.instructions)}<h3 style="font-size:15px;margin:12px 0 8px;">Original delivery notes</h3>${cellText(email.deliveryNotes)}</td></tr><tr><td style="padding:20px 4px;"><h2 style="font-size:18px;margin:0;">Customer &amp; ${email.pickup ? "pickup" : "delivery"}</h2>${[`Customer: ${email.customer}`, `Phone: ${email.phone}`, `Email: ${email.email}`, `WhatsApp: ${email.whatsapp}`, ...email.address].map(cellText).join("")}</td></tr>${cards}<tr><td style="padding:20px;background:#ffffff;border-radius:12px;">${financialReview ? warning(review) : ""}${validMoney(email.quote?.feeFils) && email.quote.feeFils > 0 ? cellText(`Stored delivery fee: ${money(email.quote.feeFils)}`) : ""}<h2 style="font-size:24px;margin:0 0 16px;">Total paid: ${paid}</h2>${link ? `<a href="${escapeHtml(link)}" style="display:inline-block;padding:14px 18px;background:#30251e;color:#ffffff;border-radius:8px;text-decoration:underline;font-weight:bold;">Open order in Operations (sign-in required)</a>` : warning("Operations link unavailable — open the authenticated dashboard and find this order.")}</td></tr></table></td></tr></table></div></body></html>`;
+  const secondary =
+    "font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:1.4;letter-spacing:1.8px;text-transform:uppercase;color:#715633;";
+  // Suppress only structured values already literally present in the full address.
+  // Conflicts, missing values and every review warning remain explicit; text stays exact.
+  const fullAddress = email.address
+    .find((line) => line.startsWith("Full address: "))
+    ?.slice(14);
+  const normalizedFull = fullAddress?.trim().toLowerCase() ?? "";
+  const addressLines = email.address.filter((line) => {
+    const field =
+      /^(Street\/address|Building\/villa|Apartment\/unit): (.+)$/.exec(line);
+    if (!field || /Not stored|Not recorded|review required/i.test(field[2]!))
+      return true;
+    const value = field[2]!.trim().toLowerCase();
+    if (!value) return true;
+    const containsExact = (needle: string) => {
+      const at = normalizedFull.indexOf(needle);
+      if (at < 0) return false;
+      const before = normalizedFull[at - 1];
+      const after = normalizedFull[at + needle.length];
+      return (
+        (!before || /[\s,;·]/.test(before)) &&
+        (!after || /[\s,;·.]/.test(after))
+      );
+    };
+    if (field[1] === "Apartment/unit")
+      return !["unit", "apartment", "flat", "apt"].some((label) =>
+        containsExact(`${label} ${value}`),
+      );
+    return !containsExact(value);
+  });
+  const addressHtml = addressLines
+    .map((line) =>
+      /(?:UNVERIFIED|Not recorded|review required|Not stored)/i.test(line)
+        ? warning(line)
+        : cellText(line.startsWith("Full address: ") ? line.slice(14) : line),
+    )
+    .join("");
+  const contacts = [
+    ...(email.phone === email.whatsapp && email.phone !== "Not stored"
+      ? [`Phone / WhatsApp: ${email.phone}`]
+      : [`Phone: ${email.phone}`, `WhatsApp: ${email.whatsapp}`]),
+    `Email: ${email.email}`,
+  ];
+  const storedSubtotal =
+    subtotal !== null && Number.isSafeInteger(subtotal)
+      ? money(subtotal)
+      : "Not stored — review required";
+  const fee = validMoney(email.quote?.feeFils)
+    ? money(email.quote.feeFils)
+    : "Not stored — review required";
+  const html = `<!doctype html><html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="format-detection" content="telephone=no"><title>Paid 3L order ${escapeHtml(email.reference)}</title></head><body style="margin:0;padding:0;background:#fffcf8;color:#191919;font-family:Georgia,'Times New Roman',serif;font-size:14px;line-height:1.3;"><div role="main" lang="en" dir="ltr"><table lang="en" dir="ltr" role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;"><tr><td align="center"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;table-layout:fixed;text-align:left;overflow-wrap:anywhere;word-break:break-word;">
+<tr><td data-kitchen-brand style="text-align:center;background:#F6DFE0;padding:8px 12px 7px;color:#715633;"><p style="font-size:26px;line-height:1.15;letter-spacing:5px;margin:0;">TRES LECHES</p><table role="presentation" width="44%" align="center" cellpadding="0" cellspacing="0"><tr><td style="border-bottom:1px solid #A28D5B;height:5px;font-size:1px;line-height:1px;">&nbsp;</td></tr></table><p style="font:10px Arial,Helvetica,sans-serif;letter-spacing:4px;margin:5px 0 0;">BAKERY</p></td></tr>
+<tr><td style="text-align:center;padding:8px 12px 9px;"><h1 style="font-family:Georgia,'Times New Roman',serif;font-size:32px;font-weight:normal;line-height:1.1;margin:0 0 5px;">New Order: ${escapeHtml(email.reference)}</h1><p style="${secondary}margin:0;">PAID · ${email.pickup ? "Pickup" : "Delivery"} · ${escapeHtml(email.date)}</p></td></tr>
+<tr><td style="padding:0 12px;"><table data-kitchen-summary role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;border:1px solid #e5d9c9;border-radius:12px;border-spacing:0;"><tr><td><table aria-label="Products to prepare" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;border-spacing:0;"><colgroup><col><col style="width:30px;"><col style="width:104px;"></colgroup><thead><tr style="background:#F6DFE0;"><th scope="col" style="text-align:left;padding:10px 9px;border-radius:11px 0 0 0;${secondary}">Product</th><th scope="col" style="text-align:center;padding:10px 2px;${secondary}">Qty</th><th scope="col" style="text-align:right;padding:10px 9px;border-radius:0 11px 0 0;${secondary}">Price</th></tr></thead>${cards}</table></td></tr>
+<tr><td style="padding:9px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="${secondary}padding:3px 0;">Subtotal</td><td style="text-align:right;font-size:15px;">${escapeHtml(storedSubtotal)}</td></tr><tr><td style="${secondary}padding:3px 0;">${email.pickup ? "Fulfillment fee" : "Delivery fee"}</td><td style="text-align:right;font-size:15px;">${escapeHtml(fee)}</td></tr></table>${financialReview ? warning(review) : ""}</td></tr>
+<tr><td style="padding:7px 9px;border-top:1px solid #dbcbb3;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="${secondary}font-size:11px;">Total paid</td><td style="text-align:right;"><h2 aria-label="Total paid: ${paid}" style="margin:0;font-size:23px;line-height:1.2;font-weight:normal;color:#715633;">${paid}</h2></td></tr></table></td></tr></table></td></tr>
+<tr><td style="padding:5px 12px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F6DFE0;border:1px solid #A28D5B;border-radius:11px;"><tr><td data-kitchen-notes style="padding:7px 9px;"><h2 style="font: bold 12px Arial,Helvetica,sans-serif;margin:0 0 4px;">Customer instructions / allergies</h2><p style="margin:0 0 3px;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;"><strong>Original customer instructions:</strong> ${escapeHtml(email.instructions)}</p><p style="margin:0;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;"><strong>Original delivery notes:</strong> ${escapeHtml(email.deliveryNotes)}</p></td></tr></table></td></tr>
+<tr><td style="padding:5px 12px 0;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;border-radius:11px;background:#F6DFE0;"><tr><td data-kitchen-fulfillment style="padding:7px 10px;width:47%;vertical-align:top;"><p style="${secondary}margin:0 0 3px;">${email.pickup ? "Pickup" : "Delivery"} date</p><p style="margin:0;font-size:15px;">${escapeHtml(email.date)}</p></td><td style="padding:7px 10px;border-left:1px solid #dbcbb3;vertical-align:top;"><p style="${secondary}margin:0 0 3px;">${email.pickup ? "Pickup" : "Delivery"} time</p><p style="margin:0;font-size:15px;">${escapeHtml(email.time)}</p></td></tr></table></td></tr>
+<tr><td style="padding:5px 12px 0;"><table data-kitchen-customer role="presentation" width="100%" cellpadding="0" cellspacing="0" style="table-layout:fixed;background:#f5efe7;border-radius:11px;"><tr><td data-kitchen-address style="width:52%;vertical-align:top;padding:7px 9px;font-size:13px;"><p style="${secondary}margin:0 0 4px;">${email.pickup ? "Pickup location" : "Delivery address"}</p><p style="margin:0 0 3px;">${escapeHtml(email.customer)}</p>${addressHtml}</td><td style="vertical-align:top;padding:7px 9px;border-left:1px solid #dbcbb3;font:12px Arial,Helvetica,sans-serif;">${contacts.map(cellText).join("")}</td></tr></table></td></tr>
+
+<tr><td style="padding:3px 12px 6px;font:12px Arial,Helvetica,sans-serif;">${link ? `<a href="${escapeHtml(link)}" style="display:inline-block;min-height:44px;box-sizing:border-box;padding:12px 0;line-height:20px;color:#27242d;text-decoration:underline;">Open order in Operations (sign-in required)</a>` : warning("Operations link unavailable — open the authenticated dashboard and find this order.")}</td></tr>
+</table></td></tr></table></div></body></html>`;
   return { text: text.join("\n"), html };
 }

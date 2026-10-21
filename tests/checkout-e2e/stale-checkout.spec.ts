@@ -1,5 +1,6 @@
 /** Isolated SQLite + in-process Paymennt mock. No external payment API or card input. */
 import { test, expect } from "@playwright/test";
+import { clickStableControl } from "../helpers/stable-control";
 for (const [sku, initialQty, currentQty, oldAmount, amount] of [
   ["pan-de-muerto", 6, 15, 150, 375],
   ["fixture-36", 1, 3, 36, 108],
@@ -63,7 +64,9 @@ for (const [sku, initialQty, currentQty, oldAmount, amount] of [
     );
     await page.goto("/checkout");
     await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
-    await page.getByRole("button", { name: "REVIEW ORDER" }).click();
+    await clickStableControl(
+      page.getByRole("button", { name: "REVIEW ORDER" }),
+    );
     await expect(
       page.getByRole("link", { name: "CHECK PAYMENT STATUS" }),
     ).toBeVisible();
@@ -87,7 +90,9 @@ for (const [sku, initialQty, currentQty, oldAmount, amount] of [
     await expect(page.locator("main")).toContainText(`AED ${amount}`);
     await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
     await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
-    await page.getByRole("button", { name: "REVIEW ORDER" }).click();
+    await clickStableControl(
+      page.getByRole("button", { name: "REVIEW ORDER" }),
+    );
     await page.getByLabel(/I've reviewed my order/).check();
     const pay = page.getByRole("button", {
       name: `PAY AED ${amount}`,

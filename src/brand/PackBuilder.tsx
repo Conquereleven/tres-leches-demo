@@ -1,6 +1,7 @@
 import { calculatePackPrice } from "../../shared/pack-pricing";
 import "./pack-builder.css";
 import { useId } from "react";
+import { tricolorSpec, tricolorPreparation } from "../../shared/tricolor";
 import {
   packSpec,
   componentName,
@@ -199,6 +200,12 @@ export function CompositionDetails({
   line: CommerceLine & { packSnapshot?: PackSnapshot };
 }) {
   const { language } = useLanguage();
+  if (tricolorSpec(line.productId))
+    return (
+      <span className="b-pack-composition">
+        {tricolorPreparation(line, language)}
+      </span>
+    );
   if (!line.composition) return null;
   const snapshot = line.packSnapshot;
   if (snapshot && !validPackSnapshot(line))

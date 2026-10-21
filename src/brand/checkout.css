@@ -850,3 +850,6 @@
   height: 20px;
   accent-color: var(--v2-raspberry);
 }
+
+/* Preserve the approved whole-image presentation in the existing Conchas thumb. */
+.brand-experience .b-co-thumb-contained { object-fit: contain; }

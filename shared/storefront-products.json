@@ -880,5 +880,16 @@
     "optionIds": [
       "candles-"
     ]
+  },
+  {
+    "id": "conchas-tricolor-pack",
+    "slug": "conchas-tricolor-pack",
+    "familyId": "conchas-tricolor-pack",
+    "variant": "",
+    "title": "Conchas Tricolor · Pack de 3",
+    "optionIds": [
+      "conchas-tricolor-pack-3-mini",
+      "conchas-tricolor-pack-3-individuales"
+    ]
   }
 ]
