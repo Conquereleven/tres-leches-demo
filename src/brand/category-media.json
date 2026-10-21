@@ -599,6 +599,510 @@
           "format": "webp"
         }
       ]
+    },
+    {
+      "sourceId": "3l-media-002-bakery-m002-002",
+      "sourceFilename": "private delivery wetransfer_nuevas-3l_2026-10-19_1715.zip: BISQUETS/6PCS BISQUETS HORIZONTAL.jpg",
+      "family": null,
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu"
+      ],
+      "usage": "bakery category gallery only; never a purchasable product image",
+      "alt": "Pastelerías 3L Panadería Mexicana · photographed assortment",
+      "status": "assigned",
+      "selectionReason": "3L-MEDIA-002 professional photography, 19 October 2026 delivery.",
+      "mediaKind": "photograph",
+      "presentation": "menu-reference-landscape",
+      "width": 2470,
+      "height": 1647,
+      "originalBytes": 3801274,
+      "derivatives": [
+        {
+          "src": "/brand/approved/3l-media-002/bakery-0-m002-002-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 52419,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/bakery-0-m002-002-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 64110,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/bakery-0-m002-002-960.avif",
+          "width": 960,
+          "height": 640,
+          "bytes": 113570,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/bakery-0-m002-002-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 136956,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/bakery-0-m002-002-1440.avif",
+          "width": 1440,
+          "height": 960,
+          "bytes": 228847,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/bakery-0-m002-002-1440.webp",
+          "width": 1440,
+          "height": 960,
+          "bytes": 279038,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-media-002-bakery-m002-041",
+      "sourceFilename": "private delivery wetransfer_nuevas-3l_2026-10-19_1715.zip: OREJITAS/OREJA 05.jpg",
+      "family": null,
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu"
+      ],
+      "usage": "bakery category gallery only; never a purchasable product image",
+      "alt": "Pastelerías 3L Panadería Mexicana · photographed assortment",
+      "status": "assigned",
+      "selectionReason": "3L-MEDIA-002 professional photography, 19 October 2026 delivery.",
+      "mediaKind": "photograph",
+      "presentation": "menu-reference-landscape",
+      "width": 2385,
+      "height": 1590,
+      "originalBytes": 4244890,
+      "derivatives": [
+        {
+          "src": "/brand/approved/3l-media-002/bakery-1-m002-041-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 62642,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/bakery-1-m002-041-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 73386,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/bakery-1-m002-041-960.avif",
+          "width": 960,
+          "height": 640,
+          "bytes": 139429,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/bakery-1-m002-041-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 166078,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/bakery-1-m002-041-1440.avif",
+          "width": 1440,
+          "height": 960,
+          "bytes": 285925,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/bakery-1-m002-041-1440.webp",
+          "width": 1440,
+          "height": 960,
+          "bytes": 341520,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-media-002-conchas-m002-026",
+      "sourceFilename": "private delivery wetransfer_nuevas-3l_2026-10-19_1715.zip: CONCHAS COLORES/CONCHAS COLORES 02.jpg",
+      "family": null,
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu"
+      ],
+      "usage": "conchas category gallery only; never a purchasable product image",
+      "alt": "Pastelerías 3L Conchas · photographed assortment",
+      "status": "assigned",
+      "selectionReason": "3L-MEDIA-002 professional photography, 19 October 2026 delivery.",
+      "mediaKind": "photograph",
+      "presentation": "menu-reference-landscape",
+      "width": 1728,
+      "height": 1152,
+      "originalBytes": 4473956,
+      "derivatives": [
+        {
+          "src": "/brand/approved/3l-media-002/conchas-0-m002-026-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 65049,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-0-m002-026-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 75514,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-0-m002-026-960.avif",
+          "width": 960,
+          "height": 640,
+          "bytes": 132745,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-0-m002-026-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 155848,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-0-m002-026-1440.avif",
+          "width": 1440,
+          "height": 960,
+          "bytes": 233833,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-0-m002-026-1440.webp",
+          "width": 1440,
+          "height": 960,
+          "bytes": 291282,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-media-002-conchas-m002-027",
+      "sourceFilename": "private delivery wetransfer_nuevas-3l_2026-10-19_1715.zip: CONCHAS COLORES/CONCHAS COLORES.jpg",
+      "family": null,
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu"
+      ],
+      "usage": "conchas category gallery only; never a purchasable product image",
+      "alt": "Pastelerías 3L Conchas · photographed assortment",
+      "status": "assigned",
+      "selectionReason": "3L-MEDIA-002 professional photography, 19 October 2026 delivery.",
+      "mediaKind": "photograph",
+      "presentation": "menu-reference-landscape",
+      "width": 1728,
+      "height": 1152,
+      "originalBytes": 2765594,
+      "derivatives": [
+        {
+          "src": "/brand/approved/3l-media-002/conchas-1-m002-027-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 15520,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-1-m002-027-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 23214,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-1-m002-027-960.avif",
+          "width": 960,
+          "height": 640,
+          "bytes": 25074,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-1-m002-027-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 39886,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-1-m002-027-1440.avif",
+          "width": 1440,
+          "height": 960,
+          "bytes": 38696,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-1-m002-027-1440.webp",
+          "width": 1440,
+          "height": 960,
+          "bytes": 69312,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-media-002-conchas-m002-024",
+      "sourceFilename": "private delivery wetransfer_nuevas-3l_2026-10-19_1715.zip: CONCHA VAINILLA/MIX MINIS.jpg",
+      "family": null,
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu"
+      ],
+      "usage": "conchas category gallery only; never a purchasable product image",
+      "alt": "Pastelerías 3L Conchas · photographed assortment",
+      "status": "assigned",
+      "selectionReason": "3L-MEDIA-002 professional photography, 19 October 2026 delivery.",
+      "mediaKind": "photograph",
+      "presentation": "menu-reference-landscape",
+      "width": 1728,
+      "height": 1152,
+      "originalBytes": 3919496,
+      "derivatives": [
+        {
+          "src": "/brand/approved/3l-media-002/conchas-2-m002-024-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 46533,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-2-m002-024-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 53866,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-2-m002-024-960.avif",
+          "width": 960,
+          "height": 640,
+          "bytes": 89657,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-2-m002-024-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 105300,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-2-m002-024-1440.avif",
+          "width": 1440,
+          "height": 960,
+          "bytes": 152219,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/conchas-2-m002-024-1440.webp",
+          "width": 1440,
+          "height": 960,
+          "bytes": 190216,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-media-002-pan-m002-059",
+      "sourceFilename": "private delivery wetransfer_nuevas-3l_2026-10-19_1715.zip: PAN DE MUERTO AZUCAR/PAN DE MUERTO AZUCAR 09.jpg",
+      "family": null,
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu"
+      ],
+      "usage": "pan category gallery only; never a purchasable product image",
+      "alt": "Pastelerías 3L Pan de Muerto · photographed assortment",
+      "status": "assigned",
+      "selectionReason": "3L-MEDIA-002 professional photography, 19 October 2026 delivery.",
+      "mediaKind": "photograph",
+      "presentation": "menu-reference-landscape",
+      "width": 3240,
+      "height": 2160,
+      "originalBytes": 5159992,
+      "derivatives": [
+        {
+          "src": "/brand/approved/3l-media-002/pan-0-m002-059-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 28393,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-0-m002-059-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 35676,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-0-m002-059-960.avif",
+          "width": 960,
+          "height": 640,
+          "bytes": 55175,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-0-m002-059-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 72704,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-0-m002-059-1440.avif",
+          "width": 1440,
+          "height": 960,
+          "bytes": 101207,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-0-m002-059-1440.webp",
+          "width": 1440,
+          "height": 960,
+          "bytes": 139952,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-media-002-pan-m002-049",
+      "sourceFilename": "private delivery wetransfer_nuevas-3l_2026-10-19_1715.zip: PAN DE MUERTO AJONJOLI/PAN DE MUERTO AJONJOLI 07.jpg",
+      "family": null,
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu"
+      ],
+      "usage": "pan category gallery only; never a purchasable product image",
+      "alt": "Pastelerías 3L Pan de Muerto · photographed assortment",
+      "status": "assigned",
+      "selectionReason": "3L-MEDIA-002 professional photography, 19 October 2026 delivery.",
+      "mediaKind": "photograph",
+      "presentation": "menu-reference-landscape",
+      "width": 3240,
+      "height": 2160,
+      "originalBytes": 4123307,
+      "derivatives": [
+        {
+          "src": "/brand/approved/3l-media-002/pan-1-m002-049-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 19117,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-1-m002-049-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 26920,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-1-m002-049-960.avif",
+          "width": 960,
+          "height": 640,
+          "bytes": 31977,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-1-m002-049-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 47930,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-1-m002-049-1440.avif",
+          "width": 1440,
+          "height": 960,
+          "bytes": 51257,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-1-m002-049-1440.webp",
+          "width": 1440,
+          "height": 960,
+          "bytes": 83192,
+          "format": "webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "3l-media-002-pan-m002-080",
+      "sourceFilename": "private delivery wetransfer_nuevas-3l_2026-10-19_1715.zip: PAN DE MUERTO PACKS CUBIERTAS/frontal mix 01.jpg",
+      "family": null,
+      "variant": "",
+      "size": null,
+      "routes": [
+        "/menu"
+      ],
+      "usage": "pan category gallery only; never a purchasable product image",
+      "alt": "Pastelerías 3L Pan de Muerto · photographed assortment",
+      "status": "assigned",
+      "selectionReason": "3L-MEDIA-002 professional photography, 19 October 2026 delivery.",
+      "mediaKind": "photograph",
+      "presentation": "menu-reference-landscape",
+      "width": 1728,
+      "height": 1152,
+      "originalBytes": 2070332,
+      "derivatives": [
+        {
+          "src": "/brand/approved/3l-media-002/pan-2-m002-080-640.avif",
+          "width": 640,
+          "height": 427,
+          "bytes": 39897,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-2-m002-080-640.webp",
+          "width": 640,
+          "height": 427,
+          "bytes": 49338,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-2-m002-080-960.avif",
+          "width": 960,
+          "height": 640,
+          "bytes": 76230,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-2-m002-080-960.webp",
+          "width": 960,
+          "height": 640,
+          "bytes": 94526,
+          "format": "webp"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-2-m002-080-1440.avif",
+          "width": 1440,
+          "height": 960,
+          "bytes": 128690,
+          "format": "avif"
+        },
+        {
+          "src": "/brand/approved/3l-media-002/pan-2-m002-080-1440.webp",
+          "width": 1440,
+          "height": 960,
+          "bytes": 172034,
+          "format": "webp"
+        }
+      ]
     }
   ],
   "editorial": [
@@ -606,7 +1110,25 @@
       "category": "conchas",
       "sourceIds": [
         "3l-conchas-final-docena_de_conchas_de_chocolate_envuelta-opening-horizontal",
-        "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán-opening-horizontal"
+        "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán-opening-horizontal",
+        "3l-media-002-conchas-m002-026",
+        "3l-media-002-conchas-m002-027",
+        "3l-media-002-conchas-m002-024"
+      ]
+    },
+    {
+      "category": "bakery",
+      "sourceIds": [
+        "3l-media-002-bakery-m002-002",
+        "3l-media-002-bakery-m002-041"
+      ]
+    },
+    {
+      "category": "pan",
+      "sourceIds": [
+        "3l-media-002-pan-m002-059",
+        "3l-media-002-pan-m002-049",
+        "3l-media-002-pan-m002-080"
       ]
     }
   ]

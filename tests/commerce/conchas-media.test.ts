@@ -92,9 +92,25 @@ test("each traditional Concha retains exact approved artwork alongside the final
   }
 });
 test("Conchas opens with the two retained approved final batch frames", () => {
-  const frames = categoryEditorialMedia("conchas");
-  assert.equal(frames.length, 2);
-  assert.ok(frames.every((a) => !a.sourceId.includes("conchas_de_pistache_sobre_tabla_de_madera")));
+  const gallery = categoryEditorialMedia("conchas");
+  assert.ok(
+    gallery.every(
+      (a) => !a.sourceId.includes("conchas_de_pistache_sobre_tabla_de_madera"),
+    ),
+  );
+  // 3L-MEDIA-002 photographs follow the retained opening frames.
+  assert.ok(
+    gallery
+      .slice(2)
+      .every((a) => a.sourceId.startsWith("3l-media-002-conchas-")),
+  );
+  assert.equal(gallery.length, 5);
+  const frames = gallery.slice(0, 2);
+  assert.ok(
+    frames.every(
+      (a) => !a.sourceId.includes("conchas_de_pistache_sobre_tabla_de_madera"),
+    ),
+  );
   assert.ok(frames.every(usesMenuReferencePresentation));
   for (const asset of frames) {
     for (const d of asset.derivatives) {
@@ -109,7 +125,7 @@ test("Conchas opens with the two retained approved final batch frames", () => {
       ),
     );
   }
-  assert.equal(categoryEditorialMedia("pan").length, 4);
+  assert.equal(categoryEditorialMedia("pan").length, 7);
   assert.equal(categoryEditorialMedia("cakes").length, 0);
 });
 
@@ -158,7 +174,10 @@ test("all seven Conchas reuse the Pan presentation without a separate frame syst
   ];
   for (const [id, family, variant] of products) {
     const asset = selectedProductMedia(id, family!, variant!);
-    if (id === "conchas-traditional--tricolor") { assert.equal(asset, undefined); continue; }
+    if (id === "conchas-traditional--tricolor") {
+      assert.equal(asset, undefined);
+      continue;
+    }
     assert.ok(asset);
     assert.ok(usesMenuReferencePresentation(asset));
   }

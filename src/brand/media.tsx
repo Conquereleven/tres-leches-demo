@@ -135,13 +135,12 @@ export const usesMenuReferencePresentation = (asset: MediaAsset | undefined) =>
       asset.authoredSourceId.startsWith("official-pan-")) ||
     ("presentation" in asset &&
       asset.presentation?.startsWith("menu-reference") === true));
-/** Mixed boards shown for a whole category; never tied to a flavour or pack. */
+/** Mixed boards shown for a whole category; never tied to a flavour or pack.
+ * Official frames open the gallery; category-media frames for the same category follow. */
 export const categoryEditorialMedia = (category: string) =>
-  (
-    [...official.editorial, ...categories.editorial].find(
-      (e) => e.category === category,
-    )?.sourceIds ?? []
-  )
+  [...official.editorial, ...categories.editorial]
+    .filter((e) => e.category === category)
+    .flatMap((e) => e.sourceIds)
     .map((id) => approvedMedia.find((a) => a.sourceId === id))
     .filter((a): a is MediaAsset => !!a);
 const srcSet = (asset: MediaAsset, format: string) =>

@@ -65,12 +65,17 @@ test("all 50 official photos are accounted for and only reviewed ones are public
     "official-pan-04",
   ]);
   assert.deepEqual(pack("pan-de-muerto-filled-pack"), ["official-pan-02"]);
-  // Restored category banner: the four boards, whole, in their original 3:2 frame.
+  // Restored category banner: the four boards open the gallery, whole, in their
+  // original 3:2 frame; the 3L-MEDIA-002 photographs follow them.
   const boards = categoryEditorialMedia("pan");
   assert.deepEqual(
-    boards.map((b) => b.sourceId),
+    boards.slice(0, 4).map((b) => b.sourceId),
     ["01", "02", "03", "04"].map((n) => `official-pan-banner-${n}`),
   );
+  assert.ok(
+    boards.slice(4).every((b) => b.sourceId.startsWith("3l-media-002-pan-")),
+  );
+  assert.equal(boards.length, 7);
   for (const board of boards) assert.equal(board.width! / board.height!, 1.5);
   for (const other of ["cakes", "jars"])
     assert.deepEqual(categoryEditorialMedia(other), []);
