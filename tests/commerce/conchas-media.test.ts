@@ -91,21 +91,20 @@ test("each traditional Concha retains exact approved artwork alongside the final
     assert.ok(a.derivatives.every((d) => !d.file.startsWith("public/")));
   }
 });
-test("Conchas opens with the two retained approved final batch frames", () => {
+test("Conchas keeps the two retained approved final batch frames after the new photographs", () => {
   const gallery = categoryEditorialMedia("conchas");
   assert.ok(
     gallery.every(
       (a) => !a.sourceId.includes("conchas_de_pistache_sobre_tabla_de_madera"),
     ),
   );
-  // 3L-MEDIA-002 photographs follow the retained opening frames.
-  assert.ok(
-    gallery
-      .slice(2)
-      .every((a) => a.sourceId.startsWith("3l-media-002-conchas-")),
+  // 3L-MEDIA-002 photographs open; the retained frames follow.
+  assert.deepEqual(
+    gallery.slice(0, 3).map((a) => a.sourceId),
+    ["026", "027", "024"].map((n) => `3l-media-002-conchas-m002-${n}`),
   );
   assert.equal(gallery.length, 5);
-  const frames = gallery.slice(0, 2);
+  const frames = gallery.slice(3);
   assert.ok(
     frames.every(
       (a) => !a.sourceId.includes("conchas_de_pistache_sobre_tabla_de_madera"),

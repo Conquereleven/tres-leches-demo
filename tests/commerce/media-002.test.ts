@@ -19,25 +19,33 @@ import {
 const metadataFree = (bytes: Buffer) =>
   !/Exif|EXIF|XMP |GPS/.test(bytes.toString("latin1"));
 
-test("category galleries keep their approved opening frames and add only the reviewed photographs", () => {
+test("new photographs open each category gallery in the reviewed order; approved frames follow", () => {
   const ids = (c: string) => categoryEditorialMedia(c).map((a) => a.sourceId);
-  for (const [category, retained, added] of [
-    ["pan", 4, 3],
-    ["conchas", 2, 3],
-    ["bakery", 0, 2],
+  for (const [category, opening, retained] of [
+    ["pan", ["080", "059", "049"], 4],
+    ["conchas", ["026", "027", "024"], 2],
+    ["bakery", ["002", "041"], 0],
   ] as const) {
     const gallery = categoryEditorialMedia(category);
-    assert.equal(gallery.length, retained + added, category);
+    assert.equal(gallery.length, opening.length + retained, category);
+    assert.deepEqual(
+      ids(category).slice(0, opening.length),
+      opening.map((n) => `3l-media-002-${category}-m002-${n}`),
+    );
     assert.ok(
       ids(category)
-        .slice(0, retained)
+        .slice(opening.length)
         .every((id) => !id.startsWith("3l-media-002-")),
     );
-    const expected = selection
-      .filter((s) => s.kind === "editorial" && s.target === category)
-      .map((s) => `3l-media-002-${category}-${s.assetId.toLowerCase()}`);
-    assert.deepEqual(ids(category).slice(retained), expected);
-    for (const asset of gallery.slice(retained)) {
+    // Exactly the reviewed editorial selection, no more.
+    assert.deepEqual(
+      [...ids(category).slice(0, opening.length)].sort(),
+      selection
+        .filter((s) => s.kind === "editorial" && s.target === category)
+        .map((s) => `3l-media-002-${category}-${s.assetId.toLowerCase()}`)
+        .sort(),
+    );
+    for (const asset of gallery.slice(0, opening.length)) {
       // A category frame is never resolvable as a product, flavour or pack image.
       assert.equal(asset.family, null);
       assert.ok(usesMenuReferencePresentation(asset));

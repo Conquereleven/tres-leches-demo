@@ -1,7 +1,7 @@
 /**
  * 3L-MEDIA-002: stage the reviewed product photographs as a private Product Hub draft.
  *
- *   HUB_BASE=https://… HUB_COOKIE='tl_session=…' node --import tsx scripts/media-002-hub.ts [--draft]
+ *   HUB_BASE=https://… HUB_COOKIE='tl_session=…' node --import tsx scripts/media-002-hub.ts [--draft | --verify]
  *   (HUB_PLAN=<file> only for an isolated rehearsal against a fixture revision)
  *
  * Default is a read-only dry run: it checks the published revision, that every
@@ -12,8 +12,15 @@
  * publishes there. Every other product and variant field is copied unchanged
  * from the Product Hub view, and the script stops if the saved draft differs
  * from the live product in anything but media.
+ *
+ * Before any write, `--draft` saves the currently published media of every
+ * planned product (HUB_SNAPSHOT, default ./media-002-published-snapshot.json)
+ * for rollback. It refuses to start if any draft already exists, so nothing
+ * unrelated can ride along. `--verify` (read-only) checks that the pending
+ * draft contains exactly the planned photographs and media links and nothing
+ * else: run it immediately before pressing Publish.
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { join } from "node:path";
 
@@ -37,9 +44,11 @@ type HubView = {
   available: boolean;
   version: number;
   published: { id: string };
-  draft: unknown;
+  draft: { stale: boolean } | null;
   products: HubProduct[];
   assets: { id: string; version: string }[];
+  changes: { kind: string; target: string; field: string }[];
+  issues: { level: string; target: string }[];
 };
 
 const docs = join(process.cwd(), "docs/media/3l-media-002");
@@ -53,6 +62,7 @@ const plan = JSON.parse(
 const base = process.env.HUB_BASE ?? "";
 const cookie = process.env.HUB_COOKIE ?? "";
 const write = process.argv.includes("--draft");
+const verifyOnly = process.argv.includes("--verify");
 if (!/^https?:\/\//.test(base) || !cookie)
   throw new Error("HUB_BASE and HUB_COOKIE are required");
 const origin = new URL(base).origin;
@@ -115,8 +125,72 @@ const differences = (a: HubProduct, b: HubProduct) => {
   return out;
 };
 
+/**
+ * The pending draft must be exactly this plan: one created asset per planned
+ * photograph (matched by content hash), media changes on the planned products
+ * only, the planned order with every previous image kept, and no issues.
+ */
+const verifyDraft = (h: HubView) => {
+  if (!h.draft) throw new Error("No Product Hub draft to verify");
+  if (h.draft.stale)
+    throw new Error("The draft is stale against the published revision");
+  const planned = new Set(plan.products.map((p) => p.productId));
+  const hashes = new Set(
+    plan.products.flatMap((p) => p.uploads.map((u) => u.sha256)),
+  );
+  const version = new Map(h.assets.map((a) => [a.id, a.version]));
+  const unexpected = h.changes.filter(
+    (c) =>
+      !(c.kind === "product" && c.field === "media" && planned.has(c.target)) &&
+      !(
+        c.kind === "asset" &&
+        c.field === "created" &&
+        hashes.has(version.get(c.target) ?? "")
+      ),
+  );
+  if (unexpected.length)
+    throw new Error(
+      `Draft contains unplanned changes: ${unexpected.map((c) => `${c.kind}:${c.target}.${c.field}`).join(", ")} — do not publish`,
+    );
+  const assets = h.changes.filter((c) => c.kind === "asset").length;
+  const media = h.changes.filter((c) => c.kind === "product").length;
+  if (assets !== hashes.size || media !== planned.size)
+    throw new Error(
+      `Draft has ${assets} new image(s) and ${media} product change(s); plan expects ${hashes.size} and ${planned.size}`,
+    );
+  if (h.issues.length)
+    throw new Error(`Draft has ${h.issues.length} issue(s) — do not publish`);
+  for (const item of plan.products) {
+    const product = h.products.find((p) => p.id === item.productId)!;
+    const got = [...product.media]
+      .sort((a, b) =>
+        a.role === b.role ? a.order - b.order : a.role === "primary" ? -1 : 1,
+      )
+      .map((l) => l.assetId);
+    const fresh = got
+      .slice(0, item.uploads.length)
+      .map((id) => version.get(id));
+    if (
+      JSON.stringify(fresh) !==
+        JSON.stringify(item.uploads.map((u) => u.sha256)) ||
+      JSON.stringify(got.slice(item.uploads.length)) !==
+        JSON.stringify(item.retainPrevious)
+    )
+      throw new Error(
+        `${item.productId}: draft media order differs from the plan`,
+      );
+  }
+  console.log(
+    `VERIFIED draft: ${assets} new images, ${media} product media changes, nothing else. Safe to review and publish.`,
+  );
+};
+
 let hub = await view();
 if (!hub.available) throw new Error("Product Hub is not available");
+if (verifyOnly) {
+  verifyDraft(hub);
+  process.exit(0);
+}
 if (hub.published.id !== plan.expectedPublishedRevision)
   throw new Error(
     `Published revision is ${hub.published.id}, plan expects ${plan.expectedPublishedRevision}. Re-review the plan.`,
@@ -142,7 +216,32 @@ for (const item of plan.products) {
     `${write ? "DRAFT" : "DRY RUN"} ${item.productId}: ${item.uploads.length} new photograph(s) first, ${item.retainPrevious.length} current image(s) kept after them`,
   );
 }
-if (!write) process.exit(0);
+if (!write) {
+  if (hub.draft)
+    console.log(
+      "NOTE: a Product Hub draft already exists. --draft will refuse to run until it is reviewed or discarded.",
+    );
+  process.exit(0);
+}
+// Rollback record: the published media of every planned product, before any write.
+const snapshot =
+  process.env.HUB_SNAPSHOT ?? "media-002-published-snapshot.json";
+writeFileSync(
+  snapshot,
+  JSON.stringify(
+    {
+      revision: hub.published.id,
+      savedAt: new Date().toISOString(),
+      products: plan.products.map((p) => ({
+        productId: p.productId,
+        media: hub.products.find((x) => x.id === p.productId)!.media,
+      })),
+    },
+    null,
+    1,
+  ) + "\n",
+);
+console.log(`Saved published media snapshot to ${snapshot}`);
 
 for (const item of plan.products) {
   const fresh: string[] = [];
@@ -236,6 +335,7 @@ for (const item of plan.products) {
     );
   console.log(`saved draft ${item.productId}: ${after.media.length} image(s)`);
 }
+verifyDraft(hub);
 console.log(
-  "Draft ready. Review it in Operations → Products and publish only after approval.",
+  "Draft ready. Review it in Operations → Products, rerun with --verify, and publish only after approval.",
 );

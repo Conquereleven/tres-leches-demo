@@ -161,9 +161,9 @@ test("dynamic HTML removes only marked bundled product images before hydration",
 
 test("Conchas category carousel excludes withdrawn pistachio board artwork", () => {
   const editorial = categoryEditorialMedia("conchas");
-  // The two retained opening frames come first; only 3L-MEDIA-002 photographs follow.
+  // 3L-MEDIA-002 photographs open; the two retained frames follow.
   assert.deepEqual(
-    editorial.slice(0, 2).map((image) => image.sourceId),
+    editorial.slice(3).map((image) => image.sourceId),
     [
       "3l-conchas-final-docena_de_conchas_de_chocolate_envuelta-opening-horizontal",
       "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán-opening-horizontal",
@@ -171,7 +171,7 @@ test("Conchas category carousel excludes withdrawn pistachio board artwork", () 
   );
   assert.ok(
     editorial
-      .slice(2)
+      .slice(0, 3)
       .every((image) => image.sourceId.startsWith("3l-media-002-conchas-")),
   );
   assert.ok(

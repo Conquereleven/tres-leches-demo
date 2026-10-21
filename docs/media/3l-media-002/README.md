@@ -18,7 +18,7 @@ Matched against the published catalog (revision `catalog-v1-63d2f003…`) by wha
 | Status | Photos | What happens |
 |---|---:|---|
 | Product media, staged for Product Hub | 34 | 12 live products; new photo becomes primary, current images kept after the new ones |
-| Category gallery frames, implemented here | 8 | Pan +3, Conchas +3, Bakery +2 (new). Approved opening frames stay first |
+| Category gallery frames, implemented here | 8 | Pan +3, Conchas +3, Bakery +2 (new). New photographs open; approved frames follow |
 | **Needs approval** | 5 | `CONCHAS COLORES 01`, `CONCHAS ROJAS*`: Tricolor is a colour-choice product with an approved neutral placeholder; these photos show only red (or a partial mix) |
 | Unmatched | 5 | `MANTECADAS*`: no Mantecadas product is published |
 | Not selected | 42 | Alternate takes, near-duplicates, top-down boards whose square crop would cut pieces, and groups that don't match the 6/12 Conchas chocolate pack |
@@ -40,18 +40,22 @@ Matched against the published catalog (revision `catalog-v1-63d2f003…`) by wha
 
 Notes for review: the new chocolate-covered photos have no orange-peel garnish (the previous ones do); filled Fresa shows white cream with strawberry, the only strawberry filling published (`mascarpone-y-fresas`); pack photos are product-level only and make no size or count claim. Not touched: Tricolor products, `conchas-traditional-pack`, `conchas-filled--pistache`, `conchas-filled-pack`, cakes, jars and every retired SKU.
 
-## Gallery order: needs founder visual review
+## Gallery order (proposed, for founder visual approval)
 
-The Pan and Conchas galleries can open with the previously approved frames (Option A, implemented) or with the new photographs (Option B). This PR implements A only so that nothing already approved changes without review; it is not a final decision.
+New photographs open each gallery and the previously approved frames follow. No photograph assignment changed.
 
-- [Pan: Option A vs B](previews/gallery-order-pan.jpg) · [Conchas: Option A vs B](previews/gallery-order-conchas.jpg)
-- Choosing B is a small follow-up: list `category-media.json` frames before the official ones in `categoryEditorialMedia`, and move the two retained Conchas ids after the new ones, plus the matching test expectations.
-- Bakery has no earlier gallery, so its two new frames apply either way.
+| Gallery | Order |
+|---|---|
+| Pan | **M002-080**, M002-059, M002-049, then official banners 01–04 |
+| Conchas | **M002-026**, M002-027, M002-024, then the retained chocolate-dozen and pistachio-cellophane frames |
+| Bakery | **M002-002**, M002-041 (new gallery) |
+
+Opening frames as rendered in the browser: [`previews/opening-*.png`](previews/). Previous vs proposed sequence: [Pan](previews/gallery-order-pan.jpg) · [Conchas](previews/gallery-order-conchas.jpg).
 
 ## What this PR changes
 
 - `src/brand/category-media.json` + `public/brand/approved/3l-media-002/`: 8 gallery frames, 3:2, AVIF + WebP at 640/960/1440 px, `family: null` so they can never resolve as product media.
-- `src/brand/media.tsx`: `categoryEditorialMedia` now combines the official and category-media lists for a category (official frames first) instead of taking the first list only. No other behaviour changes.
+- `src/brand/media.tsx`: `categoryEditorialMedia` now combines the category-media and official lists for a category (category-media first, so the new photographs open) instead of taking the first list only. No other behaviour changes.
 - `docs/media/3l-media-002/hub-uploads/`: 34 square 1200 px WebP files (≤ 325 KB, metadata-free) for Product Hub. **Product photos are published through Product Hub, not bundled.**
 - `scripts/prepare-media-002.py`: reproducible build from the private originals (hash-checked, reviewed crop boxes in `selection.json`, no stretching or colour edits).
 - `scripts/media-002-hub.ts`: stages the product media as a private Product Hub draft (see plan below).
@@ -73,9 +77,10 @@ No price, SKU, availability, description, translation, pack rule, checkout, orde
 3. Admin session in Operations, then dry run (read-only):
    `HUB_BASE=https://www.3ldubai.ae HUB_COOKIE='tl_session=…' node --import tsx scripts/media-002-hub.ts`
    It stops if the published revision is no longer `catalog-v1-63d2f003…` or any product's media changed.
-4. `… scripts/media-002-hub.ts --draft`: uploads and saves the private draft; stops if anything but media would change. It never publishes.
-5. In Operations → Products, review the draft comparison (expected: 34 assets, 12 product-media rows, no issues) and **Publish**.
-6. Check on www: the 12 products (menu card, detail, cart thumbnail) at 390 and 1440 px.
+4. `… scripts/media-002-hub.ts --draft`: refuses if any Product Hub draft already exists; saves the currently published media of the 12 products to `media-002-published-snapshot.json` (keep it with the release record); uploads; saves the private draft; stops if anything but media would change; then verifies the whole draft. It never publishes.
+5. In Operations → Products, review the draft comparison (expected: 34 assets, 12 product-media rows, no issues).
+6. Immediately before publishing, rerun read-only `… scripts/media-002-hub.ts --verify`: it fails if the draft contains anything unplanned (another editor's change, an extra image, a different order). Only then **Publish**.
+7. Check on www: the 12 products (menu card, detail, cart thumbnail) at 390 and 1440 px.
 
 **Rollback:** product images are a Product Hub edit. Move the previous image back to primary, or remove the new ones, and publish; the previous assets are kept in each product's media. Galleries: revert this PR's `category-media.json` lines. Never restore a database to undo media.
 

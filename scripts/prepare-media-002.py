@@ -35,6 +35,14 @@ EDITORIAL_ALT = {
 }
 
 
+# Founder-reviewed opening order: new photographs open each gallery.
+GALLERY_ORDER = {
+    "pan": ["M002-080", "M002-059", "M002-049"],
+    "conchas": ["M002-026", "M002-027", "M002-024"],
+    "bakery": ["M002-002", "M002-041"],
+}
+
+
 def stem(item):
     return f'{item["target"]}-{item["order"]}-{item["assetId"].lower()}'
 
@@ -120,11 +128,12 @@ for item in selection:
 
 manifest["assets"] = list(existing.values())
 for category, ids in editorial.items():
+    ids = [f"3l-media-002-{category}-{a.lower()}" for a in GALLERY_ORDER[category]]
     entry = next((e for e in manifest["editorial"] if e["category"] == category), None)
     if entry is None:
         manifest["editorial"].append(dict(category=category, sourceIds=ids))
     else:
-        # Retained approved frames open the gallery; new photographs follow.
-        entry["sourceIds"] = [s for s in entry["sourceIds"] if s not in ids] + ids
+        # New photographs open the gallery; retained approved frames follow.
+        entry["sourceIds"] = ids + [s for s in entry["sourceIds"] if s not in ids]
 manifest_file.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n")
 print(len(uploads), "Product Hub uploads;", sum(len(v) for v in editorial.values()), "editorial frames")

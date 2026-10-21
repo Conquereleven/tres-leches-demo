@@ -32,11 +32,11 @@ test("BRAND02 accounts for seven interim products and independent editorial repl
       assert.ok(existsSync("public" + d.src), d.src);
   }
   const gallery = categoryEditorialMedia("conchas");
-  // BRAND02 frames open the gallery; 3L-MEDIA-002 photographs follow them.
+  // 3L-MEDIA-002 photographs open the gallery; BRAND02 frames follow them.
   const editorial = gallery.filter(
     (a) => !a.sourceId.startsWith("3l-media-002-"),
   );
-  assert.deepEqual(gallery.slice(0, editorial.length), editorial);
+  assert.deepEqual(gallery.slice(-editorial.length), editorial);
   // The previously planned third frame was explicitly withdrawn.
   assert.equal(editorial.length, 2);
   assert.ok(

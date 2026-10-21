@@ -1109,11 +1109,11 @@
     {
       "category": "conchas",
       "sourceIds": [
-        "3l-conchas-final-docena_de_conchas_de_chocolate_envuelta-opening-horizontal",
-        "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán-opening-horizontal",
         "3l-media-002-conchas-m002-026",
         "3l-media-002-conchas-m002-027",
-        "3l-media-002-conchas-m002-024"
+        "3l-media-002-conchas-m002-024",
+        "3l-conchas-final-docena_de_conchas_de_chocolate_envuelta-opening-horizontal",
+        "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán-opening-horizontal"
       ]
     },
     {
@@ -1126,9 +1126,9 @@
     {
       "category": "pan",
       "sourceIds": [
+        "3l-media-002-pan-m002-080",
         "3l-media-002-pan-m002-059",
-        "3l-media-002-pan-m002-049",
-        "3l-media-002-pan-m002-080"
+        "3l-media-002-pan-m002-049"
       ]
     }
   ]
