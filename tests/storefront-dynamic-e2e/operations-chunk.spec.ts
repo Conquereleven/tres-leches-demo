@@ -38,11 +38,17 @@ test("a missing Operations chunk reloads the page once", async ({
   browserName,
 }) => {
   let loads = 0;
+  let documents = 0;
   page.on("load", () => loads++);
+  page.on("request", (r) => {
+    if (r.isNavigationRequest() && r.frame() === page.mainFrame()) documents++;
+  });
   // A chunk removed by a deploy fails every request (Vite's modulepreload and the
-  // import itself) until the page reloads; the reloaded page gets the new build.
+  // import itself) until the page reloads; the reloaded document, from its own
+  // request onwards (its chunk fetch can start before its load event), gets the
+  // new build.
   await page.route(/\/assets\/Workspace-[^/]+\.js$/, (route) =>
-    loads < 2 ? route.abort() : route.continue(),
+    documents < 2 ? route.abort() : route.continue(),
   );
   await page.goto("/");
   await goToOperations(page);
