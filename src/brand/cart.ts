@@ -1,6 +1,11 @@
+import {
+  calculatePackPrice,
+  type PackPricingPolicy,
+} from "../../shared/pack-pricing";
 import { useLiveCatalog } from "./live-catalog";
 import {
   commerceLineSchema,
+  packSpec,
   lineKey,
   normalizeComposition,
   type CommerceLine,
@@ -16,6 +21,11 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 export type CartLine = CommerceLine;
 import { MAX_ITEM_QUANTITY } from "../../shared/commerce-policy";
+import {
+  isTricolorColor,
+  tricolorSpec,
+  type TricolorColor,
+} from "../../shared/tricolor";
 export const MAX_QTY = MAX_ITEM_QUANTITY;
 const KEY = "3l-cart";
 
@@ -53,11 +63,17 @@ if (typeof window !== "undefined")
   });
 
 export const cart = {
-  add(productId: string, quantity = 1, composition?: Composition) {
+  add(
+    productId: string,
+    quantity = 1,
+    composition?: Composition,
+    color?: TricolorColor,
+  ) {
     if (!productId || !Number.isInteger(quantity) || quantity < 1) return;
     const entry = {
       productId,
       quantity,
+      ...(color ? { color } : {}),
       ...(composition
         ? { composition: normalizeComposition(composition) }
         : {}),
@@ -119,6 +135,26 @@ export const cart = {
         : lines.map((l) => (lineKey(l) === key ? entry : l)),
     );
   },
+  editColor(key: string, color: TricolorColor) {
+    if (!isTricolorColor(color)) return;
+    const target = lines.find((l) => lineKey(l) === key);
+    if (!target || tricolorSpec(target.productId)?.kind !== "single") return;
+    const entry = { ...target, color };
+    const existing = lines.find(
+      (l) => lineKey(l) !== key && lineKey(l) === lineKey(entry),
+    );
+    commit(
+      existing
+        ? lines
+            .filter((l) => lineKey(l) !== key)
+            .map((l) =>
+              lineKey(l) === lineKey(entry)
+                ? { ...l, quantity: l.quantity + target.quantity }
+                : l,
+            )
+        : lines.map((l) => (lineKey(l) === key ? entry : l)),
+    );
+  },
   remove(key: string) {
     commit(lines.filter((l) => lineKey(l) !== key));
   },
@@ -153,14 +189,39 @@ export type CatalogEntry = {
   description: string | null;
 };
 /** Display subtotal from server-provided prices; lines for unknown products are ignored. */
-export function cartSubtotalFils(ls: CartLine[], products: CatalogEntry[]) {
+export function cartSubtotalFils(
+  ls: CartLine[],
+  products: CatalogEntry[],
+  policy?: PackPricingPolicy | null,
+) {
   return ls.reduce((sum, l) => {
     const p = products.find((p) => p.id === l.productId);
-    return p ? sum + p.priceFils * l.quantity : sum;
+    return p
+      ? sum + displayLinePrice(l, p.priceFils, policy) * l.quantity
+      : sum;
   }, 0);
 }
 
+export function displayLinePrice(
+  line: CartLine,
+  base: number,
+  policy?: PackPricingPolicy | null,
+) {
+  if (
+    !policy ||
+    !line.productId.startsWith("pan-de-muerto-") ||
+    !line.composition ||
+    !packSpec(line.productId)
+  )
+    return base;
+  try {
+    return calculatePackPrice(line, base, policy).unitPriceFils;
+  } catch {
+    return Number.NaN;
+  }
+}
 export type CheckoutConfig = {
+  packPricing?: PackPricingPolicy | null;
   personalizedPacks?: { enabled: boolean; rules: PackEligibility };
   enabled: boolean;
   catalogAvailable?: boolean;
@@ -218,12 +279,20 @@ export function useCheckoutConfig() {
     published.status === "live"
       ? published.catalog.personalizedPacks
       : undefined;
+  const publishedPricing =
+    published.status === "live" ? published.catalog.packPricing : undefined;
   const config = useMemo(() => {
     if (!state.config || !packSettings) return state.config;
-    const merged = { ...state.config, personalizedPacks: packSettings };
+    const merged = {
+      ...state.config,
+      personalizedPacks: packSettings,
+      ...(publishedPricing !== undefined
+        ? { packPricing: publishedPricing }
+        : {}),
+    };
     receivedAt.set(merged, receivedAt.get(state.config) ?? Date.now());
     return merged;
-  }, [state.config, packSettings]);
+  }, [state.config, packSettings, publishedPricing]);
   return { ...state, config, retry: () => setAttempt((n) => n + 1) };
 }
 

@@ -44,7 +44,7 @@ test("desktop: edit a price, save the draft, reload, compare and publish", async
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await open(page);
-  await expect(page.locator(".ph-metrics")).toContainText("236");
+  await expect(page.locator(".ph-metrics")).toContainText("238");
   await page.screenshot({
     path: `${shots}/${info.project.name}-overview-1440.png`,
   });

@@ -1,0 +1,38 @@
+{
+  "checkedAt": "2026-10-19T08:14:22.127506+00:00",
+  "healthStatus": 200,
+  "health": {
+    "ok": true,
+    "environment": "production",
+    "mode": "live",
+    "revision": "a75a0fa1637f4511ed0237e2b4fff621489e619a"
+  },
+  "catalogStatus": 200,
+  "revision": "catalog-v1-63d2f003c1f1724d474e3854ad246208dcd03f41987b9eff0d62449bf0f6f05e",
+  "tricolor": [
+    {
+      "sku": "conchas-traditional-tricolor-mini-40-g",
+      "priceFils": 1100,
+      "serverPriceFils": 1100,
+      "orderable": true
+    },
+    {
+      "sku": "conchas-traditional-tricolor-individual-70-g",
+      "priceFils": 1300,
+      "serverPriceFils": 1300,
+      "orderable": true
+    },
+    {
+      "sku": "conchas-tricolor-pack-3-mini",
+      "priceFils": 3300,
+      "serverPriceFils": 3300,
+      "orderable": true
+    },
+    {
+      "sku": "conchas-tricolor-pack-3-individuales",
+      "priceFils": 3900,
+      "serverPriceFils": 3900,
+      "orderable": true
+    }
+  ]
+}

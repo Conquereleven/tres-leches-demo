@@ -2,7 +2,7 @@ import { z } from "zod";
 import { HmacVerifier, type WhatsAppProvider } from "./providers";
 import { ProviderFailure } from "./failure";
 import { inboundSchema } from "../domain/commands";
-import { locationSchema } from "../domain/model";
+import { normalizeMetaInbound } from "./meta-inbound";
 export const metaNumbersSchema = z
   .array(
     z.object({
@@ -23,50 +23,6 @@ export const metaNumbersSchema = z
     "Configured WhatsApp origins must be unique",
   );
 export type MetaNumber = z.infer<typeof metaNumbersSchema>[number];
-const incoming = z.object({
-  id: z.string(),
-  from: z.string(),
-  timestamp: z.string().regex(/^\d+$/),
-  type: z.string(),
-  text: z.object({ body: z.string() }).optional(),
-  location: z
-    .object({ latitude: z.number(), longitude: z.number() })
-    .optional(),
-});
-const payload = z.object({
-  object: z.literal("whatsapp_business_account"),
-  entry: z.array(
-    z.object({
-      id: z.string(),
-      changes: z.array(
-        z.object({
-          field: z.string(),
-          value: z.object({
-            metadata: z.object({ phone_number_id: z.string() }).optional(),
-            contacts: z
-              .array(
-                z.object({
-                  wa_id: z.string(),
-                  profile: z.object({ name: z.string() }),
-                }),
-              )
-              .optional(),
-            messages: z.array(incoming).optional(),
-            statuses: z
-              .array(
-                z.object({
-                  id: z.string(),
-                  status: z.string(),
-                  timestamp: z.string(),
-                }),
-              )
-              .optional(),
-          }),
-        }),
-      ),
-    }),
-  ),
-});
 /**
  * Meta WhatsApp integration, split into three independent capabilities so that
  * receiving messages never depends on credentials it does not need:
@@ -127,62 +83,7 @@ export class MetaWhatsAppProvider implements WhatsAppProvider {
       : null;
   }
   normalize(raw: unknown): z.infer<typeof inboundSchema>[] {
-    const result: z.infer<typeof inboundSchema>[] = [];
-    for (const entry of payload.parse(raw).entry)
-      for (const change of entry.changes) {
-        if (change.field !== "messages") continue;
-        const value = change.value;
-        const number = this.numbers.find(
-          (n) =>
-            n.phoneNumberId === value.metadata?.phone_number_id &&
-            n.wabaId === entry.id,
-        );
-        if (!number) throw new ProviderFailure("rejected", false);
-        for (const m of value.messages ?? []) {
-          const at = new Date(Number(m.timestamp) * 1000).toISOString();
-          if (Date.parse(at) > Date.now() + 300000)
-            throw new ProviderFailure("rejected", false);
-          result.push(
-            inboundSchema.parse({
-              type: "message",
-              eventId: m.id,
-              sourceNumberId: number.id,
-              phone: m.from,
-              customer:
-                value.contacts?.find((c) => c.wa_id === m.from)?.profile.name ??
-                "Cliente WhatsApp",
-              at,
-              text:
-                m.type === "text" && m.text
-                  ? m.text.body
-                  : m.type === "location"
-                    ? "Ubicación compartida"
-                    : "Mensaje no compatible; revisar en WhatsApp",
-              ...(m.type === "location" && m.location
-                ? {
-                    location: locationSchema.parse({
-                      lat: m.location.latitude,
-                      lng: m.location.longitude,
-                    }),
-                  }
-                : {}),
-            }),
-          );
-        }
-        for (const s of value.statuses ?? []) {
-          if (!["sent", "delivered", "read", "failed"].includes(s.status))
-            continue;
-          result.push(
-            inboundSchema.parse({
-              type: "status",
-              eventId: `${s.id}:${s.status}:${s.timestamp}`,
-              providerId: s.id,
-              status: s.status,
-            }),
-          );
-        }
-      }
-    return result;
+    return normalizeMetaInbound(raw, this.numbers);
   }
   async validateConfiguration() {
     const token = this.requireToken();

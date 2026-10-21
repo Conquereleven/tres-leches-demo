@@ -10,6 +10,8 @@
  * nothing and rows stay visibly pending — nothing is reported as sent.
  */
 import { randomUUID } from "node:crypto";
+import { renderCustomerEmailHtml } from "./customer-email-html";
+import { customerEmailItems, customerEmailItemsText } from "./customer-email-items";
 import { orderReference } from "../../shared/order-number";
 import { PICKUP_LOCATION } from "../../shared/pickup-location";
 import { customerName } from "./order-number";
@@ -65,14 +67,28 @@ export function renderCustomerEmail(
     .filter(Boolean)
     .join(", ");
   const sign = ["", PICKUP_LOCATION.name];
+  const items = customerEmailItems(order);
+  const reminder = ["", ...customerEmailItemsText(items)];
+  const html = renderCustomerEmailHtml({
+    event,
+    first,
+    reference,
+    when,
+    pickup,
+    zoneName: context.zoneName,
+    items,
+  });
   if (event === "ORDER_PRODUCTION_STARTED")
     return {
       subject: `Your 3L order ${reference} is now being prepared`,
+      html,
       body: [
         `Hi ${first},`,
         "",
         `Good news — your 3L order ${reference} is now being prepared by our team.`,
         ...(when ? ["", `${pickup ? "Pickup" : "Delivery"}: ${when}`] : []),
+        "",
+        ...reminder,
         "",
         "We'll let you know as soon as it's ready.",
         ...sign,
@@ -81,6 +97,7 @@ export function renderCustomerEmail(
   if (event === "ORDER_READY_FOR_PICKUP")
     return {
       subject: `Your 3L order ${reference} is ready for pickup`,
+      html,
       body: [
         `Hi ${first},`,
         "",
@@ -90,18 +107,24 @@ export function renderCustomerEmail(
         PICKUP_LOCATION.name,
         ...PICKUP_LOCATION.lines,
         "",
+        ...reminder,
+        "",
         "See you soon.",
         ...sign,
       ].join("\n"),
     };
   return {
     subject: `Your 3L order ${reference} is on the way`,
+    html,
     body: [
       `Hi ${first},`,
       "",
       `Your 3L order ${reference} is on the way.`,
       // Area only: a full address does not belong in an email.
       ...(context.zoneName ? ["", `Delivering to: ${context.zoneName}`] : []),
+      "",
+      ...(when ? ["", `${pickup ? "Pickup" : "Delivery"}: ${when}`] : []),
+      ...reminder,
       "",
       "We'll update you once your order has been delivered.",
       ...sign,
@@ -165,6 +188,7 @@ export interface CustomerEmailProvider {
     to: string;
     subject: string;
     text: string;
+    html?: string;
     idempotencyKey: string;
   }): Promise<{ messageId: string }>;
 }
@@ -224,6 +248,7 @@ export async function dispatchCustomerNotifications(
         to: claimed.recipient,
         subject: claimed.subject,
         text: claimed.body,
+        ...(claimed.html ? { html: claimed.html } : {}),
         idempotencyKey: claimed.id,
       });
       store.write((s) => {

@@ -161,3 +161,18 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Published Foundation `packEligibility` is the only component-approval source, independently of seasonal retail-single availability. Absent/empty rules approve nothing. Lisa must confirm actual production availability before release; test-fixture approvals are never commercial defaults.
 - Preserve normalized composition in cart identity, quotation, idempotency and immutable accepted preparation snapshots. Historical kitchen/ticket text must use stored preparation names, not current catalog settings. Managers draft; only admins publish. No real roles change as part of PACK-001.
 - The proposed illustrative-image disclaimer remains internal documentation until separately approved. Release and rollback: `docs/packs/personalized-packs.md`.
+
+## 3L-META-003 direct integration decision (16 October 2026)
+- Founder selected DIRECT META CLOUD API ONLY; no BSP, intermediary subscription or provider dashboard. GOLOSITALIA/3L own-business access and CornerTech's future Tech Provider registration are separate legal/use cases.
+- Preserve existing app, portfolio, WABA and Business App number. No ordinary `/register` workaround, number linking, permission changes or outbound activation without explicit authorization.
+- Current direct readiness and Meta-native coexistence gates: `docs/meta/direct-cloud-readiness.md`. Code/synthetic tests never prove individual number eligibility or actual signed delivery.
+
+## Approved product-first kitchen email (20 October 2026, founder)
+- Opted-in internal emails use a compact branded header, then an actual Product / Qty / Price table before notes, totals and compact fulfillment/contact/address rows. Preserve accepted names, sizes, quantities, frozen prices, every original instruction and safety warning.
+- Each accepted pack line keeps its own nested composition, box counts and physical-piece totals; never combine distinct mixtures of the same SKU. Pack headings have no leading quantity; the quantity column remains explicit for all products.
+- Optional OPERATIONS_EMAIL_COMPACT_TO remains a verified subset only. Non-opted-in recipients retain the original template byte-for-byte; frozen outbox rows and idempotency remain unchanged. No automatic rollout.
+- Target widths 320/375/390/430. Small orders should fit where practical; large orders scroll without truncation. Browser height measurements never certify native Gmail/Apple Mail screenshot fit. Written design is available; the referenced screenshot was not attached.
+
+## Supplied kitchen email visual reference (20 October 2026, founder)
+- The now-attached “Confirmación de pedido Tres Leches (1).png” supersedes the previous dense sans-serif proposal: centered pink wordmark header, large serif New Order title, rounded classic Product/Qty/Price panel, gold dividers/total, paired schedule and address/contact blocks. Use Georgia/system fonts and email-compatible inline tables.
+- Reference names, amounts, dates and payment method are illustrative only. Preserve authoritative frozen values, full notes/warnings and recipient-specific rollout; no new transport or decorative tracking assets. The prior 844px/35%-reduction visual budgets are superseded by reference fidelity; measure and disclose scroll instead of shrinking or truncating operational data.

@@ -1,3 +1,5 @@
+import { useLiveCatalog } from "./live-catalog";
+const formatAed = (n: number) => (Number.isFinite(n) ? formatPrice(n) : "—");
 import { PackBuilder, CompositionDetails, packComplete } from "./PackBuilder";
 import {
   lineKey,
@@ -6,11 +8,22 @@ import {
   type PackSnapshot,
 } from "../../shared/pack-composition";
 import { packCopy } from "../../shared/pack-copy";
+import {
+  TRICOLOR_COLORS,
+  isTricolorColor,
+  tricolorSpec,
+  tricolorCopy,
+  type TricolorColor,
+} from "../../shared/tricolor";
 import { storefrontI18n } from "./locales/engine";
 import { useLanguage as useCustomerLanguage } from "./localization";
 import { QuantityInput } from "./QuantityInput";
 import { normalizeWhatsAppNumber } from "../../shared/contact";
-import { ResponsiveMedia, selectedProductMedia } from "./media";
+import {
+  ResponsiveMedia,
+  selectedProductMedia,
+  publishedMediaAuthority,
+} from "./media";
 import { AddressAutocomplete } from "./AddressAutocomplete";
 import { CustomerCopy, LanguageSwitcher } from "./localization";
 import { useCheckoutNow } from "./cart";
@@ -64,7 +77,7 @@ import {
   Textarea,
   WhatsAppCTA,
 } from "./primitives";
-import { collections, formatAed } from "./content";
+import { collections, formatAed as formatPrice } from "./content";
 import { SiteFooter } from "./SiteChrome";
 import {
   FULFILMENT_STEPS,
@@ -79,6 +92,7 @@ import {
 import {
   cart,
   cartSubtotalFils,
+  displayLinePrice,
   MAX_QTY,
   useCart,
   useCheckoutConfig,
@@ -102,6 +116,7 @@ type Quote = {
 type Summary = {
   items: {
     productId: string;
+    color?: TricolorColor;
     composition?: Composition;
     packSnapshot?: PackSnapshot;
     name: string;
@@ -319,9 +334,13 @@ function productImage(productId: string) {
   return image?.src ? image : family?.image ? { src: family.image } : null;
 }
 function Thumb({ productId, name }: { productId: string; name: string }) {
-  const image = productImage(productId);
+  useLiveCatalog();
+  const image = publishedMediaAuthority() ? null : productImage(productId);
   const family = menuFamilyForSku(productId);
   const option = family?.options.find((o) => o.id === productId);
+  const thumbClass = family?.id.startsWith("conchas")
+    ? "b-co-thumb b-co-thumb-contained"
+    : "b-co-thumb";
   if (
     family &&
     option &&
@@ -344,13 +363,21 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
             ? "/brand/icon.png"
             : image?.src
         }
-        className="b-co-thumb"
+        className={thumbClass}
         sizes="72px"
       />
     );
+  if (publishedMediaAuthority())
+    return (
+      <span className={`${thumbClass} b-co-thumb-empty`} aria-hidden>
+        <CustomerCopy>3L</CustomerCopy>
+      </span>
+    );
+  if (tricolorSpec(productId))
+    return <img className={thumbClass} src="/brand/icon.png" alt="" />;
   return image ? (
     <img
-      className="b-co-thumb"
+      className={thumbClass}
       src={image.src!}
       alt=""
       width={72}
@@ -359,7 +386,7 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
       decoding="async"
     />
   ) : (
-    <span className="b-co-thumb b-co-thumb-empty" aria-hidden>
+    <span className={`${thumbClass} b-co-thumb-empty`} aria-hidden>
       {name.slice(0, 1)}
     </span>
   );
@@ -585,13 +612,20 @@ function OrderSummary({
                   </strong>
                   <CompositionDetails line={l} />
                   <span className="b-caption">
-                    <CustomerCopy>{formatAed(p.priceFils)}</CustomerCopy> ×{" "}
-                    {l.quantity}
+                    <CustomerCopy>
+                      {formatAed(
+                        displayLinePrice(l, p.priceFils, config.packPricing),
+                      )}
+                    </CustomerCopy>{" "}
+                    × {l.quantity}
                   </span>
                 </span>
                 <span className="b-co-money">
                   <CustomerCopy>
-                    {formatAed(p.priceFils * l.quantity)}
+                    {formatAed(
+                      displayLinePrice(l, p.priceFils, config.packPricing) *
+                        l.quantity,
+                    )}
                   </CustomerCopy>
                 </span>
               </li>
@@ -659,13 +693,14 @@ export function AddToCart({
   productId: string;
   fallback: ReactNode;
 }) {
-  const { text: localize } = useCustomerLanguage();
+  const { text: localize, language } = useCustomerLanguage();
 
   const { config, loading } = useCheckoutConfig();
   const lines = useCart();
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [composition, setComposition] = useState<Composition>([]);
+  const [color, setColor] = useState<TricolorColor | "">("");
   const product = config?.products.find((p) => p.id === productId);
   if (loading) return <>{fallback}</>;
   if (!product) return <>{fallback}</>;
@@ -673,8 +708,36 @@ export function AddToCart({
     .filter((l) => l.productId === productId)
     .reduce((n, l) => n + l.quantity, 0);
   const custom = !!config?.personalizedPacks?.enabled && !!packSpec(productId);
+  const tricolor = tricolorSpec(productId);
   return (
     <div className="b-add-to-cart">
+      {tricolor?.kind === "single" && (
+        <label className="b-menu-selectors">
+          {tricolorCopy[language].color}
+          <select
+            required
+            value={color}
+            onChange={(e) =>
+              setColor(isTricolorColor(e.target.value) ? e.target.value : "")
+            }
+          >
+            <option value="">{tricolorCopy[language].choose}</option>
+            {TRICOLOR_COLORS.map((c) => (
+              <option key={c} value={c}>
+                {tricolorCopy[language][c]}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      {tricolor?.kind === "single" && !color && (
+        <p>{tricolorCopy[language].piece}</p>
+      )}
+      {tricolor && (tricolor.kind === "fixed" || color) && (
+        <CompositionDetails
+          line={{ productId, quantity, ...(color ? { color } : {}) }}
+        />
+      )}
       {custom && (
         <PackBuilder
           productId={productId}
@@ -711,16 +774,34 @@ export function AddToCart({
         type="button"
         disabled={
           inCart >= MAX_QTY ||
+          (tricolor?.kind === "single" && !color) ||
           (custom && !packComplete(productId, composition, config!))
         }
         onClick={() => {
-          cart.add(productId, quantity, custom ? composition : undefined);
+          cart.add(
+            productId,
+            quantity,
+            custom ? composition : undefined,
+            color || undefined,
+          );
           setAdded(true);
           setQuantity(1);
         }}
       >
         <CustomerCopy>ADD TO CART ·</CustomerCopy>{" "}
-        <CustomerCopy>{formatAed(product.priceFils * quantity)}</CustomerCopy>
+        <CustomerCopy>
+          {formatAed(
+            displayLinePrice(
+              {
+                productId,
+                quantity,
+                composition: custom ? composition : undefined,
+              },
+              product.priceFils,
+              config?.packPricing,
+            ) * quantity,
+          )}
+        </CustomerCopy>
       </Button>
       {(added || inCart > 0) && (
         <a className="b-link" href="/cart" aria-live="polite">
@@ -763,6 +844,29 @@ function CartPackEditor({
   );
 }
 
+function CartTricolorColor({ line }: { line: CartLine }) {
+  const { language } = useCustomerLanguage();
+  return (
+    <label className="b-menu-selectors">
+      {tricolorCopy[language].color}
+      <select
+        required
+        value={line.color ?? ""}
+        onChange={(e) => {
+          if (isTricolorColor(e.target.value))
+            cart.editColor(lineKey(line), e.target.value);
+        }}
+      >
+        <option value="">{tricolorCopy[language].choose}</option>
+        {TRICOLOR_COLORS.map((c) => (
+          <option key={c} value={c}>
+            {tricolorCopy[language][c]}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
 function CartItems({
   lines,
   config,
@@ -798,6 +902,9 @@ function CartItems({
                 <CustomerCopy>{p.name}</CustomerCopy>
               </strong>
               <CompositionDetails line={l} />
+              {tricolorSpec(l.productId)?.kind === "single" && (
+                <CartTricolorColor line={l} />
+              )}
               {config.personalizedPacks?.enabled && packSpec(l.productId) && (
                 <CartPackEditor line={l} config={config} />
               )}
@@ -807,7 +914,11 @@ function CartItems({
                 </span>
               )}
               <span className="b-caption">
-                <CustomerCopy>{formatAed(p.priceFils)}</CustomerCopy>{" "}
+                <CustomerCopy>
+                  {formatAed(
+                    displayLinePrice(l, p.priceFils, config.packPricing),
+                  )}
+                </CustomerCopy>{" "}
                 <CustomerCopy>each</CustomerCopy>
               </span>
             </div>
@@ -839,7 +950,12 @@ function CartItems({
               </button>
             </div>
             <span className="b-co-money b-co-item-total">
-              <CustomerCopy>{formatAed(p.priceFils * l.quantity)}</CustomerCopy>
+              <CustomerCopy>
+                {formatAed(
+                  displayLinePrice(l, p.priceFils, config.packPricing) *
+                    l.quantity,
+                )}
+              </CustomerCopy>
             </span>
             <button
               type="button"
@@ -878,7 +994,7 @@ export function CartPage() {
   const known = lines.filter((l) =>
     config.products.some((p) => p.id === l.productId),
   );
-  const subtotal = cartSubtotalFils(lines, config.products);
+  const subtotal = cartSubtotalFils(lines, config.products, config.packPricing);
   return (
     <ShopShell step={0} title={localize("Your cart")}>
       {lines.length === 0 ? (
@@ -1023,7 +1139,11 @@ export function CheckoutPage() {
       </ShopShell>
     );
 
-  const subtotal = cartSubtotalFils(cartLines, config.products);
+  const subtotal = cartSubtotalFils(
+    cartLines,
+    config.products,
+    config.packPricing,
+  );
   // Server-calibrated clock, Dubai rules, and this cart's own lead time.
   const earliest = earliestFulfillmentDate(
     now,

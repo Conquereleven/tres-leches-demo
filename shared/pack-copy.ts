@@ -1,6 +1,11 @@
 export const packCopy = (lang: string) =>
   ({
     en: {
+      base: "Base price",
+      premiums: "Premium charges",
+      final: "Price per box",
+      perPiece: "per piece",
+      premiumNote: "Charged individually within your box. No extra pieces.",
       choose: "Choose your flavors",
       selected: "pieces selected",
       incomplete: "Select exactly the pack capacity to continue.",
@@ -17,6 +22,12 @@ export const packCopy = (lang: string) =>
       boxes: "boxes",
     },
     es: {
+      base: "Precio base",
+      premiums: "Recargos premium",
+      final: "Precio por caja",
+      perPiece: "por pieza",
+      premiumNote:
+        "Se cobra por pieza dentro de tu caja. No incluye piezas adicionales.",
       choose: "Elige tus sabores",
       selected: "piezas seleccionadas",
       incomplete: "Selecciona exactamente las piezas del pack para continuar.",
@@ -33,6 +44,11 @@ export const packCopy = (lang: string) =>
       boxes: "cajas",
     },
     ar: {
+      base: "السعر الأساسي",
+      premiums: "إضافات النكهات المميزة",
+      final: "السعر لكل علبة",
+      perPiece: "لكل قطعة",
+      premiumNote: "تُحسب كل قطعة ضمن علبتك. دون قطع إضافية.",
       choose: "اختر النكهات",
       selected: "قطع مختارة",
       incomplete: "اختر العدد المحدد من القطع للمتابعة.",
@@ -48,6 +64,11 @@ export const packCopy = (lang: string) =>
       boxes: "علب",
     },
   })[lang as "en" | "es" | "ar"] ?? {
+    base: "Base price",
+    premiums: "Premium charges",
+    final: "Price per box",
+    perPiece: "per piece",
+    premiumNote: "Charged individually within your box. No extra pieces.",
     choose: "Choose your flavors",
     selected: "pieces selected",
     incomplete: "Select exactly the pack capacity to continue.",

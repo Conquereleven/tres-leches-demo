@@ -942,5 +942,13 @@
   "conchas-filled-pistache-individual": {
     "source": "Concha rellena de pistache · Individual",
     "en": "Pistachio-filled Concha · Individual"
+  },
+  "conchas-tricolor-pack-3-mini": {
+    "source": "Conchas Tricolor · Pack de 3 · 3 mini · 3 × 40 g",
+    "en": "Tricolor Conchas · Pack of 3 · 3 mini · 3 × 40 g"
+  },
+  "conchas-tricolor-pack-3-individuales": {
+    "source": "Conchas Tricolor · Pack de 3 · 3 individuales · 3 × 70 g",
+    "en": "Tricolor Conchas · Pack of 3 · 3 individual · 3 × 70 g"
   }
 }

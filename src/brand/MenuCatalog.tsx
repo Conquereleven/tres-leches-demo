@@ -1,6 +1,9 @@
+import { packSpec } from "../../shared/pack-composition";
+import { packCopy } from "../../shared/pack-copy";
 import { useLanguage as useCustomerLanguage } from "./localization";
 import {
   ResponsiveMedia,
+  MediaPicture,
   MediaRotation,
   categoryEditorialMedia,
   selectedProductMedia,
@@ -28,7 +31,7 @@ export function ProductOptions({
   product: StorefrontProduct;
   detail?: boolean;
 }) {
-  const { text: localize } = useCustomerLanguage();
+  const { text: localize, language } = useCustomerLanguage();
 
   const menu = useMenu();
   const family = menuProductFamily(menu, product),
@@ -47,9 +50,11 @@ export function ProductOptions({
   );
   // Never show the chocolate family fallback for a different Concha flavour.
   const fallback =
-    family.id === "conchas-traditional" && product.variant !== "Chocolate"
-      ? "/brand/icon.png"
-      : family.image;
+    menu.status !== "bundled"
+      ? null
+      : family.id === "conchas-traditional" && product.variant !== "Chocolate"
+        ? "/brand/icon.png"
+        : family.image;
   const serverProduct = config?.products.find((p) => p.id === option?.id);
   // With the published catalog, a size it marks unavailable is never offered.
   const orderable = option ? liveOrderable(option.id) : null;
@@ -76,12 +81,12 @@ export function ProductOptions({
     void refreshLiveCatalog();
     retry();
   }, [disagreement, retry]);
-  // Resolved in media.tsx: a photograph replaced in Product Hub, else the authored one.
+  // Product media and gallery share the published assignment policy.
   const gallery = productGalleryMedia(product.id, family.id, product.variant);
   return (
     <div className="b-menu-options">
       <figure
-        className={`b-menu-photo ${media ? "" : "b-family-photo"} ${usesMenuReferencePresentation(media) ? "b-official-photo" : ""}`}
+        className={`b-menu-photo ${media ? "" : "b-family-photo"} ${usesMenuReferencePresentation(media) || family.id.startsWith("conchas") ? "b-official-photo" : ""}`}
       >
         {media || fallback ? (
           <ResponsiveMedia
@@ -122,6 +127,9 @@ export function ProductOptions({
         </p>
       )}
       <p className="b-menu-price" aria-live="polite">
+        {config?.packPricing && packSpec(display.id) && (
+          <span>{packCopy(language).base}: </span>
+        )}
         <CustomerCopy>{formatAed(display.priceFils)}</CustomerCopy>
       </p>
       {options.length > 1 && (
@@ -202,18 +210,11 @@ export function ProductOptions({
           aria-label={localize("Product gallery")}
         >
           {gallery.map((asset) => (
-            <img
+            <MediaPicture
               key={asset.sourceId}
-              src={
-                (
-                  asset.derivatives.find(
-                    (d) => d.format === "webp" && d.width === 640,
-                  ) ?? asset.derivatives[0]
-                )?.src
-              }
+              asset={asset}
               alt={localize(asset.alt)}
-              loading="lazy"
-              decoding="async"
+              sizes="(max-width: 640px) 90vw, 45vw"
             />
           ))}
         </div>

@@ -1,3 +1,5 @@
+import { publishedPackRules } from "../domain/packs";
+import { packPricingPolicy } from "../domain/pack-pricing";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { State } from "../domain/model";
 import { DomainError } from "../domain/model";
@@ -105,8 +107,14 @@ export function storefrontCatalog(state: State, now = new Date()) {
     ),
   ]);
   return {
+    packPricing: packPricingPolicy(state.catalog ?? []),
     ...(process.env.PERSONALIZED_PACKS_ENABLED === "true"
-      ? { personalizedPacks: { enabled: true, rules: f.packEligibility ?? [] } }
+      ? {
+          personalizedPacks: {
+            enabled: true,
+            rules: publishedPackRules(state),
+          },
+        }
       : {}),
     schemaVersion: 1 as const,
     revision: f.revision.id,

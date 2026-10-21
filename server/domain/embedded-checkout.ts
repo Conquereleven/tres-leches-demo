@@ -1,3 +1,4 @@
+import { liveLinePrice } from "./pack-pricing";
 import { ProviderFailure } from "../adapters/failure";
 /** Tokens are request-scoped only. A durable claim precedes the provider call. */
 import { z } from "zod";
@@ -115,7 +116,9 @@ export async function submitEmbeddedPayment(
   // Re-price from the current catalog and zone rule: the charged amount must
   // still equal the payment created at checkout, or nothing is charged.
   const quote = quoteWebCheckout(service, {
-    lines: order.lines.map(({ packSnapshot: _snapshot, ...line }) => line),
+    lines: order.lines.map(
+      ({ packSnapshot: _snapshot, priceSnapshot: _price, ...line }) => line,
+    ),
     zoneId: order.manualZoneId,
   });
   requireThat(
@@ -131,7 +134,7 @@ export async function submitEmbeddedPayment(
       sku: product.id,
       name: product.name,
       quantity: l.quantity,
-      unitPriceFils: product.priceFils,
+      unitPriceFils: liveLinePrice(l, s.catalog ?? []),
     };
   });
   const customer = s.conversations.find((c) => c.id === order.conversationId)!;

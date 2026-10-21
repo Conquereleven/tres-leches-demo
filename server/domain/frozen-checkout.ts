@@ -1,3 +1,4 @@
+import { acceptedLinePrice } from "../../shared/pack-pricing";
 import {
   distinctLines,
   validPackSnapshot,
@@ -37,14 +38,18 @@ export function frozenCheckout(order: Order, payment: Payment) {
       held,
       409,
     );
+    const unitPriceFils = acceptedLinePrice(line, product.priceFils);
+    requireThat(unitPriceFils !== null, held, 409);
     return {
       sku: product.id,
+      ...(line.color ? { color: line.color } : {}),
+      ...(line.packSnapshot ? { packSnapshot: line.packSnapshot } : {}),
       ...(line.composition
         ? { composition: line.composition, packSnapshot: line.packSnapshot }
         : {}),
       name: product.name,
       quantity: line.quantity,
-      unitPriceFils: product.priceFils,
+      unitPriceFils,
     };
   });
   const subtotal = items.reduce((n, i) => n + i.quantity * i.unitPriceFils, 0);

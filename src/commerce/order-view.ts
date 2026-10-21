@@ -1,3 +1,4 @@
+import { acceptedLinePrice } from "../../shared/pack-pricing";
 import type { Line } from "../../server/domain/model";
 /**
  * Order management presentation rules. Pure functions over the workspace
@@ -321,7 +322,10 @@ export function orderLines(data: Pick<Data, "catalog">, o: Order): LineView[] {
   return o.lines.map((l) => {
     const matches = source.filter((p) => p.id === l.productId);
     const price = matches.length === 1 ? matches[0]!.priceFils : undefined;
-    const unitFils = Number.isSafeInteger(price) && price! >= 0 ? price! : null;
+    const unitFils =
+      Number.isSafeInteger(price) && price! >= 0
+        ? acceptedLinePrice(l, price!)
+        : null;
     return {
       ...l,
       productId: l.productId,

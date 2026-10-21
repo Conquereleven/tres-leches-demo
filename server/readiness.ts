@@ -1,3 +1,4 @@
+import { latestCustomerInbound } from "./domain/whatsapp-inbound";
 import { locationSchema, type Location } from "./domain/model";
 import type { Store } from "./db/store";
 import type { BackupManager } from "./db/backups";
@@ -174,7 +175,7 @@ export class Readiness {
         state?.conversations.filter((c) => c.sourceNumberId === id) ?? [];
       const messages = conversations.flatMap((c) => c.messages);
       const lastInbound = latest(
-        messages.filter((m) => m.direction === "in").map((m) => m.at),
+        conversations.map((c) => latestCustomerInbound(c)?.at),
       );
       const lastOutbound = latest(
         messages

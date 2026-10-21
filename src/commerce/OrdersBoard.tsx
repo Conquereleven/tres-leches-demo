@@ -130,7 +130,7 @@ export function OrderCard({
               product={productName(data, o, l.productId)}
               id={l.productId}
             />
-            {l.composition && <p lang="en">{preparationText(l)}</p>}
+            {preparationText(l) && <p lang="en">{preparationText(l)}</p>}
           </li>
         ))}
       </ul>

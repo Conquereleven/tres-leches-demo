@@ -1,3 +1,6 @@
+import { serveAnalytics } from "./analytics/api";
+import { withoutBundledProductMedia } from "./catalog/product-media-html";
+import { packPricingPolicy } from "./domain/pack-pricing";
 import { packBuilderEnabled, publishedPackRules } from "./domain/packs";
 import {
   deliveryStreet,
@@ -60,6 +63,7 @@ import {
 } from "./config";
 import { BackupManager } from "./db/backups";
 import { Readiness } from "./readiness";
+import { ProviderFailure } from "./adapters/failure";
 import {
   DisabledWhatsAppProvider,
   UnconfiguredPaymentProvider,
@@ -129,7 +133,10 @@ function markDynamicCatalog(file: string) {
   if (!file.endsWith(".html") || storefrontCatalogMode(process.env) !== "on")
     return body;
   return Buffer.from(
-    body.toString("utf8").replace(/<html\b/, '<html data-catalog="dynamic"'),
+    withoutBundledProductMedia(body.toString("utf8")).replace(
+      /<html\b/,
+      '<html data-catalog="dynamic"',
+    ),
   );
 }
 const customerCsp =
@@ -256,6 +263,8 @@ export async function startServer(
     ? null
     : operationsResendFromEnv(process.env);
   service.operationsEmailRecipients = operationsEmail?.recipients ?? [];
+  service.operationsEmailCompactRecipients =
+    operationsEmail?.compactRecipients ?? [];
   recoverInterruptedCustomerNotifications(
     store,
     "operationsEmailNotifications",
@@ -355,13 +364,13 @@ export async function startServer(
       throw new DomainError(401, "Inicia sesión para continuar");
     return session.actor;
   }
-  async function rawBody(req: http.IncomingMessage) {
+  async function rawBody(req: http.IncomingMessage, limit = 65536) {
     const chunks: Buffer[] = [];
     let size = 0;
     for await (const chunk of req) {
       const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
       size += bytes.length;
-      if (size > 65536)
+      if (size > limit)
         throw new DomainError(413, "Solicitud demasiado grande");
       chunks.push(bytes);
     }
@@ -488,6 +497,7 @@ export async function startServer(
                 dynamic: published.dynamic,
                 revision: published.revision,
               },
+              packPricing: packPricingPolicy(s.catalog ?? []),
               personalizedPacks: {
                 enabled: packBuilderEnabled(),
                 rules:
@@ -705,7 +715,10 @@ export async function startServer(
           return res.end(challenge);
         }
         if (req.method === "POST" && path.startsWith("/api/webhooks/")) {
-          const raw = await rawBody(req);
+          const raw = await rawBody(
+            req,
+            path === "/api/webhooks/whatsapp" ? 8 * 1024 * 1024 : 65536,
+          );
           if (
             path === "/api/webhooks/payment" &&
             (!isolatedTest || service.payment.name === "paymennt")
@@ -759,7 +772,14 @@ export async function startServer(
               )
             )
               throw new DomainError(401, "Firma inválida");
-            const events = meta.normalize(parse(raw));
+            let events;
+            try {
+              events = meta.normalize(parse(raw));
+            } catch (error) {
+              if (error instanceof ProviderFailure)
+                throw new DomainError(400, "Evento WhatsApp rechazado");
+              throw error;
+            }
             return json(res, 200, service.acceptInboundBatch(events));
           }
           if (
@@ -810,6 +830,17 @@ export async function startServer(
         }
         const current = actor(req);
         // Product Hub V2: its own module; roles are enforced inside it.
+        if (
+          serveAnalytics(
+            req,
+            res,
+            path,
+            () => store.read(),
+            current,
+            runtime.environment,
+          )
+        )
+          return;
         if (await serveProductHub(req, res, path, store, current)) return;
         if (path === "/api/mcp") {
           if (process.env.MCP_ENABLED !== "true")
@@ -1131,6 +1162,7 @@ export async function startServer(
           "/checkout",
           "/checkout/return",
           "/operations/overview",
+          "/operations/analytics",
           "/operations/products",
           "/operations/print",
           "/operations/settings",

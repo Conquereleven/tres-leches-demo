@@ -1,0 +1,35 @@
+NEW PAID ORDER #042 (TL-FICTIONAL-EMAIL)
+Fulfillment: Delivery
+Date: 2026-11-01
+Time: 4:00 PM – 9:00 PM
+
+CUSTOMER INSTRUCTIONS / ALLERGIES — ORIGINAL
+Original customer instructions: ALLERGY: peanuts. Call before preparation.
+Original delivery notes: Call reception; keep box level.
+
+Customer: Alex Example
+Phone: +971500000000
+Email: customer@example.invalid
+WhatsApp: +971500000000
+Full address: Fictional Street, Example Tower, Unit 404
+Street/address: Fictional Street
+Building/villa: Example Tower
+Apartment/unit: 404
+Area: Fictional Community
+Address verification: UNVERIFIED
+
+PRODUCTS TO PREPARE
+
+PACK / BOX: Pan de Muerto · Traditional pack · 6 mini pieces (pan-de-muerto-traditional-pack-6-mini) · AED 60.00 per box · AED 60.00 line total
+1 box · pieces per box not recorded — manual review required
+MANUAL REVIEW REQUIRED: Pack composition missing or invalid. Do not infer included flavors.
+
+1 × Traditional Chocolate Concha · Individual · 70 g (conchas-traditional-chocolate-individual-70-g) · AED 13.00 each · AED 13.00 line total
+
+1 × Traditional Pan de Muerto · Sugar · Mini · 40 g (pan-de-muerto-traditional-azucar-mini-40-g) · AED 13.00 each · AED 13.00 line total
+
+1 × Traditional Pan de Muerto · Sesame · Mini · 40 g (pan-de-muerto-traditional-ajonjoli-mini-40-g) · AED 13.00 each · AED 13.00 line total
+
+Total paid: AED 99.00
+
+https://www.3ldubai.ae/operations/orders?order=TL-FICTIONAL-EMAIL

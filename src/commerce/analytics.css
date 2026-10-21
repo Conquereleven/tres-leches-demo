@@ -1,0 +1,295 @@
+.commerce.ops-shell .analytics {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+  color: #27242d;
+}
+.commerce.ops-shell .an-disclaimer {
+  display: flex;
+  gap: 12px;
+  padding: 20px;
+  border-radius: 16px;
+  background: #f6dfe0;
+  align-items: flex-start;
+}
+.commerce.ops-shell .an-disclaimer svg {
+  flex-shrink: 0;
+}
+.commerce.ops-shell .an-disclaimer p {
+  margin: 6px 0 0;
+}
+.commerce.ops-shell .an-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: end;
+}
+.commerce.ops-shell .an-filters label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.commerce.ops-shell .an-filters input {
+  min-height: 44px;
+  max-width: 100%;
+  background: #fff;
+  border: 1px solid #5a565f;
+  border-radius: 8px;
+  padding: 8px;
+  color: #27242d;
+  font: inherit;
+}
+.commerce.ops-shell .an-presets {
+  display: flex;
+  gap: 6px;
+}
+.commerce.ops-shell .analytics button,
+.commerce.ops-shell .an-export {
+  min-height: 44px;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font: inherit;
+  color: #27242d;
+}
+.commerce.ops-shell .an-presets button {
+  background: #fff;
+  border: 1px solid #5a565f;
+}
+.commerce.ops-shell .an-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  color: #5a565f;
+}
+.commerce.ops-shell .an-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.commerce.ops-shell .an-kpis article {
+  padding: 22px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+}
+.commerce.ops-shell .an-kpis h2 {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  min-height: 39px;
+  margin: 12px 0;
+}
+.commerce.ops-shell .an-kpis strong {
+  font-size: clamp(20px, 2.2vw, 30px);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+.commerce.ops-shell .an-comparison {
+  margin: 0;
+  font-size: 13px;
+  color: #5a565f;
+}
+.commerce.ops-shell .an-panel {
+  padding: 24px;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  background: #fff;
+  min-width: 0;
+}
+.commerce.ops-shell .an-panel h2 {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+.commerce.ops-shell .an-panel p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #5a565f;
+}
+.commerce.ops-shell .an-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: start;
+}
+.commerce.ops-shell .an-export {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  border: 1px solid #5a565f;
+  text-decoration: none;
+  font-size: 12px;
+}
+.commerce.ops-shell .an-chart {
+  height: 160px;
+  display: flex;
+  align-items: end;
+  gap: 3px;
+  border-bottom: 1px solid #5a565f;
+  margin: 24px 0;
+}
+.commerce.ops-shell .an-chart > div {
+  height: 100%;
+  flex: 1;
+  display: flex;
+  align-items: end;
+}
+.commerce.ops-shell .an-chart span {
+  display: block;
+  min-width: 1px;
+  width: 100%;
+  background: #a28d5b;
+  border-radius: 3px 3px 0 0;
+}
+.commerce.ops-shell .an-table-scroll {
+  max-height: 400px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.commerce.ops-shell .analytics table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 12px;
+}
+.commerce.ops-shell .analytics caption {
+  text-align: left;
+  padding: 14px 0;
+  color: #5a565f;
+}
+.commerce.ops-shell .analytics th,
+.commerce.ops-shell .analytics td {
+  padding: 14px 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  vertical-align: top;
+}
+.commerce.ops-shell .analytics th:first-child {
+  overflow-wrap: anywhere;
+  max-width: 400px;
+}
+.commerce.ops-shell .analytics small {
+  display: block;
+  font-weight: 400;
+  font-size: 11px;
+  color: #5a565f;
+  margin-top: 4px;
+}
+.commerce.ops-shell .analytics thead {
+  background: #f6dfe0;
+}
+.commerce.ops-shell .analytics td {
+  font-variant-numeric: tabular-nums;
+}
+.commerce.ops-shell .an-breakdowns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.commerce.ops-shell .an-breakdowns dl > div {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #ddd;
+  gap: 10px;
+}
+.commerce.ops-shell .an-breakdowns dd {
+  font-weight: 700;
+}
+.commerce.ops-shell .an-allocation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 20px;
+  font-size: 12px;
+}
+.commerce.ops-shell .an-empty {
+  text-align: center;
+  padding: 36px;
+  border: 1px dashed #5a565f;
+  border-radius: 16px;
+}
+.commerce.ops-shell .an-empty h2 {
+  font-size: 20px;
+}
+.commerce.ops-shell .an-warning {
+  padding: 18px;
+  border: 2px solid #27242d;
+  border-radius: 12px;
+}
+.commerce.ops-shell .analytics summary {
+  cursor: pointer;
+  min-height: 44px;
+  font-weight: 600;
+}
+.commerce.ops-shell .analytics :focus-visible {
+  outline: 2px solid #27242d;
+  outline-offset: 3px;
+}
+@media (max-width: 1100px) {
+  .commerce.ops-shell .an-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .commerce.ops-shell .analytics {
+    gap: 18px;
+  }
+  .commerce.ops-shell .an-panel {
+    padding: 16px;
+  }
+  .commerce.ops-shell .an-kpis {
+    gap: 10px;
+  }
+  .commerce.ops-shell .an-kpis article {
+    padding: 16px;
+  }
+  .commerce.ops-shell .an-kpis h2 {
+    min-height: 40px;
+  }
+  .commerce.ops-shell .an-title {
+    flex-wrap: wrap;
+  }
+  .commerce.ops-shell .an-breakdowns {
+    grid-template-columns: 1fr;
+  }
+  .commerce.ops-shell .analytics th,
+  .commerce.ops-shell .analytics td {
+    padding: 10px 6px;
+  }
+  .commerce.ops-shell .an-filters label {
+    flex: 1;
+    min-width: 120px;
+  }
+  .commerce.ops-shell .an-filters input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .commerce.ops-shell .an-presets {
+    width: 100%;
+  }
+}
+@media (max-width: 374px) {
+  .commerce.ops-shell.ops-analytics .ops-topbar {
+    flex-wrap: wrap;
+  }
+  .commerce.ops-shell.ops-analytics .ops-breadcrumb {
+    flex: 1;
+    min-width: 0;
+  }
+  .commerce.ops-shell.ops-analytics .ops-breadcrumb strong {
+    overflow-wrap: anywhere;
+  }
+  .commerce.ops-shell.ops-analytics .ops-language {
+    order: 3;
+    width: 100%;
+  }
+  .commerce.ops-shell.ops-analytics .ops-language select {
+    max-width: 180px;
+  }
+  .commerce.ops-shell.ops-analytics .ops-environment {
+    margin-left: 0;
+  }
+}

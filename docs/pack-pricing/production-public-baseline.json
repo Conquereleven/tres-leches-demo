@@ -1,0 +1,116 @@
+{
+  "revision": "catalog-v1-814c6df52cc0b6945455cd01a22daeb98971e27301731738d78b90689dbd177b",
+  "prices": [
+    {
+      "id": "pan-de-muerto-traditional-pack-6-mini",
+      "priceFils": 6000
+    },
+    {
+      "id": "pan-de-muerto-traditional-pack-12-mini",
+      "priceFils": 11500
+    },
+    {
+      "id": "pan-de-muerto-traditional-pack-6-individuales",
+      "priceFils": 7200
+    },
+    {
+      "id": "pan-de-muerto-traditional-pack-12-individuales",
+      "priceFils": 14000
+    },
+    {
+      "id": "pan-de-muerto-filled-pack-6-mini",
+      "priceFils": 10000
+    },
+    {
+      "id": "pan-de-muerto-filled-pack-12-mini",
+      "priceFils": 19000
+    },
+    {
+      "id": "pan-de-muerto-filled-pack-6-individuales",
+      "priceFils": 12000
+    },
+    {
+      "id": "pan-de-muerto-filled-pack-12-individuales",
+      "priceFils": 23500
+    },
+    {
+      "id": "pan-de-muerto-filled-pistachio-mini",
+      "priceFils": 2300
+    },
+    {
+      "id": "pan-de-muerto-filled-pistachio-individual",
+      "priceFils": 2600
+    }
+  ],
+  "packPricing": null,
+  "rules": [
+    {
+      "packSkuId": "pan-de-muerto-filled-pack-12-individuales",
+      "componentSkuIds": [
+        "pan-de-muerto-filled-chocolate-individual",
+        "pan-de-muerto-filled-crema-diplomatica-vainilla-individual",
+        "pan-de-muerto-filled-mascarpone-y-cajeta-individual",
+        "pan-de-muerto-filled-mascarpone-y-fresas-individual",
+        "pan-de-muerto-filled-pistachio-individual"
+      ]
+    },
+    {
+      "packSkuId": "pan-de-muerto-filled-pack-12-mini",
+      "componentSkuIds": [
+        "pan-de-muerto-filled-chocolate-mini",
+        "pan-de-muerto-filled-crema-diplomatica-vainilla-mini",
+        "pan-de-muerto-filled-mascarpone-y-cajeta-mini",
+        "pan-de-muerto-filled-mascarpone-y-fresas-mini",
+        "pan-de-muerto-filled-pistachio-mini"
+      ]
+    },
+    {
+      "packSkuId": "pan-de-muerto-filled-pack-6-individuales",
+      "componentSkuIds": [
+        "pan-de-muerto-filled-chocolate-individual",
+        "pan-de-muerto-filled-crema-diplomatica-vainilla-individual",
+        "pan-de-muerto-filled-mascarpone-y-cajeta-individual",
+        "pan-de-muerto-filled-mascarpone-y-fresas-individual",
+        "pan-de-muerto-filled-pistachio-individual"
+      ]
+    },
+    {
+      "packSkuId": "pan-de-muerto-filled-pack-6-mini",
+      "componentSkuIds": [
+        "pan-de-muerto-filled-chocolate-mini",
+        "pan-de-muerto-filled-crema-diplomatica-vainilla-mini",
+        "pan-de-muerto-filled-mascarpone-y-cajeta-mini",
+        "pan-de-muerto-filled-mascarpone-y-fresas-mini",
+        "pan-de-muerto-filled-pistachio-mini"
+      ]
+    },
+    {
+      "packSkuId": "pan-de-muerto-traditional-pack-12-individuales",
+      "componentSkuIds": [
+        "pan-de-muerto-traditional-ajonjoli-individual-70-g",
+        "pan-de-muerto-traditional-azucar-individual-70-g"
+      ]
+    },
+    {
+      "packSkuId": "pan-de-muerto-traditional-pack-12-mini",
+      "componentSkuIds": [
+        "pan-de-muerto-traditional-ajonjoli-mini-40-g",
+        "pan-de-muerto-traditional-azucar-mini-40-g"
+      ]
+    },
+    {
+      "packSkuId": "pan-de-muerto-traditional-pack-6-individuales",
+      "componentSkuIds": [
+        "pan-de-muerto-traditional-ajonjoli-individual-70-g",
+        "pan-de-muerto-traditional-azucar-individual-70-g"
+      ]
+    },
+    {
+      "packSkuId": "pan-de-muerto-traditional-pack-6-mini",
+      "componentSkuIds": [
+        "pan-de-muerto-traditional-ajonjoli-mini-40-g",
+        "pan-de-muerto-traditional-azucar-mini-40-g"
+      ]
+    }
+  ]
+}

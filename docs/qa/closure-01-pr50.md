@@ -1,0 +1,21 @@
+# Closure 01 — PR #50
+
+Baseline main: `589a78387c9efb5f4abd6e495d3746435c00dde5`. Initial PR head: `b93978b75ff1c00c65b08dd7e862d59abcdd127e`.
+
+CI run 39330152630 failed premium email assertions in both engines. Reproduced 2/2 locally: preview fixtures never opted in after recipient-scoped rollout was introduced, so they rendered legacy email. The fix opts only synthetic recipients into preview compact output. Runtime defaults remain legacy for every recipient.
+
+Regression coverage proves the unselected HTML byte-identical to the stored original-renderer control, three selected fictional recipients compact/fourth legacy, unknown recipients rejected, and paid-event repeats cannot replay notifications. Recipients are selected once into frozen outbox payloads. No actual email addresses were configured or verified here; private allowlist confirmation is required before rollout.
+
+Local: typecheck/lint/build; commerce 693/693; email browsers 24/24; premium 24/24; Tricolor 28/28; secrets/audit. Chromium and WebKit. Final GitHub results are recorded on the PR.
+
+Shared Tricolor synchronization explicitly verifies controlled color state, stable centered button geometry and hit target before one normal click, then exact persisted cart lines. Five-line expectations remain. CI traces on #51 show smooth-scroll/header interference; main and email-only PR share storefront code. Original intermittent miss was not deterministically reproduced locally (main 40 standard passes plus six scroll diagnostics; candidate ten standard passes). New active-scroll regression passes both engines; no claim of a newly proven customer cart defect.
+
+Compact previews remain in docs/email/previews. Browser screenshots do not certify native iPhone Gmail/Apple Mail rendering. No provider calls, historical replays, private recipient configuration or Production access. Review only; no merge/deploy.
+
+Final CI attempt on 24fe2be exposed a separate WebKit checkout timeout (run 39337666260): PAY was enabled/active and consent checked, but no checkout POST occurred. The artifact contained only error-context, not a trace. Checkout application and scenario sources match main; ten traced main repeats passed separately (10/10). No payment application defect is claimed from this evidence. The scenario now asserts the form is idle and consent committed, centers PAY instantly and verifies stable geometry/hit target before one normal click. All original POST revision, hosted redirect, reconciliation and unpaid-state assertions remain; checkout traces are retained on future failures. No financial code changed.
+
+PAY synchronization validation: 10/10 independent WebKit repeats, complete checkout 21/21 Chromium and 21/21 WebKit. All local assertions pass. The original intermittent CI timeout remains explicitly documented, not claimed deterministically reproduced.
+
+## Product-first design update
+
+The old kitchen design and the previous integration SHA are superseded by the founder's written product-first direction. See `docs/email/product-first-kitchen.md` for complete height measurements and the missing screenshot-reference disclosure. Only the opted-in render function and synthetic tests/previews change; original renderer, recipient routing, accepted amounts, outbox behavior and customer emails are preserved. New SHA and renewed joint integration CI are recorded in the PR description. Native-client fit is PENDING.

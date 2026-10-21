@@ -1,4 +1,8 @@
 import {
+  premiumPricingEnabled,
+  packPricingPolicy,
+} from "../domain/pack-pricing";
+import {
   PACK_SPECS,
   packEligibilitySchema,
 } from "../../shared/pack-composition";
@@ -861,6 +865,23 @@ export function hubCommand(
           409,
           "The published catalog changed after this draft was started. Discard the draft and re-apply your changes.",
         );
+      if (
+        !premiumPricingEnabled() &&
+        (draft.foundation.packEligibility ?? []).some((r) =>
+          r.componentSkuIds.some(
+            (id) =>
+              id.endsWith("-chocolate-covering") &&
+              !(live.foundation.packEligibility ?? [])
+                .find((p) => p.packSkuId === r.packSkuId)
+                ?.componentSkuIds.includes(id),
+          ),
+        )
+      )
+        throw new DomainError(
+          422,
+          "Chocolate covering requires verified premium pack pricing before publication",
+        );
+      packPricingPolicy(draft.catalog);
       const next = { foundation: draft.foundation, catalog: draft.catalog };
       const blocking = hubIssues(live, next).filter((i) => i.level === "error");
       if (blocking.length)

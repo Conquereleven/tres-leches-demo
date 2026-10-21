@@ -50,6 +50,21 @@ export type Audit = {
   from?: OrderState;
   to?: OrderState;
 };
+export const whatsAppMediaSchema = z.object({
+  type: z.enum([
+    "image",
+    "audio",
+    "video",
+    "document",
+    "sticker",
+    "media_placeholder",
+  ]),
+  id: z.string().min(1).max(256).optional(),
+  mimeType: z.string().max(120).optional(),
+  filename: z.string().max(255).optional(),
+  sha256: z.string().max(128).optional(),
+  voice: z.boolean().optional(),
+});
 export type Message = {
   id: string;
   direction: "in" | "out";
@@ -66,6 +81,8 @@ export type Message = {
     | "failed"
     | "unknown";
   providerId?: string;
+  origin?: "cloud" | "business-app" | "history";
+  media?: z.infer<typeof whatsAppMediaSchema>;
   sentAt?: string;
   agentGuard?: {
     runId: string;
@@ -93,7 +110,10 @@ export type Conversation = {
   address?: string;
   audit: Audit[];
 };
-export type Line = CommerceLine & { packSnapshot?: PackSnapshot };
+export type Line = CommerceLine & {
+  packSnapshot?: PackSnapshot;
+  priceSnapshot?: import("../../shared/pack-pricing").PackPriceSnapshot;
+};
 export type Quote = {
   zoneId: string | null;
   zoneName: string | null;
@@ -213,6 +233,8 @@ export type CustomerNotification = {
   recipient: string;
   subject: string;
   body: string;
+  /** Frozen responsive HTML, absent for historical text-only notifications. */
+  html?: string;
   /**
    * pending: recorded, not yet handed to a provider (also the resting state
    * while no provider is configured). sending: claimed by a dispatcher.
@@ -233,6 +255,8 @@ export type OperationsEmailNotification = Omit<
 > & {
   event: "ORDER_PAID";
   paymentId: string;
+  /** Frozen internal HTML; absent on historical text-only notifications. */
+  html?: string;
 };
 export type Payment = {
   supersededAt?: string;
@@ -334,6 +358,19 @@ export type NotificationReceipt = {
   attempts: number;
 };
 export type State = {
+  /** Signed observations only: never account control, readiness or outbound authorization. */
+  whatsappAccountObservations?: Extract<
+    import("zod").infer<typeof import("./commands").inboundSchema>,
+    { type: "coexistence" }
+  >[];
+  /** Observed contacts only; importing/removing a contact never erases chats. */
+  whatsappContacts?: {
+    sourceNumberId: string;
+    phone: string;
+    name?: string;
+    at: string;
+    removed: boolean;
+  }[];
   /** Last public order number issued. Only ever increases. */
   orderNumberSequence?: number;
   customerNotifications?: CustomerNotification[];

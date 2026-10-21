@@ -84,7 +84,7 @@ test("adoption on: public, cacheable by revision, read-only, and the page is mar
       revision: string;
       products: unknown[];
     };
-    assert.equal(body.products.length, 74);
+    assert.equal(body.products.length, 75);
     assert.equal(
       (
         await fetch(s.base + "/api/storefront/catalog", {

@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { chooseArea, fillName } from "../fixtures/storefront-form";
+import { clickStableControl } from "../helpers/stable-control";
 
 const ORIGIN = "http://127.0.0.1:3189";
 const tomorrow = () =>
@@ -63,7 +64,12 @@ test("cart → delivery → details → review → payment step", async ({
   await page
     .getByRole("combobox", { name: "Delivery time", exact: true })
     .selectOption("4:00 PM – 9:00 PM");
-  await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
+  // WebKit may still be scrolling from the time selector. Settle the pointer
+  // target before one real click, then verify the step actually changed.
+  await clickStableControl(
+    page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
+  );
+  await expect(page.getByLabel("First name", { exact: true })).toBeVisible();
 
   await fillName(page, "UAT", "Reviewer");
   await page.getByLabel("Email for payment receipt").fill("uat@example.com");
@@ -117,10 +123,44 @@ test("cart → delivery → details → review → payment step", async ({
       body: "<h1>Mock Paymennt TEST checkout</h1>",
     }),
   );
+  const pay = page.getByRole("button", { name: "PAY AED 50", exact: true });
+  const paymentForm = page.locator("form.b-co-payment");
+  await expect(paymentForm).toHaveAttribute("aria-busy", "false");
+  await expect(
+    page.getByRole("checkbox", { name: /I've reviewed/ }),
+  ).toBeChecked();
+  // The scenario has just scrolled between billing, consent and the footer.
+  // Complete that movement before issuing one real pointer action. Enabled
+  // alone does not establish that the same point stays on PAY during scrolling.
+  await pay.evaluate((el) =>
+    el.scrollIntoView({ block: "center", behavior: "instant" }),
+  );
+  await expect
+    .poll(() =>
+      pay.evaluate(async (el) => {
+        const before = el.getBoundingClientRect();
+        await new Promise<void>((resolve) =>
+          requestAnimationFrame(() => resolve()),
+        );
+        const after = el.getBoundingClientRect();
+        return (
+          before.x === after.x &&
+          before.y === after.y &&
+          before.height === after.height &&
+          document
+            .elementFromPoint(
+              after.x + after.width / 2,
+              after.y + after.height / 2,
+            )
+            ?.closest("button") === el
+        );
+      }),
+    )
+    .toBe(true);
   const submitted = page.waitForRequest(
     (r) => r.url().endsWith("/api/checkout/web") && r.method() === "POST",
   );
-  await page.getByRole("button", { name: "PAY AED 50", exact: true }).click();
+  await pay.click();
   expect((await submitted).headers()["x-checkout-quote-revision"]).toMatch(
     /^[a-f0-9]{64}$/,
   );
@@ -240,7 +280,15 @@ test("a paid checkout in this session cannot be paid again", async ({
     },
   });
   // Same cart and fulfillment must keep the paid order protected.
+  // Match the first checkout scenario: don't tear down an initializing WebKit
+  // document while its configuration fetch is still in flight.
+  const homepageConfig = page.waitForResponse(
+    (response) => response.url() === ORIGIN + "/api/checkout/config",
+  );
   await page.goto("/");
+  const configResponse = await homepageConfig;
+  expect(configResponse.status()).toBe(200);
+  expect(await configResponse.finished()).toBeNull();
   await page.evaluate(
     ([k, d, c]) => {
       sessionStorage.setItem(

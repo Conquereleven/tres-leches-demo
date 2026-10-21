@@ -81,17 +81,21 @@ for (const width of [390, 768, 1440])
             () => document.documentElement.scrollWidth <= innerWidth,
           ),
         ).toBe(true);
-        expect(
-          await page
-            .locator("img")
-            .evaluateAll((images) =>
-              images.every(
-                (image) =>
-                  (image as HTMLImageElement).complete &&
-                  (image as HTMLImageElement).naturalWidth > 0,
+        // Route UI visibility does not imply its image requests have finished.
+        // Keep the exact completeness/nonzero-width predicate and assertion budget.
+        await expect
+          .poll(() =>
+            page
+              .locator("img")
+              .evaluateAll((images) =>
+                images.every(
+                  (image) =>
+                    (image as HTMLImageElement).complete &&
+                    (image as HTMLImageElement).naturalWidth > 0,
+                ),
               ),
-            ),
-        ).toBe(true);
+          )
+          .toBe(true);
         const results = await new AxeBuilder({ page }).analyze();
         expect(results.violations, JSON.stringify(results.violations)).toEqual(
           [],

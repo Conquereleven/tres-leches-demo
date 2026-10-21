@@ -123,7 +123,7 @@ test("audit of a release-production database is physically read-only, needs no e
     assert.equal(out.json.decision, "READY_TO_APPLY");
     assert.equal(out.json.profile, "release-production");
     assert.equal(out.json.integrity, "ok");
-    assert.equal(out.json.database.skuCount, 236);
+    assert.equal(out.json.database.skuCount, 238);
     assert.equal(out.json.database.orderCount, 1);
     assert.equal(out.json.foundation.status, "absent");
     assert.match(

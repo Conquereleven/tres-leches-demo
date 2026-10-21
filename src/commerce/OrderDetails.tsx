@@ -464,7 +464,7 @@ export function OrderItemsCard({ order: o, data }: CardProps) {
                     {l.product.name}
                   </span>
                   <small className="oms-ref">{l.productId}</small>
-                  {l.composition && <p lang="en">{preparationText(l)}</p>}
+                  {preparationText(l) && <p lang="en">{preparationText(l)}</p>}
                   {l.product.reviewRequired && (
                     <small className="oms-item-review">
                       <Translate aria-hidden />
