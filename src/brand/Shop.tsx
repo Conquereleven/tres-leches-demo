@@ -338,9 +338,8 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
   const image = publishedMediaAuthority() ? null : productImage(productId);
   const family = menuFamilyForSku(productId);
   const option = family?.options.find((o) => o.id === productId);
-  const thumbClass = family?.id.startsWith("conchas")
-    ? "b-co-thumb b-co-thumb-contained"
-    : "b-co-thumb";
+  // The same square photographic thumbnail contract applies to every family.
+  const thumbClass = "b-co-thumb";
   if (
     family &&
     option &&
@@ -374,7 +373,7 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
       </span>
     );
   if (tricolorSpec(productId))
-    return <img className={thumbClass} src="/brand/icon.png" alt="" />;
+    return <img className={thumbClass} src="/brand/icon.png" alt="" style={{ objectFit: "contain" }} />;
   return image ? (
     <img
       className={thumbClass}

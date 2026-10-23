@@ -96,7 +96,9 @@ export function ProductOptions({
             size={display.size}
             fallback={fallback}
             alt={product.title}
-            rotate={!detail}
+            // Product cards and detail hero always use the published primary.
+            // Further media belongs only in the detail gallery, never layered
+            // or auto-rotated over a purchasable SKU.
           />
         ) : (
           <div

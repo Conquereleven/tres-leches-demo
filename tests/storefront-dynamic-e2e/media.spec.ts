@@ -204,7 +204,7 @@ test("homepage named products follow publication while category/editorial previe
   await expect(page.locator(".b-preview-grid img")).toHaveCount(5);
 });
 
-test("a failed inactive gallery frame cannot cover the published primary", async ({
+test("product cards keep one square primary, with gallery confined to detail and editorial at 3:2", async ({
   page,
 }) => {
   const catalog: LiveCatalog = await (
@@ -235,17 +235,32 @@ test("a failed inactive gallery frame cannot cover the published primary", async
   await page.route("**/brand/hub/fixture-broken-gallery.png", (route) =>
     route.fulfill({ status: 404, body: "" }),
   );
-  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/menu?category=conchas");
   const card = page.locator(`[data-product-id="${target.id}"]`);
   await card.scrollIntoViewIfNeeded();
-  await expect(card.locator('[data-media-state="load-error"]')).toHaveCount(1);
-  const frames = card.locator(".b-official-rotation picture");
-  await expect(frames).toHaveCount(2);
-  await expect(frames.first()).toHaveClass("is-active");
-  await expect(frames.last()).toHaveAttribute("aria-hidden", "true");
-  await expect(frames.last()).toHaveCSS("opacity", "0");
-  await expect(frames.first().locator("img")).toBeVisible();
+  await expect(card.locator(".b-menu-photo picture")).toHaveCount(1);
+  await expect(card.locator(".b-official-rotation")).toHaveCount(0);
+  const photo = card.locator(".b-menu-photo img");
+  await expect(photo).toBeVisible();
+  await expect(photo).toHaveCSS("object-fit", "cover");
+  const square = await card.locator(".b-menu-photo").evaluate((el) => {
+    const b = el.getBoundingClientRect();
+    return Math.abs(b.width / b.height - 1) < 0.02;
+  });
+  expect(square).toBe(true);
+  // The unchanged category presentation is editorial, independent of product images.
+  const editorial = page.locator(".b-category-showcase");
+  if (await editorial.count()) {
+    const ratio = await editorial.evaluate((el) => {
+      const b = el.getBoundingClientRect();
+      return b.width / b.height;
+    });
+    expect(ratio).toBeGreaterThan(1.48);
+    expect(ratio).toBeLessThan(1.52);
+  }
+  await page.goto(`/menu?product=${target.slug}`);
+  await expect(page.locator(".b-product-gallery")).toBeVisible();
+  await expect(page.locator(".b-menu-photo .b-official-rotation")).toHaveCount(0);
 });
 
 test("dynamic homepage HTML cannot show stale bundled product photos before JavaScript loads", async ({
