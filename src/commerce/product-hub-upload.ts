@@ -24,19 +24,19 @@ export type PreparedHubImage = { blob: Blob; optimized: boolean };
 /** Preserve small files; optimize large, decodable images only when smaller. */
 export async function prepareHubUpload(file: File): Promise<PreparedHubImage> {
   if (file.size <= OPTIMIZE_ABOVE_BYTES) return { blob: file, optimized: false };
-  const url = URL.createObjectURL(file);
+  // ImageBitmap decodes a local File without a blob: URL. This respects the
+  // existing operations-page CSP (img-src self/data:) and adds no network IO.
+  let image: ImageBitmap;
   try {
-    const image = new Image();
-    image.src = url;
-    // Image.decode honors browser orientation handling, without sending data.
-    try {
-      await image.decode();
-    } catch {
-      // Server remains authoritative for potentially unsupported/corrupt inputs.
-      return { blob: file, optimized: false };
-    }
-    const width = image.naturalWidth;
-    const height = image.naturalHeight;
+    image = await createImageBitmap(file);
+  } catch {
+    // Not all browsers decode all formats: keep original and let the backend
+    // validate its signature/dimensions instead of corrupting image content.
+    return { blob: file, optimized: false };
+  }
+  try {
+    const width = image.width;
+    const height = image.height;
     if (width < MIN_SOURCE_SIDE || height < MIN_SOURCE_SIDE ||
         width > MAX_SOURCE_SIDE || height > MAX_SOURCE_SIDE)
       throw new Error("Image must be between 200 and 6000 pixels on each side.");
@@ -57,6 +57,6 @@ export async function prepareHubUpload(file: File): Promise<PreparedHubImage> {
       return { blob: file, optimized: false };
     return { blob: candidate, optimized: true };
   } finally {
-    URL.revokeObjectURL(url);
+    image.close();
   }
 }
