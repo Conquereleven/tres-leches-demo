@@ -240,14 +240,27 @@ test("product cards keep one square primary, with gallery confined to detail and
   await card.scrollIntoViewIfNeeded();
   await expect(card.locator(".b-menu-photo picture")).toHaveCount(1);
   await expect(card.locator(".b-official-rotation")).toHaveCount(0);
+  const illustration = card.locator(".b-menu-photo picture");
+  await expect(illustration).toHaveAttribute(
+    "data-media-kind",
+    "digital-illustration",
+  );
   const photo = card.locator(".b-menu-photo img");
   await expect(photo).toBeVisible();
-  await expect(photo).toHaveCSS("object-fit", "cover");
+  // Branded illustrations remain entirely visible; only photographs crop to fill.
+  await expect(photo).toHaveCSS("object-fit", "contain");
   const square = await card.locator(".b-menu-photo").evaluate((el) => {
     const b = el.getBoundingClientRect();
     return Math.abs(b.width / b.height - 1) < 0.02;
   });
   expect(square).toBe(true);
+  // The same shared card contract uses cover for actual food photographs.
+  await page.goto("/menu?category=pan");
+  const photographic = page.locator(
+    '[data-product-id="pan-de-muerto-traditional--ajonjoli"] .b-menu-photo img',
+  );
+  await expect(photographic).toBeVisible();
+  await expect(photographic).toHaveCSS("object-fit", "cover");
   // The unchanged category presentation is editorial, independent of product images.
   const editorial = page.locator(".b-category-showcase");
   if (await editorial.count()) {
