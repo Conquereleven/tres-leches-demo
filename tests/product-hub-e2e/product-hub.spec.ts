@@ -167,21 +167,38 @@ test("desktop: create a product with a new SKU and an uploaded image, then disca
   await variant.getByLabel("Flavour", { exact: true }).fill("Canela");
   await variant.getByLabel("Size", { exact: true }).fill("Mini · 40 g");
   await variant.getByLabel("Price (AED)").fill("13");
-  // A file that is not an image is refused by the server.
+  // >5 MiB is rejected in the browser before ANY network upload.
+  let uploadRequests = 0;
+  page.on("request", (request) => {
+    if (request.method() === "POST" && request.url().endsWith("/api/product-hub/media"))
+      uploadRequests += 1;
+  });
+  await page.getByLabel("Upload a new image").setInputFiles({
+    name: "too-large.jpg",
+    mimeType: "image/jpeg",
+    buffer: Buffer.alloc(5 * 1024 * 1024 + 1),
+  });
+  await expect(page.locator("#ph-upload-feedback")).toContainText("Maximum upload size is 5 MB");
+  expect(uploadRequests).toBe(0);
+
+  // A file that declares image/png but contains SVG bytes is rejected by the server.
   await page.getByLabel("Upload a new image").setInputFiles({
     name: "not-an-image.png",
     mimeType: "image/png",
     buffer: Buffer.from("<svg onload=alert(1)>".padEnd(80)),
   });
-  await expect(page.getByRole("alert").first()).toContainText(
+  await expect(page.locator("#ph-upload-feedback")).toContainText(
     "PNG, JPEG, WebP or AVIF",
   );
+  // A 4.5 MiB upload is now accepted, even when browser image decoding is
+  // unavailable: the server still validates the file signature and dimensions.
   await page.getByLabel("Upload a new image").setInputFiles({
     name: "canela.png",
     mimeType: "image/png",
-    buffer: png(640, 640),
+    buffer: Buffer.concat([png(640, 640), Buffer.alloc(Math.floor(4.5 * 1024 * 1024))]),
   });
   await expect(page.locator(".ph-media li")).toHaveCount(1);
+  expect(uploadRequests).toBe(2);
   await expect(page.locator(".ph-media li")).toContainText("Primary image");
   await page.getByRole("button", { name: "Save draft" }).click();
   await expect(page.getByText("Draft saved")).toBeVisible();
