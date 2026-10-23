@@ -829,7 +829,7 @@ test("images: only real PNG, JPEG, WebP or AVIF of sane size are accepted, store
     refuse(png(50, 400), "image/png", 422); // too small
     refuse(png(7000, 400), "image/png", 422); // too large
     refuse(
-      Buffer.concat([png(400, 400), Buffer.alloc(3 * 1024 * 1024)]),
+      Buffer.concat([png(400, 400), Buffer.alloc(5 * 1024 * 1024)]),
       "image/png",
       413,
     );
@@ -1088,6 +1088,25 @@ test("manager prepares a private draft but cannot publish, including replaying a
     assert.equal(JSON.stringify(store.read()), published);
     assert.deepEqual(store.read().orders, before.orders);
     assert.deepEqual(store.read().payments, before.payments);
+  } finally {
+    store.close();
+  }
+});
+
+test("media upload accepts 4.5 MiB files, rejects above 5 MiB and never publishes without approval", () => {
+  const { store, view } = setup();
+  try {
+    const alt = { en: empty, es: empty, ar: empty };
+    const payload = Buffer.concat([png(400, 400), Buffer.alloc(Math.floor(4.5 * 1024 * 1024))]);
+    const originalRevision = view().published.id;
+    const result = hubUpload(store, admin, key(), payload, "image/png",
+      { expectedVersion: 0, alt }, ON) as { assetId: string };
+    const asset = view().assets.find((a) => a.id === result.assetId)!;
+    assert.equal(store.getMedia(asset.version)!.bytes.length, payload.length);
+    assert.equal(view().published.id, originalRevision);
+    assert.throws(() => hubUpload(store, admin, key(),
+      Buffer.concat([png(400, 400), Buffer.alloc(5 * 1024 * 1024)]),
+      "image/png", { expectedVersion: 1, alt }, ON), { status: 413 });
   } finally {
     store.close();
   }

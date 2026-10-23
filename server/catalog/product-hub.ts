@@ -1019,7 +1019,7 @@ export function hubCommand(
 
 // ---- Media ----------------------------------------------------------------
 
-export const MAX_UPLOAD_BYTES = 3 * 1024 * 1024;
+export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 const MIN_SIDE = 200;
 const MAX_SIDE = 6000;
 type ImageInfo = {
@@ -1144,7 +1144,7 @@ export function hubUpload(
   if (!/^[A-Za-z0-9_-]{8,128}$/.test(key))
     throw new DomainError(400, "Idempotency-Key required");
   if (!bytes.length || bytes.length > MAX_UPLOAD_BYTES)
-    throw new DomainError(413, "Image is larger than 3 MB");
+    throw new DomainError(413, "Image is larger than 5 MB");
   const meta = uploadMeta.parse(rawMeta);
   const info = inspectImage(bytes);
   if (declaredType.split(";")[0]!.trim().toLowerCase() !== info.type)
