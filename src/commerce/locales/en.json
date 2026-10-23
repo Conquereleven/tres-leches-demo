@@ -784,5 +784,8 @@
   "Product report table": "Product report table",
   "adjustment_amount_unavailable": "Refund/dispute amounts unavailable",
   "Internally consistent financial records": "Internally consistent financial records",
-  "Historical LIVE/TEST provenance is unverified. This report is not independently LIVE-certified.": "Historical LIVE/TEST provenance is unverified. This report is not independently LIVE-certified."
+  "Historical LIVE/TEST provenance is unverified. This report is not independently LIVE-certified.": "Historical LIVE/TEST provenance is unverified. This report is not independently LIVE-certified.",
+  "Unable to connect. Try again.": "Unable to connect. Try again.",
+  "Request timed out. Refresh to check the latest status before retrying.": "Request timed out. Refresh to check the latest status before retrying.",
+  "Offline. Showing the last received data. Reconnect before changing orders.": "Offline. Showing the last received data. Reconnect before changing orders."
 }

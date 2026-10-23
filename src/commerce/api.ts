@@ -73,29 +73,66 @@ export type Workspace = {
   /** Name of the configured email provider, or null when none is configured. */
   customerEmailProvider?: string | null;
 };
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
 export async function api<T>(
   path: string,
   body?: unknown,
   key?: string,
+  options: { signal?: AbortSignal; timeoutMs?: number } = {},
 ): Promise<T> {
-  const res = await fetch("/api/" + path, {
-    method: body ? "POST" : "GET",
-    headers: body
-      ? {
-          "Content-Type": "application/json",
-          "Idempotency-Key": key ?? crypto.randomUUID(),
-        }
-      : undefined,
-    body: body ? JSON.stringify(body) : undefined,
-    signal: AbortSignal.timeout(15000),
-  });
-  const data: unknown = await res.json();
-  if (!res.ok)
-    throw new Error(
-      (data as { error?: string }).error ??
-        "No se pudo conectar. Intenta de nuevo.",
-    );
-  return data as T;
+  // AbortSignal.timeout is unavailable in some supported mobile browser versions.
+  // Own the timer and listener so cancellation also covers reading the body.
+  const controller = new AbortController();
+  const cancel = () => controller.abort();
+  options.signal?.addEventListener("abort", cancel, { once: true });
+  if (options.signal?.aborted) cancel();
+  let timedOut = false;
+  const timer = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, options.timeoutMs ?? 15000);
+  try {
+    const res = await fetch("/api/" + path, {
+      method: body ? "POST" : "GET",
+      headers: body
+        ? {
+            "Content-Type": "application/json",
+            "Idempotency-Key": key ?? crypto.randomUUID(),
+          }
+        : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
+    });
+    const data: unknown = await res.json().catch(() => null);
+    if (!res.ok)
+      throw new ApiError(
+        (data as { error?: string } | null)?.error ??
+          "Unable to connect. Try again.",
+        res.status,
+      );
+    if (data === null) throw new Error("Unable to connect. Try again.");
+    return data as T;
+  } catch (error) {
+    if (options.signal?.aborted)
+      throw new DOMException("Cancelled", "AbortError");
+    if (timedOut)
+      throw new Error(
+        "Request timed out. Refresh to check the latest status before retrying.",
+      );
+    if (error instanceof ApiError) throw error;
+    throw new Error("Unable to connect. Try again.");
+  } finally {
+    clearTimeout(timer);
+    options.signal?.removeEventListener("abort", cancel);
+  }
 }
 export const money = (fils: number | null | undefined) =>
   fils == null ? "Por confirmar" : `AED ${(fils / 100).toFixed(2)}`;

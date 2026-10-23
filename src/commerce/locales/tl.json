@@ -784,5 +784,8 @@
   "Product report table": "Talahanayan ng ulat ng produkto",
   "adjustment_amount_unavailable": "Walang nakaimbak na halaga ng refund o pagtutol sa bayad",
   "Internally consistent financial records": "Magkakatugmang tala sa pananalapi",
-  "Historical LIVE/TEST provenance is unverified. This report is not independently LIVE-certified.": "Hindi beripikado ang LIVE/TEST na pinagmulan ng mga lumang tala. Hindi independiyenteng sertipikadong LIVE ang ulat na ito."
+  "Historical LIVE/TEST provenance is unverified. This report is not independently LIVE-certified.": "Hindi beripikado ang LIVE/TEST na pinagmulan ng mga lumang tala. Hindi independiyenteng sertipikadong LIVE ang ulat na ito.",
+  "Unable to connect. Try again.": "Hindi makakonekta. Subukan muli.",
+  "Request timed out. Refresh to check the latest status before retrying.": "Nag-time out ang request. I-refresh upang suriin ang pinakabagong status bago subukang muli.",
+  "Offline. Showing the last received data. Reconnect before changing orders.": "Offline. Ipinapakita ang huling natanggap na datos. Kumonekta muli bago baguhin ang mga order."
 }
