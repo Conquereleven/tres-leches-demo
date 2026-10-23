@@ -4,7 +4,12 @@ on:
     branches: [main]
     paths:
       - "server/analytics/**"
-      - "src/commerce/**"
+      - "src/commerce/Analytics.tsx"
+      - "src/commerce/analytics.css"
+      - "src/commerce/Workspace.tsx"
+      - "src/commerce/api.ts"
+      - "src/commerce/ops-i18n.tsx"
+      - "src/commerce/locales/**"
       - "tests/analytics-e2e/**"
       - "tests/fixtures/analytics*"
       - "playwright.analytics.config.ts"
