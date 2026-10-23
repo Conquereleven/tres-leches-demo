@@ -243,7 +243,14 @@ for (const width of [390, 768, 1440])
       `docs/brand/brand02/conchas/parity-${info.project.name}-${width}.json`,
       JSON.stringify({ pan: styles[0], conchas: styles[1] }, null, 2),
     );
-    expect(styles[0]).toEqual(styles[1]);
+    // PR #61: real food photographs fill the frame, deliberate illustrations
+    // remain contained. All shared card geometry is still identical.
+    expect(styles[0]!.imageFit).toBe("cover");
+    expect(styles[1]!.imageFit).toBe("contain");
+    expect({ ...styles[0], imageFit: "by-media-kind" }).toEqual({
+      ...styles[1],
+      imageFit: "by-media-kind",
+    });
   });
 
 for (const [slug, image] of [
