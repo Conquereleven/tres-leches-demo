@@ -27,12 +27,27 @@ test("public colour refresh preserves geometry, typography, motion and media CSS
       "margin: 0 auto 40px; overflow: hidden; border-radius: var(--radius-panel); background: #f6efe3;",
     );
     let current = readFileSync(f, "utf8");
-    if (f === "src/brand/checkout.css") {
-      // Closure 01: the only permitted post-refresh media change is scoped
-      // whole-image rendering for Conchas, enforced by the browser geometry suite.
-      const approved = ".brand-experience .b-co-thumb-contained { object-fit: contain; }";
-      assert.equal(current.split(approved).length, 2);
-      current = current.replace(approved, "");
+    if (f === "src/brand/storefront.css") {
+      // PR #61: whitelist exactly the four shared media presentation changes.
+      // Normalize them back to the approved pre-PR geometry for this guard;
+      // all other layout, typography and motion declarations stay protected.
+      const approved = [
+        [".b-product-gallery img {\n  width: min(220px, 60vw);\n  height: auto;\n  max-width: none;\n  aspect-ratio: 1;\n  object-fit: cover;\n  object-position: center;\n}", ".b-product-gallery img {\n  max-width: 260px;\n  object-fit: contain;\n}"],
+        [".brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo img { object-fit: cover; object-position: center; }", ".brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo img { object-fit: contain; object-position: center; }"],
+        [".brand-experience .b-official-rotation picture img { width: 100%; height: 100%; object-fit: cover; object-position: center; }", ".brand-experience .b-official-rotation picture img { width: 100%; height: 100%; object-fit: contain; object-position: center; }"],
+        [".brand-experience .b-product-page .b-official-gallery img { flex: none; width: min(220px, 60vw); height: auto; max-width: none; aspect-ratio: 1; object-fit: cover; object-position: center; background: var(--v2-white); }", ".brand-experience .b-product-page .b-official-gallery img { flex: none; width: min(220px, 60vw); height: auto; max-width: none; aspect-ratio: 1; object-fit: contain; background: var(--v2-white); }"],
+      ] as const;
+      for (const [after, before] of approved) {
+        assert.equal(
+          current.split(after).length,
+          2,
+          `Expected exactly one approved media rule in ${f}`,
+        );
+        current = current.replace(after, before);
+      }
+    } else if (f === "src/brand/checkout.css") {
+      // PR #61 removes the Conchas-only contain exception: photo fit is shared.
+      assert.doesNotMatch(current, /\\.b-co-thumb-contained\\b/);
     }
     assert.deepEqual(geometry(current), geometry(previous), f);
   }
