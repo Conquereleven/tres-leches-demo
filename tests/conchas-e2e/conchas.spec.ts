@@ -492,6 +492,8 @@ for (const width of [390, 768, 1440])
           background: css.backgroundColor,
           overflow: css.overflow,
           fit: getComputedStyle(img).objectFit,
+          mediaKind: img.closest("picture")?.getAttribute("data-media-kind"),
+          fallbackLogo: img.getAttribute("src") === "/brand/icon.png",
           imageHeight: img.getBoundingClientRect().height,
           imageWidth: img.getBoundingClientRect().width,
           sourceRatio:
@@ -504,7 +506,13 @@ for (const width of [390, 768, 1440])
       expect(f.ratio).toBe("1 / 1");
       expect(f.radius).toBe("20px");
       expect(f.overflow).toBe("hidden");
-      expect(f.fit).toBe("contain");
+      // Keep approved illustrations and brand fallback intact; only food
+      // photography fills the frame. Shared shape is always square.
+      expect(f.fit).toBe(
+        f.mediaKind === "digital-illustration" || f.fallbackLogo
+          ? "contain"
+          : "cover",
+      );
       expect(f.sourceRatio).toBe(1);
       expect(f.background).toBe(frames[0]!.background);
       expect(f.height).toBeCloseTo(frames[0]!.height, 0);
@@ -558,12 +566,18 @@ for (const width of [390, 768, 1440])
             ratio: b.width / b.height,
             radius: s.borderRadius,
             fit: s.objectFit,
+            mediaKind: el.closest("picture")?.getAttribute("data-media-kind"),
+            fallbackLogo: (el as HTMLImageElement).getAttribute("src") === "/brand/icon.png",
             background: s.backgroundColor,
           };
         });
         expect(f.ratio).toBeCloseTo(1, 2);
         expect(f.radius).toBe("12px");
-        expect(f.fit).toBe("contain");
+        expect(f.fit).toBe(
+          f.mediaKind === "digital-illustration" || f.fallbackLogo
+            ? "contain"
+            : "cover",
+        );
       }
       expect(
         await page.evaluate(
