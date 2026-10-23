@@ -47,7 +47,7 @@ test("public colour refresh preserves geometry, typography, motion and media CSS
       }
     } else if (f === "src/brand/checkout.css") {
       // PR #61 removes the Conchas-only contain exception: photo fit is shared.
-      assert.doesNotMatch(current, /\\.b-co-thumb-contained\\b/);
+      assert.ok(!current.includes(".b-co-thumb-contained"), "Conchas-only photo-fit override must be absent");
     }
     assert.deepEqual(geometry(current), geometry(previous), f);
   }
