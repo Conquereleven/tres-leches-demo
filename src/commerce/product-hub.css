@@ -463,3 +463,13 @@
 .commerce.ops-shell .ph-variant-i18n .ph-form {
   margin-top: 10px;
 }
+
+.commerce.ops-shell .ph-upload-control {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.commerce.ops-shell .ph-upload-control .ph-banner {
+  overflow-wrap: anywhere;
+  font-weight: 400;
+}
