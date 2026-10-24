@@ -96,7 +96,6 @@ export function ProductOptions({
             size={display.size}
             fallback={fallback}
             alt={product.title}
-            rotate={!detail}
           />
         ) : (
           <div
