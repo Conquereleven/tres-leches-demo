@@ -1967,6 +1967,8 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
 .brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo { background: var(--v2-white); border-radius: var(--radius-panel); overflow: hidden; aspect-ratio: 1; }
 .brand-experience .b-official-gallery img { border-radius: var(--radius-panel); }
 .brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo img { object-fit: cover; object-position: center; }
+/* Do not crop deliberate family/logo placeholders when they also use the shared photo frame. */
+.brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo.b-family-photo img { object-fit: contain; }
 .b-official-rotation { position: relative; display: block; width: 100%; height: 100%; overflow: hidden; background: var(--v2-white); }
 .brand-experience .b-official-rotation picture { position: absolute; inset: 0; width: 100%; height: 100%; background: var(--v2-white); opacity: 0; transition: opacity 0s linear 800ms; }
 .brand-experience .b-official-rotation picture.is-active { opacity: 1; z-index: 1; transition: opacity 800ms ease; }

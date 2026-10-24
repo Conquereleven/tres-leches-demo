@@ -45,6 +45,11 @@ test("public colour refresh preserves geometry, typography, motion and media CSS
         );
         current = current.replace(after, before);
       }
+      // The one approved placeholder override protects the Tricolor/family logo
+      // when its frame also has the shared photographic presentation class.
+      const placeholderOverride = ".brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo.b-family-photo img { object-fit: contain; }";
+      assert.equal(current.split(placeholderOverride).length, 2);
+      current = current.replace(placeholderOverride, "");
     } else if (f === "src/brand/checkout.css") {
       // PR #61 removes the Conchas-only contain exception: photo fit is shared.
       assert.ok(!current.includes(".b-co-thumb-contained"), "Conchas-only photo-fit override must be absent");
