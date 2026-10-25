@@ -1981,3 +1981,8 @@ html[dir="rtl"] .b-modal .b-modal-nav :is(a, button) {
 .b-official-rotation:focus-visible { outline: 2px solid var(--v2-graphite); outline-offset: 4px; }
 .brand-experience .b-product-page .b-official-gallery img { flex: none; width: min(220px, 60vw); height: auto; max-width: none; aspect-ratio: 1; object-fit: cover; object-position: center; background: var(--v2-white); }
 @media (prefers-reduced-motion: reduce) { .brand-experience .b-official-rotation picture { transition: none; } }
+
+/* Reserve the loading viewport without changing loaded catalog geometry. */
+.b-full-menu[data-catalog-status="loading"] {
+  min-height: 100svh;
+}
