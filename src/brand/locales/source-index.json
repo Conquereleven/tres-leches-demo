@@ -1071,5 +1071,9 @@
   "Conchas Tricolor · Pack de 3 · 3 mini · 3 × 40 g": "product:copy_91ac66a71231c71d",
   "Conchas Tricolor · Pack de 3 · 3 individuales · 3 × 70 g": "product:copy_74e4e59d6fc5f1b5",
   "Choose exactly one valid Tricolor color; fixed packs cannot be customized": "checkout:copy_13e45fb4a00a8d71",
-  "This product does not accept a color": "checkout:copy_63b26b3134d6c013"
+  "This product does not accept a color": "checkout:copy_63b26b3134d6c013",
+  "Check your order": "checkout:copy_a8a6816560b8f9be",
+  "This browser cannot securely retrieve your previous checkout.": "checkout:copy_6a2e56af2b18047a",
+  "This does not mean your payment failed. Please do not pay again to check its status.": "checkout:copy_c84fd96054e7ef3f",
+  "If you received a confirmation email, keep it for your records. Otherwise, contact 3L so we can help check your order securely.": "checkout:copy_dbee70b175436c79"
 }

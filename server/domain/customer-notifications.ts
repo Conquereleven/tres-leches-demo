@@ -10,8 +10,13 @@
  * nothing and rows stay visibly pending — nothing is reported as sent.
  */
 import { randomUUID } from "node:crypto";
+import { ProviderFailure } from "../adapters/failure";
+import { z } from "zod";
 import { renderCustomerEmailHtml } from "./customer-email-html";
-import { customerEmailItems, customerEmailItemsText } from "./customer-email-items";
+import {
+  customerEmailItems,
+  customerEmailItemsText,
+} from "./customer-email-items";
 import { orderReference } from "../../shared/order-number";
 import { PICKUP_LOCATION } from "../../shared/pickup-location";
 import { customerName } from "./order-number";
@@ -20,6 +25,7 @@ import type {
   CustomerNotification,
   Order,
   OrderState,
+  Payment,
   State,
 } from "./model";
 
@@ -52,7 +58,11 @@ const day = (date?: string) =>
 export function renderCustomerEmail(
   event: CustomerEvent,
   order: Order,
-  context: { fallbackName?: string; zoneName?: string } = {},
+  context: {
+    fallbackName?: string;
+    zoneName?: string;
+    paidAmountFils?: number;
+  } = {},
 ) {
   const reference = orderReference(order);
   const first =
@@ -77,7 +87,38 @@ export function renderCustomerEmail(
     pickup,
     zoneName: context.zoneName,
     items,
+    paidTotal:
+      context.paidAmountFils === undefined
+        ? undefined
+        : `AED ${(context.paidAmountFils / 100).toFixed(2)}`,
   });
+  if (event === "ORDER_PAID")
+    return {
+      subject: `Your 3L order ${reference} is confirmed!`,
+      html,
+      body: [
+        `Hi ${first},`,
+        "",
+        `Your payment is verified and your 3L order ${reference} is confirmed.`,
+        "",
+        ...reminder,
+        ...(context.paidAmountFils === undefined
+          ? []
+          : [
+              "",
+              `Total paid: AED ${(context.paidAmountFils / 100).toFixed(2)}`,
+            ]),
+        "",
+        `${pickup ? "Pickup" : "Delivery"}${when ? `: ${when}` : ""}`,
+        ...(pickup
+          ? [PICKUP_LOCATION.name, ...PICKUP_LOCATION.lines]
+          : ["Please be available during your selected delivery window."]),
+        "",
+        "We'll let you know when our team starts preparing your order.",
+        "For help, contact 3L: +971 58 594 3319.",
+        ...sign,
+      ].join("\n"),
+    };
   if (event === "ORDER_PRODUCTION_STARTED")
     return {
       subject: `Your 3L order ${reference} is now being prepared`,
@@ -145,6 +186,62 @@ export function recordCustomerEvent(
 ): CustomerNotification | null {
   const event = customerEventFor(order, from, to);
   if (!event) return null;
+  return recordEvent(s, order, event);
+}
+
+/** Off unless explicitly configured; invalid or incomplete activation fails closed. */
+export function customerPaidEmailSince(
+  env: NodeJS.ProcessEnv,
+): string | undefined {
+  if (env.CUSTOMER_ORDER_PAID_EMAIL_ENABLED !== "true") return undefined;
+  if (env.CUSTOMER_EMAIL_ENABLED !== "true")
+    throw new Error(
+      "Paid confirmation requires customer email delivery enabled",
+    );
+  const since = z.iso
+    .datetime({ offset: true })
+    .safeParse(env.CUSTOMER_ORDER_PAID_EMAIL_SINCE);
+  if (!since.success)
+    throw new Error("Paid confirmation requires a valid activation timestamp");
+  return new Date(since.data).toISOString();
+}
+
+/** Only called in the authoritative paid+confirmed transaction; no historical scan. */
+export function recordPaidCustomerConfirmation(
+  s: State,
+  order: Order,
+  payment: Payment,
+  since?: string,
+) {
+  const cutoff = since ? Date.parse(since) : NaN;
+  const created = order.audit[0]?.at;
+  if (
+    !Number.isFinite(cutoff) ||
+    order.state !== "Confirmed" ||
+    order.paymentId !== payment.id ||
+    payment.orderId !== order.id ||
+    payment.status !== "paid" ||
+    !payment.paidAt ||
+    !payment.lastReconciledAt ||
+    order.paidAt !== payment.paidAt ||
+    !created ||
+    ![created, payment.createdAt, payment.paidAt].every(
+      (at) => Number.isFinite(Date.parse(at)) && Date.parse(at) >= cutoff,
+    )
+  )
+    return null;
+  return recordEvent(s, order, "ORDER_PAID", {
+    paidAmountFils: payment.amountFils,
+    activationSince: since,
+  });
+}
+
+function recordEvent(
+  s: State,
+  order: Order,
+  event: CustomerEvent,
+  paid?: { paidAmountFils: number; activationSince?: string },
+): CustomerNotification | null {
   const key = `customer-event:${event}:${order.id}`;
   if (s.events[key]) return null;
   const recipient = order.customerDetails?.email;
@@ -165,7 +262,9 @@ export function recordCustomerEvent(
     ...renderCustomerEmail(event, order, {
       fallbackName: conversation?.customer,
       zoneName: zone?.name ?? order.quote?.zoneName ?? undefined,
+      paidAmountFils: paid?.paidAmountFils,
     }),
+    ...(paid ? { activationSince: paid.activationSince } : {}),
     status: "pending",
     attemptCount: 0,
     createdAt: new Date().toISOString(),
@@ -213,6 +312,7 @@ export async function dispatchCustomerNotifications(
   collection:
     | "customerNotifications"
     | "operationsEmailNotifications" = "customerNotifications",
+  paidActivationSince?: string,
 ) {
   if (!provider) return { attempted: 0, skipped: "no-email-provider" as const };
   let attempted = 0;
@@ -230,11 +330,25 @@ export async function dispatchCustomerNotifications(
         }
     });
   for (const pending of (store.read()[collection] ?? []).filter(
-    (n) => n.status === "pending",
+    (n) =>
+      n.status === "pending" &&
+      (n.event !== "ORDER_PAID" ||
+        collection !== "customerNotifications" ||
+        !!paidActivationSince),
   )) {
     const claimed = store.write((s) => {
       const row = s[collection]?.find((r) => r.id === pending.id);
       if (!row || row.status !== "pending") return null;
+      if (
+        collection === "customerNotifications" &&
+        row.event === "ORDER_PAID" &&
+        row.activationSince !== paidActivationSince
+      ) {
+        row.status = "failed";
+        row.deliveryOutcome = "failed";
+        row.lastError = "Expired activation window; not sent";
+        return null;
+      }
       row.status = "sending";
       row.attemptCount++;
       row.provider = provider.name;
@@ -254,15 +368,32 @@ export async function dispatchCustomerNotifications(
       store.write((s) => {
         const row = s[collection]!.find((r) => r.id === claimed.id)!;
         row.status = "sent";
+        if (
+          collection === "customerNotifications" &&
+          row.event === "ORDER_PAID"
+        )
+          row.deliveryOutcome = "accepted";
         row.sentAt = new Date().toISOString();
         row.providerMessageId = result.messageId;
         row.lastError = undefined;
       });
-    } catch {
+    } catch (error) {
       store.write((s) => {
         const row = s[collection]!.find((r) => r.id === claimed.id)!;
         row.status = "failed";
-        row.lastError = "Delivery failed; review before resending";
+        if (
+          collection === "customerNotifications" &&
+          row.event === "ORDER_PAID"
+        ) {
+          row.deliveryOutcome =
+            error instanceof ProviderFailure && error.certainty === "rejected"
+              ? "failed"
+              : "unknown";
+          row.lastError =
+            row.deliveryOutcome === "unknown"
+              ? "Provider outcome unknown; review before resending"
+              : "Provider rejected email; review before resending";
+        } else row.lastError = "Delivery failed; review before resending";
       });
     }
   }
@@ -284,6 +415,11 @@ export function recoverInterruptedCustomerNotifications(
       if (row.status === "sending") {
         row.status = "failed";
         row.lastError = "Interrupted while sending; review before resending";
+        if (
+          collection === "customerNotifications" &&
+          row.event === "ORDER_PAID"
+        )
+          row.deliveryOutcome = "unknown";
         recovered++;
       }
     return recovered;

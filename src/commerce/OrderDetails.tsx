@@ -790,7 +790,7 @@ export function OrderDeliveryCard({ order: o }: CardProps) {
 }
 
 export function OrderNotificationsCard({ order: o, data }: CardProps) {
-  const { t } = useOps();
+  const { t, formatDate } = useOps();
   const rows = orderNotifications(data, o);
   return (
     <Card
@@ -805,6 +805,16 @@ export function OrderNotificationsCard({ order: o, data }: CardProps) {
               <span>
                 <b>{t(n.channel)}</b>
                 <small className="oms-muted">{t(n.subject)}</small>
+                {n.lastAttemptAt && (
+                  <small className="oms-muted">
+                    {t("Last email attempt")}: {formatDate(n.lastAttemptAt)}
+                  </small>
+                )}
+                {n.providerMessageId && (
+                  <small className="oms-muted">
+                    {t("Provider message reference")}: {n.providerMessageId}
+                  </small>
+                )}
               </span>
               <span className="oms-badge" data-tone={n.status}>
                 {t(n.label)}

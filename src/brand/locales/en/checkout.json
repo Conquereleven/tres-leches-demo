@@ -184,5 +184,9 @@
   "pack_37bb19baa264e645": "Personalized packs are not enabled",
   "pack_1c2a4497f4a430a3": "Duplicate composition or maximum box quantity exceeded",
   "copy_13e45fb4a00a8d71": "Choose exactly one valid Tricolor color; fixed packs cannot be customized",
-  "copy_63b26b3134d6c013": "This product does not accept a color"
+  "copy_63b26b3134d6c013": "This product does not accept a color",
+  "copy_a8a6816560b8f9be": "Check your order",
+  "copy_6a2e56af2b18047a": "This browser cannot securely retrieve your previous checkout.",
+  "copy_c84fd96054e7ef3f": "This does not mean your payment failed. Please do not pay again to check its status.",
+  "copy_dbee70b175436c79": "If you received a confirmation email, keep it for your records. Otherwise, contact 3L so we can help check your order securely."
 }
