@@ -16,6 +16,7 @@ type CustomerHtmlInput = {
   pickup: boolean;
   zoneName?: string;
   items: CustomerEmailItem[];
+  paidTotal?: string;
 };
 
 const escapeHtml = (value: string) =>
@@ -38,33 +39,44 @@ export function renderCustomerEmailHtml(input: CustomerHtmlInput): string {
   const first = escapeHtml(input.first);
   const zone = input.zoneName ? escapeHtml(input.zoneName) : "";
 
+  const paid = event === "ORDER_PAID";
   const prepared = event === "ORDER_PRODUCTION_STARTED";
   const ready = event === "ORDER_READY_FOR_PICKUP";
-  const label = prepared
-    ? "PREPARING YOUR ORDER"
-    : ready
-      ? "READY FOR PICKUP"
-      : "OUT FOR DELIVERY";
-  const heading = prepared
-    ? "We're preparing your order."
-    : ready
-      ? "Your order is ready!"
-      : "Your order is on its way.";
-  const description = prepared
-    ? "Good news! Our team is preparing your order with care."
-    : ready
-      ? "Your treats are ready for pickup at our store."
-      : "Your 3L delivery is now on its way.";
-  const next = prepared
-    ? "We'll let you know as soon as it's ready."
-    : ready
-      ? "We look forward to seeing you."
-      : "We'll update you once your order has been delivered.";
-  const summary = prepared
-    ? "Your order is being prepared"
-    : ready
-      ? "Your order is ready for pickup"
-      : "Your order is on the way";
+  const label = paid
+    ? "ORDER CONFIRMED"
+    : prepared
+      ? "PREPARING YOUR ORDER"
+      : ready
+        ? "READY FOR PICKUP"
+        : "OUT FOR DELIVERY";
+  const heading = paid
+    ? "Your order is confirmed!"
+    : prepared
+      ? "We're preparing your order."
+      : ready
+        ? "Your order is ready!"
+        : "Your order is on its way.";
+  const description = paid
+    ? "Your payment has been verified and your order is confirmed."
+    : prepared
+      ? "Good news! Our team is preparing your order with care."
+      : ready
+        ? "Your treats are ready for pickup at our store."
+        : "Your 3L delivery is now on its way.";
+  const next = paid
+    ? "We will let you know when our team starts preparing your order."
+    : prepared
+      ? "We'll let you know as soon as it's ready."
+      : ready
+        ? "We look forward to seeing you."
+        : "We'll update you once your order has been delivered.";
+  const summary = paid
+    ? "Your payment is verified and your order is confirmed"
+    : prepared
+      ? "Your order is being prepared"
+      : ready
+        ? "Your order is ready for pickup"
+        : "Your order is on the way";
 
   const details: string[] = [
     '<tr><td style="padding:0 0 5px;font-size:12px;letter-spacing:1px;color:' +
@@ -90,7 +102,7 @@ export function renderCustomerEmailHtml(input: CustomerHtmlInput): string {
         "</td></tr>",
     );
   }
-  if (ready) {
+  if (ready || (paid && pickup)) {
     details.push(
       '<tr><td style="padding:0 0 5px;font-size:12px;letter-spacing:1px;color:' +
         secondary +
@@ -239,6 +251,15 @@ export function renderCustomerEmailHtml(input: CustomerHtmlInput): string {
     '<tr><td style="padding:24px 23px;">',
     '<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%;border-collapse:collapse;table-layout:fixed;">',
     details.join(""),
+    ...(paid && input.paidTotal
+      ? [
+          '<tr><td style="padding:12px 0;font-size:18px;font-weight:bold;color:' +
+            ink +
+            ';">Total paid: ' +
+            escapeHtml(input.paidTotal) +
+            "</td></tr>",
+        ]
+      : []),
     "</table></td></tr></table>",
     '<h2 style="margin:28px 0 10px;color:' +
       ink +
@@ -250,6 +271,12 @@ export function renderCustomerEmailHtml(input: CustomerHtmlInput): string {
       secondary +
       ';font-size:15px;line-height:1.6;">' +
       escapeHtml(next) +
+      (paid
+        ? "<br>For help, contact 3L: +971 58 594 3319." +
+          (!pickup
+            ? "<br>Please be available during your selected delivery window."
+            : "")
+        : "") +
       "</p>",
     "</td></tr>",
     '<tr><td style="padding:0;background:' +

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ProviderFailure } from "./failure";
 import type { CustomerEmailProvider } from "../domain/customer-notifications";
 const responseSchema = z.object({ id: z.string().min(1).max(200) });
 /**
@@ -45,7 +46,22 @@ export class ResendEmailProvider implements CustomerEmailProvider {
       signal: AbortSignal.timeout(10000),
     });
     // Never surface the provider body: it can echo the recipient address.
-    if (!response.ok) throw new Error(`Resend HTTP ${response.status}`);
+    if (!response.ok) {
+      const failure = new ProviderFailure(
+        response.status >= 400 &&
+          response.status < 500 &&
+          response.status !== 408 &&
+          response.status !== 409
+          ? "rejected"
+          : "unknown",
+        false,
+        undefined,
+        response.status,
+      );
+      // Preserve the existing safe status-only error contract for internal emails.
+      failure.message = `Resend HTTP ${response.status}`;
+      throw failure;
+    }
     return { messageId: responseSchema.parse(await response.json()).id };
   }
 }

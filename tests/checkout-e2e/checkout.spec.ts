@@ -226,7 +226,9 @@ test("confirmation comes from the server, never from the URL", async ({
       email: "uat@example.com",
     },
   });
-  expect((await paid.json()).paymentStatus).toBe("paid");
+  const paidResult = await paid.json();
+  expect(paidResult.paymentStatus).toBe("paid");
+  expect(paidResult.orderNumber).toMatch(/^#\d{3,}$/);
 
   await page.evaluate((k) => {
     sessionStorage.setItem("3l-checkout", JSON.stringify({ key: k }));
@@ -234,7 +236,9 @@ test("confirmation comes from the server, never from the URL", async ({
   await page.goto("/checkout/return");
   await expect(page.getByRole("heading", { name: "Thank you" })).toBeVisible();
   // The customer sees the short public number; the internal reference stays internal.
-  await expect(page.locator("main")).toContainText("#001");
+  // Browser projects share the disposable server; assert its allocated reference,
+  // not that this happens to be the first paid order in the database.
+  await expect(page.locator("main")).toContainText(paidResult.orderNumber);
   await expect(page.locator("main")).not.toContainText(orderId);
   await expect(page.locator("main")).toContainText("AED 50");
 });

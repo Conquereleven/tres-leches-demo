@@ -71,6 +71,7 @@ import {
 import { PaymenntProvider } from "./adapters/paymennt";
 import { operationsResendFromEnv, resendFromEnv } from "./adapters/resend";
 import {
+  customerPaidEmailSince,
   dispatchCustomerNotifications,
   recoverInterruptedCustomerNotifications,
 } from "./domain/customer-notifications";
@@ -258,6 +259,7 @@ export async function startServer(
   // Isolated tests may inject a fake; they never construct the real provider.
   const emailProvider =
     overrides.email ?? (isolatedTest ? null : resendFromEnv(process.env));
+  service.customerPaidEmailSince = customerPaidEmailSince(process.env);
   recoverInterruptedCustomerNotifications(store);
   const operationsEmail = isolatedTest
     ? null
@@ -1312,7 +1314,14 @@ export async function startServer(
             : [],
         }),
       )
-      .then(() => dispatchCustomerNotifications(store, emailProvider))
+      .then(() =>
+        dispatchCustomerNotifications(
+          store,
+          emailProvider,
+          "customerNotifications",
+          service.customerPaidEmailSince,
+        ),
+      )
       .then(() =>
         dispatchCustomerNotifications(
           store,

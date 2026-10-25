@@ -41,7 +41,10 @@ import {
 import { type GeoService, quoteOrder } from "./zones";
 import { recordPaidOperationsEmail } from "./operations-email";
 import { recordOrderPaid, applyOperationsReceipt } from "./notifications";
-import { recordCustomerEvent } from "./customer-notifications";
+import {
+  recordCustomerEvent,
+  recordPaidCustomerConfirmation,
+} from "./customer-notifications";
 import { assignPublicOrderNumber } from "./order-number";
 import { transition } from "./workflow";
 import { Store } from "../db/store";
@@ -121,6 +124,8 @@ export class CommerceService {
   /** Private configuration; absent until the manager's number is supplied. */
   operationsManagerPhone?: string;
   operationsEmailRecipients: string[] = [];
+  /** Explicit new-only customer paid-confirmation epoch; absent means disabled. */
+  customerPaidEmailSince?: string;
   /** Opt-in subset of Operations recipients; empty means original email for all. */
   operationsEmailCompactRecipients: string[] = [];
   /**
@@ -1135,6 +1140,7 @@ export class CommerceService {
           // branch runs once per payment (paidAt guard) and only when the
           // order was genuinely awaiting this payment; recordOrderPaid is
           // additionally idempotent per order.
+          recordPaidCustomerConfirmation(s, o, p, this.customerPaidEmailSince);
           recordPaidOperationsEmail(
             s,
             o,

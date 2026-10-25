@@ -787,5 +787,13 @@
   "Historical LIVE/TEST provenance is unverified. This report is not independently LIVE-certified.": "Hindi beripikado ang LIVE/TEST na pinagmulan ng mga lumang tala. Hindi independiyenteng sertipikadong LIVE ang ulat na ito.",
   "Unable to connect. Try again.": "Hindi makakonekta. Subukan muli.",
   "Request timed out. Refresh to check the latest status before retrying.": "Nag-time out ang request. I-refresh upang suriin ang pinakabagong status bago subukang muli.",
-  "Offline. Showing the last received data. Reconnect before changing orders.": "Offline. Ipinapakita ang huling natanggap na datos. Kumonekta muli bago baguhin ang mga order."
+  "Offline. Showing the last received data. Reconnect before changing orders.": "Offline. Ipinapakita ang huling natanggap na datos. Kumonekta muli bago baguhin ang mga order.",
+  "Payment confirmation": "Payment confirmation",
+  "Email outcome unknown — review": "Email outcome unknown — review",
+  "Email provider accepted — delivery unverified": "Email provider accepted — delivery unverified",
+  "Confirmation failed — review": "Confirmation failed — review",
+  "Sending confirmation": "Sending confirmation",
+  "Confirmation queued": "Confirmation queued",
+  "Last email attempt": "Last email attempt",
+  "Provider message reference": "Provider message reference"
 }

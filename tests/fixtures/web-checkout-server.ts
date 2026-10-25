@@ -198,4 +198,22 @@ if (process.env.COVERAGE_FIXTURE === "approved") {
 }
 process.env.DELIVERY_ADDRESS_MODE ??=
   process.env.COVERAGE_FIXTURE === "approved" ? "google" : "legacy";
-await startServer({ initial, payment: provider, geo });
+await startServer({
+  initial,
+  payment: provider,
+  geo,
+  ...(process.env.CUSTOMER_PAID_EMAIL_FIXTURE === "true"
+    ? {
+        email: {
+          name: "fake-resend",
+          async send(email: { idempotencyKey: string }) {
+            process.send?.({
+              type: "customer-email-accepted",
+              eventId: email.idempotencyKey,
+            });
+            return { messageId: "fixture-provider-accepted" };
+          },
+        },
+      }
+    : {}),
+});
