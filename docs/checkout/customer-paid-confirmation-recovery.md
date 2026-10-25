@@ -60,7 +60,7 @@ Existing valid capabilities retain normal server-authoritative reconciliation an
 
 ## Rollback
 
-Disable only `CUSTOMER_ORDER_PAID_EMAIL_ENABLED`; keep existing progress/internal email configuration intact. New paid-confirmation creation/dispatch stops while the safe return-page fallback remains useful. Preserve outbox/event markers and provider references. Never restore a Production SQLite backup to undo email code, delete event identities or replay payments. If reverting code is necessary, retain paid rows and review compatibility before re-enabling. Use a new activation epoch when reactivating to exclude previous pending rows.
+Disable only `CUSTOMER_ORDER_PAID_EMAIL_ENABLED`; keep existing progress/internal email configuration intact. New paid-confirmation creation/dispatch stops while the safe return-page fallback remains useful. Preserve outbox/event markers and provider references. Never restore a Production SQLite backup to undo email code, delete event identities or replay payments. If a binary rollback to code predating this feature is necessary, that old dispatcher does not understand the new paid-event flag. Before downgrading, separately authorize temporarily setting CUSTOMER_EMAIL_ENABLED=false so old code cannot drain new paid rows; this also pauses customer progress emails. Keep OPERATIONS_EMAIL_ENABLED and internal recipients unchanged. Retain all rows, upgrade again to code with event-aware dispatch, then review the pending epochs before re-enabling customer delivery. Use a new activation epoch when reactivating to exclude previous pending rows.
 
 ## Production acceptance checklist
 
