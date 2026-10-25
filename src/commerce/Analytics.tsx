@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  trendBuckets,
+  categoryRanking,
+  periodComparisons,
+  type Granularity,
+} from "./analytics-presentation";
+import { ReportPanel, Distribution } from "./ReportingPrimitives";
+import "./operations-experience-v2.css";
+import { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import {
   ChartLine,
   Receipt,
@@ -44,6 +52,7 @@ export function AnalyticsWorkspace() {
   const [to, setTo] = useState(
     () => new URLSearchParams(location.search).get("to") ?? today,
   );
+  const [granularity, setGranularity] = useState<Granularity>("day");
   const [session, setSession] = useState<Session | null>(null),
     [report, setReport] = useState<AnalyticsReport | null>(null),
     [busy, setBusy] = useState(true),
@@ -104,9 +113,40 @@ export function AnalyticsWorkspace() {
       controller.current?.abort();
     };
   }, [load]); // filters are submitted explicitly
+  const trend = useMemo(
+    () => (report ? trendBuckets(report.current.daily, granularity) : []),
+    [report, granularity],
+  );
+  const categories = useMemo(
+    () => (report ? categoryRanking(report.current.products) : []),
+    [report],
+  );
+  const peak = Math.max(1, ...trend.map((d) => d.capturedFils));
+  const dirty =
+    report && (report.range.from !== from || report.range.to !== to);
   if (auth) return <Login onLogin={() => load(from, to)} />;
   const body = (
-    <section className="analytics" aria-label={t("Financial reporting")}>
+    <section className="analytics ops-v2" aria-label={t("Financial reporting")}>
+      <header className="ops-v2-intro">
+        <div>
+          <p className="ops-kicker">{t("REPORTING WORKSPACE")}</p>
+          <h2>{t("Understand the numbers. Plan the day.")}</h2>
+          <p>
+            {t("Historical payments, accepted products and current operations")}
+          </p>
+        </div>
+      </header>
+      <nav className="ops-v2-nav" aria-label={t("Report sections")}>
+        {[
+          ["an-sales", "Sales intelligence"],
+          ["an-products", "Product intelligence"],
+          ["an-operations", "Operational intelligence"],
+        ].map(([id, label]) => (
+          <a key={id} href={`#${id}`}>
+            {t(label!)}
+          </a>
+        ))}
+      </nav>
       <div className="an-disclaimer">
         <WarningCircle size={22} aria-hidden="true" />
         <div>
@@ -174,6 +214,13 @@ export function AnalyticsWorkspace() {
         </button>
         <small>{t("Asia/Dubai · up to 366 days")}</small>
       </form>
+      {dirty && !busy && (
+        <p role="status" className="an-warning">
+          {t(
+            "Date changes are not applied. Charts and exports still use the displayed report period.",
+          )}
+        </p>
+      )}
       {busy && <p role="status">{t("Loading financial reports…")}</p>}
       {error && (
         <div role="alert" className="an-warning">
@@ -197,7 +244,7 @@ export function AnalyticsWorkspace() {
               · {t("Updated")} {formatDate(report.generatedAt)}
             </span>
           </div>
-          <div className="an-kpis">
+          <div id="an-sales" className="an-kpis">
             {[
               [
                 "Confirmed captured volume",
@@ -241,6 +288,29 @@ export function AnalyticsWorkspace() {
             · {t("Previous captured volume")}:{" "}
             {money(report.previous.capturedFils)}
           </p>
+          <dl
+            className="ops-v2-comparisons"
+            aria-label={t("Period comparisons")}
+          >
+            {periodComparisons(report).map((row) => (
+              <div key={row.label}>
+                <dt>{t(row.label)}</dt>
+                <dd>
+                  {row.change === null
+                    ? t("No comparison baseline")
+                    : `${row.change > 0 ? "+" : ""}${row.change}%`}
+                </dd>
+                <dt>
+                  {t("Previous period")}:{" "}
+                  {row.previous === null
+                    ? t("Unavailable")
+                    : row.monetary
+                      ? money(row.previous)
+                      : row.previous}
+                </dt>
+              </div>
+            ))}
+          </dl>
           {!report.current.paidOrders && (
             <div className="an-empty">
               <Receipt size={32} />
@@ -260,18 +330,40 @@ export function AnalyticsWorkspace() {
               </div>
               <Export report={report} kind="sales" />
             </div>
+            <label className="ops-v2-granularity">
+              {t("Trend grouping")}
+              <select
+                value={granularity}
+                onChange={(e) => setGranularity(e.target.value as Granularity)}
+              >
+                {[
+                  ["day", "Daily"],
+                  ["week", "Weekly"],
+                  ["month", "Monthly"],
+                ].map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {t(label!)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="ops-v2-note">
+              {t(
+                "Boundary buckets include only selected dates. CSV retains exact daily rows for the same period.",
+              )}
+            </p>
             <div
               className="an-chart"
               role="img"
               aria-label={t(
-                "Daily captured payment trend. Exact values follow in the table.",
+                "Captured payment trend. Exact values follow in the table.",
               )}
             >
-              {report.current.daily.map((d) => (
+              {trend.map((d) => (
                 <div key={d.day} title={`${d.day}: ${money(d.capturedFils)}`}>
                   <span
                     style={{
-                      height: `${Math.max(2, (d.capturedFils / Math.max(1, ...report.current.daily.map((x) => x.capturedFils))) * 100)}%`,
+                      height: `${(d.capturedFils / peak) * 100}%`,
                     }}
                   />
                 </div>
@@ -284,7 +376,13 @@ export function AnalyticsWorkspace() {
               aria-label={t("Daily report table")}
             >
               <table>
-                <caption>{t("Daily totals in AED")}</caption>
+                <caption>
+                  {t(
+                    granularity === "day"
+                      ? "Daily totals in AED"
+                      : "Aggregated totals in AED",
+                  )}
+                </caption>
                 <thead>
                   <tr>
                     <th>{t("Dubai date")}</th>
@@ -293,7 +391,7 @@ export function AnalyticsWorkspace() {
                   </tr>
                 </thead>
                 <tbody>
-                  {report.current.daily.map((d) => (
+                  {trend.map((d) => (
                     <tr key={d.day}>
                       <th scope="row">{formatDate(d.day, false)}</th>
                       <td>{d.paidOrders}</td>
@@ -304,6 +402,56 @@ export function AnalyticsWorkspace() {
               </table>
             </div>
           </article>
+          <ReportPanel
+            title={t("Product intelligence")}
+            subtitle={t(
+              "Historical category ranking · accepted allocations only",
+            )}
+            id="an-products"
+          >
+            {categories.length ? (
+              <>
+                <Distribution
+                  label={t("Historical category ranking")}
+                  rows={categories.map((c) => ({
+                    label: c.category ?? t("Unclassified"),
+                    count: c.amountFils,
+                    valueLabel: money(c.amountFils),
+                  }))}
+                />
+                <div
+                  className="an-table-scroll"
+                  tabIndex={0}
+                  role="region"
+                  aria-label={t("Category allocations")}
+                >
+                  <table>
+                    <caption>
+                      {t("Category totals reconcile to allocated products")}
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th>{t("Historical category")}</th>
+                        <th>{t("Units / boxes")}</th>
+                        <th>{t("Allocated amount")}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {categories.map((c) => (
+                        <tr key={c.category ?? "unclassified"}>
+                          <th scope="row">{c.category ?? t("Unclassified")}</th>
+                          <td>{c.units}</td>
+                          <td>{money(c.amountFils)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            ) : (
+              <p>{t("No allocatable historical product snapshots.")}</p>
+            )}
+          </ReportPanel>
           <article className="an-panel">
             <div className="an-title">
               <div>
@@ -376,6 +524,14 @@ export function AnalyticsWorkspace() {
               </span>
             </div>
           </article>
+          <div id="an-operations">
+            <h2>{t("Operational intelligence")}</h2>
+            <p className="ops-v2-note">
+              {t(
+                "Current paid-cohort states · not historical workload or preparation duration",
+              )}
+            </p>
+          </div>
           <div className="an-breakdowns">
             {(
               [
@@ -396,7 +552,14 @@ export function AnalyticsWorkspace() {
                         : "Current state of orders confirmed paid during the period.",
                   )}
                 </p>
-                <dl>
+                <Distribution
+                  label={t(String(title))}
+                  rows={Object.entries(entries).map(([label, count]) => ({
+                    label: t(label),
+                    count,
+                  }))}
+                />
+                <dl className="ops-v2-breakdown-values">
                   {Object.entries(entries).map(([label, count]) => (
                     <div key={label}>
                       <dt>{t(label)}</dt>

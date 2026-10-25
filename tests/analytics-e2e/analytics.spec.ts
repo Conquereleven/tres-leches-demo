@@ -138,7 +138,9 @@ test("filters, empty period, custom validation, unavailable baseline, session ex
     page.getByText("No eligible paid orders in this period", { exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("No comparison baseline", { exact: true }),
+    page
+      .locator(".an-comparison")
+      .getByText("No comparison baseline", { exact: true }),
   ).toBeVisible();
   await page.getByLabel("From", { exact: true }).fill("2026-10-20");
   await page.getByRole("button", { name: "Apply dates" }).click();
