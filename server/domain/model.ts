@@ -213,6 +213,7 @@ export type OperationsNotification = {
   lastError?: string;
 };
 export const customerEvents = [
+  "ORDER_PAID",
   "ORDER_PRODUCTION_STARTED",
   "ORDER_READY_FOR_PICKUP",
   "ORDER_OUT_FOR_DELIVERY",
@@ -240,6 +241,10 @@ export type CustomerNotification = {
    * while no provider is configured). sending: claimed by a dispatcher.
    */
   status: "pending" | "sending" | "sent" | "failed";
+  /** New paid-confirmation outcomes; legacy/internal status semantics stay unchanged. */
+  deliveryOutcome?: "accepted" | "failed" | "unknown";
+  /** Activation epoch frozen when the new paid-confirmation event was recorded. */
+  activationSince?: string;
   attemptCount: number;
   createdAt: string;
   /** Which provider handled the last attempt; absent until one is tried. */

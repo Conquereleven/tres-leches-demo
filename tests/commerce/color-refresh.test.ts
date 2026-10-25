@@ -50,6 +50,11 @@ test("public colour refresh preserves geometry, typography, motion and media CSS
       const placeholderOverride = ".brand-experience :is(.b-full-menu, .b-product-page) .b-official-photo.b-family-photo img { object-fit: contain; }";
       assert.equal(current.split(placeholderOverride).length, 2);
       current = current.replace(placeholderOverride, "");
+      // Technical media closure: only the loading state reserves a viewport.
+      // Its removal here preserves the geometry guard for every loaded surface.
+      const loadingReservation = '.b-full-menu[data-catalog-status="loading"] {\n  min-height: 100svh;\n}';
+      assert.equal(current.split(loadingReservation).length, 2);
+      current = current.replace(loadingReservation, "");
     } else if (f === "src/brand/checkout.css") {
       // PR #61 removes the Conchas-only contain exception: photo fit is shared.
       assert.ok(!current.includes(".b-co-thumb-contained"), "Conchas-only photo-fit override must be absent");

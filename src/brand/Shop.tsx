@@ -1,3 +1,4 @@
+import { checkoutCapability } from "./checkout-capability";
 import { useLiveCatalog } from "./live-catalog";
 const formatAed = (n: number) => (Number.isFinite(n) ? formatPrice(n) : "—");
 import { PackBuilder, CompositionDetails, packComplete } from "./PackBuilder";
@@ -241,9 +242,12 @@ async function post<T>(
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok)
-    throw new Error(
-      friendly(data.message ?? data.error) ??
-        "Something went wrong. Please try again.",
+    throw Object.assign(
+      new Error(
+        friendly(data.message ?? data.error) ??
+          "Something went wrong. Please try again.",
+      ),
+      { status: res.status },
     );
   return data as T;
 }
@@ -373,7 +377,14 @@ function Thumb({ productId, name }: { productId: string; name: string }) {
       </span>
     );
   if (tricolorSpec(productId))
-    return <img className={thumbClass} src="/brand/icon.png" alt="" style={{ objectFit: "contain" }} />;
+    return (
+      <img
+        className={thumbClass}
+        src="/brand/icon.png"
+        alt=""
+        style={{ objectFit: "contain" }}
+      />
+    );
   return image ? (
     <img
       className={thumbClass}
@@ -2508,6 +2519,7 @@ export function CheckoutReturn() {
 
   const [result, setResult] = useState<Status | null>(null);
   const [error, setError] = useState("");
+  const [sessionUnavailable, setSessionUnavailable] = useState(false);
   const [revision, setRevision] = useState(0);
   useEffect(() => {
     let active = true;
@@ -2515,13 +2527,19 @@ export function CheckoutReturn() {
     let attempts = 0;
     async function poll() {
       try {
-        const saved = JSON.parse(sessionStorage.getItem(CAPABILITY) ?? "null");
-        if (!saved?.key)
-          throw Error(
-            "We can't find a checkout in this browser. If you placed an order, please contact us.",
-          );
+        // Storage can be unavailable or malformed. Neither proves a failed payment.
+        let key: string | null = null;
+        try {
+          key = checkoutCapability(sessionStorage);
+        } catch {
+          /* storage access denied */
+        }
+        if (!key) {
+          if (active) setSessionUnavailable(true);
+          return;
+        }
         const data = await post<Status>("/api/checkout/reconcile", {
-          key: saved.key,
+          key,
         });
         if (!active) return;
         setResult(data);
@@ -2550,6 +2568,16 @@ export function CheckoutReturn() {
         )
           timer = setTimeout(poll, 4000);
       } catch (e) {
+        if (
+          active &&
+          e &&
+          typeof e === "object" &&
+          "status" in e &&
+          [400, 401, 403, 404, 410].includes(Number(e.status))
+        ) {
+          setSessionUnavailable(true);
+          return;
+        }
         if (active)
           setError(
             e instanceof Error ? e.message : "Unable to check your payment.",
@@ -2562,6 +2590,39 @@ export function CheckoutReturn() {
       clearTimeout(timer);
     };
   }, [revision]);
+
+  if (sessionUnavailable)
+    return (
+      <ShopShell step={3} title={localize("Check your order")} bare>
+        <div className="b-co-status">
+          <h1>
+            <CustomerCopy>Check your order</CustomerCopy>
+          </h1>
+          <div role="status" aria-live="polite">
+            <p>
+              <CustomerCopy>
+                This browser cannot securely retrieve your previous checkout.
+              </CustomerCopy>
+            </p>
+            <p>
+              <CustomerCopy>
+                This does not mean your payment failed. Please do not pay again
+                to check its status.
+              </CustomerCopy>
+            </p>
+            <p>
+              <CustomerCopy>
+                If you received a confirmation email, keep it for your records.
+                Otherwise, contact 3L so we can help check your order securely.
+              </CustomerCopy>
+            </p>
+          </div>
+          <div className="b-shop-actions">
+            <SupportLink />
+          </div>
+        </div>
+      </ShopShell>
+    );
 
   const state = result ? paymentStateOf(result) : null;
   if (result && state === "PAID") return <Confirmation result={result} />;

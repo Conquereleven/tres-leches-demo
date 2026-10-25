@@ -1,3 +1,4 @@
+import { paidEmailLabel } from "./customer-email-status";
 import { Login } from "./Login";
 import { AnalyticsWorkspace } from "./Analytics";
 import { lineKey, preparationText } from "../../shared/pack-composition";
@@ -1600,6 +1601,7 @@ function boardOrders(data: Data, view: string) {
 }
 
 const EMAIL_EVENT: Record<string, string> = {
+  ORDER_PAID: "Payment confirmation",
   ORDER_PRODUCTION_STARTED: "En producción",
   ORDER_READY_FOR_PICKUP: "Listo para pickup",
   ORDER_OUT_FOR_DELIVERY: "En camino",
@@ -1665,17 +1667,19 @@ function OrderNotifications({ order, data }: { order: Order; data: Data }) {
           <b>
             {t("Email al cliente ·")} {t(EMAIL_EVENT[n.event] ?? n.event)}
           </b>{" "}
-          {n.status === "sent"
-            ? t("Enviado")
-            : n.status === "failed"
-              ? n.lastError?.startsWith("Expired")
-                ? t("No enviado · caducó")
-                : t("Falló · revisar")
-              : n.status === "sending"
-                ? t("Enviando")
-                : data.customerEmailProvider
-                  ? t("Pendiente")
-                  : t("Pendiente · proveedor de email no configurado")}
+          {n.event === "ORDER_PAID"
+            ? t(paidEmailLabel(n))
+            : n.status === "sent"
+              ? t("Enviado")
+              : n.status === "failed"
+                ? n.lastError?.startsWith("Expired")
+                  ? t("No enviado · caducó")
+                  : t("Falló · revisar")
+                : n.status === "sending"
+                  ? t("Enviando")
+                  : data.customerEmailProvider
+                    ? t("Pendiente")
+                    : t("Pendiente · proveedor de email no configurado")}
         </li>
       ))}
     </ul>
