@@ -840,5 +840,14 @@
   "Category allocations": "Category allocations",
   "Category totals reconcile to allocated products": "Category totals reconcile to allocated products",
   "Current paid-cohort states · not historical workload or preparation duration": "Current paid-cohort states · not historical workload or preparation duration",
-  "Asia/Dubai": "Asia/Dubai"
+  "Asia/Dubai": "Asia/Dubai",
+  "New delivery area": "New delivery area",
+  "Create area": "Create area",
+  "Cancel new area": "Cancel new area",
+  "Only administrators can create delivery areas": "Only administrators can create delivery areas",
+  "Invalid delivery area ID": "Invalid delivery area ID",
+  "A new delivery area must start at version zero": "A new delivery area must start at version zero",
+  "Confirm the approved minimum before creating an area": "Confirm the approved minimum before creating an area",
+  "Delivery area names must contain letters or numbers": "Delivery area names must contain letters or numbers",
+  "A delivery area with this ID, name or alias already exists": "A delivery area with this ID, name or alias already exists"
 }

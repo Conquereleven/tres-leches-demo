@@ -18,6 +18,14 @@ export const normalizeAreaQuery = (value: string) =>
 const SEARCH_HINTS: Record<string, string[]> = {
   jlt: ["jumeirah lakes towers", "jumeirah lake towers"],
 };
+// Spelling hints only, scoped to an already configured matching name/alias.
+// These never add a zone, establish coverage, or count as an exact selection.
+const BLUEWATERS_LABELS = [
+  "bluewaters",
+  "bluewaters island",
+  "blue waters",
+  "blue waters island",
+];
 function distance(a: string, b: string, limit: number) {
   if (Math.abs(a.length - b.length) > limit) return limit + 1;
   let previous = Array.from({ length: b.length + 1 }, (_, i) => i);
@@ -93,6 +101,11 @@ export function searchAreas<T extends SearchableArea>(
       ...Object.entries(SEARCH_HINTS).flatMap(([key, hints]) =>
         name.split(" ").includes(key) ? hints : [],
       ),
+      ...([area.name, ...(area.aliases ?? [])].some((label) =>
+        BLUEWATERS_LABELS.includes(normalizeAreaQuery(label)),
+      )
+        ? BLUEWATERS_LABELS
+        : []),
     ];
     let best: number | null = null;
     labels.forEach((label, index) => {

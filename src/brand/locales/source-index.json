@@ -1075,5 +1075,8 @@
   "Check your order": "checkout:copy_a8a6816560b8f9be",
   "This browser cannot securely retrieve your previous checkout.": "checkout:copy_6a2e56af2b18047a",
   "This does not mean your payment failed. Please do not pay again to check its status.": "checkout:copy_c84fd96054e7ef3f",
-  "If you received a confirmation email, keep it for your records. Otherwise, contact 3L so we can help check your order securely.": "checkout:copy_dbee70b175436c79"
+  "If you received a confirmation email, keep it for your records. Otherwise, contact 3L so we can help check your order securely.": "checkout:copy_dbee70b175436c79",
+  "We couldn't find that area. Try another spelling or contact us.": "checkout:area_2597bbfb29a1c90d",
+  "Try another spelling, contact 3L or choose pickup.": "checkout:area_f357162bd9f2af66",
+  "Online delivery is not currently available for the selected area.": "checkout:area_bff98afc04fe097b"
 }
