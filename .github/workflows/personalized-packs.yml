@@ -11,6 +11,7 @@ on:
       - "tests/commerce/**"
       - "tests/checkout-e2e/**"
       - "tests/packs-e2e/**"
+      - "tests/conversion-e2e/**"
       - "tests/email-e2e/**"
       - "tests/premium-e2e/**"
       - "tests/tricolor-e2e/**"
@@ -19,6 +20,7 @@ on:
       - "tests/fixtures/**"
       - "scripts/preview-*.ts"
       - "playwright.packs.config.ts"
+      - "playwright.conversion.config.ts"
       - "playwright.checkout.config.ts"
       - "playwright.email.config.ts"
       - "playwright.premium.config.ts"
@@ -60,7 +62,11 @@ jobs:
       - run: npx playwright test --config=playwright.checkout.config.ts --browser=chromium
       - run: npx playwright test --config=playwright.checkout.config.ts --browser=webkit
       - run: npx playwright test --config=playwright.product-hub.config.ts
-      - run: npx playwright test --config=playwright.storefront-dynamic.config.ts
+      # Each browser gets a fresh fixture and rate-limit window. The combined
+      # 50-test run can exceed the fixture's 300-request/minute API guard.
+      - run: npx playwright test --config=playwright.storefront-dynamic.config.ts --project=chromium
+      - run: npx playwright test --config=playwright.storefront-dynamic.config.ts --project=webkit
+      - run: npx playwright test --config=playwright.conversion.config.ts
       - if: failure()
         name: Synthetic browser failure context
         run: |

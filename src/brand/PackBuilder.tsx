@@ -11,7 +11,8 @@ import {
   type PackSnapshot,
   validPackSnapshot,
 } from "../../shared/pack-composition";
-import { packCopy } from "../../shared/pack-copy";
+import { fillPackRemaining } from "../../shared/pack-builder-ux";
+import { packCopy, packCopyNumber } from "../../shared/pack-copy";
 import { useLanguage } from "./localization";
 import type { CheckoutConfig } from "./cart";
 
@@ -87,6 +88,8 @@ export function PackBuilder({
     }
   }
   const selected = value.reduce((n, c) => n + c.units, 0);
+  const remaining = Math.max(0, spec.capacity - selected);
+  const complete = packComplete(productId, value, config);
   const change = (componentSkuId: string, units: number) =>
     onChange(
       normalizeComposition([
@@ -96,7 +99,28 @@ export function PackBuilder({
     );
   return (
     <fieldset className="b-pack-builder" aria-describedby={`${id}-status`}>
-      <legend>{copy.choose}</legend>
+      <legend>{copy.buildHeading}</legend>
+      <p className="b-pack-instruction">
+        {packCopyNumber(copy.instruction, spec.capacity)}
+      </p>
+      <div className="b-pack-progress">
+        <p id={`${id}-status`} role="status" aria-live="polite">
+          <strong>
+            <bdi>
+              {selected} / {spec.capacity}
+            </bdi>{" "}
+            {copy.selected}
+          </strong>
+          <span>
+            {complete ? copy.ready : packCopyNumber(copy.remaining, remaining)}
+          </span>
+        </p>
+        <progress
+          aria-label={copy.progress}
+          value={Math.min(selected, spec.capacity)}
+          max={spec.capacity}
+        />
+      </div>
       {!allowed.length && <p role="status">{copy.unavailable}</p>}
       {spec.components
         .filter(
@@ -161,6 +185,25 @@ export function PackBuilder({
                   +
                 </button>
               </div>
+              {enabled && remaining > 0 && (
+                <button
+                  type="button"
+                  className="b-pack-fill"
+                  aria-label={`${copy.fillRemaining}: ${label}`}
+                  onClick={() =>
+                    onChange(
+                      fillPackRemaining(
+                        value,
+                        c.componentSkuId,
+                        spec.capacity,
+                        allowed,
+                      ),
+                    )
+                  }
+                >
+                  {copy.fillRemaining}
+                </button>
+              )}
             </div>
           );
         })}
@@ -184,12 +227,6 @@ export function PackBuilder({
             <p role="alert">{copy.unavailable}</p>
           )}
         </div>
-      )}
-      <p id={`${id}-status`} role="status" aria-live="polite">
-        {selected} / {spec.capacity} {copy.selected}
-      </p>
-      {!packComplete(productId, value, config) && (
-        <p className="b-caption">{copy.incomplete}</p>
       )}
     </fieldset>
   );

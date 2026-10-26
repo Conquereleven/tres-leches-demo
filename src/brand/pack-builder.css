@@ -46,3 +46,50 @@
   appearance: none;
   margin: 0;
 }
+
+/* Composition is per box; the adjacent quantity control counts boxes only. */
+.brand-experience .b-pack-instruction {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.brand-experience .b-pack-progress {
+  margin-block: 1rem;
+}
+.brand-experience .b-pack-progress p {
+  display: grid;
+  gap: 0.3rem;
+  margin-block-end: 0.6rem;
+}
+.brand-experience .b-pack-progress progress {
+  display: block;
+  inline-size: 100%;
+  block-size: 0.6rem;
+  accent-color: var(--v2-raspberry);
+}
+.brand-experience .b-pack-flavor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.4rem 0.75rem;
+  padding-block: 0.6rem;
+  border-block-end: 1px solid var(--v2-blush);
+}
+.brand-experience .b-pack-fill {
+  grid-column: 1 / -1;
+  justify-self: start;
+  min-block-size: 44px;
+  border: 1px solid var(--v2-raspberry);
+  background: var(--v2-white);
+  color: var(--v2-raspberry);
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+}
+.brand-experience .b-pack-fill:focus-visible {
+  outline: 2px solid var(--v2-graphite);
+  outline-offset: 3px;
+}
+.brand-experience .b-box-label {
+  font-weight: 600;
+  margin-block: 1rem 0.4rem;
+}

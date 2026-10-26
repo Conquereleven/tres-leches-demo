@@ -8,7 +8,8 @@ import {
   type Composition,
   type PackSnapshot,
 } from "../../shared/pack-composition";
-import { packCopy } from "../../shared/pack-copy";
+import { ComplementarySuggestions } from "./CatalogDiscovery";
+import { packCopy, packCopyNumber } from "../../shared/pack-copy";
 import {
   TRICOLOR_COLORS,
   isTricolorColor,
@@ -756,7 +757,16 @@ export function AddToCart({
           onChange={setComposition}
         />
       )}
-      <div className="b-qty" role="group" aria-label={localize("Quantity")}>
+      {custom && (
+        <p className="b-box-label">{packCopy(language).numberBoxes}</p>
+      )}
+      <div
+        className="b-qty"
+        role="group"
+        aria-label={
+          custom ? packCopy(language).numberBoxes : localize("Quantity")
+        }
+      >
         <button
           type="button"
           aria-label={localize("Decrease quantity")}
@@ -768,7 +778,7 @@ export function AddToCart({
         <QuantityInput
           value={quantity}
           max={Math.max(1, MAX_QTY - inCart)}
-          label="Quantity"
+          label={custom ? packCopy(language).numberBoxes : "Quantity"}
           onChange={setQuantity}
         />
         <button
@@ -788,6 +798,12 @@ export function AddToCart({
           (custom && !packComplete(productId, composition, config!))
         }
         onClick={() => {
+          if (
+            quantity < 1 ||
+            quantity + inCart > MAX_QTY ||
+            (custom && !packComplete(productId, composition, config!))
+          )
+            return;
           cart.add(
             productId,
             quantity,
@@ -798,21 +814,38 @@ export function AddToCart({
           setQuantity(1);
         }}
       >
-        <CustomerCopy>ADD TO CART ·</CustomerCopy>{" "}
-        <CustomerCopy>
-          {formatAed(
-            displayLinePrice(
-              {
-                productId,
-                quantity,
-                composition: custom ? composition : undefined,
-              },
-              product.priceFils,
-              config?.packPricing,
-            ) * quantity,
-          )}
-        </CustomerCopy>
+        {custom && !packComplete(productId, composition, config!) ? (
+          packCopyNumber(
+            composition.reduce((n, c) => n + c.units, 0) >=
+              packSpec(productId)!.capacity
+              ? packCopy(language).reviewSelection
+              : packCopy(language).remainingCta,
+            Math.max(
+              0,
+              packSpec(productId)!.capacity -
+                composition.reduce((n, c) => n + c.units, 0),
+            ),
+          )
+        ) : (
+          <>
+            <CustomerCopy>ADD TO CART ·</CustomerCopy>{" "}
+            <CustomerCopy>
+              {formatAed(
+                displayLinePrice(
+                  {
+                    productId,
+                    quantity,
+                    composition: custom ? composition : undefined,
+                  },
+                  product.priceFils,
+                  config?.packPricing,
+                ) * quantity,
+              )}
+            </CustomerCopy>
+          </>
+        )}
       </Button>
+      {added && <ComplementarySuggestions contextSku={productId} afterAdd />}
       {(added || inCart > 0) && (
         <a className="b-link" href="/cart" aria-live="polite">
           {inCart} <CustomerCopy>in your cart · View cart</CustomerCopy>
