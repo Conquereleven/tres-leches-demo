@@ -202,3 +202,130 @@ test("Google authoritative resolution cannot be bypassed by typing a recognized 
     f.store.close();
   }
 });
+
+test("admin area creation is audited, durable-idempotent and leaves all other state intact", () => {
+  const f = fixture();
+  try {
+    const before = f.store.read();
+    const cmd = {
+      type: "createZone",
+      zone: {
+        ...blue,
+        id: "new-fixture-island",
+        name: "New Fixture Island",
+        aliases: ["New Fixture"],
+        version: 0,
+        minOrderAed: 50,
+      },
+    };
+    const actor = { id: "fixture-admin", role: "admin" as const };
+    const first = f.service.command(cmd, "fixture-new-area", actor);
+    assert.deepEqual(
+      f.service.command(cmd, "fixture-new-area", actor),
+      JSON.parse(JSON.stringify(first)),
+    );
+    const after = f.store.read();
+    assert.equal(after.zones.length, before.zones.length + 1);
+    assert.equal(after.zones.at(-1)?.minOrderAed, 50);
+    assert.equal(after.zones.at(-1)?.version, 1);
+    assert.equal(after.audit.length, before.audit.length + 1);
+    const {
+      zones: _beforeZones,
+      audit: _beforeAudit,
+      commands: _beforeCommands,
+      ...beforeRest
+    } = before;
+    const {
+      zones: _afterZones,
+      audit: _afterAudit,
+      commands: _afterCommands,
+      ...afterRest
+    } = after;
+    assert.deepEqual(afterRest, beforeRest);
+    assert.deepEqual(after.zones.slice(0, -1), before.zones);
+  } finally {
+    f.store.close();
+  }
+});
+
+test("area creation cannot overwrite concurrent ids or steal existing names/aliases", () => {
+  const f = fixture();
+  try {
+    for (const zone of [
+      { ...blue, version: 0 },
+      {
+        ...blue,
+        id: "other-fixture",
+        version: 0,
+        name: "New Fixture",
+        aliases: ["Dubai Marina"],
+      },
+      {
+        ...blue,
+        id: "other-fixture",
+        version: 0,
+        name: "  INACTIVE ",
+        aliases: [],
+      },
+      {
+        ...blue,
+        id: "other-fixture",
+        version: 0,
+        name: "BLUEWATERS ISLAND",
+        aliases: [],
+      },
+    ]) {
+      const before = f.store.read();
+      assert.throws(
+        () =>
+          f.service.command({ type: "createZone", zone }, "fixture-collision", {
+            id: "admin",
+            role: "admin",
+          }),
+        /already exists/,
+      );
+      assert.deepEqual(f.store.read(), before);
+    }
+  } finally {
+    f.store.close();
+  }
+});
+
+test("new zones require approved minimum, zero fees, new identity and admin role", () => {
+  const f = fixture();
+  try {
+    const zone = {
+      ...blue,
+      id: "new-fixture",
+      name: "New Fixture",
+      aliases: [],
+      version: 0,
+    };
+    for (const patch of [
+      { minOrderAed: null },
+      { deliveryFeeAed: 5, freeDelivery: false },
+      { version: 2 },
+      { id: "../../zone" },
+      { name: "   " },
+    ])
+      assert.throws(() =>
+        f.service.command(
+          { type: "createZone", zone: { ...zone, ...patch } },
+          "fixture-invalid",
+          { id: "admin", role: "admin" },
+        ),
+      );
+    for (const role of ["manager", "agent", "operator"] as const)
+      assert.throws(
+        () =>
+          f.service.command({ type: "createZone", zone }, "fixture-role-test", {
+            id: role,
+            role,
+          }),
+        /Only administrators/,
+      );
+    assert.ok(!f.store.read().zones.some((z) => z.id === zone.id));
+  } finally {
+    f.store.close();
+  }
+});

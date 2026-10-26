@@ -63,6 +63,7 @@ export function AreaField({
   }, [selected, noMatch, localize]);
   const choose = (area: DeliveryAreaOption) => {
     setText(area.name);
+    setActive(areas.findIndex((option) => option.id === area.id));
     setOpen(false);
     onChange(area.id);
   };
@@ -93,15 +94,27 @@ export function AreaField({
         }
         aria-describedby={`${id}-status`}
         value={text}
-        onFocus={() => setOpen(true)}
+        onFocus={() => {
+          setActive(
+            Math.max(
+              0,
+              areas.findIndex((area) => area.id === value),
+            ),
+          );
+          setOpen(true);
+        }}
         onBlur={() => setOpen(false)}
         onChange={(event) => {
           const next = event.target.value;
           setText(next);
-          setActive(0);
           setOpen(true);
           // An exact name or alias selects itself; anything else is unchosen.
           const exact = exactArea(areas, next);
+          // Once its canonical label is shown, options contains the full list.
+          // Enter must keep that exact selection rather than jump to row zero.
+          setActive(
+            exact ? areas.findIndex((area) => area.id === exact.id) : 0,
+          );
           onChange(exact?.id ?? "");
         }}
         onKeyDown={(event) => {

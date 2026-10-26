@@ -183,6 +183,38 @@ test("keyboard selection never submits and blur preserves the canonical choice",
   expect(writes).toEqual([]);
 });
 
+test("Enter after an exact alias or refocus cannot replace Bluewaters with the first zone", async ({
+  page,
+}) => {
+  await open(page);
+  const area = page.getByRole("combobox", {
+    name: "Delivery area",
+    exact: true,
+  });
+  await area.fill("Blue Waters");
+  // Canonicalization exposes the full approved list; its active row must still
+  // identify the selected zone (not the first JLT cluster).
+  await expect(area).toHaveValue("Bluewaters Island");
+  await expect(area).toHaveAttribute(
+    "aria-activedescendant",
+    new RegExp(zoneId + "$"),
+  );
+  await area.press("Enter");
+  await expect(area).toHaveValue("Bluewaters Island");
+  await area.press("Tab");
+  await area.focus();
+  await expect(area).toHaveAttribute(
+    "aria-activedescendant",
+    new RegExp(zoneId + "$"),
+  );
+  await area.press("Enter");
+  await expect(area).toHaveValue("Bluewaters Island");
+  const draft = await page.evaluate(() =>
+    JSON.parse(sessionStorage.getItem("3l-checkout-draft")!),
+  );
+  expect(draft.delivery.zoneId).toBe(zoneId);
+});
+
 test("minimum comes from backend and unmet minimum blocks; empty search never selects", async ({
   page,
 }) => {
@@ -417,4 +449,78 @@ test("no-match retains a useful support link and pickup can recover without area
     page.getByRole("button", { name: "CONTINUE TO DETAILS", exact: true }),
   ).toBeEnabled();
   expect(writes).toEqual([]);
+});
+
+test("admin creates one explicit approved rule through commands; cancel and missing minimum write nothing", async ({
+  page,
+  request,
+}, info) => {
+  const before = await (await request.get("/api/workspace")).json();
+  const commands: unknown[] = [];
+  page.on("request", (r) => {
+    if (r.method() === "POST" && new URL(r.url()).pathname === "/api/commands")
+      commands.push(r.postDataJSON());
+  });
+  await page.goto("/operations/zones");
+  await page
+    .getByRole("button", { name: "New delivery area", exact: true })
+    .click();
+  await page
+    .locator(".co-zone-editor")
+    .getByLabel("Name", { exact: true })
+    .fill("Cancelled Fixture");
+  await page
+    .getByRole("button", { name: "Cancel new area", exact: true })
+    .click();
+  expect(commands).toEqual([]);
+  await page
+    .getByRole("button", { name: "New delivery area", exact: true })
+    .click();
+  const editor = page.locator(".co-zone-editor");
+  await editor
+    .getByLabel("Name", { exact: true })
+    .fill(`Synthetic Island ${info.project.name}`);
+  await page.getByRole("button", { name: "Create area", exact: true }).click();
+  expect(commands).toEqual([]);
+  await editor.getByLabel("Minimum AED", { exact: true }).fill("50");
+  await expect(
+    editor.getByRole("checkbox", { name: "Active area", exact: true }),
+  ).not.toBeChecked();
+  await editor
+    .getByRole("checkbox", { name: "Active area", exact: true })
+    .check();
+  await editor
+    .getByLabel("Aliases · one per line", { exact: true })
+    .fill(`Synthetic Alternate ${info.project.name}`);
+  const saved = page.waitForResponse(
+    (r) => r.url().endsWith("/api/commands") && r.request().method() === "POST",
+  );
+  await page.getByRole("button", { name: "Create area", exact: true }).click();
+  expect((await saved).status()).toBe(200);
+  await expect(
+    page.getByRole("button", { name: "Save rule", exact: true }),
+  ).toBeVisible();
+  expect(commands).toHaveLength(1);
+  const after = await (await request.get("/api/workspace")).json();
+  expect(after.orders).toEqual(before.orders);
+  expect(after.payments).toEqual(before.payments);
+  expect(after.catalog).toEqual(before.catalog);
+  const created = after.zones.find(
+    (z: { name: string }) => z.name === `Synthetic Island ${info.project.name}`,
+  );
+  expect(created.minOrderAed).toBe(50);
+  expect(created.deliveryFeeAed).toBe(0);
+  expect(created.freeDelivery).toBe(true);
+  expect(created.active).toBe(true);
+  expect(
+    after.zones.filter((z: { id: string }) => z.id !== created.id),
+  ).toEqual(before.zones);
+  const cfg = await (await request.get("/api/checkout/config")).json();
+  expect(
+    cfg.zones.find((z: { id: string }) => z.id === created.id).minOrderAed,
+  ).toBe(50);
+  await page
+    .getByLabel("Search areas", { exact: true })
+    .fill(`Synthetic Island ${info.project.name}`);
+  await screenshot(page, "admin-created", info.project.name);
 });
