@@ -188,5 +188,8 @@
   "copy_a8a6816560b8f9be": "Consulta tu pedido",
   "copy_6a2e56af2b18047a": "Este navegador no puede recuperar de forma segura tu proceso de pago anterior.",
   "copy_c84fd96054e7ef3f": "Esto no significa que tu pago haya fallado. No vuelvas a pagar para consultar su estado.",
-  "copy_dbee70b175436c79": "Si recibiste un correo de confirmación, consérvalo. Si no, contacta a 3L para que podamos ayudarte a verificar tu pedido de forma segura."
+  "copy_dbee70b175436c79": "Si recibiste un correo de confirmación, consérvalo. Si no, contacta a 3L para que podamos ayudarte a verificar tu pedido de forma segura.",
+  "area_2597bbfb29a1c90d": "No encontramos esa zona. Prueba otra forma de escribirla o contáctanos.",
+  "area_f357162bd9f2af66": "Prueba otra forma de escribirla, contacta a 3L o elige recoger tu pedido.",
+  "area_bff98afc04fe097b": "La entrega online no está disponible actualmente para la zona seleccionada."
 }

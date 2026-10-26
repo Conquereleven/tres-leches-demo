@@ -1,0 +1,51 @@
+name: Delivery area recognition
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "shared/area-search.ts"
+      - "src/brand/AreaField.tsx"
+      - "src/brand/Shop.tsx"
+      - "src/brand/locales/**"
+      - "server/domain/*area*"
+      - "server/domain/zones.ts"
+      - "tests/delivery-area-e2e/**"
+      - "tests/fixtures/delivery-areas.ts"
+      - "tests/fixtures/web-checkout-server.ts"
+      - "playwright.delivery-area.config.ts"
+      - ".github/workflows/delivery-area-regression.yml"
+permissions:
+  contents: read
+concurrency:
+  group: delivery-area-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  delivery-area-browsers:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      options: --user 1001
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.23.1"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright test --config=playwright.delivery-area.config.ts
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: delivery-area-synthetic-qa
+          path: |
+            work/qa/delivery-area/
+            test-results/delivery-area/
+          retention-days: 7
+          if-no-files-found: ignore
+      # Disposable SQLite, synthetic addresses and fake provider only; no secrets/deploy.

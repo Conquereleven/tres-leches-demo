@@ -37,15 +37,17 @@ test("cart → delivery → details → review → payment step", async ({
   await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
 
   await expect(page).toHaveURL(/\/checkout$/);
-  // Typing an area we do not serve offers no suggestion and blocks checkout.
+  // No search match is not evidence of geographic non-coverage.
   await page
     .getByRole("combobox", { name: "Delivery area", exact: true })
     .fill("Sharjah");
   await expect(
-    page.getByText("We don't currently deliver to this area."),
+    page.getByText(
+      "We couldn't find that area. Try another spelling or contact us.",
+    ),
   ).toBeVisible();
   await expect(
-    page.getByText("Online delivery isn't available for your area yet."),
+    page.getByText("Try another spelling, contact 3L or choose pickup."),
   ).toBeVisible();
   await expect(
     page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
