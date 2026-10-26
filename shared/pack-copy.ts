@@ -1,69 +1,5 @@
-export const packCopy = (lang: string) =>
-  ({
-    en: {
-      base: "Base price",
-      premiums: "Premium charges",
-      final: "Price per box",
-      perPiece: "per piece",
-      premiumNote: "Charged individually within your box. No extra pieces.",
-      choose: "Choose your flavors",
-      selected: "pieces selected",
-      incomplete: "Select exactly the pack capacity to continue.",
-      unavailable:
-        "Pack flavors are not currently available. Please review your selection.",
-      edit: "Edit flavors",
-      save: "Save composition",
-      perBox: "Per box",
-      eligibility: "Pack flavor eligibility",
-      approval:
-        "Enable only flavors confirmed for production. Save a private draft, then review and publish.",
-      draft: "Save pack eligibility draft",
-      disabled: "Not enabled for customer ordering",
-      boxes: "boxes",
-    },
-    es: {
-      base: "Precio base",
-      premiums: "Recargos premium",
-      final: "Precio por caja",
-      perPiece: "por pieza",
-      premiumNote:
-        "Se cobra por pieza dentro de tu caja. No incluye piezas adicionales.",
-      choose: "Elige tus sabores",
-      selected: "piezas seleccionadas",
-      incomplete: "Selecciona exactamente las piezas del pack para continuar.",
-      unavailable:
-        "Los sabores del pack no están disponibles. Revisa tu selección.",
-      edit: "Editar sabores",
-      save: "Guardar composición",
-      perBox: "Por caja",
-      eligibility: "Disponibilidad de sabores para packs",
-      approval:
-        "Habilita solo sabores confirmados para producción. Guarda un borrador privado, revisa y publica.",
-      draft: "Guardar borrador de disponibilidad",
-      disabled: "No habilitado para pedidos",
-      boxes: "cajas",
-    },
-    ar: {
-      base: "السعر الأساسي",
-      premiums: "إضافات النكهات المميزة",
-      final: "السعر لكل علبة",
-      perPiece: "لكل قطعة",
-      premiumNote: "تُحسب كل قطعة ضمن علبتك. دون قطع إضافية.",
-      choose: "اختر النكهات",
-      selected: "قطع مختارة",
-      incomplete: "اختر العدد المحدد من القطع للمتابعة.",
-      unavailable: "نكهات العبوة غير متاحة حالياً. يرجى مراجعة اختيارك.",
-      edit: "تعديل النكهات",
-      save: "حفظ التشكيلة",
-      perBox: "لكل علبة",
-      eligibility: "توفر نكهات العبوات",
-      approval:
-        "فعّل فقط النكهات المؤكدة للإنتاج. احفظ مسودة خاصة ثم راجعها وانشرها.",
-      draft: "حفظ مسودة التوفر",
-      disabled: "غير مفعّل للطلبات",
-      boxes: "علب",
-    },
-  })[lang as "en" | "es" | "ar"] ?? {
+const copies = {
+  en: {
     base: "Base price",
     premiums: "Premium charges",
     final: "Price per box",
@@ -83,4 +19,81 @@ export const packCopy = (lang: string) =>
     draft: "Save pack eligibility draft",
     disabled: "Not enabled for customer ordering",
     boxes: "boxes",
-  };
+    buildHeading: "Build your box",
+    instruction:
+      "Choose all {0} pieces for each box. Mix flavors or fill it with one.",
+    progress: "Box composition",
+    remaining: "Pieces remaining: {0}",
+    remainingCta: "Choose {0} more to finish your box",
+    ready: "Your box is ready",
+    fillRemaining: "Fill remaining with this flavor",
+    numberBoxes: "Number of boxes",
+    reviewSelection: "Review your selection",
+  },
+  es: {
+    base: "Precio base",
+    premiums: "Recargos premium",
+    final: "Precio por caja",
+    perPiece: "por pieza",
+    premiumNote:
+      "Se cobra por pieza dentro de tu caja. No incluye piezas adicionales.",
+    choose: "Elige tus sabores",
+    selected: "piezas seleccionadas",
+    incomplete: "Selecciona exactamente las piezas del pack para continuar.",
+    unavailable:
+      "Los sabores del pack no están disponibles. Revisa tu selección.",
+    edit: "Editar sabores",
+    save: "Guardar composición",
+    perBox: "Por caja",
+    eligibility: "Disponibilidad de sabores para packs",
+    approval:
+      "Habilita solo sabores confirmados para producción. Guarda un borrador privado, revisa y publica.",
+    draft: "Guardar borrador de disponibilidad",
+    disabled: "No habilitado para pedidos",
+    boxes: "cajas",
+    buildHeading: "Arma tu caja",
+    instruction:
+      "Elige las {0} piezas de cada caja. Combina sabores o elige uno para todas.",
+    progress: "Composición de la caja",
+    remaining: "Piezas por elegir: {0}",
+    remainingCta: "Elige {0} más para completar tu caja",
+    ready: "Tu caja está lista",
+    fillRemaining: "Completar con este sabor",
+    numberBoxes: "Número de cajas",
+    reviewSelection: "Revisa tu selección",
+  },
+  ar: {
+    base: "السعر الأساسي",
+    premiums: "إضافات النكهات المميزة",
+    final: "السعر لكل علبة",
+    perPiece: "لكل قطعة",
+    premiumNote: "تُحسب كل قطعة ضمن علبتك. دون قطع إضافية.",
+    choose: "اختر النكهات",
+    selected: "قطع مختارة",
+    incomplete: "اختر العدد المحدد من القطع للمتابعة.",
+    unavailable: "نكهات العبوة غير متاحة حالياً. يرجى مراجعة اختيارك.",
+    edit: "تعديل النكهات",
+    save: "حفظ التشكيلة",
+    perBox: "لكل علبة",
+    eligibility: "توفر نكهات العبوات",
+    approval:
+      "فعّل فقط النكهات المؤكدة للإنتاج. احفظ مسودة خاصة ثم راجعها وانشرها.",
+    draft: "حفظ مسودة التوفر",
+    disabled: "غير مفعّل للطلبات",
+    boxes: "علب",
+    buildHeading: "شكّل علبتك",
+    instruction:
+      "اختر جميع القطع وعددها {0} لكل علبة. امزج النكهات أو اختر نكهة واحدة.",
+    progress: "تشكيلة العلبة",
+    remaining: "القطع المتبقية: {0}",
+    remainingCta: "اختر {0} قطع إضافية لإكمال علبتك",
+    ready: "علبتك جاهزة",
+    fillRemaining: "أكمل العدد المتبقي بهذه النكهة",
+    numberBoxes: "عدد العلب",
+    reviewSelection: "راجع اختيارك",
+  },
+} as const;
+export const packCopy = (lang: string) =>
+  copies[lang as keyof typeof copies] ?? copies.en;
+export const packCopyNumber = (template: string, n: number) =>
+  template.replace("{0}", String(n));

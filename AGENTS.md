@@ -180,3 +180,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 ## Media technical closure (25 October 2026, founder)
 - The current Tricolor pack photo and whole-cake photos for Special Flavours Cake Jars Matcha/Chocolate/Berries are explicit temporary non-blocking commercial exceptions. Preserve their assignments; do not claim they are corrected or extend the exception to Tricolor single.
 - Menu viewport reservation is loading-state-only. Keep loaded card/detail/cart/checkout geometry and static-gallery behavior unchanged. The offline Media Quality Gate never grants commercial approval or publishes catalog data; metadata corrections remain proposals until separately authorized.
+
+## Storefront Conversion UX V2 (26 October 2026)
+- The customer pack builder requires all 6 or 12 approved components before Add to Cart. Its explicit fill-remaining control preserves existing selections; box quantity is independent of piece composition. Existing server eligibility, premiums and frozen-cart identity remain authoritative.
+- Product search reads the current published Product Hub catalog intersected with checkout availability and prices. It must never offer retired, unavailable, unpublished or mismatched-price SKUs. Search vocabulary may add localized synonyms, never a parallel product or price catalog.
+- Complementary suggestions are optional after a successful Add to Cart. Curate families in `src/brand/recommendation-rules.json`; resolve current SKUs, availability, photos and prices from published sources. Complex packs must open the existing builder. Never add without an explicit customer action or block the cart/checkout path.
+- Preserve EN/ES/AR and RTL. The local conversion fixture uses disposable SQLite and fake providers; its screenshots and QA are in `docs/storefront/conversion-v2/`.

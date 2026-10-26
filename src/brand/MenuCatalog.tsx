@@ -1,3 +1,4 @@
+import { ProductSearch } from "./CatalogDiscovery";
 import { packSpec } from "../../shared/pack-composition";
 import { packCopy } from "../../shared/pack-copy";
 import { useLanguage as useCustomerLanguage } from "./localization";
@@ -36,7 +37,16 @@ export function ProductOptions({
   const menu = useMenu();
   const family = menuProductFamily(menu, product),
     labelId = useId();
-  const [sku, setSku] = useState(family.options[0]!.id);
+  const [sku, setSku] = useState(() => {
+    const requested =
+      typeof location === "undefined"
+        ? null
+        : new URLSearchParams(location.search).get("sku");
+    return (
+      family.options.find((o) => o.id === requested)?.id ??
+      family.options[0]!.id
+    );
+  });
   const { config, loading, retry } = useCheckoutConfig();
   const now = useCheckoutNow(config);
   const options = family.options.filter((o) => availableSku(o.id, now));
@@ -249,6 +259,7 @@ export function MenuCatalog() {
           {" "}
           <CustomerCopy>THE 3L MENU</CustomerCopy>{" "}
         </p>
+        <ProductSearch />
         <div role="status">
           <p>
             <CustomerCopy>
@@ -329,6 +340,7 @@ export function MenuCatalog() {
         {" "}
         <CustomerCopy>FIND YOUR FAVOURITE.</CustomerCopy>{" "}
       </h2>
+      <ProductSearch />
       <nav
         className="b-menu-categories"
         aria-label={localize("Menu categories")}
