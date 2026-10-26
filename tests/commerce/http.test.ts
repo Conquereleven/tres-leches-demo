@@ -134,6 +134,33 @@ test("production sandbox requires login and enforces agent role server-side", as
       body: JSON.stringify({ type: "updateZone", zone: data.zones[0] }),
     });
     assert.equal(r.status, 403);
+    // Creation uses the same authenticated command boundary, not a public
+    // configuration endpoint or an operator-owned catalog write.
+    const create = JSON.stringify({
+      type: "createZone",
+      zone: {
+        ...(data.zones[0] as Record<string, unknown>),
+        id: "fixture-new-area",
+        name: "Fixture New Area",
+        aliases: [],
+        minOrderAed: 50,
+        deliveryFeeAed: 0,
+        freeDelivery: true,
+        version: 0,
+      },
+    });
+    for (const authorized of [false, true]) {
+      r = await fetch(f.base + "/api/commands", {
+        method: "POST",
+        headers: {
+          Origin: f.base,
+          ...(authorized ? { Cookie: cookie } : {}),
+          "Idempotency-Key": randomUUID(),
+        },
+        body: create,
+      });
+      assert.equal(r.status, authorized ? 403 : 401);
+    }
   } finally {
     await stop(f.child, f.dir);
   }

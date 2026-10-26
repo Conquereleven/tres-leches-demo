@@ -1361,15 +1361,14 @@ export function CheckoutPage() {
                       value={delivery.zoneId ?? ""}
                       disabled={config.addressVerificationRequired}
                       onChange={(zoneId) => set("zoneId", zoneId)}
-                      onUnsupported={setAreaMissing}
+                      onNoMatch={setAreaMissing}
                     />
                   </div>
                   {areaMissing && (
                     <div className="b-shop-notice" role="status">
                       <p>
                         <CustomerCopy>
-                          Online delivery isn't available for your area yet. Our
-                          team can still help you on WhatsApp.
+                          Try another spelling, contact 3L or choose pickup.
                         </CustomerCopy>
                       </p>
                       <WhatsAppCTA
@@ -1394,7 +1393,7 @@ export function CheckoutPage() {
                             {quote.minimumMet === false &&
                             quote.minOrderAed != null
                               ? `The minimum order for ${quote.zoneName ?? "this area"} is ${formatAed(minFils)}. Add ${formatAed(Math.max(0, minFils - quote.subtotalFils))} more to continue.`
-                              : "Online delivery isn't available for this area yet."}
+                              : "Online delivery is not currently available for the selected area."}
                           </CustomerCopy>{" "}
                           {quote.minimumMet === false && (
                             <a className="b-link" href="/cart">

@@ -1231,11 +1231,33 @@ function Zones({ data, run }: { data: Data; run: Run }) {
   const { t } = useOps();
   const [search, setSearch] = useState(""),
     [id, setId] = useState("jvc");
-  const zone = data.zones.find((z) => z.id === id) ?? data.zones[0];
+  const [newZone, setNewZone] = useState<DeliveryZone | null>(null);
+  const zone = newZone ?? data.zones.find((z) => z.id === id) ?? data.zones[0];
   return (
     <section className="co-zones">
       <aside>
         <h2>{t("Zonas de entrega")}</h2>
+        {data.actor.role === "admin" && (
+          <button
+            type="button"
+            disabled={!!newZone}
+            onClick={() =>
+              setNewZone({
+                id: crypto.randomUUID(),
+                name: "",
+                aliases: [],
+                minOrderAed: null,
+                deliveryFeeAed: 0,
+                freeDelivery: true,
+                active: false,
+                priority: 10,
+                version: 0,
+              })
+            }
+          >
+            {t("New delivery area")}
+          </button>
+        )}
         <p>
           {t("Tabla aprobada ·")} {data.zones.length}{" "}
           {t("reglas de mínimo. Sin cargos de entrega.")}
@@ -1255,7 +1277,10 @@ function Zones({ data, run }: { data: Data; run: Run }) {
               <button
                 key={z.id}
                 className={z.id === id ? "selected" : ""}
-                onClick={() => setId(z.id)}
+                onClick={() => {
+                  setNewZone(null);
+                  setId(z.id);
+                }}
               >
                 <span>{z.name}</span>
                 <b>
@@ -1277,6 +1302,12 @@ function Zones({ data, run }: { data: Data; run: Run }) {
           zone={zone}
           disabled={data.actor.role !== "admin"}
           run={run}
+          creating={!!newZone}
+          onCreated={(createdId) => {
+            setId(createdId);
+            setNewZone(null);
+          }}
+          onCancel={() => setNewZone(null)}
         />
       ) : (
         <p className="co-empty">{t("No delivery areas configured")}</p>
@@ -1288,10 +1319,16 @@ function ZoneEditor({
   zone,
   disabled,
   run,
+  creating = false,
+  onCreated,
+  onCancel,
 }: {
   zone: DeliveryZone;
   disabled: boolean;
   run: Run;
+  creating?: boolean;
+  onCreated?: (id: string) => void;
+  onCancel?: () => void;
 }) {
   const { t, errorText } = useOps();
   const [draft, setDraft] = useState(zone),
@@ -1299,18 +1336,21 @@ function ZoneEditor({
       zone.polygon ? JSON.stringify(zone.polygon) : "",
     ),
     [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
   return (
     <form
       className="co-zone-editor"
       onSubmit={(e) => {
         e.preventDefault();
+        if (saving) return;
         try {
           const parsed: unknown = polygon.trim()
             ? JSON.parse(polygon)
             : undefined;
           setError("");
+          setSaving(true);
           void run({
-            type: "updateZone",
+            type: creating ? "createZone" : "updateZone",
             zone: {
               ...draft,
               deliveryFeeAed: 0,
@@ -1318,7 +1358,11 @@ function ZoneEditor({
               aliases: draft.aliases.map((a) => a.trim()).filter(Boolean),
               polygon: parsed,
             },
-          });
+          })
+            .then((ok) => {
+              if (ok && creating) onCreated?.(draft.id);
+            })
+            .finally(() => setSaving(false));
         } catch {
           setError(
             "Polígono inválido: usa una lista JSON de coordenadas lat/lng.",
@@ -1327,7 +1371,7 @@ function ZoneEditor({
       }}
     >
       <p className="eyebrow">{t("REGLA CONFIGURABLE")}</p>
-      <h2>{zone.name}</h2>
+      <h2>{creating ? t("New delivery area") : zone.name}</h2>
       {zone.minOrderAed == null && (
         <p className="ops-rule-warning">
           {t(
@@ -1335,7 +1379,7 @@ function ZoneEditor({
           )}
         </p>
       )}
-      <fieldset className="co-fieldset" disabled={disabled}>
+      <fieldset className="co-fieldset" disabled={disabled || saving}>
         <label>
           {t("Nombre")}
           <input
@@ -1358,6 +1402,7 @@ function ZoneEditor({
             {t("Mínimo AED")}
             <input
               type="number"
+              required={creating}
               min="0"
               step="0.01"
               value={draft.minOrderAed ?? ""}
@@ -1436,8 +1481,13 @@ function ZoneEditor({
         </details>
         {error && <p role="alert">{errorText(error)}</p>}
         <button className="primary" type="submit">
-          {t("Guardar regla")}
+          {t(creating ? "Create area" : "Guardar regla")}
         </button>
+        {creating && (
+          <button type="button" onClick={onCancel}>
+            {t("Cancel new area")}
+          </button>
+        )}
       </fieldset>
     </form>
   );

@@ -54,6 +54,7 @@ export const commandSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("resendPayment"), ...base }),
   z.object({ type: z.literal("transition"), ...base, state: z.enum(states) }),
   z.object({ type: z.literal("updateZone"), zone: zoneSchema }),
+  z.object({ type: z.literal("createZone"), zone: zoneSchema }),
   z.object({ type: z.literal("retryJob"), id: z.string() }),
 ]);
 export type Command = z.infer<typeof commandSchema>;

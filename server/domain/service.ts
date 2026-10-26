@@ -39,6 +39,7 @@ import {
   paymentEventSchema,
 } from "./commands";
 import { type GeoService, quoteOrder } from "./zones";
+import { normalizeAreaName } from "./delivery-areas";
 import { recordPaidOperationsEmail } from "./operations-email";
 import { recordOrderPaid, applyOperationsReceipt } from "./notifications";
 import {
@@ -251,6 +252,65 @@ export class CommerceService {
     });
   }
   private apply(s: State, cmd: Command, actor: Actor): unknown {
+    if (cmd.type === "createZone") {
+      requireThat(
+        actor.role === "admin",
+        "Only administrators can create delivery areas",
+        403,
+      );
+      requireThat(
+        /^[a-z0-9][a-z0-9-]{0,99}$/.test(cmd.zone.id),
+        "Invalid delivery area ID",
+        422,
+      );
+      requireThat(
+        cmd.zone.version === 0,
+        "A new delivery area must start at version zero",
+        422,
+      );
+      requireThat(
+        cmd.zone.minOrderAed !== null,
+        "Confirm the approved minimum before creating an area",
+        422,
+      );
+      requireThat(
+        cmd.zone.deliveryFeeAed === 0 && cmd.zone.freeDelivery,
+        "Delivery has no separate charge; edit only the area minimum",
+        422,
+      );
+      const zone = {
+        ...cmd.zone,
+        name: cmd.zone.name.trim(),
+        aliases: [
+          ...new Set(cmd.zone.aliases.map((a) => a.trim()).filter(Boolean)),
+        ],
+        version: 1,
+      };
+      const labels = [zone.name, ...zone.aliases].map(normalizeAreaName);
+      requireThat(
+        labels.every(Boolean),
+        "Delivery area names must contain letters or numbers",
+        422,
+      );
+      requireThat(
+        !s.zones.some(
+          (existing) =>
+            existing.id === zone.id ||
+            [existing.name, ...existing.aliases].some((label) =>
+              labels.includes(normalizeAreaName(label)),
+            ),
+        ),
+        "A delivery area with this ID, name or alias already exists",
+        409,
+      );
+      s.zones.push(zone);
+      s.audit.push({
+        ...at(),
+        actor: actor.id,
+        action: `Delivery area ${zone.id} created: ${JSON.stringify(zone)}`,
+      });
+      return zone;
+    }
     if (cmd.type === "updateZone") {
       requireThat(
         actor.role === "admin",
