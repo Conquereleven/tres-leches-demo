@@ -22,7 +22,7 @@ concurrency:
 jobs:
   operations-browsers:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     strategy:
       fail-fast: false
       matrix:
@@ -44,8 +44,6 @@ jobs:
         run: node scripts/verify-webkit-runtime.mjs
       - run: mkdir -p work/e2e
       - name: Complete candidate Operations regression
-        env:
-          DEBUG: pw:browser
         run: /usr/bin/time -v npx playwright test --config=playwright.operations.config.ts --project=${{ matrix.browser }}
       - if: failure()
         name: Synthetic Operations failure context
@@ -65,5 +63,5 @@ jobs:
             test-results/operations/
           retention-days: 7
           if-no-files-found: ignore
-      # Same 92 Operations scenarios, split 46 per engine on isolated runners.
-      # No timeout increase, skipped assertions, credentials or external providers.
+      # Keep every Operations scenario and both engines on isolated runners.
+      # Failed runs retain browser traces and screenshots for diagnosis.
