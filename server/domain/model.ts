@@ -390,6 +390,8 @@ export type State = {
       cartHash?: string;
       supersededAt?: string;
       replacements?: Record<string, string>;
+      /** One durable successor for hosted retries, shared by concurrent tabs/workers. */
+      recoveryKey?: string;
     }
   >;
   ai?: import("../agents/model").AgentData;

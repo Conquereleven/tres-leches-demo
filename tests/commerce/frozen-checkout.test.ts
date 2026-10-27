@@ -362,8 +362,12 @@ test("expired same cart creates fresh priced replacement, never reuses expired U
   try {
     const key = randomUUID();
     await createWebCheckout(f.service, f.input(), key, "web", origin);
+    payload(f).status = "EXPIRED";
+    await f.service.reconcile(f.store.read().payments[0]!.id, {
+      id: "fixture-admin",
+      role: "admin",
+    });
     f.store.write((s) => {
-      s.payments[0]!.status = "expired";
       s.catalog![0]!.priceFils = 4200;
     });
     const next = resumeWebCheckout(f.service, { key, checkout: f.input() });

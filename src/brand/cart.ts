@@ -2,6 +2,7 @@ import {
   calculatePackPrice,
   type PackPricingPolicy,
 } from "../../shared/pack-pricing";
+import { clearCheckoutDraft } from "./checkout-storage";
 import { useLiveCatalog } from "./live-catalog";
 import {
   commerceLineSchema,
@@ -160,11 +161,7 @@ export const cart = {
   },
   clear() {
     commit([]);
-    try {
-      sessionStorage.removeItem("3l-checkout-draft");
-    } catch {
-      /* Storage optional. Paid order capability remains available. */
-    }
+    clearCheckoutDraft();
   },
 };
 

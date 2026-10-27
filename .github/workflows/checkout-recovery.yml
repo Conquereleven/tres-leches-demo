@@ -1,0 +1,51 @@
+name: Checkout recovery
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/brand/**"
+      - "server/domain/**"
+      - "server/http.ts"
+      - "shared/**"
+      - "tests/checkout-e2e/**"
+      - "tests/fixtures/**"
+      - "playwright.checkout.config.ts"
+      - "playwright.incident.config.ts"
+      - "package*.json"
+      - ".github/workflows/checkout-recovery.yml"
+permissions:
+  contents: read
+concurrency:
+  group: checkout-recovery-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  checkout-recovery-browsers:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      options: --user 1001
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.23.1"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright test --config=playwright.incident.config.ts
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: checkout-recovery-synthetic-qa
+          path: |
+            work/recovery/
+            work/incident/
+            test-results/incident/
+          retention-days: 7
+          if-no-files-found: ignore
+      # Disposable SQLite and fake providers; no merchant secrets or deployment.

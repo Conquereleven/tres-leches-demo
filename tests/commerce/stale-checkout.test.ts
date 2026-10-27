@@ -94,6 +94,13 @@ for (const [price, oldQty, nextQty, oldAmount, nextAmount] of [
         "https://fixture.invalid",
       );
       const input = f.input(nextQty);
+      assert.throws(
+        () => resumeWebCheckout(f.service, { key, checkout: input }),
+        /previous payment must be verified/,
+      );
+      f.checkouts.get(f.store.read().payments[0]!.providerCheckoutId!)!.status =
+        "EXPIRED";
+      await reconcileEmbeddedPayment(f.service, key);
       const replacement = resumeWebCheckout(f.service, {
         key,
         checkout: input,
@@ -128,7 +135,7 @@ for (const [price, oldQty, nextQty, oldAmount, nextAmount] of [
       const previousPayment = f.store
         .read()
         .payments.find((p) => p.orderId === old.orderId)!;
-      assert.equal(previousPayment.status, "pending");
+      assert.equal(previousPayment.status, "expired");
       assert.ok(previousPayment.supersededAt);
       assert.ok(
         f.store
@@ -291,6 +298,13 @@ for (const change of ["product", "variant", "fulfillment"] as const)
         input.lines.push({ productId: "sku-b", quantity: 1 });
       if (change === "fulfillment")
         input.delivery.building = "Different Fixture Tower";
+      assert.throws(
+        () => resumeWebCheckout(f.service, { key, checkout: input }),
+        /previous payment must be verified/,
+      );
+      f.checkouts.get(f.store.read().payments[0]!.providerCheckoutId!)!.status =
+        "EXPIRED";
+      await reconcileEmbeddedPayment(f.service, key);
       const replacement = resumeWebCheckout(f.service, {
         key,
         checkout: input,
@@ -322,6 +336,9 @@ test("late authoritative payment for superseded order stays on the original orde
       "web",
       "https://fixture.invalid",
     );
+    f.checkouts.get(f.store.read().payments[0]!.providerCheckoutId!)!.status =
+      "EXPIRED";
+    await reconcileEmbeddedPayment(f.service, key);
     const replacement = resumeWebCheckout(f.service, {
       key,
       checkout: f.input(3),

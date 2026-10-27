@@ -191,5 +191,8 @@
   "copy_dbee70b175436c79": "Si recibiste un correo de confirmación, consérvalo. Si no, contacta a 3L para que podamos ayudarte a verificar tu pedido de forma segura.",
   "area_2597bbfb29a1c90d": "No encontramos esa zona. Prueba otra forma de escribirla o contáctanos.",
   "area_f357162bd9f2af66": "Prueba otra forma de escribirla, contacta a 3L o elige recoger tu pedido.",
-  "area_bff98afc04fe097b": "La entrega online no está disponible actualmente para la zona seleccionada."
+  "area_bff98afc04fe097b": "La entrega online no está disponible actualmente para la zona seleccionada.",
+  "copy_recovery_storage": "Este navegador no puede guardar tu compra de forma segura. Activa el almacenamiento del navegador o contacta con 3L antes de pagar.",
+  "copy_recovery_review": "Revisa tus datos guardados: la dirección, la fecha y el total actual del pedido.",
+  "copy_recovery_ready": "Tu intento de pago anterior ha finalizado. Tus datos están guardados. Revisa tu pedido antes de iniciar un nuevo pago seguro."
 }
