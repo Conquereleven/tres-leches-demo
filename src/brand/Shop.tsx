@@ -1208,6 +1208,7 @@ export function CheckoutPage() {
         customer,
         billing,
       }),
+      true,
     )
       .then(() => {
         if (active) setStep(3);
@@ -2039,8 +2040,12 @@ export function CheckoutPage() {
 }
 
 /** Resolve this cart on the server before reusing a session checkout. */
-async function heldCheckout(checkout: unknown): Promise<Status | null> {
+async function heldCheckout(
+  checkout: unknown,
+  validateDraft = false,
+): Promise<Status | null> {
   const saved = savedCheckout();
+  if (!saved?.key && !validateDraft) return null;
   const result = await post<{
     key: string | null;
     cartHash?: string;
