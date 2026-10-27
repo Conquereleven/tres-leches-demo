@@ -6,9 +6,9 @@ Baseline: `10a2176583da52890758dad57b9262a8af0e44f2`.
 |---|---|
 | TypeScript / lint | PASS |
 | Build and locale/copy gates | PASS |
-| Commerce | 798 passed, 0 failed |
+| Commerce | 799 passed, 0 failed |
 | Chromium / WebKit checkout | 92 passed, 0 failed, 0 skipped |
-| Recovery domain/storage | 16 passed (included in Commerce total) |
+| Recovery domain/storage | 17 passed (included in Commerce total) |
 | Pack builder | 17 passed (included in Commerce total) |
 | Sites | 4 passed |
 | Dependency audit | 0 vulnerabilities |

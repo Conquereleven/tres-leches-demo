@@ -273,6 +273,30 @@ test("replacement revalidates catalog price/minimum/coverage/date; never edits t
   }
 });
 
+test("a provider regression after terminal failure cannot offer a payable URL for a Building order", async () => {
+  const f = fixture();
+  try {
+    const key = randomUUID();
+    await f.create(key);
+    f.setStatus("EXPIRED");
+    await f.service.reconcile(f.store.read().payments[0]!.id, {
+      id: "fixture-admin",
+      role: "admin",
+    });
+    f.setStatus("PENDING");
+    const recovered = await recoverWebCheckout(f.service, {
+      key,
+      checkout: f.input(),
+    });
+    assert.equal(recovered.status?.status, "Building");
+    assert.equal(recovered.status?.actionRequired, "review_payment");
+    assert.equal(recovered.status?.url, null);
+    assert.equal(f.counts().posts, 1);
+  } finally {
+    f.store.close();
+  }
+});
+
 test("a changed live price cannot display a different total alongside an accepted pending URL", async () => {
   const f = fixture();
   try {

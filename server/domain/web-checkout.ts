@@ -877,6 +877,8 @@ export function readWebCheckoutStatus(
     currency: payment.currency,
     actionRequired:
       record?.supersededAt ||
+      (!["paid", "failed", "cancelled", "expired"].includes(payment.status) &&
+        order.state !== "Awaiting Payment") ||
       (payment.status === "paid" &&
         order.state === "Awaiting Payment" &&
         !acceptedPackPricesCurrent(s, order)) ||
@@ -894,7 +896,10 @@ export function readWebCheckoutStatus(
               ? "complete_payment"
               : null,
     url:
-      frozen && !record?.supersededAt && payment.status === "pending"
+      frozen &&
+      !record?.supersededAt &&
+      payment.status === "pending" &&
+      order.state === "Awaiting Payment"
         ? (payment.url ?? null)
         : null,
     summary: frozen

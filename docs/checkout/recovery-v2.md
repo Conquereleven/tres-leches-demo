@@ -26,7 +26,7 @@ Pending hosted checkouts cannot be locally retired simply because the customer c
 
 If today's quote differs from the accepted pending payment amount, recovery returns a review hold with no hosted URL. It never displays a current cart total beside a link for a different amount. The original accepted amount is not rewritten; the capability-protected return page can still show the actual stored payment facts.
 
-The original accepted snapshots and payment amounts remain intact. Terminal reconciliation uses the existing transition back to Building; no kitchen entry or ORDER_PAID notification occurs. A late paid predecessor is held for review by the existing workflow, and blocks an uncreated replacement. Refunds, partial refunds and chargebacks never grant an automatic retry. A distinct cart after a paid purchase retains the existing separate-purchase semantics.
+The original accepted snapshots and payment amounts remain intact. Terminal reconciliation uses the existing transition back to Building; no kitchen entry or ORDER_PAID notification occurs. A late paid predecessor is held for review by the existing workflow, and blocks an uncreated replacement. Refunds, partial refunds and chargebacks never grant an automatic retry. A nonterminal provider result on an order that can no longer accept payment is review-only, with no payable URL. A distinct cart after a paid purchase retains the existing separate-purchase semantics.
 
 ## Browser experience
 
