@@ -187,7 +187,7 @@ test("public contract: published revision only, three languages, server prices, 
   const { store, view, payload, save, cake } = setup();
   try {
     const before = storefrontCatalog(store.read());
-    assert.equal(before.products.length, 74);
+    assert.equal(before.products.length, 75);
     assert.equal(before.revision, view().published.id);
     const ids = new Set(sources.approved.map((c) => c.id));
     for (const p of before.products) {

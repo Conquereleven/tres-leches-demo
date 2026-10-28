@@ -242,6 +242,7 @@
 }
 .commerce.ops-shell .oms .oms-tabs button {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 8px;
   min-height: 44px;
@@ -982,7 +983,7 @@
   position: absolute;
   top: 0;
   z-index: 2;
-  width: 36px;
+  width: 44px;
   min-height: 44px;
   height: 44px;
   padding: 0;

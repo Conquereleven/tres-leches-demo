@@ -114,7 +114,7 @@ test("only six approved Conchas SKUs join the preserved catalog and pricing", ()
     { id: `conchas-traditional-${slug}-individual-70-g`, variant, size: "Individual · 70 g", priceFils: 1300 },
   ]);
   assert.deepEqual(
-    after.families,
+    after.families.filter((f: {id:string}) => f.id !== "conchas-tricolor-pack"),
     before.families.map((f: { id: string; options: { id: string; priceFils: number }[] }) => ({
       ...f,
       options: [
@@ -138,10 +138,10 @@ test("only six approved Conchas SKUs join the preserved catalog and pricing", ()
     title,
     optionIds: [`conchas-traditional-${slug}-mini-40-g`, `conchas-traditional-${slug}-individual-70-g`],
   })));
-  assert.deepEqual(storefrontProducts, productsBefore);
+  assert.deepEqual(storefrontProducts.filter(p => p.id !== "conchas-tricolor-pack"), productsBefore);
   const importBefore = released("data-imports/liza-current-menu.json");
   assert.deepEqual(
-    imported().items.filter((i: { id: string }) => !RETIRED_SKUS.has(i.id)),
+    imported().items.filter((i: { id: string }) => !RETIRED_SKUS.has(i.id) && !i.id.startsWith("conchas-tricolor-pack-3-")),
     importBefore.items
       .filter((i: { id: string }) => !RETIRED_SKUS.has(i.id))
       .map((i: { id: string; priceAed: string; active: boolean; availability: string }) => ({

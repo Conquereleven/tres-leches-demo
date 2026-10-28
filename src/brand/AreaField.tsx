@@ -17,15 +17,15 @@ export function AreaField({
   value,
   disabled,
   onChange,
-  onUnsupported,
+  onNoMatch,
 }: {
   areas: DeliveryAreaOption[];
   /** Canonical area id, or "" when nothing is chosen. */
   value: string;
   disabled?: boolean;
   onChange: (id: string) => void;
-  /** True while the typed text matches no approved area. */
-  onUnsupported: (unsupported: boolean) => void;
+  /** Search evidence only; never a claim about geographic delivery coverage. */
+  onNoMatch: (noMatch: boolean) => void;
 }) {
   const { text: localize } = useLanguage();
   const id = useId();
@@ -46,22 +46,24 @@ export function AreaField({
         : areas,
     [areas, typed, selected],
   );
-  const unsupported = !selected && typed.length >= 2 && options.length === 0;
-  useEffect(() => onUnsupported(unsupported), [unsupported, onUnsupported]);
+  const noMatch = !selected && typed.length >= 2 && options.length === 0;
+  const activeIndex = Math.min(active, Math.max(0, options.length - 1));
+  useEffect(() => onNoMatch(noMatch), [noMatch, onNoMatch]);
   // Native validation: the form cannot proceed on text that is not an area.
   useEffect(() => {
     input.current?.setCustomValidity(
       selected
         ? ""
         : localize(
-            unsupported
-              ? "We don't currently deliver to this area."
+            noMatch
+              ? "We couldn't find that area. Try another spelling or contact us."
               : "Choose your delivery area from the list.",
           ),
     );
-  }, [selected, unsupported, localize]);
+  }, [selected, noMatch, localize]);
   const choose = (area: DeliveryAreaOption) => {
     setText(area.name);
+    setActive(areas.findIndex((option) => option.id === area.id));
     setOpen(false);
     onChange(area.id);
   };
@@ -86,19 +88,33 @@ export function AreaField({
         aria-controls={`${id}-list`}
         aria-autocomplete="list"
         aria-activedescendant={
-          open && options[active] ? `${id}-${options[active].id}` : undefined
+          open && options[activeIndex]
+            ? `${id}-${options[activeIndex].id}`
+            : undefined
         }
         aria-describedby={`${id}-status`}
         value={text}
-        onFocus={() => setOpen(true)}
+        onFocus={() => {
+          setActive(
+            Math.max(
+              0,
+              areas.findIndex((area) => area.id === value),
+            ),
+          );
+          setOpen(true);
+        }}
         onBlur={() => setOpen(false)}
         onChange={(event) => {
           const next = event.target.value;
           setText(next);
-          setActive(0);
           setOpen(true);
           // An exact name or alias selects itself; anything else is unchosen.
           const exact = exactArea(areas, next);
+          // Once its canonical label is shown, options contains the full list.
+          // Enter must keep that exact selection rather than jump to row zero.
+          setActive(
+            exact ? areas.findIndex((area) => area.id === exact.id) : 0,
+          );
           onChange(exact?.id ?? "");
         }}
         onKeyDown={(event) => {
@@ -113,10 +129,10 @@ export function AreaField({
             const step = event.key === "ArrowDown" ? 1 : -1;
             setActive((at) => (at + step + options.length) % options.length);
           }
-          if (event.key === "Enter" && open && options[active]) {
+          if (event.key === "Enter" && open && options[activeIndex]) {
             // Choosing an area must not submit the form.
             event.preventDefault();
-            choose(options[active]);
+            choose(options[activeIndex]);
           }
         }}
       />
@@ -133,14 +149,16 @@ export function AreaField({
             id={`${id}-${area.id}`}
             role="option"
             aria-selected={area.id === value}
-            data-active={index === active || undefined}
+            data-active={index === activeIndex || undefined}
             // pointerdown, so the choice lands before the input's blur closes the list.
             onPointerDown={(event) => {
               event.preventDefault();
               choose(area);
             }}
+            // Assistive technologies can activate an option without pointerdown.
+            onClick={() => choose(area)}
             ref={(element) => {
-              if (index === active && open)
+              if (index === activeIndex && open)
                 element?.scrollIntoView?.({ block: "nearest" });
             }}
           >
@@ -154,8 +172,10 @@ export function AreaField({
       <p id={`${id}-status`} className="b-caption" role="status">
         {selected ? (
           label(selected)
-        ) : unsupported ? (
-          <CustomerCopy>We don't currently deliver to this area.</CustomerCopy>
+        ) : noMatch ? (
+          <CustomerCopy>
+            We couldn't find that area. Try another spelling or contact us.
+          </CustomerCopy>
         ) : typed ? (
           <CustomerCopy>Choose your delivery area from the list.</CustomerCopy>
         ) : (

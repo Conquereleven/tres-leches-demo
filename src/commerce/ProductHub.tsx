@@ -1,3 +1,5 @@
+import { productListingSizes } from "./product-hub-presentation";
+import { prepareHubUpload, validateHubUpload } from "./product-hub-upload";
 import {
   PACK_SPECS,
   componentName,
@@ -423,10 +425,6 @@ function Overview({
     () => new Map(view.assets.map((a) => [a.id, a])),
     [view.assets],
   );
-  const families = useMemo(
-    () => new Map(view.families.map((f) => [f.id, f])),
-    [view.families],
-  );
   const categories = useMemo(
     () => new Map(view.categories.map((c) => [c.id, c])),
     [view.categories],
@@ -567,8 +565,10 @@ function Overview({
                   <strong>{p.name}</strong>
                   <small>
                     {categories.get(p.categoryId ?? "")?.name ??
-                      t("No category")}{" "}
-                    · {families.get(p.familyId ?? "")?.name ?? t("No family")}
+                      t("No category")}
+                    {productListingSizes(p.variants)
+                      ? ` · ${productListingSizes(p.variants)}`
+                      : ""}
                   </small>
                 </span>
                 <span className="ph-row-meta">
@@ -746,6 +746,11 @@ function Editor({
   const [locale, setLocale] = useState<Locale>("en");
   const [problems, setProblems] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadFilename, setUploadFilename] = useState("");
+  const [uploadFeedback, setUploadFeedback] = useState<{
+    kind: "error" | "success";
+    message: string;
+  } | null>(null);
   const [pick, setPick] = useState("");
   const assets = useMemo(
     () => new Map(view.assets.map((a) => [a.id, a])),
@@ -872,32 +877,54 @@ function Editor({
     });
   };
   const upload = async (file: File) => {
-    setUploading(true);
+    setUploadFeedback(null);
+    setUploadFilename(file.name);
     setError("");
+    const invalid = validateHubUpload(file);
+    if (invalid) {
+      setUploadFeedback({ kind: "error", message: invalid });
+      return;
+    }
+    setUploading(true);
     try {
+      // Convert at source: a smaller WebP travels over the network and occupies
+      // less SQLite storage. Small images and failed conversions keep original.
+      const prepared = await prepareHubUpload(file);
       const alt = blank();
       alt.en.name = nullable(d.name);
+      // Base64 encodes bytes rather than Unicode code points; supports Arabic.
+      const metadata = new TextEncoder().encode(
+        JSON.stringify({ expectedVersion: view.version, alt }),
+      );
       const res = await fetch("/api/product-hub/media", {
         method: "POST",
         headers: {
-          "Content-Type": file.type,
+          "Content-Type": prepared.blob.type,
           "Idempotency-Key": crypto.randomUUID(),
           "X-Hub-Meta": btoa(
-            JSON.stringify({ expectedVersion: view.version, alt }),
+            Array.from(metadata, (byte) => String.fromCharCode(byte)).join(""),
           )
             .replaceAll("+", "-")
             .replaceAll("/", "_")
             .replace(/=+$/, ""),
         },
-        body: file,
+        body: prepared.blob,
       });
-      const body = (await res.json()) as {
+      const body = (await res.json().catch(() => ({}))) as {
         assetId?: string;
         message?: string;
         error?: string;
       };
-      if (!res.ok || !body.assetId)
-        throw new Error(body.message ?? body.error ?? "Upload failed");
+      if (!res.ok || !body.assetId) {
+        const reason = body.message ?? body.error;
+        throw new Error(
+          res.status === 413
+            ? `"${file.name}" is too large. Maximum upload size is 5 MB.`
+            : res.status === 409
+              ? `${reason ?? "The image is already uploaded or the catalog draft changed."} Refresh the image library, or choose an existing image there. Your unsaved product edits remain here.`
+              : reason ?? `Image upload failed (HTTP ${res.status}).`,
+        );
+      }
       await reload();
       setD((x) => ({
         ...x,
@@ -912,8 +939,18 @@ function Editor({
           },
         ],
       }));
+      const sizeKb = Math.ceil(prepared.blob.size / 1024);
+      setUploadFeedback({
+        kind: "success",
+        message: prepared.optimized
+          ? `"${file.name}" optimized to WebP (${sizeKb} KB) and added. Click Save draft to link it to the product.`
+          : `"${file.name}" added (${sizeKb} KB). Click Save draft to link it to the product.`,
+      });
     } catch (e) {
-      setError((e as Error).message);
+      setUploadFeedback({
+        kind: "error",
+        message: (e as Error).message || "Image upload failed. Try again.",
+      });
     } finally {
       setUploading(false);
     }
@@ -1504,24 +1541,40 @@ function Editor({
                       ))}
                     </select>
                   </label>
-                  <label>
-                    {t("Upload a new image")}
-                    <input
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp,image/avif"
-                      disabled={uploading}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        e.target.value = "";
-                        if (file) void upload(file);
-                      }}
-                    />
-                    <small>
-                      {t(
-                        "PNG, JPEG, WebP or AVIF. Up to 3 MB, 200–6000 px per side.",
-                      )}
-                    </small>
-                  </label>
+                  <div className="ph-upload-control">
+                    <label>
+                      {t("Upload a new image")}
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/avif"
+                        disabled={uploading}
+                        aria-describedby="ph-upload-help ph-upload-feedback"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          // Reset so selecting the same file again can be retried.
+                          e.target.value = "";
+                          if (file) void upload(file);
+                        }}
+                      />
+                      <small id="ph-upload-help">
+                        {t(
+                          "PNG, JPEG, WebP or AVIF. Up to 5 MB, 200–6000 px per side. Large images are optimized to WebP automatically.",
+                        )}
+                      </small>
+                    </label>
+                    {uploading && (
+                      <small role="status">{t("Uploading")} {uploadFilename}…</small>
+                    )}
+                    {uploadFeedback && (
+                      <p
+                        id="ph-upload-feedback"
+                        className={`ph-banner ph-banner-${uploadFeedback.kind === "error" ? "error" : "ok"}`}
+                        role={uploadFeedback.kind === "error" ? "alert" : "status"}
+                      >
+                        {uploadFeedback.message}
+                      </p>
+                    )}
+                  </div>
                 </div>
               )}
             </section>

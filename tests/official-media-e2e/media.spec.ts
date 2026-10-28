@@ -89,11 +89,11 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
       path: `work/qa/official-media/${info.project.name}-product-${width}.png`,
     });
     await visitMenu("/menu?category=pan");
-    // Restored Pan de Muerto banner: whole 3:2 boards, before the product grid.
+    // Pan gallery opens with the 3L-MEDIA-002 photograph M002-080, 3:2, before the product grid.
     const banner = page.locator(".b-category-showcase .b-official-rotation");
     await expect(banner.locator("picture.is-active img")).toHaveAttribute(
       "src",
-      /official-pan-banner-0[1-4]-/,
+      /3l-media-002\/pan-2-m002-080-/,
     );
     const bannerBox = (await page
       .locator(".b-category-showcase")
@@ -122,7 +122,7 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
         ];
       }),
     ).toEqual(["0.08", "none", "true", "no-repeat", true]);
-    // Every card image is a square with rounded corners and shows the whole photo.
+    // Every product card is square; photographs fill the frame without letterboxing.
     const frames = await page.evaluate(() =>
       [...document.querySelectorAll(".b-menu-card .b-menu-photo")].map((f) => {
         const r = f.getBoundingClientRect();
@@ -174,7 +174,7 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     expect(frames.length).toBeGreaterThan(8);
     expect(frames.every(([square]) => square)).toBe(true);
     expect([...new Set(frames.map(([, radius]) => radius))]).toEqual(["20px"]);
-    expect([...new Set(frames.map(([, , fit]) => fit))]).toEqual(["contain"]);
+    expect([...new Set(frames.map(([, , fit]) => fit))]).toEqual(["cover"]);
     for (const [id, source] of [
       ["pan-de-muerto-traditional-pack", /official-pan-02-/],
       ["pan-de-muerto-filled-pack", /official-pan-02-/],
@@ -185,144 +185,42 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
         card.locator("picture.is-active img, img").first(),
       ).toHaveAttribute("src", source);
     }
-    // Whole bread, centred on cream: every official photo is contained, none zoomed.
-    expect(
-      await page.evaluate(() =>
-        [...document.querySelectorAll(".b-official-photo img")]
-          .filter((i) => !i.closest("picture:not(.is-active)") || true)
-          .map((i) => getComputedStyle(i).objectFit)
-          .filter((f) => f !== "contain"),
-      ),
-    ).toEqual([]);
-    const rotation = page.locator(
-      '[data-product-id="pan-de-muerto-traditional--ajonjoli"] .b-official-rotation',
+    // PR #61: cards show exactly one stable PRIMARY; galleries stay on detail.
+    await expect(page.locator(".b-menu-card .b-official-rotation")).toHaveCount(
+      0,
     );
+    const coverFits = await page.locator(".b-official-photo img").evaluateAll(
+      (images) => images.map((i) => getComputedStyle(i).objectFit),
+    );
+    expect(coverFits.length).toBeGreaterThan(0);
+    expect(coverFits.every((fit) => fit === "cover")).toBe(true);
+
+    // The category editorial banner retains its independent 3:2 rotation.
+    const rotation = page.locator(".b-category-showcase .b-official-rotation");
+    await expect(rotation).toHaveCount(1);
     await rotation.scrollIntoViewIfNeeded();
-    // Only the current and the next photo are mounted until a turn has played.
-    await expect(rotation.locator("picture")).toHaveCount(2);
-    const initial = await rotation.boundingBox();
-    expect(Math.round(initial!.width)).toBe(Math.round(initial!.height));
-    await expect(rotation.locator("picture.is-active img")).toHaveAttribute(
-      "src",
-      /official-pan-06-/,
-      { timeout: 12000 },
-    );
-    // Mid-fade the outgoing photo is still fully painted: no blank frame.
-    expect(
-      await rotation.evaluate((node) =>
-        [...node.querySelectorAll("picture")].some(
-          (p) => getComputedStyle(p).opacity === "1",
-        ),
-      ),
-    ).toBe(true);
-    const after = await rotation.boundingBox();
-    expect(after?.height).toBe(initial?.height);
-    await rotation.focus();
-    const active = await rotation
-      .locator("picture.is-active img")
-      .getAttribute("src");
-    await page.waitForTimeout(4200);
-    expect(
-      await rotation.locator("picture.is-active img").getAttribute("src"),
-    ).toBe(active);
-    // Crema diplomática: Joel's three photos, in order, 3.5 s apart, then back to the first.
-    const crema = page.locator(
-      '[data-product-id="pan-de-muerto-filled--crema-diplomatica-vainilla"] .b-official-rotation',
-    );
-    await crema.scrollIntoViewIfNeeded();
-    const shown = () =>
-      crema
-        .locator("picture.is-active img")
-        .evaluate((img: HTMLImageElement) =>
-          img.currentSrc.replace(/^.*official-pan-(.*)-\d+\.\w+$/, "$1"),
-        );
-    const seen: [string, number][] = [[await shown(), Date.now()]];
-    while (seen.length < 5) {
-      await expect.poll(shown, { timeout: 9000 }).not.toBe(seen.at(-1)![0]);
-      seen.push([await shown(), Date.now()]);
-      if (seen.length === 3) {
-        // The cutout keeps its transparency and sits on the card surface, never black.
-        // BRAND-02 (approved 12 October 2026) made product surfaces white.
-        expect(
-          await crema
-            .locator("picture.is-active")
-            .evaluate((p) => getComputedStyle(p).backgroundColor),
-        ).toBe("rgb(255, 255, 255)");
-      }
-      if (seen.at(-1)![0] === "13")
-        expect(
-          await crema
-            .locator("picture.is-active img")
-            .evaluate((img) => getComputedStyle(img).objectFit),
-        ).toBe("contain");
-      await crema.screenshot({
-        path: `work/qa/official-media/${info.project.name}-crema-${width}-${seen.length}.png`,
-      });
-    }
-    const order = seen.map(([name]) => name);
-    const start = order.indexOf("14");
-    expect(order.slice(start, start + 3)).toEqual(["14", "14-cutout", "13"]);
-    expect(order.filter((n) => !["14", "14-cutout", "13"].includes(n))).toEqual(
-      [],
-    );
-    for (let i = 2; i < seen.length; i++) {
-      const gap = seen[i]![1] - seen[i - 1]![1];
-      expect(gap).toBeGreaterThan(3000 - 150);
-      expect(gap).toBeLessThan(4300);
-    }
-    const cremaBox = (await crema.boundingBox())!;
-    expect(Math.abs(cremaBox.height - cremaBox.width)).toBeLessThan(1);
-    // Chocolate relleno: Joel's five photos, detail last, never first.
-    const choc = page.locator(
-      '[data-product-id="pan-de-muerto-filled--chocolate"] .b-official-rotation',
-    );
-    await choc.scrollIntoViewIfNeeded();
-    const chocShown = () =>
-      choc
-        .locator("picture.is-active img")
-        .evaluate((img: HTMLImageElement) =>
-          img.currentSrc.replace(/^.*official-pan-(.*)-\d+\.\w+$/, "$1"),
-        );
-    const chocSeen = [await chocShown()];
-    await choc.screenshot({
-      path: `work/qa/official-media/${info.project.name}-chocolate-${width}-1.png`,
+    const first = rotation.locator("picture.is-active img");
+    await expect
+      .poll(() => first.evaluate((i: HTMLImageElement) => i.naturalWidth))
+      .toBeGreaterThan(0);
+    const firstSrc = await first.getAttribute("src");
+    await expect(first).not.toHaveAttribute("src", firstSrc!, {
+      timeout: 11000,
     });
-    while (chocSeen.length < 6) {
-      await expect.poll(chocShown, { timeout: 9000 }).not.toBe(chocSeen.at(-1));
-      chocSeen.push(await chocShown());
-      await choc.screenshot({
-        path: `work/qa/official-media/${info.project.name}-chocolate-${width}-${chocSeen.length}.png`,
-      });
-    }
-    const cycle = ["16", "18", "16-cutout", "18-cutout", "29"];
-    const from = cycle.indexOf(chocSeen[0]!);
-    expect(from).toBeGreaterThanOrEqual(0);
-    expect(chocSeen).toEqual(
-      chocSeen.map((_, i) => cycle[(from + i) % cycle.length]),
-    );
-    expect(
-      await choc
-        .locator("picture.is-active")
-        .evaluate((p) => getComputedStyle(p).backgroundColor),
-    ).toBe("rgb(255, 255, 255)");
-    // The traditional pack has four photos and rotates; the filled pack has one and stays static.
-    await expect(
-      page.locator(
-        '[data-product-id="pan-de-muerto-traditional-pack"] .b-official-rotation',
-      ),
-    ).toHaveCount(1);
-    await expect(
-      page.locator(
-        '[data-product-id="pan-de-muerto-filled-pack"] .b-official-rotation',
-      ),
-    ).toHaveCount(0);
-    expect(
-      await page.evaluate(() =>
-        [...document.images]
-          .filter((i) => i.complete && !i.naturalWidth)
-          .map((i) => i.currentSrc),
-      ),
-    ).toEqual([]);
+    await rotation.focus();
+    const focusedSrc = await first.getAttribute("src");
+    await page.waitForTimeout(3900);
+    await expect(first).toHaveAttribute("src", focusedSrc!);
+
+    // Detail-only gallery remains accessible, and is not a card carousel.
+    await visitMenu("/menu?product=pan-de-muerto-filled--chocolate");
+    await expect(page.locator(".b-menu-photo .b-official-rotation")).toHaveCount(0);
+    const gallery = page.locator(".b-product-gallery img");
+    expect(await gallery.count()).toBeGreaterThan(0);
+    await expect(gallery.first()).toBeVisible();
+
+    // Return to the Pan product grid for the screenshot and responsive check.
+    await visitMenu("/menu?category=pan");
     await page.screenshot({
       path: `work/qa/official-media/${info.project.name}-menu-${width}.png`,
     });
@@ -336,12 +234,12 @@ for (const width of [390, 768, 1024, 1440, 1920]) {
     await page.waitForTimeout(4200);
     await expect(rotation.locator("picture.is-active img")).toHaveAttribute(
       "src",
-      /official-pan-09-/,
+      /3l-media-002\/pan-2-m002-080-/,
     );
     // Still frames: the default photograph is the first approved one.
     await expect(
       page.locator(
-        '[data-product-id="pan-de-muerto-filled--chocolate"] picture.is-active img',
+        '[data-product-id="pan-de-muerto-filled--chocolate"] .b-menu-photo img',
       ),
     ).toHaveAttribute("src", /official-pan-16-/);
     await page.goto("/");

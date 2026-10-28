@@ -1,0 +1,52 @@
+{
+  "status": "OFFLINE_PROPOSAL_NOT_PUBLISHED",
+  "sourceRevision": "catalog-v1-3979051848b605cfd349bf4f794ba8c849c3ed7b88d52c0bcb7d431e061929ac",
+  "sourceSha256": "2ece49be60d87f6a116f614633d1cf0e49fe2f4391f68950ca0b137bee94c74e",
+  "patch": [
+    {
+      "op": "test",
+      "path": "/revision",
+      "value": "catalog-v1-3979051848b605cfd349bf4f794ba8c849c3ed7b88d52c0bcb7d431e061929ac"
+    },
+    {
+      "op": "add",
+      "path": "/assets/3/derivatives/0/width",
+      "value": 116
+    },
+    {
+      "op": "add",
+      "path": "/assets/3/derivatives/0/height",
+      "value": 119
+    },
+    {
+      "op": "add",
+      "path": "/assets/32/derivatives/0/width",
+      "value": 124
+    },
+    {
+      "op": "add",
+      "path": "/assets/32/derivatives/0/height",
+      "value": 101
+    },
+    {
+      "op": "add",
+      "path": "/assets/57/derivatives/0/width",
+      "value": 214
+    },
+    {
+      "op": "add",
+      "path": "/assets/57/derivatives/0/height",
+      "value": 75
+    },
+    {
+      "op": "add",
+      "path": "/assets/65/derivatives/0/width",
+      "value": 116
+    },
+    {
+      "op": "add",
+      "path": "/assets/65/derivatives/0/height",
+      "value": 104
+    }
+  ]
+}

@@ -9,6 +9,7 @@ import { validateCatalog } from "../../server/domain/catalog";
 import { writeFileSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { randomUUID } from "node:crypto";
+import { bluewatersFixture } from "./delivery-areas";
 process.env.APP_ENV = "test";
 process.env.NODE_ENV = "test";
 process.env.PROVIDER_MODE = "offline";
@@ -44,6 +45,24 @@ process.on("message", (value) => {
 });
 const debits = new Map<string, unknown>();
 const initial = seed();
+if (process.env.DELIVERY_AREA_FIXTURE === "true")
+  initial.zones.push(
+    bluewatersFixture,
+    {
+      ...bluewatersFixture,
+      id: "fixture-inactive",
+      name: "Inactive Fixture",
+      aliases: [],
+      active: false,
+    },
+    {
+      ...bluewatersFixture,
+      id: "fixture-pending",
+      name: "Pending Fixture",
+      aliases: [],
+      minOrderAed: null,
+    },
+  );
 initial.catalog = validateCatalog(
   JSON.parse(
     readFileSync(
@@ -198,4 +217,22 @@ if (process.env.COVERAGE_FIXTURE === "approved") {
 }
 process.env.DELIVERY_ADDRESS_MODE ??=
   process.env.COVERAGE_FIXTURE === "approved" ? "google" : "legacy";
-await startServer({ initial, payment: provider, geo });
+await startServer({
+  initial,
+  payment: provider,
+  geo,
+  ...(process.env.CUSTOMER_PAID_EMAIL_FIXTURE === "true"
+    ? {
+        email: {
+          name: "fake-resend",
+          async send(email: { idempotencyKey: string }) {
+            process.send?.({
+              type: "customer-email-accepted",
+              eventId: email.idempotencyKey,
+            });
+            return { messageId: "fixture-provider-accepted" };
+          },
+        },
+      }
+    : {}),
+});

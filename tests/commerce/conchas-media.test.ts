@@ -77,23 +77,39 @@ test("each traditional Concha retains exact approved artwork alongside the final
         "conchas-traditional",
         label,
       )?.sourceId,
-      source,
+      slug === "tricolor" ? undefined : source,
     );
   assert.equal(
     productMediaAssignments.filter(
       (p) =>
         p.productId.startsWith("conchas-traditional--") && p.primarySourceId,
     ).length,
-    4,
+    3,
   );
   for (const a of index.filter((x) => !x.productId)) {
     assert.ok(!existsSync("public/brand/approved/" + a.source));
     assert.ok(a.derivatives.every((d) => !d.file.startsWith("public/")));
   }
 });
-test("Conchas opens with the three approved final batch frames", () => {
-  const frames = categoryEditorialMedia("conchas");
-  assert.equal(frames.length, 3);
+test("Conchas keeps the two retained approved final batch frames after the new photographs", () => {
+  const gallery = categoryEditorialMedia("conchas");
+  assert.ok(
+    gallery.every(
+      (a) => !a.sourceId.includes("conchas_de_pistache_sobre_tabla_de_madera"),
+    ),
+  );
+  // 3L-MEDIA-002 photographs open; the retained frames follow.
+  assert.deepEqual(
+    gallery.slice(0, 3).map((a) => a.sourceId),
+    ["026", "027", "024"].map((n) => `3l-media-002-conchas-m002-${n}`),
+  );
+  assert.equal(gallery.length, 5);
+  const frames = gallery.slice(3);
+  assert.ok(
+    frames.every(
+      (a) => !a.sourceId.includes("conchas_de_pistache_sobre_tabla_de_madera"),
+    ),
+  );
   assert.ok(frames.every(usesMenuReferencePresentation));
   for (const asset of frames) {
     for (const d of asset.derivatives) {
@@ -108,7 +124,7 @@ test("Conchas opens with the three approved final batch frames", () => {
       ),
     );
   }
-  assert.equal(categoryEditorialMedia("pan").length, 4);
+  assert.equal(categoryEditorialMedia("pan").length, 7);
   assert.equal(categoryEditorialMedia("cakes").length, 0);
 });
 
@@ -157,6 +173,10 @@ test("all seven Conchas reuse the Pan presentation without a separate frame syst
   ];
   for (const [id, family, variant] of products) {
     const asset = selectedProductMedia(id, family!, variant!);
+    if (id === "conchas-traditional--tricolor") {
+      assert.equal(asset, undefined);
+      continue;
+    }
     assert.ok(asset);
     assert.ok(usesMenuReferencePresentation(asset));
   }

@@ -1,0 +1,51 @@
+name: Conchas visual regression
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/brand/category-media.json"
+      - "src/brand/MenuCatalog.tsx"
+      - "src/brand/Shop.tsx"
+      - "src/brand/checkout.css"
+      - "src/brand/media.tsx"
+      - "src/brand/media-manifest.json"
+      - "tests/conchas-e2e/**"
+      - "playwright.conchas.config.ts"
+      - ".github/workflows/conchas-visual.yml"
+permissions:
+  contents: read
+concurrency:
+  group: conchas-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  conchas-browsers:
+    runs-on: ubuntu-latest
+    # Playwright 1.64.0 image includes compatible browsers and native dependencies.
+    # Avoid slow Ubuntu apt mirror downloads consuming the job timeout.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      options: --user 1001
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.23.1"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright test --config=playwright.conchas.config.ts
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: conchas-visual-${{ github.run_attempt }}
+          path: |
+            test-results/conchas/
+            docs/brand/brand02/conchas/*.png
+            docs/brand/brand02/conchas/*.json
+          retention-days: 7
+          if-no-files-found: ignore
+      # Loopback fixture and disposable SQLite only; no secrets or deployment.

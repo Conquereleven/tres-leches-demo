@@ -3,12 +3,30 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "shared/pack-*.ts"
+      - "shared/**"
       - "server/**"
       - "src/brand/**"
-      - "src/commerce/**"
-      - "tests/**"
-      - "playwright*.ts"
+      - "src/commerce/ProductHub.tsx"
+      - "src/commerce/product-hub-*"
+      - "tests/commerce/**"
+      - "tests/checkout-e2e/**"
+      - "tests/packs-e2e/**"
+      - "tests/conversion-e2e/**"
+      - "tests/email-e2e/**"
+      - "tests/premium-e2e/**"
+      - "tests/tricolor-e2e/**"
+      - "tests/product-hub-e2e/**"
+      - "tests/storefront-dynamic-e2e/**"
+      - "tests/fixtures/**"
+      - "scripts/preview-*.ts"
+      - "playwright.packs.config.ts"
+      - "playwright.conversion.config.ts"
+      - "playwright.checkout.config.ts"
+      - "playwright.email.config.ts"
+      - "playwright.premium.config.ts"
+      - "playwright.tricolor.config.ts"
+      - "playwright.product-hub.config.ts"
+      - "playwright.storefront-dynamic.config.ts"
       - ".github/workflows/personalized-packs.yml"
 permissions:
   contents: read
@@ -32,12 +50,23 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
+      - run: node scripts/verify-webkit-runtime.mjs
+      - run: node --import tsx scripts/preview-kitchen-email.ts
+      - run: npx playwright test --config=playwright.email.config.ts
+      - run: node --import tsx scripts/preview-pack-pricing.ts
+      - run: npx playwright test --config=playwright.premium.config.ts
+      - run: node --import tsx scripts/preview-tricolor.ts
+      - run: npx playwright test --config=playwright.tricolor.config.ts
       - run: mkdir -p work/e2e
       - run: npx playwright test --config=playwright.packs.config.ts
       - run: npx playwright test --config=playwright.checkout.config.ts --browser=chromium
       - run: npx playwright test --config=playwright.checkout.config.ts --browser=webkit
       - run: npx playwright test --config=playwright.product-hub.config.ts
-      - run: npx playwright test --config=playwright.operations.config.ts
+      # Each browser gets a fresh fixture and rate-limit window. The combined
+      # 50-test run can exceed the fixture's 300-request/minute API guard.
+      - run: npx playwright test --config=playwright.storefront-dynamic.config.ts --project=chromium
+      - run: npx playwright test --config=playwright.storefront-dynamic.config.ts --project=webkit
+      - run: npx playwright test --config=playwright.conversion.config.ts
       - if: failure()
         name: Synthetic browser failure context
         run: |
@@ -47,5 +76,13 @@ jobs:
               print(str(p))
               print(p.read_text())
           PY
+      - if: failure()
+        name: Retain synthetic browser traces
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: packs-browser-failure-${{ github.run_attempt }}
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
       # Loopback fixtures, disposable SQLite and in-process fake provider only.
       # No secrets, remote data, deployment or provider network requests.

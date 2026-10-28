@@ -1,0 +1,86 @@
+[
+  {
+    "kind": "short",
+    "width": 430,
+    "height": 704,
+    "productHeight": 93,
+    "productTop": 140,
+    "productsBeforeSecondary": true,
+    "htmlBytes": 7901,
+    "fitsRaw844px": true,
+    "nativeUsableHeight": null,
+    "nativeClient": "PENDING"
+  },
+  {
+    "kind": "three",
+    "width": 430,
+    "height": 820,
+    "productHeight": 209,
+    "productTop": 140,
+    "productsBeforeSecondary": true,
+    "htmlBytes": 9384,
+    "fitsRaw844px": true,
+    "nativeUsableHeight": null,
+    "nativeClient": "PENDING"
+  },
+  {
+    "kind": "typical",
+    "width": 430,
+    "height": 974,
+    "productHeight": 363,
+    "productTop": 140,
+    "productsBeforeSecondary": true,
+    "htmlBytes": 10535,
+    "fitsRaw844px": false,
+    "nativeUsableHeight": null,
+    "nativeClient": "PENDING"
+  },
+  {
+    "kind": "large",
+    "width": 430,
+    "height": 1206,
+    "productHeight": 577,
+    "productTop": 140,
+    "productsBeforeSecondary": true,
+    "htmlBytes": 11876,
+    "fitsRaw844px": false,
+    "nativeUsableHeight": null,
+    "nativeClient": "PENDING"
+  },
+  {
+    "kind": "long",
+    "width": 430,
+    "height": 2421,
+    "productHeight": 363,
+    "productTop": 140,
+    "productsBeforeSecondary": true,
+    "htmlBytes": 14553,
+    "fitsRaw844px": false,
+    "nativeUsableHeight": null,
+    "nativeClient": "PENDING"
+  },
+  {
+    "kind": "pickup",
+    "width": 430,
+    "height": 979,
+    "productHeight": 363,
+    "productTop": 140,
+    "productsBeforeSecondary": true,
+    "htmlBytes": 10770,
+    "fitsRaw844px": false,
+    "nativeUsableHeight": null,
+    "nativeClient": "PENDING"
+  },
+  {
+    "kind": "review",
+    "width": 430,
+    "height": 973,
+    "productHeight": 362,
+    "productTop": 140,
+    "productsBeforeSecondary": true,
+    "htmlBytes": 10606,
+    "fitsRaw844px": false,
+    "nativeUsableHeight": null,
+    "nativeClient": "PENDING"
+  }
+]

@@ -11,7 +11,9 @@ import products from "../../shared/storefront-products.json";
 import plan from "../../docs/brand/brand02/replacement-manifest.json";
 const baseline = "5d47c9d09b629bec73d47b34026848ca9ccca72a";
 test("BRAND02 accounts for seven interim products and independent editorial replacements", () => {
-  const current = products.filter((p) => p.familyId.startsWith("conchas"));
+  const current = products.filter(
+    (p) => p.familyId.startsWith("conchas") && p.id !== "conchas-tricolor-pack",
+  );
   assert.equal(current.length, 7);
   assert.equal(plan.products.length, 7);
   for (const p of current) {
@@ -20,16 +22,32 @@ test("BRAND02 accounts for seven interim products and independent editorial repl
     assert.deepEqual(row.skuIds, p.optionIds);
     assert.equal(row.replacementStatus, "AWAITING FOUNDER-APPROVED IMAGES");
     const asset = selectedProductMedia(p.id, p.familyId, p.variant)!;
+    if (p.id === "conchas-traditional--tricolor") {
+      assert.equal(asset, undefined);
+      continue;
+    }
     assert.equal(row.currentSourceId, asset.sourceId);
     assert.equal(asset.width, asset.height);
     for (const d of row.currentDerivatives)
       assert.ok(existsSync("public" + d.src), d.src);
   }
-  const editorial = categoryEditorialMedia("conchas");
-  assert.equal(editorial.length, 3);
-  assert.deepEqual(
-    plan.editorial.map((a) => a.sourceId),
-    editorial.map((a) => a.sourceId),
+  const gallery = categoryEditorialMedia("conchas");
+  // 3L-MEDIA-002 photographs open the gallery; BRAND02 frames follow them.
+  const editorial = gallery.filter(
+    (a) => !a.sourceId.startsWith("3l-media-002-"),
+  );
+  assert.deepEqual(gallery.slice(-editorial.length), editorial);
+  // The previously planned third frame was explicitly withdrawn.
+  assert.equal(editorial.length, 2);
+  assert.ok(
+    editorial.every((a) =>
+      plan.editorial.some((p) => p.sourceId === a.sourceId),
+    ),
+  );
+  assert.ok(
+    editorial.every(
+      (a) => !a.sourceId.includes("conchas_de_pistache_sobre_tabla_de_madera"),
+    ),
   );
   for (const a of editorial)
     assert.ok(!plan.products.some((p) => p.currentSourceId === a.sourceId));
@@ -54,6 +72,14 @@ test("BRAND02 leaves commercial identifiers, prices, availability, translations 
       ].includes(path)
     ) {
       const current = JSON.parse(readFileSync(path, "utf8"));
+      if (current.items)
+        current.items = current.items.filter(
+          (i: { id: string }) => !i.id.startsWith("conchas-tricolor-pack-3-"),
+        );
+      if (current.families)
+        current.families = current.families.filter(
+          (f: { id: string }) => f.id !== "conchas-tricolor-pack",
+        );
       const undoPrices = (value: unknown): void => {
         if (Array.isArray(value)) value.forEach(undoPrices);
         else if (value && typeof value === "object") {
@@ -83,7 +109,31 @@ test("BRAND02 leaves commercial identifiers, prices, availability, translations 
             `a75a0fa1637f4511ed0237e2b4fff621489e619a:${path}`,
           ])
         : readFileSync(path);
-      assert.deepEqual(current, old, path);
+      if (path === "shared/storefront-products.json")
+        assert.deepEqual(
+          JSON.parse(current.toString()).filter(
+            (p: { id: string }) => p.id !== "conchas-tricolor-pack",
+          ),
+          JSON.parse(old.toString()),
+          path,
+        );
+      else if (/src\/brand\/locales\/(en|es|ar)\/menu.json/.test(path)) {
+        const now = JSON.parse(current.toString()),
+          previous = JSON.parse(old.toString());
+        const expected = path.includes("/en/")
+          ? "Tricolor Concha · 1 piece"
+          : path.includes("/es/")
+            ? "Concha Tricolor · 1 pieza"
+            : "كونشا تريكولور · قطعة واحدة";
+        assert.equal(now.copy_8ac93f91a21b40c3, expected);
+        now.copy_8ac93f91a21b40c3 = previous.copy_8ac93f91a21b40c3;
+        // Conversion UX translations are additive to the historic BRAND02
+        // visual release; keep this guard focused on prior catalog copy.
+        for (const key of Object.keys(now))
+          if (key.startsWith("conversion_") || key.startsWith("pack_v2_"))
+            delete now[key];
+        assert.deepEqual(now, previous, path);
+      } else assert.deepEqual(current, old, path);
     }
   }
 });

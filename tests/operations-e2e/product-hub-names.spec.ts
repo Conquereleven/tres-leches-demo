@@ -36,9 +36,21 @@ for (const language of ["en", "tl"] as const)
       { id: SKU, name: "Pastel 3 Leches · Receta nueva", priceFils: 9900 },
     ];
     data.orders = [current!, earlier!, unapproved!];
+    // Keep these fictional accepted financial snapshots consistent with their
+    // renamed product/price; a mismatched quote must correctly block tickets.
+    for (const order of data.orders) {
+      const subtotalFils =
+        order.catalogSnapshot![0]!.priceFils * order.lines[0]!.quantity;
+      order.quote = {
+        ...order.quote!,
+        subtotalFils,
+        totalFils: subtotalFils + (order.quote?.feeFils ?? 0),
+      };
+    }
     data.payments = data.orders.map((o) => ({
       ...data.payments[0]!,
       orderId: o.id,
+      amountFils: o.quote!.totalFils,
     }));
     Object.assign(data, {
       productNames: {

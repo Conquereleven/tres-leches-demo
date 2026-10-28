@@ -98,7 +98,11 @@ export function PrintCenter({ data }: { data: Workspace }) {
                     product={operationalProductName(l.productId, l.name)}
                     id={l.productId}
                   />
-                  {l.composition && <p lang="en">{preparationText(l)}</p>}
+                  <p lang="en">
+                    Unit price: AED {(l.priceFils / 100).toFixed(2)} · Line
+                    total: AED {((l.priceFils * l.quantity) / 100).toFixed(2)}
+                  </p>
+                  {preparationText(l) && <p lang="en">{preparationText(l)}</p>}
                 </li>
               ))}
             </ul>

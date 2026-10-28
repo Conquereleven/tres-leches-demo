@@ -1,3 +1,10 @@
+import { acceptedPackPricesCurrent } from "./pack-pricing";
+import {
+  applyWhatsAppContact,
+  applyWhatsAppHistoryMedia,
+  applyWhatsAppMessage,
+  latestCustomerInbound,
+} from "./whatsapp-inbound";
 import { validatePackLines, snapshotPackLines } from "./packs";
 import { distinctLines } from "../../shared/pack-composition";
 import { frozenCheckout } from "./frozen-checkout";
@@ -32,9 +39,13 @@ import {
   paymentEventSchema,
 } from "./commands";
 import { type GeoService, quoteOrder } from "./zones";
+import { normalizeAreaName } from "./delivery-areas";
 import { recordPaidOperationsEmail } from "./operations-email";
 import { recordOrderPaid, applyOperationsReceipt } from "./notifications";
-import { recordCustomerEvent } from "./customer-notifications";
+import {
+  recordCustomerEvent,
+  recordPaidCustomerConfirmation,
+} from "./customer-notifications";
 import { assignPublicOrderNumber } from "./order-number";
 import { transition } from "./workflow";
 import { Store } from "../db/store";
@@ -75,7 +86,7 @@ export class CommerceService {
         "AI send aborted: context changed",
         409,
       );
-      const inbound = c.messages.filter((m) => m.direction === "in").at(-1);
+      const inbound = latestCustomerInbound(c);
       requireThat(
         inbound &&
           Date.now() - Date.parse(inbound.at) < 86400000 &&
@@ -114,6 +125,10 @@ export class CommerceService {
   /** Private configuration; absent until the manager's number is supplied. */
   operationsManagerPhone?: string;
   operationsEmailRecipients: string[] = [];
+  /** Explicit new-only customer paid-confirmation epoch; absent means disabled. */
+  customerPaidEmailSince?: string;
+  /** Opt-in subset of Operations recipients; empty means original email for all. */
+  operationsEmailCompactRecipients: string[] = [];
   /**
    * Activation timestamp for external-only Paymennt acknowledgements.
    * When absent, no unmatched checkout can be auto-closed as external.
@@ -237,6 +252,65 @@ export class CommerceService {
     });
   }
   private apply(s: State, cmd: Command, actor: Actor): unknown {
+    if (cmd.type === "createZone") {
+      requireThat(
+        actor.role === "admin",
+        "Only administrators can create delivery areas",
+        403,
+      );
+      requireThat(
+        /^[a-z0-9][a-z0-9-]{0,99}$/.test(cmd.zone.id),
+        "Invalid delivery area ID",
+        422,
+      );
+      requireThat(
+        cmd.zone.version === 0,
+        "A new delivery area must start at version zero",
+        422,
+      );
+      requireThat(
+        cmd.zone.minOrderAed !== null,
+        "Confirm the approved minimum before creating an area",
+        422,
+      );
+      requireThat(
+        cmd.zone.deliveryFeeAed === 0 && cmd.zone.freeDelivery,
+        "Delivery has no separate charge; edit only the area minimum",
+        422,
+      );
+      const zone = {
+        ...cmd.zone,
+        name: cmd.zone.name.trim(),
+        aliases: [
+          ...new Set(cmd.zone.aliases.map((a) => a.trim()).filter(Boolean)),
+        ],
+        version: 1,
+      };
+      const labels = [zone.name, ...zone.aliases].map(normalizeAreaName);
+      requireThat(
+        labels.every(Boolean),
+        "Delivery area names must contain letters or numbers",
+        422,
+      );
+      requireThat(
+        !s.zones.some(
+          (existing) =>
+            existing.id === zone.id ||
+            [existing.name, ...existing.aliases].some((label) =>
+              labels.includes(normalizeAreaName(label)),
+            ),
+        ),
+        "A delivery area with this ID, name or alias already exists",
+        409,
+      );
+      s.zones.push(zone);
+      s.audit.push({
+        ...at(),
+        actor: actor.id,
+        action: `Delivery area ${zone.id} created: ${JSON.stringify(zone)}`,
+      });
+      return zone;
+    }
     if (cmd.type === "updateZone") {
       requireThat(
         actor.role === "admin",
@@ -611,7 +685,12 @@ export class CommerceService {
     for (const delivery of due) {
       try {
         const event = inboundSchema.parse(delivery.event);
-        if (event.type === "message" && event.location) {
+        if (
+          event.type === "message" &&
+          event.location &&
+          event.origin !== "history" &&
+          event.direction !== "out"
+        ) {
           // A geocoder outage must not lose the customer's message; unresolved GPS stays blocked for manual review.
           try {
             await this.geo.prepare?.(event.location);
@@ -653,6 +732,9 @@ export class CommerceService {
         // Existing signed/idempotent inbound transaction owns this receipt.
       } else if (e.type === "status") {
         const m = s.conversations
+          .filter(
+            (c) => !e.sourceNumberId || c.sourceNumberId === e.sourceNumberId,
+          )
           .flatMap((c) => c.messages)
           .find((m) => m.providerId === e.providerId);
         requireThat(m, "Mensaje todavía no disponible; reintentar", 503);
@@ -662,42 +744,24 @@ export class CommerceService {
         if (e.status === "failed") {
           if (current < 2) m.status = "failed";
         } else if (ranks[e.status] > current) m.status = e.status;
+      } else if (e.type === "contact") {
+        applyWhatsAppContact(s, e, this.operationalNumbers);
+      } else if (e.type === "historyMedia") {
+        requireThat(
+          this.operationalNumbers.some((n) => n.id === e.sourceNumberId),
+          "Número de origen desconocido",
+          400,
+        );
+        applyWhatsAppHistoryMedia(s, e);
+      } else if (e.type === "coexistence") {
+        // Diagnostic observations are not registration/connection state or permission to send.
+        s.whatsappAccountObservations ??= [];
+        s.whatsappAccountObservations.push(e);
+        if (s.whatsappAccountObservations.length > 1000)
+          s.whatsappAccountObservations.shift();
       } else {
-        const n = this.operationalNumbers.find(
-          (n) => n.id === e.sourceNumberId,
-        );
-        requireThat(n, "Número de origen desconocido", 400);
-        let c = s.conversations.find(
-          (c) => c.sourceNumberId === n.id && c.phone === e.phone,
-        );
-        if (!c) {
-          c = {
-            id: randomUUID(),
-            customer: e.customer,
-            phone: e.phone,
-            sourceNumberId: n.id,
-            sourcePhoneNumber: n.phone,
-            assignedAgent: null,
-            status: "open",
-            unread: true,
-            version: 0,
-            messages: [],
-            audit: [],
-          };
-          s.conversations.push(c);
-        }
-        c.messages.push({
-          id: e.eventId,
-          direction: "in",
-          text: e.text,
-          location: e.location,
-          status: "received",
-          at: e.at ?? now(),
-        });
-        c.unread = true;
-        c.status = "open";
-        c.version++;
-        if (e.location) {
+        const c = applyWhatsAppMessage(s, e, this.operationalNumbers);
+        if (c && e.location) {
           c.location = e.location;
           c.address = undefined;
           for (const o of s.orders.filter(
@@ -771,6 +835,7 @@ export class CommerceService {
         // A late success is money received, but must never silently resurrect a cancelled/replaced order.
         if (
           o.state === "Awaiting Payment" &&
+          acceptedPackPricesCurrent(s, o) &&
           o.paymentId === p.id &&
           !s.payments.some(
             (other) =>
@@ -1050,8 +1115,7 @@ export class CommerceService {
     return this.store.write((s) => {
       const p = s.payments.find((p) => p.id === paymentId)!;
       requireThat(
-        checkout.checkoutId ===
-          (p.providerReference ?? p.providerCheckoutId) &&
+        checkout.checkoutId === (p.providerReference ?? p.providerCheckoutId) &&
           checkout.requestId === p.id &&
           checkout.orderId === p.orderId &&
           checkout.amountFils === p.amountFils &&
@@ -1117,6 +1181,7 @@ export class CommerceService {
         p.paidAt = now();
         if (
           o.state === "Awaiting Payment" &&
+          acceptedPackPricesCurrent(s, o) &&
           o.paymentId === p.id &&
           !s.payments.some(
             (other) =>
@@ -1135,12 +1200,14 @@ export class CommerceService {
           // branch runs once per payment (paidAt guard) and only when the
           // order was genuinely awaiting this payment; recordOrderPaid is
           // additionally idempotent per order.
+          recordPaidCustomerConfirmation(s, o, p, this.customerPaidEmailSince);
           recordPaidOperationsEmail(
             s,
             o,
             p,
             this.operationsEmailRecipients,
             this.operationsOrigin,
+            this.operationsEmailCompactRecipients,
           );
           recordOrderPaid(
             s,
@@ -1183,6 +1250,11 @@ export class CommerceService {
       409,
     );
     const frozen = frozenCheckout(order, payment);
+    requireThat(
+      acceptedPackPricesCurrent(snapshot, order),
+      "Premium pricing changed; review required",
+      409,
+    );
     const names = customer.customer.trim().split(/\s+/);
     // Names captured separately are sent as given; only older orders are split.
     const firstName = order.customerDetails.firstName ?? names[0]!;
@@ -1347,9 +1419,7 @@ export class CommerceService {
               const current = this.conversation(s, c.id),
                 session = s.ai?.sessions[c.id],
                 run = s.ai?.runs.find((r) => r.id === m.agentGuard!.runId);
-              const incoming = current.messages
-                .filter((m) => m.direction === "in")
-                .at(-1);
+              const incoming = latestCustomerInbound(current);
               const origin = this.operationalNumbers.find(
                 (n) =>
                   n.id === current.sourceNumberId &&
@@ -1389,11 +1459,7 @@ export class CommerceService {
               ...sourceOf(c),
               text: m.text,
               paymentContext: m.paymentContext,
-              lastInboundAt: c.messages
-                .filter((m) => m.direction === "in")
-                .map((m) => m.at)
-                .sort()
-                .at(-1),
+              lastInboundAt: latestCustomerInbound(c)?.at,
               idempotencyKey: m.id,
             }),
           );

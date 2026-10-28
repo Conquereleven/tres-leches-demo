@@ -1,4 +1,9 @@
 import {
+  liveLinePrice,
+  packPricingPolicy,
+  acceptedPackPricesCurrent,
+} from "./pack-pricing";
+import {
   commerceLineSchema,
   distinctLines,
   lineKey,
@@ -378,18 +383,21 @@ export function canonicalCartHash(
       requireThat(product?.active, "Product unavailable", 422);
       return {
         sku: line.productId,
+        ...(line.color ? { color: line.color } : {}),
         ...(line.composition ? { composition: line.composition } : {}),
         quantity: line.quantity,
-        unitPriceFils: product.priceFils,
+        unitPriceFils: liveLinePrice(line, catalog),
       };
     })
     .sort((a, b) =>
       lineKey({
         productId: a.sku,
+        color: a.color,
         composition: "composition" in a ? a.composition : undefined,
       }).localeCompare(
         lineKey({
           productId: b.sku,
+          color: b.color,
           composition: "composition" in b ? b.composition : undefined,
         }),
       ),
@@ -437,6 +445,7 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
             lines: frozen.items
               .map((i) => ({
                 sku: i.sku,
+                ...(i.color ? { color: i.color } : {}),
                 ...(i.composition ? { composition: i.composition } : {}),
                 quantity: i.quantity,
                 unitPriceFils: i.unitPriceFils,
@@ -444,10 +453,12 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
               .sort((a, b) =>
                 lineKey({
                   productId: a.sku,
+                  color: a.color,
                   composition: "composition" in a ? a.composition : undefined,
                 }).localeCompare(
                   lineKey({
                     productId: b.sku,
+                    color: b.color,
                     composition: "composition" in b ? b.composition : undefined,
                   }),
                 ),
@@ -479,7 +490,9 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
       ) =>
         JSON.stringify({
           lines: lines
-            .map(({ packSnapshot: _snapshot, ...l }) => l)
+            .map(
+              ({ packSnapshot: _snapshot, priceSnapshot: _price, ...l }) => l,
+            )
             .sort((a, b) => lineKey(a).localeCompare(lineKey(b))),
           method: method ?? "delivery",
           zoneId: zoneId ?? null,
@@ -630,6 +643,7 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
       ...(packBuilderEnabled()
         ? { packEligibility: publishedPackRules(s) }
         : {}),
+      packPricing: packPricingPolicy(s.catalog ?? []),
       lines: [...input.lines]
         .sort((a, b) => lineKey(a).localeCompare(lineKey(b)))
         .map((l) => ({
@@ -645,6 +659,7 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
 export type WebCheckoutSummary = {
   items: {
     productId: string;
+    color?: Order["lines"][number]["color"];
     composition?: Order["lines"][number]["composition"];
     packSnapshot?: Order["lines"][number]["packSnapshot"];
     name: string;
@@ -691,7 +706,18 @@ export function readWebCheckoutStatus(
   let frozen: ReturnType<typeof frozenCheckout> | undefined;
   try {
     frozen = frozenCheckout(order, payment);
+    if (
+      !["paid", "partially_refunded", "refunded", "chargeback"].includes(
+        payment.status,
+      )
+    )
+      requireThat(
+        acceptedPackPricesCurrent(s, order),
+        "Premium pricing changed; review required",
+        409,
+      );
   } catch {
+    frozen = undefined;
     /* Legacy financial status remains readable; no invented line prices. */
   }
   return {
@@ -707,7 +733,11 @@ export function readWebCheckoutStatus(
     amountFils: payment.amountFils,
     currency: payment.currency,
     actionRequired:
-      record?.supersededAt || (!frozen && payment.status !== "paid")
+      record?.supersededAt ||
+      (payment.status === "paid" &&
+        order.state === "Awaiting Payment" &&
+        !acceptedPackPricesCurrent(s, order)) ||
+      (!frozen && payment.status !== "paid")
         ? "review_payment"
         : payment.checkoutFlow === "web" &&
             !payment.url &&
@@ -728,6 +758,8 @@ export function readWebCheckoutStatus(
       ? {
           items: frozen.items.map((i) => ({
             productId: i.sku,
+            ...(i.color ? { color: i.color } : {}),
+            ...(i.packSnapshot ? { packSnapshot: i.packSnapshot } : {}),
             ...(i.composition
               ? { composition: i.composition, packSnapshot: i.packSnapshot }
               : {}),

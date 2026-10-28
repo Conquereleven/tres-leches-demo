@@ -155,3 +155,26 @@ Local current-baseline gate: typecheck, lint, build; 615/615 commerce tests; ded
 **Current DNS correction supersedes section3's guessed root target:** Railway already has `3ldubai.ae` attached to Production port3001; it is unverified and certificate issuance is pending. Required apex target is **`qh7cebps.up.railway.app`**, not the www target. At AEserver replace `@ A 165.22.30.248` with a supported ALIAS/ANAME/flattened CNAME to that target and add the exact `_railway-verify` TXT shown in Railway. Keep `www CNAME agpvjymd.up.railway.app` and every mail/SPF/DKIM/DMARC record unchanged. Do not copy Railway's resolved IP into an A record. If apex flattening is unavailable, ask AEserver for managed HTTPS301 forwarding preserving path/query; no nameserver migration is authorized.
 
 The `.ae` parent and registrar delegate to `dns1–3.aeserver.com`. The child zone/recursive NS answer advertises `ns1–3.rrpproxy.net`, with SOA contact `domains.aeserver.com`. DNS management remains AEserver; do not confuse these two observations with an authorized delegation change. Apex HTTP `/menu` currently404 and HTTPS connection refused; www TLS valid.
+
+## Sprint 02 refresh · 21 October 2026 (3L-SEO-TECH-002)
+
+Merged `main` `17dc5fb` (3L-MEDIA-002 photography, Closure Sprint 01, Vite 6.4.4) into this branch with no conflicts. Track A code is unchanged; Product Hub, dynamic catalog, packs, checkout and the photography system come from `main` as they are.
+
+**Customer download, same method on both builds** (real browser visit at 390 px; every JS/CSS file the page requests, gzip -9 of the built file; identical for `/`, `/menu`, `/menu?category=pan`, `/cart`):
+
+| | `main` 17dc5fb | this branch |
+|---|---:|---:|
+| JavaScript (gzip) | 418.5 KB | **325.8 KB** (−22%) |
+| CSS (gzip) | 30.9 KB | **20.7 KB** (−33%) |
+| JS + CSS (brotli) | 308.1 KB | **233.2 KB** (−24%) |
+| Operations code downloaded on public pages | yes | **no** (separate `Workspace-*.js` chunk) |
+
+Hydration at 4× CPU throttle, `/menu?category=pan`, median of 5 alternating runs: DOMContentLoaded 247 → 226 ms, live menu rendered 397 → 376 ms, long tasks 177 → 161 ms. No regression; local measurements, not field data.
+
+**HTTP behaviour of this build** (local, test environment, where every page is deliberately `noindex`): `/terms.html` → 301 `/terms`, `/index.html?lang=es` → 301 `/?lang=es`, `/menu/` → 301 `/menu`; `/api/*` answers carry `X-Robots-Tag: noindex`; gallery and official photos (`/brand/approved/3l-media-002/…`, `/brand/official-pan/…`) return a weak ETag with `public, max-age=3600, must-revalidate` and a 304 on `If-None-Match`; hashed bundles stay `immutable`. Product Hub uploads (`/brand/hub/<sha>`) are served by their own route before this rule and keep `immutable, max-age=31536000`. Public pages carry one canonical each; no `hreflang` (English documents only); sitemap lists the 8 public pages. `robots.txt` is not changed (AI crawler permissions untouched).
+
+Live Production today (read-only, `main`): public pages indexable, cart/checkout/Operations/API `noindex`, but `/terms.html` answers 200 as a duplicate of `/terms`; this branch fixes that with a 301. Nothing here is evidence of Google indexing; only Search Console can show that.
+
+**Test model corrected:** with `main`'s Vite/Playwright, opening Operations requests the `Workspace` chunk twice (Vite's modulepreload, then the import). The reload-once test blocked only the first request, so the import succeeded without a reload and the test failed 5/5 in Chromium although the application behaved correctly. The test now models a chunk removed by a deploy: every request fails until the reloaded document is requested (switching on its navigation request, not its load event, because its chunk fetch can start before load). It still requires exactly one reload and, in Chromium, a recovered Operations; the separate no-loop test is unchanged. Application code is unchanged.
+
+**PR #34 after this merges:** a trial merge of #34 onto this branch was clean (11 commits, 14 files), typecheck passed and its product-page tests passed 10/10 against the built server. Its server-rendered product page goes through `main`'s `markDynamicCatalog` path, so the published-media policy (#44) also applies there. To resume: merge `main` (including this PR) into #34; run storefront-dynamic, checkout, i18n and menu suites; recheck that product pages show the 3L-MEDIA-002 photos once Product Hub publishes them; update its README SHAs; then founder review. `lastmod` still needs a real `publishedAt`.

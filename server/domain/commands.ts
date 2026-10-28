@@ -1,6 +1,11 @@
 import { commerceLineSchema } from "../../shared/pack-composition";
 import { z } from "zod";
-import { locationSchema, states, zoneSchema } from "./model";
+import {
+  locationSchema,
+  states,
+  zoneSchema,
+  whatsAppMediaSchema,
+} from "./model";
 const base = {
   id: z.string().min(1).max(100),
   version: z.number().int().nonnegative(),
@@ -49,10 +54,44 @@ export const commandSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("resendPayment"), ...base }),
   z.object({ type: z.literal("transition"), ...base, state: z.enum(states) }),
   z.object({ type: z.literal("updateZone"), zone: zoneSchema }),
+  z.object({ type: z.literal("createZone"), zone: zoneSchema }),
   z.object({ type: z.literal("retryJob"), id: z.string() }),
 ]);
 export type Command = z.infer<typeof commandSchema>;
 export const inboundSchema = z.discriminatedUnion("type", [
+  z.object({
+    type: z.literal("historyMedia"),
+    eventId: z.string().min(1).max(150),
+    sourceNumberId: z.string(),
+    providerMessageId: z.string().min(1).max(256),
+    phone: z.string().regex(/^\+?[0-9]{7,16}$/),
+    media: whatsAppMediaSchema,
+    caption: z.string().max(4000).optional(),
+  }),
+  z.object({
+    type: z.literal("coexistence"),
+    eventId: z.string().min(1).max(150),
+    wabaId: z.string().min(1).max(256),
+    sourceNumberId: z.string().optional(),
+    event: z.enum([
+      "PARTNER_REMOVED",
+      "ACCOUNT_OFFBOARDED",
+      "ACCOUNT_RECONNECTED",
+      "HISTORY_SHARING_DECLINED",
+    ]),
+    at: z.iso.datetime().optional(),
+    reason: z
+      .enum([
+        "ACCOUNT_DISCONNECTED",
+        "BUSINESS_DOWNGRADE",
+        "CHANGE_NUMBER",
+        "COMPANION_INACTIVITY",
+        "PRIMARY_INACTIVITY",
+        "USER_RE_REGISTERED",
+      ])
+      .optional(),
+    initiatedBy: z.enum(["USER", "SYSTEM"]).optional(),
+  }),
   z.object({
     type: z.literal("message"),
     eventId: z.string().min(1).max(150),
@@ -62,11 +101,28 @@ export const inboundSchema = z.discriminatedUnion("type", [
     customer: z.string().min(1).max(100),
     text: z.string().max(4000),
     location: locationSchema.optional(),
+    providerMessageId: z.string().min(1).max(256).optional(),
+    direction: z.enum(["in", "out"]).optional(),
+    origin: z.enum(["cloud", "business-app", "history"]).optional(),
+    media: whatsAppMediaSchema.optional(),
+    observedStatus: z
+      .enum(["received", "sent", "delivered", "read", "failed", "unknown"])
+      .optional(),
+  }),
+  z.object({
+    type: z.literal("contact"),
+    eventId: z.string().min(1).max(150),
+    sourceNumberId: z.string(),
+    phone: z.string().regex(/^\+?[0-9]{7,16}$/),
+    customer: z.string().min(1).max(100).optional(),
+    action: z.enum(["add", "remove"]),
+    at: z.iso.datetime(),
   }),
   z.object({
     type: z.literal("status"),
     eventId: z.string().min(1).max(150),
     providerId: z.string(),
+    sourceNumberId: z.string().optional(),
     status: z.enum(["sent", "delivered", "read", "failed"]),
   }),
 ]);

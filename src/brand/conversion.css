@@ -1,0 +1,178 @@
+/* Conversion controls: existing brand tokens, native keyboard controls, logical RTL layout. */
+.brand-experience .b-discovery-search {
+  margin-block: 1.5rem 2rem;
+  max-inline-size: 64rem;
+}
+.brand-experience .b-discovery-search label {
+  display: block;
+  font-weight: 600;
+  margin-block-end: 0.65rem;
+}
+.brand-experience .b-discovery-input {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  background: var(--v2-white);
+  border: 1px solid var(--v2-graphite);
+  padding-inline: 0.8rem;
+}
+.brand-experience .b-discovery-input input {
+  border: 0;
+  background: transparent;
+  color: var(--v2-graphite);
+  font: inherit;
+  font-size: 1rem;
+  min-inline-size: 0;
+  inline-size: 100%;
+  min-block-size: 52px;
+}
+.brand-experience .b-discovery-input input::-webkit-search-cancel-button {
+  display: none;
+}
+.brand-experience .b-discovery-input button,
+.brand-experience .b-complementary-nav button {
+  min-block-size: 44px;
+  font: inherit;
+  color: var(--v2-graphite);
+}
+.brand-experience .b-discovery-status {
+  font-size: 0.85rem;
+  margin-block: 0.6rem;
+}
+.brand-experience .b-search-results {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 1rem;
+}
+.brand-experience .b-search-results a {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.8rem;
+  background: var(--v2-white);
+  color: var(--v2-graphite);
+  text-decoration: none;
+  min-inline-size: 0;
+}
+.brand-experience .b-search-results a > span:last-child {
+  display: grid;
+  gap: 0.3rem;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+.brand-experience .b-search-results strong {
+  font-size: 1rem;
+}
+.brand-experience .b-discovery-photo {
+  display: block;
+  inline-size: 72px;
+  block-size: 72px;
+  flex: 0 0 72px;
+  background: var(--v2-blush);
+  overflow: hidden;
+}
+.brand-experience .b-discovery-photo :is(picture, img) {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.brand-experience .b-complementary {
+  border-block-start: 1px solid var(--3l-gold);
+  background: var(--v2-white);
+  padding: 1rem;
+  margin-block: 1rem;
+  color: var(--v2-graphite);
+  min-inline-size: 0;
+}
+.brand-experience .b-complementary h2 {
+  font-family: var(--body-font);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0;
+  margin-block: 0.5rem 1rem;
+}
+.brand-experience .b-item-added {
+  font-weight: 600;
+}
+.brand-experience .b-complementary-nav {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-block-end: 1rem;
+}
+.brand-experience .b-complementary-nav .b-button {
+  min-block-size: 44px;
+  padding: 0.75rem 1rem;
+}
+.brand-experience .b-complementary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 1rem;
+}
+.brand-experience .b-recommendation {
+  display: flex;
+  gap: 0.75rem;
+  min-inline-size: 0;
+}
+.brand-experience .b-recommendation > div {
+  min-inline-size: 0;
+  flex: 1;
+}
+.brand-experience .b-recommendation p {
+  font-size: 0.85rem;
+  margin-block: 0.5rem;
+}
+.brand-experience .b-recommendation-name {
+  font-weight: 600;
+  color: var(--v2-graphite);
+  overflow-wrap: anywhere;
+}
+.brand-experience .b-recommendation label {
+  display: block;
+  font-size: 0.85rem;
+}
+.brand-experience .b-recommendation select {
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-block-size: 44px;
+  background: var(--v2-white);
+  color: var(--v2-graphite);
+  font: inherit;
+  font-size: 0.9rem;
+  margin-block: 0.4rem;
+}
+.brand-experience .b-recommendation-add {
+  border: 1px solid var(--v2-raspberry);
+  color: var(--v2-raspberry);
+  background: var(--v2-white);
+  min-block-size: 44px;
+  padding: 0.5rem 1rem;
+  font: inherit;
+  cursor: pointer;
+}
+.brand-experience .b-recommendation-add:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.brand-experience
+  :is(
+    .b-discovery-input input,
+    .b-discovery-input button,
+    .b-search-results a,
+    .b-recommendation-add,
+    .b-complementary-nav a,
+    .b-complementary-nav button
+  ):focus-visible {
+  outline: 2px solid var(--v2-graphite);
+  outline-offset: 3px;
+}
+@media (max-width: 600px) {
+  .brand-experience .b-complementary-nav .b-button {
+    flex: 1;
+  }
+}

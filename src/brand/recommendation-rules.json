@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "bakery-milk",
+      "whenCategories": ["cakes", "jars", "bakery", "pan", "conchas"],
+      "targetFamilies": ["milk"],
+      "priority": 100
+    },
+    {
+      "id": "celebration-candles",
+      "whenCategories": ["cakes"],
+      "targetFamilies": ["candles"],
+      "priority": 90
+    },
+    {
+      "id": "celebration-topper",
+      "whenCategories": ["cakes"],
+      "targetFamilies": ["cake-topper"],
+      "priority": 80
+    }
+  ]
+}

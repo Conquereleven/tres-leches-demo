@@ -243,13 +243,20 @@ for (const width of [390, 768, 1440])
       `docs/brand/brand02/conchas/parity-${info.project.name}-${width}.json`,
       JSON.stringify({ pan: styles[0], conchas: styles[1] }, null, 2),
     );
-    expect(styles[0]).toEqual(styles[1]);
+    // PR #61: real food photographs fill the frame, deliberate illustrations
+    // remain contained. All shared card geometry is still identical.
+    expect(styles[0]!.imageFit).toBe("cover");
+    expect(styles[1]!.imageFit).toBe("contain");
+    expect({ ...styles[0], imageFit: "by-media-kind" }).toEqual({
+      ...styles[1],
+      imageFit: "by-media-kind",
+    });
   });
 
 for (const [slug, image] of [
   ["vainilla", "concha-tradicional-vainilla"],
   ["pistache", "concha-tradicional-pistache"],
-  ["tricolor", "concha-tradicional-tricolor-mexico"],
+  ["tricolor", "^/brand/icon\\.png$"],
 ] as const) {
   for (const [size, fils] of [
     ["Mini · 40 g", 1100],
@@ -270,11 +277,20 @@ for (const [slug, image] of [
         .poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth))
         .toBeGreaterThan(0);
       await expect(img).toHaveAttribute("src", new RegExp(image));
-      const selector = card.locator(".b-menu-selectors select");
+      const selector = card.locator(".b-menu-selectors select").first();
       await selector.selectOption({ label: size });
       await expect(card.locator(".b-menu-price")).toContainText(
         String(fils / 100),
       );
+      if (slug === "tricolor") {
+        await expect(card.locator(".b-add-to-cart > button")).toBeDisabled();
+        await card
+          .getByRole("combobox", { name: "Color", exact: true })
+          .selectOption("green");
+        await expect(card.locator(".b-pack-composition")).toContainText(
+          "Verde",
+        );
+      }
       await expect(card.locator(".b-menu-options button").last()).toBeEnabled();
       await card.locator(".b-menu-options button").last().click();
       const cartReady = page.waitForResponse((r) =>
@@ -326,8 +342,11 @@ for (const width of [390, 768, 1440])
     await banner.scrollIntoViewIfNeeded();
     await expect(banner.locator("picture.is-active img")).toHaveAttribute(
       "src",
-      /conchas_de_pistache_sobre_tabla_de_madera/,
+      /3l-media-002\/conchas-0-m002-026-/,
     );
+    await expect(
+      banner.locator('img[src*="conchas_de_pistache_sobre_tabla_de_madera"]'),
+    ).toHaveCount(0);
     const bannerStyle = await banner.evaluate((el) => ({
       ratio: getComputedStyle(el).aspectRatio,
       radius: getComputedStyle(el).borderRadius,
@@ -404,7 +423,7 @@ for (const width of [390, 768, 1440])
   });
 
 for (const width of [390, 768, 1440])
-  test(`all seven Conchas uniform frames, row alignment and journey ${width}`, async ({
+  test(`all eight approved Conchas uniform frames, row alignment and journey ${width}`, async ({
     page,
   }, info) => {
     await page.setViewportSize({ width, height: 900 });
@@ -423,7 +442,29 @@ for (const width of [390, 768, 1440])
     };
     await visit("/menu?category=conchas");
     const cards = page.locator(".b-menu-card");
-    await expect(cards).toHaveCount(7);
+    await expect(cards).toHaveCount(8);
+    expect(
+      await cards.evaluateAll((nodes) =>
+        nodes.map((n) => n.getAttribute("data-product-id")),
+      ),
+    ).toEqual([
+      "conchas-traditional--chocolate",
+      "conchas-traditional--vainilla",
+      "conchas-traditional--pistache",
+      "conchas-traditional--tricolor",
+      "conchas-filled--pistache",
+      "conchas-traditional-pack",
+      "conchas-filled-pack",
+      "conchas-tricolor-pack",
+    ]);
+    for (const id of [
+      "conchas-traditional--tricolor",
+      "conchas-tricolor-pack",
+    ]) {
+      await expect(
+        page.locator(`[data-product-id="${id}"] .b-menu-photo img`),
+      ).toHaveAttribute("src", "/brand/icon.png");
+    }
     for (const card of await cards.all()) {
       await card.scrollIntoViewIfNeeded();
       await expect
@@ -451,6 +492,8 @@ for (const width of [390, 768, 1440])
           background: css.backgroundColor,
           overflow: css.overflow,
           fit: getComputedStyle(img).objectFit,
+          mediaKind: img.closest("picture")?.getAttribute("data-media-kind"),
+          fallbackLogo: img.getAttribute("src") === "/brand/icon.png",
           imageHeight: img.getBoundingClientRect().height,
           imageWidth: img.getBoundingClientRect().width,
           sourceRatio:
@@ -463,7 +506,13 @@ for (const width of [390, 768, 1440])
       expect(f.ratio).toBe("1 / 1");
       expect(f.radius).toBe("20px");
       expect(f.overflow).toBe("hidden");
-      expect(f.fit).toBe("contain");
+      // Keep approved illustrations and brand fallback intact; only food
+      // photography fills the frame. Shared shape is always square.
+      expect(f.fit).toBe(
+        f.mediaKind === "digital-illustration" || f.fallbackLogo
+          ? "contain"
+          : "cover",
+      );
       expect(f.sourceRatio).toBe(1);
       expect(f.background).toBe(frames[0]!.background);
       expect(f.height).toBeCloseTo(frames[0]!.height, 0);
@@ -482,7 +531,7 @@ for (const width of [390, 768, 1440])
       JSON.stringify(frames, null, 2),
     );
     if (info.project.name === "chromium")
-      await capture(page, `${root}/seven-cards-${width}.png`);
+      await capture(page, `${root}/eight-cards-${width}.png`);
     const ids = frames.map((f) => f.id!);
     for (const id of ids) {
       await visit(`/menu?product=${id}`);
@@ -493,6 +542,14 @@ for (const width of [390, 768, 1440])
       expect(
         await frame.evaluate((el) => getComputedStyle(el).borderRadius),
       ).toBe("20px");
+      if (id === "conchas-traditional--tricolor") {
+        await page
+          .getByRole("combobox", { name: "Color", exact: true })
+          .selectOption("green");
+        await expect(page.locator(".b-pack-composition")).toContainText(
+          "Green",
+        );
+      }
       await page.locator(".b-menu-options button").last().click();
     }
     for (const path of ["cart", "checkout"]) {
@@ -500,7 +557,7 @@ for (const width of [390, 768, 1440])
       if (await page.locator(".b-co-summary-toggle").isVisible())
         await page.locator(".b-co-summary-toggle").click();
       const thumbs = page.locator(".b-co-thumb");
-      await expect(thumbs).toHaveCount(7);
+      await expect(thumbs).toHaveCount(8);
       for (const thumb of await thumbs.all()) {
         const f = await thumb.evaluate((el) => {
           const b = el.getBoundingClientRect(),
@@ -509,12 +566,18 @@ for (const width of [390, 768, 1440])
             ratio: b.width / b.height,
             radius: s.borderRadius,
             fit: s.objectFit,
+            mediaKind: el.closest("picture")?.getAttribute("data-media-kind"),
+            fallbackLogo: (el as HTMLImageElement).getAttribute("src") === "/brand/icon.png",
             background: s.backgroundColor,
           };
         });
         expect(f.ratio).toBeCloseTo(1, 2);
         expect(f.radius).toBe("12px");
-        expect(f.fit).toBe("contain");
+        expect(f.fit).toBe(
+          f.mediaKind === "digital-illustration" || f.fallbackLogo
+            ? "contain"
+            : "cover",
+        );
       }
       expect(
         await page.evaluate(
@@ -523,7 +586,7 @@ for (const width of [390, 768, 1440])
       ).toBe(true);
       if (info.project.name === "chromium")
         await page.screenshot({
-          path: `${root}/seven-${path}-${width}.png`,
+          path: `${root}/eight-${path}-${width}.png`,
           fullPage: true,
         });
     }

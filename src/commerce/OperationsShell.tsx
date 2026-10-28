@@ -2,6 +2,7 @@ import { useOps } from "./ops-i18n";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   House,
+  ChartLine,
   Package,
   Printer,
   Gear,
@@ -29,6 +30,14 @@ export const operationsNavigation = [
     description: "Your operation at a glance",
     group: "Workspace",
     icon: House,
+  },
+  {
+    id: "analytics",
+    label: "Analytics & Reports",
+    title: "Analytics & Reports",
+    description: "Recorded payment captures and historical product performance",
+    group: "Workspace",
+    icon: ChartLine,
   },
   {
     id: "orders",
@@ -106,7 +115,7 @@ export const operationsNavigation = [
 const navigation = operationsNavigation;
 
 type Props = {
-  data: Workspace;
+  data: Pick<Workspace, "actor" | "agents" | "environment" | "mode">;
   view: string;
   busy: boolean;
   onNavigate: (id: string) => void;
@@ -142,7 +151,7 @@ export function OperationsShell({
     (item) =>
       (item.id !== "readiness" ||
         (data.environment === "staging" && data.actor.role === "admin")) &&
-      (item.id !== "settings" ||
+      (!["settings", "analytics"].includes(item.id) ||
         ["admin", "manager"].includes(data.actor.role)),
   );
   useEffect(() => {
@@ -280,7 +289,7 @@ export function OperationsShell({
   }
   return (
     <div
-      className={`commerce ops-shell${collapsed ? " ops-collapsed" : ""}`}
+      className={`commerce ops-shell${collapsed ? " ops-collapsed" : ""}${view === "analytics" ? " ops-analytics" : ""}`}
       aria-busy={busy}
       lang={language}
     >

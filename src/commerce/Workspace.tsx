@@ -1,3 +1,6 @@
+import { paidEmailLabel } from "./customer-email-status";
+import { Login } from "./Login";
+import { AnalyticsWorkspace } from "./Analytics";
 import { lineKey, preparationText } from "../../shared/pack-composition";
 import {
   orderProductName,
@@ -19,12 +22,13 @@ import type {
   DeliveryZone,
   OrderState,
 } from "../../server/domain/model";
-import { api, money, type Workspace as Data } from "./api";
+import { api, ApiError, money, type Workspace as Data } from "./api";
 import { OrderCard } from "./OrdersBoard";
 import { OrdersList } from "./OrdersList";
 import { OrderDetailsPage, OrderPageHeading } from "./OrderDetails";
 import {
   orderPath,
+  orderLines,
   parseListQuery,
   parseOperationsPath,
   serializeListQuery,
@@ -47,13 +51,19 @@ function readRoute() {
 export function CommerceWorkspace() {
   return (
     <OpsProvider>
-      <WorkspaceInner />
+      {location.pathname === "/operations/analytics" ? (
+        <AnalyticsWorkspace />
+      ) : (
+        <WorkspaceInner />
+      )}
     </OpsProvider>
   );
 }
 function WorkspaceInner() {
   const { t, formatDate, setUser, language, errorText } = useOps();
   const [data, setData] = useState<Data | null>(null),
+    [sessionExpired, setSessionExpired] = useState(false),
+    [offline, setOffline] = useState(() => !navigator.onLine),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [route, setRoute] = useState(readRoute),
@@ -102,28 +112,106 @@ function WorkspaceInner() {
     setUser(data?.actor.id ?? null);
   }, [data?.actor.id, setUser]);
   const pending = useRef(new Map<string, string>());
-  const refresh = useCallback(async () => {
-    try {
-      const next = await api<Data>("workspace");
-      // Before rendering: names approved in Product Hub for staff screens and tickets.
-      setPublishedProductNames(next.productNames);
-      setData(next);
-      setError((previous) =>
-        previous.includes("Inicia sesión") ? "" : previous,
-      );
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Error de conexión");
-      if (e instanceof Error && e.message.includes("Inicia sesión"))
-        setData(null);
-    }
+  const mutationActive = useRef(false);
+  const expired = useRef(false);
+  const generation = useRef(0);
+  const reading = useRef<{
+    controller: AbortController;
+    promise: Promise<void>;
+  } | null>(null);
+  const readError = useRef("");
+  const invalidateRead = useCallback(() => {
+    generation.current++;
+    reading.current?.controller.abort();
+    reading.current = null;
   }, []);
+  const refresh = useCallback((afterMutation = false): Promise<void> => {
+    if (
+      (!afterMutation && mutationActive.current) ||
+      !navigator.onLine ||
+      document.visibilityState === "hidden"
+    )
+      return Promise.resolve();
+    if (reading.current) return reading.current.promise;
+    const controller = new AbortController();
+    const current = ++generation.current;
+    const promise = (async () => {
+      try {
+        const next = await api<Data>("workspace", undefined, undefined, {
+          signal: controller.signal,
+        });
+        if (current !== generation.current || controller.signal.aborted) return;
+        // Before rendering: names approved in Product Hub for staff screens and tickets.
+        setPublishedProductNames(next.productNames);
+        setData(next);
+        const wasExpired = expired.current;
+        expired.current = false;
+        setSessionExpired(false);
+        // Clear recovered transport errors, never hide a rejected command.
+        const previousReadError = readError.current;
+        setError((previous) =>
+          wasExpired || previous === previousReadError ? "" : previous,
+        );
+        readError.current = "";
+      } catch (e) {
+        if (current !== generation.current || controller.signal.aborted) return;
+        if (e instanceof ApiError && e.status === 401) {
+          expired.current = true;
+          setSessionExpired(true);
+          setData(null);
+        } else {
+          readError.current =
+            e instanceof Error ? e.message : "Unable to connect. Try again.";
+          setError(readError.current);
+        }
+      } finally {
+        if (current === generation.current) reading.current = null;
+      }
+    })();
+    reading.current = { controller, promise };
+    return promise;
+  }, []);
+  const resumeAfterLogin = useCallback(async () => {
+    // The login response may arrive while hidden/offline. Release the expired
+    // session latch so foreground/reconnect can fetch the authorized workspace.
+    // Private data still renders only after a successful workspace response.
+    expired.current = false;
+    setSessionExpired(false);
+    setError("");
+    await refresh();
+  }, [refresh]);
   useEffect(() => {
     void refresh();
-    const timer = setInterval(() => void refresh(), 3000);
-    return () => clearInterval(timer);
-  }, [refresh]);
+    const tick = () => {
+      if (!expired.current) void refresh();
+    };
+    const visibility = () => {
+      if (document.visibilityState === "hidden") invalidateRead();
+      else tick();
+    };
+    const connection = () => {
+      setOffline(!navigator.onLine);
+      if (navigator.onLine) tick();
+      else invalidateRead();
+    };
+    const timer = setInterval(tick, 3000);
+    window.addEventListener("online", connection);
+    window.addEventListener("offline", connection);
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("online", connection);
+      window.removeEventListener("offline", connection);
+      document.removeEventListener("visibilitychange", visibility);
+      invalidateRead();
+    };
+  }, [refresh, invalidateRead]);
   const run: Run = async (body, path = "commands") => {
-    if (busy) return false;
+    // A ref closes the same-event double-tap window before React re-renders.
+    if (mutationActive.current || expired.current || !navigator.onLine)
+      return false;
+    mutationActive.current = true;
+    invalidateRead();
     setBusy(true);
     setError("");
     const signature = path + JSON.stringify(body);
@@ -132,25 +220,33 @@ function WorkspaceInner() {
     try {
       await api(path, body, key);
       pending.current.delete(signature);
-      await refresh();
+      await refresh(true);
       return true;
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
-      await refresh();
+      if (e instanceof ApiError && e.status === 401) {
+        expired.current = true;
+        setSessionExpired(true);
+        setData(null);
+      } else await refresh(true);
       return false;
     } finally {
+      mutationActive.current = false;
       setBusy(false);
     }
   };
-  if (!data && error.includes("Inicia sesión"))
-    return <Login onLogin={refresh} />;
+  if (!data && sessionExpired) return <Login onLogin={resumeAfterLogin} />;
   if (!data)
     return (
       <main className="commerce ops-shell ops-auth" lang={language}>
         <h1>{t("Workspace de operaciones")}</h1>
-        {error ? (
+        {error || offline ? (
           <div role="alert">
-            {errorText(error)}
+            {offline
+              ? t(
+                  "Offline. Showing the last received data. Reconnect before changing orders.",
+                )
+              : errorText(error)}
             <button onClick={() => void refresh()}>
               {t("Reintentar conexión")}
             </button>
@@ -184,7 +280,11 @@ function WorkspaceInner() {
       data={data}
       view={view}
       busy={busy}
-      onNavigate={(id) => go(`/operations/${id}`)}
+      onNavigate={(id) =>
+        id === "analytics"
+          ? location.assign("/operations/analytics")
+          : go(`/operations/${id}`)
+      }
       onRefresh={() => void refresh()}
       onLogout={() => void run({}, "logout")}
       heading={
@@ -202,6 +302,13 @@ function WorkspaceInner() {
         ) : undefined
       }
     >
+      {offline && (
+        <p className="co-error" role="status">
+          {t(
+            "Offline. Showing the last received data. Reconnect before changing orders.",
+          )}
+        </p>
+      )}
       {data.integrationHealth?.inboundFailed ? (
         <p className="co-error" role="alert">
           {t("Hay")} {data.integrationHealth.inboundFailed}{" "}
@@ -221,11 +328,15 @@ function WorkspaceInner() {
           </button>
         </div>
       )}
-      <fieldset className="co-fieldset" disabled={busy}>
+      <fieldset className="co-fieldset" disabled={busy || offline}>
         {view === "overview" ? (
           <OperationsOverview
             data={data}
-            onNavigate={(id) => go(`/operations/${id}`)}
+            onNavigate={(id) =>
+              id === "analytics"
+                ? location.assign("/operations/analytics")
+                : go(`/operations/${id}`)
+            }
           />
         ) : view === "products" ? (
           <ProductHub actor={data.actor} />
@@ -620,6 +731,12 @@ function ConversationPanel({
         {c.messages.map((m) => (
           <div key={m.id} className={"co-message " + m.direction}>
             <p>{m.text}</p>
+            {m.media && (
+              <p>
+                {t("Archivo recibido; revisar en WhatsApp")} · {m.media.type}
+                {m.media.filename ? ` · ${m.media.filename}` : ""}
+              </p>
+            )}
             {m.location && (
               <p>
                 {t("GPS ·")} {m.location.lat}, {m.location.lng}
@@ -631,6 +748,9 @@ function ConversationPanel({
               </p>
             )}
             <small>
+              {m.origin === "business-app" &&
+                `${t("Enviado desde WhatsApp Business App")} · `}
+              {m.origin === "history" && `${t("Historial importado")} · `}
               {formatDate(m.at)} · {t(m.status)}{" "}
               {m.direction === "out" && `· ${c.sourceNumberId.toUpperCase()}`}
             </small>
@@ -761,16 +881,20 @@ function OrderPanel({
                   product={orderProductName(o, l.productId, data.catalog)}
                   id={l.productId}
                 />
-                {l.composition && <small lang="en">{preparationText(l)}</small>}
+                {preparationText(l) && (
+                  <small lang="en">{preparationText(l)}</small>
+                )}
               </span>
               <span>
-                {t(
-                  money(
-                    ((o.catalogSnapshot ?? data.catalog).find(
-                      (p) => p.id === l.productId,
-                    )?.priceFils ?? 0) * l.quantity,
-                  ),
-                )}
+                {(() => {
+                  const price =
+                    orderLines(data, o).find(
+                      (line) => lineKey(line) === lineKey(l),
+                    )?.unitFils ?? null;
+                  return price === null
+                    ? t("Review required")
+                    : t(money(price * l.quantity));
+                })()}
               </span>
               {editable && (
                 <button
@@ -1107,11 +1231,33 @@ function Zones({ data, run }: { data: Data; run: Run }) {
   const { t } = useOps();
   const [search, setSearch] = useState(""),
     [id, setId] = useState("jvc");
-  const zone = data.zones.find((z) => z.id === id) ?? data.zones[0];
+  const [newZone, setNewZone] = useState<DeliveryZone | null>(null);
+  const zone = newZone ?? data.zones.find((z) => z.id === id) ?? data.zones[0];
   return (
     <section className="co-zones">
       <aside>
         <h2>{t("Zonas de entrega")}</h2>
+        {data.actor.role === "admin" && (
+          <button
+            type="button"
+            disabled={!!newZone}
+            onClick={() =>
+              setNewZone({
+                id: crypto.randomUUID(),
+                name: "",
+                aliases: [],
+                minOrderAed: null,
+                deliveryFeeAed: 0,
+                freeDelivery: true,
+                active: false,
+                priority: 10,
+                version: 0,
+              })
+            }
+          >
+            {t("New delivery area")}
+          </button>
+        )}
         <p>
           {t("Tabla aprobada ·")} {data.zones.length}{" "}
           {t("reglas de mínimo. Sin cargos de entrega.")}
@@ -1131,7 +1277,10 @@ function Zones({ data, run }: { data: Data; run: Run }) {
               <button
                 key={z.id}
                 className={z.id === id ? "selected" : ""}
-                onClick={() => setId(z.id)}
+                onClick={() => {
+                  setNewZone(null);
+                  setId(z.id);
+                }}
               >
                 <span>{z.name}</span>
                 <b>
@@ -1153,6 +1302,12 @@ function Zones({ data, run }: { data: Data; run: Run }) {
           zone={zone}
           disabled={data.actor.role !== "admin"}
           run={run}
+          creating={!!newZone}
+          onCreated={(createdId) => {
+            setId(createdId);
+            setNewZone(null);
+          }}
+          onCancel={() => setNewZone(null)}
         />
       ) : (
         <p className="co-empty">{t("No delivery areas configured")}</p>
@@ -1164,10 +1319,16 @@ function ZoneEditor({
   zone,
   disabled,
   run,
+  creating = false,
+  onCreated,
+  onCancel,
 }: {
   zone: DeliveryZone;
   disabled: boolean;
   run: Run;
+  creating?: boolean;
+  onCreated?: (id: string) => void;
+  onCancel?: () => void;
 }) {
   const { t, errorText } = useOps();
   const [draft, setDraft] = useState(zone),
@@ -1175,18 +1336,21 @@ function ZoneEditor({
       zone.polygon ? JSON.stringify(zone.polygon) : "",
     ),
     [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
   return (
     <form
       className="co-zone-editor"
       onSubmit={(e) => {
         e.preventDefault();
+        if (saving) return;
         try {
           const parsed: unknown = polygon.trim()
             ? JSON.parse(polygon)
             : undefined;
           setError("");
+          setSaving(true);
           void run({
-            type: "updateZone",
+            type: creating ? "createZone" : "updateZone",
             zone: {
               ...draft,
               deliveryFeeAed: 0,
@@ -1194,7 +1358,11 @@ function ZoneEditor({
               aliases: draft.aliases.map((a) => a.trim()).filter(Boolean),
               polygon: parsed,
             },
-          });
+          })
+            .then((ok) => {
+              if (ok && creating) onCreated?.(draft.id);
+            })
+            .finally(() => setSaving(false));
         } catch {
           setError(
             "Polígono inválido: usa una lista JSON de coordenadas lat/lng.",
@@ -1203,7 +1371,7 @@ function ZoneEditor({
       }}
     >
       <p className="eyebrow">{t("REGLA CONFIGURABLE")}</p>
-      <h2>{zone.name}</h2>
+      <h2>{creating ? t("New delivery area") : zone.name}</h2>
       {zone.minOrderAed == null && (
         <p className="ops-rule-warning">
           {t(
@@ -1211,7 +1379,7 @@ function ZoneEditor({
           )}
         </p>
       )}
-      <fieldset className="co-fieldset" disabled={disabled}>
+      <fieldset className="co-fieldset" disabled={disabled || saving}>
         <label>
           {t("Nombre")}
           <input
@@ -1234,6 +1402,7 @@ function ZoneEditor({
             {t("Mínimo AED")}
             <input
               type="number"
+              required={creating}
               min="0"
               step="0.01"
               value={draft.minOrderAed ?? ""}
@@ -1312,56 +1481,15 @@ function ZoneEditor({
         </details>
         {error && <p role="alert">{errorText(error)}</p>}
         <button className="primary" type="submit">
-          {t("Guardar regla")}
+          {t(creating ? "Create area" : "Guardar regla")}
         </button>
+        {creating && (
+          <button type="button" onClick={onCancel}>
+            {t("Cancel new area")}
+          </button>
+        )}
       </fieldset>
     </form>
-  );
-}
-
-function Login({ onLogin }: { onLogin: () => Promise<void> }) {
-  const { t, errorText } = useOps();
-  const [id, setId] = useState("liza"),
-    [password, setPassword] = useState(""),
-    [error, setError] = useState("");
-  return (
-    <main className="commerce ops-shell ops-auth">
-      <form
-        className="co-zone-editor"
-        onSubmit={(e) => {
-          e.preventDefault();
-          void api("login", { id, password })
-            .then(() => onLogin())
-            .catch((e) =>
-              setError(
-                e instanceof Error ? e.message : "No se pudo iniciar sesión",
-              ),
-            );
-        }}
-      >
-        <h1>{t("Inicia sesión")}</h1>
-        <label>
-          {t("Agente")}
-          <input
-            value={id}
-            onChange={(e) => setId(e.target.value)}
-            autoComplete="username"
-            required
-          />
-        </label>
-        <label>
-          {t("Contraseña")}
-          <input
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
-        {error && <p role="alert">{errorText(error)}</p>}
-        <button className="primary">{t("Entrar al workspace")}</button>
-      </form>
-    </main>
   );
 }
 
@@ -1523,6 +1651,7 @@ function boardOrders(data: Data, view: string) {
 }
 
 const EMAIL_EVENT: Record<string, string> = {
+  ORDER_PAID: "Payment confirmation",
   ORDER_PRODUCTION_STARTED: "En producción",
   ORDER_READY_FOR_PICKUP: "Listo para pickup",
   ORDER_OUT_FOR_DELIVERY: "En camino",
@@ -1588,17 +1717,19 @@ function OrderNotifications({ order, data }: { order: Order; data: Data }) {
           <b>
             {t("Email al cliente ·")} {t(EMAIL_EVENT[n.event] ?? n.event)}
           </b>{" "}
-          {n.status === "sent"
-            ? t("Enviado")
-            : n.status === "failed"
-              ? n.lastError?.startsWith("Expired")
-                ? t("No enviado · caducó")
-                : t("Falló · revisar")
-              : n.status === "sending"
-                ? t("Enviando")
-                : data.customerEmailProvider
-                  ? t("Pendiente")
-                  : t("Pendiente · proveedor de email no configurado")}
+          {n.event === "ORDER_PAID"
+            ? t(paidEmailLabel(n))
+            : n.status === "sent"
+              ? t("Enviado")
+              : n.status === "failed"
+                ? n.lastError?.startsWith("Expired")
+                  ? t("No enviado · caducó")
+                  : t("Falló · revisar")
+                : n.status === "sending"
+                  ? t("Enviando")
+                  : data.customerEmailProvider
+                    ? t("Pendiente")
+                    : t("Pendiente · proveedor de email no configurado")}
         </li>
       ))}
     </ul>
