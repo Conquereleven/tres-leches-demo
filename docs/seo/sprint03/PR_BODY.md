@@ -1,0 +1,9 @@
+## Published product discovery from the authoritative catalog
+
+Tracking #32. Continues this Draft PR and integrates main `10a2176583da52890758dad57b9262a8af0e44f2`, including current storefront conversion and delivery fixes. Published products have server-rendered `/menu/<slug>` pages, stable canonicals, product H1s, current AED prices/availability, Product/ProductGroup/Offer and breadcrumb JSON-LD, and a live sitemap. Legacy links preserve SKU, language and other query parameters.
+
+Sprint 03 aligns photo removal with current published-media policy, preserves intrinsic no-JS image proportions, prevents legacy queries from replacing the canonical path's product, returns retryable 503 for a temporarily unavailable sitemap catalog, and retains working legacy links when dynamic adoption is disabled. No checkout/payment/domain, catalog publication, training-crawler policy or production configuration change.
+
+Validation: typecheck/lint/build; 791 commerce/HTTP/SEO tests; 56 dynamic storefront browser tests; 8 final product-page browser tests; 33 checkout tests; 18 conversion tests; Sites 4/4; zero secret-scan findings; npm audit zero vulnerabilities. Chromium and WebKit, mobile EN/ES/AR/RTL, no-JS, SKU selection and Add to Cart covered. Menu suite is 14/19: the same five failures reproduce on clean main; release remains conditional. Remote CI must be reviewed on the pushed SHA.
+
+Evidence, lab measurements, search intent/editorial plan, GSC/Bing checklist, owner actions and rollback: `docs/seo/sprint03/README.md`. Public read-only evidence shows www working, apex HTTPS refusing connections, 76 published products without English descriptions, and only eight static sitemap URLs in current production. Search accounts remain unverified. Commercial copy needs Lisa's approval. No merge or deployment requested by this PR update.

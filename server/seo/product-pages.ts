@@ -69,14 +69,23 @@ export const availability = (o: Option) =>
 const availabilityText = (o: Option) =>
   o.orderable && o.available ? "Available to order" : "Not available now";
 
-/** Primary published photograph: largest WebP up to 960 px, plus its srcset. */
+/** Same published assignment policy as selectedProductMedia: product links only.
+ * Removing a product photo must not revive a variant or bundled photograph.
+ * Largest WebP up to 960 px, with intrinsic dimensions and srcset.
+ */
 function primaryImage(catalog: StorefrontCatalog, p: Product) {
-  const link =
-    [...p.media].sort(
+  const link = [...p.media]
+    .sort(
       (a, b) =>
         Number(b.role === "primary") - Number(a.role === "primary") ||
-        a.order - b.order,
-    )[0] ?? p.options.flatMap((o) => o.media).find((m) => m.role === "primary");
+        a.order - b.order ||
+        a.assetId.localeCompare(b.assetId),
+    )
+    .find((link) =>
+      catalog.assets.some(
+        (asset) => asset.id === link.assetId && asset.derivatives.length,
+      ),
+    );
   const asset: Asset | undefined = link
     ? catalog.assets.find((a) => a.id === link.assetId)
     : undefined;
@@ -222,7 +231,7 @@ export function productSection(catalog: StorefrontCatalog, p: Product) {
     `<nav aria-label="Breadcrumb"><a class="b-link" href="/menu?category=${esc(encodeURIComponent(p.categoryId))}">← ${esc(category)}</a></nav>`,
     `<article class="b-menu-card">`,
     image
-      ? `<img src="${esc(image.src)}"${image.srcset ? ` srcset="${esc(image.srcset)}" sizes="(min-width: 900px) 480px, 100vw"` : ""} alt="${esc(image.alt)}"${image.width ? ` width="${image.width}"` : ""}${image.height ? ` height="${image.height}"` : ""} />`
+      ? `<img style="max-width:100%;height:auto" src="${esc(image.src)}"${image.srcset ? ` srcset="${esc(image.srcset)}" sizes="(min-width: 900px) 480px, 100vw"` : ""} alt="${esc(image.alt)}"${image.width ? ` width="${image.width}"` : ""}${image.height ? ` height="${image.height}"` : ""} />`
       : "",
     `<h1>${esc(productName(p))}</h1>`,
     `<p class="b-label">${esc(category)} · ${esc(BRAND)} Dubai</p>`,

@@ -1192,7 +1192,21 @@ export async function startServer(
         if (path === "/sitemap.xml") {
           const entries = productSitemapEntries(store.read(), SITE_ORIGIN);
           const file = resolve(client, "sitemap.xml");
-          if (entries && existsSync(file)) {
+          if (entries === null) {
+            // A temporary catalog failure is not evidence that product URLs vanished.
+            res.writeHead(503, {
+              "Content-Type": "text/plain; charset=utf-8",
+              "Cache-Control": "no-store",
+              "Retry-After": "30",
+              "X-Robots-Tag": NOINDEX,
+            });
+            return res.end(
+              req.method === "HEAD"
+                ? undefined
+                : "Catalog revision unavailable",
+            );
+          }
+          if (existsSync(file)) {
             res.writeHead(200, {
               "Content-Type": "application/xml; charset=utf-8",
               "X-Content-Type-Options": "nosniff",

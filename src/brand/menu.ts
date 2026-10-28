@@ -56,7 +56,9 @@ export function productFamily(product: StorefrontProduct): MenuFamily {
 }
 /** A product's permanent, indexable URL (3L-SEO-AEO-002). */
 export const productHref = (product: StorefrontProduct) =>
-  `/menu/${encodeURIComponent(product.slug)}`;
+  currentMenu().status === "bundled"
+    ? `/menu?product=${encodeURIComponent(product.slug)}`
+    : `/menu/${encodeURIComponent(product.slug)}`;
 /** Slug of `/menu/<slug>`, or null on any other page. */
 export const productSlugFromPath = (
   pathname = typeof location === "undefined" ? "" : location.pathname,

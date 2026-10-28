@@ -115,7 +115,7 @@ for (const width of [390, 1440])
         .first()
         .getAttribute("href");
       await page.locator(".b-search-results a").first().click();
-      await expect(page).toHaveURL(/product=milk/);
+      await expect(page).toHaveURL(/\/menu\/milk\?sku=milk-190-ml&lang=/);
       await expect(page.locator(".b-menu-selectors select")).toHaveValue(
         catalog.products
           .find((p) => p.id === "milk")!
@@ -217,7 +217,7 @@ test("search no-results, URL, keyboard and offline recovery", async ({
   await page.locator(".b-search-results a").first().focus();
   await expect(page.locator(".b-search-results a").first()).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/product=milk/);
+  await expect(page).toHaveURL(/\/menu\/milk\?sku=milk-190-ml&lang=/);
   await page.goBack();
   await expect(input).toHaveValue("milk");
   await input.fill("zzzzzzzz");

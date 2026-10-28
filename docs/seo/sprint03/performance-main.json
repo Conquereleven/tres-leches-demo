@@ -1,0 +1,227 @@
+{
+  "origin": "http://127.0.0.1:3265",
+  "route": "/menu?product=tres-leches--classic",
+  "conditions": "3 cold browser contexts, 390x844, local machine, no network/CPU throttle. LCP/CLS and sampled keyboard event timings are lab diagnostics, not field INP or CrUX certification.",
+  "runs": [
+    {
+      "lcp": 264,
+      "cls": 0,
+      "eventDurations": [
+        16,
+        16,
+        16,
+        16
+      ],
+      "overflow": false,
+      "resources": [
+        {
+          "url": "http://127.0.0.1:3265/brand/fonts/abril-fatface.woff2",
+          "transferBytes": 16080
+        },
+        {
+          "url": "http://127.0.0.1:3265/assets/index-Der-jo1q.css",
+          "transferBytes": 124788
+        },
+        {
+          "url": "http://127.0.0.1:3265/assets/index-D1f1gQAb.js",
+          "transferBytes": 1253759
+        },
+        {
+          "url": "http://127.0.0.1:3265/brand/wordmark.png",
+          "transferBytes": 20352
+        },
+        {
+          "url": "http://127.0.0.1:3265/payments/visa.svg",
+          "transferBytes": 1860
+        },
+        {
+          "url": "http://127.0.0.1:3265/payments/mastercard.svg",
+          "transferBytes": 1281
+        },
+        {
+          "url": "http://127.0.0.1:3265/brand/fonts/montserrat.woff2",
+          "transferBytes": 36504
+        },
+        {
+          "url": "http://127.0.0.1:3265/api/storefront/catalog",
+          "transferBytes": 306434
+        },
+        {
+          "url": "http://127.0.0.1:3265/api/checkout/config",
+          "transferBytes": 49856
+        },
+        {
+          "url": "http://127.0.0.1:3265/brand/approved/tres-leches-classic-640.avif",
+          "transferBytes": 27974
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:3265/brand/approved/tres-leches-classic-640.avif",
+          "width": 350,
+          "height": 350,
+          "naturalWidth": 351,
+          "naturalHeight": 234
+        }
+      ],
+      "fonts": "loaded",
+      "bundles": [
+        {
+          "path": "/assets/index-Der-jo1q.css",
+          "bytes": 124488,
+          "gzipBytes": 21919
+        },
+        {
+          "path": "/assets/index-D1f1gQAb.js",
+          "bytes": 1253459,
+          "gzipBytes": 343475
+        }
+      ],
+      "maxObservedInteractionMs": 16
+    },
+    {
+      "lcp": 132,
+      "cls": 0,
+      "eventDurations": [],
+      "overflow": false,
+      "resources": [
+        {
+          "url": "http://127.0.0.1:3265/brand/fonts/abril-fatface.woff2",
+          "transferBytes": 16080
+        },
+        {
+          "url": "http://127.0.0.1:3265/assets/index-Der-jo1q.css",
+          "transferBytes": 124788
+        },
+        {
+          "url": "http://127.0.0.1:3265/assets/index-D1f1gQAb.js",
+          "transferBytes": 1253759
+        },
+        {
+          "url": "http://127.0.0.1:3265/brand/wordmark.png",
+          "transferBytes": 20352
+        },
+        {
+          "url": "http://127.0.0.1:3265/payments/visa.svg",
+          "transferBytes": 1860
+        },
+        {
+          "url": "http://127.0.0.1:3265/payments/mastercard.svg",
+          "transferBytes": 1281
+        },
+        {
+          "url": "http://127.0.0.1:3265/brand/fonts/montserrat.woff2",
+          "transferBytes": 36504
+        },
+        {
+          "url": "http://127.0.0.1:3265/api/storefront/catalog",
+          "transferBytes": 306434
+        },
+        {
+          "url": "http://127.0.0.1:3265/api/checkout/config",
+          "transferBytes": 49856
+        },
+        {
+          "url": "http://127.0.0.1:3265/brand/approved/tres-leches-classic-640.avif",
+          "transferBytes": 27974
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:3265/brand/approved/tres-leches-classic-640.avif",
+          "width": 350,
+          "height": 350,
+          "naturalWidth": 351,
+          "naturalHeight": 234
+        }
+      ],
+      "fonts": "loaded",
+      "bundles": [
+        {
+          "path": "/assets/index-Der-jo1q.css",
+          "bytes": 124488,
+          "gzipBytes": 21919
+        },
+        {
+          "path": "/assets/index-D1f1gQAb.js",
+          "bytes": 1253459,
+          "gzipBytes": 343475
+        }
+      ],
+      "maxObservedInteractionMs": null
+    },
+    {
+      "lcp": 156,
+      "cls": 0,
+      "eventDurations": [
+        16
+      ],
+      "overflow": false,
+      "resources": [
+        {
+          "url": "http://127.0.0.1:3265/brand/fonts/abril-fatface.woff2",
+          "transferBytes": 16080
+        },
+        {
+          "url": "http://127.0.0.1:3265/assets/index-Der-jo1q.css",
+          "transferBytes": 124788
+        },
+        {
+          "url": "http://127.0.0.1:3265/brand/wordmark.png",
+          "transferBytes": 20352
+        },
+        {
+          "url": "http://127.0.0.1:3265/assets/index-D1f1gQAb.js",
+          "transferBytes": 1253759
+        },
+        {
+          "url": "http://127.0.0.1:3265/payments/visa.svg",
+          "transferBytes": 1860
+        },
+        {
+          "url": "http://127.0.0.1:3265/payments/mastercard.svg",
+          "transferBytes": 1281
+        },
+        {
+          "url": "http://127.0.0.1:3265/brand/fonts/montserrat.woff2",
+          "transferBytes": 36504
+        },
+        {
+          "url": "http://127.0.0.1:3265/api/storefront/catalog",
+          "transferBytes": 306434
+        },
+        {
+          "url": "http://127.0.0.1:3265/api/checkout/config",
+          "transferBytes": 49856
+        },
+        {
+          "url": "http://127.0.0.1:3265/brand/approved/tres-leches-classic-640.avif",
+          "transferBytes": 27974
+        }
+      ],
+      "images": [
+        {
+          "src": "http://127.0.0.1:3265/brand/approved/tres-leches-classic-640.avif",
+          "width": 350,
+          "height": 350,
+          "naturalWidth": 351,
+          "naturalHeight": 234
+        }
+      ],
+      "fonts": "loaded",
+      "bundles": [
+        {
+          "path": "/assets/index-Der-jo1q.css",
+          "bytes": 124488,
+          "gzipBytes": 21919
+        },
+        {
+          "path": "/assets/index-D1f1gQAb.js",
+          "bytes": 1253459,
+          "gzipBytes": 343475
+        }
+      ],
+      "maxObservedInteractionMs": 16
+    }
+  ]
+}

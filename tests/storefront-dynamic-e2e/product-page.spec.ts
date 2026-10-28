@@ -55,6 +55,16 @@ test("/menu/<slug> has one H1, the product name, before and after JavaScript", a
   await raw.goto(`/menu/${product.slug}`);
   await expect(raw.locator("h1")).toHaveCount(1);
   await expect(raw.locator("h1")).toHaveText(name);
+  const photo = raw.locator("[data-seo-product] img");
+  const ratio = await photo.evaluate((img) => {
+    const box = img.getBoundingClientRect();
+    return {
+      displayed: box.width / box.height,
+      intrinsic:
+        Number(img.getAttribute("width")) / Number(img.getAttribute("height")),
+    };
+  });
+  expect(ratio.displayed).toBeCloseTo(ratio.intrinsic, 2);
   await crawler.close();
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
@@ -67,4 +77,46 @@ test("/menu/<slug> has one H1, the product name, before and after JavaScript", a
   await page.goto("/menu");
   await expect(page.locator("h1").first()).toHaveText(/Menu/);
   expect(errors).toEqual([]);
+});
+
+test("a legacy query cannot replace the canonical path product after JavaScript", async ({
+  page,
+}) => {
+  await page.goto("/menu/tres-leches--classic?product=carrot-cake&lang=en");
+  await expect(page.locator("[data-product-id]")).toHaveAttribute(
+    "data-product-id",
+    "tres-leches--classic",
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "https://www.3ldubai.ae/menu/tres-leches--classic",
+  );
+});
+
+test("product pages preserve mobile EN/ES/AR, RTL and Add to Cart", async ({
+  page,
+}, testInfo) => {
+  for (const language of ["en", "es", "ar"]) {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`/menu/tres-leches--classic?lang=${language}`);
+    await expect(page.locator("[data-product-id]")).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute("lang", language);
+    if (language === "ar")
+      await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+    await expect(page.locator("h1")).toHaveCount(1);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    const add = page.locator(".b-add-to-cart > button");
+    await expect(add).toBeEnabled();
+    await page.screenshot({
+      path: `docs/seo/sprint03/${testInfo.project.name}-${language}-390.png`,
+      fullPage: true,
+    });
+    await add.click();
+    await page.goto(`/cart?lang=${language}`);
+    await expect(page.locator(".b-co-item").first()).toBeVisible();
+  }
 });

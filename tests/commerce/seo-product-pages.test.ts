@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
 import { request } from "node:http";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Store, seed } from "../../server/db/store";
@@ -26,6 +26,8 @@ import {
   PRODUCT_PATH,
   availability,
   productPage,
+  productSection,
+  productJsonLd,
   productSitemapEntries,
   sitemapWithProducts,
 } from "../../server/seo/product-pages";
@@ -529,7 +531,7 @@ test(
 );
 
 test(
-  "server: without a published revision, product URLs answer 503 and the sitemap stays static",
+  "server: without a published revision, product URLs and sitemap answer retryable 503",
   { skip: !built && "run npm run build first" },
   async () => {
     await withServer({ FIXTURE_FOUNDATION: "absent" }, async () => {
@@ -538,11 +540,22 @@ test(
       assert.equal(page.headers["retry-after"], "30");
       assert.match(String(page.headers["x-robots-tag"]), /noindex/);
       const sitemap = await get("/sitemap.xml");
-      assert.equal(sitemap.status, 200);
-      assert.equal(
-        sitemap.body,
-        readFileSync("dist/client/sitemap.xml", "utf8"),
-      );
+      assert.equal(sitemap.status, 503);
+      assert.equal(sitemap.headers["retry-after"], "30");
+      assert.equal(sitemap.headers["cache-control"], "no-store");
+      assert.doesNotMatch(sitemap.body, /<urlset/);
     });
   },
 );
+
+test("removed product photographs never revive variant assignments in HTML or JSON-LD", () => {
+  const { store } = setup();
+  const catalog = storefrontCatalog(store.read());
+  const product = structuredClone(
+    catalog.products.find((p) => p.media.length)!,
+  );
+  product.options[0]!.media = structuredClone(product.media);
+  product.media = [];
+  assert.doesNotMatch(productSection(catalog, product), /<img /);
+  assert.equal("image" in productJsonLd(catalog, product, ORIGIN), false);
+});
