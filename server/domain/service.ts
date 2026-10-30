@@ -1234,6 +1234,24 @@ export class CommerceService {
   }
   private async createHostedWebPayment(payment: Payment, snapshot: State) {
     requireThat(!payment.supersededAt, "Checkout superseded", 409);
+    const parent = Object.values(snapshot.webCheckouts ?? {}).find(
+      (record) =>
+        record.supersededAt &&
+        record.recoveryKey &&
+        snapshot.webCheckouts?.[
+          createHash("sha256").update(record.recoveryKey).digest("hex")
+        ]?.orderId === payment.orderId,
+    );
+    if (parent)
+      requireThat(
+        snapshot.payments.some(
+          (p) =>
+            p.orderId === parent.orderId &&
+            ["failed", "cancelled", "expired"].includes(p.status),
+        ),
+        "Previous checkout requires review",
+        409,
+      );
     requireThat(
       this.payment instanceof PaymenntProvider,
       "Web checkout unavailable",

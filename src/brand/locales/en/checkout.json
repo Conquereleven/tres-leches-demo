@@ -191,5 +191,8 @@
   "copy_dbee70b175436c79": "If you received a confirmation email, keep it for your records. Otherwise, contact 3L so we can help check your order securely.",
   "area_2597bbfb29a1c90d": "We couldn't find that area. Try another spelling or contact us.",
   "area_f357162bd9f2af66": "Try another spelling, contact 3L or choose pickup.",
-  "area_bff98afc04fe097b": "Online delivery is not currently available for the selected area."
+  "area_bff98afc04fe097b": "Online delivery is not currently available for the selected area.",
+  "copy_recovery_storage": "This browser cannot save your checkout securely. Please enable browser storage or contact 3L before paying.",
+  "copy_recovery_review": "Your saved details need review. Please check your address, date and current order total.",
+  "copy_recovery_ready": "Your previous payment attempt has ended. Your details are saved. Review your order before starting a new secure payment."
 }

@@ -36,6 +36,7 @@ import {
 } from "./billing";
 import type { CommerceService } from "./service";
 import {
+  DomainError,
   requireThat,
   type Actor,
   type DeliveryDetails,
@@ -539,6 +540,12 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
     if (!record) return { key: randomUUID(), cartHash, changed: false };
     requireThat(order && payment, "Checkout not found", 409);
     requireThat(
+      payment.checkoutFlow !== "web" ||
+        ["paid", "failed", "cancelled", "expired"].includes(payment.status),
+      "The previous payment must be verified before updating checkout.",
+      409,
+    );
+    requireThat(
       record.cartHash || payment.status !== "paid",
       "The previous paid order must be reviewed before updating checkout.",
       409,
@@ -556,12 +563,13 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
       "The previous payment must be verified before updating checkout.",
       409,
     );
-    let nextKey = record.replacements?.[cartHash];
+    let nextKey = record.recoveryKey ?? record.replacements?.[cartHash];
     service.store.write((s) => {
       const previous = s.webCheckouts![digest(key)]!;
       previous.replacements ??= {};
       nextKey ??= randomUUID();
       previous.replacements[cartHash] = nextKey!;
+      if (payment.checkoutFlow === "web") previous.recoveryKey = nextKey!;
       if (payment.status !== "paid" && !previous.supersededAt) {
         const at = new Date().toISOString();
         previous.supersededAt = at;
@@ -592,6 +600,141 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
     });
     return { key: nextKey!, cartHash, changed: true };
   });
+}
+
+/** Current rules are checked before a saved draft can bypass fulfillment/details. */
+function reviewCheckout(service: CommerceService, raw: unknown) {
+  const input = normalizeCheckout(raw);
+  if (input.delivery) {
+    const zone = authoritativeAddress(service, input.delivery);
+    input.zoneId = zone.id;
+  }
+  const quote = quoteWebCheckout(service, {
+    lines: input.lines,
+    ...(input.fulfillmentMethod === "pickup"
+      ? { fulfillmentMethod: "pickup" }
+      : { zoneId: input.zoneId }),
+  });
+  requireThat(quote.eligible, quote.reason, 422);
+  return quote;
+}
+
+const retryableTerminal = (status: string) =>
+  ["failed", "cancelled", "expired"].includes(status);
+
+/** A replacement key is not permission to ignore its predecessor's financial state. */
+async function verifyRecoveryParent(service: CommerceService, key: string) {
+  const parent = Object.values(service.store.read().webCheckouts ?? {}).find(
+    (record) => record.recoveryKey === key,
+  );
+  if (!parent) return;
+  const state = service.store.read();
+  const payment = state.payments.find((p) => p.orderId === parent.orderId);
+  requireThat(payment, "Checkout not found", 409);
+  // An intentionally different cart after a paid order is a separate purchase.
+  if (!parent.supersededAt && payment.status === "paid") return;
+  try {
+    await service.reconcile(payment.id, WEB_ACTOR);
+  } catch {
+    throw new DomainError(
+      503,
+      "The payment result could not be verified. Your order is held for review.",
+      "CHECKOUT_RECOVERY_UNVERIFIED",
+    );
+  }
+  const latest = service.store
+    .read()
+    .payments.find((p) => p.id === payment.id)!;
+  requireThat(
+    retryableTerminal(latest.status),
+    "The payment result could not be verified. Your order is held for review.",
+    409,
+  );
+}
+
+/** Provider GET precedes every hosted resume/retry. This never creates a payment. */
+export async function recoverWebCheckout(
+  service: CommerceService,
+  raw: unknown,
+) {
+  const { key, checkout } = z
+    .object({ key: z.uuid().optional(), checkout: z.unknown() })
+    .strict()
+    .parse(raw);
+  if (!key)
+    return {
+      key: null,
+      changed: false,
+      quote: reviewCheckout(service, checkout),
+    };
+  // Follow the one durable successor, rather than allocating another key per tab.
+  let currentKey = key;
+  const seen = new Set<string>();
+  for (;;) {
+    requireThat(
+      !seen.has(currentKey) && seen.size < 32,
+      "Checkout recovery requires review",
+      409,
+    );
+    seen.add(currentKey);
+    const record = service.store.read().webCheckouts?.[digest(currentKey)];
+    if (!record?.recoveryKey) break;
+    currentKey = record.recoveryKey;
+  }
+  try {
+    await verifyRecoveryParent(service, currentKey);
+    const state = service.store.read();
+    const record = state.webCheckouts?.[digest(currentKey)];
+    const payment = state.payments.find((p) => p.orderId === record?.orderId);
+    if (payment?.checkoutFlow === "web" && payment.status !== "paid")
+      await service.reconcile(payment.id, WEB_ACTOR);
+  } catch {
+    // No stale URL and no new key on timeout, an in-flight worker or uncertain GET.
+    throw new DomainError(
+      503,
+      "The payment result could not be verified. Your order is held for review.",
+      "CHECKOUT_RECOVERY_UNVERIFIED",
+    );
+  }
+  const latestStatus = service.store.read().webCheckouts?.[digest(currentKey)]
+    ? readWebCheckoutStatus(service, currentKey)
+    : undefined;
+  if (
+    latestStatus &&
+    ["refunded", "partially_refunded", "chargeback"].includes(
+      latestStatus.paymentStatus,
+    )
+  )
+    return {
+      key: currentKey,
+      changed: false,
+      status: {
+        ...latestStatus,
+        url: null,
+        actionRequired: "review_payment" as const,
+      },
+    };
+  const quote = reviewCheckout(service, checkout);
+  if (!service.store.read().webCheckouts?.[digest(currentKey)])
+    return { key: currentKey, changed: currentKey !== key, quote };
+  const resumed = resumeWebCheckout(service, { key: currentKey, checkout });
+  // Never present today's cart total beside a URL for a different accepted amount.
+  // The accepted payment stays immutable; uncertain recovery requires review.
+  if (
+    resumed.status &&
+    resumed.status.paymentStatus !== "paid" &&
+    resumed.status.amountFils !== quote.totalFils
+  )
+    return {
+      ...resumed,
+      quote,
+      status: {
+        ...resumed.status,
+        url: null,
+        actionRequired: "review_payment" as const,
+      },
+    };
+  return { ...resumed, quote };
 }
 
 /** Server-side quote for a cart. The browser never supplies a price. */
@@ -734,6 +877,8 @@ export function readWebCheckoutStatus(
     currency: payment.currency,
     actionRequired:
       record?.supersededAt ||
+      (!["paid", "failed", "cancelled", "expired"].includes(payment.status) &&
+        order.state !== "Awaiting Payment") ||
       (payment.status === "paid" &&
         order.state === "Awaiting Payment" &&
         !acceptedPackPricesCurrent(s, order)) ||
@@ -751,7 +896,10 @@ export function readWebCheckoutStatus(
               ? "complete_payment"
               : null,
     url:
-      frozen && !record?.supersededAt && payment.status === "pending"
+      frozen &&
+      !record?.supersededAt &&
+      payment.status === "pending" &&
+      order.state === "Awaiting Payment"
         ? (payment.url ?? null)
         : null,
     summary: frozen
@@ -808,6 +956,8 @@ export async function createWebCheckout(
   }
   const input = normalizeCheckout(raw),
     receiptKey = digest(keySchema.parse(key));
+  if (embedded === "web" && !service.store.read().webCheckouts?.[receiptKey])
+    await verifyRecoveryParent(service, key);
   // Direct card payments need the full checkout: delivery details and a
   // confirmed billing address. The legacy single-product shape cannot pay.
   requireThat(
@@ -825,6 +975,21 @@ export async function createWebCheckout(
   const inputHash = digest(JSON.stringify(input));
   service.store.transaction(() => {
     const snapshot = service.store.read();
+    const recoveryParent =
+      embedded === "web" &&
+      Object.values(snapshot.webCheckouts ?? {}).find(
+        (r) => r.recoveryKey === key && r.supersededAt,
+      );
+    if (recoveryParent && !snapshot.webCheckouts?.[receiptKey]) {
+      const parentPayment = snapshot.payments.find(
+        (p) => p.orderId === recoveryParent.orderId,
+      );
+      requireThat(
+        parentPayment && retryableTerminal(parentPayment.status),
+        "The payment result could not be verified. Your order is held for review.",
+        409,
+      );
+    }
     const previous = snapshot.webCheckouts?.[receiptKey];
     if (previous) {
       requireThat(
