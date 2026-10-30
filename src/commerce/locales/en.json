@@ -849,5 +849,12 @@
   "A new delivery area must start at version zero": "A new delivery area must start at version zero",
   "Confirm the approved minimum before creating an area": "Confirm the approved minimum before creating an area",
   "Delivery area names must contain letters or numbers": "Delivery area names must contain letters or numbers",
-  "A delivery area with this ID, name or alias already exists": "A delivery area with this ID, name or alias already exists"
+  "A delivery area with this ID, name or alias already exists": "A delivery area with this ID, name or alias already exists",
+  "Free delivery threshold AED": "Free delivery threshold AED",
+  "Allow delivery below threshold with a fee": "Allow delivery below threshold with a fee",
+  "Delivery fee below threshold AED": "Delivery fee below threshold AED",
+  "Flexible delivery changes only new quotes. Accepted orders keep their stored fee.": "Flexible delivery changes only new quotes. Accepted orders keep their stored fee.",
+  "configurable delivery rules.": "configurable delivery rules.",
+  "Delivery fee below threshold": "Delivery fee below threshold",
+  "Coverage and delivery pricing rules": "Coverage and delivery pricing rules"
 }

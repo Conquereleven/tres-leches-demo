@@ -632,7 +632,12 @@ export async function startServer(
                       const zone = service.store
                         .read()
                         .zones.find((z) => z.id === resolved.zoneId)!;
-                      return { name: zone.name, minOrderAed: zone.minOrderAed };
+                      return {
+                        name: zone.name,
+                        minOrderAed: zone.deliveryPolicy
+                          ? zone.deliveryPolicy.freeDeliveryThresholdFils / 100
+                          : zone.minOrderAed,
+                      };
                     })(),
                   }
                 : {}),
@@ -655,7 +660,9 @@ export async function startServer(
             return json(res, 200, {
               zoneId: zone.id,
               name: zone.name,
-              minOrderAed: zone.minOrderAed,
+              minOrderAed: zone.deliveryPolicy
+                ? zone.deliveryPolicy.freeDeliveryThresholdFils / 100
+                : zone.minOrderAed,
               corrected: zone.id !== input.zoneId,
             });
           }

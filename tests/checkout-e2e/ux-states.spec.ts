@@ -166,7 +166,9 @@ test.describe("payment step", () => {
     await shot(page, "cart-390");
     await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
     await expect(page.locator(".b-co-fee")).toHaveCount(0);
-    await expect(page.locator(".b-shop-totals")).not.toContainText("Delivery");
+    // Delivery is now itemized, including a zero fee under the legacy policy.
+    await expect(page.locator(".b-shop-totals")).toContainText("Delivery");
+    await expect(page.locator(".b-shop-totals")).toContainText("Free");
     await shot(page, "checkout-delivery-390");
     await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
     // Traced WebKit failures leave Details unchanged if this click races scrolling.

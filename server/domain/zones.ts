@@ -1,5 +1,6 @@
 import { liveLinePrice } from "./pack-pricing";
 import {
+  deliveryPolicySchema,
   type DeliveryZone,
   type Location,
   type Quote,
@@ -192,14 +193,25 @@ for (const cluster of ["A", "B", "C", "D"])
 /** Public area options depend only on confirmed minimums, not obsolete fee metadata. */
 export function publicDeliveryAreas(zones: DeliveryZone[]) {
   return zones
-    .filter((z) => z.active && z.minOrderAed != null)
+    .filter(
+      (z) =>
+        z.active &&
+        z.minOrderAed != null &&
+        (!z.deliveryPolicy ||
+          deliveryPolicySchema.safeParse(z.deliveryPolicy).success),
+    )
     .map((z) => ({
       id: z.id,
       name: z.name,
       // Search labels for the area typeahead; the id remains the only authority.
       aliases: z.aliases,
-      minOrderAed: z.minOrderAed,
-      deliveryFeeAed: 0 as const, // Retained wire compatibility; never a separate charge.
+      minOrderAed: z.deliveryPolicy
+        ? z.deliveryPolicy.freeDeliveryThresholdFils / 100
+        : z.minOrderAed,
+      deliveryFeeAed: z.deliveryPolicy
+        ? z.deliveryPolicy.belowThresholdFeeFils / 100
+        : 0,
+      ...(z.deliveryPolicy ? { deliveryPolicy: z.deliveryPolicy } : {}),
     }));
 }
 export interface GeoService {
@@ -308,14 +320,19 @@ export function quoteOrder(
   products: CatalogItem[] = catalog,
   fulfillmentMethod: "delivery" | "pickup" = "delivery",
 ): Quote {
-  const validProducts = lines.every((l) =>
-    products.some(
-      (p) =>
-        p.id === l.productId &&
-        p.active !== false &&
-        p.availability !== "unavailable",
-    ),
-  );
+  const validProducts =
+    lines.length > 0 &&
+    lines.every(
+      (l) =>
+        Number.isSafeInteger(l.quantity) &&
+        l.quantity > 0 &&
+        products.some(
+          (p) =>
+            p.id === l.productId &&
+            p.active !== false &&
+            p.availability !== "unavailable",
+        ),
+    );
   const subtotalFils = lines.reduce(
     (sum, l) => sum + liveLinePrice(l, products) * l.quantity,
     0,
@@ -336,23 +353,35 @@ export function quoteOrder(
           : "Add available products",
       resolutionCode: "RESOLVED",
       zoneVersion: null,
+      deliveryRule: {
+        mode: "pickup",
+        freeDeliveryThresholdFils: null,
+        belowThresholdFeeFils: 0,
+      },
     };
   const zone = manualZoneId
     ? zones.find((z) => z.id === manualZoneId && z.active)
     : matchZone(zones, address, location, geo);
-  // Compatibility field only: logistics are absorbed by the area minimum.
-  // Historical persisted quotes are never rewritten. New quotes cannot charge delivery.
-  const feeFils = 0;
-  const minimumMet =
-    zone?.minOrderAed != null &&
-    subtotalFils >= Math.round(zone.minOrderAed * 100);
+  const parsedPolicy = zone?.deliveryPolicy
+    ? deliveryPolicySchema.safeParse(zone.deliveryPolicy)
+    : null;
+  const policy = parsedPolicy?.success ? parsedPolicy.data : undefined;
+  const policyValid = parsedPolicy === null || parsedPolicy.success;
+  const thresholdFils =
+    policy?.freeDeliveryThresholdFils ??
+    (zone?.minOrderAed == null ? null : Math.round(zone.minOrderAed * 100));
+  const minimumMet = thresholdFils != null && subtotalFils >= thresholdFils;
+  const feeFils =
+    policy && !minimumMet && subtotalFils > 0
+      ? policy.belowThresholdFeeFils
+      : 0;
   const reason = !validProducts
     ? "Producto no disponible en el catálogo aprobado"
     : !zone
       ? "Fuera de cobertura o ubicación ambigua"
-      : zone.minOrderAed == null
+      : !policyValid || thresholdFils == null
         ? "Regla pendiente de revisión"
-        : !minimumMet
+        : !minimumMet && !policy
           ? `Minimum order for ${zone.name} is AED ${zone.minOrderAed}.`
           : !subtotalFils
             ? "Agrega productos"
@@ -361,13 +390,26 @@ export function quoteOrder(
     resolutionCode: zone ? "RESOLVED" : "ZONE_REVIEW_REQUIRED",
     zoneId: zone?.id ?? null,
     zoneName: zone?.name ?? null,
-    minOrderAed: zone?.minOrderAed ?? null,
+    minOrderAed: thresholdFils == null ? null : thresholdFils / 100,
     feeFils,
     subtotalFils,
-    totalFils: subtotalFils,
+    totalFils: subtotalFils + feeFils,
     minimumMet,
-    eligible: validProducts && !!zone && minimumMet && subtotalFils > 0,
+    eligible:
+      validProducts &&
+      !!zone &&
+      policyValid &&
+      thresholdFils != null &&
+      (minimumMet || !!policy) &&
+      Number.isSafeInteger(subtotalFils) &&
+      Number.isSafeInteger(subtotalFils + feeFils) &&
+      subtotalFils > 0,
     reason,
     zoneVersion: zone?.version ?? null,
+    deliveryRule: {
+      mode: policy ? "flexible" : "minimum",
+      freeDeliveryThresholdFils: thresholdFils,
+      belowThresholdFeeFils: policy?.belowThresholdFeeFils ?? 0,
+    },
   };
 }

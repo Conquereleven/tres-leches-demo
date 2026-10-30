@@ -87,6 +87,12 @@ export function renderCustomerEmail(
     pickup,
     zoneName: context.zoneName,
     items,
+    ...(order.quote?.feeFils != null
+      ? {
+          subtotal: `AED ${(order.quote.subtotalFils / 100).toFixed(2)}`,
+          deliveryFee: `AED ${(order.quote.feeFils / 100).toFixed(2)}`,
+        }
+      : {}),
     paidTotal:
       context.paidAmountFils === undefined
         ? undefined
@@ -106,6 +112,12 @@ export function renderCustomerEmail(
           ? []
           : [
               "",
+              ...(order.quote?.feeFils != null
+                ? [
+                    `Subtotal: AED ${(order.quote.subtotalFils / 100).toFixed(2)}`,
+                    `Delivery fee: AED ${(order.quote.feeFils / 100).toFixed(2)}`,
+                  ]
+                : []),
               `Total paid: AED ${(context.paidAmountFils / 100).toFixed(2)}`,
             ]),
         "",

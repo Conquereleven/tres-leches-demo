@@ -105,6 +105,11 @@ import {
 // ── Shared ───────────────────────────────────────────────────────────────
 
 type Quote = {
+  deliveryRule?: {
+    mode: "minimum" | "flexible" | "pickup";
+    freeDeliveryThresholdFils: number | null;
+    belowThresholdFeeFils: number;
+  };
   quoteRevision?: string;
   eligible: boolean;
   minimumMet: boolean;
@@ -494,6 +499,9 @@ function ShopShell({
 function Totals({
   subtotal,
   total,
+  fee,
+  feePending,
+  fulfillmentMethod,
 }: {
   subtotal: number;
   fee: number | null;
@@ -511,6 +519,22 @@ function Totals({
           <CustomerCopy>{formatAed(subtotal)}</CustomerCopy>
         </dd>
       </div>
+      <div>
+        <dt>
+          <CustomerCopy>
+            {fulfillmentMethod === "pickup" ? "Pickup" : "Delivery"}
+          </CustomerCopy>
+        </dt>
+        <dd>
+          <CustomerCopy>
+            {feePending || fee == null
+              ? "Confirmed at checkout"
+              : fee === 0
+                ? "Free"
+                : formatAed(fee)}
+          </CustomerCopy>
+        </dd>
+      </div>
       {total != null && (
         <div className="b-shop-grand">
           <dt>
@@ -522,6 +546,61 @@ function Totals({
         </div>
       )}
     </dl>
+  );
+}
+function DeliveryNotice({ quote }: { quote: Quote }) {
+  if (quote.deliveryRule?.mode !== "flexible") return null;
+  return (
+    <p className="b-caption" aria-live="polite">
+      <CustomerCopy>{`Free delivery from ${formatAed(quote.deliveryRule.freeDeliveryThresholdFils ?? 0)} in ${quote.zoneName ?? "this area"}.`}</CustomerCopy>{" "}
+      {!quote.minimumMet && (
+        <CustomerCopy>{`Add ${formatAed(Math.max(0, (quote.deliveryRule.freeDeliveryThresholdFils ?? 0) - quote.subtotalFils))} in products for free delivery.`}</CustomerCopy>
+      )}
+    </p>
+  );
+}
+
+function CartDeliveryTotals({
+  lines,
+  config,
+  subtotal,
+}: {
+  lines: CartLine[];
+  config: CheckoutConfig;
+  subtotal: number;
+}) {
+  const [quote, setQuote] = useState<Quote | null>(null);
+  const saved = loadDraft();
+  const method = saved.fulfillmentMethod ?? "delivery";
+  const zoneId = saved.delivery?.zoneId;
+  useEffect(() => {
+    let active = true;
+    setQuote(null);
+    if (lines.length && (method === "pickup" || zoneId)) {
+      void post<Quote>("/api/checkout/quote", {
+        lines,
+        ...(method === "pickup" ? { fulfillmentMethod: "pickup" } : { zoneId }),
+      })
+        .then((q) => {
+          if (active) setQuote(q);
+        })
+        .catch(() => {});
+    }
+    return () => {
+      active = false;
+    };
+  }, [lines, config, method, zoneId]);
+  return (
+    <>
+      <Totals
+        subtotal={quote?.subtotalFils ?? subtotal}
+        fee={quote?.feeFils ?? null}
+        total={quote?.eligible ? quote.totalFils : null}
+        feePending={!quote}
+        fulfillmentMethod={method}
+      />
+      {quote && <DeliveryNotice quote={quote} />}
+    </>
   );
 }
 function Card({
@@ -1067,11 +1146,15 @@ export function CartPage() {
               <h2>
                 <CustomerCopy>Order total</CustomerCopy>
               </h2>
-              <Totals subtotal={subtotal} fee={null} total={null} feePending />
+              <CartDeliveryTotals
+                lines={lines}
+                config={config}
+                subtotal={subtotal}
+              />
               <p className="b-caption">
                 <CustomerCopy>
-                  Delivery is included once your area’s minimum order is
-                  reached. Your area and address are confirmed in the next step.
+                  Delivery charges and free delivery eligibility are confirmed
+                  for your selected area at checkout.
                 </CustomerCopy>
               </p>
               <a
@@ -1346,7 +1429,8 @@ export function CheckoutPage() {
               ) : (
                 <p className="b-caption">
                   <CustomerCopy>
-                    Delivery — Included once minimum order is reached
+                    Delivery charges depend on your selected area and product
+                    subtotal.
                   </CustomerCopy>
                 </p>
               )}
@@ -1383,9 +1467,13 @@ export function CheckoutPage() {
                     <div aria-live="polite">
                       {quote.eligible ? (
                         <>
-                          <p className="b-caption">
-                            <CustomerCopy>{`Minimum order for ${quote.zoneName} is ${formatAed(minFils)}.`}</CustomerCopy>
-                          </p>
+                          {quote.deliveryRule?.mode === "flexible" ? (
+                            <DeliveryNotice quote={quote} />
+                          ) : (
+                            <p className="b-caption">
+                              <CustomerCopy>{`Minimum order for ${quote.zoneName} is ${formatAed(minFils)}.`}</CustomerCopy>
+                            </p>
+                          )}
                         </>
                       ) : (
                         <p className="b-shop-notice" role="status">
@@ -1420,7 +1508,7 @@ export function CheckoutPage() {
                             setError("");
                             setAddressNotice(
                               result.status === "VERIFIED"
-                                ? `Verified address. Delivery area: ${result.name}. Minimum order: AED ${result.minOrderAed}.`
+                                ? `Verified address. Delivery area: ${result.name}. Review delivery charges below.`
                                 : "Coverage verified. We could not determine your delivery area. Contact 3L or choose pickup.",
                             );
                             setDelivery((d) => ({

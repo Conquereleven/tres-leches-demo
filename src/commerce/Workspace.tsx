@@ -1053,7 +1053,9 @@ function OrderPanel({
             <dt>
               {o.fulfillmentMethod === "pickup"
                 ? t("Mínimo de zona")
-                : t("Mínimo de compra")}
+                : o.quote?.deliveryRule?.mode === "flexible"
+                  ? t("Free delivery threshold AED")
+                  : t("Mínimo de compra")}
             </dt>
             <dd>
               {t(
@@ -1064,6 +1066,8 @@ function OrderPanel({
                 ),
               )}
             </dd>
+            <dt>{t("Delivery")}</dt>
+            <dd>{t(money(o.quote?.feeFils))}</dd>
             <dt>{t("Productos")}</dt>
             <dd>{t(money(o.quote?.subtotalFils))}</dd>
             <dt>{t("Total")}</dt>
@@ -1260,7 +1264,7 @@ function Zones({ data, run }: { data: Data; run: Run }) {
         )}
         <p>
           {t("Tabla aprobada ·")} {data.zones.length}{" "}
-          {t("reglas de mínimo. Sin cargos de entrega.")}
+          {t("configurable delivery rules.")}
         </p>
         <label>
           {t("Buscar zona")}
@@ -1284,12 +1288,16 @@ function Zones({ data, run }: { data: Data; run: Run }) {
               >
                 <span>{z.name}</span>
                 <b>
-                  {z.minOrderAed === null
-                    ? t("Revisar mínimo")
-                    : t(money(z.minOrderAed * 100))}
+                  {z.deliveryPolicy
+                    ? t(money(z.deliveryPolicy.freeDeliveryThresholdFils))
+                    : z.minOrderAed === null
+                      ? t("Revisar mínimo")
+                      : t(money(z.minOrderAed * 100))}
                 </b>
                 <small>
-                  {t("Sin cargo adicional ·")}{" "}
+                  {z.deliveryPolicy
+                    ? `${t("Delivery fee below threshold")}: ${t(money(z.deliveryPolicy.belowThresholdFeeFils))} · `
+                    : t("Sin cargo adicional ·")}{" "}
                   {z.active ? t("Activa") : t("Inactiva")}
                 </small>
               </button>
@@ -1353,8 +1361,6 @@ function ZoneEditor({
             type: creating ? "createZone" : "updateZone",
             zone: {
               ...draft,
-              deliveryFeeAed: 0,
-              freeDelivery: true,
               aliases: draft.aliases.map((a) => a.trim()).filter(Boolean),
               polygon: parsed,
             },
@@ -1399,26 +1405,91 @@ function ZoneEditor({
         </label>
         <div className="co-two">
           <label>
-            {t("Mínimo AED")}
+            {draft.deliveryPolicy
+              ? t("Free delivery threshold AED")
+              : t("Mínimo AED")}
             <input
               type="number"
               required={creating}
               min="0"
               step="0.01"
-              value={draft.minOrderAed ?? ""}
+              value={
+                draft.deliveryPolicy
+                  ? draft.deliveryPolicy.freeDeliveryThresholdFils / 100
+                  : (draft.minOrderAed ?? "")
+              }
               onChange={(e) =>
                 setDraft({
                   ...draft,
-                  minOrderAed:
-                    e.target.value === "" ? null : Number(e.target.value),
+                  ...(draft.deliveryPolicy
+                    ? {
+                        deliveryPolicy: {
+                          ...draft.deliveryPolicy,
+                          freeDeliveryThresholdFils: Math.round(
+                            Number(e.target.value) * 100,
+                          ),
+                        },
+                      }
+                    : {
+                        minOrderAed:
+                          e.target.value === "" ? null : Number(e.target.value),
+                      }),
                 })
               }
             />
           </label>
         </div>
+        <label className="co-check">
+          <input
+            type="checkbox"
+            checked={!!draft.deliveryPolicy}
+            onChange={(e) => {
+              const { deliveryPolicy: _previous, ...legacy } = draft;
+              setDraft(
+                e.target.checked
+                  ? {
+                      ...draft,
+                      deliveryPolicy: {
+                        mode: "flexible",
+                        freeDeliveryThresholdFils: Math.round(
+                          (draft.minOrderAed ?? 0) * 100,
+                        ),
+                        belowThresholdFeeFils: 0,
+                      },
+                    }
+                  : legacy,
+              );
+            }}
+          />
+          {t("Allow delivery below threshold with a fee")}
+        </label>
+        {draft.deliveryPolicy && (
+          <label>
+            {t("Delivery fee below threshold AED")}
+            <input
+              type="number"
+              required
+              min="0"
+              max="10000"
+              step="0.01"
+              value={draft.deliveryPolicy.belowThresholdFeeFils / 100}
+              onChange={(e) =>
+                setDraft({
+                  ...draft,
+                  deliveryPolicy: {
+                    ...draft.deliveryPolicy!,
+                    belowThresholdFeeFils: Math.round(
+                      Number(e.target.value) * 100,
+                    ),
+                  },
+                })
+              }
+            />
+          </label>
+        )}
         <p>
           {t(
-            "Sin cargos de entrega. La logística está incluida en el mínimo del área.",
+            "Flexible delivery changes only new quotes. Accepted orders keep their stored fee.",
           )}
         </p>
         <label className="co-check">

@@ -17,6 +17,8 @@ type CustomerHtmlInput = {
   zoneName?: string;
   items: CustomerEmailItem[];
   paidTotal?: string;
+  subtotal?: string;
+  deliveryFee?: string;
 };
 
 const escapeHtml = (value: string) =>
@@ -253,6 +255,15 @@ export function renderCustomerEmailHtml(input: CustomerHtmlInput): string {
     details.join(""),
     ...(paid && input.paidTotal
       ? [
+          ...(input.subtotal && input.deliveryFee
+            ? [
+                '<tr><td style="padding:8px 0;">Subtotal: ' +
+                  escapeHtml(input.subtotal) +
+                  "<br>Delivery fee: " +
+                  escapeHtml(input.deliveryFee) +
+                  "</td></tr>",
+              ]
+            : []),
           '<tr><td style="padding:12px 0;font-size:18px;font-weight:bold;color:' +
             ink +
             ';">Total paid: ' +
