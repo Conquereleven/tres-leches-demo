@@ -91,7 +91,7 @@ export const operationsNavigation = [
     id: "zones",
     label: "Delivery areas",
     title: "Delivery areas",
-    description: "Coverage and authoritative minimum-order rules",
+    description: "Coverage and delivery pricing rules",
     group: "Administration",
     icon: MapPin,
   },

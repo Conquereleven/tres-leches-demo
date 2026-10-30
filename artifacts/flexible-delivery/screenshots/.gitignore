@@ -1,0 +1,5 @@
+*.png
+!chromium-en-*.png
+!chromium-admin-*.png
+!chromium-review-*.png
+!chromium-ar-below-*.png

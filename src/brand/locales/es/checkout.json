@@ -191,5 +191,15 @@
   "copy_dbee70b175436c79": "Si recibiste un correo de confirmación, consérvalo. Si no, contacta a 3L para que podamos ayudarte a verificar tu pedido de forma segura.",
   "area_2597bbfb29a1c90d": "No encontramos esa zona. Prueba otra forma de escribirla o contáctanos.",
   "area_f357162bd9f2af66": "Prueba otra forma de escribirla, contacta a 3L o elige recoger tu pedido.",
-  "area_bff98afc04fe097b": "La entrega online no está disponible actualmente para la zona seleccionada."
+  "area_bff98afc04fe097b": "La entrega online no está disponible actualmente para la zona seleccionada.",
+  "delivery_2bd377d1edda5e40": "Se confirma al finalizar la compra",
+  "delivery_9584eced58ee0343": "Envío gratis desde {0} en {1}.",
+  "delivery_265296a40d6d3c41": "Añade {0} en productos y consigue entrega gratis.",
+  "delivery_1d06e902a36d9d8a": "El cargo de entrega y el envío gratis se confirman para tu zona al finalizar la compra.",
+  "delivery_2fff3a6db36255f8": "— Envío gratis desde AED",
+  "delivery_2e0b4ba08c65dbbb": "El cargo de entrega depende de tu zona y del subtotal de productos.",
+  "delivery_d10d04778c2cb0f6": "Dirección verificada. Zona de entrega: {0}. Revisa el cargo de entrega abajo.",
+  "delivery_4b005eb4e2886429": "Confirma la zona de tu dirección verificada y revisa el cargo de entrega y el envío gratis antes de pagar.",
+  "delivery_9372978b9bbfd139": "Selecciona tu comunidad y revisa el cargo de entrega y el envío gratis antes de pagar.",
+  "delivery_f411a1fb62758b4c": "Gratis"
 }

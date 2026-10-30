@@ -6,6 +6,11 @@ export type DeliveryAreaOption = {
   name: string;
   aliases?: string[];
   minOrderAed: number;
+  deliveryPolicy?: {
+    mode: "flexible";
+    freeDeliveryThresholdFils: number;
+    belowThresholdFeeFils: number;
+  };
 };
 /**
  * Type-to-find delivery area. What the customer types only filters the list of
@@ -68,7 +73,7 @@ export function AreaField({
     onChange(area.id);
   };
   const label = (area: DeliveryAreaOption) =>
-    `${area.name} ${localize("— Minimum AED")} ${area.minOrderAed}`;
+    `${area.name} ${localize(area.deliveryPolicy ? "— Free delivery from AED" : "— Minimum AED")} ${area.minOrderAed}`;
   return (
     <div className="b-area-field">
       <input
@@ -164,7 +169,12 @@ export function AreaField({
           >
             <span>{area.name}</span>
             <small>
-              <CustomerCopy>— Minimum AED</CustomerCopy> {area.minOrderAed}
+              <CustomerCopy>
+                {area.deliveryPolicy
+                  ? "— Free delivery from AED"
+                  : "— Minimum AED"}
+              </CustomerCopy>{" "}
+              {area.minOrderAed}
             </small>
           </li>
         ))}

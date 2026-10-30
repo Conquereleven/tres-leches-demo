@@ -191,5 +191,15 @@
   "copy_dbee70b175436c79": "If you received a confirmation email, keep it for your records. Otherwise, contact 3L so we can help check your order securely.",
   "area_2597bbfb29a1c90d": "We couldn't find that area. Try another spelling or contact us.",
   "area_f357162bd9f2af66": "Try another spelling, contact 3L or choose pickup.",
-  "area_bff98afc04fe097b": "Online delivery is not currently available for the selected area."
+  "area_bff98afc04fe097b": "Online delivery is not currently available for the selected area.",
+  "delivery_2bd377d1edda5e40": "Confirmed at checkout",
+  "delivery_9584eced58ee0343": "Free delivery from {0} in {1}.",
+  "delivery_265296a40d6d3c41": "Add {0} in products for free delivery.",
+  "delivery_1d06e902a36d9d8a": "Delivery charges and free delivery eligibility are confirmed for your selected area at checkout.",
+  "delivery_2fff3a6db36255f8": "— Free delivery from AED",
+  "delivery_2e0b4ba08c65dbbb": "Delivery charges depend on your selected area and product subtotal.",
+  "delivery_d10d04778c2cb0f6": "Verified address. Delivery area: {0}. Review delivery charges below.",
+  "delivery_4b005eb4e2886429": "Confirm the area detected from your verified address and review delivery charges and free delivery eligibility before payment.",
+  "delivery_9372978b9bbfd139": "Select your community and review delivery charges and free delivery eligibility before payment.",
+  "delivery_f411a1fb62758b4c": "Free"
 }

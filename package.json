@@ -20,7 +20,8 @@
     "test:e2e:build": "E2E_BUILD=true playwright test",
     "audit:i18n": "node scripts/audit-i18n.mjs",
     "audit:customer-copy": "node scripts/audit-customer-copy.mjs",
-    "catalog:foundation": "tsx scripts/catalog-foundation.ts"
+    "catalog:foundation": "tsx scripts/catalog-foundation.ts",
+    "delivery:policy": "tsx scripts/flexible-delivery.ts"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

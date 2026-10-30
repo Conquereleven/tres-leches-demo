@@ -22,6 +22,15 @@ export const locationSchema = z
   })
   .strict();
 export type Location = z.infer<typeof locationSchema>;
+/** Explicit opt-in. Absent means the historical hard minimum still applies. */
+export const deliveryPolicySchema = z
+  .object({
+    mode: z.literal("flexible"),
+    freeDeliveryThresholdFils: z.number().int().nonnegative().max(10000000),
+    belowThresholdFeeFils: z.number().int().nonnegative().max(1000000),
+  })
+  .strict();
+export type DeliveryPolicy = z.infer<typeof deliveryPolicySchema>;
 export const zoneSchema = z
   .object({
     id: z.string().min(1),
@@ -36,6 +45,7 @@ export const zoneSchema = z
     polygon: z.array(locationSchema).min(3).optional(),
     review: z.string().optional(),
     version: z.number().int().nonnegative(),
+    deliveryPolicy: deliveryPolicySchema.optional(),
   })
   .strict()
   .refine(
@@ -115,6 +125,12 @@ export type Line = CommerceLine & {
   priceSnapshot?: import("../../shared/pack-pricing").PackPriceSnapshot;
 };
 export type Quote = {
+  /** Frozen with the accepted quote. Never reconstructed from live zone rules. */
+  deliveryRule?: {
+    mode: "minimum" | "flexible" | "pickup";
+    freeDeliveryThresholdFils: number | null;
+    belowThresholdFeeFils: number;
+  };
   zoneId: string | null;
   zoneName: string | null;
   minOrderAed: number | null;

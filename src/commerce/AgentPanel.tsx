@@ -250,7 +250,11 @@ export function AgentPanel({
               <dd>{t(money(payment?.quote?.totalFils))}</dd>
               <dt>{t("Zona")}</dt>
               <dd>{payment?.quote?.zoneName ?? t("Por resolver")}</dd>
-              <dt>{t("Mínimo")}</dt>
+              <dt>
+                {payment?.quote?.deliveryRule?.mode === "flexible"
+                  ? t("Free delivery threshold AED")
+                  : t("Mínimo")}
+              </dt>
               <dd>
                 {payment?.quote?.minOrderAed == null
                   ? t("Por confirmar")

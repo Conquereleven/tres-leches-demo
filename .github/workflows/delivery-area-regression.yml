@@ -9,6 +9,9 @@ on:
       - "src/brand/locales/**"
       - "server/domain/*area*"
       - "server/domain/zones.ts"
+      - "server/domain/model.ts"
+      - "server/domain/flexible-delivery.ts"
+      - "scripts/flexible-delivery.ts"
       - "server/domain/commands.ts"
       - "server/domain/service.ts"
       - "src/commerce/Workspace.tsx"
@@ -17,6 +20,8 @@ on:
       - "tests/fixtures/delivery-areas.ts"
       - "tests/fixtures/web-checkout-server.ts"
       - "playwright.delivery-area.config.ts"
+      - "playwright.flexible-delivery.config.ts"
+      - "tests/flexible-delivery-e2e/**"
       - ".github/workflows/delivery-area-regression.yml"
 permissions:
   contents: read
@@ -43,6 +48,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright test --config=playwright.delivery-area.config.ts
+      - run: npx playwright test --config=playwright.flexible-delivery.config.ts
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
@@ -50,6 +56,8 @@ jobs:
           path: |
             work/qa/delivery-area/
             test-results/delivery-area/
+            artifacts/flexible-delivery/screenshots/
+            test-results/flexible-delivery/
           retention-days: 7
           if-no-files-found: ignore
       # Disposable SQLite, synthetic addresses and fake provider only; no secrets/deploy.

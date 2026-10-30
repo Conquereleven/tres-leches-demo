@@ -10,6 +10,7 @@ import { writeFileSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { bluewatersFixture } from "./delivery-areas";
+import { planFlexibleDelivery } from "../../server/domain/flexible-delivery";
 process.env.APP_ENV = "test";
 process.env.NODE_ENV = "test";
 process.env.PROVIDER_MODE = "offline";
@@ -45,6 +46,11 @@ process.on("message", (value) => {
 });
 const debits = new Map<string, unknown>();
 const initial = seed();
+if (process.env.FLEXIBLE_DELIVERY_FIXTURE === "true") {
+  for (const change of planFlexibleDelivery(initial.zones).changes)
+    initial.zones.find((z) => z.id === change.id)!.deliveryPolicy =
+      change.after;
+}
 if (process.env.DELIVERY_AREA_FIXTURE === "true")
   initial.zones.push(
     bluewatersFixture,

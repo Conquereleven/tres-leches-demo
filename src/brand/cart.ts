@@ -242,6 +242,11 @@ export type CheckoutConfig = {
     aliases?: string[];
     minOrderAed: number;
     deliveryFeeAed: number;
+    deliveryPolicy?: {
+      mode: "flexible";
+      freeDeliveryThresholdFils: number;
+      belowThresholdFeeFils: number;
+    };
   }[];
 };
 let configPromise: Promise<CheckoutConfig | null> | null = null;

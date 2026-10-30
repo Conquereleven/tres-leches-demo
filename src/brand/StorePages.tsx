@@ -68,8 +68,8 @@ export function HowToOrder() {
           <li>
             <CustomerCopy>
               {config?.addressVerificationRequired
-                ? "Confirm the area detected from your verified address, review its minimum order and add items if needed. Delivery is included once the minimum is met."
-                : "Review the minimum order for your selected community and add items if needed. Delivery is included once the minimum is met."}
+                ? "Confirm the area detected from your verified address and review delivery charges and free delivery eligibility before payment."
+                : "Select your community and review delivery charges and free delivery eligibility before payment."}
             </CustomerCopy>
           </li>
           <li>

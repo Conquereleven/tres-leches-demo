@@ -106,6 +106,24 @@ export function PrintCenter({ data }: { data: Workspace }) {
                 </li>
               ))}
             </ul>
+            {order.quote && (
+              <dl>
+                <dt>Subtotal</dt>
+                <dd>AED {(order.quote.subtotalFils / 100).toFixed(2)}</dd>
+                <dt>Delivery fee</dt>
+                <dd>
+                  {order.quote.feeFils == null
+                    ? "Not stored"
+                    : `AED ${(order.quote.feeFils / 100).toFixed(2)}`}
+                </dd>
+                <dt>Total</dt>
+                <dd>
+                  {order.quote.totalFils == null
+                    ? "Not stored"
+                    : `AED ${(order.quote.totalFils / 100).toFixed(2)}`}
+                </dd>
+              </dl>
+            )}
             <p>
               {order.pickup?.pickupDate || order.delivery?.date
                 ? formatOpsDate(

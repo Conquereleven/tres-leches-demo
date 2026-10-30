@@ -1,0 +1,948 @@
+{
+  "valid": true,
+  "digest": "b227fda96c13d32cde9fad2a04b3cf6dce2f8bee86a007a33d667324daea234e",
+  "count": 94,
+  "changes": [
+    {
+      "id": "jlt-cluster-o",
+      "name": "JLT Cluster O",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jlt-cluster-p",
+      "name": "JLT Cluster P",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jlt-cluster-q",
+      "name": "JLT Cluster Q",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jlt-cluster-r",
+      "name": "JLT Cluster R",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jlt-cluster-s",
+      "name": "JLT Cluster S",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jlt-cluster-t",
+      "name": "JLT Cluster T",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jlt-cluster-u",
+      "name": "JLT Cluster U",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jlt-cluster-v",
+      "name": "JLT Cluster V",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jlt-cluster-w",
+      "name": "JLT Cluster W",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jlt-cluster-x",
+      "name": "JLT Cluster X",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jlt-cluster-y",
+      "name": "JLT Cluster Y",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "one-jlt",
+      "name": "One JLT",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "mazaya",
+      "name": "Mazaya",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "taj-residence",
+      "name": "Taj Residence",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jumeirah-island",
+      "name": "Jumeirah Island",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "the-gardens",
+      "name": "The Gardens",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "discovery-gardens",
+      "name": "Discovery Gardens",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "springs",
+      "name": "Springs",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "meadows",
+      "name": "Meadows",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "emirates-hills",
+      "name": "Emirates Hills",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "the-lakes",
+      "name": "The Lakes",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "the-greens",
+      "name": "The Greens",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jumeirah-park",
+      "name": "Jumeirah Park",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jumeirah-heights",
+      "name": "Jumeirah Heights",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jvt",
+      "name": "JVT",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "al-furjan",
+      "name": "Al Furjan",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jebel-ali-2",
+      "name": "Jebel Ali 2",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jebel-ali-village",
+      "name": "Jebel Ali Village",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "the-hills",
+      "name": "The Hills",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "vida-the-hills",
+      "name": "Vida The Hills",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jbr",
+      "name": "JBR",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "marina",
+      "name": "Marina",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 5000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jvc",
+      "name": "JVC",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 10000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "internet-city",
+      "name": "Internet City",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 10000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "media-city",
+      "name": "Media City",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 10000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "barsha-heights",
+      "name": "Barsha Heights",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 10000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "palm-jumeirah-shoreline",
+      "name": "Palm Jumeirah - Shoreline",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 10000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "palm-jumeirah-golden-mile",
+      "name": "Palm Jumeirah - Golden Mile",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 10000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "al-barsha-1",
+      "name": "Al Barsha 1",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 10000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "knowledge-village",
+      "name": "Knowledge Village",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 10000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "knowledge-park",
+      "name": "Knowledge Park",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 10000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "al-sufouh-2",
+      "name": "Al Sufouh 2",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 10000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "secret-beach",
+      "name": "Secret Beach",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 10000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "dubai-hills",
+      "name": "Dubai Hills",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "al-quoz",
+      "name": "Al Quoz",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "impz-d-production-city",
+      "name": "IMPZ / Dubai Production City",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "al-barsha-south",
+      "name": "Al Barsha South",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "jumeirah-golf-estate",
+      "name": "Jumeirah Golf Estate",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "motorcity",
+      "name": "Motorcity",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "sports-city",
+      "name": "Sports City",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "jebel-ali",
+      "name": "Jebel Ali",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "al-barsha-2",
+      "name": "Al Barsha 2",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "al-barsha-3",
+      "name": "Al Barsha 3",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "al-sufouh-1",
+      "name": "Al Sufouh 1",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "umm-suqeim-3",
+      "name": "Umm Suqeim 3",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "victory-heights",
+      "name": "Victory Heights",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "palm-jumeirah-west-crescent",
+      "name": "Palm Jumeirah - West Crescent",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "palm-jumeirah-east-crescent",
+      "name": "Palm Jumeirah - East Crescent",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "studio-city",
+      "name": "Studio City",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 15000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "al-wasl-road",
+      "name": "Al Wasl Road",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 20000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "al-safa",
+      "name": "Al Safa",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 20000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "arabian-ranches",
+      "name": "Arabian Ranches",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 20000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "umm-suqeim-2",
+      "name": "Umm Suqeim 2",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 20000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "umm-suqeim-1",
+      "name": "Umm Suqeim 1",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 20000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "al-manara",
+      "name": "Al Manara",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 20000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "jafza",
+      "name": "JAFZA",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 20000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "dip",
+      "name": "DIP",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 20000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "green-community-dip",
+      "name": "Green Community DIP",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 20000,
+        "belowThresholdFeeFils": 2000
+      }
+    },
+    {
+      "id": "damac-hills",
+      "name": "Damac Hills",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 25000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "sustainable-city",
+      "name": "Sustainable City",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 25000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "jumeirah-3",
+      "name": "Jumeirah 3",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "jumeirah-2",
+      "name": "Jumeirah 2",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "jumeirah-1",
+      "name": "Jumeirah 1",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "satwa",
+      "name": "Satwa",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "deira",
+      "name": "Deira",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "downtown",
+      "name": "Downtown",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "jebel-ali-downtown",
+      "name": "Jebel Ali Downtown",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "kitebeach",
+      "name": "Kitebeach",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "festival-city",
+      "name": "Festival City",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "dubai-south",
+      "name": "Dubai South",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "remran",
+      "name": "Remraam",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "expo-site",
+      "name": "Expo Site",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "d3-district",
+      "name": "D3 District",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "difc",
+      "name": "DIFC",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "nad-al-sheeba",
+      "name": "Nad Al Sheeba",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "mudon",
+      "name": "Mudon",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "port-rashid",
+      "name": "Port Rashid",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "al-badda",
+      "name": "Al Badda",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "villa-nova",
+      "name": "Villa Nova",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "burj-al-arab",
+      "name": "Burj Al Arab",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 30000,
+        "belowThresholdFeeFils": 2500
+      }
+    },
+    {
+      "id": "jlt-cluster-a",
+      "name": "JLT Cluster A",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jlt-cluster-b",
+      "name": "JLT Cluster B",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jlt-cluster-c",
+      "name": "JLT Cluster C",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    },
+    {
+      "id": "jlt-cluster-d",
+      "name": "JLT Cluster D",
+      "version": 0,
+      "after": {
+        "mode": "flexible",
+        "freeDeliveryThresholdFils": 3000,
+        "belowThresholdFeeFils": 1500
+      }
+    }
+  ],
+  "errors": []
+}

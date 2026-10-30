@@ -186,3 +186,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Product search reads the current published Product Hub catalog intersected with checkout availability and prices. It must never offer retired, unavailable, unpublished or mismatched-price SKUs. Search vocabulary may add localized synonyms, never a parallel product or price catalog.
 - Complementary suggestions are optional after a successful Add to Cart. Curate families in `src/brand/recommendation-rules.json`; resolve current SKUs, availability, photos and prices from published sources. Complex packs must open the existing builder. Never add without an explicit customer action or block the cart/checkout path.
 - Preserve EN/ES/AR and RTL. The local conversion fixture uses disposable SQLite and fake providers; its screenshots and QA are in `docs/storefront/conversion-v2/`.
+
+## Approved flexible delivery (30 October 2026, Joel)
+- Explicit per-zone `deliveryPolicy` opts new quotes into paid delivery below a free-delivery threshold. Absent policy preserves the legacy hard minimum; legacy fields are not repurposed in stored data.
+- Initial thresholds AED 30/50/100 → fee 15; 150/200 → fee 20; 250/300 → fee 25. Exact threshold or above is free. Nonempty carts have no additional minimum; pickup is free and coverage/scheduling still apply.
+- All policy money is integer fils. Freeze policy, zone version, fee and total with the accepted order. Never reprice an accepted payment or historical snapshot.
+- `delivery:policy dry-run` is read-only; apply requires its exact digest and an integrity-checked backup. No automatic startup migration or Production apply/deploy. Public delivery policy copy needs founder approval before activation.
