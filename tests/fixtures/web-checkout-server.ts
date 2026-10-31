@@ -152,7 +152,14 @@ const provider = new PaymenntProvider(
       });
     return Response.json({
       success: true,
-      result: { ...checkouts.get(id), status },
+      result: {
+        ...checkouts.get(id),
+        status: process.env.FIXTURE_PAYMENT_STATUS_FILE
+          ? (JSON.parse(
+              readFileSync(process.env.FIXTURE_PAYMENT_STATUS_FILE, "utf8"),
+            )[id] ?? status)
+          : status,
+      },
     });
   },
 );

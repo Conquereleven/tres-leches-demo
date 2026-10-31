@@ -1,6 +1,7 @@
 /** Isolated SQLite + in-process Paymennt mock. No external payment API or card input. */
 import { test, expect } from "@playwright/test";
 import { clickStableControl } from "../helpers/stable-control";
+import { setCheckoutProviderStatus } from "../fixtures/checkout-provider-control";
 for (const [sku, initialQty, currentQty, oldAmount, amount] of [
   ["pan-de-muerto", 6, 15, 150, 375],
   ["fixture-36", 1, 3, 36, 108],
@@ -70,6 +71,8 @@ for (const [sku, initialQty, currentQty, oldAmount, amount] of [
     await expect(
       page.getByRole("link", { name: "CHECK PAYMENT STATUS" }),
     ).toBeVisible();
+    // A new hosted attempt is safe only after GET proves the old one terminal.
+    setCheckoutProviderStatus(previous.url, "EXPIRED");
     // Leave checkout and change the real browser cart.
     const returnedConfig = page.waitForResponse(
       (r) => r.url() === "http://127.0.0.1:3189/api/checkout/config",
@@ -89,10 +92,10 @@ for (const [sku, initialQty, currentQty, oldAmount, amount] of [
     await page.goto("/cart");
     await expect(page.locator("main")).toContainText(`AED ${amount}`);
     await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
-    await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
-    await clickStableControl(
-      page.getByRole("button", { name: "REVIEW ORDER" }),
-    );
+    // Valid saved details now recover directly to review instead of step 1.
+    await expect(
+      page.getByRole("button", { name: "CONTINUE TO DETAILS" }),
+    ).toHaveCount(0);
     await page.getByLabel(/I've reviewed my order/).check();
     const pay = page.getByRole("button", {
       name: `PAY AED ${amount}`,
@@ -141,7 +144,7 @@ for (const [sku, initialQty, currentQty, oldAmount, amount] of [
     expect(await old.json()).toMatchObject({
       superseded: true,
       url: null,
-      paymentStatus: "pending",
+      paymentStatus: "expired",
     });
   });
 }

@@ -113,6 +113,9 @@ function fixture(approved = true) {
     store,
     service,
     calls,
+    expired: () => {
+      status = "EXPIRED";
+    },
     paid: () => {
       status = "PAID";
     },
@@ -595,7 +598,7 @@ test("paid pack composition and financial snapshots are immutable after publishe
   }
 });
 
-test("changing only the mix supersedes an unpaid checkout; normalized component ordering replays the same intent", async () => {
+test("changing only the mix requires a terminal hosted checkout; normalized component ordering replays the same intent", async () => {
   const f = fixture(),
     spec = PACK_SPECS[0]!;
   try {
@@ -624,6 +627,16 @@ test("changing only the mix supersedes an unpaid checkout; normalized component 
     );
     assert.equal(first.orderId, same.orderId);
     assert.equal(f.calls.length, 1);
+    assert.throws(
+      () =>
+        resumeWebCheckout(f.service, {
+          key,
+          checkout: input([{ ...lines[0]!, composition: single(spec, 1) }]),
+        }),
+      /previous payment must be verified/,
+    );
+    f.expired();
+    await f.service.reconcile(f.store.read().payments[0]!.id, admin);
     const changed = resumeWebCheckout(f.service, {
       key,
       checkout: input([{ ...lines[0]!, composition: single(spec, 1) }]),
@@ -635,6 +648,28 @@ test("changing only the mix supersedes an unpaid checkout; normalized component 
       f.store.read().payments.find((p) => p.orderId === first.orderId)!
         .supersededAt,
     );
+    const replacementInput = input([
+      { ...lines[0]!, composition: single(spec, 1) },
+    ]);
+    const fresh = await createWebCheckout(
+      f.service,
+      replacementInput,
+      changed.key,
+      "web",
+      "https://fixture.invalid",
+    );
+    const accepted = f.store.read().orders.find((o) => o.id === fresh.orderId)!;
+    assert.deepEqual(
+      accepted.lines[0]!.composition,
+      replacementInput.lines[0]!.composition,
+    );
+    assert.deepEqual(
+      f.store.read().orders.find((o) => o.id === first.orderId)!.lines[0]!
+        .composition,
+      commerceLineSchema.parse(lines[0]).composition,
+    );
+    assert.equal(accepted.state, "Awaiting Payment");
+    assert.equal(f.calls.length, 2);
   } finally {
     f.store.close();
   }

@@ -1106,5 +1106,8 @@
   "Add": "menu:conversion_add",
   "We couldn't find that area. Try another spelling or contact us.": "checkout:area_2597bbfb29a1c90d",
   "Try another spelling, contact 3L or choose pickup.": "checkout:area_f357162bd9f2af66",
-  "Online delivery is not currently available for the selected area.": "checkout:area_bff98afc04fe097b"
+  "Online delivery is not currently available for the selected area.": "checkout:area_bff98afc04fe097b",
+  "This browser cannot save your checkout securely. Please enable browser storage or contact 3L before paying.": "checkout:copy_recovery_storage",
+  "Your saved details need review. Please check your address, date and current order total.": "checkout:copy_recovery_review",
+  "Your previous payment attempt has ended. Your details are saved. Review your order before starting a new secure payment.": "checkout:copy_recovery_ready"
 }

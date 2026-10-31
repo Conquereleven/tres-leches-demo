@@ -1,4 +1,10 @@
-import { checkoutCapability } from "./checkout-capability";
+import {
+  savedCheckout,
+  rememberCheckout,
+  savedDraft,
+  rememberDraft,
+  clearCheckoutDraft,
+} from "./checkout-storage";
 import { useLiveCatalog } from "./live-catalog";
 const formatAed = (n: number) => (Number.isFinite(n) ? formatPrice(n) : "—");
 import { PackBuilder, CompositionDetails, packComplete } from "./PackBuilder";
@@ -232,15 +238,30 @@ async function post<T>(
   key?: string,
   quoteRevision?: string,
 ): Promise<T> {
-  const res = await fetch(path, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(key ? { "Idempotency-Key": key } : {}),
-      ...(quoteRevision ? { "X-Checkout-Quote-Revision": quoteRevision } : {}),
-    },
-    body: JSON.stringify(body),
-  });
+  let res: Response;
+  try {
+    res = await fetch(path, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(key ? { "Idempotency-Key": key } : {}),
+        ...(quoteRevision
+          ? { "X-Checkout-Quote-Revision": quoteRevision }
+          : {}),
+      },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(25000),
+    });
+  } catch {
+    throw Object.assign(
+      new Error(
+        /\/checkout\/(web|resume|reconcile)$/.test(path)
+          ? "The payment result could not be verified. Your order is held for review."
+          : "Something went wrong. Please try again.",
+      ),
+      { status: 503 },
+    );
+  }
   const data = await res.json().catch(() => ({}));
   if (!res.ok)
     throw Object.assign(
@@ -255,7 +276,11 @@ async function post<T>(
 /** Server messages written for operators are replaced with customer copy. */
 function friendly(message?: string) {
   if (!message) return undefined;
-  if (/held for review|could not be verified/i.test(message))
+  if (
+    /held for review|could not be verified|previous payment must be verified|recovery requires review/i.test(
+      message,
+    )
+  )
     return "The payment result could not be verified. Your order is held for review.";
   if (/could not be processed/i.test(message))
     return "Payment could not be processed. Please check your details or try again.";
@@ -277,21 +302,26 @@ export function normalizeUaeMobile(raw: string) {
   );
   return m ? `+971${m[1]}` : null;
 }
-const CAPABILITY = "3l-checkout";
 const CUTOFF_SEEN = "3l-cutoff-notice";
-const DRAFT = "3l-checkout-draft";
 function loadDraft(): {
+  step?: number;
   fulfillmentMethod?: "delivery" | "pickup";
   delivery?: Partial<Delivery>;
   customer?: Partial<Customer>;
   billing?: Billing;
 } {
   try {
-    const draft = JSON.parse(sessionStorage.getItem(DRAFT) ?? "{}");
+    const draft = (savedDraft() ?? {}) as {
+      step?: number;
+      fulfillmentMethod?: "delivery" | "pickup";
+      delivery?: Partial<Delivery>;
+      customer?: Partial<Customer> & { name?: string };
+      billing?: Billing;
+    };
     // A draft saved before names were captured separately holds one "name".
     // Offer a best-effort split the customer can correct; nothing is lost.
     const legacy = draft.customer?.name;
-    if (typeof legacy === "string" && !draft.customer.firstName) {
+    if (typeof legacy === "string" && !draft.customer?.firstName) {
       const [first, ...rest] = legacy.trim().split(/\s+/);
       draft.customer = {
         ...draft.customer,
@@ -306,13 +336,14 @@ function loadDraft(): {
   }
 }
 function saveDraft(draft: {
+  step?: number;
   fulfillmentMethod?: "delivery" | "pickup";
   delivery?: Partial<Delivery>;
   customer?: Partial<Customer>;
   billing?: Billing;
 }) {
   try {
-    sessionStorage.setItem(DRAFT, JSON.stringify(draft));
+    rememberDraft(draft);
   } catch {
     /* Session storage unavailable: the form still works on this page. */
   }
@@ -1119,6 +1150,10 @@ export function CheckoutPage() {
   const [billing, setBilling] = useState<Billing>(
     draft.billing ?? { sameAsDelivery: true },
   );
+  const resumeSaved = useRef(
+    draft.step === 3 ||
+      new URLSearchParams(location.search).get("recover") === "1",
+  );
   const [areaMissing, setAreaMissing] = useState(false);
   const [cutoffDialog, setCutoffDialog] = useState(false);
   const [addressBusy, setAddressBusy] = useState(false);
@@ -1135,8 +1170,8 @@ export function CheckoutPage() {
   );
 
   useEffect(
-    () => saveDraft({ fulfillmentMethod, delivery, customer, billing }),
-    [fulfillmentMethod, delivery, customer, billing],
+    () => saveDraft({ step, fulfillmentMethod, delivery, customer, billing }),
+    [step, fulfillmentMethod, delivery, customer, billing],
   );
   useEffect(() => {
     heading.current?.focus();
@@ -1160,6 +1195,50 @@ export function CheckoutPage() {
       active = false;
     };
   }, [delivery.zoneId, cartLines, config, pickup]);
+
+  useEffect(() => {
+    if (!resumeSaved.current || !config?.enabled || !quote?.eligible) return;
+    resumeSaved.current = false;
+    let active = true;
+    void heldCheckout(
+      checkoutBody({
+        fulfillmentMethod,
+        lines: cartLines,
+        delivery,
+        customer,
+        billing,
+      }),
+      true,
+    )
+      .then(() => {
+        if (active) setStep(3);
+      })
+      .catch((error: unknown) => {
+        if (!active) return;
+        if (
+          error &&
+          typeof error === "object" &&
+          "status" in error &&
+          Number(error.status) === 503
+        )
+          setStep(3);
+        else
+          setError(
+            "Your saved details need review. Please check your address, date and current order total.",
+          );
+      });
+    return () => {
+      active = false;
+    };
+  }, [
+    config,
+    quote,
+    fulfillmentMethod,
+    cartLines,
+    delivery,
+    customer,
+    billing,
+  ]);
 
   if (loading)
     return (
@@ -1609,6 +1688,12 @@ export function CheckoutPage() {
                 className="b-co-cta"
                 disabled={
                   !quote?.eligible ||
+                  !validWindow(
+                    delivery.date ?? "",
+                    delivery.slot ?? "",
+                    now,
+                    leadHours(cartLines.map((line) => line.productId)),
+                  ) ||
                   (!pickup &&
                     (areaMissing ||
                       (config.addressVerificationRequired &&
@@ -1955,27 +2040,29 @@ export function CheckoutPage() {
 }
 
 /** Resolve this cart on the server before reusing a session checkout. */
-async function heldCheckout(checkout: unknown): Promise<Status | null> {
-  let saved: { key?: string } | null = null;
-  try {
-    saved = JSON.parse(sessionStorage.getItem(CAPABILITY) ?? "null");
-  } catch {
-    return null;
-  }
-  if (!saved?.key) return null;
+async function heldCheckout(
+  checkout: unknown,
+  validateDraft = false,
+): Promise<Status | null> {
+  const saved = savedCheckout();
+  if (!saved?.key && !validateDraft) return null;
   const result = await post<{
-    key: string;
-    cartHash: string;
+    key: string | null;
+    cartHash?: string;
     changed: boolean;
     status?: Status;
-  }>("/api/checkout/resume", { key: saved.key, checkout });
-  if (!result.status) {
-    sessionStorage.setItem(
-      CAPABILITY,
-      JSON.stringify({ key: result.key, cartHash: result.cartHash }),
-    );
-    return null;
-  }
+  }>("/api/checkout/resume", {
+    ...(saved?.key ? { key: saved.key } : {}),
+    checkout,
+  });
+  if (result.key)
+    rememberCheckout({
+      key: result.key,
+      cartHash: result.cartHash,
+      retryReady:
+        result.changed || (saved?.key === result.key && saved.retryReady),
+    });
+  if (!result.status) return null;
   const status = result.status;
   return status.actionRequired === "review_payment" ||
     [
@@ -2121,43 +2208,21 @@ function StateNotice({
   );
 }
 
-function PaymentStep({
+function checkoutBody({
   fulfillmentMethod,
-  config,
   lines,
   delivery,
   customer,
   billing,
-  quote,
-  back,
-  backToDelivery,
 }: {
   fulfillmentMethod: "delivery" | "pickup";
-  config: CheckoutConfig;
   lines: CartLine[];
-  delivery: Delivery;
-  customer: Customer;
+  delivery: Partial<Delivery>;
+  customer: Partial<Customer>;
   billing: Billing;
-  quote: Quote | null;
-  subtotal: number;
-  back: () => void;
-  backToDelivery: () => void;
 }) {
-  const { text: localize } = useCustomerLanguage();
-
-  const [reviewed, setReviewed] = useState(false);
-  const [held, setHeld] = useState<Status | null>(null);
-  const [checkingPrevious, setCheckingPrevious] = useState(true);
-  const [busy, setBusy] = useState(false);
-  /** Set just before the page navigates away, so the button stays locked. */
-  const [leaving, setLeaving] = useState<CustomerPaymentState | null>(null);
-  const [error, setError] = useState("");
-  const inFlight = useRef(false);
   const pickup = fulfillmentMethod === "pickup";
-  const zone = pickup
-    ? undefined
-    : config.zones.find((z) => z.id === delivery.zoneId);
-  const body = {
+  return {
     lines,
     fulfillmentMethod,
     ...(pickup
@@ -2200,11 +2265,58 @@ function PaymentStep({
             country: billing.country ?? "AE",
           },
   };
+}
+
+function PaymentStep({
+  fulfillmentMethod,
+  config,
+  lines,
+  delivery,
+  customer,
+  billing,
+  quote,
+  back,
+  backToDelivery,
+}: {
+  fulfillmentMethod: "delivery" | "pickup";
+  config: CheckoutConfig;
+  lines: CartLine[];
+  delivery: Delivery;
+  customer: Customer;
+  billing: Billing;
+  quote: Quote | null;
+  subtotal: number;
+  back: () => void;
+  backToDelivery: () => void;
+}) {
+  const { text: localize } = useCustomerLanguage();
+
+  const [reviewed, setReviewed] = useState(false);
+  const [held, setHeld] = useState<Status | null>(null);
+  const [checkingPrevious, setCheckingPrevious] = useState(true);
+  const [recoveryRevision, setRecoveryRevision] = useState(0);
+  const [busy, setBusy] = useState(false);
+  /** Set just before the page navigates away, so the button stays locked. */
+  const [leaving, setLeaving] = useState<CustomerPaymentState | null>(null);
+  const [error, setError] = useState("");
+  const inFlight = useRef(false);
+  const pickup = fulfillmentMethod === "pickup";
+  const zone = pickup
+    ? undefined
+    : config.zones.find((z) => z.id === delivery.zoneId);
+  const body = checkoutBody({
+    fulfillmentMethod,
+    lines,
+    delivery,
+    customer,
+    billing,
+  });
 
   const cartContext = JSON.stringify(body);
   useEffect(() => {
     let active = true;
     setCheckingPrevious(true);
+    setError("");
     setHeld(null);
     void heldCheckout(JSON.parse(cartContext))
       .then((previous) => {
@@ -2222,7 +2334,7 @@ function PaymentStep({
     return () => {
       active = false;
     };
-  }, [cartContext]);
+  }, [cartContext, recoveryRevision]);
 
   async function pay(e: React.FormEvent) {
     e.preventDefault();
@@ -2240,12 +2352,12 @@ function PaymentStep({
         setBusy(false);
         return;
       }
-      const saved = JSON.parse(sessionStorage.getItem(CAPABILITY) ?? "null");
+      const saved = savedCheckout();
       const key =
         saved?.key && (!saved.fingerprint || saved.fingerprint === fingerprint)
           ? saved.key
           : crypto.randomUUID();
-      sessionStorage.setItem(CAPABILITY, JSON.stringify({ key, fingerprint }));
+      rememberCheckout({ key, fingerprint });
       const result = await post<Status>(
         "/api/checkout/web",
         body,
@@ -2405,10 +2517,14 @@ function PaymentStep({
                 />
               ) : (
                 <StateNotice
-                  state="HELD_FOR_REVIEW"
-                  {...stateCopy("HELD_FOR_REVIEW")}
-                  detail={`Order ${reference(held)}. We'll confirm it, or contact us with your order number.`}
+                  state={paymentStateOf(held)}
+                  {...stateCopy(paymentStateOf(held), held.paymentStatus)}
                 />
+              )}
+              {paymentStateOf(held) === "HOSTED_REDIRECT" && held.url && (
+                <a className="b-button b-co-cta" href={held.url}>
+                  <CustomerCopy>CONTINUE PAYMENT</CustomerCopy>
+                </a>
               )}
               <a className="b-button b-co-cta" href="/checkout/return">
                 <CustomerCopy>
@@ -2443,6 +2559,15 @@ function PaymentStep({
                   order.
                 </CustomerCopy>
               </p>
+              {savedCheckout()?.retryReady && (
+                <p role="status">
+                  <CustomerCopy>
+                    Your previous payment attempt has ended. Your details are
+                    saved. Review your order before starting a new secure
+                    payment.
+                  </CustomerCopy>
+                </p>
+              )}
               <label className="b-check">
                 <input
                   type="checkbox"
@@ -2494,9 +2619,18 @@ function PaymentStep({
                       detail={issue === "DECLINED" ? error : undefined}
                     >
                       {issue === "HELD_FOR_REVIEW" && (
-                        <a className="b-link" href="/checkout/return">
-                          <CustomerCopy>Check payment status</CustomerCopy>
-                        </a>
+                        <>
+                          <Button
+                            type="button"
+                            disabled={checkingPrevious}
+                            onClick={() => setRecoveryRevision((n) => n + 1)}
+                          >
+                            <CustomerCopy>CHECK AGAIN</CustomerCopy>
+                          </Button>
+                          <a className="b-link" href="/checkout/return">
+                            <CustomerCopy>Check payment status</CustomerCopy>
+                          </a>
+                        </>
                       )}
                     </StateNotice>
                   ) : (
@@ -2562,7 +2696,7 @@ export function CheckoutReturn() {
         // Storage can be unavailable or malformed. Neither proves a failed payment.
         let key: string | null = null;
         try {
-          key = checkoutCapability(sessionStorage);
+          key = savedCheckout()?.key ?? null;
         } catch {
           /* storage access denied */
         }
@@ -2582,7 +2716,7 @@ export function CheckoutReturn() {
         ) {
           cart.clear();
           try {
-            sessionStorage.removeItem(DRAFT);
+            clearCheckoutDraft();
           } catch {
             /* ignore */
           }
@@ -2712,7 +2846,7 @@ export function CheckoutReturn() {
               </a>
             )}
           {(state === "DECLINED" || state === "FAILED") && (
-            <a className="b-button b-co-cta" href="/checkout">
+            <a className="b-button b-co-cta" href="/checkout?recover=1">
               <CustomerCopy>TRY AGAIN</CustomerCopy>
             </a>
           )}

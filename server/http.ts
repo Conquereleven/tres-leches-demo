@@ -39,7 +39,7 @@ import {
   createWebCheckout,
   quoteWebCheckout,
   readWebCheckoutStatus,
-  resumeWebCheckout,
+  recoverWebCheckout,
 } from "./domain/web-checkout";
 import { agentConfig } from "./agents/config";
 import { AgentOrchestrator } from "./agents/orchestrator";
@@ -679,7 +679,7 @@ export async function startServer(
           if (path === "/api/checkout/quote")
             return json(res, 200, quoteWebCheckout(service, body));
           if (path === "/api/checkout/resume")
-            return json(res, 200, resumeWebCheckout(service, body));
+            return json(res, 200, await recoverWebCheckout(service, body));
           if (path === "/api/checkout/status") {
             const { key } = z.object({ key: z.uuid() }).strict().parse(body);
             return json(res, 200, readWebCheckoutStatus(service, key));
