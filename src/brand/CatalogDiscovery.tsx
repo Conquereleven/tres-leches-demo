@@ -95,17 +95,21 @@ export function ProductSearch() {
   const hits = available
     ? searchProducts(published.catalog, config, query, now)
     : [];
+  // A known catalog outage is stated at once, not after checkout settings load:
+  // a later, longer message would wrap and move the menu's TRY AGAIN below it.
   const message = !online
     ? copy("offline")
-    : waiting
-      ? copy("loading")
-      : !available
-        ? copy("unavailable")
-        : query.trim()
-          ? hits.length
-            ? copy("results", { 0: hits.length })
-            : copy("noResults")
-          : copy("searchHint");
+    : published.status === "unavailable"
+      ? copy("unavailable")
+      : waiting
+        ? copy("loading")
+        : !available
+          ? copy("unavailable")
+          : query.trim()
+            ? hits.length
+              ? copy("results", { 0: hits.length })
+              : copy("noResults")
+            : copy("searchHint");
   return (
     <section className="b-discovery-search" aria-busy={waiting}>
       <form
