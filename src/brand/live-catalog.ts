@@ -146,14 +146,9 @@ function schedule(ms: number) {
   if (timer) clearTimeout(timer);
   timer = setTimeout(() => void refreshLiveCatalog(), ms);
 }
-/**
- * Revalidates against the server. Concurrent callers share one request, except
- * a customer's explicit retry: a request already in flight may have been sent
- * before the server recovered, so the retry asks again once it settles.
- */
-export function refreshLiveCatalog(explicit = false): Promise<void> {
+/** Revalidates against the server. Concurrent callers share one request. */
+export function refreshLiveCatalog(): Promise<void> {
   if (!dynamicCatalog()) return Promise.resolve();
-  if (explicit && inFlight) return inFlight.then(() => refreshLiveCatalog());
   inFlight ??= (async () => {
     try {
       const res = await fetch(ENDPOINT, {
