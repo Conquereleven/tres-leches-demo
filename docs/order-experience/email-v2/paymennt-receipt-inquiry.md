@@ -1,6 +1,6 @@
 # Paymennt support inquiry: customer emails from `/checkout/web` (DRAFT, not sent)
 
-**Status: prepared for founder approval. Not sent.** No LIVE setting, credential or payment request was changed.
+**Status: CLOSED, never sent.** Founder decision, 31 October 2026: Paymennt's customer payment receipt stays enabled and unchanged. Do not modify the checkout request, dashboard, configuration, credentials or receipts. Kept for the record only.
 
 ## Why this inquiry is needed
 

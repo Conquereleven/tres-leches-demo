@@ -1,6 +1,6 @@
 # Customer email flow V2 — two automatic emails
 
-Founder decision, 31 October 2026: each newly paid order receives exactly two automatic customer emails, triggered by time slot. No kitchen or operator step is involved.
+Founder decision, 31 October 2026: each newly paid order receives exactly two automatic customer emails from 3L, triggered by time slot. Paymennt's own payment receipt is separate and unchanged. No kitchen or operator step is involved.
 
 **Status: implemented behind a flag, not activated.** No real email, provider change, merge or deploy.
 
@@ -67,14 +67,7 @@ The application's own customer emails never contain the internal `TL-…` id: th
 
 Paymennt therefore most likely emails its own payment receipt, showing `TL-…`, to the customer address it receives. To confirm, compare the sender domain of the `TL-…` email (Paymennt versus our Resend `CUSTOMER_EMAIL_FROM`).
 
-Supported suppression options, **none applied**:
-
-1. A merchant-dashboard setting for customer payment receipts or notifications, if Paymennt offers one.
-2. A documented `/checkout/web` parameter equivalent to `sendEmail: false`. This must be confirmed in Paymennt's API documentation or with Paymennt support first: an unverified field could be rejected by a LIVE checkout.
-
-Both are changes to the live provider and need explicit founder authorization.
-
-Official documentation could not confirm either option (31 Oct 2026: `docs.paymennt.com` is unreachable from the engineering environment, and the public pages say nothing about suppressing receipts). A support inquiry is prepared for founder approval, not sent: [`paymennt-receipt-inquiry.md`](paymennt-receipt-inquiry.md).
+**Founder decision, 31 October 2026:** the Paymennt receipt stays **enabled and unchanged**. Each newly paid order is meant to produce one Paymennt receipt plus exactly two 3L emails (Email 1 and Email 2). Nothing in V2 suppresses or alters Paymennt emails. The suppression inquiry is closed and was never sent: [`paymennt-receipt-inquiry.md`](paymennt-receipt-inquiry.md).
 
 ## Activation plan (requires founder GO)
 
