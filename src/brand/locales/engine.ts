@@ -52,7 +52,8 @@ export function localizedKey(
 }
 /** Compatibility boundary for existing copy nodes; new UI should use explicit keys + values. */
 export function localizedSource(source: string, locale: Locale): string {
-  if (locale === "en" || !source.trim()) return source;
+  if (!source.trim()) return source;
+  if (locale === "en") return reviewedEnglish(source);
   source = source.replace(/\s+/g, " ").trim();
   if (translatedValues[locale]!.has(source.toLocaleLowerCase("en")))
     return source;
@@ -95,6 +96,22 @@ export function localizedSource(source: string, locale: Locale): string {
       .map((part) => localizedSource(part, locale))
       .join(" · ");
   return missingLabels[locale];
+}
+/**
+ * English is the source language, but some catalog sources are authored in Spanish.
+ * Their reviewed English wording lives in the EN resources; anything without a
+ * reviewed entry is shown exactly as authored, never as a "pending" marker.
+ */
+function reviewedEnglish(source: string): string {
+  const normalized = source.replace(/\s+/g, " ").trim();
+  const key =
+    sourceIndex[normalized] ??
+    foldedIndex.get(normalized.toLocaleLowerCase("en"));
+  if (key && storefrontI18n.exists(key, { lng: "en" }))
+    return String(storefrontI18n.t(key, { lng: "en" }));
+  if (normalized.includes(" · "))
+    return normalized.split(" · ").map(reviewedEnglish).join(" · ");
+  return source;
 }
 export function localizedMoney(priceFils: number, locale: Locale): string {
   return new Intl.NumberFormat(
