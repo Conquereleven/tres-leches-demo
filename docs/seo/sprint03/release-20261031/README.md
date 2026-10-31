@@ -22,3 +22,14 @@ Local validation uses clean detached worktree `/private/tmp/3l-seo-release-20261
 Recommendation: GO WITH CONDITIONS for founder release review only after current candidate CI completes. Merchant product submission remains blocked until the URL, English-description and delivery gates above are satisfied. Do not treat merge readiness as Merchant activation authorization.
 
 No production deployment, PR merge, provider calls, Product Hub publication, commercial edits, DNS change or search-console mutation. After separately approved release, rollback is an approved code revision/revert, never a production database restore or a catalog price rollback through adoption flags.
+
+## Completed local integration checks
+
+- Typecheck, lint, build, Sites 4/4 and heuristic secret scan (zero findings) passed.
+- Commerce/HTTP/SEO/recovery: 810 passed, none skipped.
+- Dynamic storefront: 58 passed across Chromium/WebKit, including EN/ES/AR, mobile, media removal, publication, canonical/H1/offer behavior and Add to Cart.
+- Full checkout/incident suite: 91 passed, 1 failed. The WebKit cart-to-payment case failed at `same.check()` with "Clicking the checkbox did not change its state". Three isolated repetitions of that exact unmodified test then passed (3/3). Classify as an observed intermittent WebKit interaction failure; do not erase the initial failure or claim an initial 92/92. Checkout source and test are identical to current main; no checkout fix or weakened assertion was introduced.
+- Full dependency audit now fails: one newly reported advisory, `GHSA-g3hv-75wg-m249`, affecting minimatch 10.2.6 through ESLint/TypeScript ESLint (npm reports 10 affected dependency entries). The candidate package.json and lockfile exactly match current main. Advisory was updated October 30; October 28's zero findings are historical. [Primary advisory](https://github.com/advisories/GHSA-g3hv-75wg-m249) names 11.0.1 as fixed. Automatic audit proposes a breaking ESLint downgrade; it was not applied. Recommend a separate narrow tooling dependency fix with lint/typecheck/build validation. Full audit remains a current release blocker; no threshold was relaxed.
+- Production-only audit (`npm audit --omit=dev --audit-level=moderate`) reports zero vulnerabilities. This does not make the required full audit pass.
+
+Decision before remote CI: technically integrated candidate ready for founder inspection, **NO-GO for release while required audit is failing**. Merchant activation remains separately blocked by publication/description/delivery gates. Current-SHA CI outcomes must accompany founder review; prior CI results are not reused as proof.
