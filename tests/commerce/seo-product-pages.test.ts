@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { spawn } from "node:child_process";
 import { request } from "node:http";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Store, seed } from "../../server/db/store";
@@ -465,6 +465,12 @@ test(
       assert.match(String(page.headers["content-type"]), /text\/html/);
       assert.equal(page.headers["cache-control"], "no-cache");
       assert.match(page.body, /<html data-catalog="dynamic"/);
+      // The owner verification from main must survive the product head rewrite.
+      const verification = readFileSync("index.html", "utf8").match(
+        /<meta name="google-site-verification"[^>]+>/,
+      )?.[0];
+      assert.ok(verification, "main has the owner-approved Google tag");
+      assert.ok(page.body.includes(verification));
       assert.ok(
         page.body.includes(
           `<link rel="canonical" href="https://www.3ldubai.ae/menu/${product.slug}" />`,
