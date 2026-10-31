@@ -32,6 +32,5 @@ jobs:
       - run: npm run build
       - name: Instrumented scenario, 20 repetitions per width
         run: npx playwright test --config playwright.storefront-dynamic.config.ts --project=webkit tests/storefront-dynamic-e2e/catalog-recovery-diagnostic.spec.ts --repeat-each=20 --retries=0 --reporter=line
-        continue-on-error: true
-      - name: Original scenario, 20 repetitions per width
-        run: npx playwright test --config playwright.storefront-dynamic.config.ts --project=webkit tests/storefront-dynamic-e2e/media-loading.spec.ts -g "catalog unavailable retries" --repeat-each=20 --retries=0 --reporter=line
+      - name: Catalog loading, recovery, layout stability and no-fallback cases, 20 repetitions per width
+        run: npx playwright test --config playwright.storefront-dynamic.config.ts --project=webkit tests/storefront-dynamic-e2e/media-loading.spec.ts --repeat-each=20 --retries=0 --reporter=line

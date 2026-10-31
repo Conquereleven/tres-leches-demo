@@ -77,7 +77,9 @@ for (const width of [390, 1440]) {
     ).toBeVisible();
     await expect(page.locator(".b-menu-card")).toHaveCount(0);
     failed = false;
-    const candidates = page.getByRole("button", { name: "TRY AGAIN" });
+    const candidates = page
+      .locator('[data-catalog-status] > [role="status"]')
+      .getByRole("button", { name: "TRY AGAIN", exact: true });
     net.push(`${at()}:click-start`);
     let outcome = "live";
     try {

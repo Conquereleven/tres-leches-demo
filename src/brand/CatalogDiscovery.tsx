@@ -142,10 +142,16 @@ export function ProductSearch() {
       <p id={`${id}-status`} role="status" className="b-discovery-status">
         {message}
       </p>
-      {!waiting && online && !available && (
+      {/* While the menu itself is not live, this button's place is kept from
+          the first render: appearing once checkout settings load would push
+          the menu's TRY AGAIN down under a pointer already pressing it. */}
+      {online && !available && (published.status !== "live" || !waiting) && (
         <button
           className="b-text-button"
           type="button"
+          disabled={waiting}
+          aria-hidden={waiting || undefined}
+          style={waiting ? { visibility: "hidden" } : undefined}
           onClick={() => {
             void refreshLiveCatalog();
             retry();
