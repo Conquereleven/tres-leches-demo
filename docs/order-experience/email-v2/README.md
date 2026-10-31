@@ -74,6 +74,8 @@ Supported suppression options, **none applied**:
 
 Both are changes to the live provider and need explicit founder authorization.
 
+Official documentation could not confirm either option (31 Oct 2026: `docs.paymennt.com` is unreachable from the engineering environment, and the public pages say nothing about suppressing receipts). A support inquiry is prepared for founder approval, not sent: [`paymennt-receipt-inquiry.md`](paymennt-receipt-inquiry.md).
+
 ## Activation plan (requires founder GO)
 
 1. Merge this PR, deploy it with the flag **off**, and confirm nothing changes. No new rows appear; OMS and internal emails behave the same.
