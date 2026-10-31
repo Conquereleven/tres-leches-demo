@@ -147,7 +147,7 @@ export function ProductSearch() {
           className="b-text-button"
           type="button"
           onClick={() => {
-            void refreshLiveCatalog(true);
+            void refreshLiveCatalog();
             retry();
           }}
         >
