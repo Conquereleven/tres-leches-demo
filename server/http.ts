@@ -101,6 +101,8 @@ import {
 } from "./domain/notifications";
 import { operationsWhatsAppConfig } from "./domain/operations-whatsapp-config";
 import {
+  NOINDEX,
+  SITE_ORIGIN,
   REVALIDATED_CACHE_CONTROL,
   htmlAliasTarget,
   revalidatedAsset,
@@ -108,6 +110,14 @@ import {
   trailingSlashTarget,
   weakEtag,
 } from "../shared/seo";
+import {
+  PRODUCT_PATH,
+  SLUG,
+  productPage,
+  productPath,
+  productSitemapEntries,
+  sitemapWithProducts,
+} from "./seo/product-pages";
 /** Public customer policy/contact routes; keep in sync with src/brand/business.ts. */
 export const customerPages = [
   "/terms",
@@ -142,6 +152,13 @@ function markDynamicCatalog(file: string) {
 }
 const customerCsp =
   "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; script-src 'self' https://pay.paymennt.com; frame-src https://pay.test.paymennt.com; frame-ancestors 'none'";
+/** The query string without `product`, for redirects to `/menu/<slug>`. */
+function legacyQuery(params: URLSearchParams) {
+  const rest = new URLSearchParams(params);
+  rest.delete("product");
+  const query = rest.toString();
+  return query ? `?${query}` : "";
+}
 export async function startServer(
   overrides: {
     initial?: ReturnType<typeof seed>;
@@ -1119,6 +1136,90 @@ export async function startServer(
       // out of search indexes.
       const robots = robotsDirective(path, runtime.environment);
       if (robots) res.setHeader("X-Robots-Tag", robots);
+      // Indexable product pages, the live sitemap and old ?product= links,
+      // all from the published catalog revision (3L-SEO-AEO-002).
+      if (storefrontCatalogMode(process.env) === "on") {
+        const legacy = url.searchParams.get("product");
+        if (path === "/menu" && legacy && SLUG.test(legacy)) {
+          res.writeHead(301, {
+            // Keep every other parameter (language, category): only `product` moves into the path.
+            Location: productPath(legacy) + legacyQuery(url.searchParams),
+            "Cache-Control": "public, max-age=3600",
+          });
+          return res.end();
+        }
+        const match = PRODUCT_PATH.exec(path);
+        const client = resolve("dist/client");
+        if (match) {
+          const menuFile = resolve(client, "menu.html");
+          if (!existsSync(menuFile))
+            throw new DomainError(
+              404,
+              "Ejecuta el build para servir la aplicación",
+            );
+          const template = markDynamicCatalog(menuFile).toString("utf8");
+          const page = productPage(store.read(), match[1]!, {
+            origin: SITE_ORIGIN,
+            menuTemplate: template,
+            socialImage: {
+              path: "/brand/icon.png",
+              width: 410,
+              height: 410,
+              alt: "Pastelerías 3L logo",
+            },
+          });
+          const headers = {
+            "Content-Type": "text/html; charset=utf-8",
+            "X-Content-Type-Options": "nosniff",
+            "Referrer-Policy": "same-origin",
+            "Content-Security-Policy": customerCsp,
+            // Prices and availability change with each publication.
+            "Cache-Control": "no-cache",
+          };
+          if (page.status === 200) {
+            res.writeHead(200, headers);
+            return res.end(req.method === "HEAD" ? undefined : page.html);
+          }
+          // Not offered (404/410) or no valid revision (503): never indexed. The
+          // menu shell still lets a visitor continue to the current menu.
+          res.writeHead(page.status, {
+            ...headers,
+            "X-Robots-Tag": NOINDEX,
+            ...(page.status === 503 ? { "Retry-After": "30" } : {}),
+          });
+          return res.end(req.method === "HEAD" ? undefined : template);
+        }
+        if (path === "/sitemap.xml") {
+          const entries = productSitemapEntries(store.read(), SITE_ORIGIN);
+          const file = resolve(client, "sitemap.xml");
+          if (entries === null) {
+            // A temporary catalog failure is not evidence that product URLs vanished.
+            res.writeHead(503, {
+              "Content-Type": "text/plain; charset=utf-8",
+              "Cache-Control": "no-store",
+              "Retry-After": "30",
+              "X-Robots-Tag": NOINDEX,
+            });
+            return res.end(
+              req.method === "HEAD"
+                ? undefined
+                : "Catalog revision unavailable",
+            );
+          }
+          if (existsSync(file)) {
+            res.writeHead(200, {
+              "Content-Type": "application/xml; charset=utf-8",
+              "X-Content-Type-Options": "nosniff",
+              "Cache-Control": "no-cache",
+            });
+            return res.end(
+              req.method === "HEAD"
+                ? undefined
+                : sitemapWithProducts(readFileSync(file, "utf8"), entries),
+            );
+          }
+        }
+      }
       // Uploaded catalog images live in SQLite, not in the static bundle.
       if (
         serveHubMedia(req, res, path, store, () => {

@@ -1,6 +1,7 @@
 import { useCheckoutConfig } from "./cart";
 import { CustomerCopy } from "./localization";
 import { MenuCatalog } from "./MenuCatalog";
+import { productSlugFromPath } from "./menu";
 import { SiteHeader, SiteFooter, FloatingShopping } from "./SiteChrome";
 import { useLanguage } from "./localization";
 import "./brand.css";
@@ -17,17 +18,19 @@ export function MenuPage() {
       </a>
       <SiteHeader onContactUnavailable={contact} />
       <main id="main-content">
+        {/* A product view has its own H1 (the product name); the page title then is not "Menu". */}
         {!new URLSearchParams(
           typeof location === "undefined" ? "" : location.search,
-        ).has("product") && (
-          <>
-            {/* Decorative official logo behind the Menu introduction only. */}
-            <div className="b-menu-intro-mark" aria-hidden="true" />
-            <h1 className="b-heading" style={{ textAlign: "center" }}>
-              <CustomerCopy>{t("menu")}</CustomerCopy>
-            </h1>
-          </>
-        )}
+        ).has("product") &&
+          !productSlugFromPath() && (
+            <>
+              {/* Decorative official logo behind the Menu introduction only. */}
+              <div className="b-menu-intro-mark" aria-hidden="true" />
+              <h1 className="b-heading" style={{ textAlign: "center" }}>
+                <CustomerCopy>{t("menu")}</CustomerCopy>
+              </h1>
+            </>
+          )}
         <MenuCatalog />
       </main>
       <SiteFooter onContactUnavailable={contact} />

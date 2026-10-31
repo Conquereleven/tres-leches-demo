@@ -21,6 +21,7 @@ import { formatAed } from "./content";
 import {
   menuProductFamily,
   productHref,
+  productSlugFromPath,
   useMenu,
   type StorefrontProduct,
 } from "./menu";
@@ -38,6 +39,7 @@ export function ProductOptions({
   const family = menuProductFamily(menu, product),
     labelId = useId();
   const [sku, setSku] = useState(() => {
+    // Preserve search/recommendation and SEO offer links to the actual SKU.
     const requested =
       typeof location === "undefined"
         ? null
@@ -245,7 +247,7 @@ export function MenuCatalog() {
   const category = menu.categories.some((c) => c.id === chosen)
     ? chosen
     : (menu.categories.find((c) => c.id === "cakes") ?? menu.categories[0])?.id;
-  const slug = params.get("product");
+  const slug = productSlugFromPath() ?? params.get("product");
   // Dynamic catalog without a published revision yet (or at all): sell nothing.
   if (menu.status === "loading" || menu.status === "unavailable" || !category)
     return (
