@@ -188,6 +188,6 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Preserve EN/ES/AR and RTL. The local conversion fixture uses disposable SQLite and fake providers; its screenshots and QA are in `docs/storefront/conversion-v2/`.
 
 ## Customer email flow V2 (31 October 2026, founder)
-- Exactly two automatic customer emails per newly paid order: Order Confirmed at the authoritative payment confirmation, and a scheduled email at the start of the accepted slot (08:00/13:00/16:00 Asia/Dubai). No dependency on Take Order or OMS transitions; OMS progress emails are suppressed for enrolled orders while V2 is active. Internal team emails unchanged.
+- Exactly two automatic customer emails per newly paid order: Order Confirmed at the authoritative payment confirmation, and a scheduled email at the start of the accepted slot (08:00/13:00/16:00 Asia/Dubai). No dependency on Take Order or OMS transitions; Enrolment is permanent: OMS progress emails never resume for an enrolled order, even if V2 is disabled or its epoch changes. Internal team emails unchanged.
 - Delivery copy never claims courier dispatch. A window email later than 30 minutes is not sent; it is recorded as an operational exception.
 - Off by default: `CUSTOMER_EMAIL_V2_ENABLED` plus a fresh `CUSTOMER_EMAIL_V2_SINCE` epoch. No backfill or replay. Paymennt's own `TL-…` receipt is provider-side; suppress it only with explicit authorization. Details: `docs/order-experience/email-v2/README.md`.

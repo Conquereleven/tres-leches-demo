@@ -39,7 +39,7 @@ Previews (illustrative data) are in this folder: `confirmed-delivery`, `confirme
 | Slot start | none | Email 2 |
 | Internal team emails / WhatsApp | unchanged | unchanged |
 
-OMS state changes work exactly as before. Progress emails are suppressed only for orders enrolled in V2, and only while V2 stays active with the same epoch. Orders paid before the epoch keep the legacy behaviour.
+OMS state changes work exactly as before. Progress emails are suppressed for every order enrolled in V2, **permanently**: turning V2 off or changing its epoch never brings them back for that order, so an enrolled customer can never receive a third email. Orders paid before the epoch keep the legacy behaviour.
 
 ## Safety rules implemented
 
@@ -56,7 +56,7 @@ OMS state changes work exactly as before. Progress emails are suppressed only fo
 - **Missing recipient** at payment: nothing is queued and an audit line is written.
 - **Invalid or missing schedule:** Email 1 is still sent, and Email 2 is recorded as failed "Invalid or missing schedule; not scheduled", visible in Operations.
 - **Unknown provider outcome:** recorded as `unknown`, never retried blindly.
-- **Rollback.** Turning the flag off holds V2 rows: they are not sent and expire. Re-enabling with a new epoch never releases old rows ("Expired activation window").
+- **Rollback.** Turning the flag off holds V2 rows: they are not sent and expire. Re-enabling with a new epoch never releases old rows ("Expired activation window"). Enrolment is permanent, so legacy progress emails never resume for an enrolled order.
 
 ## The automatic `TL-…` email: provider findings
 
@@ -85,4 +85,4 @@ Both are changes to the live provider and need explicit founder authorization.
    - no progress email follows the operator's transitions.
 
    No synthetic LIVE charges.
-5. **Rollback:** set `CUSTOMER_EMAIL_V2_ENABLED=false` and redeploy. Pending V2 emails are held and expire; enrolled orders return to the legacy progress emails. No data rollback.
+5. **Rollback:** set `CUSTOMER_EMAIL_V2_ENABLED=false` and redeploy. New orders return to the legacy flow. Already enrolled orders keep the V2 policy: their pending V2 emails are held and expire, and they receive no legacy progress emails. No data rollback; existing rows and event identities are kept.

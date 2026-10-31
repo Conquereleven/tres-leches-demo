@@ -396,6 +396,28 @@ test("enrolled orders get no OMS progress emails; OMS still moves and internal e
   }
 });
 
+test("an enrolled order keeps V2 after the flag is turned off or the epoch changes: no third customer email", async () => {
+  const f = v2();
+  try {
+    const key = await paid(f, true);
+    const before = structuredClone(rows(f));
+    const events = structuredClone(f.store.read().events);
+    // V2 turned off, legacy confirmation still on; then a new epoch.
+    f.service.customerEmailV2Since = undefined;
+    move(f, key, "Production");
+    f.service.customerEmailV2Since = new Date().toISOString();
+    move(f, key, "Ready");
+    assert.equal(f.order(key).state, "Ready");
+    assert.equal(rows(f).length, 2);
+    assert.deepEqual(rows(f), before);
+    for (const [k, v] of Object.entries(events))
+      assert.equal(f.store.read().events[k], v, k);
+    assert.equal(f.store.read().operationsEmailNotifications!.length, 1);
+  } finally {
+    f.store.close();
+  }
+});
+
 test("without V2 the existing flow is unchanged: legacy confirmation and progress emails", async () => {
   const f = paidFixture();
   try {

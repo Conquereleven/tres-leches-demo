@@ -188,13 +188,13 @@ export function recordCustomerEvent(
   order: Order,
   from: OrderState,
   to: OrderState,
-  v2Since?: string,
 ): CustomerNotification | null {
   const event = customerEventFor(order, from, to);
   if (!event) return null;
-  // Email flow V2 replaces progress emails with one scheduled window email.
-  // The OMS transition itself is unaffected.
-  if (customerEmailV2Enrolled(s, order.id, v2Since)) return null;
+  // Email flow V2 replaces progress emails with one scheduled window email,
+  // for the order's whole life, even if V2 is later turned off. The OMS
+  // transition itself is unaffected.
+  if (customerEmailV2Enrolled(s, order.id)) return null;
   return recordEvent(s, order, event);
 }
 

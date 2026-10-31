@@ -648,7 +648,7 @@ export class CommerceService {
       transition(o, cmd.state, actor.id);
       // Same transaction as the state change: the event exists if and only
       // if the transition committed, and at most once per order.
-      recordCustomerEvent(s, o, from, cmd.state, this.customerEmailV2Since);
+      recordCustomerEvent(s, o, from, cmd.state);
       return o;
     }
     throw new DomainError(400, "Comando no soportado");

@@ -27,13 +27,12 @@ export function customerEmailV2Since(
 }
 
 export const enrolmentKey = (orderId: string) => `customer-email-v2:${orderId}`;
-/** Whether this order follows V2 under the currently active epoch. */
-export function customerEmailV2Enrolled(
-  s: State,
-  orderId: string,
-  since?: string,
-) {
-  return !!since && s.events[enrolmentKey(orderId)] === since;
+/**
+ * Whether this order was ever enrolled in V2. Enrolment is permanent: turning
+ * V2 off or changing its epoch never brings back progress emails for it.
+ */
+export function customerEmailV2Enrolled(s: State, orderId: string) {
+  return Object.hasOwn(s.events, enrolmentKey(orderId));
 }
 
 /** Start of a configured window on a Dubai date, as a UTC ISO instant; null if invalid. */
