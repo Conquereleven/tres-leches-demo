@@ -849,5 +849,10 @@
   "A new delivery area must start at version zero": "Dapat magsimula sa bersyong zero ang bagong lugar ng paghahatid",
   "Confirm the approved minimum before creating an area": "Kumpirmahin ang aprubadong minimum bago gumawa ng lugar",
   "Delivery area names must contain letters or numbers": "Dapat may titik o numero ang pangalan ng lugar ng paghahatid",
-  "A delivery area with this ID, name or alias already exists": "May lugar ng paghahatid na may ganitong ID, pangalan o alias"
+  "A delivery area with this ID, name or alias already exists": "May lugar ng paghahatid na may ganitong ID, pangalan o alias",
+  "Inicio de ventana programada": "Simula ng nakatakdang oras",
+  "Programado para el inicio de la ventana": "Nakaiskedyul sa simula ng oras",
+  "No enviado · fuera de tiempo": "Hindi naipadala · huli na",
+  "No programado · horario inválido": "Hindi naiskedyul · hindi wastong iskedyul",
+  "No enviado · pedido no elegible": "Hindi naipadala · hindi kwalipikado ang order"
 }

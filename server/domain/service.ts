@@ -47,6 +47,7 @@ import {
   recordPaidCustomerConfirmation,
 } from "./customer-notifications";
 import { assignPublicOrderNumber } from "./order-number";
+import { recordCustomerEmailV2 } from "./customer-email-v2";
 import { transition } from "./workflow";
 import { Store } from "../db/store";
 import {
@@ -127,6 +128,8 @@ export class CommerceService {
   operationsEmailRecipients: string[] = [];
   /** Explicit new-only customer paid-confirmation epoch; absent means disabled. */
   customerPaidEmailSince?: string;
+  /** Customer email flow V2 epoch (confirmation + window email); absent means disabled. */
+  customerEmailV2Since?: string;
   /** Opt-in subset of Operations recipients; empty means original email for all. */
   operationsEmailCompactRecipients: string[] = [];
   /**
@@ -1200,6 +1203,9 @@ export class CommerceService {
           // branch runs once per payment (paidAt guard) and only when the
           // order was genuinely awaiting this payment; recordOrderPaid is
           // additionally idempotent per order.
+          // V2 first: when it enrols the order, its confirmation takes the
+          // single per-order ORDER_PAID slot and the legacy one is a no-op.
+          recordCustomerEmailV2(s, o, p, this.customerEmailV2Since);
           recordPaidCustomerConfirmation(s, o, p, this.customerPaidEmailSince);
           recordPaidOperationsEmail(
             s,
