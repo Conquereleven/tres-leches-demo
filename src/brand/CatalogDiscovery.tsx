@@ -95,17 +95,21 @@ export function ProductSearch() {
   const hits = available
     ? searchProducts(published.catalog, config, query, now)
     : [];
+  // A known catalog outage is stated at once, not after checkout settings load:
+  // a later, longer message would wrap and move the menu's TRY AGAIN below it.
   const message = !online
     ? copy("offline")
-    : waiting
-      ? copy("loading")
-      : !available
-        ? copy("unavailable")
-        : query.trim()
-          ? hits.length
-            ? copy("results", { 0: hits.length })
-            : copy("noResults")
-          : copy("searchHint");
+    : published.status === "unavailable"
+      ? copy("unavailable")
+      : waiting
+        ? copy("loading")
+        : !available
+          ? copy("unavailable")
+          : query.trim()
+            ? hits.length
+              ? copy("results", { 0: hits.length })
+              : copy("noResults")
+            : copy("searchHint");
   return (
     <section className="b-discovery-search" aria-busy={waiting}>
       <form
@@ -142,10 +146,16 @@ export function ProductSearch() {
       <p id={`${id}-status`} role="status" className="b-discovery-status">
         {message}
       </p>
-      {!waiting && online && !available && (
+      {/* While the menu itself is not live, this button's place is kept from
+          the first render: appearing once checkout settings load would push
+          the menu's TRY AGAIN down under a pointer already pressing it. */}
+      {online && !available && (published.status !== "live" || !waiting) && (
         <button
           className="b-text-button"
           type="button"
+          disabled={waiting}
+          aria-hidden={waiting || undefined}
+          style={waiting ? { visibility: "hidden" } : undefined}
           onClick={() => {
             void refreshLiveCatalog();
             retry();
