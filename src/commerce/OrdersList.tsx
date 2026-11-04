@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CaretLeft,
   CaretRight,
+  DownloadSimple,
+  FilePdf,
   Funnel,
   MagnifyingGlass,
   Receipt,
@@ -14,9 +16,17 @@ import { orderReference } from "../../shared/order-number";
 import type { Workspace as Data } from "./api";
 import { FulfilmentBadge, PaymentBadge } from "./OrderBadges";
 import { useOps } from "./ops-i18n";
+import { dubaiDay } from "../../shared/order-days";
+import {
+  MAX_DOCUMENT_ORDERS,
+  canDownloadDocuments,
+  downloadOrders,
+  type DocumentRequest,
+} from "./order-documents";
 import {
   EMPTY_QUERY,
   FULFILMENT_FILTERS,
+  ORDER_VIEWS,
   PAGE_SIZE,
   PAYMENT_FILTERS,
   activeFilterCount,
@@ -25,9 +35,13 @@ import {
   customerName,
   dueDate,
   dueSlot,
+  deliveredWithoutEvidence,
   fulfilmentGroup,
+  inView,
+  isActionable,
   itemCount,
   listOrders,
+  matchingOrders,
   orderPath,
   paymentOf,
   type ListQuery,
@@ -35,6 +49,16 @@ import {
 
 export const aed = (fils: number | null | undefined) =>
   fils == null ? null : `AED ${(fils / 100).toFixed(2)}`;
+
+/** Today's Dubai date, re-read every minute so the views roll over at midnight. */
+function useDubaiToday() {
+  const [today, setToday] = useState(() => dubaiDay());
+  useEffect(() => {
+    const timer = setInterval(() => setToday(dubaiDay()), 60_000);
+    return () => clearInterval(timer);
+  }, []);
+  return today;
+}
 
 /**
  * Every order in the workspace, searchable and filterable. Unpaid orders are
@@ -51,8 +75,10 @@ export function OrdersList({
   onQuery: (next: ListQuery) => void;
   onOpen: (id: string) => void;
 }) {
-  const { t } = useOps();
+  const { t, errorText } = useOps();
+  const today = useDubaiToday();
   const filters = activeFilterCount(query);
+  const canSelect = canDownloadDocuments(data.actor.role);
   const [open, setOpen] = useState(
     () =>
       !!(
@@ -66,7 +92,49 @@ export function OrdersList({
   );
   const set = (patch: Partial<ListQuery>) =>
     onQuery({ ...query, page: 1, ...patch });
-  const result = listOrders(data, query);
+  const result = listOrders(data, query, today);
+  const matching = matchingOrders(data, query, today);
+  // The selection survives paging but never a change of view, search or filter.
+  const { page: _page, ...scope } = query;
+  const scopeKey = JSON.stringify(scope) + today;
+  const [selection, setSelection] = useState<{
+    key: string;
+    ids: Set<string>;
+  }>({ key: scopeKey, ids: new Set() });
+  const selected =
+    selection.key === scopeKey
+      ? matching.filter((o) => selection.ids.has(o.id)).map((o) => o.id)
+      : [];
+  const select = (ids: Set<string>) => setSelection({ key: scopeKey, ids });
+  const pageIds = result.rows.map((o) => o.id);
+  const pageSelected = pageIds.filter((id) => selected.includes(id)).length;
+  const [download, setDownload] = useState<{
+    busy: boolean;
+    error: string;
+  }>({ busy: false, error: "" });
+  const run = async (request: DocumentRequest) => {
+    setDownload({ busy: true, error: "" });
+    try {
+      await downloadOrders(selected, request);
+      setDownload({ busy: false, error: "" });
+    } catch (error) {
+      setDownload({
+        busy: false,
+        error: errorText(
+          error instanceof Error
+            ? error.message
+            : "Unable to connect. Try again.",
+        ),
+      });
+    }
+  };
+  const viewCounts = new Map(
+    ORDER_VIEWS.map(([id]) => [
+      id,
+      data.orders.filter((o) => inView(o, id, today)).length,
+    ]),
+  );
+  const actionable = matching.filter(isActionable).length;
   const first = result.total ? (result.page - 1) * PAGE_SIZE + 1 : 0;
   const last = Math.min(result.page * PAGE_SIZE, result.total);
   const counts = new Map<string, number>();
@@ -77,6 +145,44 @@ export function OrdersList({
   return (
     <div className="oms oms-list">
       <div className="oms-card oms-toolbar">
+        <div
+          className="oms-views"
+          role="group"
+          aria-label={t("Daily order views")}
+        >
+          {ORDER_VIEWS.map(([id, label]) => (
+            <button
+              type="button"
+              key={id}
+              aria-pressed={query.view === id}
+              onClick={() => set({ view: id })}
+            >
+              {t(label)}
+              <span>{viewCounts.get(id) ?? 0}</span>
+            </button>
+          ))}
+        </div>
+        {query.view === "delivered-today" && (
+          <p className="oms-muted">
+            {t(
+              "Orders whose delivery or collection was recorded today (Dubai).",
+            )}
+            {deliveredWithoutEvidence(data.orders) > 0 &&
+              " " +
+                t(
+                  "{{count}} delivered orders have no recorded completion time and are not counted.",
+                  { count: deliveredWithoutEvidence(data.orders) },
+                )}
+          </p>
+        )}
+        {query.view === "tomorrow" && (
+          <p className="oms-muted">
+            {t(
+              "Due tomorrow (Dubai), excluding delivered and cancelled orders: {{ready}} paid or confirmed · {{waiting}} unpaid or draft, not ready to prepare.",
+              { ready: actionable, waiting: matching.length - actionable },
+            )}
+          </p>
+        )}
         <FulfilmentTabs
           query={query}
           counts={counts}
@@ -204,12 +310,129 @@ export function OrdersList({
         </div>
       </div>
 
+      {canSelect && result.total > 0 && (
+        <div
+          className="oms-card oms-bulk"
+          role="region"
+          aria-label={t("Selected orders")}
+        >
+          <p aria-live="polite">
+            <strong>
+              {t("{{count}} selected", { count: selected.length })}
+            </strong>{" "}
+            <span className="oms-muted">
+              {t("of {{count}} matching orders", { count: matching.length })}
+            </span>
+          </p>
+          {selected.length < matching.length && (
+            <button
+              type="button"
+              className="oms-link"
+              onClick={() => select(new Set(matching.map((o) => o.id)))}
+            >
+              {t("Select all {{count}} matching orders", {
+                count: matching.length,
+              })}
+            </button>
+          )}
+          {selected.length > 0 && (
+            <button
+              type="button"
+              className="oms-link"
+              onClick={() => select(new Set())}
+            >
+              {t("Clear selection")}
+            </button>
+          )}
+          <div className="oms-bulk-actions">
+            <button
+              type="button"
+              className="oms-button"
+              disabled={
+                !selected.length ||
+                selected.length > MAX_DOCUMENT_ORDERS ||
+                download.busy
+              }
+              onClick={() => run({ format: "csv" })}
+            >
+              <DownloadSimple aria-hidden />
+              {t("Export orders CSV")}
+            </button>
+            <button
+              type="button"
+              className="oms-button"
+              disabled={
+                !selected.length ||
+                selected.length > MAX_DOCUMENT_ORDERS ||
+                download.busy
+              }
+              onClick={() => run({ format: "pdf", kind: "delivery-note" })}
+            >
+              <FilePdf aria-hidden />
+              {t("Delivery notes (PDF)")}
+            </button>
+            <button
+              type="button"
+              className="oms-button"
+              disabled={
+                !selected.length ||
+                selected.length > MAX_DOCUMENT_ORDERS ||
+                download.busy
+              }
+              onClick={() => run({ format: "pdf", kind: "packing-slip" })}
+            >
+              <FilePdf aria-hidden />
+              {t("Packing slips (PDF)")}
+            </button>
+          </div>
+          {selected.length > MAX_DOCUMENT_ORDERS && (
+            <p role="alert">
+              {t("Select at most {{max}} orders per download.", {
+                max: MAX_DOCUMENT_ORDERS,
+              })}
+            </p>
+          )}
+          {download.busy && (
+            <p className="oms-muted" role="status">
+              {t("Preparing download…")}
+            </p>
+          )}
+          {download.error && <p role="alert">{download.error}</p>}
+          <p className="oms-muted">
+            {t(
+              "Download only: operational documents, not invoices. Nothing is sent, printed or changed.",
+            )}
+          </p>
+        </div>
+      )}
+
       {result.rows.length ? (
         <div className="oms-card oms-table-card">
           <table className="oms-table">
             <caption className="oms-sr">{t("Orders")}</caption>
             <thead>
               <tr>
+                {canSelect && (
+                  <th scope="col" className="oms-select">
+                    <input
+                      type="checkbox"
+                      aria-label={t("Select all orders on this page")}
+                      checked={pageSelected === pageIds.length}
+                      ref={(el) => {
+                        if (el)
+                          el.indeterminate =
+                            pageSelected > 0 && pageSelected < pageIds.length;
+                      }}
+                      onChange={(e) => {
+                        const next = new Set(selected);
+                        for (const id of pageIds)
+                          if (e.target.checked) next.add(id);
+                          else next.delete(id);
+                        select(next);
+                      }}
+                    />
+                  </th>
+                )}
                 <th scope="col">{t("Order")}</th>
                 <th scope="col">{t("Cliente")}</th>
                 <th scope="col">{t("Date")}</th>
@@ -226,7 +449,19 @@ export function OrdersList({
             </thead>
             <tbody>
               {result.rows.map((o) => (
-                <OrderRow key={o.id} order={o} data={data} onOpen={onOpen} />
+                <OrderRow
+                  key={o.id}
+                  order={o}
+                  data={data}
+                  onOpen={onOpen}
+                  selected={canSelect ? selected.includes(o.id) : undefined}
+                  onSelect={(on) => {
+                    const next = new Set(selected);
+                    if (on) next.add(o.id);
+                    else next.delete(o.id);
+                    select(next);
+                  }}
+                />
               ))}
             </tbody>
           </table>
@@ -405,10 +640,15 @@ function OrderRow({
   order: o,
   data,
   onOpen,
+  selected,
+  onSelect,
 }: {
   order: Order;
   data: Data;
   onOpen: (id: string) => void;
+  /** Undefined when the operator cannot select orders for documents. */
+  selected?: boolean;
+  onSelect: (selected: boolean) => void;
 }) {
   const { t, formatDate } = useOps();
   const c = conversationOf(data, o);
@@ -427,13 +667,25 @@ function OrderRow({
         // Let real links, modified clicks and text selection behave natively.
         if (
           e.defaultPrevented ||
-          (e.target as HTMLElement).closest("a,button") ||
+          (e.target as HTMLElement).closest("a,button,input,label") ||
           window.getSelection()?.toString()
         )
           return;
         onOpen(o.id);
       }}
     >
+      {selected !== undefined && (
+        <td className="oms-select">
+          <input
+            type="checkbox"
+            checked={selected}
+            aria-label={t("Select order {{order}}", {
+              order: orderReference(o),
+            })}
+            onChange={(e) => onSelect(e.target.checked)}
+          />
+        </td>
+      )}
       <th scope="row" data-label={t("Order")}>
         <a
           className="oms-order-link"

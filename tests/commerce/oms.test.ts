@@ -97,6 +97,7 @@ test("OMS list is paginated and clamps an out-of-range page", () => {
 
 test("OMS filters round-trip through the URL and reject invalid values", () => {
   const query: ListQuery = {
+    view: "tomorrow",
     q: "layla #012",
     payment: "paid",
     fulfilment: "preparing",
