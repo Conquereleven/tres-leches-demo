@@ -1,5 +1,41 @@
 import { test, expect } from "@playwright/test";
 import type { LiveCatalog } from "../../src/brand/live-catalog";
+import type { Page } from "@playwright/test";
+
+const menuRetry = (page: Page) =>
+  page
+    .locator('[data-catalog-status] > [role="status"]')
+    .getByRole("button", { name: "TRY AGAIN", exact: true });
+
+/** The menu's retry must not move when checkout settings finish loading. */
+async function retryStaysPut(page: Page, width: number) {
+  await page.setViewportSize({ width, height: 1000 });
+  let release!: () => void;
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route("**/api/checkout/config", async (route) => {
+    await held;
+    await route.continue();
+  });
+  await page.route("**/api/storefront/catalog", (route) =>
+    route.fulfill({ status: 503, json: { error: "fixture unavailable" } }),
+  );
+  await page.goto("/menu?category=cakes");
+  const retry = menuRetry(page);
+  await expect(retry).toBeVisible();
+  const before = await retry.boundingBox();
+  release();
+  await expect(
+    page
+      .locator(".b-discovery-search")
+      .getByRole("button", { name: "Try again", exact: true }),
+  ).toBeVisible();
+  expect(await retry.boundingBox()).toEqual(before);
+}
+
+// Narrow enough that a longer search status wraps, in every font environment.
+test("menu TRY AGAIN keeps its position when checkout settings arrive 320", ({
+  page,
+}) => retryStaysPut(page, 320));
 
 for (const width of [390, 1440]) {
   test(`catalog loading reserves viewport and recovers ${width}`, async ({
@@ -70,10 +106,15 @@ for (const width of [390, 1440]) {
     ).toBeVisible();
     await expect(page.locator(".b-menu-card")).toHaveCount(0);
     failed = false;
-    await page.getByRole("button", { name: "TRY AGAIN" }).click();
+    // The menu's own retry; the search panel has a separate "Try again".
+    await menuRetry(page).click();
     await expect(page.locator('[data-catalog-status="live"]')).toBeVisible();
     await expect(page.locator(".b-menu-card").first()).toBeVisible();
   });
+
+  test(`menu TRY AGAIN keeps its position when checkout settings arrive ${width}`, ({
+    page,
+  }) => retryStaysPut(page, width));
 
   test(`empty published menu never falls back to bundled products ${width}`, async ({
     page,
