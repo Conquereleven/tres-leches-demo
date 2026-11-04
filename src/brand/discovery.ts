@@ -3,6 +3,7 @@ import { availableSku } from "../../shared/commerce-policy";
 import type { LiveCatalog, LiveProduct, LiveOption } from "./live-catalog";
 import type { CheckoutConfig, CartLine } from "./cart";
 import curated from "./recommendation-rules.json";
+import { localizedSource } from "./locales/engine";
 
 export type DiscoveryProduct = {
   product: LiveProduct;
@@ -120,9 +121,12 @@ export function searchProducts(
       const p = hit.product,
         category = catalog.categories.find((c) => c.id === p.categoryId),
         family = catalog.families.find((f) => f.id === p.familyId);
+      // Customers search the English wording they see, not only the authored source.
+      const withEnglish = (s: string) => [s, localizedSource(s, "en")];
       const names = Object.values(p.content)
         .flatMap((t) => [t.name, t.variantLabel])
         .filter((s): s is string => !!s)
+        .flatMap(withEnglish)
         .map(normalizeSearch);
       const fields = [
         ...names,
@@ -136,6 +140,7 @@ export function searchProducts(
         ...Object.values(p.content).map((t) => t.description),
       ]
         .filter((s): s is string => !!s)
+        .flatMap(withEnglish)
         .map(normalizeSearch);
       const words = fields.flatMap((s) => s.split(" "));
       let score = names.includes(q) ? 100 : 0;
