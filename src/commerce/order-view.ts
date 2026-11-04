@@ -1,4 +1,4 @@
-import { paidEmailLabel } from "./customer-email-status";
+import { paidEmailLabel, windowEmailLabel } from "./customer-email-status";
 import { acceptedLinePrice } from "../../shared/pack-pricing";
 import type { Line } from "../../server/domain/model";
 /**
@@ -435,6 +435,7 @@ const CUSTOMER_EVENT: Record<string, string> = {
   ORDER_PRODUCTION_STARTED: "En producción",
   ORDER_READY_FOR_PICKUP: "Listo para pickup",
   ORDER_OUT_FOR_DELIVERY: "En camino",
+  ORDER_SCHEDULED_WINDOW_STARTED: "Inicio de ventana programada",
 };
 /**
  * One chronological record from what is stored: order audit, payment
@@ -611,9 +612,13 @@ export function orderNotifications(data: Data, o: Order): NotificationRow[] {
       channel: "Customer email",
       subject: CUSTOMER_EVENT[n.event] ?? n.event,
       ...email(n, data.customerEmailProvider),
-      ...(n.event === "ORDER_PAID"
+      ...(n.event === "ORDER_PAID" ||
+      n.event === "ORDER_SCHEDULED_WINDOW_STARTED"
         ? {
-            label: paidEmailLabel(n),
+            label:
+              n.event === "ORDER_PAID"
+                ? paidEmailLabel(n)
+                : windowEmailLabel(n),
             status:
               n.deliveryOutcome === "accepted"
                 ? ("accepted" as const)

@@ -75,6 +75,7 @@ import {
   dispatchCustomerNotifications,
   recoverInterruptedCustomerNotifications,
 } from "./domain/customer-notifications";
+import { customerEmailV2Since } from "./domain/customer-email-v2";
 import { MetaWhatsAppProvider } from "./adapters/meta";
 import { MapboxGeoProvider } from "./adapters/mapbox";
 import { GeocodingAdapter } from "./adapters/geo";
@@ -260,6 +261,7 @@ export async function startServer(
   const emailProvider =
     overrides.email ?? (isolatedTest ? null : resendFromEnv(process.env));
   service.customerPaidEmailSince = customerPaidEmailSince(process.env);
+  service.customerEmailV2Since = customerEmailV2Since(process.env);
   recoverInterruptedCustomerNotifications(store);
   const operationsEmail = isolatedTest
     ? null
@@ -1320,6 +1322,7 @@ export async function startServer(
           emailProvider,
           "customerNotifications",
           service.customerPaidEmailSince,
+          service.customerEmailV2Since,
         ),
       )
       .then(() =>

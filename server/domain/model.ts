@@ -217,6 +217,8 @@ export const customerEvents = [
   "ORDER_PRODUCTION_STARTED",
   "ORDER_READY_FOR_PICKUP",
   "ORDER_OUT_FOR_DELIVERY",
+  /** Email flow V2: sent when the accepted pickup/delivery window starts. */
+  "ORDER_SCHEDULED_WINDOW_STARTED",
 ] as const;
 export type CustomerEvent = (typeof customerEvents)[number];
 /**
@@ -245,6 +247,16 @@ export type CustomerNotification = {
   deliveryOutcome?: "accepted" | "failed" | "unknown";
   /** Activation epoch frozen when the new paid-confirmation event was recorded. */
   activationSince?: string;
+  /** Email flow V2 rows; their activation epoch is CUSTOMER_EMAIL_V2_SINCE. */
+  flow?: "v2";
+  /** Scheduled rows are never sent before this instant (UTC ISO). */
+  dueAt?: string;
+  /** The accepted schedule the row was computed from, rechecked before sending. */
+  schedule?: {
+    method: "delivery" | "pickup";
+    date: string;
+    slot: string;
+  };
   attemptCount: number;
   createdAt: string;
   /** Which provider handled the last attempt; absent until one is tried. */

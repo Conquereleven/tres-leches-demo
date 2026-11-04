@@ -1,4 +1,4 @@
-import { paidEmailLabel } from "./customer-email-status";
+import { paidEmailLabel, windowEmailLabel } from "./customer-email-status";
 import { Login } from "./Login";
 import { AnalyticsWorkspace } from "./Analytics";
 import { lineKey, preparationText } from "../../shared/pack-composition";
@@ -1655,6 +1655,7 @@ const EMAIL_EVENT: Record<string, string> = {
   ORDER_PRODUCTION_STARTED: "En producción",
   ORDER_READY_FOR_PICKUP: "Listo para pickup",
   ORDER_OUT_FOR_DELIVERY: "En camino",
+  ORDER_SCHEDULED_WINDOW_STARTED: "Inicio de ventana programada",
 };
 /**
  * What was recorded for this order and what actually happened to it. A row is
@@ -1719,17 +1720,19 @@ function OrderNotifications({ order, data }: { order: Order; data: Data }) {
           </b>{" "}
           {n.event === "ORDER_PAID"
             ? t(paidEmailLabel(n))
-            : n.status === "sent"
-              ? t("Enviado")
-              : n.status === "failed"
-                ? n.lastError?.startsWith("Expired")
-                  ? t("No enviado · caducó")
-                  : t("Falló · revisar")
-                : n.status === "sending"
-                  ? t("Enviando")
-                  : data.customerEmailProvider
-                    ? t("Pendiente")
-                    : t("Pendiente · proveedor de email no configurado")}
+            : n.event === "ORDER_SCHEDULED_WINDOW_STARTED"
+              ? t(windowEmailLabel(n))
+              : n.status === "sent"
+                ? t("Enviado")
+                : n.status === "failed"
+                  ? n.lastError?.startsWith("Expired")
+                    ? t("No enviado · caducó")
+                    : t("Falló · revisar")
+                  : n.status === "sending"
+                    ? t("Enviando")
+                    : data.customerEmailProvider
+                      ? t("Pendiente")
+                      : t("Pendiente · proveedor de email no configurado")}
         </li>
       ))}
     </ul>

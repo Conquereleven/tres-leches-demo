@@ -20,6 +20,11 @@ import {
 import { orderReference } from "../../shared/order-number";
 import { PICKUP_LOCATION } from "../../shared/pickup-location";
 import { customerName } from "./order-number";
+import {
+  CUSTOMER_EMAIL_V2_GRACE_MS,
+  customerEmailV2Enrolled,
+  scheduledEmailBlocker,
+} from "./customer-email-v2-policy";
 import type {
   CustomerEvent,
   CustomerNotification,
@@ -186,6 +191,10 @@ export function recordCustomerEvent(
 ): CustomerNotification | null {
   const event = customerEventFor(order, from, to);
   if (!event) return null;
+  // Email flow V2 replaces progress emails with one scheduled window email,
+  // for the order's whole life, even if V2 is later turned off. The OMS
+  // transition itself is unaffected.
+  if (customerEmailV2Enrolled(s, order.id)) return null;
   return recordEvent(s, order, event);
 }
 
@@ -313,41 +322,83 @@ export async function dispatchCustomerNotifications(
     | "customerNotifications"
     | "operationsEmailNotifications" = "customerNotifications",
   paidActivationSince?: string,
+  v2Since?: string,
+  clock: () => number = Date.now,
 ) {
   if (!provider) return { attempted: 0, skipped: "no-email-provider" as const };
   let attempted = 0;
-  const cutoff = Date.now() - CUSTOMER_EMAIL_MAX_AGE_MS;
+  const now = clock();
+  // A scheduled row ages from its window start, never from when it was
+  // queued: tomorrow's email must not expire under the two-hour rule.
+  const expired = (n: { createdAt: string; dueAt?: string }) =>
+    n.dueAt
+      ? Date.parse(n.dueAt) + CUSTOMER_EMAIL_V2_GRACE_MS < now
+      : Date.parse(n.createdAt) < now - CUSTOMER_EMAIL_MAX_AGE_MS;
   if (
     (store.read()[collection] ?? []).some(
-      (n) => n.status === "pending" && Date.parse(n.createdAt) < cutoff,
+      (n) => n.status === "pending" && expired(n),
     )
   )
     store.write((s) => {
       for (const row of s[collection] ?? [])
-        if (row.status === "pending" && Date.parse(row.createdAt) < cutoff) {
+        if (row.status === "pending" && expired(row)) {
           row.status = "failed";
-          row.lastError = "Expired before it could be sent; not sent";
+          row.lastError =
+            "dueAt" in row && row.dueAt
+              ? "Late: window started more than 30 minutes ago; not sent"
+              : "Expired before it could be sent; not sent";
+          if ("dueAt" in row && row.dueAt)
+            s.audit.push({
+              at: new Date(now).toISOString(),
+              actor: "system",
+              action: `Customer email V2 ${row.orderId}: operational exception, window email not sent (${row.lastError})`,
+            });
         }
     });
+  const v2 = (n: { flow?: "v2" }) =>
+    collection === "customerNotifications" && n.flow === "v2";
   for (const pending of (store.read()[collection] ?? []).filter(
     (n) =>
       n.status === "pending" &&
-      (n.event !== "ORDER_PAID" ||
-        collection !== "customerNotifications" ||
-        !!paidActivationSince),
+      !("dueAt" in n && n.dueAt && Date.parse(n.dueAt) > now) &&
+      (v2(n)
+        ? !!v2Since
+        : n.event !== "ORDER_PAID" ||
+          collection !== "customerNotifications" ||
+          !!paidActivationSince),
   )) {
     const claimed = store.write((s) => {
       const row = s[collection]?.find((r) => r.id === pending.id);
       if (!row || row.status !== "pending") return null;
       if (
         collection === "customerNotifications" &&
-        row.event === "ORDER_PAID" &&
-        row.activationSince !== paidActivationSince
+        (v2(row)
+          ? row.activationSince !== v2Since
+          : row.event === "ORDER_PAID" &&
+            row.activationSince !== paidActivationSince)
       ) {
         row.status = "failed";
         row.deliveryOutcome = "failed";
         row.lastError = "Expired activation window; not sent";
         return null;
+      }
+      if (v2(row) && row.event === "ORDER_SCHEDULED_WINDOW_STARTED") {
+        const blocker = scheduledEmailBlocker(
+          s,
+          row as CustomerNotification,
+          now,
+        );
+        if (blocker) {
+          row.status = "failed";
+          row.deliveryOutcome = "failed";
+          row.lastError = blocker;
+          s.audit.push({
+            at: new Date(now).toISOString(),
+            actor: "system",
+            action: `Customer email V2 ${row.orderId}: operational exception, window email not sent (${blocker})`,
+          });
+          return null;
+        }
       }
       row.status = "sending";
       row.attemptCount++;
@@ -370,7 +421,7 @@ export async function dispatchCustomerNotifications(
         row.status = "sent";
         if (
           collection === "customerNotifications" &&
-          row.event === "ORDER_PAID"
+          (row.event === "ORDER_PAID" || v2(row))
         )
           row.deliveryOutcome = "accepted";
         row.sentAt = new Date().toISOString();
@@ -383,7 +434,7 @@ export async function dispatchCustomerNotifications(
         row.status = "failed";
         if (
           collection === "customerNotifications" &&
-          row.event === "ORDER_PAID"
+          (row.event === "ORDER_PAID" || v2(row))
         ) {
           row.deliveryOutcome =
             error instanceof ProviderFailure && error.certainty === "rejected"
@@ -417,7 +468,7 @@ export function recoverInterruptedCustomerNotifications(
         row.lastError = "Interrupted while sending; review before resending";
         if (
           collection === "customerNotifications" &&
-          row.event === "ORDER_PAID"
+          (row.event === "ORDER_PAID" || ("flow" in row && row.flow === "v2"))
         )
           row.deliveryOutcome = "unknown";
         recovered++;

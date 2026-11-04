@@ -849,5 +849,10 @@
   "A new delivery area must start at version zero": "A new delivery area must start at version zero",
   "Confirm the approved minimum before creating an area": "Confirm the approved minimum before creating an area",
   "Delivery area names must contain letters or numbers": "Delivery area names must contain letters or numbers",
-  "A delivery area with this ID, name or alias already exists": "A delivery area with this ID, name or alias already exists"
+  "A delivery area with this ID, name or alias already exists": "A delivery area with this ID, name or alias already exists",
+  "Inicio de ventana programada": "Scheduled window start",
+  "Programado para el inicio de la ventana": "Scheduled for the start of the window",
+  "No enviado · fuera de tiempo": "Not sent · too late",
+  "No programado · horario inválido": "Not scheduled · invalid schedule",
+  "No enviado · pedido no elegible": "Not sent · order not eligible"
 }
