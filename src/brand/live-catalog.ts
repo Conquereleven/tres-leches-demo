@@ -216,9 +216,10 @@ function translations() {
   ) => {
     if (!source) return;
     const entry = overlay!.get(source) ?? {};
-    for (const locale of ["es", "ar"] as const) {
+    for (const locale of ["en", "es", "ar"] as const) {
       const value = pick(t[locale]);
-      if (value) entry[locale] = value;
+      // English only overrides when the published wording differs from the source.
+      if (value && (locale !== "en" || value !== source)) entry[locale] = value;
     }
     overlay!.set(source, entry);
   };
@@ -239,6 +240,6 @@ function translations() {
 }
 /** The published translation of a catalog string, when the catalog provides one. */
 export function liveCopy(source: string, locale: string): string | null {
-  if (state.status !== "live" || locale === "en") return null;
+  if (state.status !== "live") return null;
   return translations().get(source)?.[locale as Locale] ?? null;
 }

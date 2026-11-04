@@ -10,6 +10,13 @@ import {
 import products from "../../shared/storefront-products.json";
 import plan from "../../docs/brand/brand02/replacement-manifest.json";
 const baseline = "5d47c9d09b629bec73d47b34026848ca9ccca72a";
+const reviewedEnglish: { key: string; source: string; en: string }[] =
+  JSON.parse(
+    readFileSync(
+      "docs/storefront/english-catalog-names/reviewed-english.json",
+      "utf8",
+    ),
+  );
 test("BRAND02 accounts for seven interim products and independent editorial replacements", () => {
   const current = products.filter(
     (p) => p.familyId.startsWith("conchas") && p.id !== "conchas-tricolor-pack",
@@ -127,6 +134,16 @@ test("BRAND02 leaves commercial identifiers, prices, availability, translations 
             : "كونشا تريكولور · قطعة واحدة";
         assert.equal(now.copy_8ac93f91a21b40c3, expected);
         now.copy_8ac93f91a21b40c3 = previous.copy_8ac93f91a21b40c3;
+        // The 31 Oct English hotfix replaces Spanish-authored English values with
+        // exactly the reviewed wording, nothing else.
+        if (path.includes("/en/"))
+          for (const row of reviewedEnglish)
+            if (row.key.startsWith("menu:")) {
+              const key = row.key.slice(5);
+              assert.equal(now[key], row.en, key);
+              assert.equal(previous[key], row.source, key);
+              now[key] = previous[key];
+            }
         // Conversion UX translations are additive to the historic BRAND02
         // visual release; keep this guard focused on prior catalog copy.
         for (const key of Object.keys(now))
