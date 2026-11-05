@@ -3,7 +3,8 @@ import { ApiError } from "./api";
 /** Mirrors the server bound; larger selections are refused before any request. */
 export const MAX_DOCUMENT_ORDERS = 500;
 export type DocumentRequest =
-  { format: "csv" } | { format: "pdf"; kind: "delivery-note" | "packing-slip" };
+  | { format: "csv" }
+  | { format: "pdf" | "zip"; kind: "delivery-note" | "packing-slip" };
 /** Server-generated documents are for admins and managers only. */
 export const canDownloadDocuments = (role: string) =>
   role === "admin" || role === "manager";
@@ -41,7 +42,7 @@ export async function downloadOrders(ids: string[], request: DocumentRequest) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ids, ...request }),
   });
-  await save(res, request.format === "csv" ? "3l-orders.csv" : "3l-orders.pdf");
+  await save(res, `3l-orders.${request.format}`);
 }
 export async function downloadOrderDocument(
   id: string,

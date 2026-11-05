@@ -86,6 +86,12 @@ test("real SQLite/API: order documents RBAC, bounds, headers, origin and zero wr
         assert.equal(csv.status, allowed ? 200 : 403, `${role} csv`);
         const pdf = await single(cookie, "TL-BULK000");
         assert.equal(pdf.status, allowed ? 200 : 403, `${role} pdf`);
+        const zip = await bulk(cookie, {
+          ids: ["TL-BULK001", "TL-BULK000"],
+          format: "zip",
+          kind: "delivery-note",
+        });
+        assert.equal(zip.status, allowed ? 200 : 403, `${role} zip`);
         if (!allowed) continue;
 
         assert.equal(
@@ -127,6 +133,19 @@ test("real SQLite/API: order documents RBAC, bounds, headers, origin and zero wr
         const body = Buffer.from(await merged.arrayBuffer()).toString("latin1");
         assert.equal((body.match(/\/Type \/Page /g) ?? []).length, 60);
 
+        assert.equal(zip.headers.get("content-type"), "application/zip");
+        assert.equal(zip.headers.get("cache-control"), "no-store");
+        assert.match(
+          zip.headers.get("content-disposition")!,
+          /^attachment; filename="3l-delivery-notes-\d{4}-\d{2}-\d{2}-2\.zip"$/,
+        );
+        const archive = Buffer.from(await zip.arrayBuffer());
+        assert.equal(archive.readUInt32LE(0), 0x04034b50);
+        const latin = archive.toString("latin1");
+        assert.ok(latin.includes("001-delivery-note-TL-BULK001.pdf"));
+        assert.ok(latin.includes("002-delivery-note-TL-BULK000.pdf"));
+        assert.ok(!archive.includes(Buffer.from(PROVIDER_REF)));
+
         // Bounds and validation.
         for (const bad of [
           { ids: [], format: "csv" },
@@ -135,7 +154,13 @@ test("real SQLite/API: order documents RBAC, bounds, headers, origin and zero wr
             ids: Array.from({ length: 501 }, (_, i) => `x${i}`),
             format: "csv",
           },
-          { ids: ["TL-BULK000"], format: "zip" },
+          { ids: ["TL-BULK000"], format: "docx" },
+          { ids: ["TL-BULK000"], format: "zip", kind: "invoice" },
+          { ids: [], format: "zip" },
+          {
+            ids: Array.from({ length: 501 }, (_, i) => `x${i}`),
+            format: "zip",
+          },
           { ids: ["TL-BULK000"], format: "csv", extra: true },
         ])
           assert.equal(

@@ -879,5 +879,7 @@
   "Pickup order sheet (PDF)": "Pickup order sheet (PDF)",
   "Delivery note (PDF)": "Delivery note (PDF)",
   "Packing slip (PDF)": "Packing slip (PDF)",
-  "Operational documents, not invoices or receipts.": "Operational documents, not invoices or receipts."
+  "Operational documents, not invoices or receipts.": "Operational documents, not invoices or receipts.",
+  "Delivery notes (ZIP)": "Delivery notes (ZIP)",
+  "Packing slips (ZIP)": "Packing slips (ZIP)"
 }

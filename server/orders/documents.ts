@@ -8,6 +8,7 @@ import {
 } from "../domain/model";
 import { safeLog } from "../observability";
 import { PdfDocument } from "./pdf";
+import { zipFiles } from "./zip";
 import { orderReference } from "../../shared/order-number";
 import { completedAt, dueDay } from "../../shared/order-days";
 import { PICKUP_LOCATION } from "../../shared/pickup-location";
@@ -43,7 +44,7 @@ const selection = z
       .min(1)
       .max(MAX_DOCUMENT_ORDERS)
       .refine((ids) => new Set(ids).size === ids.length, "Duplicate orders"),
-    format: z.enum(["csv", "pdf"]),
+    format: z.enum(["csv", "pdf", "zip"]),
     kind: z.enum(["delivery-note", "packing-slip"]).default("delivery-note"),
   })
   .strict();
@@ -288,6 +289,26 @@ export function ordersPdf(
 
 const fileSafe = (v: string) => v.replace(/[^A-Za-z0-9-]+/g, "-").slice(0, 60);
 
+/**
+ * One single-order PDF per selected order, in selection order. The numeric
+ * prefix keeps names unique and sorted even if two references sanitise alike.
+ */
+export function ordersZip(
+  state: State,
+  orders: Order[],
+  kind: DocumentKind,
+  actor: Actor,
+  at = new Date(),
+) {
+  return zipFiles(
+    orders.map((o, i) => ({
+      name: `${String(i + 1).padStart(3, "0")}-${kind}-${fileSafe(orderReference(o)).replace(/^-+|-+$/g, "") || "order"}.pdf`,
+      data: ordersPdf(state, [o], kind, actor, at),
+    })),
+    at,
+  );
+}
+
 function send(
   res: ServerResponse,
   body: string | Buffer,
@@ -365,7 +386,10 @@ export async function serveOrderDocuments(
       `${missing} selected order${missing === 1 ? " was" : "s were"} not found; refresh and select again`,
     );
   safeLog("orders.document", {
-    kind: format === "csv" ? "csv" : kind,
+    kind:
+      format === "pdf"
+        ? kind
+        : `${format}:${format === "csv" ? "orders" : kind}`,
     count: ids.length,
   });
   if (format === "csv")
@@ -374,6 +398,13 @@ export async function serveOrderDocuments(
       ordersCsv(state, orders as Order[]),
       "text/csv; charset=utf-8",
       `3l-orders-${day}-${ids.length}.csv`,
+    );
+  else if (format === "zip")
+    send(
+      res,
+      ordersZip(state, orders as Order[], kind, actor, stamp),
+      "application/zip",
+      `3l-${kind}s-${day}-${ids.length}.zip`,
     );
   else
     send(

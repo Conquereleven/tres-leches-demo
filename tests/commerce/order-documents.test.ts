@@ -17,7 +17,10 @@ import {
   csvCell,
   ordersCsv,
   ordersPdf,
+  ordersZip,
 } from "../../server/orders/documents";
+import { MAX_ZIP_ENTRIES, zipFiles } from "../../server/orders/zip";
+import { crc32 as zlibCrc32, inflateRawSync } from "node:zlib";
 import { PdfDocument } from "../../server/orders/pdf";
 import {
   PII,
@@ -282,4 +285,102 @@ test("Review fixes: line breaks kept, legacy address fallback, unknown names fla
   );
   assert.match(text, /Ordered units: 3/);
   assert.ok(!text.includes("Total pieces"));
+});
+
+/** Independent minimal reader: central directory → inflate → CRC check. */
+function readZip(zip: Buffer) {
+  const end = zip.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  assert.ok(end >= 0, "end of central directory");
+  const count = zip.readUInt16LE(end + 10);
+  let at = zip.readUInt32LE(end + 16);
+  const entries: { name: string; data: Buffer }[] = [];
+  for (let i = 0; i < count; i++) {
+    assert.equal(zip.readUInt32LE(at), 0x02014b50);
+    const method = zip.readUInt16LE(at + 10);
+    const crc = zip.readUInt32LE(at + 16);
+    const size = zip.readUInt32LE(at + 20);
+    const nameLength = zip.readUInt16LE(at + 28);
+    const local = zip.readUInt32LE(at + 42);
+    const name = zip.subarray(at + 46, at + 46 + nameLength).toString("ascii");
+    assert.equal(zip.readUInt32LE(local), 0x04034b50);
+    const start =
+      local + 30 + zip.readUInt16LE(local + 26) + zip.readUInt16LE(local + 28);
+    assert.equal(method, 8);
+    const data = inflateRawSync(zip.subarray(start, start + size));
+    assert.equal(zlibCrc32(data), crc, `${name} crc`);
+    assert.equal(data.length, zip.readUInt32LE(at + 24));
+    entries.push({ name, data });
+    at += 46 + nameLength;
+  }
+  return entries;
+}
+
+test("ZIP: one single-order PDF per selected order, safe unique names, selection order", () => {
+  const pick = ["TL-BULK003", "TL-UNPAID", "TL-NOSNAPSHOT"].map((id) =>
+    state.orders.find((o) => o.id === id)!,
+  );
+  const numbered = { ...pick[0]!, id: "TL-NUMBERED", publicOrderNumber: 7 };
+  const zip = ordersZip(state, [...pick, numbered], "packing-slip", actor);
+  const entries = readZip(zip);
+  assert.deepEqual(
+    entries.map((e) => e.name),
+    [
+      "001-packing-slip-TL-BULK003.pdf",
+      "002-packing-slip-TL-UNPAID.pdf",
+      "003-packing-slip-TL-NOSNAPSHOT.pdf",
+      "004-packing-slip-007.pdf",
+    ],
+  );
+  for (const [i, e] of entries.entries()) {
+    const raw = e.data.toString("latin1");
+    assert.ok(raw.startsWith("%PDF-1.4"));
+    assert.equal((raw.match(/\/Type \/Page /g) ?? []).length, 1);
+    assert.match(
+      pdfText(e.data),
+      new RegExp(
+        `Order ${["TL-BULK003", "TL-UNPAID", "TL-NOSNAPSHOT", "#007"][i]}`,
+      ),
+    );
+  }
+  assert.match(pdfText(entries[1]!.data), /NOT PAID OR NOT CONFIRMED/);
+  assert.match(pdfText(entries[2]!.data), /Items unavailable/);
+  assert.ok(!zip.includes(Buffer.from(PROVIDER_REF)));
+});
+
+test("ZIP writer refuses empty, oversized, unsafe and duplicate entries", () => {
+  const pdf = Buffer.from("%PDF-1.4\n");
+  assert.throws(() => zipFiles([]), /count/);
+  assert.throws(
+    () =>
+      zipFiles(
+        Array.from({ length: MAX_ZIP_ENTRIES + 1 }, (_, i) => ({
+          name: `f${i}.pdf`,
+          data: pdf,
+        })),
+      ),
+    /count/,
+  );
+  for (const name of [
+    "../evil.pdf",
+    "a/b.pdf",
+    "C:\\x.pdf",
+    ".hidden",
+    "",
+    "a b.pdf",
+    "é.pdf",
+    "x".repeat(101),
+  ])
+    assert.throws(() => zipFiles([{ name, data: pdf }]), /Unsafe/, name);
+  assert.throws(
+    () =>
+      zipFiles([
+        { name: "a.pdf", data: pdf },
+        { name: "a.pdf", data: pdf },
+      ]),
+    /Duplicate/,
+  );
+  const one = readZip(
+    zipFiles([{ name: "a.pdf", data: pdf }], new Date("2026-11-05T20:30:00Z")),
+  );
+  assert.equal(one[0]!.data.toString(), "%PDF-1.4\n");
 });

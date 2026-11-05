@@ -3,6 +3,7 @@ import {
   CaretLeft,
   CaretRight,
   DownloadSimple,
+  FileArchive,
   FilePdf,
   Funnel,
   MagnifyingGlass,
@@ -389,6 +390,32 @@ export function OrdersList({
             >
               <FilePdf aria-hidden />
               {t("Packing slips (PDF)")}
+            </button>
+            <button
+              type="button"
+              className="oms-button"
+              disabled={
+                !selected.length ||
+                selected.length > MAX_DOCUMENT_ORDERS ||
+                download.busy
+              }
+              onClick={() => run({ format: "zip", kind: "delivery-note" })}
+            >
+              <FileArchive aria-hidden />
+              {t("Delivery notes (ZIP)")}
+            </button>
+            <button
+              type="button"
+              className="oms-button"
+              disabled={
+                !selected.length ||
+                selected.length > MAX_DOCUMENT_ORDERS ||
+                download.busy
+              }
+              onClick={() => run({ format: "zip", kind: "packing-slip" })}
+            >
+              <FileArchive aria-hidden />
+              {t("Packing slips (ZIP)")}
             </button>
           </div>
           {selected.length > MAX_DOCUMENT_ORDERS && (
