@@ -152,6 +152,35 @@ export function OrdersList({
   return (
     <div className="oms oms-list">
       <div className="oms-card oms-toolbar">
+        <FulfilmentTabs
+          query={query}
+          counts={counts}
+          total={data.orders.length}
+          onSelect={(fulfilment) => set({ fulfilment })}
+        />
+        <div className="oms-search-row">
+          <label className="oms-search">
+            <span className="oms-sr">{t("Search orders")}</span>
+            <MagnifyingGlass aria-hidden />
+            <input
+              type="search"
+              value={query.q}
+              onChange={(e) => set({ q: e.target.value })}
+              placeholder={t("Order number, customer, phone or email")}
+            />
+          </label>
+          <button
+            type="button"
+            className="oms-button"
+            aria-expanded={open}
+            aria-controls="oms-filters"
+            onClick={() => setOpen(!open)}
+          >
+            <Funnel aria-hidden />
+            {t("Filters")}
+            {filters > 0 && <span className="oms-count">{filters}</span>}
+          </button>
+        </div>
         <div
           className="oms-views"
           role="group"
@@ -190,35 +219,6 @@ export function OrdersList({
             )}
           </p>
         )}
-        <FulfilmentTabs
-          query={query}
-          counts={counts}
-          total={data.orders.length}
-          onSelect={(fulfilment) => set({ fulfilment })}
-        />
-        <div className="oms-search-row">
-          <label className="oms-search">
-            <span className="oms-sr">{t("Search orders")}</span>
-            <MagnifyingGlass aria-hidden />
-            <input
-              type="search"
-              value={query.q}
-              onChange={(e) => set({ q: e.target.value })}
-              placeholder={t("Order number, customer, phone or email")}
-            />
-          </label>
-          <button
-            type="button"
-            className="oms-button"
-            aria-expanded={open}
-            aria-controls="oms-filters"
-            onClick={() => setOpen(!open)}
-          >
-            <Funnel aria-hidden />
-            {t("Filters")}
-            {filters > 0 && <span className="oms-count">{filters}</span>}
-          </button>
-        </div>
         {open && (
           <div className="oms-filters" id="oms-filters">
             <label>
