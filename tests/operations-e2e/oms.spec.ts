@@ -56,10 +56,16 @@ test("orders list shows real orders, marks unpaid ones and filters them", async 
   await expect(row(page, "TL-FIX00004")).toContainText("Name not recorded");
   await expect(row(page, "TL-FIX00003")).toContainText("Pickup");
 
-  await page.getByRole("button", { name: /^Awaiting payment/ }).click();
+  await page
+    .getByRole("group", { name: "Filter by fulfillment status" })
+    .getByRole("button", { name: /^Awaiting payment/ })
+    .click();
   await expect(page.locator(".oms-table tbody tr")).toHaveCount(1);
   await expect(page).toHaveURL(/status=unpaid/);
-  await page.getByRole("button", { name: /^All/ }).click();
+  await page
+    .getByRole("group", { name: "Filter by fulfillment status" })
+    .getByRole("button", { name: /^All/ })
+    .click();
 
   await page.getByRole("searchbox", { name: "Search orders" }).fill("layla");
   await expect(page.locator(".oms-table tbody tr")).toHaveCount(1);
@@ -104,7 +110,9 @@ test("row opens the order page; Back restores filters, search and page", async (
   await expect(page).toHaveURL(/status=completed&page=2/);
   await expect(page.getByText(/Page 2 of 2/)).toBeVisible();
   await expect(
-    page.getByRole("button", { name: /^Delivered/ }),
+    page
+      .getByRole("group", { name: "Filter by fulfillment status" })
+      .getByRole("button", { name: /^Delivered/ }),
   ).toHaveAttribute("aria-pressed", "true");
 
   // Keyboard: the order number is a real link.
