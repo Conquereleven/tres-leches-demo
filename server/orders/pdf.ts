@@ -80,6 +80,12 @@ export class PdfDocument {
   }
   /** Wrapped paragraph; breaks long words so nothing runs off the page. */
   text(value: string, style: TextStyle = {}) {
+    // Customer line breaks are kept as separate lines, never joined.
+    const parts = value.split(/\r\n|\r|\n/);
+    if (parts.length > 1) {
+      for (const part of parts) this.text(part, style);
+      return;
+    }
     const size = style.size ?? 10,
       bold = !!style.bold,
       indent = style.indent ?? 0,

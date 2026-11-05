@@ -106,6 +106,12 @@ export function OrdersList({
       ? matching.filter((o) => selection.ids.has(o.id)).map((o) => o.id)
       : [];
   const select = (ids: Set<string>) => setSelection({ key: scopeKey, ids });
+  // A different scope discards the old selection; returning never revives it.
+  useEffect(() => {
+    setSelection((current) =>
+      current.key === scopeKey ? current : { key: scopeKey, ids: new Set() },
+    );
+  }, [scopeKey]);
   const pageIds = result.rows.map((o) => o.id);
   const pageSelected = pageIds.filter((id) => selected.includes(id)).length;
   const [download, setDownload] = useState<{

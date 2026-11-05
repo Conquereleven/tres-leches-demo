@@ -204,3 +204,43 @@ test("PDF writer wraps long text, paginates and flags unprintable characters", (
       .some((l) => /^x+$/.test(l) && l.length < 400),
   );
 });
+
+test("Review fixes: line breaks kept, legacy address fallback, unknown names flagged, units labelled", () => {
+  const legacy = {
+    ...state.orders.find((o) => o.id === "TL-BULK001")!,
+    id: "TL-LEGACY",
+    delivery: undefined,
+    address: "Villa 9, Fictional Legacy Road",
+    customerDetails: {
+      firstName: "Fixture",
+      instructions: "Keep boxes separate\nNo nuts",
+    },
+    lines: [{ productId: "fixture-unknown", quantity: 3 }],
+    catalogSnapshot: [
+      {
+        id: "fixture-unknown",
+        name: "Fictional unreviewed item",
+        category: "Fictional",
+        priceFils: 3000,
+      },
+    ],
+  };
+  legacy.quote = { ...legacy.quote!, subtotalFils: 9000 };
+  const text = pdfText(
+    ordersPdf(
+      state,
+      [legacy],
+      "delivery-note",
+      actor,
+      new Date("2026-11-04T06:00:00Z"),
+    ),
+  );
+  assert.match(text, /Customer notes: Keep boxes separate\nNo nuts/);
+  assert.match(text, /Address: Villa 9, Fictional Legacy Road/);
+  assert.match(
+    text,
+    /3 × Fictional unreviewed item\nProduct translation requires review \(fixture-unknown\)/,
+  );
+  assert.match(text, /Ordered units: 3/);
+  assert.ok(!text.includes("Total pieces"));
+});

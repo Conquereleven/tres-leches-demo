@@ -13,7 +13,12 @@ import { completedAt, dueDay } from "../../shared/order-days";
 import { PICKUP_LOCATION } from "../../shared/pickup-location";
 import { preparationText } from "../../shared/pack-composition";
 import { ticketSnapshot } from "../../src/commerce/ticket-snapshot";
-import { operationalProductName } from "../../src/commerce/product-names";
+import {
+  TRANSLATION_REVIEW,
+  operationalProductName,
+  setPublishedProductNames,
+} from "../../src/commerce/product-names";
+import { approvedOperationsNames } from "../catalog/product-hub";
 import opsEnglish from "../../src/commerce/locales/en.json";
 import {
   customerName,
@@ -194,10 +199,13 @@ function writeOrder(
   // Address and phone only where a courier needs them.
   if (kind === "delivery-note" && !pickup) {
     const d = o.delivery;
-    const address = [d?.unit, d?.building, d?.address]
-      .map((v) => v?.trim())
-      .filter(Boolean)
-      .join(", ");
+    const address =
+      [d?.unit, d?.building, d?.address]
+        .map((v) => v?.trim())
+        .filter(Boolean)
+        .join(", ") ||
+      // Conversation and legacy checkout orders store one full address line.
+      o.address?.trim();
     pdf.text(`Address: ${address || "Address not recorded"}`);
     pdf.text(`Area: ${o.quote?.zoneName ?? "Area not recorded"}`);
     if (d && d.addressVerification !== "VERIFIED")
@@ -218,13 +226,18 @@ function writeOrder(
     );
   else {
     for (const l of lines) {
-      const name = operationalProductName(l.productId, l.name).name;
-      pdf.text(`${l.quantity} × ${name}`, { bold: true });
+      const product = operationalProductName(l.productId, l.name);
+      pdf.text(`${l.quantity} × ${product.name}`, { bold: true });
+      if (product.reviewRequired)
+        pdf.text(`${TRANSLATION_REVIEW} (${l.productId})`, {
+          indent: 18,
+          size: 8,
+        });
       const prep = preparationText(l);
       if (prep) pdf.text(prep, { indent: 18, size: 9 });
     }
     pdf.gap(4);
-    pdf.text(`Total pieces: ${itemCount(o)}`);
+    pdf.text(`Ordered units: ${itemCount(o)}`);
   }
   const notes = [
     ["Customer notes", o.customerDetails?.instructions],
@@ -262,6 +275,9 @@ export function ordersPdf(
 ) {
   const label = kind === "delivery-note" ? "Delivery notes" : "Packing slips";
   const pdf = new PdfDocument(`3L ${label}`);
+  // Same approved English staff names as the Operations screens. Generation is
+  // synchronous, so the shared registry is current for this whole document.
+  setPublishedProductNames(approvedOperationsNames(state));
   for (const o of orders) writeOrder(pdf, state, o, kind);
   const generated = dubaiDateTime(at);
   return pdf.toBuffer(
