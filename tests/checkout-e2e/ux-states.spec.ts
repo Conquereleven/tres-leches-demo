@@ -252,11 +252,20 @@ test.describe("operations orders list", () => {
           .filter({ hasText: "Layla Fixture" })
           .locator('[data-kind="payment"]'),
       ).toHaveText("Paid");
-      await page.getByRole("button", { name: /^Delivered/ }).click();
+      await page
+        .getByRole("group", { name: "Filter by fulfillment status" })
+        .getByRole("button", { name: /^Delivered/ })
+        .click();
       await expect(rows).toHaveCount(1);
-      await page.getByRole("button", { name: /^Awaiting payment/ }).click();
+      await page
+        .getByRole("group", { name: "Filter by fulfillment status" })
+        .getByRole("button", { name: /^Awaiting payment/ })
+        .click();
       await expect(rows).toHaveCount(1);
-      await page.getByRole("button", { name: /^All/ }).click();
+      await page
+        .getByRole("group", { name: "Filter by fulfillment status" })
+        .getByRole("button", { name: /^All/ })
+        .click();
       await expect(rows).toHaveCount(7);
       expect(await noOverflow(page)).toBe(true);
       await shot(page, `operations-orders-${width}`);

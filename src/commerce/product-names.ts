@@ -14,14 +14,22 @@ let published: Published = {};
 export function setPublishedProductNames(names: Published | undefined) {
   published = names ?? {};
 }
-export function operationalProductName(id: string, original?: string) {
+/**
+ * `registry` lets the server pass the approved names for one request without
+ * touching the browser's module-wide registry.
+ */
+export function operationalProductName(
+  id: string,
+  original?: string,
+  registry: Published = published,
+) {
   const reviewed = Object.hasOwn(approved, id) ? approved[id] : undefined;
   const recognizes = (e: { source: string; en: string }) =>
     original === e.source || original === e.en;
   const entry =
     (reviewed && recognizes(reviewed) ? reviewed : undefined) ??
-    (Object.hasOwn(published, id)
-      ? published[id]!.findLast(recognizes)
+    (Object.hasOwn(registry, id)
+      ? registry[id]!.findLast(recognizes)
       : undefined);
   // An ID alone cannot prove that a historical/custom definition is unchanged.
   const safe = !!entry;

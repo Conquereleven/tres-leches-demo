@@ -1019,3 +1019,67 @@
     align-self: flex-start;
   }
 }
+
+/* TPL-18: daily views, cross-page selection and document downloads. */
+.commerce.ops-shell .oms-views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.commerce.ops-shell .oms-views button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--oms-line);
+  border-radius: 999px;
+  background: var(--oms-white);
+  color: var(--oms-ink);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.commerce.ops-shell .oms-views button[aria-pressed="true"] {
+  background: var(--oms-blush-light);
+  border-color: var(--oms-gold);
+}
+.commerce.ops-shell .oms-views button span {
+  color: var(--oms-muted);
+  font-variant-numeric: tabular-nums;
+}
+.commerce.ops-shell .oms-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.commerce.ops-shell .oms-bulk > p {
+  flex-basis: 100%;
+}
+.commerce.ops-shell .oms-bulk > p:first-child {
+  flex-basis: auto;
+}
+.commerce.ops-shell .oms-bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-basis: 100%;
+}
+.commerce.ops-shell .oms-table .oms-select {
+  width: 44px;
+}
+.commerce.ops-shell .oms-select input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--oms-gold);
+  cursor: pointer;
+}
+@container (max-width: 900px) {
+  .commerce.ops-shell .oms-table tbody td.oms-select {
+    grid-column: 1 / -1;
+  }
+  .commerce.ops-shell .oms-table tbody td.oms-select::before {
+    display: none;
+  }
+}
