@@ -8,7 +8,7 @@ import {
 } from "../domain/model";
 import { safeLog } from "../observability";
 import { PdfDocument } from "./pdf";
-import { zipFiles } from "./zip";
+import { ZipLimitError, ZipWriter } from "./zip";
 import { orderReference } from "../../shared/order-number";
 import { completedAt, dueDay } from "../../shared/order-days";
 import { PICKUP_LOCATION } from "../../shared/pickup-location";
@@ -300,13 +300,25 @@ export function ordersZip(
   actor: Actor,
   at = new Date(),
 ) {
-  return zipFiles(
-    orders.map((o, i) => ({
-      name: `${String(i + 1).padStart(3, "0")}-${kind}-${fileSafe(orderReference(o)).replace(/^-+|-+$/g, "") || "order"}.pdf`,
-      data: ordersPdf(state, [o], kind, actor, at),
-    })),
-    at,
-  );
+  // One PDF at a time: only compressed bytes are kept, and generation stops
+  // as soon as the archive budget is exceeded.
+  const zip = new ZipWriter(at);
+  try {
+    orders.forEach((o, i) =>
+      zip.add(
+        `${String(i + 1).padStart(3, "0")}-${kind}-${fileSafe(orderReference(o)).replace(/^-+|-+$/g, "") || "order"}.pdf`,
+        ordersPdf(state, [o], kind, actor, at),
+      ),
+    );
+  } catch (error) {
+    if (error instanceof ZipLimitError)
+      throw new DomainError(
+        413,
+        "Selection too large for one ZIP; select fewer orders",
+      );
+    throw error;
+  }
+  return zip.finish();
 }
 
 function send(
@@ -386,10 +398,7 @@ export async function serveOrderDocuments(
       `${missing} selected order${missing === 1 ? " was" : "s were"} not found; refresh and select again`,
     );
   safeLog("orders.document", {
-    kind:
-      format === "pdf"
-        ? kind
-        : `${format}:${format === "csv" ? "orders" : kind}`,
+    kind: format === "csv" ? "csv" : format === "zip" ? `zip:${kind}` : kind,
     count: ids.length,
   });
   if (format === "csv")

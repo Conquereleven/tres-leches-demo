@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import type { Workspace } from "../../src/commerce/api";
+import { DomainError } from "../../server/domain/model";
 import {
   EMPTY_QUERY,
   PAGE_SIZE,
@@ -19,7 +20,13 @@ import {
   ordersPdf,
   ordersZip,
 } from "../../server/orders/documents";
-import { MAX_ZIP_ENTRIES, zipFiles } from "../../server/orders/zip";
+import {
+  MAX_ZIP_BYTES,
+  MAX_ZIP_ENTRIES,
+  ZipLimitError,
+  ZipWriter,
+  zipFiles,
+} from "../../server/orders/zip";
 import { crc32 as zlibCrc32, inflateRawSync } from "node:zlib";
 import { PdfDocument } from "../../server/orders/pdf";
 import {
@@ -379,8 +386,38 @@ test("ZIP writer refuses empty, oversized, unsafe and duplicate entries", () => 
       ]),
     /Duplicate/,
   );
+  // The budget covers the finished archive, and generation stops early.
+  const big = Buffer.alloc(MAX_ZIP_BYTES / 2 + 1, 0x41);
+  assert.throws(
+    () =>
+      zipFiles([
+        { name: "a.pdf", data: big },
+        { name: "b.pdf", data: big },
+      ]),
+    ZipLimitError,
+  );
+  const writer = new ZipWriter();
+  writer.add("a.pdf", Buffer.from("x"));
+  assert.ok(writer.size < MAX_ZIP_BYTES);
+  assert.equal(
+    writer.finish().length,
+    writer.size,
+    "size includes directory and end record",
+  );
   const one = readZip(
     zipFiles([{ name: "a.pdf", data: pdf }], new Date("2026-11-05T20:30:00Z")),
   );
   assert.equal(one[0]!.data.toString(), "%PDF-1.4\n");
+});
+
+test("ZIP over the writer's bounds becomes a clear 413, never a partial archive", () => {
+  const base = state.orders.find((o) => o.id === "TL-BULK000")!;
+  const many = Array.from({ length: MAX_ZIP_ENTRIES + 1 }, (_, i) => ({
+    ...base,
+    id: `TL-MANY${i}`,
+  }));
+  assert.throws(
+    () => ordersZip(state, many, "packing-slip", actor),
+    (e: unknown) => e instanceof DomainError && e.status === 413,
+  );
 });
