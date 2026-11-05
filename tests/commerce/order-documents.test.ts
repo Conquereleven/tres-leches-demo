@@ -37,7 +37,9 @@ const actor = { id: "fixture-admin", role: "admin" as const };
 /** Text drawn by the PDF (hex strings decoded from the content streams). */
 const pdfText = (pdf: Buffer) =>
   [...pdf.toString("latin1").matchAll(/<([0-9a-f]+)> Tj/g)]
-    .map((m) => Buffer.from(m[1]!, "hex").toString("latin1"))
+    .map((m) =>
+      new TextDecoder("windows-1252").decode(Buffer.from(m[1]!, "hex")),
+    )
     .join("\n");
 
 test("Dubai calendar: midnight boundary and next day are host-timezone independent", () => {
@@ -188,21 +190,51 @@ test("PDF: valid structure, one page per order, stored facts only, explicit unkn
   assert.match(slip, new RegExp(`Customer: ${PII} Fixture`));
 });
 
-test("PDF writer wraps long text, paginates and flags unprintable characters", () => {
+test("PDF writer wraps long text, paginates and marks unprintable scripts explicitly", () => {
   const doc = new PdfDocument("t");
   doc.newPage();
   for (let i = 0; i < 80; i++) doc.text(`Line ${i} ` + "word ".repeat(40));
   assert.ok(doc.pageCount > 3);
-  doc.text("Name: سارة · Ünïcode ok");
-  assert.equal(doc.takeLossy(), 4);
+  doc.text("Name: سارة أحمد · Ünïcode ok\tok");
+  assert.equal(doc.takeLossy(), 1, "a multi-word Arabic name is one run");
+  doc.text("Ольга · 王芳 · Cake 🎂 · \u2003gap");
+  assert.equal(doc.takeLossy(), 3);
   const text = pdfText(doc.toBuffer(() => "f"));
-  assert.ok(text.includes("Name: ???? · Ünïcode ok"));
+  assert.ok(
+    text.includes("Name: [Arabic text – see order page] · Ünïcode ok ok"),
+  );
+  assert.ok(
+    text.includes(
+      "[Cyrillic text – see order page] · [Chinese text – see order page] · Cake [emoji] · gap",
+    ),
+  );
+  assert.ok(!text.includes("?"), "no character is replaced by a question mark");
   doc.text("x".repeat(400));
   assert.ok(
     pdfText(doc.toBuffer(() => "f"))
       .split("\n")
       .some((l) => /^x+$/.test(l) && l.length < 400),
   );
+});
+
+test("Delivery note with an Arabic customer name and notes says so on the page", () => {
+  const o = {
+    ...state.orders.find((x) => x.id === "TL-BULK002")!,
+    id: "TL-ARABIC",
+    customerDetails: {
+      firstName: "سارة",
+      lastName: "Fixture",
+      instructions: "بدون مكسرات",
+    },
+  };
+  const text = pdfText(ordersPdf(state, [o], "delivery-note", actor));
+  assert.match(text, /Customer: \[Arabic text – see order page\] Fixture/);
+  assert.match(text, /Customer notes: \[Arabic text – see order page\]/);
+  assert.match(
+    text,
+    /it is marked above\. The exact text is on the order page\./,
+  );
+  assert.ok(!text.includes("?"));
 });
 
 test("Review fixes: line breaks kept, legacy address fallback, unknown names flagged, units labelled", () => {
@@ -237,6 +269,7 @@ test("Review fixes: line breaks kept, legacy address fallback, unknown names fla
   );
   assert.match(text, /Customer notes: Keep boxes separate\nNo nuts/);
   assert.match(text, /Address: Villa 9, Fictional Legacy Road/);
+  assert.match(text, /Address not verified · confirm with the customer/);
   assert.match(
     text,
     /3 × Fictional unreviewed item\nProduct translation requires review \(fixture-unknown\)/,

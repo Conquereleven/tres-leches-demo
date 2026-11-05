@@ -1,7 +1,7 @@
 /**
  * Minimal print-ready PDF writer for operational order documents: A4 pages,
  * the standard Helvetica fonts (no embedding, no dependency) and WinAnsi text.
- * A character that WinAnsi cannot represent is printed as "?" and counted, so
+ * Text WinAnsi cannot represent is printed as a named marker and counted, so
  * the caller can point the reader to the order page instead of guessing.
  */
 const PAGE = { width: 595.28, height: 841.89, margin: 48 } as const;
@@ -33,22 +33,62 @@ const CP1252: Record<string, number> = {
   "™": 0x99,
 };
 
+const printable = (ch: string) => {
+  const code = ch.codePointAt(0)!;
+  return (
+    (code >= 32 && code <= 126) ||
+    (code >= 0xa0 && code <= 0xff) ||
+    CP1252[ch] !== undefined
+  );
+};
+const SCRIPTS: [RegExp, string][] = [
+  [/\p{Script=Arabic}/u, "Arabic"],
+  [/\p{Script=Hebrew}/u, "Hebrew"],
+  [/\p{Script=Cyrillic}/u, "Cyrillic"],
+  [/\p{Script=Greek}/u, "Greek"],
+  [/\p{Script=Devanagari}/u, "Devanagari"],
+  [/\p{Script=Bengali}/u, "Bengali"],
+  [/\p{Script=Tamil}/u, "Tamil"],
+  [/\p{Script=Malayalam}/u, "Malayalam"],
+  [/\p{Script=Thai}/u, "Thai"],
+  [/\p{Script=Han}/u, "Chinese"],
+  [/\p{Script=Hangul}/u, "Korean"],
+  [/[\p{Script=Hiragana}\p{Script=Katakana}]/u, "Japanese"],
+  [/\p{Extended_Pictographic}/u, "emoji"],
+];
+// One run: unprintable characters, with the spaces, marks and joiners between them.
+const RUN =
+  /[^\x20-\x7e\xa0-\xff€‚„…‘’“”•–—™](?:[\s\p{M}\u200c\u200d\ufe0f]*[^\x20-\x7e\xa0-\xff€‚„…‘’“”•–—™\s])*/gu;
+/**
+ * WinAnsi Helvetica cannot draw these scripts, and Arabic also needs shaping
+ * and right-to-left ordering. Each run becomes an explicit, named marker,
+ * never a "?" that could pass for the real text.
+ */
+export function unprintableRuns(text: string) {
+  let runs = 0;
+  const out = text.replace(RUN, (run) => {
+    runs++;
+    const label = SCRIPTS.find(([re]) => re.test(run))?.[1] ?? "non-Latin";
+    return label === "emoji" ? "[emoji]" : `[${label} text – see order page]`;
+  });
+  return { text: out, runs };
+}
+
 function encode(text: string): { bytes: number[]; lossy: number } {
   const bytes: number[] = [];
-  let lossy = 0;
-  for (const ch of text.normalize("NFC").replaceAll("→", "->")) {
+  const marked = unprintableRuns(
+    text
+      .normalize("NFC")
+      .replaceAll("→", "->")
+      .replace(/[\t\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]/g, " ")
+      .replace(/[\u0000-\u001f\u007f\u200b\ufeff]/g, ""),
+  );
+  for (const ch of marked.text) {
     const code = ch.codePointAt(0)!;
-    if (code === 9) bytes.push(32);
-    else if (code >= 32 && code <= 126) bytes.push(code);
-    else if (code >= 0xa0 && code <= 0xff) bytes.push(code);
-    else if (CP1252[ch] !== undefined) bytes.push(CP1252[ch]!);
-    else if (code < 32 || code === 0x7f) continue;
-    else {
-      bytes.push(63);
-      lossy++;
-    }
+    // Every unprintable run was replaced above; nothing is dropped silently.
+    if (printable(ch)) bytes.push(CP1252[ch] ?? code);
   }
-  return { bytes, lossy };
+  return { bytes, lossy: marked.runs };
 }
 const glyph = (byte: number) =>
   byte >= 32 && byte <= 126 ? WIDTHS[byte - 32]! : 556;
@@ -62,7 +102,7 @@ export type TextStyle = { size?: number; bold?: boolean; indent?: number };
 export class PdfDocument {
   private pages: string[][] = [];
   private y = 0;
-  /** Characters printed as "?" since the last call to takeLossy(). */
+  /** Unprintable text runs marked since the last call to takeLossy(). */
   private lossy = 0;
   constructor(private readonly title: string) {}
 

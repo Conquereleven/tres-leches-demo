@@ -16,7 +16,6 @@ import { ticketSnapshot } from "../../src/commerce/ticket-snapshot";
 import {
   TRANSLATION_REVIEW,
   operationalProductName,
-  setPublishedProductNames,
 } from "../../src/commerce/product-names";
 import { approvedOperationsNames } from "../catalog/product-hub";
 import opsEnglish from "../../src/commerce/locales/en.json";
@@ -155,6 +154,7 @@ function writeOrder(
   state: State,
   o: Order,
   kind: DocumentKind,
+  names: ReturnType<typeof approvedOperationsNames>,
 ) {
   pdf.newPage();
   const pickup = o.fulfillmentMethod === "pickup";
@@ -208,7 +208,8 @@ function writeOrder(
       o.address?.trim();
     pdf.text(`Address: ${address || "Address not recorded"}`);
     pdf.text(`Area: ${o.quote?.zoneName ?? "Area not recorded"}`);
-    if (d && d.addressVerification !== "VERIFIED")
+    // Legacy address lines carry no verification evidence either.
+    if (address && d?.addressVerification !== "VERIFIED")
       pdf.text("Address not verified · confirm with the customer", { size: 8 });
     const phone = conversation?.phone?.trim();
     const whatsapp = o.customerDetails?.whatsappNumber?.trim();
@@ -226,7 +227,7 @@ function writeOrder(
     );
   else {
     for (const l of lines) {
-      const product = operationalProductName(l.productId, l.name);
+      const product = operationalProductName(l.productId, l.name, names);
       pdf.text(`${l.quantity} × ${product.name}`, { bold: true });
       if (product.reviewRequired)
         pdf.text(`${TRANSLATION_REVIEW} (${l.productId})`, {
@@ -253,7 +254,7 @@ function writeOrder(
   }
   if (pdf.takeLossy())
     pdf.text(
-      "Some characters cannot be printed in this PDF. Check the order page for the exact text.",
+      "Some text is in a script this PDF cannot print yet; it is marked above. The exact text is on the order page.",
       { size: 8, bold: true },
     );
   if (kind === "delivery-note" && !pickup) {
@@ -275,10 +276,9 @@ export function ordersPdf(
 ) {
   const label = kind === "delivery-note" ? "Delivery notes" : "Packing slips";
   const pdf = new PdfDocument(`3L ${label}`);
-  // Same approved English staff names as the Operations screens. Generation is
-  // synchronous, so the shared registry is current for this whole document.
-  setPublishedProductNames(approvedOperationsNames(state));
-  for (const o of orders) writeOrder(pdf, state, o, kind);
+  // Same approved English staff names as the Operations screens, per request.
+  const names = approvedOperationsNames(state);
+  for (const o of orders) writeOrder(pdf, state, o, kind, names);
   const generated = dubaiDateTime(at);
   return pdf.toBuffer(
     (page, pages) =>
