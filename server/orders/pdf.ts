@@ -80,8 +80,12 @@ function encode(text: string): { bytes: number[]; lossy: number } {
     text
       .normalize("NFC")
       .replaceAll("→", "->")
-      .replace(/[\t\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]/g, " ")
-      .replace(/[\u0000-\u001f\u007f\u200b\ufeff]/g, ""),
+      // Spaces, controls and invisible breaks become a plain space: words
+      // separated in the original are never joined in print.
+      .replace(
+        /[\u0000-\u001f\u007f\u1680\u2000-\u200b\u2028\u2029\u202f\u205f\u2060\u3000\ufeff]/g,
+        " ",
+      ),
   );
   for (const ch of marked.text) {
     const code = ch.codePointAt(0)!;

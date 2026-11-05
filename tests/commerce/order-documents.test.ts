@@ -209,6 +209,12 @@ test("PDF writer wraps long text, paginates and marks unprintable scripts explic
     ),
   );
   assert.ok(!text.includes("?"), "no character is replaced by a question mark");
+  const breaks = new PdfDocument("b");
+  breaks.text("No\u200bnuts · a\u0007b · c\ufeffd · e\u2060f");
+  assert.equal(breaks.takeLossy(), 0);
+  assert.ok(
+    pdfText(breaks.toBuffer(() => "f")).startsWith("No nuts · a b · c d · e f"),
+  );
   doc.text("x".repeat(400));
   assert.ok(
     pdfText(doc.toBuffer(() => "f"))
