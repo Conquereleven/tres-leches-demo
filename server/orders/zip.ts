@@ -50,8 +50,9 @@ export class ZipWriter {
     if (!SAFE_NAME.test(name) || name.includes(".."))
       throw new Error("Unsafe ZIP entry name");
     if (this.names.has(name)) throw new Error("Duplicate ZIP entry name");
-    this.input += data.length;
-    if (this.input > MAX_ZIP_BYTES) throw new ZipLimitError("ZIP too large");
+    // Checked before any state changes: a refused entry leaves the writer as it was.
+    if (this.input + data.length > MAX_ZIP_BYTES)
+      throw new ZipLimitError("ZIP too large");
     const nameBytes = Buffer.from(name, "ascii");
     const packed = deflateRawSync(data);
     const crc = crc32(data);
@@ -86,6 +87,7 @@ export class ZipWriter {
     if (this.size + added + central.length + nameBytes.length > MAX_ZIP_BYTES)
       throw new ZipLimitError("ZIP too large");
     this.names.add(name);
+    this.input += data.length;
     this.locals.push(local, nameBytes, packed);
     this.centrals.push(central, nameBytes);
     this.offset += added;

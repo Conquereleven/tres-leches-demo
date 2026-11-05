@@ -398,6 +398,21 @@ test("ZIP writer refuses empty, oversized, unsafe and duplicate entries", () => 
   );
   const writer = new ZipWriter();
   writer.add("a.pdf", Buffer.from("x"));
+  // A refused entry changes nothing: later valid entries still fit.
+  assert.throws(
+    () => writer.add("big.pdf", Buffer.alloc(MAX_ZIP_BYTES)),
+    ZipLimitError,
+  );
+  writer.add("b.pdf", Buffer.from("y"));
+  assert.deepEqual(
+    readZip(
+      zipFiles([
+        { name: "a.pdf", data: Buffer.from("x") },
+        { name: "b.pdf", data: Buffer.from("y") },
+      ]),
+    ).map((e) => e.name),
+    ["a.pdf", "b.pdf"],
+  );
   assert.ok(writer.size < MAX_ZIP_BYTES);
   assert.equal(
     writer.finish().length,
