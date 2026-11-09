@@ -1,6 +1,7 @@
 import * as requireFs from "node:fs";
 import test from "node:test";
 import assert from "node:assert/strict";
+import { minimumOrderQuantity } from "../../shared/minimum-quantity";
 import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync, mkdtempSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -63,7 +64,8 @@ test("all ten server quotes preserve fixed packs, quantities, pickup and per-zon
   );
   try {
     for (const [id, [, price]] of Object.entries(PAN_OCT13_CORRECTION))
-      for (const quantity of [1, 3])
+      // Loose singles sell from 6 pieces (TPL-21); packs keep quantity 1.
+      for (const quantity of minimumOrderQuantity(id) > 1 ? [6, 7] : [1, 3])
         for (const fulfillmentMethod of ["pickup", "delivery"]) {
           const zone = store
             .read()

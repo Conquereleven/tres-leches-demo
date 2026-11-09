@@ -98,10 +98,12 @@ import {
   type CustomerPaymentState,
 } from "./checkout-states";
 import {
+  belowMinimumLines,
   cart,
   cartSubtotalFils,
   displayLinePrice,
   MAX_QTY,
+  minQty,
   useCart,
   useCheckoutConfig,
   type CartLine,
@@ -739,7 +741,8 @@ export function AddToCart({
 
   const { config, loading } = useCheckoutConfig();
   const lines = useCart();
-  const [quantity, setQuantity] = useState(1);
+  const min = minQty(productId);
+  const [quantity, setQuantity] = useState(min);
   const [added, setAdded] = useState(false);
   const [composition, setComposition] = useState<Composition>([]);
   const [color, setColor] = useState<TricolorColor | "">("");
@@ -791,6 +794,11 @@ export function AddToCart({
       {custom && (
         <p className="b-box-label">{packCopy(language).numberBoxes}</p>
       )}
+      {min > 1 && (
+        <p className="b-menu-advance" data-minimum-notice>
+          <CustomerCopy>Minimum order: 6 pieces</CustomerCopy>
+        </p>
+      )}
       <div
         className="b-qty"
         role="group"
@@ -801,14 +809,15 @@ export function AddToCart({
         <button
           type="button"
           aria-label={localize("Decrease quantity")}
-          disabled={quantity <= 1}
-          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+          disabled={quantity <= min}
+          onClick={() => setQuantity((q) => Math.max(min, q - 1))}
         >
           <Minus aria-hidden />
         </button>
         <QuantityInput
           value={quantity}
-          max={Math.max(1, MAX_QTY - inCart)}
+          min={min}
+          max={Math.max(min, MAX_QTY - inCart)}
           label={custom ? packCopy(language).numberBoxes : "Quantity"}
           onChange={setQuantity}
         />
@@ -830,7 +839,7 @@ export function AddToCart({
         }
         onClick={() => {
           if (
-            quantity < 1 ||
+            quantity < min ||
             quantity + inCart > MAX_QTY ||
             (custom && !packComplete(productId, composition, config!))
           )
@@ -842,7 +851,7 @@ export function AddToCart({
             color || undefined,
           );
           setAdded(true);
-          setQuantity(1);
+          setQuantity(min);
         }}
       >
         {custom && !packComplete(productId, composition, config!) ? (
@@ -976,6 +985,20 @@ function CartItems({
                 <CustomerCopy>{p.name}</CustomerCopy>
               </strong>
               <CompositionDetails line={l} />
+              {minQty(l.productId) > 1 && (
+                <span className="b-caption" data-minimum-notice>
+                  <CustomerCopy>Minimum order: 6 pieces</CustomerCopy>
+                </span>
+              )}
+              {l.quantity < minQty(l.productId) && (
+                <button
+                  type="button"
+                  className="b-link"
+                  onClick={() => cart.set(lineKey(l), minQty(l.productId))}
+                >
+                  <CustomerCopy>Update to 6 pieces</CustomerCopy>
+                </button>
+              )}
               {tricolorSpec(l.productId)?.kind === "single" && (
                 <CartTricolorColor line={l} />
               )}
@@ -1004,12 +1027,16 @@ function CartItems({
               <button
                 type="button"
                 aria-label={localize(`Decrease ${p.name}`)}
+                disabled={
+                  minQty(l.productId) > 1 && l.quantity <= minQty(l.productId)
+                }
                 onClick={() => cart.set(lineKey(l), l.quantity - 1)}
               >
                 <Minus aria-hidden />
               </button>
               <QuantityInput
                 value={l.quantity}
+                min={minQty(l.productId)}
                 max={MAX_QTY}
                 label={`${p.name} quantity`}
                 onChange={(n) => cart.set(lineKey(l), n)}
@@ -1018,7 +1045,12 @@ function CartItems({
                 type="button"
                 aria-label={localize(`Increase ${p.name}`)}
                 disabled={l.quantity >= MAX_QTY}
-                onClick={() => cart.set(lineKey(l), l.quantity + 1)}
+                onClick={() =>
+                  cart.set(
+                    lineKey(l),
+                    Math.max(minQty(l.productId), l.quantity + 1),
+                  )
+                }
               >
                 <Plus aria-hidden />
               </button>
@@ -1068,6 +1100,7 @@ export function CartPage() {
   const known = lines.filter((l) =>
     config.products.some((p) => p.id === l.productId),
   );
+  const ready = known.length > 0 && belowMinimumLines(lines).length === 0;
   const subtotal = cartSubtotalFils(lines, config.products, config.packPricing);
   return (
     <ShopShell step={0} title={localize("Your cart")}>
@@ -1105,10 +1138,17 @@ export function CartPage() {
                   reached. Your area and address are confirmed in the next step.
                 </CustomerCopy>
               </p>
+              {known.length > 0 && !ready && (
+                <p role="alert" data-minimum-blocker>
+                  <CustomerCopy>
+                    Update items below the 6-piece minimum to continue.
+                  </CustomerCopy>
+                </p>
+              )}
               <a
-                className={`b-button b-co-cta ${known.length ? "" : "b-disabled"}`}
-                aria-disabled={!known.length}
-                href={known.length ? "/checkout" : undefined}
+                className={`b-button b-co-cta ${ready ? "" : "b-disabled"}`}
+                aria-disabled={!ready}
+                href={ready ? "/checkout" : undefined}
               >
                 <CustomerCopy>CONTINUE TO FULFILLMENT</CustomerCopy>
               </a>
@@ -1258,6 +1298,22 @@ export function CheckoutPage() {
     return (
       <ShopShell step={1} title={localize("Checkout")}>
         <EmptyCart />
+      </ShopShell>
+    );
+  // TPL-21: a stale saved cart below a SKU minimum is corrected in the cart first.
+  if (belowMinimumLines(cartLines).length)
+    return (
+      <ShopShell step={1} title={localize("Checkout")}>
+        <div className="b-shop-panel" role="alert" data-minimum-blocker>
+          <p>
+            <CustomerCopy>
+              Update items below the 6-piece minimum to continue.
+            </CustomerCopy>
+          </p>
+          <a className="b-button" href="/cart">
+            <CustomerCopy>Your cart</CustomerCopy>
+          </a>
+        </div>
       </ShopShell>
     );
 

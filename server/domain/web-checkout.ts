@@ -23,6 +23,10 @@ import {
   leadHours,
   DELIVERY_WINDOWS,
 } from "../../shared/commerce-policy";
+import {
+  belowMinimumSkus,
+  MINIMUM_QUANTITY_MESSAGE,
+} from "../../shared/minimum-quantity";
 import products from "../../shared/storefront-products.json";
 import { formatOrderNumber } from "../../shared/order-number";
 import { normalizeWhatsAppNumber } from "../../shared/contact";
@@ -438,7 +442,15 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
     if (record) {
       requireThat(order && payment, "Checkout not found", 409);
       const frozen = frozenCheckout(order, payment);
-      if (payment.status !== "paid") validatePackLines(snapshot, input.lines);
+      if (payment.status !== "paid") {
+        validatePackLines(snapshot, input.lines);
+        // A checkout started before TPL-21 cannot resume below the minimum.
+        requireThat(
+          belowMinimumSkus(input.lines).length === 0,
+          MINIMUM_QUANTITY_MESSAGE,
+          422,
+        );
+      }
       // Recover a missing pre-release hash only from validated frozen records.
       if (!record.cartHash) {
         record.cartHash = digest(
@@ -762,6 +774,11 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
     "This product is outside its ordering season",
     422,
   );
+  requireThat(
+    belowMinimumSkus(input.lines).length === 0,
+    MINIMUM_QUANTITY_MESSAGE,
+    422,
+  );
   const method =
     "fulfillmentMethod" in input ? input.fulfillmentMethod : undefined;
   const zone = s.zones.find((z) => z.id === input.zoneId && z.active);
@@ -1006,6 +1023,11 @@ export async function createWebCheckout(
       const payment = snapshot.payments.find((p) => p.id === order?.paymentId);
       requireThat(order && payment, "Checkout not found", 409);
       frozenCheckout(order, payment);
+      requireThat(
+        payment.status === "paid" || belowMinimumSkus(input.lines).length === 0,
+        MINIMUM_QUANTITY_MESSAGE,
+        422,
+      );
       return;
     }
     const cartHash = canonicalCartHash(

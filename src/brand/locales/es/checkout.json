@@ -194,5 +194,7 @@
   "area_bff98afc04fe097b": "La entrega online no está disponible actualmente para la zona seleccionada.",
   "copy_recovery_storage": "Este navegador no puede guardar tu compra de forma segura. Activa el almacenamiento del navegador o contacta con 3L antes de pagar.",
   "copy_recovery_review": "Revisa tus datos guardados: la dirección, la fecha y el total actual del pedido.",
-  "copy_recovery_ready": "Tu intento de pago anterior ha finalizado. Tus datos están guardados. Revisa tu pedido antes de iniciar un nuevo pago seguro."
+  "copy_recovery_ready": "Tu intento de pago anterior ha finalizado. Tus datos están guardados. Revisa tu pedido antes de iniciar un nuevo pago seguro.",
+  "copy_a676926f7a61268e": "Actualizar a 6 piezas",
+  "copy_3cae4dabe77bf883": "Actualiza los productos por debajo del mínimo de 6 piezas para continuar."
 }

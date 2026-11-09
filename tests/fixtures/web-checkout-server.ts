@@ -6,7 +6,7 @@ import { startServer } from "../../server/http";
 import { seed } from "../../server/db/store";
 import { PaymenntProvider } from "../../server/adapters/paymennt";
 import { validateCatalog } from "../../server/domain/catalog";
-import { writeFileSync, readFileSync } from "node:fs";
+import { appendFileSync, writeFileSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { bluewatersFixture } from "./delivery-areas";
@@ -73,6 +73,15 @@ initial.catalog = validateCatalog(
     ),
   ),
 );
+// TPL-21: mirrors the published Bolillo option identity (B111, AED 5).
+if (process.env.BOLILLO_FIXTURE === "true")
+  initial.catalog.push({
+    id: "B111",
+    name: "Bolillos",
+    priceFils: 500,
+    active: true,
+    availability: "available",
+  });
 if (process.env.CATALOG_FIXTURE === "legacy")
   initial.catalog.push({
     id: "fixture-36",
@@ -84,6 +93,8 @@ if (process.env.CATALOG_FIXTURE === "legacy")
 const provider = new PaymenntProvider(
   { apiKey: "fixture-key", apiSecret: "fixture-secret", environment: "test" },
   async (url, init) => {
+    if (process.env.PROVIDER_CALL_LOG)
+      appendFileSync(process.env.PROVIDER_CALL_LOG, `${init?.method} ${url}\n`);
     if (init?.method === "POST") {
       const body = JSON.parse(String(init.body));
       const id = randomUUID();

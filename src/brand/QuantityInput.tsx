@@ -3,11 +3,13 @@ import { useState } from "react";
 /** Preserve an editing draft; commit complete integers, restore invalid drafts on blur. */
 export function QuantityInput({
   value,
+  min = 1,
   max,
   label,
   onChange,
 }: {
   value: number;
+  min?: number;
   max: number;
   label: string;
   onChange: (value: number) => void;
@@ -30,7 +32,7 @@ export function QuantityInput({
         if (!/^\d*$/.test(text)) return;
         setDraft(text);
         const n = Number(text);
-        if (text && n >= 1 && n <= max) onChange(n);
+        if (text && n >= min && n <= max) onChange(n);
       }}
       onBlur={() => setDraft(null)}
       onKeyDown={(event) => {
@@ -44,12 +46,16 @@ export function QuantityInput({
           onChange(
             Math.min(
               max,
-              Math.max(1, value + (event.key === "ArrowUp" ? 1 : -1)),
+              Math.max(min, value + (event.key === "ArrowUp" ? 1 : -1)),
             ),
           );
         }
       }}
-      aria-description={localize(`Whole number from 1 to ${max}`)}
+      aria-description={localize(
+        min > 1
+          ? `Whole number from 6 to ${max}`
+          : `Whole number from 1 to ${max}`,
+      )}
     />
   );
 }

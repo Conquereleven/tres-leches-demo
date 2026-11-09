@@ -24,6 +24,7 @@ import {
 import { ResponsiveMedia } from "./media";
 import { packSpec } from "../../shared/pack-composition";
 import { tricolorSpec } from "../../shared/tricolor";
+import { minimumOrderQuantity } from "../../shared/minimum-quantity";
 import "./conversion.css";
 
 function subscribeOnline(fn: () => void) {
@@ -301,8 +302,13 @@ function Recommendation({
       .slice()
       .sort((a, b) => a.priceFils - b.priceFils || a.id.localeCompare(b.id))[0]!
       .id;
+  // Minimum-quantity SKUs (TPL-21) open the product page, where the 6-piece
+  // selector and notice live, instead of a one-tap add.
   const builder =
-    !!option && (!!packSpec(option.id) || !!tricolorSpec(option.id));
+    !!option &&
+    (!!packSpec(option.id) ||
+      !!tricolorSpec(option.id) ||
+      minimumOrderQuantity(option.id) > 1);
   return (
     <article className="b-recommendation" data-recommendation={hit.product.id}>
       <DiscoveryPhoto hit={hit} />

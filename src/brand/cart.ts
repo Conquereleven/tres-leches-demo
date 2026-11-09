@@ -23,11 +23,21 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 export type CartLine = CommerceLine;
 import { MAX_ITEM_QUANTITY } from "../../shared/commerce-policy";
 import {
+  belowMinimumSkus,
+  minimumOrderQuantity,
+} from "../../shared/minimum-quantity";
+import {
   isTricolorColor,
   tricolorSpec,
   type TricolorColor,
 } from "../../shared/tricolor";
 export const MAX_QTY = MAX_ITEM_QUANTITY;
+export const minQty = minimumOrderQuantity;
+/** Lines whose SKU total is under its minimum; checkout stays closed until corrected. */
+export const belowMinimumLines = (ls: CartLine[]) => {
+  const ids = new Set(belowMinimumSkus(ls));
+  return ls.filter((l) => ids.has(l.productId));
+};
 const KEY = "3l-cart";
 
 let lines: CartLine[] = read();
@@ -83,7 +93,11 @@ export const cart = {
     const total = lines
       .filter((l) => l.productId === productId)
       .reduce((n, l) => n + l.quantity, 0);
-    if (total + quantity > MAX_QTY) return;
+    if (
+      total + quantity > MAX_QTY ||
+      total + quantity < minimumOrderQuantity(productId)
+    )
+      return;
     const current = lines.find((l) => lineKey(l) === key);
     commit(
       current
@@ -100,6 +114,14 @@ export const cart = {
     const target = lines.find((l) => lineKey(l) === key);
     if (
       !target ||
+      (quantity > 0 &&
+        quantity +
+          lines
+            .filter(
+              (l) => l.productId === target.productId && lineKey(l) !== key,
+            )
+            .reduce((n, l) => n + l.quantity, 0) <
+          minimumOrderQuantity(target.productId)) ||
       lines
         .filter((l) => l.productId === target.productId && lineKey(l) !== key)
         .reduce((n, l) => n + l.quantity, 0) +
