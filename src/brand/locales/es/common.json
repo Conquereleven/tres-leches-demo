@@ -185,5 +185,6 @@
   "copy_d743070540a1268e": "Confirmación",
   "copy_07726fb3dc76bd39": "{0} productos",
   "copy_400c52985aaa7248": "No pudimos procesar el pago. Revisa tus datos o inténtalo de nuevo.",
-  "copy_dbb0213f293ddeb8": "No pudimos verificar el resultado del pago. Tu pedido está pendiente de revisión."
+  "copy_dbb0213f293ddeb8": "No pudimos verificar el resultado del pago. Tu pedido está pendiente de revisión.",
+  "copy_087b0c5284144bf7": "Número entero del 6 al {0}"
 }

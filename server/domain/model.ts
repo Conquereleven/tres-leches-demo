@@ -277,6 +277,10 @@ export type OperationsEmailNotification = Omit<
 };
 export type Payment = {
   supersededAt?: string;
+  /** TPL-21: ended locally before any provider call (see local-rejection.ts). */
+  localRejection?: { code: "BELOW_MINIMUM"; jobId: string; at: string };
+  /** Written immediately before a hosted create request leaves this server. */
+  providerCreateAttemptedAt?: string;
   checkoutFlow?: "web";
   webReturnUrl?: string;
   directAttempt?: "ready" | "submitted" | "resolved" | "unknown";
@@ -339,6 +343,8 @@ export type Job = {
   nextAt: number;
   leaseUntil?: number;
   lastError?: string;
+  /** Set only with a proven pre-provider rejection; mirrors Payment.localRejection. */
+  localRejection?: "BELOW_MINIMUM";
 };
 export type InboundDelivery = {
   id: string;

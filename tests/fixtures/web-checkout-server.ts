@@ -6,7 +6,7 @@ import { startServer } from "../../server/http";
 import { seed } from "../../server/db/store";
 import { PaymenntProvider } from "../../server/adapters/paymennt";
 import { validateCatalog } from "../../server/domain/catalog";
-import { writeFileSync, readFileSync } from "node:fs";
+import { appendFileSync, writeFileSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { bluewatersFixture } from "./delivery-areas";
@@ -73,6 +73,15 @@ initial.catalog = validateCatalog(
     ),
   ),
 );
+// TPL-21: mirrors the published Bolillo option identity (B111, AED 5).
+if (process.env.BOLILLO_FIXTURE === "true")
+  initial.catalog.push({
+    id: "B111",
+    name: "Bolillos",
+    priceFils: 500,
+    active: true,
+    availability: "available",
+  });
 if (process.env.CATALOG_FIXTURE === "legacy")
   initial.catalog.push({
     id: "fixture-36",
@@ -84,6 +93,8 @@ if (process.env.CATALOG_FIXTURE === "legacy")
 const provider = new PaymenntProvider(
   { apiKey: "fixture-key", apiSecret: "fixture-secret", environment: "test" },
   async (url, init) => {
+    if (process.env.PROVIDER_CALL_LOG)
+      appendFileSync(process.env.PROVIDER_CALL_LOG, `${init?.method} ${url}\n`);
     if (init?.method === "POST") {
       const body = JSON.parse(String(init.body));
       const id = randomUUID();
@@ -224,7 +235,7 @@ if (process.env.COVERAGE_FIXTURE === "approved") {
 }
 process.env.DELIVERY_ADDRESS_MODE ??=
   process.env.COVERAGE_FIXTURE === "approved" ? "google" : "legacy";
-await startServer({
+const started = await startServer({
   initial,
   payment: provider,
   geo,
@@ -243,3 +254,35 @@ await startServer({
       }
     : {}),
 });
+
+// TPL-21: hosted 5-piece web checkouts persisted as if queued before the
+// 6-piece minimum, then drained once by the real worker. One key per browser run.
+if (process.env.STALE_MINIMUM_FIXTURE_KEYS) {
+  const { createWebCheckout } =
+    await import("../../server/domain/web-checkout");
+  const sku = "pan-de-muerto-filled-pistachio-individual";
+  const { service, store } = started;
+  const drain = service.drain.bind(service);
+  service.drain = async () => {};
+  for (const key of process.env.STALE_MINIMUM_FIXTURE_KEYS.split(",")) {
+    const { orderId } = await createWebCheckout(
+      service,
+      JSON.parse(process.env.STALE_MINIMUM_FIXTURE_BODY!),
+      key,
+      "web",
+      process.env.APP_ORIGIN,
+    );
+    store.write((s) => {
+      const o = s.orders.find((o) => o.id === orderId)!;
+      const p = s.payments.find((p) => p.id === o.paymentId)!;
+      const line = o.lines.find((l) => l.productId === sku)!;
+      const unit = o.catalogSnapshot!.find((c) => c.id === sku)!.priceFils;
+      line.quantity = 5;
+      o.quote!.subtotalFils! -= unit;
+      o.quote!.totalFils! -= unit;
+      p.amountFils -= unit;
+    });
+  }
+  service.drain = drain;
+  await service.drain();
+}

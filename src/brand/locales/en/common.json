@@ -185,5 +185,6 @@
   "copy_d743070540a1268e": "Confirmation",
   "copy_07726fb3dc76bd39": "{0} items",
   "copy_400c52985aaa7248": "Payment could not be processed. Please check your details or try again.",
-  "copy_dbb0213f293ddeb8": "The payment result could not be verified. Your order is held for review."
+  "copy_dbb0213f293ddeb8": "The payment result could not be verified. Your order is held for review.",
+  "copy_087b0c5284144bf7": "Whole number from 6 to {0}"
 }

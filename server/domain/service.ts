@@ -7,6 +7,11 @@ import {
 } from "./whatsapp-inbound";
 import { validatePackLines, snapshotPackLines } from "./packs";
 import { distinctLines } from "../../shared/pack-composition";
+import {
+  belowMinimumSkus,
+  MINIMUM_QUANTITY_MESSAGE,
+} from "../../shared/minimum-quantity";
+import { provablyUninitiated, verifiedLocalRejection } from "./local-rejection";
 import { frozenCheckout } from "./frozen-checkout";
 import { PaymenntProvider } from "../adapters/paymennt";
 import { orderBillingAddress, toPaymenntDeliveryAddress } from "./billing";
@@ -1010,6 +1015,8 @@ export class CommerceService {
     const order = this.order(snapshot, p.orderId);
     if (actor.role !== "admin" && actor.role !== "manager")
       this.owned(this.conversation(snapshot, order.conversationId), actor);
+    // Nothing exists at the provider to reconcile; a GET would only mislead.
+    if (verifiedLocalRejection(snapshot, p)) return { status: p.status };
     requireThat(
       this.payment.getCheckout,
       "La conciliación requiere un proveedor de pagos configurado",
@@ -1384,6 +1391,56 @@ export class CommerceService {
             });
             continue;
           }
+          // TPL-21: a web job queued before the minimum existed is ended here,
+          // before any provider call; no retry, no URL, payment stays unpaid.
+          if (
+            p.checkoutFlow === "web" &&
+            belowMinimumSkus(this.order(snapshot, p.orderId).lines).length
+          ) {
+            this.store.write((s) => {
+              const job = s.jobs.find((j) => j.id === claimed.id)!;
+              if (
+                job.status !== "processing" ||
+                job.attempts !== claimed.attempts
+              )
+                return;
+              job.status = "failed";
+              job.lastError = MINIMUM_QUANTITY_MESSAGE;
+              // Only a provable first-and-only local attempt becomes retryable;
+              // anything uncertain stays "creating" and keeps reconciliation.
+              const payment = s.payments.find((x) => x.id === p.id)!;
+              if (
+                this.reconciling.has(payment.id) ||
+                !provablyUninitiated(s, payment, claimed)
+              )
+                return;
+              const rejectedAt = now();
+              job.localRejection = "BELOW_MINIMUM";
+              payment.localRejection = {
+                code: "BELOW_MINIMUM",
+                jobId: job.id,
+                at: rejectedAt,
+              };
+              payment.status = "cancelled";
+              payment.updatedAt = rejectedAt;
+              payment.timeline.push({
+                at: rejectedAt,
+                actor: "system",
+                action:
+                  "Rejected before provider: below 6-piece minimum; Paymennt not contacted",
+              });
+              const o = this.order(s, payment.orderId);
+              if (o.paymentId === payment.id && o.state === "Awaiting Payment")
+                transition(o, "Building", "system");
+            });
+            continue;
+          }
+          if (p.checkoutFlow === "web")
+            this.store.write((s) => {
+              s.payments.find(
+                (x) => x.id === p.id,
+              )!.providerCreateAttemptedAt ??= now();
+            });
           const result = await this.bounded(
             p.checkoutFlow === "web"
               ? this.createHostedWebPayment(p, snapshot)

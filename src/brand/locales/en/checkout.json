@@ -194,5 +194,7 @@
   "area_bff98afc04fe097b": "Online delivery is not currently available for the selected area.",
   "copy_recovery_storage": "This browser cannot save your checkout securely. Please enable browser storage or contact 3L before paying.",
   "copy_recovery_review": "Your saved details need review. Please check your address, date and current order total.",
-  "copy_recovery_ready": "Your previous payment attempt has ended. Your details are saved. Review your order before starting a new secure payment."
+  "copy_recovery_ready": "Your previous payment attempt has ended. Your details are saved. Review your order before starting a new secure payment.",
+  "copy_a676926f7a61268e": "Update to 6 pieces",
+  "copy_3cae4dabe77bf883": "Update items below the 6-piece minimum to continue."
 }

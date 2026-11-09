@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { minimumOrderQuantity } from "../../shared/minimum-quantity";
 import { readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { Store } from "../../server/db/store";
@@ -95,7 +96,8 @@ test("the server charges the official price for every purchasable repriced SKU, 
   let checked = 0;
   for (const [id, fils] of Object.entries(OFFICIAL_PRICES_FILS)) {
     if (!catalog.find((p) => p.id === id)?.active) continue;
-    for (const quantity of [1, 3]) {
+    // Loose singles sell from 6 pieces (TPL-21); packs keep quantity 1.
+    for (const quantity of minimumOrderQuantity(id) > 1 ? [6, 7] : [1, 3]) {
       const quote = quoteWebCheckout(service, {
         fulfillmentMethod: "pickup",
         lines: [{ productId: id, quantity }],
