@@ -152,6 +152,8 @@ type Status = {
   currency: string;
   url: string | null;
   actionRequired?: "review_payment" | "complete_payment" | null;
+  /** Ended before Paymennt below the 6-piece minimum; correct the cart to retry. */
+  rejection?: "minimum_quantity";
   summary?: Summary;
 };
 type Delivery = {
@@ -2848,14 +2850,22 @@ export function CheckoutReturn() {
 
   const state = result ? paymentStateOf(result) : null;
   if (result && state === "PAID") return <Confirmation result={result} />;
-  const copy = state
-    ? stateCopy(state, result?.paymentStatus)
-    : error
-      ? {
-          title: "We couldn't load your payment",
-          message: "Please check again in a moment, or contact us.",
-        }
-      : stateCopy("PROCESSING");
+  const belowMinimum =
+    state === "FAILED" && result?.rejection === "minimum_quantity";
+  const copy = belowMinimum
+    ? {
+        title: "Payment wasn't completed",
+        message: "Minimum order: 6 pieces",
+        detail: "Update items below the 6-piece minimum to continue.",
+      }
+    : state
+      ? stateCopy(state, result?.paymentStatus)
+      : error
+        ? {
+            title: "We couldn't load your payment",
+            message: "Please check again in a moment, or contact us.",
+          }
+        : stateCopy("PROCESSING");
   return (
     <ShopShell step={3} title={localize(copy.title)} bare>
       <div className="b-co-status">
@@ -2901,10 +2911,16 @@ export function CheckoutReturn() {
                 <CustomerCopy>CONTINUE PAYMENT</CustomerCopy>
               </a>
             )}
-          {(state === "DECLINED" || state === "FAILED") && (
-            <a className="b-button b-co-cta" href="/checkout?recover=1">
-              <CustomerCopy>TRY AGAIN</CustomerCopy>
+          {belowMinimum ? (
+            <a className="b-button b-co-cta" href="/cart">
+              <CustomerCopy>Edit cart</CustomerCopy>
             </a>
+          ) : (
+            (state === "DECLINED" || state === "FAILED") && (
+              <a className="b-button b-co-cta" href="/checkout?recover=1">
+                <CustomerCopy>TRY AGAIN</CustomerCopy>
+              </a>
+            )
           )}
           {state === "READY" && (
             <a className="b-button b-co-cta" href="/checkout">

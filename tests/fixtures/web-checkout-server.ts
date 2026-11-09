@@ -235,7 +235,7 @@ if (process.env.COVERAGE_FIXTURE === "approved") {
 }
 process.env.DELIVERY_ADDRESS_MODE ??=
   process.env.COVERAGE_FIXTURE === "approved" ? "google" : "legacy";
-await startServer({
+const started = await startServer({
   initial,
   payment: provider,
   geo,
@@ -254,3 +254,35 @@ await startServer({
       }
     : {}),
 });
+
+// TPL-21: hosted 5-piece web checkouts persisted as if queued before the
+// 6-piece minimum, then drained once by the real worker. One key per browser run.
+if (process.env.STALE_MINIMUM_FIXTURE_KEYS) {
+  const { createWebCheckout } =
+    await import("../../server/domain/web-checkout");
+  const sku = "pan-de-muerto-filled-pistachio-individual";
+  const { service, store } = started;
+  const drain = service.drain.bind(service);
+  service.drain = async () => {};
+  for (const key of process.env.STALE_MINIMUM_FIXTURE_KEYS.split(",")) {
+    const { orderId } = await createWebCheckout(
+      service,
+      JSON.parse(process.env.STALE_MINIMUM_FIXTURE_BODY!),
+      key,
+      "web",
+      process.env.APP_ORIGIN,
+    );
+    store.write((s) => {
+      const o = s.orders.find((o) => o.id === orderId)!;
+      const p = s.payments.find((p) => p.id === o.paymentId)!;
+      const line = o.lines.find((l) => l.productId === sku)!;
+      const unit = o.catalogSnapshot!.find((c) => c.id === sku)!.priceFils;
+      line.quantity = 5;
+      o.quote!.subtotalFils! -= unit;
+      o.quote!.totalFils! -= unit;
+      p.amountFils -= unit;
+    });
+  }
+  service.drain = drain;
+  await service.drain();
+}

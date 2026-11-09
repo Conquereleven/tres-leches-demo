@@ -430,16 +430,15 @@ test("background worker ends a stale under-minimum hosted job before any provide
       s.payments.find((p) => p.orderId === orderId)!;
 
     // Quantity 5: terminally failed once, unpaid, no URL, no provider call.
+    // Provably never sent, so the payment ends retryable (minimum-recovery.test.ts).
     assert.equal(job(stale.id).status, "failed");
     assert.equal(job(stale.id).attempts, 1);
     assert.equal(job(stale.id).lastError, MESSAGE);
-    assert.equal(payment(stale.id).status, "creating");
+    assert.equal(job(stale.id).localRejection, "BELOW_MINIMUM");
+    assert.equal(payment(stale.id).status, "cancelled");
     assert.equal(payment(stale.id).url, undefined);
     assert.equal(payment(stale.id).providerCheckoutId, undefined);
-    assert.equal(
-      s.orders.find((o) => o.id === stale.id)!.state,
-      "Awaiting Payment",
-    );
+    assert.equal(s.orders.find((o) => o.id === stale.id)!.state, "Building");
 
     // Quantity 6: exactly one provider call and the usual pending hosted link.
     assert.equal(f.calls(), 1);
