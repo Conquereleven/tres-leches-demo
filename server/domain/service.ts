@@ -7,6 +7,10 @@ import {
 } from "./whatsapp-inbound";
 import { validatePackLines, snapshotPackLines } from "./packs";
 import { distinctLines } from "../../shared/pack-composition";
+import {
+  belowMinimumSkus,
+  MINIMUM_QUANTITY_MESSAGE,
+} from "../../shared/minimum-quantity";
 import { frozenCheckout } from "./frozen-checkout";
 import { PaymenntProvider } from "../adapters/paymennt";
 import { orderBillingAddress, toPaymenntDeliveryAddress } from "./billing";
@@ -1381,6 +1385,20 @@ export class CommerceService {
           if (p.checkoutFlow === "web" && p.status !== "creating") {
             this.store.write((s) => {
               s.jobs.find((j) => j.id === claimed.id)!.status = "done";
+            });
+            continue;
+          }
+          // TPL-21: a web job queued before the minimum existed is ended here,
+          // before any provider call; no retry, no URL, payment stays unpaid.
+          if (
+            p.checkoutFlow === "web" &&
+            belowMinimumSkus(this.order(snapshot, p.orderId).lines).length
+          ) {
+            this.store.write((s) => {
+              const job = s.jobs.find((j) => j.id === claimed.id)!;
+              if (job.attempts !== claimed.attempts) return;
+              job.status = "failed";
+              job.lastError = MINIMUM_QUANTITY_MESSAGE;
             });
             continue;
           }

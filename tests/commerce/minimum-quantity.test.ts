@@ -124,6 +124,8 @@ function fixture() {
         success: true,
         result: {
           id: "checkout-fixture",
+          requestId: body.requestId,
+          orderId: body.orderId,
           amount: body.amount,
           currency: "AED",
           status: "PENDING",
@@ -374,6 +376,85 @@ test("paid historical orders below the minimum stay readable and untouched", asy
       JSON.stringify(
         JSON.parse(before).map((o: object) => ({ ...o, audit: undefined })),
       ),
+    );
+  } finally {
+    f.store.close();
+    mock.timers.reset();
+  }
+});
+
+test("background worker ends a stale under-minimum hosted job before any provider call; 6 pieces and paid orders unaffected", async () => {
+  mock.timers.enable({ apis: ["Date"], now: new Date(NOW) });
+  const f = fixture();
+  const ORIGIN = "http://localhost:5173";
+  try {
+    // Queue hosted web jobs without draining, as if persisted before TPL-21.
+    const drain = f.service.drain.bind(f.service);
+    f.service.drain = async () => {};
+    const queue = async (quantity: number) => {
+      const created = await createWebCheckout(
+        f.service,
+        checkoutBody([{ productId: PAN, quantity: 6 }]),
+        randomUUID(),
+        "web",
+        ORIGIN,
+      );
+      if (quantity !== 6) rewriteQuantity(f, created.orderId, PAN, quantity);
+      return f.store.read().orders.find((o) => o.id === created.orderId)!;
+    };
+    const stale = await queue(5);
+    const valid = await queue(6);
+    const paid = await queue(2);
+    f.store.write((s) => {
+      const p = s.payments.find((p) => p.id === paid.paymentId)!;
+      p.status = "paid";
+      s.jobs = s.jobs.filter((j) => j.entityId !== p.id);
+    });
+    f.service.drain = drain;
+    const paidBefore = JSON.stringify(
+      f.store.read().orders.find((o) => o.id === paid.id),
+    );
+    assert.equal(f.calls(), 0);
+
+    // Repeated drains, including after the retry backoff would have elapsed.
+    for (let i = 0; i < 4; i++) {
+      await f.service.drain();
+      mock.timers.tick(60_000);
+    }
+    const s = f.store.read();
+    const job = (orderId: string) =>
+      s.jobs.find(
+        (j) => j.entityId === s.orders.find((o) => o.id === orderId)!.paymentId,
+      )!;
+    const payment = (orderId: string) =>
+      s.payments.find((p) => p.orderId === orderId)!;
+
+    // Quantity 5: terminally failed once, unpaid, no URL, no provider call.
+    assert.equal(job(stale.id).status, "failed");
+    assert.equal(job(stale.id).attempts, 1);
+    assert.equal(job(stale.id).lastError, MESSAGE);
+    assert.equal(payment(stale.id).status, "creating");
+    assert.equal(payment(stale.id).url, undefined);
+    assert.equal(payment(stale.id).providerCheckoutId, undefined);
+    assert.equal(
+      s.orders.find((o) => o.id === stale.id)!.state,
+      "Awaiting Payment",
+    );
+
+    // Quantity 6: exactly one provider call and the usual pending hosted link.
+    assert.equal(f.calls(), 1);
+    assert.equal(job(valid.id).status, "done");
+    assert.equal(payment(valid.id).status, "pending");
+    assert.equal(
+      payment(valid.id).url,
+      "https://pay.test.paymennt.com/checkout/fixture",
+    );
+
+    // Paid historical order below the minimum: untouched.
+    assert.equal(payment(paid.id).status, "paid");
+    assert.equal(
+      JSON.stringify(s.orders.find((o) => o.id === paid.id)),
+      paidBefore,
     );
   } finally {
     f.store.close();
