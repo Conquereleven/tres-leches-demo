@@ -158,7 +158,7 @@ export function ProductSearch() {
           aria-hidden={waiting || undefined}
           style={waiting ? { visibility: "hidden" } : undefined}
           onClick={() => {
-            void refreshLiveCatalog();
+            void refreshLiveCatalog(true);
             retry();
           }}
         >
