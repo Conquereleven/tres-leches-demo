@@ -1,0 +1,25 @@
+{
+  "checkedAtUtc": "2026-10-31T06:46:43.338996+00:00",
+  "results": [
+    {
+      "path": "/",
+      "status": 200,
+      "googleVerificationPresent": true
+    },
+    {
+      "path": "/sitemap.xml",
+      "status": 200,
+      "urlCount": 8
+    },
+    {
+      "path": "/menu/tres-leches--classic",
+      "status": 404
+    },
+    {
+      "path": "/api/storefront/catalog",
+      "status": 200,
+      "publishedProducts": 76,
+      "englishDescriptions": 0
+    }
+  ]
+}

@@ -58,7 +58,8 @@ function RoutedApp() {
       </Suspense>
     );
   const page = path.replace(/\/+$/, "");
-  if (page === "/menu") return <MenuPage />;
+  // `/menu/<slug>` is a product's permanent URL (3L-SEO-AEO-002).
+  if (page === "/menu" || page.startsWith("/menu/")) return <MenuPage />;
   if (page === "/how-to-order") return <HowToOrder />;
   if (page === "/checkout/return") return <CheckoutReturn />;
   if (page === "/cart") return <CartPage />;

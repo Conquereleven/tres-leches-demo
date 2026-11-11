@@ -1,0 +1,140 @@
+{
+  "observedAtUtc": "2026-10-28T07:40:06.307538+00:00",
+  "method": "Read-only public GET requests; no authentication or private data",
+  "results": [
+    {
+      "url": "https://www.3ldubai.ae/",
+      "status": 200,
+      "finalUrl": "https://www.3ldubai.ae/",
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "bytes": 80368,
+      "titles": [
+        "Pasteler\u00edas 3L Dubai \u2014 Tres Leches, Mexico City since 1982"
+      ],
+      "canonicals": [
+        "<link rel=\"canonical\" href=\"https://www.3ldubai.ae/\" />"
+      ],
+      "h1": [
+        "Soaked in <br/> Tradition."
+      ]
+    },
+    {
+      "url": "https://www.3ldubai.ae/menu",
+      "status": 200,
+      "finalUrl": "https://www.3ldubai.ae/menu",
+      "headers": {
+        "Content-Type": "text/html"
+      },
+      "bytes": 11258,
+      "titles": [
+        "Menu \u2014 Pasteler\u00edas 3L Dubai"
+      ],
+      "canonicals": [
+        "<link rel=\"canonical\" href=\"https://www.3ldubai.ae/menu\" />"
+      ],
+      "h1": [
+        "Menu"
+      ]
+    },
+    {
+      "url": "https://www.3ldubai.ae/robots.txt",
+      "status": 200,
+      "finalUrl": "https://www.3ldubai.ae/robots.txt",
+      "headers": {
+        "Content-Type": "text/plain; charset=utf-8"
+      },
+      "bytes": 68,
+      "body": "User-agent: *\nAllow: /\n\nSitemap: https://www.3ldubai.ae/sitemap.xml\n"
+    },
+    {
+      "url": "https://www.3ldubai.ae/sitemap.xml",
+      "status": 200,
+      "finalUrl": "https://www.3ldubai.ae/sitemap.xml",
+      "headers": {
+        "Content-Type": "application/xml; charset=utf-8"
+      },
+      "bytes": 791,
+      "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n  <url>\n    <loc>https://www.3ldubai.ae/</loc>\n  </url>\n  <url>\n    <loc>https://www.3ldubai.ae/menu</loc>\n  </url>\n  <url>\n    <loc>https://www.3ldubai.ae/how-to-order</loc>\n  </url>\n  <url>\n    <loc>https://www.3ldubai.ae/terms</loc>\n    <lastmod>2026-09-22</lastmod>\n  </url>\n  <url>\n    <loc>https://www.3ldubai.ae/privacy</loc>\n    <lastmod>2026-09-22</lastmod>\n  </url>\n  <url>\n    <loc>https://www.3ldubai.ae/refund-policy</loc>\n    <lastmod>2026-09-22</lastmod>\n  </url>\n  <url>\n    <loc>https://www.3ldubai.ae/delivery-policy</loc>\n    <lastmod>2026-09-22</lastmod>\n  </url>\n  <url>\n    <loc>https://www.3ldubai.ae/contact</loc>\n    <lastmod>2026-09-22</lastmod>\n  </url>\n</urlset>\n"
+    },
+    {
+      "url": "https://www.3ldubai.ae/menu/tres-leches--classic",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "url": "https://www.3ldubai.ae/cart",
+      "status": 200,
+      "finalUrl": "https://www.3ldubai.ae/cart",
+      "headers": {
+        "Content-Type": "text/html",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "bytes": 80368,
+      "titles": [
+        "Pasteler\u00edas 3L Dubai \u2014 Tres Leches, Mexico City since 1982"
+      ],
+      "canonicals": [
+        "<link rel=\"canonical\" href=\"https://www.3ldubai.ae/\" />"
+      ],
+      "h1": [
+        "Soaked in <br/> Tradition."
+      ]
+    },
+    {
+      "url": "https://www.3ldubai.ae/checkout",
+      "status": 200,
+      "finalUrl": "https://www.3ldubai.ae/checkout",
+      "headers": {
+        "Content-Type": "text/html",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "bytes": 80368,
+      "titles": [
+        "Pasteler\u00edas 3L Dubai \u2014 Tres Leches, Mexico City since 1982"
+      ],
+      "canonicals": [
+        "<link rel=\"canonical\" href=\"https://www.3ldubai.ae/\" />"
+      ],
+      "h1": [
+        "Soaked in <br/> Tradition."
+      ]
+    },
+    {
+      "url": "https://www.3ldubai.ae/operations/orders",
+      "status": 200,
+      "finalUrl": "https://www.3ldubai.ae/operations/orders",
+      "headers": {
+        "Content-Type": "text/html",
+        "x-robots-tag": "noindex, nofollow"
+      },
+      "bytes": 80368,
+      "titles": [
+        "Pasteler\u00edas 3L Dubai \u2014 Tres Leches, Mexico City since 1982"
+      ],
+      "canonicals": [
+        "<link rel=\"canonical\" href=\"https://www.3ldubai.ae/\" />"
+      ],
+      "h1": [
+        "Soaked in <br/> Tradition."
+      ]
+    },
+    {
+      "url": "https://www.3ldubai.ae/api/storefront/catalog",
+      "status": 200,
+      "finalUrl": "https://www.3ldubai.ae/api/storefront/catalog",
+      "headers": {
+        "Cache-Control": "no-cache, max-age=0, must-revalidate",
+        "Content-Type": "application/json; charset=utf-8",
+        "x-robots-tag": "noindex"
+      },
+      "bytes": 328774,
+      "publishedProductCount": 76,
+      "productsWithEnglishDescription": 0
+    },
+    {
+      "url": "https://3ldubai.ae/",
+      "error": "<urlopen error [Errno 61] Connection refused>"
+    }
+  ]
+}
