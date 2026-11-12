@@ -21,6 +21,11 @@ concurrency:
 jobs:
   checkout-recovery-browsers:
     runs-on: ubuntu-latest
+    # Each engine owns a fresh SQLite fixture and frozen-clock rate window.
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium-390, webkit-390]
     container:
       image: mcr.microsoft.com/playwright:v1.64.0-noble
       options: --user 1001
@@ -37,11 +42,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npx playwright test --config=playwright.incident.config.ts
+      - run: npx playwright test --config=playwright.incident.config.ts --project=${{ matrix.project }}
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: checkout-recovery-synthetic-qa
+          name: checkout-recovery-synthetic-qa-${{ matrix.project }}
           path: |
             work/recovery/
             work/incident/

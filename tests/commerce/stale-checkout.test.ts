@@ -94,10 +94,14 @@ for (const [price, oldQty, nextQty, oldAmount, nextAmount] of [
         "https://fixture.invalid",
       );
       const input = f.input(nextQty);
-      assert.throws(
-        () => resumeWebCheckout(f.service, { key, checkout: input }),
-        /previous payment must be verified/,
-      );
+      {
+        // TPL-2: the open attempt is reported, never retired or replaced.
+        const held = resumeWebCheckout(f.service, { key, checkout: input });
+        assert.ok("conflict" in held && held.conflict);
+        assert.equal(held.key, key);
+        assert.equal(held.changed, false);
+        assert.equal(held.status?.url, null);
+      }
       f.checkouts.get(f.store.read().payments[0]!.providerCheckoutId!)!.status =
         "EXPIRED";
       await reconcileEmbeddedPayment(f.service, key);
@@ -271,10 +275,14 @@ test("uncertain or authorized previous payment cannot be superseded blindly", as
     f.store.write((s) => {
       s.payments[0]!.status = "authorized";
     });
-    assert.throws(
-      () => resumeWebCheckout(f.service, { key, checkout: f.input(3) }),
-      /must be verified/,
-    );
+    {
+      // TPL-2: the open attempt is reported, never retired or replaced.
+      const held = resumeWebCheckout(f.service, { key, checkout: f.input(3) });
+      assert.ok("conflict" in held && held.conflict);
+      assert.equal(held.key, key);
+      assert.equal(held.changed, false);
+      assert.equal(held.status?.url, null);
+    }
     assert.equal(f.posts(), 1);
     assert.equal(f.store.read().payments[0]!.supersededAt, undefined);
   } finally {
@@ -298,10 +306,14 @@ for (const change of ["product", "variant", "fulfillment"] as const)
         input.lines.push({ productId: "sku-b", quantity: 1 });
       if (change === "fulfillment")
         input.delivery.building = "Different Fixture Tower";
-      assert.throws(
-        () => resumeWebCheckout(f.service, { key, checkout: input }),
-        /previous payment must be verified/,
-      );
+      {
+        // TPL-2: the open attempt is reported, never retired or replaced.
+        const held = resumeWebCheckout(f.service, { key, checkout: input });
+        assert.ok("conflict" in held && held.conflict);
+        assert.equal(held.key, key);
+        assert.equal(held.changed, false);
+        assert.equal(held.status?.url, null);
+      }
       f.checkouts.get(f.store.read().payments[0]!.providerCheckoutId!)!.status =
         "EXPIRED";
       await reconcileEmbeddedPayment(f.service, key);

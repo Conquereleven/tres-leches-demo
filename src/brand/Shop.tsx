@@ -155,6 +155,8 @@ type Status = {
   /** Ended before Paymennt below the 6-piece minimum; correct the cart to retry. */
   rejection?: "minimum_quantity";
   summary?: Summary;
+  /** TPL-2: this cart differs from an attempt that is still open or unverified. */
+  conflict?: "previous_payment_open" | "previous_payment_unverified";
 };
 type Delivery = {
   addressRef?: string;
@@ -2097,6 +2099,7 @@ export function CheckoutPage() {
   );
 }
 
+const MAX_HELD_CHECKS = 3;
 /** Resolve this cart on the server before reusing a session checkout. */
 async function heldCheckout(
   checkout: unknown,
@@ -2108,6 +2111,7 @@ async function heldCheckout(
     key: string | null;
     cartHash?: string;
     changed: boolean;
+    conflict?: Status["conflict"];
     status?: Status;
   }>("/api/checkout/resume", {
     ...(saved?.key ? { key: saved.key } : {}),
@@ -2121,7 +2125,10 @@ async function heldCheckout(
         result.changed || (saved?.key === result.key && saved.retryReady),
     });
   if (!result.status) return null;
-  const status = result.status;
+  const status = result.conflict
+    ? { ...result.status, conflict: result.conflict }
+    : result.status;
+  if (status.conflict) return status;
   return status.actionRequired === "review_payment" ||
     [
       "creating",
@@ -2353,6 +2360,8 @@ function PaymentStep({
   const [held, setHeld] = useState<Status | null>(null);
   const [checkingPrevious, setCheckingPrevious] = useState(true);
   const [recoveryRevision, setRecoveryRevision] = useState(0);
+  /** Unverified checks in a row; CHECK AGAIN stops offering an unchanged loop. */
+  const [heldChecks, setHeldChecks] = useState(0);
   const [busy, setBusy] = useState(false);
   /** Set just before the page navigates away, so the button stays locked. */
   const [leaving, setLeaving] = useState<CustomerPaymentState | null>(null);
@@ -2378,13 +2387,17 @@ function PaymentStep({
     setHeld(null);
     void heldCheckout(JSON.parse(cartContext))
       .then((previous) => {
-        if (active) setHeld(previous);
+        if (!active) return;
+        setHeld(previous);
+        setHeldChecks(0);
       })
       .catch((err: unknown) => {
-        if (active)
-          setError(
-            err instanceof Error ? err.message : "Unable to verify checkout.",
-          );
+        if (!active) return;
+        const message =
+          err instanceof Error ? err.message : "Unable to verify checkout.";
+        setError(message);
+        if (paymentStateOfError(message) === "HELD_FOR_REVIEW")
+          setHeldChecks((n) => n + 1);
       })
       .finally(() => {
         if (active) setCheckingPrevious(false);
@@ -2573,6 +2586,13 @@ function PaymentStep({
                   title={localize("This order is already paid")}
                   message={`Order ${reference(held)} from this visit is already paid.`}
                 />
+              ) : held.conflict === "previous_payment_open" ? (
+                <StateNotice
+                  state="HOSTED_REDIRECT"
+                  title={stateCopy("HOSTED_REDIRECT").title}
+                  message={`Order ${reference(held)} still has an open payment, so these changes can't be applied to it.`}
+                  detail="Complete that payment, or wait until it ends, before paying for a changed order."
+                />
               ) : (
                 <StateNotice
                   state={paymentStateOf(held)}
@@ -2678,13 +2698,21 @@ function PaymentStep({
                     >
                       {issue === "HELD_FOR_REVIEW" && (
                         <>
-                          <Button
-                            type="button"
-                            disabled={checkingPrevious}
-                            onClick={() => setRecoveryRevision((n) => n + 1)}
-                          >
-                            <CustomerCopy>CHECK AGAIN</CustomerCopy>
-                          </Button>
+                          {heldChecks < MAX_HELD_CHECKS ? (
+                            <Button
+                              type="button"
+                              disabled={checkingPrevious}
+                              onClick={() => setRecoveryRevision((n) => n + 1)}
+                            >
+                              <CustomerCopy>CHECK AGAIN</CustomerCopy>
+                            </Button>
+                          ) : (
+                            <p>
+                              <CustomerCopy>
+                                Please check again in a moment, or contact us.
+                              </CustomerCopy>
+                            </p>
+                          )}
                           <a className="b-link" href="/checkout/return">
                             <CustomerCopy>Check payment status</CustomerCopy>
                           </a>

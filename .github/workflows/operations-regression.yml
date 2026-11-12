@@ -21,7 +21,8 @@ concurrency:
   cancel-in-progress: true
 jobs:
   operations-browsers:
-    runs-on: ubuntu-latest
+    # The libsoup guard inspects the bundled Noble WebKit runtime.
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     strategy:
       fail-fast: false

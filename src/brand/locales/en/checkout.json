@@ -196,5 +196,7 @@
   "copy_recovery_review": "Your saved details need review. Please check your address, date and current order total.",
   "copy_recovery_ready": "Your previous payment attempt has ended. Your details are saved. Review your order before starting a new secure payment.",
   "copy_a676926f7a61268e": "Update to 6 pieces",
-  "copy_3cae4dabe77bf883": "Update items below the 6-piece minimum to continue."
+  "copy_3cae4dabe77bf883": "Update items below the 6-piece minimum to continue.",
+  "copy_tpl2_previous_open": "Order {0} still has an open payment, so these changes can't be applied to it.",
+  "copy_tpl2_previous_open_detail": "Complete that payment, or wait until it ends, before paying for a changed order."
 }

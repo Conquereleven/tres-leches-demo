@@ -627,14 +627,17 @@ test("changing only the mix requires a terminal hosted checkout; normalized comp
     );
     assert.equal(first.orderId, same.orderId);
     assert.equal(f.calls.length, 1);
-    assert.throws(
-      () =>
-        resumeWebCheckout(f.service, {
-          key,
-          checkout: input([{ ...lines[0]!, composition: single(spec, 1) }]),
-        }),
-      /previous payment must be verified/,
-    );
+    {
+      // TPL-2: the open attempt is reported, never retired or replaced.
+      const held = resumeWebCheckout(f.service, {
+        key,
+        checkout: input([{ ...lines[0]!, composition: single(spec, 1) }]),
+      });
+      assert.ok("conflict" in held && held.conflict);
+      assert.equal(held.key, key);
+      assert.equal(held.changed, false);
+      assert.equal(held.status?.url, null);
+    }
     f.expired();
     await f.service.reconcile(f.store.read().payments[0]!.id, admin);
     const changed = resumeWebCheckout(f.service, {
