@@ -195,9 +195,14 @@ for (const status of ["PENDING", "AUTHORIZED", "PENDING_CONFIRMATION"])
       const key = randomUUID();
       await f.create(key);
       f.setStatus(status);
-      await assert.rejects(
-        recoverWebCheckout(f.service, { key, checkout: f.input(4) }),
-      );
+      // TPL-2: reported as the open/unverified attempt, not a repeatable 409.
+      const held = await recoverWebCheckout(f.service, {
+        key,
+        checkout: f.input(4),
+      });
+      assert.ok("conflict" in held && held.conflict);
+      assert.equal(held.key, key);
+      assert.equal(held.status?.url, null);
       assert.equal(f.counts().posts, 1);
       assert.equal(f.store.read().orders.length, 1);
       assert.equal(readWebCheckoutStatus(f.service, key).superseded, false);

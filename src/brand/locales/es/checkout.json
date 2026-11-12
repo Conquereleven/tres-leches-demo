@@ -196,5 +196,7 @@
   "copy_recovery_review": "Revisa tus datos guardados: la dirección, la fecha y el total actual del pedido.",
   "copy_recovery_ready": "Tu intento de pago anterior ha finalizado. Tus datos están guardados. Revisa tu pedido antes de iniciar un nuevo pago seguro.",
   "copy_a676926f7a61268e": "Actualizar a 6 piezas",
-  "copy_3cae4dabe77bf883": "Actualiza los productos por debajo del mínimo de 6 piezas para continuar."
+  "copy_3cae4dabe77bf883": "Actualiza los productos por debajo del mínimo de 6 piezas para continuar.",
+  "copy_tpl2_previous_open": "El pedido {0} todavía tiene un pago abierto, por lo que estos cambios no se pueden aplicar.",
+  "copy_tpl2_previous_open_detail": "Completa ese pago, o espera a que termine, antes de pagar un pedido modificado."
 }

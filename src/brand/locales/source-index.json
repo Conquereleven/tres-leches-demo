@@ -1113,5 +1113,7 @@
   "Minimum order: 6 pieces": "product:copy_c62c1f93ef189133",
   "Update to 6 pieces": "checkout:copy_a676926f7a61268e",
   "Update items below the 6-piece minimum to continue.": "checkout:copy_3cae4dabe77bf883",
-  "Whole number from 6 to {0}": "common:copy_087b0c5284144bf7"
+  "Whole number from 6 to {0}": "common:copy_087b0c5284144bf7",
+  "Order {0} still has an open payment, so these changes can't be applied to it.": "checkout:copy_tpl2_previous_open",
+  "Complete that payment, or wait until it ends, before paying for a changed order.": "checkout:copy_tpl2_previous_open_detail"
 }

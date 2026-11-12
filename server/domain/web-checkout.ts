@@ -553,29 +553,47 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
     if (!record) return { key: randomUUID(), cartHash, changed: false };
     requireThat(order && payment, "Checkout not found", 409);
     requireThat(
-      payment.checkoutFlow !== "web" ||
-        ["paid", "failed", "cancelled", "expired"].includes(payment.status),
-      "The previous payment must be verified before updating checkout.",
-      409,
-    );
-    requireThat(
       record.cartHash || payment.status !== "paid",
       "The previous paid order must be reviewed before updating checkout.",
       409,
     );
-    requireThat(
-      !["authorized", "pending_confirmation"].includes(payment.status) &&
-        payment.directAttempt !== "unknown" &&
-        payment.directAttempt !== "submitted" &&
-        !snapshot.jobs.some(
-          (j) =>
-            j.kind === "payment" &&
-            j.entityId === payment.id &&
-            ["processing", "unknown"].includes(j.status),
-        ),
-      "The previous payment must be verified before updating checkout.",
-      409,
-    );
+    const unresolved =
+      (payment.checkoutFlow === "web" &&
+        !["paid", "failed", "cancelled", "expired"].includes(
+          payment.status,
+        )) ||
+      ["authorized", "pending_confirmation"].includes(payment.status) ||
+      payment.directAttempt === "unknown" ||
+      payment.directAttempt === "submitted" ||
+      snapshot.jobs.some(
+        (j) =>
+          j.kind === "payment" &&
+          j.entityId === payment.id &&
+          ["processing", "unknown"].includes(j.status),
+      );
+    // TPL-2: a changed cart cannot retire an open attempt. Report that attempt's
+    // own state instead of a 409 the customer can only repeat; no new key, no
+    // supersede and no URL beside a cart it was not created for.
+    if (unresolved) {
+      const status = readWebCheckoutStatus(service, key);
+      const open =
+        payment.status === "pending" &&
+        !!status.url &&
+        status.actionRequired === null;
+      return {
+        key,
+        cartHash: record.cartHash,
+        changed: false,
+        conflict: open
+          ? ("previous_payment_open" as const)
+          : ("previous_payment_unverified" as const),
+        status: {
+          ...status,
+          url: null,
+          actionRequired: open ? null : ("review_payment" as const),
+        },
+      };
+    }
     let nextKey = record.recoveryKey ?? record.replacements?.[cartHash];
     service.store.write((s) => {
       const previous = s.webCheckouts![digest(key)]!;
@@ -731,6 +749,7 @@ export async function recoverWebCheckout(
   if (!service.store.read().webCheckouts?.[digest(currentKey)])
     return { key: currentKey, changed: currentKey !== key, quote };
   const resumed = resumeWebCheckout(service, { key: currentKey, checkout });
+  if ("conflict" in resumed) return { ...resumed, quote };
   // Never present today's cart total beside a URL for a different accepted amount.
   // The accepted payment stays immutable; uncertain recovery requires review.
   if (
