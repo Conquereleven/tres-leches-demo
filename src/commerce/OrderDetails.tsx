@@ -1,5 +1,5 @@
 import { lineKey, preparationText } from "../../shared/pack-composition";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   ChatsCircle,
@@ -7,6 +7,7 @@ import {
   Circle,
   CreditCard,
   EnvelopeSimple,
+  FilePdf,
   MapPin,
   Phone,
   Receipt,
@@ -24,6 +25,7 @@ import { TRANSLATION_REVIEW } from "./product-names";
 import { FulfilmentBadge, PaymentBadge } from "./OrderBadges";
 import { aed } from "./OrdersList";
 import { useOps } from "./ops-i18n";
+import { canDownloadDocuments, downloadOrderDocument } from "./order-documents";
 import {
   addressCheck,
   conversationOf,
@@ -251,6 +253,9 @@ export function OrderDetailsPage({
           <OrderCustomerCard order={o} data={data} conversation={c} />
           <OrderDeliveryCard order={o} data={data} />
           <OrderNotificationsCard order={o} data={data} />
+          {canDownloadDocuments(data.actor.role) && (
+            <OrderDocumentsCard order={o} />
+          )}
         </div>
       </div>
     </article>
@@ -854,6 +859,60 @@ export function OrderActivityTimeline({ order: o, data }: CardProps) {
       ) : (
         <p className="oms-muted">{t("No activity recorded.")}</p>
       )}
+    </Card>
+  );
+}
+
+/** Download only; the order, its payment and notifications are untouched. */
+function OrderDocumentsCard({ order: o }: { order: Order }) {
+  const { t, errorText } = useOps();
+  const [state, setState] = useState({ busy: false, error: "" });
+  const get = async (kind: "delivery-note" | "packing-slip") => {
+    setState({ busy: true, error: "" });
+    try {
+      await downloadOrderDocument(o.id, kind);
+      setState({ busy: false, error: "" });
+    } catch (error) {
+      setState({
+        busy: false,
+        error: errorText(
+          error instanceof Error
+            ? error.message
+            : "Unable to connect. Try again.",
+        ),
+      });
+    }
+  };
+  return (
+    <Card id="documents" title={t("Order documents")}>
+      <div className="oms-head-actions">
+        <button
+          type="button"
+          className="oms-button"
+          disabled={state.busy}
+          onClick={() => get("delivery-note")}
+        >
+          <FilePdf aria-hidden />
+          {t(
+            o.fulfillmentMethod === "pickup"
+              ? "Pickup order sheet (PDF)"
+              : "Delivery note (PDF)",
+          )}
+        </button>
+        <button
+          type="button"
+          className="oms-button"
+          disabled={state.busy}
+          onClick={() => get("packing-slip")}
+        >
+          <FilePdf aria-hidden />
+          {t("Packing slip (PDF)")}
+        </button>
+      </div>
+      {state.error && <p role="alert">{state.error}</p>}
+      <p className="oms-muted">
+        {t("Operational documents, not invoices or receipts.")}
+      </p>
     </Card>
   );
 }
