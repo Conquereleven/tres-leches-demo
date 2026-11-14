@@ -4,6 +4,7 @@
  * imports, so the outbox can load it in native ESM email previews.
  */
 import { z } from "zod";
+import { fulfillmentPending } from "./payment-fulfillment";
 import { DELIVERY_WINDOWS } from "../../shared/commerce-policy";
 import type { CustomerNotification, Order, State } from "./model";
 
@@ -55,11 +56,12 @@ export function acceptedSchedule(order: Order) {
   const pickup = order.fulfillmentMethod === "pickup";
   const date = pickup ? order.pickup?.pickupDate : order.delivery?.date;
   const slot = pickup ? order.pickup?.preferredTime : order.delivery?.slot;
-  const dueAt = date && slot ? windowStartsAt(date, slot) : null;
+  const pending = fulfillmentPending(order);
+  const dueAt = !pending && date && slot ? windowStartsAt(date, slot) : null;
   return {
     method: pickup ? ("pickup" as const) : ("delivery" as const),
-    date: date ?? "",
-    slot: slot ?? "",
+    date: pending ? "" : (date ?? ""),
+    slot: pending ? "" : (slot ?? ""),
     dueAt,
   };
 }
@@ -79,6 +81,8 @@ export function scheduledEmailBlocker(
     return "Late: window started more than 30 minutes ago; not sent";
   const order = s.orders.find((o) => o.id === row.orderId);
   if (!order) return "Order not found; not sent";
+  if (fulfillmentPending(order))
+    return "Fulfillment pending confirmation; not sent";
   if (order.state === "Cancelled") return "Order cancelled; not sent";
   const payment = s.payments.find((p) => p.id === order.paymentId);
   // Same gate as fulfilment: a refunded, disputed or unreconciled payment

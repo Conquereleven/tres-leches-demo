@@ -333,6 +333,16 @@ export function OrderFulfillmentCard({
       icon={pickup ? <Storefront aria-hidden /> : <Truck aria-hidden />}
       aside={<FulfilmentBadge order={o} />}
     >
+      {o.paymentFulfillment && o.paymentFulfillment.status !== "unchanged" && (
+        <p className="oms-notice" role="alert">
+          Fulfillment pending customer and 3L team confirmation.{" "}
+          {o.paymentFulfillment.reason} Original:{" "}
+          {o.paymentFulfillment.original.date || "Not stored"}{" "}
+          {o.paymentFulfillment.original.slot || "Not stored"}. Proposed:{" "}
+          {o.paymentFulfillment.effective?.date || "No safe date"}{" "}
+          {o.paymentFulfillment.effective?.slot}.
+        </p>
+      )}
       {group === "unpaid" && (
         <p className="oms-notice" role="status">
           <WarningCircle aria-hidden />

@@ -559,9 +559,7 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
     );
     const unresolved =
       (payment.checkoutFlow === "web" &&
-        !["paid", "failed", "cancelled", "expired"].includes(
-          payment.status,
-        )) ||
+        !["paid", "failed", "cancelled", "expired"].includes(payment.status)) ||
       ["authorized", "pending_confirmation"].includes(payment.status) ||
       payment.directAttempt === "unknown" ||
       payment.directAttempt === "submitted" ||
@@ -856,6 +854,8 @@ export type WebCheckoutSummary = {
   customerFirstName?: string;
 };
 export type WebCheckoutResult = {
+  fulfillmentPending?: boolean;
+  fulfillmentProposal?: { date: string; slot: string };
   cartHash?: string;
   superseded?: boolean;
   /** Internal reference; kept for support and for clients built before #001. */
@@ -911,6 +911,20 @@ export function readWebCheckoutStatus(
       : null,
     status: order.state,
     paymentStatus: payment.status,
+    ...(order.paymentFulfillment &&
+    order.paymentFulfillment.status !== "unchanged"
+      ? {
+          fulfillmentPending: true,
+          ...(order.paymentFulfillment.effective
+            ? {
+                fulfillmentProposal: {
+                  date: order.paymentFulfillment.effective.date,
+                  slot: order.paymentFulfillment.effective.slot,
+                },
+              }
+            : {}),
+        }
+      : {}),
     ...(payment.checkoutFlow === "web" ? { paymentFlow: "web" as const } : {}),
     ...(verifiedLocalRejection(s, payment)
       ? { rejection: "minimum_quantity" as const }

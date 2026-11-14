@@ -13,6 +13,11 @@ import {
 } from "../../shared/minimum-quantity";
 import { provablyUninitiated, verifiedLocalRejection } from "./local-rejection";
 import { frozenCheckout } from "./frozen-checkout";
+import {
+  fulfillmentIntent,
+  requestedFulfillment,
+  revalidatePaidFulfillment,
+} from "./payment-fulfillment";
 import { PaymenntProvider } from "../adapters/paymennt";
 import { orderBillingAddress, toPaymenntDeliveryAddress } from "./billing";
 import {
@@ -585,6 +590,8 @@ export class CommerceService {
         ),
       );
       s.payments.push(p);
+      p.fulfillmentIntent = fulfillmentIntent(o);
+      p.fulfillmentRequested = requestedFulfillment(o);
       o.paymentId = p.id;
       transition(o, "Awaiting Payment", actor.id);
       this.enqueue(s, "payment", p.id);
@@ -840,6 +847,17 @@ export class CommerceService {
         );
         p.status = "paid";
         p.transactionId = e.transactionId;
+        p.paidAt = now();
+        revalidatePaidFulfillment(
+          o,
+          p,
+          p.paidAt,
+          "payment-webhook",
+          "verified-alternative-event",
+          o.state === "Awaiting Payment" &&
+            o.paymentId === p.id &&
+            acceptedPackPricesCurrent(s, o),
+        );
         // A late success is money received, but must never silently resurrect a cancelled/replaced order.
         if (
           o.state === "Awaiting Payment" &&
@@ -855,6 +873,7 @@ export class CommerceService {
           transition(o, "Paid", "payment-webhook");
           transition(o, "Confirmed", "payment-webhook");
           assignPublicOrderNumber(s, o);
+          o.paidAt = p.paidAt;
         } else {
           p.timeline.push({
             ...at(),
@@ -1186,9 +1205,38 @@ export class CommerceService {
           actor,
           action: `Conciliación Paymennt: ${previous} → ${p.status}`,
         });
-      if (p.status === "paid" && !p.paidAt) {
+      if (
+        p.status === "paid" &&
+        previous !== "paid" &&
+        !p.paidAt &&
+        !o.paidAt
+      ) {
         // Receipt time, not a fabricated provider transaction timestamp.
         p.paidAt = now();
+        const eligible =
+          o.state === "Awaiting Payment" &&
+          acceptedPackPricesCurrent(s, o) &&
+          o.paymentId === p.id &&
+          !s.payments.some(
+            (other) =>
+              other.id !== p.id &&
+              other.orderId === o.id &&
+              settled.includes(other.status),
+          );
+        const decision = revalidatePaidFulfillment(
+          o,
+          p,
+          p.paidAt,
+          actor,
+          receiptId ? "verified-notification-get" : "authoritative-checkout",
+          eligible,
+          receiptId,
+        );
+        o.audit.push({
+          at: p.paidAt,
+          actor,
+          action: `Payment fulfillment ${decision.status}: ${decision.reason}`,
+        });
         if (
           o.state === "Awaiting Payment" &&
           acceptedPackPricesCurrent(s, o) &&

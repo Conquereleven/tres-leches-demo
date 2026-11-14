@@ -1,4 +1,5 @@
 import { acceptedLinePrice } from "../../shared/pack-pricing";
+import { fulfillmentNotice, fulfillmentPending } from "./payment-fulfillment";
 import { tricolorSpec, tricolorPreparation } from "../../shared/tricolor";
 import { packSpec, validPackSnapshot } from "../../shared/pack-composition";
 import { renderOperationsEmail } from "./operations-email-template";
@@ -120,8 +121,12 @@ export function recordPaidOperationsEmail(
     amountFils: payment.amountFils,
     quote: order.quote,
     pickup,
-    date: order.pickup?.pickupDate ?? order.delivery?.date ?? "Not stored",
-    time: order.pickup?.preferredTime ?? order.delivery?.slot ?? "Not stored",
+    date:
+      fulfillmentNotice(order) ||
+      (order.pickup?.pickupDate ?? order.delivery?.date ?? "Not stored"),
+    time: fulfillmentPending(order)
+      ? "Pending confirmation"
+      : (order.pickup?.preferredTime ?? order.delivery?.slot ?? "Not stored"),
     address: pickup
       ? [`Pickup: ${PICKUP_LOCATION.name}`, ...PICKUP_LOCATION.lines]
       : [

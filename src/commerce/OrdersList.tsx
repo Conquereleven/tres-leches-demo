@@ -435,6 +435,12 @@ function OrderRow({
       }}
     >
       <th scope="row" data-label={t("Order")}>
+        {o.paymentFulfillment &&
+          o.paymentFulfillment.status !== "unchanged" && (
+            <small className="oms-muted">
+              Fulfillment pending confirmation
+            </small>
+          )}
         <a
           className="oms-order-link"
           href={orderPath(o.id)}
