@@ -1,0 +1,150 @@
+[WebServer] (node:69087) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 19 tests using 1 worker
+
+(node:69088) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 tests/menu-e2e/menu.spec.ts:19:1 › all eight categories expose purchasable options with safe selectors (1.0s)
+  ✘   2 tests/menu-e2e/menu.spec.ts:42:1 › latest individual sizes, fillings and packs preserve their precise prices (5.3s)
+(node:69152) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   3 tests/menu-e2e/menu.spec.ts:72:1 › multiple menu SKUs go through cart and existing web checkout with authoritative total (1.0m)
+(node:69462) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   4 tests/menu-e2e/menu.spec.ts:103:1 › missing or differently priced server SKUs cannot enter the cart (562ms)
+  ✘   5 tests/menu-e2e/menu.spec.ts:125:3 › visual, accessibility and no-payment QA at 390px (1.0m)
+(node:69815) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   6 tests/menu-e2e/menu.spec.ts:125:3 › visual, accessibility and no-payment QA at 768px (1.0m)
+(node:70268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   7 tests/menu-e2e/menu.spec.ts:125:3 › visual, accessibility and no-payment QA at 1440px (1.0m)
+(node:70718) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   8 tests/menu-e2e/menu.spec.ts:207:1 › catalog remains server-authoritative when payment activation is offline (734ms)
+  ✓   9 tests/menu-e2e/menu.spec.ts:247:1 › removed Pan de Muerto combinations cannot be found, linked to, or paid for (536ms)
+  ✓  10 tests/menu-e2e/pan-prices-oct13.spec.ts:12:3 › pan-de-muerto-traditional-azucar-mini-40-g-chocolate-covering: selector, cart, delivery/pickup summary and fixed quantity price (1.4s)
+  ✓  11 tests/menu-e2e/pan-prices-oct13.spec.ts:12:3 › pan-de-muerto-traditional-azucar-individual-70-g-chocolate-covering: selector, cart, delivery/pickup summary and fixed quantity price (1.4s)
+  ✓  12 tests/menu-e2e/pan-prices-oct13.spec.ts:12:3 › pan-de-muerto-traditional-pack-6-mini: selector, cart, delivery/pickup summary and fixed quantity price (1.4s)
+  ✓  13 tests/menu-e2e/pan-prices-oct13.spec.ts:12:3 › pan-de-muerto-traditional-pack-12-mini: selector, cart, delivery/pickup summary and fixed quantity price (1.4s)
+  ✓  14 tests/menu-e2e/pan-prices-oct13.spec.ts:12:3 › pan-de-muerto-traditional-pack-6-individuales: selector, cart, delivery/pickup summary and fixed quantity price (1.4s)
+  ✓  15 tests/menu-e2e/pan-prices-oct13.spec.ts:12:3 › pan-de-muerto-traditional-pack-12-individuales: selector, cart, delivery/pickup summary and fixed quantity price (1.4s)
+  ✓  16 tests/menu-e2e/pan-prices-oct13.spec.ts:12:3 › pan-de-muerto-filled-pack-6-mini: selector, cart, delivery/pickup summary and fixed quantity price (1.4s)
+  ✓  17 tests/menu-e2e/pan-prices-oct13.spec.ts:12:3 › pan-de-muerto-filled-pack-12-mini: selector, cart, delivery/pickup summary and fixed quantity price (1.4s)
+  ✓  18 tests/menu-e2e/pan-prices-oct13.spec.ts:12:3 › pan-de-muerto-filled-pack-6-individuales: selector, cart, delivery/pickup summary and fixed quantity price (1.4s)
+  ✓  19 tests/menu-e2e/pan-prices-oct13.spec.ts:12:3 › pan-de-muerto-filled-pack-12-individuales: selector, cart, delivery/pickup summary and fixed quantity price (1.4s)
+
+
+  1) tests/menu-e2e/menu.spec.ts:42:1 › latest individual sizes, fillings and packs preserve their precise prices 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator: locator('[data-menu-family="pan-de-muerto-filled-pack"]').first().getByRole('button', { name: 'ADD TO CART · AED 255' })
+    Expected: enabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeEnabled" locator('[data-menu-family="pan-de-muerto-filled-pack"]').first().getByRole('button', { name: 'ADD TO CART · AED 255' }) with timeout 5000ms
+      - waiting for locator('[data-menu-family="pan-de-muerto-filled-pack"]').first().getByRole('button', { name: 'ADD TO CART · AED 255' })
+
+
+      57 |   await expect(
+      58 |     pack.getByRole("button", { name: "ADD TO CART · AED 255" }),
+    > 59 |   ).toBeEnabled();
+         |     ^
+      60 |   await category(page, "Conchas");
+      61 |   const concha = family(page, "conchas-filled");
+      62 |   await expect(concha.locator("select")).toHaveCount(1);
+        at /Users/lalizasilva/Documents/ChatGPT/3L Carpeta Trabajo/sprint03/tests/menu-e2e/menu.spec.ts:59:5
+
+    Error Context: test-results/menu/menu-latest-individual-siz-2b23a-eserve-their-precise-prices/error-context.md
+
+  2) tests/menu-e2e/menu.spec.ts:72:1 › multiple menu SKUs go through cart and existing web checkout with authoritative total 
+
+    Test timeout of 60000ms exceeded.
+
+    Error: locator.click: Test timeout of 60000ms exceeded.
+    Call log:
+      - waiting for locator('[data-menu-family="pan-de-muerto-traditional-pack"]').first().getByRole('button', { name: 'ADD TO CART · AED 72' })
+
+
+      80 |   await family(page, "pan-de-muerto-traditional-pack")
+      81 |     .getByRole("button", { name: "ADD TO CART · AED 72" })
+    > 82 |     .click();
+         |      ^
+      83 |   await category(page, "Cake Jars");
+      84 |   const bundle = family(page, "cake-jar-bundle");
+      85 |   await expect(bundle.locator("select")).toHaveCount(1);
+        at /Users/lalizasilva/Documents/ChatGPT/3L Carpeta Trabajo/sprint03/tests/menu-e2e/menu.spec.ts:82:6
+
+    Error Context: test-results/menu/menu-multiple-menu-SKUs-go-b22c7-ut-with-authoritative-total/error-context.md
+
+  3) tests/menu-e2e/menu.spec.ts:125:3 › visual, accessibility and no-payment QA at 390px ──────────
+
+    Test timeout of 60000ms exceeded.
+
+    Error: locator.click: Test timeout of 60000ms exceeded.
+    Call log:
+      - waiting for locator('[data-menu-family="pan-de-muerto-traditional-pack"]').first().getByRole('button', { name: 'ADD TO CART · AED 72' })
+
+
+      195 |     await family(page, "pan-de-muerto-traditional-pack")
+      196 |       .getByRole("button", { name: "ADD TO CART · AED 72" })
+    > 197 |       .click();
+          |        ^
+      198 |     await page.goto("/cart");
+      199 |     await shot("cart");
+      200 |     await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
+        at /Users/lalizasilva/Documents/ChatGPT/3L Carpeta Trabajo/sprint03/tests/menu-e2e/menu.spec.ts:197:8
+
+    Error Context: test-results/menu/menu-visual-accessibility-and-no-payment-QA-at-390px/error-context.md
+
+  4) tests/menu-e2e/menu.spec.ts:125:3 › visual, accessibility and no-payment QA at 768px ──────────
+
+    Test timeout of 60000ms exceeded.
+
+    Error: locator.click: Test timeout of 60000ms exceeded.
+    Call log:
+      - waiting for locator('[data-menu-family="pan-de-muerto-traditional-pack"]').first().getByRole('button', { name: 'ADD TO CART · AED 72' })
+
+
+      195 |     await family(page, "pan-de-muerto-traditional-pack")
+      196 |       .getByRole("button", { name: "ADD TO CART · AED 72" })
+    > 197 |       .click();
+          |        ^
+      198 |     await page.goto("/cart");
+      199 |     await shot("cart");
+      200 |     await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
+        at /Users/lalizasilva/Documents/ChatGPT/3L Carpeta Trabajo/sprint03/tests/menu-e2e/menu.spec.ts:197:8
+
+    Error Context: test-results/menu/menu-visual-accessibility-and-no-payment-QA-at-768px/error-context.md
+
+  5) tests/menu-e2e/menu.spec.ts:125:3 › visual, accessibility and no-payment QA at 1440px ─────────
+
+    Test timeout of 60000ms exceeded.
+
+    Error: locator.click: Test timeout of 60000ms exceeded.
+    Call log:
+      - waiting for locator('[data-menu-family="pan-de-muerto-traditional-pack"]').first().getByRole('button', { name: 'ADD TO CART · AED 72' })
+
+
+      195 |     await family(page, "pan-de-muerto-traditional-pack")
+      196 |       .getByRole("button", { name: "ADD TO CART · AED 72" })
+    > 197 |       .click();
+          |        ^
+      198 |     await page.goto("/cart");
+      199 |     await shot("cart");
+      200 |     await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
+        at /Users/lalizasilva/Documents/ChatGPT/3L Carpeta Trabajo/sprint03/tests/menu-e2e/menu.spec.ts:197:8
+
+    Error Context: test-results/menu/menu-visual-accessibility-and-no-payment-QA-at-1440px/error-context.md
+
+  5 failed
+    tests/menu-e2e/menu.spec.ts:42:1 › latest individual sizes, fillings and packs preserve their precise prices 
+    tests/menu-e2e/menu.spec.ts:72:1 › multiple menu SKUs go through cart and existing web checkout with authoritative total 
+    tests/menu-e2e/menu.spec.ts:125:3 › visual, accessibility and no-payment QA at 390px ───────────
+    tests/menu-e2e/menu.spec.ts:125:3 › visual, accessibility and no-payment QA at 768px ───────────
+    tests/menu-e2e/menu.spec.ts:125:3 › visual, accessibility and no-payment QA at 1440px ──────────
+  14 passed (4.5m)

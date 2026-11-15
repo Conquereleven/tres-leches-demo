@@ -54,8 +54,16 @@ export function productFamily(product: StorefrontProduct): MenuFamily {
     options: family.options.filter((o) => product.optionIds.includes(o.id)),
   };
 }
+/** A product's permanent, indexable URL (3L-SEO-AEO-002). */
 export const productHref = (product: StorefrontProduct) =>
-  `/menu?product=${encodeURIComponent(product.slug)}`;
+  currentMenu().status === "bundled"
+    ? `/menu?product=${encodeURIComponent(product.slug)}`
+    : `/menu/${encodeURIComponent(product.slug)}`;
+/** Slug of `/menu/<slug>`, or null on any other page. */
+export const productSlugFromPath = (
+  pathname = typeof location === "undefined" ? "" : location.pathname,
+) =>
+  /^\/menu\/([a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\/?$/.exec(pathname)?.[1] ?? null;
 
 export const storefrontProductForSku = (sku: string) =>
   currentMenu().products.find((p) => p.optionIds.includes(sku));
