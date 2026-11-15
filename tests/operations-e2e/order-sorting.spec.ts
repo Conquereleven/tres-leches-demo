@@ -150,9 +150,12 @@ for (const language of ["en", "tl"] as const)
       await expect(rows.first()).toHaveAttribute("data-order", "TL-P1-0");
       await rows.first().getByRole("link").click();
       await expect(page).toHaveURL(/\/operations\/orders\/TL-P1-0$/);
-      await expect(page.locator("#payment")).toContainText(
-        translateOps(language, "Paid at (3L recognition)"),
-      );
+      await expect(
+        page.getByRole("region", {
+          name: translateOps(language, "Payment summary"),
+          exact: true,
+        }),
+      ).toContainText(translateOps(language, "Paid at (3L recognition)"));
       await expect(page.locator(".oms-page-heading")).toContainText("2026");
       await page.screenshot({
         path: `${SHOTS}/${browserName}-${language}-${width}-detail.png`,
