@@ -335,12 +335,18 @@ export function OrderFulfillmentCard({
     >
       {o.paymentFulfillment && o.paymentFulfillment.status !== "unchanged" && (
         <p className="oms-notice" role="alert">
-          Fulfillment pending customer and 3L team confirmation.{" "}
-          {o.paymentFulfillment.reason} Original:{" "}
-          {o.paymentFulfillment.original.date || "Not stored"}{" "}
-          {o.paymentFulfillment.original.slot || "Not stored"}. Proposed:{" "}
-          {o.paymentFulfillment.effective?.date || "No safe date"}{" "}
-          {o.paymentFulfillment.effective?.slot}.
+          {t("Fulfillment pending customer and 3L team confirmation.")}{" "}
+          {t("Recorded reason: {{reason}}", {
+            reason: o.paymentFulfillment.reason,
+          })}{" "}
+          {t("Original: {{date}} {{slot}}.", {
+            date: o.paymentFulfillment.original.date || t("Not stored"),
+            slot: o.paymentFulfillment.original.slot || t("Not stored"),
+          })}{" "}
+          {t("Proposed: {{date}} {{slot}}.", {
+            date: o.paymentFulfillment.effective?.date || t("No safe date"),
+            slot: o.paymentFulfillment.effective?.slot || t("Not stored"),
+          })}
         </p>
       )}
       {group === "unpaid" && (

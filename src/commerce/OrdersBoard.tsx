@@ -88,7 +88,7 @@ export function OrderCard({
       <header className="ops-oc-head">
         {o.paymentFulfillment &&
           o.paymentFulfillment.status !== "unchanged" && (
-            <span role="status">Fulfillment pending confirmation</span>
+            <span role="status">{t("Fulfillment pending confirmation")}</span>
           )}
         {/* The number customers quote; absent only for unpaid or pre-numbering orders. */}
         {o.publicOrderNumber && (

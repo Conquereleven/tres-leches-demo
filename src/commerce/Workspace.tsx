@@ -1039,8 +1039,10 @@ function OrderPanel({
           {o.paymentFulfillment &&
             o.paymentFulfillment.status !== "unchanged" && (
               <p role="alert">
-                Fulfillment pending customer and 3L team confirmation.{" "}
-                {o.paymentFulfillment.reason}
+                {t("Fulfillment pending customer and 3L team confirmation.")}{" "}
+                {t("Recorded reason: {{reason}}", {
+                  reason: o.paymentFulfillment.reason,
+                })}
               </p>
             )}
           <b>

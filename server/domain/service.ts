@@ -68,6 +68,12 @@ import {
 const hash = (v: unknown) =>
   createHash("sha256").update(JSON.stringify(v)).digest("hex");
 const at = () => ({ at: now() });
+const settledPaymentStatuses: readonly Payment["status"][] = [
+  "paid",
+  "partially_refunded",
+  "refunded",
+  "chargeback",
+];
 export class CommerceService {
   agentAutomationAllowed = false;
   deliveryAddressMode: "legacy" | "google" = "google";
@@ -847,29 +853,36 @@ export class CommerceService {
         );
         p.status = "paid";
         p.transactionId = e.transactionId;
-        p.paidAt = now();
-        revalidatePaidFulfillment(
-          o,
-          p,
-          p.paidAt,
-          "payment-webhook",
-          "verified-alternative-event",
+        const firstRecognition = !p.paidAt && !o.paidAt;
+        const eligible =
           o.state === "Awaiting Payment" &&
-            o.paymentId === p.id &&
-            acceptedPackPricesCurrent(s, o),
-        );
-        // A late success is money received, but must never silently resurrect a cancelled/replaced order.
-        if (
-          o.state === "Awaiting Payment" &&
-          acceptedPackPricesCurrent(s, o) &&
           o.paymentId === p.id &&
+          acceptedPackPricesCurrent(s, o) &&
           !s.payments.some(
             (other) =>
               other.id !== p.id &&
               other.orderId === o.id &&
-              other.status === "paid",
-          )
-        ) {
+              settledPaymentStatuses.includes(other.status),
+          );
+        if (firstRecognition) {
+          // First server acknowledgement, never a provider transaction timestamp.
+          p.paidAt = now();
+          const decision = revalidatePaidFulfillment(
+            o,
+            p,
+            p.paidAt,
+            "payment-webhook",
+            "verified-alternative-event",
+            eligible,
+          );
+          o.audit.push({
+            at: p.paidAt,
+            actor: "payment-webhook",
+            action: `Payment fulfillment ${decision.status}: ${decision.reason}`,
+          });
+        }
+        // A late success is money received, but must never silently resurrect a cancelled/replaced order.
+        if (firstRecognition && eligible) {
           transition(o, "Paid", "payment-webhook");
           transition(o, "Confirmed", "payment-webhook");
           assignPublicOrderNumber(s, o);
@@ -1178,7 +1191,7 @@ export class CommerceService {
           action:
             "Revisión requerida: devolución/disputa; historial de fulfillment conservado",
         });
-      const settled = ["paid", "partially_refunded", "refunded", "chargeback"];
+      const settled = settledPaymentStatuses;
       const regression =
         (settled.includes(previous) && !settled.includes(checkout.status)) ||
         (previous === "refunded" &&

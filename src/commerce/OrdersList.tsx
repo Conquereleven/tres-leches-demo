@@ -438,7 +438,7 @@ function OrderRow({
         {o.paymentFulfillment &&
           o.paymentFulfillment.status !== "unchanged" && (
             <small className="oms-muted">
-              Fulfillment pending confirmation
+              {t("Fulfillment pending confirmation")}
             </small>
           )}
         <a

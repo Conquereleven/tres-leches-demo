@@ -1,4 +1,10 @@
 {
+  "Fulfillment pending confirmation": "Fulfillment pending confirmation",
+  "Fulfillment pending customer and 3L team confirmation.": "Fulfillment pending customer and 3L team confirmation.",
+  "Original: {{date}} {{slot}}.": "Original: {{date}} {{slot}}.",
+  "Proposed: {{date}} {{slot}}.": "Proposed: {{date}} {{slot}}.",
+  "No safe date": "No safe date",
+  "Recorded reason: {{reason}}": "Recorded reason: {{reason}}",
   "Review required": "Review required",
   "Workspace de operaciones": "Operations workspace",
   "Reintentar conexión": "Retry connection",
