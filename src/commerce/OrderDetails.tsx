@@ -40,6 +40,7 @@ import {
   orderPermissions,
   paymentMethod,
   paymentOf,
+  recognizedPaidAt,
   type OrderPermissions,
 } from "./order-view";
 
@@ -537,7 +538,7 @@ export function OrderPaymentCard({
   const q = o.quote;
   const pickup = o.fulfillmentMethod === "pickup";
   const method = paymentMethod(p);
-  const paidAt = p?.paidAt ?? o.paidAt;
+  const paidAt = recognizedPaidAt(data, o);
   const jobs = p ? data.jobs.filter((j) => j.entityId === p.id) : [];
   return (
     <Card
@@ -569,7 +570,9 @@ export function OrderPaymentCard({
             {aed(p.amountFils)} {p.status === "paid" ? "" : `· ${t(p.status)}`}
           </Field>
         )}
-        {paidAt && <Field label={t("Paid at")}>{formatDate(paidAt)}</Field>}
+        <Field label={t("Paid at (3L recognition)")}>
+          {paidAt ? formatDate(paidAt) : t("Not stored")}
+        </Field>
       </dl>
       {!p && (
         <p className="oms-muted">

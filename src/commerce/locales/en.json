@@ -1,4 +1,9 @@
 {
+  "Created at": "Created at",
+  "Created at from": "Created at from",
+  "Created at to": "Created at to",
+  "Paid at (3L recognition)": "Paid at (3L recognition)",
+  "Unnumbered": "Unnumbered",
   "Fulfillment pending confirmation": "Fulfillment pending confirmation",
   "Fulfillment pending customer and 3L team confirmation.": "Fulfillment pending customer and 3L team confirmation.",
   "Original: {{date}} {{slot}}.": "Original: {{date}} {{slot}}.",

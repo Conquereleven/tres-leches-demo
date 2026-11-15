@@ -130,6 +130,18 @@ Lower risk, still unreviewed.
 
 ## Sign-off
 
+### P1 Orders timestamps and numbering · 15 November 2026
+
+**NOT native-reviewed.** Five implementer-authored Operations-only labels; dates, numbers and stored facts are not translated. No customer language is affected.
+
+| English key | Tagalog draft |
+| --- | --- |
+| Created at | Nagawa noong |
+| Created at from | Nagawa mula |
+| Created at to | Nagawa hanggang |
+| Paid at (3L recognition) | Oras ng pagkilala ng 3L sa bayad |
+| Unnumbered | Walang numero ng order |
+
 ### P0 payment-time review-fix labels · 15 November 2026
 
 **NOT native-reviewed.** These six additional labels are implementer-authored drafts in the isolated Operations EN/TL resources. Native language and commercial/copy acceptance remain release gates. Stored reasons, dates and time-slot labels are interpolated verbatim; they are not translated at runtime. These residual gates do not block a separately authorized local P1 continuation.

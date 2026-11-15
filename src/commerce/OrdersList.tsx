@@ -30,6 +30,7 @@ import {
   listOrders,
   orderPath,
   paymentOf,
+  recognizedPaidAt,
   type ListQuery,
 } from "./order-view";
 
@@ -137,9 +138,9 @@ export function OrdersList({
               </select>
             </label>
             <fieldset>
-              <legend>{t("Order date")}</legend>
+              <legend>{t("Created at")}</legend>
               <label>
-                <span className="oms-sr">{t("Order date from")}</span>
+                <span className="oms-sr">{t("Created at from")}</span>
                 <input
                   type="date"
                   value={query.placedFrom}
@@ -149,7 +150,7 @@ export function OrdersList({
               </label>
               <span aria-hidden>–</span>
               <label>
-                <span className="oms-sr">{t("Order date to")}</span>
+                <span className="oms-sr">{t("Created at to")}</span>
                 <input
                   type="date"
                   value={query.placedTo}
@@ -212,7 +213,7 @@ export function OrdersList({
               <tr>
                 <th scope="col">{t("Order")}</th>
                 <th scope="col">{t("Cliente")}</th>
-                <th scope="col">{t("Date")}</th>
+                <th scope="col">{t("Created at")}</th>
                 <th scope="col" className="oms-num">
                   {t("Items")}
                 </th>
@@ -414,6 +415,7 @@ function OrderRow({
   const c = conversationOf(data, o);
   const who = customerName(data, o, c);
   const placed = createdAt(o);
+  const paid = recognizedPaidAt(data, o);
   const due = dueDate(o);
   const slot = dueSlot(o);
   const pickup = o.fulfillmentMethod === "pickup";
@@ -455,18 +457,25 @@ function OrderRow({
         {unpaid && (
           <small className="oms-muted">{t("Not in the kitchen queue")}</small>
         )}
+        {!o.publicOrderNumber && (
+          <small className="oms-muted">{t("Unnumbered")}</small>
+        )}
       </th>
       <td data-label={t("Cliente")}>
         {who.name ?? (
           <span className="oms-muted">{t("Name not recorded")}</span>
         )}
       </td>
-      <td data-label={t("Date")}>
+      <td data-label={t("Created at")}>
         {placed ? (
           formatDate(placed)
         ) : (
           <span className="oms-muted">{t("Not stored")}</span>
         )}
+        <small className="oms-muted">
+          {t("Paid at (3L recognition)")}:{" "}
+          {paid ? formatDate(paid) : t("Not stored")}
+        </small>
       </td>
       <td data-label={t("Items")} className="oms-num">
         {itemCount(o)}

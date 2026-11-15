@@ -1,4 +1,9 @@
 {
+  "Created at": "Nagawa noong",
+  "Created at from": "Nagawa mula",
+  "Created at to": "Nagawa hanggang",
+  "Paid at (3L recognition)": "Oras ng pagkilala ng 3L sa bayad",
+  "Unnumbered": "Walang numero ng order",
   "Fulfillment pending confirmation": "Naghihintay ng kumpirmasyon ang pagtupad sa order",
   "Fulfillment pending customer and 3L team confirmation.": "Naghihintay ng kumpirmasyon mula sa customer at sa 3L team ang pagtupad sa order.",
   "Original: {{date}} {{slot}}.": "Orihinal: {{date}} {{slot}}.",
