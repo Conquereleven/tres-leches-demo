@@ -91,3 +91,22 @@ test("stored payment acknowledgement is a fallback; missing creation remains unk
   assert.ok(html.includes(formatOpsDate(f.p.paidAt, "en")));
   assert.ok(payment(f).includes(formatOpsDate(f.p.paidAt, "en")));
 });
+
+for (const value of [0, -3, 1.5, NaN, Number.MAX_SAFE_INTEGER + 1])
+  test(`malformed public number ${String(value)} renders the Unnumbered marker`, () => {
+    const f = fixture();
+    f.o.publicOrderNumber = value;
+    const before = structuredClone(f.data);
+    const html = list(f.data);
+    assert.match(html, />Unnumbered</);
+    assert.ok(html.includes(`>${f.o.id}</a>`));
+    assert.deepEqual(f.data, before);
+  });
+
+test("valid issued public number retains its display and no Unnumbered marker", () => {
+  const f = fixture();
+  f.o.publicOrderNumber = 200;
+  const html = list(f.data);
+  assert.match(html, />#200</);
+  assert.doesNotMatch(html, />Unnumbered</);
+});

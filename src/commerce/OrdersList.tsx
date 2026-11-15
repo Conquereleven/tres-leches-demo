@@ -31,6 +31,7 @@ import {
   orderPath,
   paymentOf,
   recognizedPaidAt,
+  storedOrderNumber,
   type ListQuery,
 } from "./order-view";
 
@@ -416,6 +417,7 @@ function OrderRow({
   const who = customerName(data, o, c);
   const placed = createdAt(o);
   const paid = recognizedPaidAt(data, o);
+  const number = storedOrderNumber(o);
   const due = dueDate(o);
   const slot = dueSlot(o);
   const pickup = o.fulfillmentMethod === "pickup";
@@ -452,12 +454,12 @@ function OrderRow({
             onOpen(o.id);
           }}
         >
-          {orderReference(o)}
+          {number === null ? o.id : orderReference(o)}
         </a>
         {unpaid && (
           <small className="oms-muted">{t("Not in the kitchen queue")}</small>
         )}
-        {!o.publicOrderNumber && (
+        {number === null && (
           <small className="oms-muted">{t("Unnumbered")}</small>
         )}
       </th>

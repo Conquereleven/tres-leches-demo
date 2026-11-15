@@ -299,14 +299,14 @@ export const byNewest = (a: Order, b: Order) =>
   (createdAt(b) ?? "").localeCompare(createdAt(a) ?? "") ||
   (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
 
-const storedNumber = (o: Order) =>
+export const storedOrderNumber = (o: Pick<Order, "publicOrderNumber">) =>
   Number.isSafeInteger(o.publicOrderNumber) && o.publicOrderNumber! > 0
     ? o.publicOrderNumber!
     : null;
 /** All orders: numbered first, numeric descending, then creation/id for ties. */
 export function byOrderNumber(a: Order, b: Order) {
-  const an = storedNumber(a),
-    bn = storedNumber(b);
+  const an = storedOrderNumber(a),
+    bn = storedOrderNumber(b);
   return (
     (an === null ? (bn === null ? 0 : 1) : bn === null ? -1 : bn - an) ||
     byNewest(a, b)

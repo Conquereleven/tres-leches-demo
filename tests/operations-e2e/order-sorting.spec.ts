@@ -1,7 +1,27 @@
 import { test, expect } from "@playwright/test";
+import { readFileSync } from "node:fs";
 import { omsWorkspace } from "../fixtures/oms";
-import { translateOps, preferenceKey } from "../../src/commerce/ops-i18n";
 import type { Workspace } from "../../src/commerce/api";
+
+// Test-loader-safe locale reads, as in product-language.spec.ts. Never import
+// the app's JSX/i18n instance into Playwright's native ESM discovery process.
+const locales = {
+  en: JSON.parse(
+    readFileSync("src/commerce/locales/en.json", "utf8"),
+  ) as Record<string, string>,
+  tl: JSON.parse(
+    readFileSync("src/commerce/locales/tl.json", "utf8"),
+  ) as Record<string, string>,
+};
+const translateOps = (language: "en" | "tl", key: string) => {
+  const value = locales[language][key];
+  if (typeof value !== "string")
+    throw new Error(`Missing Operations test locale: ${language}/${key}`);
+  return value;
+};
+// Stable per-user browser preference contract; fixture-local, no app import.
+const preferenceKey = (user: string) =>
+  `3l-operations-language:${encodeURIComponent(user)}`;
 
 const SHOTS = process.env.P1_EVIDENCE_DIR ?? "work/qa/order-sorting";
 function fixture() {
