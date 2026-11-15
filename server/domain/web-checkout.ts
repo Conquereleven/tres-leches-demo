@@ -1,3 +1,4 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import {
   liveLinePrice,
   packPricingPolicy,
@@ -911,15 +912,14 @@ export function readWebCheckoutStatus(
       : null,
     status: order.state,
     paymentStatus: payment.status,
-    ...(order.paymentFulfillment &&
-    order.paymentFulfillment.status !== "unchanged"
+    ...(fulfillmentPending(order)
       ? {
           fulfillmentPending: true,
-          ...(order.paymentFulfillment.effective
+          ...(order.paymentFulfillment?.effective
             ? {
                 fulfillmentProposal: {
-                  date: order.paymentFulfillment.effective.date,
-                  slot: order.paymentFulfillment.effective.slot,
+                  date: order.paymentFulfillment?.effective.date,
+                  slot: order.paymentFulfillment?.effective.slot,
                 },
               }
             : {}),

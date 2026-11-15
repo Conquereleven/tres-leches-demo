@@ -1,3 +1,4 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import { paidEmailLabel, windowEmailLabel } from "./customer-email-status";
 import { acceptedLinePrice } from "../../shared/pack-pricing";
 import type { Line } from "../../server/domain/model";
@@ -435,7 +436,7 @@ export function orderPermissions(
     canTake:
       !!c && !owned && c.status === "open" && (!c.assignedAgent || elevated),
     assignee: data.agents.find((a) => a.id === c?.assignedAgent)?.name ?? null,
-    next,
+    next: fulfillmentPending(o) ? null : next,
     canReconcile: p?.provider === "paymennt" && (owned || elevated),
   };
 }

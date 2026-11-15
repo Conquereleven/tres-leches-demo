@@ -14,6 +14,7 @@ import {
 import { provablyUninitiated, verifiedLocalRejection } from "./local-rejection";
 import { frozenCheckout } from "./frozen-checkout";
 import {
+  fulfillmentPending,
   fulfillmentIntent,
   requestedFulfillment,
   revalidatePaidFulfillment,
@@ -639,6 +640,16 @@ export class CommerceService {
         requireThat(
           s.payments.find((p) => p.id === o.paymentId)?.status === "paid",
           "Pago requiere revisión antes de fulfillment",
+        );
+      if (
+        ["Production", "Ready", "Out for Delivery", "Delivered"].includes(
+          cmd.state,
+        )
+      )
+        requireThat(
+          !fulfillmentPending(o),
+          "Fulfillment review required; preparation and dispatch are on hold",
+          409,
         );
       requireThat(
         !["Paid", "Confirmed", "Awaiting Payment"].includes(cmd.state),

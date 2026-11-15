@@ -1,3 +1,5 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
+export { fulfillmentPending } from "../../shared/payment-fulfillment";
 import { createHash } from "node:crypto";
 import {
   DELIVERY_WINDOWS,
@@ -40,17 +42,11 @@ export function requestedFulfillment(order: Order) {
         : order.delivery?.slot,
   };
 }
-export function fulfillmentPending(order: Order) {
-  return (
-    !!order.paymentFulfillment &&
-    order.paymentFulfillment.status !== "unchanged"
-  );
-}
 export function fulfillmentNotice(order: Order) {
   const decision = order.paymentFulfillment;
   if (!fulfillmentPending(order)) return "";
   const candidate = decision?.effective;
-  return `Payment verified. Fulfillment pending confirmation by the customer and 3L team.${candidate ? ` Proposed: ${candidate.date}, ${candidate.slot}.` : " Manual review required; no fulfillment date is promised."}`;
+  return `Payment verified. Fulfillment review required; preparation and dispatch are on hold.${candidate ? ` Proposed: ${candidate.date}, ${candidate.slot}.` : " Manual review required; no fulfillment date is promised."}`;
 }
 
 /** FIRST paid transaction, before outbox snapshots. Uncertainty never discards money. */
@@ -63,7 +59,6 @@ export function revalidatePaidFulfillment(
   eligible: boolean,
   receiptId?: string,
 ) {
-  if (order.paymentFulfillment) return order.paymentFulfillment;
   const pickup = order.fulfillmentMethod === "pickup";
   const original = payment.fulfillmentRequested ?? requestedFulfillment(order);
   const decision: NonNullable<Order["paymentFulfillment"]> = {
@@ -77,6 +72,10 @@ export function revalidatePaidFulfillment(
     status: "review-required",
     reason: "Uncertain or changed payment intent; manual review required",
   };
+  // Absence is historical; a present malformed value is evidence of uncertainty.
+  // Preserve it instead of silently issuing a fresh automatic acceptance.
+  if (order.paymentFulfillment !== undefined)
+    return order.paymentFulfillment ?? decision;
   order.paymentFulfillment = decision;
   let consistent = false;
   try {
@@ -134,8 +133,8 @@ export function revalidatePaidFulfillment(
     for (let i = 0; i < 32; i++) {
       const candidate = first.toISOString().slice(0, 10);
       if (validWindow(candidate, original.slot, now, hours)) {
-        decision.status = "proposed";
-        decision.reason = `Requested schedule invalid at paid acknowledgement; earliest same-slot proposal (${hours}h notice); pending customer and team confirmation`;
+        decision.status = "auto-rescheduled";
+        decision.reason = `Requested schedule invalid at paid acknowledgement; automatically accepted earliest safe same-slot schedule (${hours}h notice)`;
         decision.effective = {
           method: original.method,
           date: candidate,

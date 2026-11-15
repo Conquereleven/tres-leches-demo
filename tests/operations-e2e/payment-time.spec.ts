@@ -3,7 +3,7 @@ import { omsWorkspace } from "../fixtures/oms";
 import { status } from "../fixtures/ux-states";
 
 // UI contract only; the real decision/reconciliation is covered by the SQLite tests.
-test("P0 operations shows original and proposed schedule without acceptance", async ({
+test("P0 legacy proposal remains on review hold", async ({
   page,
   browserName,
 }) => {
@@ -33,16 +33,16 @@ test("P0 operations shows original and proposed schedule without acceptance", as
   await page.route("**/api/**", (r) => r.fulfill({ json: data }));
   await page.goto("/operations/orders");
   await expect(page.locator(`[data-order="${o.id}"]`)).toContainText(
-    "Fulfillment pending confirmation",
+    "Fulfillment review required",
   );
   await page.goto(`/operations/orders/${o.id}`);
   const notice = page
     .getByRole("alert")
-    .filter({ hasText: "Fulfillment pending customer" });
+    .filter({ hasText: "Fulfillment review required" });
   await expect(notice).toContainText("Original: 2026-11-13");
   await expect(notice).toContainText("Proposed: 2026-11-14");
   await page.screenshot({
-    path: `work/qa/payment-time/${browserName}-operations.png`,
+    path: `${process.env.PAYMENT_TIME_EVIDENCE_DIR ?? "/tmp/payment-contract-browser"}/${browserName}-operations.png`,
     fullPage: true,
   });
 });
@@ -88,7 +88,81 @@ for (const width of [390, 1440])
       ),
     ).toBe(true);
     await page.screenshot({
-      path: `work/qa/payment-time/${browserName}-return-${width}.png`,
+      path: `${process.env.PAYMENT_TIME_EVIDENCE_DIR ?? "/tmp/payment-contract-browser"}/${browserName}-return-${width}.png`,
+      fullPage: true,
+    });
+  });
+
+for (const decision of [
+  "auto-rescheduled",
+  "review-required",
+  "proposed",
+  "unknown",
+  "missing-effective",
+  "mismatch",
+  "historical",
+])
+  test(`P0 capabilities and PrintCenter: ${decision}`, async ({ page }) => {
+    const data = omsWorkspace(),
+      o = data.orders[0]!;
+    o.fulfillmentMethod = "pickup";
+    o.state = "Confirmed";
+    o.pickup = { pickupDate: "2026-11-14", preferredTime: "4:00 PM – 9:00 PM" };
+    o.paymentFulfillment = {
+      paymentId: o.paymentId,
+      acknowledgedAt: "2026-11-13T12:51:00Z",
+      actor: "synthetic",
+      source: "authoritative-checkout",
+      reason: "Synthetic policy check",
+      status: "auto-rescheduled",
+      original: {
+        method: "pickup",
+        date: "2026-11-13",
+        slot: o.pickup.preferredTime,
+      },
+      effective: {
+        method: "pickup",
+        date: "2026-11-14",
+        slot: o.pickup.preferredTime,
+      },
+    };
+    if (["review-required", "proposed", "unknown"].includes(decision))
+      o.paymentFulfillment.status = decision;
+    if (decision === "missing-effective") delete o.paymentFulfillment.effective;
+    if (decision === "mismatch")
+      o.paymentFulfillment.effective.date = "2026-11-15";
+    if (decision === "historical") delete o.paymentFulfillment;
+    const held = !["auto-rescheduled", "historical"].includes(decision);
+    await page.route("**/api/**", (r) => r.fulfill({ json: data }));
+    await page.goto(`/operations/orders/${o.id}`);
+    const notice = page
+      .getByRole("alert")
+      .filter({ hasText: "Fulfillment review required" });
+    await expect(notice).toHaveCount(held ? 1 : 0);
+    await expect(
+      page.getByRole("button", { name: "Start preparation", exact: true }),
+    ).toHaveCount(held ? 0 : 1);
+    await page.goto("/operations/production");
+    const card = page.getByRole("article", { name: "Order #012", exact: true });
+    await expect(
+      card.getByRole("button", { name: "Start preparation", exact: true }),
+    ).toHaveCount(held ? 0 : 1);
+    await page.goto("/operations/print");
+    await page.locator(".ops-print select").first().selectOption(o.id);
+    if (held) {
+      await expect(page.getByRole("alert")).toContainText(
+        "Fulfillment review required",
+      );
+      await expect(page.locator(".ops-ticket")).toHaveCount(0);
+      await expect(page.locator(".ops-print")).not.toContainText("4:00 PM");
+    } else {
+      await expect(page.locator(".ops-ticket")).toContainText(
+        "4:00 PM – 9:00 PM",
+      );
+      await expect(page.locator(".ops-ticket")).toContainText("14");
+    }
+    await page.screenshot({
+      path: `${process.env.PAYMENT_TIME_EVIDENCE_DIR ?? "/tmp/payment-contract-browser"}/${decision}-print.png`,
       fullPage: true,
     });
   });

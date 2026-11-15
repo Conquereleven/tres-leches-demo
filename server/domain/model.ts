@@ -164,7 +164,7 @@ export type Order = {
   billing?: import("./billing").OrderBilling;
   /** Set exactly once, when the order first becomes paid. */
   paidAt?: string;
-  /** First authoritative acknowledgement only; proposals are not accepted promises. */
+  /** First authoritative acknowledgement only; legacy proposals remain on review hold. */
   paymentFulfillment?: {
     paymentId: string;
     acknowledgedAt: string;
@@ -172,7 +172,7 @@ export type Order = {
     source: string;
     checkoutId?: string;
     receiptId?: string;
-    status: "unchanged" | "proposed" | "review-required";
+    status: "unchanged" | "auto-rescheduled" | "proposed" | "review-required";
     reason: string;
     original: { method?: string; date?: string; slot?: string };
     effective?: { method: string; date: string; slot: string };

@@ -1,3 +1,4 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import { lineKey, preparationText } from "../../shared/pack-composition";
 import type { ReactNode } from "react";
 import {
@@ -334,19 +335,19 @@ export function OrderFulfillmentCard({
       icon={pickup ? <Storefront aria-hidden /> : <Truck aria-hidden />}
       aside={<FulfilmentBadge order={o} />}
     >
-      {o.paymentFulfillment && o.paymentFulfillment.status !== "unchanged" && (
+      {fulfillmentPending(o) && (
         <p className="oms-notice" role="alert">
           {t("Fulfillment pending customer and 3L team confirmation.")}{" "}
           {t("Recorded reason: {{reason}}", {
-            reason: o.paymentFulfillment.reason,
+            reason: o.paymentFulfillment?.reason ?? "",
           })}{" "}
           {t("Original: {{date}} {{slot}}.", {
-            date: o.paymentFulfillment.original.date || t("Not stored"),
-            slot: o.paymentFulfillment.original.slot || t("Not stored"),
+            date: o.paymentFulfillment?.original?.date || t("Not stored"),
+            slot: o.paymentFulfillment?.original?.slot || t("Not stored"),
           })}{" "}
           {t("Proposed: {{date}} {{slot}}.", {
-            date: o.paymentFulfillment.effective?.date || t("No safe date"),
-            slot: o.paymentFulfillment.effective?.slot || t("Not stored"),
+            date: o.paymentFulfillment?.effective?.date || t("No safe date"),
+            slot: o.paymentFulfillment?.effective?.slot || t("Not stored"),
           })}
         </p>
       )}

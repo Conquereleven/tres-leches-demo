@@ -100,7 +100,7 @@ test("alternative first acknowledgement has one durable audit, first timestamps 
     assert.equal(audit[0]!.at, "2026-11-13T12:51:00.000Z");
     assert.equal(
       audit[0]!.action,
-      `Payment fulfillment proposed: ${before.paymentFulfillment!.reason}`,
+      `Payment fulfillment auto-rescheduled: ${before.paymentFulfillment!.reason}`,
     );
     assert.equal(before.paidAt, audit[0]!.at);
     assert.equal(f.store.read().payments[0]!.paidAt, audit[0]!.at);

@@ -1,3 +1,4 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CaretLeft,
@@ -439,12 +440,11 @@ function OrderRow({
       }}
     >
       <th scope="row" data-label={t("Order")}>
-        {o.paymentFulfillment &&
-          o.paymentFulfillment.status !== "unchanged" && (
-            <small className="oms-muted">
-              {t("Fulfillment pending confirmation")}
-            </small>
-          )}
+        {fulfillmentPending(o) && (
+          <small className="oms-muted">
+            {t("Fulfillment pending confirmation")}
+          </small>
+        )}
         <a
           className="oms-order-link"
           href={orderPath(o.id)}

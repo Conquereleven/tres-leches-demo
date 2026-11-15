@@ -30,12 +30,13 @@ for (const pickup of [true, false])
         pickup ? o.pickup?.pickupDate : o.delivery?.date,
         "2026-11-14",
       );
-      assert.equal(o.paymentFulfillment?.status, "proposed");
+      assert.equal(o.paymentFulfillment?.status, "auto-rescheduled");
       assert.equal(o.paymentFulfillment?.original.date, "2026-11-13");
-      assert.match(
+      assert.doesNotMatch(
         f.store.read().customerNotifications![0]!.body,
         /pending confirmation/i,
       );
+      assert.match(f.store.read().customerNotifications![0]!.body, /14/);
       const before = structuredClone(o);
       await f.reconcile(key);
       assert.deepEqual(f.order(key), before);
@@ -54,6 +55,7 @@ for (const pickup of [true, false])
     ["2026-11-13T21:00:59+04:00", 12, "2026-11-14"],
     ["2026-11-13T21:01:00+04:00", 12, "2026-11-15"],
     ["2026-11-13T21:00:59+04:00", 24, "2026-11-15"],
+    ["2026-11-13T21:01:00+04:00", 24, "2026-11-15"],
   ] as const)
     test(`schedule matrix ${pickup} ${time} ${hours}h`, async (t) => {
       t.mock.timers.enable({
@@ -89,16 +91,13 @@ for (const pickup of [true, false])
         const window = rows.find(
           (r) => r.event === "ORDER_SCHEDULED_WINDOW_STARTED",
         )!;
-        if (expected === "2026-11-13") assert.equal(window.status, "pending");
-        else {
-          assert.equal(window.status, "failed");
-          assert.equal(window.dueAt, undefined);
-          assert.match(rows[0]!.body, /pending confirmation/i);
-          assert.match(
-            f.store.read().operationsEmailNotifications![0]!.body,
-            /pending confirmation/i,
-          );
-        }
+        assert.equal(window.status, "pending");
+        assert.equal(window.dueAt, `${expected}T12:00:00.000Z`);
+        assert.doesNotMatch(rows[0]!.body, /pending confirmation/i);
+        assert.doesNotMatch(
+          f.store.read().operationsEmailNotifications![0]!.body,
+          /pending confirmation/i,
+        );
         const payment = f.store.read().payments[0]!;
         const event = {
           id: payment.providerReference!,
