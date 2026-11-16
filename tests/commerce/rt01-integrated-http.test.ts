@@ -9,6 +9,21 @@ import {
 test("real HTTP checkout → mock authoritative payment/replay → workspace/documents → server hold409", async () => {
   const f = await integratedServer(3346);
   try {
+    const configResponse = await fetch(f.base + "/api/checkout/config");
+    assert.equal(configResponse.status, 200);
+    const config = (await configResponse.json()) as {
+      enabled: boolean;
+      catalogAvailable: boolean;
+      catalog: { dynamic: boolean; revision: string | null };
+    };
+    assert.equal(config.catalog.dynamic, true);
+    assert.ok(config.catalog.revision);
+    assert.equal(config.catalogAvailable, true);
+    assert.equal(
+      config.enabled,
+      true,
+      "Actual checkout guard prerequisites must be satisfied",
+    );
     const post = async (
       path: string,
       body: unknown,

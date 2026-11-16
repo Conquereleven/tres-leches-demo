@@ -27,6 +27,15 @@ for (const width of [390, 1440])
       );
       const t = (s: string) => resources[s] ?? s;
       try {
+        const configResponse = await page.request.get(
+          f.base + "/api/checkout/config",
+        );
+        expect(configResponse.status()).toBe(200);
+        const config = await configResponse.json();
+        expect(config.catalog.dynamic).toBe(true);
+        expect(config.catalog.revision).toBeTruthy();
+        expect(config.catalogAvailable).toBe(true);
+        expect(config.enabled).toBe(true);
         await page.setViewportSize({ width, height: 1000 });
         await page.clock.setFixedTime(new Date("2026-11-15T12:51:00Z"));
         await page.addInitScript(

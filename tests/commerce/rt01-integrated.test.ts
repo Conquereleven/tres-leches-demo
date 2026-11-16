@@ -182,3 +182,37 @@ for (const pickup of [true, false])
         f.store.close();
       }
     });
+
+import {
+  integratedFixture,
+  integratedWebhookFixture,
+} from "../fixtures/rt01-integrated-server";
+import { publishedRevision } from "../../server/catalog/storefront-api";
+test("HTTP/browser fixture has a valid published catalog with adoption ON", () => {
+  const { initial, payment } = integratedFixture();
+  const published = publishedRevision(initial, "on");
+  assert.equal(published.dynamic, true);
+  assert.equal(published.sellable, true);
+  assert.ok(published.revision);
+  assert.equal(payment.constructor.name, "PaymenntProvider");
+});
+
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { loadWebhookSecret } from "../../server/adapters/paymennt-secrets";
+test("HTTP/browser fake webhook registration satisfies the existing private-file loader", () => {
+  const dir = mkdtempSync(join(tmpdir(), "rt01-integrated-config-"));
+  try {
+    const path = integratedWebhookFixture(dir);
+    const registered = loadWebhookSecret(path);
+    assert.equal(registered?.id, "rt01-synthetic-webhook");
+    assert.equal(
+      registered?.address,
+      "https://fixture.invalid/api/webhooks/payment",
+    );
+    assert.throws(() => integratedWebhookFixture(dir), /EEXIST/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
