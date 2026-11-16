@@ -1,7 +1,9 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { workspace } from "../fixtures/ux-states";
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
+const SHOTS =
+  process.env.OPERATIONS_EVIDENCE_DIR ?? "docs/operations/d1/screenshots";
 const resources = Object.fromEntries(
   ["en", "tl"].map((l) => [
     l,
@@ -123,11 +125,16 @@ for (const width of [390, 768, 1440])
           await expect(page.locator(".oms-table tbody tr")).toHaveCount(1);
           await page.getByLabel(tr(language, "Search orders")).fill("");
         }
-        if (info.project.name === "chromium")
+        if (
+          info.project.name === "chromium" ||
+          process.env.OPERATIONS_EVIDENCE_DIR
+        ) {
+          mkdirSync(SHOTS, { recursive: true });
           await page.screenshot({
-            path: `docs/operations/d1/screenshots/${language}-${screen}-${width}.png`,
+            path: `${SHOTS}/${language}-${screen}-${width}.png`,
             fullPage: true,
           });
+        }
       }
       expect(errors).toEqual([]);
       await page.goto("/operations/overview");

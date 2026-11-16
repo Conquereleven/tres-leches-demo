@@ -1,4 +1,10 @@
 import { fulfillmentPending } from "../../shared/payment-fulfillment";
+import {
+  dueDate,
+  dueSlot,
+  fulfilmentLabel,
+  orderPermissions,
+} from "./order-view";
 import { lineKey, preparationText } from "../../shared/pack-composition";
 import { orderProductName } from "./product-names";
 import { OperationalProductName } from "./OperationalProductName";
@@ -13,13 +19,7 @@ import {
 import type { Order } from "../../server/domain/model";
 import { money, type Workspace as Data } from "./api";
 import { orderReference } from "../../shared/order-number";
-import {
-  FULFILMENT,
-  FULFILMENT_LABEL,
-  NEXT_ACTION,
-  fulfilmentIndex,
-  paymentBadge,
-} from "./orders-board";
+import { FULFILMENT, fulfilmentIndex, paymentBadge } from "./orders-board";
 
 type Run = (body: Record<string, unknown>, path?: string) => Promise<boolean>;
 
@@ -53,7 +53,7 @@ export function OrderCard({
   const c = customerOf(data, o);
   const payment = data.payments.find((p) => p.id === o.paymentId);
   const badge = paymentBadge(payment);
-  const date = o.pickup?.pickupDate ?? o.delivery?.date;
+  const date = dueDate(o);
   const due = {
     tone: !date
       ? "none"
@@ -67,18 +67,13 @@ export function OrderCard({
       : `${date < today && o.state !== "Delivered" ? t("Overdue") + " · " : ""}${formatDate(date, false)}`,
   };
   const web = c?.sourceNumberId === "web";
-  const owned = !!c && c.assignedAgent === data.actor.id && c.status === "open";
-  const canTake =
-    !!c &&
-    !owned &&
-    c.status === "open" &&
-    (!c.assignedAgent || ["admin", "manager"].includes(data.actor.role));
-  const next =
-    o.fulfillmentMethod === "pickup" && o.state === "Ready"
-      ? { to: "Delivered" as const, label: "Confirmar recogida" }
-      : NEXT_ACTION[o.state];
+  const { owned, canTake, next, assignee } = orderPermissions(
+    data,
+    o,
+    c,
+    payment,
+  );
   const step = fulfilmentIndex(o.state);
-  const assignee = data.agents.find((a) => a.id === c?.assignedAgent)?.name;
   return (
     <article
       className="ops-order-card"
@@ -98,9 +93,7 @@ export function OrderCard({
           {badge.tone === "paid" && <CheckCircle weight="fill" aria-hidden />}
           {t(badge.label)}
         </span>
-        <span className="ops-oc-state">
-          {t(FULFILMENT_LABEL[o.state] ?? o.state)}
-        </span>
+        <span className="ops-oc-state">{t(fulfilmentLabel(o))}</span>
         <strong className="ops-oc-total">{t(money(o.quote?.totalFils))}</strong>
       </header>
 
@@ -176,14 +169,14 @@ export function OrderCard({
               : due.label}
           </dd>
         </div>
-        {(o.pickup?.preferredTime || o.delivery?.slot) && (
+        {dueSlot(o) && (
           <div>
             <dt>
               <Clock aria-hidden />
               {t("Hora")}
             </dt>
             <dd>
-              <strong>{o.pickup?.preferredTime ?? o.delivery?.slot}</strong>
+              <strong>{dueSlot(o)}</strong>
             </dd>
           </div>
         )}
@@ -220,7 +213,7 @@ export function OrderCard({
         )}
       </dl>
 
-      {step >= 0 && (
+      {!fulfillmentPending(o) && step >= 0 && (
         <ol className="ops-oc-steps" aria-label={t("Preparación")}>
           {FULFILMENT.map((s, i) => (
             <li

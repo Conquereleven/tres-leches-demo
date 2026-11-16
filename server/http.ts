@@ -1,4 +1,5 @@
 import { serveAnalytics } from "./analytics/api";
+import { serveOrderDocuments } from "./orders/documents";
 import { withoutBundledProductMedia } from "./catalog/product-media-html";
 import { packPricingPolicy } from "./domain/pack-pricing";
 import { packBuilderEnabled, publishedPackRules } from "./domain/packs";
@@ -842,6 +843,17 @@ export async function startServer(
             () => store.read(),
             current,
             runtime.environment,
+          )
+        )
+          return;
+        if (
+          await serveOrderDocuments(
+            req,
+            res,
+            path,
+            () => store.read(),
+            current,
+            async () => parse(await rawBody(req)),
           )
         )
           return;

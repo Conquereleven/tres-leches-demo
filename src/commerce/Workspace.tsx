@@ -1,3 +1,4 @@
+import { fulfillmentSchedule } from "../../shared/fulfillment-schedule";
 import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import { paidEmailLabel, windowEmailLabel } from "./customer-email-status";
 import { Login } from "./Login";
@@ -1039,10 +1040,7 @@ function OrderPanel({
         <div className={"co-quote " + (o.quote?.eligible ? "eligible" : "")}>
           {fulfillmentPending(o) && (
             <p role="alert">
-              {t("Fulfillment pending customer and 3L team confirmation.")}{" "}
-              {t("Recorded reason: {{reason}}", {
-                reason: o.paymentFulfillment?.reason ?? "",
-              })}
+              {t("Fulfillment pending customer and 3L team confirmation.")}
             </p>
           )}
           <b>
@@ -1051,8 +1049,8 @@ function OrderPanel({
               : (o.quote?.zoneName ?? t("Ubicación pendiente"))}
           </b>
           <p>
-            {o.fulfillmentMethod === "pickup"
-              ? `${o.pickup?.pickupDate ? formatDate(o.pickup.pickupDate, false) : t("Sin fecha")} · ${o.pickup?.preferredTime}`
+            {!fulfillmentPending(o) && o.fulfillmentMethod === "pickup"
+              ? `${fulfillmentSchedule(o).date ? formatDate(fulfillmentSchedule(o).date!, false) : t("Sin fecha")} · ${fulfillmentSchedule(o).slot ?? ""}`
               : o.location
                 ? `GPS ${o.location.lat}, ${o.location.lng}`
                 : (o.address ??
@@ -1650,6 +1648,7 @@ function ReadinessPanel({ data, run }: { data: Data; run: Run }) {
 
 function boardOrders(data: Data, view: string) {
   return data.orders
+    .filter((o) => !fulfillmentPending(o))
     .filter((o) =>
       (view === "production"
         ? ["Confirmed", "Production", "Ready"]
