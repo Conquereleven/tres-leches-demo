@@ -271,7 +271,7 @@ export function MenuCatalog() {
           {menu.status !== "loading" && (
             <button
               className="b-text-button"
-              onClick={() => void refreshLiveCatalog()}
+              onClick={() => void refreshLiveCatalog(true)}
             >
               {" "}
               <CustomerCopy>TRY AGAIN</CustomerCopy>{" "}
