@@ -102,7 +102,10 @@ for (const decision of [
   "mismatch",
   "historical",
 ])
-  test(`P0 capabilities and PrintCenter: ${decision}`, async ({ page }) => {
+  test(`P0 capabilities and PrintCenter: ${decision}`, async ({
+    page,
+    browserName,
+  }) => {
     const data = omsWorkspace(),
       o = data.orders[0]!;
     o.fulfillmentMethod = "pickup";
@@ -142,12 +145,24 @@ for (const decision of [
     await expect(
       page.getByRole("button", { name: "Start preparation", exact: true }),
     ).toHaveCount(held ? 0 : 1);
-    await page.goto("/operations/production");
+    // Navigate through the hydrated shell; an absent action alone is not readiness.
+    await page
+      .getByRole("button", { name: "Kitchen / Production", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/operations\/production$/);
+    await expect(
+      page.getByRole("button", { name: "Kitchen / Production", exact: true }),
+    ).toHaveAttribute("aria-current", "page");
     const card = page.getByRole("article", { name: "Order #012", exact: true });
+    await expect(card).toBeVisible();
     await expect(
       card.getByRole("button", { name: "Start preparation", exact: true }),
     ).toHaveCount(held ? 0 : 1);
-    await page.goto("/operations/print");
+    await page
+      .getByRole("button", { name: "Print Center", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/operations\/print$/);
+    await expect(page.locator(".ops-print")).toBeVisible();
     await page.locator(".ops-print select").first().selectOption(o.id);
     if (held) {
       await expect(page.getByRole("alert")).toContainText(
@@ -162,7 +177,62 @@ for (const decision of [
       await expect(page.locator(".ops-ticket")).toContainText("14");
     }
     await page.screenshot({
-      path: `${process.env.PAYMENT_TIME_EVIDENCE_DIR ?? "/tmp/payment-contract-browser"}/${decision}-print.png`,
+      path: `${process.env.PAYMENT_TIME_EVIDENCE_DIR ?? "/tmp/payment-contract-browser"}/${browserName}-${decision}-print.png`,
       fullPage: true,
     });
   });
+
+// Executable regression for the false-negative readiness seam shown in CI's
+// empty <main> snapshot: zero actions says nothing while workspace is loading.
+test("P0 held checks require a rendered card after deferred workspace hydration", async ({
+  page,
+}) => {
+  const data = omsWorkspace(),
+    o = data.orders[0]!;
+  o.state = "Confirmed";
+  o.paymentFulfillment = {
+    status: "review-required",
+    reason: "Synthetic missing intent",
+  };
+  let release!: () => void, requested!: () => void;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const requestSeen = new Promise<void>((resolve) => {
+    requested = resolve;
+  });
+  await page.route("**/api/**", async (route) => {
+    if (new URL(route.request().url()).pathname === "/api/workspace") {
+      requested();
+      await gate;
+    }
+    await route.fulfill({ json: data });
+  });
+  try {
+    await page.goto("/operations/production");
+    await requestSeen;
+    // The old zero-count condition succeeds here even though no card exists.
+    await expect(
+      page.getByRole("button", { name: "Start preparation", exact: true }),
+    ).toHaveCount(0);
+    const card = page.getByRole("article", { name: "Order #012", exact: true });
+    await expect(card).toHaveCount(0);
+    release();
+    await expect(card).toBeVisible();
+    await expect(card).toContainText("Fulfillment review required");
+    await expect(
+      card.getByRole("button", { name: "Start preparation", exact: true }),
+    ).toHaveCount(0);
+    await page
+      .getByRole("button", { name: "Print Center", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/operations\/print$/);
+    await page.locator(".ops-print select").first().selectOption(o.id);
+    await expect(page.getByRole("alert")).toContainText(
+      "Fulfillment review required",
+    );
+    await expect(page.locator(".ops-ticket")).toHaveCount(0);
+  } finally {
+    release();
+  }
+});

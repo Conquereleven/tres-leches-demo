@@ -1,3 +1,4 @@
+import { CATALOG_FIXTURE_NOW } from "../fixtures/catalog-clock";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -76,6 +77,7 @@ test("no English product or menu resource keeps Spanish catalog wording, except 
 });
 
 test("published English wording wins over the build when it differs; search finds the English name", async (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: new Date(CATALOG_FIXTURE_NOW) });
   const sources = loadBootstrapSources(process.cwd());
   const state = seed();
   state.catalog = structuredClone(sources.approved);
@@ -136,7 +138,7 @@ test("published English wording wins over the build when it differs; search find
     catalog,
     config,
     "sugar pan de muerto",
-    new Date("2026-10-31T08:00:00Z"),
+    new Date(),
   );
   assert.ok(hits.some((h) => h.product.id === sugar.id));
 });

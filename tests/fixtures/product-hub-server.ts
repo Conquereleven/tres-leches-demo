@@ -1,3 +1,7 @@
+import {
+  CATALOG_FIXTURE_NOW,
+  installCatalogFixtureClock,
+} from "./catalog-clock";
 // Isolated Product Hub harness: disposable database, approved catalog and its
 // foundation, no providers. Never imported by the production server.
 import { startServer } from "../../server/http";
@@ -13,6 +17,7 @@ process.env.META_OUTBOUND_ENABLED = "false";
 process.env.AI_ENABLED = "false";
 process.env.PRODUCT_HUB_ENABLED ??= "true";
 process.env.PRODUCT_HUB_PUBLISH_ENABLED ??= "true";
+installCatalogFixtureClock(CATALOG_FIXTURE_NOW);
 const sources = loadBootstrapSources(process.cwd());
 const initial = seed();
 initial.catalog = structuredClone(sources.approved);

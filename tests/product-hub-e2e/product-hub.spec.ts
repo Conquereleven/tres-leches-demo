@@ -1,17 +1,28 @@
+import { CATALOG_FIXTURE_NOW } from "../fixtures/catalog-clock";
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync } from "node:fs";
 import { deflateSync } from "node:zlib";
 
-const shots = "work/qa/product-hub";
+const shots = process.env.PRODUCT_HUB_EVIDENCE_DIR ?? "work/qa/product-hub";
 mkdirSync(shots, { recursive: true });
 const SKU = "pan-de-muerto-traditional-azucar-individual-70-g";
-const serverPrice = async (page: Page) =>
-  (
-    (await (await page.request.get("/api/checkout/config")).json()) as {
-      products: { id: string; priceFils: number }[];
-    }
-  ).products.find((p) => p.id === SKU)!.priceFils;
+const serverPrice = async (page: Page) => {
+  const response = await page.request.get("/api/checkout/config");
+  expect(response.ok()).toBe(true);
+  const config = (await response.json()) as {
+    products: { id: string; priceFils: number }[];
+  };
+  const product = config.products.find((p) => p.id === SKU);
+  expect(
+    product,
+    "published SKU must exist under the explicit in-season fixture server clock",
+  ).toBeDefined();
+  return product!.priceFils;
+};
+test.beforeEach(async ({ page }) => {
+  await page.clock.setFixedTime(new Date(CATALOG_FIXTURE_NOW));
+});
 const open = async (page: Page) => {
   await page.goto("/operations/products");
   await expect(page.locator(".ph-overview")).toBeVisible();
