@@ -45,12 +45,7 @@ test("real HTTP checkout → mock authoritative payment/replay → workspace/doc
         .status,
       401,
     );
-    const login = await post("/api/login", {
-      id: "fixture-admin",
-      password: "fictional-password",
-    });
-    assert.equal(login.status, 200);
-    const cookie = login.headers.get("set-cookie")!.split(";")[0]!;
+    let cookie = "";
     for (const pickup of [true, false])
       for (const held of [false, true]) {
         await f.control("pending");
@@ -85,6 +80,14 @@ test("real HTTP checkout → mock authoritative payment/replay → workspace/doc
           after.state.operationsEmailNotifications,
           before.state.operationsEmailNotifications,
         );
+        // The three-day payment clock jump expires the real eight-hour session.
+        // Authenticate at the settled clock for every case, without changing TTL.
+        const login = await post("/api/login", {
+          id: "fixture-admin",
+          password: "fictional-password",
+        });
+        assert.equal(login.status, 200);
+        cookie = login.headers.get("set-cookie")!.split(";")[0]!;
         const workspace = await fetch(f.base + "/api/workspace", {
           headers: { Cookie: cookie },
         });
