@@ -1,3 +1,4 @@
+import { CATALOG_FIXTURE_NOW } from "../fixtures/catalog-clock";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { minimumOrderQuantity } from "../../shared/minimum-quantity";
@@ -79,7 +80,8 @@ test("official Pan de Muerto price list: every approved row", () => {
   assert.equal(Object.keys(OFFICIAL_PRICES_FILS).length, 24);
 });
 
-test("the server charges the official price for every purchasable repriced SKU, alone and in quantity", () => {
+test("the server charges the official price for every purchasable repriced SKU, alone and in quantity", (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: new Date(CATALOG_FIXTURE_NOW) });
   const store = new Store(":memory:", "test");
   store.write((s) => {
     s.catalog = catalog;

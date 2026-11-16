@@ -1,3 +1,4 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import { lineKey, preparationText } from "../../shared/pack-composition";
 import { orderProductName } from "./product-names";
 import { OperationalProductName } from "./OperationalProductName";
@@ -86,6 +87,9 @@ export function OrderCard({
       aria-label={`${t("Order")} ${orderReference(o)}`}
     >
       <header className="ops-oc-head">
+        {fulfillmentPending(o) && (
+          <span role="status">{t("Fulfillment pending confirmation")}</span>
+        )}
         {/* The number customers quote; absent only for unpaid or pre-numbering orders. */}
         {o.publicOrderNumber && (
           <strong className="ops-oc-number">{orderReference(o)}</strong>
@@ -237,6 +241,7 @@ export function OrderCard({
           </p>
         )}
         {next &&
+          !fulfillmentPending(o) &&
           (owned ? (
             <button
               className="primary"

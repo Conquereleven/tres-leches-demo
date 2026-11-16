@@ -1,3 +1,4 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import { lineKey, preparationText } from "../../shared/pack-composition";
 import type { ReactNode } from "react";
 import {
@@ -40,6 +41,7 @@ import {
   orderPermissions,
   paymentMethod,
   paymentOf,
+  recognizedPaidAt,
   type OrderPermissions,
 } from "./order-view";
 
@@ -333,6 +335,22 @@ export function OrderFulfillmentCard({
       icon={pickup ? <Storefront aria-hidden /> : <Truck aria-hidden />}
       aside={<FulfilmentBadge order={o} />}
     >
+      {fulfillmentPending(o) && (
+        <p className="oms-notice" role="alert">
+          {t("Fulfillment pending customer and 3L team confirmation.")}{" "}
+          {t("Recorded reason: {{reason}}", {
+            reason: o.paymentFulfillment?.reason ?? "",
+          })}{" "}
+          {t("Original: {{date}} {{slot}}.", {
+            date: o.paymentFulfillment?.original?.date || t("Not stored"),
+            slot: o.paymentFulfillment?.original?.slot || t("Not stored"),
+          })}{" "}
+          {t("Proposed: {{date}} {{slot}}.", {
+            date: o.paymentFulfillment?.effective?.date || t("No safe date"),
+            slot: o.paymentFulfillment?.effective?.slot || t("Not stored"),
+          })}
+        </p>
+      )}
       {group === "unpaid" && (
         <p className="oms-notice" role="status">
           <WarningCircle aria-hidden />
@@ -521,7 +539,7 @@ export function OrderPaymentCard({
   const q = o.quote;
   const pickup = o.fulfillmentMethod === "pickup";
   const method = paymentMethod(p);
-  const paidAt = p?.paidAt ?? o.paidAt;
+  const paidAt = recognizedPaidAt(data, o);
   const jobs = p ? data.jobs.filter((j) => j.entityId === p.id) : [];
   return (
     <Card
@@ -553,7 +571,9 @@ export function OrderPaymentCard({
             {aed(p.amountFils)} {p.status === "paid" ? "" : `· ${t(p.status)}`}
           </Field>
         )}
-        {paidAt && <Field label={t("Paid at")}>{formatDate(paidAt)}</Field>}
+        <Field label={t("Paid at (3L recognition)")}>
+          {paidAt ? formatDate(paidAt) : t("Not stored")}
+        </Field>
       </dl>
       {!p && (
         <p className="oms-muted">

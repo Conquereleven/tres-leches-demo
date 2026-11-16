@@ -1,3 +1,4 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import { acceptedLinePrice } from "../../shared/pack-pricing";
 import { lineKey, validPackSnapshot } from "../../shared/pack-composition";
 import type { Order } from "../../server/domain/model";
@@ -5,8 +6,19 @@ import type { Order } from "../../server/domain/model";
 /** Historical ticket data must come entirely from the accepted order snapshot. */
 export function ticketSnapshot(
   order: Pick<Order, "lines" | "catalogSnapshot"> &
-    Partial<Pick<Order, "quote">>,
+    Partial<
+      Pick<
+        Order,
+        | "quote"
+        | "paymentFulfillment"
+        | "paymentId"
+        | "fulfillmentMethod"
+        | "pickup"
+        | "delivery"
+      >
+    >,
 ) {
+  if (fulfillmentPending(order)) return null;
   const snapshot = order.catalogSnapshot;
   if (!snapshot?.length || !order.lines.length) return null;
   const seen = new Set<string>();

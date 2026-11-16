@@ -1,3 +1,4 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import { paidEmailLabel, windowEmailLabel } from "./customer-email-status";
 import { Login } from "./Login";
 import { AnalyticsWorkspace } from "./Analytics";
@@ -1036,6 +1037,14 @@ function OrderPanel({
           </>
         )}
         <div className={"co-quote " + (o.quote?.eligible ? "eligible" : "")}>
+          {fulfillmentPending(o) && (
+            <p role="alert">
+              {t("Fulfillment pending customer and 3L team confirmation.")}{" "}
+              {t("Recorded reason: {{reason}}", {
+                reason: o.paymentFulfillment?.reason ?? "",
+              })}
+            </p>
+          )}
           <b>
             {o.fulfillmentMethod === "pickup"
               ? t("Pickup · Pastelerías 3L")
@@ -1173,7 +1182,7 @@ function OrderPanel({
               ))}
           </div>
         )}
-        {next[o.state] && (
+        {next[o.state] && !fulfillmentPending(o) && (
           <button
             className="primary co-full"
             onClick={() =>

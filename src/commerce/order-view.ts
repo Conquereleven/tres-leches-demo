@@ -1,3 +1,4 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import { paidEmailLabel, windowEmailLabel } from "./customer-email-status";
 import { acceptedLinePrice } from "../../shared/pack-pricing";
 import type { Line } from "../../server/domain/model";
@@ -41,6 +42,14 @@ export const paymentOf = (data: Data, o: Order) =>
 
 /** First recorded event; orders carry no separate creation timestamp. */
 export const createdAt = (o: Pick<Order, "audit">) => o.audit[0]?.at;
+/** Stored first server recognition only; never infer from audit or provider time. */
+export function recognizedPaidAt(data: Pick<Data, "payments">, o: Order) {
+  const value =
+    o.paidAt ??
+    data.payments.find((p) => p.id === o.paymentId && p.orderId === o.id)
+      ?.paidAt;
+  return value && Number.isFinite(Date.parse(value)) ? value : undefined;
+}
 
 const same = (a?: string | null, b?: string | null) =>
   !!a && !!b && a.trim().toLowerCase() === b.trim().toLowerCase();
@@ -286,15 +295,42 @@ export function matchesQuery(data: Data, o: Order, query: ListQuery) {
   }
   return true;
 }
-/** Newest first; orders with no recorded activity keep their stored order. */
+/** Creation chronology, then immutable internal id; never payment/settlement time. */
 export const byNewest = (a: Order, b: Order) =>
-  (createdAt(b) ?? "").localeCompare(createdAt(a) ?? "");
+  (createdAt(b) ?? "").localeCompare(createdAt(a) ?? "") ||
+  (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+
+export const storedOrderNumber = (o: Pick<Order, "publicOrderNumber">) =>
+  Number.isSafeInteger(o.publicOrderNumber) && o.publicOrderNumber! > 0
+    ? o.publicOrderNumber!
+    : null;
+/** All orders: numbered first, numeric descending, then creation/id for ties. */
+export function byOrderNumber(a: Order, b: Order) {
+  const an = storedOrderNumber(a),
+    bn = storedOrderNumber(b);
+  return (
+    (an === null ? (bn === null ? 0 : 1) : bn === null ? -1 : bn - an) ||
+    byNewest(a, b)
+  );
+}
+/**
+ * TPL-18 integration seam: use in matchingOrders before its existing Tomorrow
+ * actionable partition. Daily views and fulfilment groups keep chronology.
+ * Main has no daily views; the optional field does not implement them here.
+ */
+export function orderComparator(
+  query: Pick<ListQuery, "fulfilment"> & { view?: string },
+) {
+  return query.fulfilment === "any" && (!query.view || query.view === "all")
+    ? byOrderNumber
+    : byNewest;
+}
 
 export const PAGE_SIZE = 25;
 export function listOrders(data: Data, query: ListQuery) {
   const matching = data.orders
     .filter((o) => matchesQuery(data, o, query))
-    .sort(byNewest);
+    .sort(orderComparator(query));
   const pages = Math.max(1, Math.ceil(matching.length / PAGE_SIZE));
   const page = Math.min(query.page, pages);
   return {
@@ -400,7 +436,7 @@ export function orderPermissions(
     canTake:
       !!c && !owned && c.status === "open" && (!c.assignedAgent || elevated),
     assignee: data.agents.find((a) => a.id === c?.assignedAgent)?.name ?? null,
-    next,
+    next: fulfillmentPending(o) ? null : next,
     canReconcile: p?.provider === "paymennt" && (owned || elevated),
   };
 }

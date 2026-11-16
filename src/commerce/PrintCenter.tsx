@@ -1,3 +1,4 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import { lineKey, preparationText } from "../../shared/pack-composition";
 import { operationalProductName } from "./product-names";
 import { OperationalProductName } from "./OperationalProductName";
@@ -67,7 +68,11 @@ export function PrintCenter({ data }: { data: Workspace }) {
             </select>
           </label>
         </div>
-        {order && !ticketLines ? (
+        {order && fulfillmentPending(order) ? (
+          <p role="alert" className="co-empty">
+            {t("Fulfillment pending customer and 3L team confirmation.")}
+          </p>
+        ) : order && !ticketLines ? (
           <p role="alert" className="co-empty">
             {t(
               "Review required: the stored order catalog snapshot is missing or inconsistent. Ticket preview is unavailable.",

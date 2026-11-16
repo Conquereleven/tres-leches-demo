@@ -15,6 +15,8 @@
  * epoch are enrolled: no backfill, no replay.
  */
 import { randomUUID } from "node:crypto";
+import { fulfillmentPending } from "./payment-fulfillment";
+import { renderCustomerEmail } from "./customer-notifications";
 import { acceptedLinePrice } from "../../shared/pack-pricing";
 import { orderReference } from "../../shared/order-number";
 import { PICKUP_LOCATION } from "../../shared/pickup-location";
@@ -330,7 +332,9 @@ export function recordCustomerEmailV2(
       id: randomUUID(),
       event: "ORDER_PAID",
       ...base,
-      ...renderCustomerEmailV2("confirmed", input),
+      ...(fulfillmentPending(order)
+        ? renderCustomerEmail("ORDER_PAID", order)
+        : renderCustomerEmailV2("confirmed", input)),
       status: "pending",
     };
     s.events[confirmedKey] = row.id;
@@ -342,7 +346,9 @@ export function recordCustomerEmailV2(
       id: randomUUID(),
       event: "ORDER_SCHEDULED_WINDOW_STARTED",
       ...base,
-      ...renderCustomerEmailV2("window", input),
+      ...(fulfillmentPending(order)
+        ? renderCustomerEmail("ORDER_PAID", order)
+        : renderCustomerEmailV2("window", input)),
       schedule: {
         method: schedule.method,
         date: schedule.date,
@@ -353,7 +359,9 @@ export function recordCustomerEmailV2(
         : {
             // An operational exception, visible in Operations; never guessed.
             status: "failed" as const,
-            lastError: "Invalid or missing schedule; not scheduled",
+            lastError: fulfillmentPending(order)
+              ? "Fulfillment pending confirmation; not scheduled"
+              : "Invalid or missing schedule; not scheduled",
           }),
     };
     s.events[windowKey] = row.id;
