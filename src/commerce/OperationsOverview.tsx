@@ -3,7 +3,8 @@ import { DailyFinanceSummary } from "./DailyFinanceSummary";
 import { ReportPanel, Distribution } from "./ReportingPrimitives";
 import "./operations-experience-v2.css";
 import type { Workspace } from "./api";
-import { orderPath } from "./order-view";
+import { orderPath, fulfilmentLabel } from "./order-view";
+import { fulfillmentSchedule } from "../../shared/fulfillment-schedule";
 import { useOps } from "./ops-i18n";
 import { overviewMetrics, overviewAgenda } from "./operations-overview";
 import { orderReference } from "../../shared/order-number";
@@ -26,6 +27,7 @@ export function OperationsOverview({
     Production: "preparing",
     Ready: "ready",
     "Out for Delivery": "out",
+    "Fulfillment pending confirmation": "review",
   };
   const cards = [
     [
@@ -62,10 +64,7 @@ export function OperationsOverview({
     )
     .slice(0, 8);
   const schedule = (o: Workspace["orders"][number]) =>
-    [
-      o.pickup?.pickupDate ?? o.delivery?.date,
-      o.pickup?.preferredTime ?? o.delivery?.slot,
-    ]
+    [fulfillmentSchedule(o).date, fulfillmentSchedule(o).slot]
       .filter(Boolean)
       .join(" · ");
   return (
@@ -135,7 +134,7 @@ export function OperationsOverview({
                 <li key={order.id}>
                   <div className="ops-v2-priority-title">
                     <a href={orderPath(order.id)}>{orderReference(order)}</a>
-                    <span>{t(order.state)}</span>
+                    <span>{t(fulfilmentLabel(order))}</span>
                   </div>
                   <p>
                     {t(
@@ -221,7 +220,9 @@ export function OperationsOverview({
                     <a href={orderPath(o.id)}>{orderReference(o)}</a>
                   </td>
                   <td>
-                    <span className="ops-status-pill">{t(o.state)}</span>
+                    <span className="ops-status-pill">
+                      {t(fulfilmentLabel(o))}
+                    </span>
                   </td>
                   <td>
                     {t(

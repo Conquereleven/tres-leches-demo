@@ -142,6 +142,8 @@ type Summary = {
   customerFirstName?: string;
 };
 type Status = {
+  fulfillmentPending?: boolean;
+  fulfillmentProposal?: { date: string; slot: string };
   orderId: string;
   /** "#001" once paid; null before payment and for orders paid before numbering. */
   orderNumber?: string | null;
@@ -2877,7 +2879,12 @@ export function CheckoutReturn() {
     );
 
   const state = result ? paymentStateOf(result) : null;
-  if (result && state === "PAID") return <Confirmation result={result} />;
+  if (
+    result &&
+    (state === "PAID" ||
+      (result.paymentStatus === "paid" && result.fulfillmentPending))
+  )
+    return <Confirmation result={result} />;
   const belowMinimum =
     state === "FAILED" && result?.rejection === "minimum_quantity";
   const copy = belowMinimum
@@ -3001,6 +3008,26 @@ function Confirmation({ result }: { result: Status }) {
       : fulfilmentStep(result.status);
   const heading = useRef<HTMLHeadingElement>(null);
   useEffect(() => heading.current?.focus(), []);
+  if (result.fulfillmentPending)
+    return (
+      <ShopShell step={4} title={localize("Paid")} bare>
+        <div className="b-co-status" role="status">
+          <h1>
+            <CustomerCopy>Paid</CustomerCopy> · <bdi>{reference(result)}</bdi>
+          </h1>
+          <p>
+            <CustomerCopy>
+              Payment verified. Fulfillment is pending confirmation by you and
+              the 3L team. Please do not pay again.
+            </CustomerCopy>
+          </p>
+          <p>
+            <CustomerCopy>{formatAed(result.amountFils)}</CustomerCopy>
+          </p>
+          <SupportLink orderId={reference(result)} />
+        </div>
+      </ShopShell>
+    );
   return (
     <ShopShell step={4} title={localize("Thank you")} bare>
       <div className="b-co-confirm">

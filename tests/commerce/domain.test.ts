@@ -222,6 +222,19 @@ test("golden path: WA2 → order → GPS → minimum → payment → confirmed �
   const f = fixture(wa),
     id = ready(f);
   assert.equal(current(f, id).quote?.zoneId, "jvc");
+  // A fulfillment golden path needs authored intent before payment initiation.
+  // Missing schedules are deliberately held by the P0 contract regression.
+  f.store.write((s) => {
+    const o = s.orders.find((o) => o.id === id)!;
+    o.fulfillmentMethod = "delivery";
+    o.delivery = {
+      zoneId: "jvc",
+      address: "Synthetic Street",
+      building: "Synthetic Tower",
+      date: new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10),
+      slot: "4:00 PM – 9:00 PM",
+    };
+  });
   f.cmd({ type: "requestPayment", id, version: current(f, id).version });
   await f.service.drain();
   assert.equal(sent.length, 1);

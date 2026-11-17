@@ -11,7 +11,8 @@ export function safeLog(
     | "webhook.accepted"
     | "webhook.rejected"
     | "webhook.external"
-    | "worker.failed",
+    | "worker.failed"
+    | "orders.document",
   fields: {
     status?: number | string;
     attempt?: number;

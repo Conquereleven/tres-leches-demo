@@ -37,7 +37,7 @@ const find = (data: Workspace, id: string) =>
 const ids = (data: Workspace, q: Partial<ListQuery>) =>
   listOrders(data, { ...EMPTY_QUERY, ...q }).rows.map((o) => o.id);
 
-test("OMS list shows every order, newest first, and never drops history silently", () => {
+test("OMS All list shows numbered orders descending and never drops history silently", () => {
   const data = load();
   const all = listOrders(data, EMPTY_QUERY);
   assert.equal(all.total, data.orders.length);
@@ -47,8 +47,15 @@ test("OMS list shows every order, newest first, and never drops history silently
       all.rows.some((o) => o.id === id),
       id,
     );
-  const times = all.rows.map((o) => o.audit[0]!.at);
-  assert.deepEqual(times, [...times].sort().reverse());
+  const numbers = all.rows
+    .filter((o) => o.publicOrderNumber)
+    .map((o) => o.publicOrderNumber!);
+  assert.deepEqual(
+    numbers,
+    [...numbers].sort((a, b) => b - a),
+  );
+  const firstUnnumbered = all.rows.findIndex((o) => !o.publicOrderNumber);
+  assert.ok(all.rows.slice(firstUnnumbered).every((o) => !o.publicOrderNumber));
   // Listing an unpaid order does not put it in the kitchen queue.
   assert.equal(inQueue(find(data, "TL-FIX00007")), false);
 });
@@ -97,6 +104,7 @@ test("OMS list is paginated and clamps an out-of-range page", () => {
 
 test("OMS filters round-trip through the URL and reject invalid values", () => {
   const query: ListQuery = {
+    view: "tomorrow",
     q: "layla #012",
     payment: "paid",
     fulfilment: "preparing",

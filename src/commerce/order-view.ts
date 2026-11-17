@@ -1,3 +1,5 @@
+import { fulfillmentSchedule } from "../../shared/fulfillment-schedule";
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import { paidEmailLabel, windowEmailLabel } from "./customer-email-status";
 import { acceptedLinePrice } from "../../shared/pack-pricing";
 import type { Line } from "../../server/domain/model";
@@ -24,6 +26,7 @@ import {
   type PaymentTone,
 } from "./orders-board";
 import { orderProductName, productSearchText } from "./product-names";
+import { completedAt, dubaiDay, nextDay } from "../../shared/order-days";
 
 export const DRAFT_STATES: readonly OrderState[] = [
   "New",
@@ -41,6 +44,14 @@ export const paymentOf = (data: Data, o: Order) =>
 
 /** First recorded event; orders carry no separate creation timestamp. */
 export const createdAt = (o: Pick<Order, "audit">) => o.audit[0]?.at;
+/** Stored first server recognition only; never infer from audit or provider time. */
+export function recognizedPaidAt(data: Pick<Data, "payments">, o: Order) {
+  const value =
+    o.paidAt ??
+    data.payments.find((p) => p.id === o.paymentId && p.orderId === o.id)
+      ?.paidAt;
+  return value && Number.isFinite(Date.parse(value)) ? value : undefined;
+}
 
 const same = (a?: string | null, b?: string | null) =>
   !!a && !!b && a.trim().toLowerCase() === b.trim().toLowerCase();
@@ -74,6 +85,7 @@ export function customerName(
 }
 
 export type FulfilmentGroup =
+  | "review"
   | "draft"
   | "unpaid"
   | "to-confirm"
@@ -105,8 +117,15 @@ export function fulfilmentGroup(state: OrderState): FulfilmentGroup {
       return "draft";
   }
 }
+/** Review is a presentation group, never a persisted state. */
+export const orderFulfilmentGroup = (
+  o: Pick<Order, "state"> & Partial<Order>,
+): FulfilmentGroup =>
+  fulfillmentPending(o) ? "review" : fulfilmentGroup(o.state);
+
 export const FULFILMENT_FILTERS: [FulfilmentGroup | "any", string][] = [
   ["any", "All fulfillment"],
+  ["review", "Fulfillment pending confirmation"],
   ["unpaid", "Esperando pago"],
   ["to-confirm", "Por confirmar"],
   ["confirmed", "Confirmado"],
@@ -127,18 +146,59 @@ export const PAYMENT_FILTERS: [PaymentTone | "any", string][] = [
 ];
 /** Label shown for an order's fulfilment state; drafts keep their exact state. */
 export const fulfilmentLabel = (
-  o: Pick<Order, "state" | "fulfillmentMethod">,
+  o: Pick<Order, "state" | "fulfillmentMethod"> & Partial<Order>,
 ) =>
-  o.state === "Delivered" && o.fulfillmentMethod === "pickup"
-    ? "Picked up"
-    : (FULFILMENT_LABEL[o.state] ?? o.state);
+  fulfillmentPending(o)
+    ? "Fulfillment pending confirmation"
+    : o.state === "Delivered" && o.fulfillmentMethod === "pickup"
+      ? "Picked up"
+      : (FULFILMENT_LABEL[o.state] ?? o.state);
 
-export const dueDate = (o: Pick<Order, "pickup" | "delivery">) =>
-  o.pickup?.pickupDate ?? o.delivery?.date;
-export const dueSlot = (o: Pick<Order, "pickup" | "delivery">) =>
-  o.pickup?.preferredTime ?? o.delivery?.slot;
+export const dueDate = (
+  o: Pick<Order, "pickup" | "delivery"> & Partial<Order>,
+) => fulfillmentSchedule(o).date;
+export const dueSlot = (
+  o: Pick<Order, "pickup" | "delivery"> & Partial<Order>,
+) => fulfillmentSchedule(o).slot;
+
+/**
+ * Daily operations views. "Delivered today" uses the persisted transition to
+ * Delivered on the current Dubai day; "Tomorrow" uses the fulfilment date.
+ */
+export const ORDER_VIEWS = [
+  ["all", "All orders"],
+  ["delivered-today", "Delivered today"],
+  ["tomorrow", "Scheduled tomorrow"],
+] as const;
+export type OrderView = (typeof ORDER_VIEWS)[number][0];
+
+/** Paid and accepted work; unpaid and draft orders are never actionable. */
+export const isActionable = (o: Pick<Order, "state"> & Partial<Order>) =>
+  !fulfillmentPending(o) &&
+  !isDraft(o) &&
+  o.state !== "Awaiting Payment" &&
+  o.state !== "Cancelled";
+
+export function inView(o: Order, view: OrderView, today: string) {
+  if (view !== "all" && fulfillmentPending(o)) return false;
+  if (view === "delivered-today") {
+    const at = completedAt(o);
+    return !!at && dubaiDay(at) === today;
+  }
+  if (view === "tomorrow")
+    return (
+      dueDate(o) === nextDay(today) &&
+      o.state !== "Delivered" &&
+      o.state !== "Cancelled"
+    );
+  return true;
+}
+/** Delivered orders whose completion time was never recorded: unknown, not today. */
+export const deliveredWithoutEvidence = (orders: Order[]) =>
+  orders.filter((o) => o.state === "Delivered" && !completedAt(o)).length;
 
 export type ListQuery = {
+  view: OrderView;
   q: string;
   payment: PaymentTone | "any";
   fulfilment: FulfilmentGroup | "any";
@@ -151,6 +211,7 @@ export type ListQuery = {
   page: number;
 };
 export const EMPTY_QUERY: ListQuery = {
+  view: "all",
   q: "",
   payment: "any",
   fulfilment: "any",
@@ -162,6 +223,7 @@ export const EMPTY_QUERY: ListQuery = {
   page: 1,
 };
 const KEYS = {
+  view: "view",
   q: "q",
   payment: "payment",
   fulfilment: "status",
@@ -189,7 +251,9 @@ export function parseListQuery(search: string): ListQuery {
   };
   const method = p.get(KEYS.method);
   const page = Number(p.get("page"));
+  const view = ORDER_VIEWS.find(([id]) => id === p.get(KEYS.view))?.[0];
   return {
+    view: view ?? "all",
     q: (p.get(KEYS.q) ?? "").slice(0, 120),
     payment: pick(KEYS.payment, PAYMENT_FILTERS),
     fulfilment: pick(KEYS.fulfilment, FULFILMENT_FILTERS),
@@ -208,7 +272,7 @@ export function serializeListQuery(query: ListQuery): string {
     string,
   ][]) {
     const v = query[field];
-    if (v && v !== "any") p.set(key, v);
+    if (v && v !== "any" && !(field === "view" && v === "all")) p.set(key, v);
   }
   if (query.page > 1) p.set("page", String(query.page));
   const s = p.toString();
@@ -216,7 +280,7 @@ export function serializeListQuery(query: ListQuery): string {
 }
 export const activeFilterCount = (q: ListQuery) =>
   (Object.keys(KEYS) as (keyof typeof KEYS)[]).filter(
-    (k) => k !== "q" && q[k] && q[k] !== "any",
+    (k) => k !== "q" && k !== "view" && q[k] && q[k] !== "any",
   ).length;
 
 const digits = (v: string) => v.replace(/\D/g, "");
@@ -244,7 +308,13 @@ export function orderSearchText(data: Data, o: Order) {
     .join(" ")
     .toLowerCase();
 }
-export function matchesQuery(data: Data, o: Order, query: ListQuery) {
+export function matchesQuery(
+  data: Data,
+  o: Order,
+  query: ListQuery,
+  today = dubaiDay(),
+) {
+  if (!inView(o, query.view, today)) return false;
   const needle = query.q.trim().toLowerCase();
   if (needle) {
     const text = orderSearchText(data, o);
@@ -263,7 +333,7 @@ export function matchesQuery(data: Data, o: Order, query: ListQuery) {
     return false;
   if (
     query.fulfilment !== "any" &&
-    fulfilmentGroup(o.state) !== query.fulfilment
+    orderFulfilmentGroup(o) !== query.fulfilment
   )
     return false;
   if (
@@ -286,15 +356,57 @@ export function matchesQuery(data: Data, o: Order, query: ListQuery) {
   }
   return true;
 }
-/** Newest first; orders with no recorded activity keep their stored order. */
+/** Creation chronology, then immutable internal id; never payment/settlement time. */
 export const byNewest = (a: Order, b: Order) =>
-  (createdAt(b) ?? "").localeCompare(createdAt(a) ?? "");
+  (createdAt(b) ?? "").localeCompare(createdAt(a) ?? "") ||
+  (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+
+export const storedOrderNumber = (o: Pick<Order, "publicOrderNumber">) =>
+  Number.isSafeInteger(o.publicOrderNumber) && o.publicOrderNumber! > 0
+    ? o.publicOrderNumber!
+    : null;
+/** All orders: numbered first, numeric descending, then creation/id for ties. */
+export function byOrderNumber(a: Order, b: Order) {
+  const an = storedOrderNumber(a),
+    bn = storedOrderNumber(b);
+  return (
+    (an === null ? (bn === null ? 0 : 1) : bn === null ? -1 : bn - an) ||
+    byNewest(a, b)
+  );
+}
+/**
+ * TPL-18 integration seam: use in matchingOrders before its existing Tomorrow
+ * actionable partition. Daily views and fulfilment groups keep chronology.
+ * All-matching bulk selection uses the same ordering before pagination.
+ */
+export function orderComparator(
+  query: Pick<ListQuery, "fulfilment"> & { view?: string },
+) {
+  return query.fulfilment === "any" && (!query.view || query.view === "all")
+    ? byOrderNumber
+    : byNewest;
+}
 
 export const PAGE_SIZE = 25;
-export function listOrders(data: Data, query: ListQuery) {
-  const matching = data.orders
-    .filter((o) => matchesQuery(data, o, query))
-    .sort(byNewest);
+/**
+ * Every order matching the view, search and filters, across all pages. Bulk
+ * selection and documents use this list; the table shows one page of it.
+ * Tomorrow lists paid/accepted work first, then unpaid and draft orders.
+ */
+export function matchingOrders(
+  data: Data,
+  query: ListQuery,
+  today = dubaiDay(),
+) {
+  const rows = data.orders
+    .filter((o) => matchesQuery(data, o, query, today))
+    .sort(orderComparator(query));
+  return query.view === "tomorrow"
+    ? [...rows.filter(isActionable), ...rows.filter((o) => !isActionable(o))]
+    : rows;
+}
+export function listOrders(data: Data, query: ListQuery, today = dubaiDay()) {
+  const matching = matchingOrders(data, query, today);
   const pages = Math.max(1, Math.ceil(matching.length / PAGE_SIZE));
   const page = Math.min(query.page, pages);
   return {
@@ -400,7 +512,7 @@ export function orderPermissions(
     canTake:
       !!c && !owned && c.status === "open" && (!c.assignedAgent || elevated),
     assignee: data.agents.find((a) => a.id === c?.assignedAgent)?.name ?? null,
-    next,
+    next: fulfillmentPending(o) ? null : next,
     canReconcile: p?.provider === "paymennt" && (owned || elevated),
   };
 }
