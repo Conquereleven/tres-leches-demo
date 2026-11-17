@@ -110,3 +110,31 @@ test("valid issued public number retains its display and no Unnumbered marker", 
   assert.match(html, />#200</);
   assert.doesNotMatch(html, />Unnumbered</);
 });
+
+// Selection must use the same validated identity as the visible link, for every role.
+for (const role of ["admin", "manager", "operator", "agent"] as const)
+  for (const value of [
+    -3,
+    1.5,
+    0,
+    NaN,
+    Infinity,
+    -Infinity,
+    Number.MAX_SAFE_INTEGER + 1,
+    undefined,
+    200,
+  ])
+    test(`selection label preserves safe identity role=${role} value=${String(value)}`, () => {
+      const f = fixture();
+      f.data.actor.role = role;
+      f.o.publicOrderNumber = value;
+      const before = structuredClone(f.data);
+      const html = list(f.data);
+      const selectable = role === "admin" || role === "manager";
+      const identity = value === 200 ? "#200" : f.o.id;
+      if (selectable)
+        assert.ok(html.includes(`aria-label="Select order ${identity}"`));
+      else assert.doesNotMatch(html, /aria-label="Select order /);
+      assert.ok(html.includes(`>${identity}</a>`));
+      assert.deepEqual(f.data, before);
+    });

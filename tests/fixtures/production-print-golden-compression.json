@@ -1,0 +1,765 @@
+{
+  "sourceSHA": "1fd194f829c427d13ae2c4c988517f15025a3613",
+  "basis": "Exact immutable 1fd artifacts: decoded objects/streams, text, geometry and all-page pixels equal. Only native zlib deflate bitstreams differ. Profiles are whole-corpus raw-byte allowlists, not runtime-version gates.",
+  "diagnostics": {
+    "runtime-golden-diagnostic.json": "cd93bfa5a6af866cb50a11e95eb77ac007676dc16759561a530fe509837691b7",
+    "pdf-runtime-semantic-diagnostic.json": "295ea3f0b53526b8934cd1db5e6df41eac23164bb3f32b8bee6fd8ef11829027",
+    "pdf-compression-root-cause.json": "c9933291d531637b90711ca9d09855786596e69526615b1efc08153f0130c332"
+  },
+  "profiles": [
+    {
+      "id": "deflate-1.2.12",
+      "documents": {
+        "P1_Numeric_Arabic.pdf": "6607ce6f08d11e8581207db356b42dd985db498783bed7ebed80774d8d11a258",
+        "P2_Numeric_Arabic.pdf": "11481de0a9b15c3189e6605c1ec61a2e172c917231b17abcdf235a6b21d1f7f8",
+        "P2_Oversized_Group.pdf": "279293cc3710b9d047899c91b906e0d5399d0b2bd08624237947fb927521d3ea",
+        "P1_Bulk60.pdf": "62f7b49a9a653560cdbdbbb95942979a21cd6fafe017ef8f2fecdf25b68b7907",
+        "P1_3L_Production_Standard.pdf": "983836b5a3003561af7d0e0b15de972b718c9042de41e799ffe8961278f3667c",
+        "P2_3L_Production_Event_Bulk.pdf": "f0934a23a2b1e72fe1166bc1a42bca8cc56fcb581dca1d8897cb63cb7dd0d3c3",
+        "P1_3L_Unpaid_and_Missing_Snapshot.pdf": "36cf79a4346252a740adea0b0399f853f9efe83f19eea7a5fbadfe245e64a772",
+        "P1_Overflow.pdf": "1f60f6086df87b58e41157981797e29b50950c65bb564156f4848e345d649822",
+        "P2_Overflow.pdf": "cb13e39671fc1b61470c305135f9e69d162e8fafdf3f14ebebd6f790e5d45a15"
+      },
+      "zipSha256": "f0c449105d97642eb69f7561cd8dba1d915cb2e0eb0d47e46524509166aa2392",
+      "entries": [
+        {
+          "name": "001-packing-slip-TL-BULK000.pdf",
+          "sha256": "e69771fbab9422e262696b33841535381db30ee80f2142afc83d7fb855c45670",
+          "bytes": 44946,
+          "crc32": 2237700928
+        },
+        {
+          "name": "002-packing-slip-TL-BULK001.pdf",
+          "sha256": "e4d06ddb3d2ea77747e50b092b13fb24ffa627c2a1be0f2b93184823d22311eb",
+          "bytes": 44982,
+          "crc32": 3719363028
+        },
+        {
+          "name": "003-packing-slip-TL-BULK002.pdf",
+          "sha256": "9fb326033cab7e028dab44abda5030d5b617c053e4da637493fadf5e99461df6",
+          "bytes": 44938,
+          "crc32": 3347072529
+        },
+        {
+          "name": "004-packing-slip-TL-BULK003.pdf",
+          "sha256": "8072681153cfcb34f54e9dfd4d786642384620ab42456618451a7fe61e726e3f",
+          "bytes": 45036,
+          "crc32": 3578074297
+        },
+        {
+          "name": "005-packing-slip-TL-BULK004.pdf",
+          "sha256": "a0d4c6a47fd82ddc425871ebeee611550ab18eb26cec0f3cc8492f8b50f65862",
+          "bytes": 45055,
+          "crc32": 4006437323
+        },
+        {
+          "name": "006-packing-slip-TL-BULK005.pdf",
+          "sha256": "4804d68552329a4994edb62ee255ad955f02a81c52d6f9e949aa3c0ee6cf85ef",
+          "bytes": 45036,
+          "crc32": 4204786531
+        },
+        {
+          "name": "007-packing-slip-TL-BULK006.pdf",
+          "sha256": "dbf0d03031087b0b79cf86d5642a9798985c4abd2619a10391a670f672611378",
+          "bytes": 45056,
+          "crc32": 826409185
+        },
+        {
+          "name": "008-packing-slip-TL-BULK007.pdf",
+          "sha256": "699691c3257794b3f0ca61f515500eb6734a1f1419f6438bfa90db8d0389fdf6",
+          "bytes": 45044,
+          "crc32": 3153707789
+        },
+        {
+          "name": "009-packing-slip-TL-BULK008.pdf",
+          "sha256": "b38f99529a6b1fdc60debb9d04a412d2815f889424bb737bb3e937be9445b2b8",
+          "bytes": 45183,
+          "crc32": 1703792081
+        },
+        {
+          "name": "010-packing-slip-TL-BULK009.pdf",
+          "sha256": "bb7e628146ccc12ac8ff6acb33a6b354af65aacf103407ec95b28a790a45696b",
+          "bytes": 45150,
+          "crc32": 4244922055
+        },
+        {
+          "name": "011-packing-slip-TL-BULK010.pdf",
+          "sha256": "bb781c93a15579153d9cd07e62e1211729aadab299a50017025c9b8697062e08",
+          "bytes": 44982,
+          "crc32": 2903123559
+        },
+        {
+          "name": "012-packing-slip-TL-BULK011.pdf",
+          "sha256": "0248f763740e9244de67592f26fc45f308a94881a237ee5be42b44fc982c888a",
+          "bytes": 44979,
+          "crc32": 2797015306
+        },
+        {
+          "name": "013-packing-slip-TL-BULK012.pdf",
+          "sha256": "9c4f6e18404f4b560e9586d7ea1964a90681acd24c2127e5f565dd17edacec45",
+          "bytes": 44981,
+          "crc32": 582613774
+        },
+        {
+          "name": "014-packing-slip-TL-BULK013.pdf",
+          "sha256": "51c24ff6cd18886b6542e14b7286ead5f34c9e23cba4b658ecf718e047866021",
+          "bytes": 45076,
+          "crc32": 648333653
+        },
+        {
+          "name": "015-packing-slip-TL-BULK014.pdf",
+          "sha256": "08a5a483fc90eae397932e1492984b4509188c9909073a3f497448620e1890d3",
+          "bytes": 45101,
+          "crc32": 221326575
+        },
+        {
+          "name": "016-packing-slip-TL-BULK015.pdf",
+          "sha256": "60c3cccd117c634cccd6d17218c96abf4210b114a4c134ec9b9c9f787b6b28b5",
+          "bytes": 45075,
+          "crc32": 2128271034
+        },
+        {
+          "name": "017-packing-slip-TL-BULK016.pdf",
+          "sha256": "440d4201cef4db5ff5cf2e924cecfc6e838baf43397651351158b6e421298ad7",
+          "bytes": 45099,
+          "crc32": 3379202120
+        },
+        {
+          "name": "018-packing-slip-TL-BULK017.pdf",
+          "sha256": "a13f82581238e8ff73e8ac0e161b5d5b428a1a04264b903d16eddb9831a5536d",
+          "bytes": 45088,
+          "crc32": 1118716719
+        },
+        {
+          "name": "019-packing-slip-TL-BULK018.pdf",
+          "sha256": "c399f2f4677dde16bf606a50ec8549e87cba09167242793768366448ded890d3",
+          "bytes": 45227,
+          "crc32": 2035128426
+        },
+        {
+          "name": "020-packing-slip-TL-BULK019.pdf",
+          "sha256": "033bf72ca0a6ef454ba82cb5e58b6e7e5c851a8c1451813f123e6cf7d12e8123",
+          "bytes": 45194,
+          "crc32": 545975343
+        },
+        {
+          "name": "021-packing-slip-TL-BULK020.pdf",
+          "sha256": "6c78437cc55406f6de9fea08b071716a35fa8e2f9255fb57a7f775e41f05bc24",
+          "bytes": 44938,
+          "crc32": 933803165
+        },
+        {
+          "name": "022-packing-slip-TL-BULK021.pdf",
+          "sha256": "1521478be702ebeeed3909e3559a1f863a37acf818d237572846dae8874fe98b",
+          "bytes": 44981,
+          "crc32": 1550132043
+        },
+        {
+          "name": "023-packing-slip-TL-BULK022.pdf",
+          "sha256": "028032e64f95c7c0baaa34a4a57e3b937f1106257378f1f004a3dca88956121c",
+          "bytes": 44940,
+          "crc32": 2436212559
+        },
+        {
+          "name": "024-packing-slip-TL-BULK023.pdf",
+          "sha256": "f23d1820f8d4e191a069bfd33ac04b81a003b282cba7aa6b0c7cd7c4568cebb2",
+          "bytes": 45035,
+          "crc32": 3947801867
+        },
+        {
+          "name": "025-packing-slip-TL-BULK024.pdf",
+          "sha256": "86902c635d0f908e605e763d52637e9460f183039f3d15a9ded703b48acb0c03",
+          "bytes": 45058,
+          "crc32": 2454587273
+        },
+        {
+          "name": "026-packing-slip-TL-BULK025.pdf",
+          "sha256": "f1db0be223b1ba2bf84ee1c678755b65f4004b8b0b44737dc7fb12ae6779fec2",
+          "bytes": 45034,
+          "crc32": 1518750065
+        },
+        {
+          "name": "027-packing-slip-TL-BULK026.pdf",
+          "sha256": "56713f0c1f2e5081319840b5eed910035ce17257ed1874a5ce32624f5fc086a6",
+          "bytes": 45057,
+          "crc32": 2347263361
+        },
+        {
+          "name": "028-packing-slip-TL-BULK027.pdf",
+          "sha256": "d81d2f160e475681f2651d9eb722543d330daffe2af40455bdeda8efc8607eb8",
+          "bytes": 45041,
+          "crc32": 3194061704
+        },
+        {
+          "name": "029-packing-slip-TL-BULK028.pdf",
+          "sha256": "c40facdf6cb3b58b809a2f0862ac5b9a0c341607347ca039a0c31eb96b12af37",
+          "bytes": 45185,
+          "crc32": 1511581012
+        },
+        {
+          "name": "030-packing-slip-TL-BULK029.pdf",
+          "sha256": "f3dcc16c1ee27d7d49309db2b6244a628d6529884d35774f6031239f24046a5c",
+          "bytes": 45151,
+          "crc32": 3404667578
+        },
+        {
+          "name": "031-packing-slip-TL-BULK030.pdf",
+          "sha256": "c5166bf57d5c1c2ba06b9c1a2995a7a98862b03f120fdb6cc3c6a3c91d2078a1",
+          "bytes": 45039,
+          "crc32": 2150356141
+        },
+        {
+          "name": "032-packing-slip-TL-BULK031.pdf",
+          "sha256": "eff574e9facd81005a66a3f094c5fb969988a220aada5d744c7b7a5a63d224bf",
+          "bytes": 45081,
+          "crc32": 3112627462
+        },
+        {
+          "name": "033-packing-slip-TL-BULK032.pdf",
+          "sha256": "9a67801df615cbe5b5ff77f2cdaa65a3de8056e67bf93a06e81ca8e451e1ee38",
+          "bytes": 45038,
+          "crc32": 771381484
+        },
+        {
+          "name": "034-packing-slip-TL-BULK033.pdf",
+          "sha256": "0650a9cd44d7d4aae7b3e9c01a0131045293a7d71985e2938124819138f96e4d",
+          "bytes": 45040,
+          "crc32": 3920359675
+        },
+        {
+          "name": "035-packing-slip-TL-BULK034.pdf",
+          "sha256": "378928f6c4b6c86b98c3babaebe775fffe6553fc581019d88599046630a748ed",
+          "bytes": 45155,
+          "crc32": 4229512208
+        },
+        {
+          "name": "036-packing-slip-TL-BULK035.pdf",
+          "sha256": "b65a1f688b7c883b56f4a486af95943f73c81c27446c5f2d02c294b7e73c33b1",
+          "bytes": 45123,
+          "crc32": 1696978949
+        },
+        {
+          "name": "037-packing-slip-TL-BULK036.pdf",
+          "sha256": "684f10c0de20965869245b8a06acf29e2930c619cbd48c25a27750b9867c77c7",
+          "bytes": 45156,
+          "crc32": 384462222
+        },
+        {
+          "name": "038-packing-slip-TL-BULK037.pdf",
+          "sha256": "9c345f76e23380410a578e7611f5750915883095413e3be5a8e767a134291926",
+          "bytes": 45150,
+          "crc32": 1500931221
+        },
+        {
+          "name": "039-packing-slip-TL-BULK038.pdf",
+          "sha256": "b07177ee5a42aa2b1bc49fe287c6b40a269e60c9cd188daf923b72609b42e78b",
+          "bytes": 45280,
+          "crc32": 174928823
+        },
+        {
+          "name": "040-packing-slip-TL-BULK039.pdf",
+          "sha256": "41c73bd5c26885fab2be244567f6c9dd85cdf19de447d46ecf9334357cd906e7",
+          "bytes": 45244,
+          "crc32": 3166261894
+        },
+        {
+          "name": "041-packing-slip-TL-BULK040.pdf",
+          "sha256": "cfcea52f9d6f2d56f959381c235f5eb91b99aed89c89416919b6235387b47675",
+          "bytes": 45055,
+          "crc32": 3833254205
+        },
+        {
+          "name": "042-packing-slip-TL-BULK041.pdf",
+          "sha256": "5db91417e1b71e9b4a7b58c6c3159dd7c1bc7560bfcca111e5ba87b671e6ff22",
+          "bytes": 45105,
+          "crc32": 2044333519
+        },
+        {
+          "name": "043-packing-slip-TL-BULK042.pdf",
+          "sha256": "40595ff649b775ed423ba754e72ea16ed71414cd868cb1d993c1f4b7ce31f2fa",
+          "bytes": 45057,
+          "crc32": 632396304
+        },
+        {
+          "name": "044-packing-slip-TL-BULK043.pdf",
+          "sha256": "3fecfa61b964ba4d9bcbcf66e0621f41573e3f8a43aca5e985d7944a7b7a33d0",
+          "bytes": 45158,
+          "crc32": 1632178576
+        },
+        {
+          "name": "045-packing-slip-TL-BULK044.pdf",
+          "sha256": "82361b0e64ffec5334d17172a1935d2b030381fa05421ad8388eb51550ce98b1",
+          "bytes": 45053,
+          "crc32": 1421676800
+        },
+        {
+          "name": "046-packing-slip-TL-BULK045.pdf",
+          "sha256": "c03642ca4140244924ba1e4b84594eb8043ab05a9b8fb6b4a1fa7d9261b27e1b",
+          "bytes": 45153,
+          "crc32": 881353247
+        },
+        {
+          "name": "047-packing-slip-TL-BULK046.pdf",
+          "sha256": "fc9063150ce5a25a3d2097c71bdaa75c67459c9f32e4a400f391e8be8c6b127d",
+          "bytes": 45174,
+          "crc32": 4230402210
+        },
+        {
+          "name": "048-packing-slip-TL-BULK047.pdf",
+          "sha256": "98da823d6854de0b0bf20b2b24f3c41ef72bbd9228403d4a69761e7145dddcc7",
+          "bytes": 45167,
+          "crc32": 1115242509
+        },
+        {
+          "name": "049-packing-slip-TL-BULK048.pdf",
+          "sha256": "80d764e077c981b30834210db7b7f7f13a6ec7c3d509c5f1d0b866de333213a6",
+          "bytes": 45310,
+          "crc32": 3361799661
+        },
+        {
+          "name": "050-packing-slip-TL-BULK049.pdf",
+          "sha256": "a4199e26b4baae5fb653b3d87f5eac64be1388adc4267b36b56d72f711104433",
+          "bytes": 45278,
+          "crc32": 1720941598
+        },
+        {
+          "name": "051-packing-slip-TL-BULK050.pdf",
+          "sha256": "232fdf4ad0a345f29c3133c9278c662bc2a191f3ef26e6570376349ee6710634",
+          "bytes": 45037,
+          "crc32": 3189193531
+        },
+        {
+          "name": "052-packing-slip-TL-BULK051.pdf",
+          "sha256": "5517e38883bc372a28c5388118160b33999f410d1cf52f015b1c17cd12fc55de",
+          "bytes": 45080,
+          "crc32": 2274980100
+        },
+        {
+          "name": "053-packing-slip-TL-BULK052.pdf",
+          "sha256": "c30b02b202cc12aac14b530c62ebc6d627e3c26d7e05ec5e815469173f5621c1",
+          "bytes": 45041,
+          "crc32": 993478296
+        },
+        {
+          "name": "054-packing-slip-TL-BULK053.pdf",
+          "sha256": "474d1f7aaeaea04dda88c2ff24784941a6eae6d35a7483b56b1189e51477f831",
+          "bytes": 45127,
+          "crc32": 2364638411
+        },
+        {
+          "name": "055-packing-slip-TL-BULK054.pdf",
+          "sha256": "594059ca5f0d43d28a8182cd83fd538ba172934b1043ff17b73a4da8069b4338",
+          "bytes": 45151,
+          "crc32": 2427910153
+        },
+        {
+          "name": "056-packing-slip-TL-BULK055.pdf",
+          "sha256": "793b6302ca0cf3d9987b177859b3619f4bf05b51e90cfdec55ce265dd80d1893",
+          "bytes": 45043,
+          "crc32": 1835681882
+        },
+        {
+          "name": "057-packing-slip-TL-BULK056.pdf",
+          "sha256": "6262cd439479fdb864831ef5ba0ef4ce214aca676b3e751bddc41631385ed67e",
+          "bytes": 45155,
+          "crc32": 2607017636
+        },
+        {
+          "name": "058-packing-slip-TL-BULK057.pdf",
+          "sha256": "34e93a54baf39da7417bcb37724754dd493f84d1d6b2f9674751054670528888",
+          "bytes": 45152,
+          "crc32": 2366423871
+        },
+        {
+          "name": "059-packing-slip-TL-BULK058.pdf",
+          "sha256": "c87c345695eb699c64f5ee9205839ecfec67c561b7aad7a0573cc040ac18b965",
+          "bytes": 45281,
+          "crc32": 1914692972
+        },
+        {
+          "name": "060-packing-slip-TL-BULK059.pdf",
+          "sha256": "a415430eca7af9cfc45ef7751e8ba38e58c40b91348bd4264bf851dd0bb28ae0",
+          "bytes": 45247,
+          "crc32": 3577914387
+        }
+      ]
+    },
+    {
+      "id": "deflate-1.3.1",
+      "documents": {
+        "P1_Numeric_Arabic.pdf": "35dadfcf1cb122c5cd37778ec4624ff47859ccc9cfc4fd2441808205292a5251",
+        "P2_Numeric_Arabic.pdf": "0061ec92c55a0b2347c23023c8de2dcc74e0e531ccb67adb294170600c76199c",
+        "P2_Oversized_Group.pdf": "0c5b5fdee3f4d8586efd352f9a563669827e79e6c053e7cbf89996a47ba3d603",
+        "P1_Bulk60.pdf": "29eddc1f7e9792dc2e107fc4c9a8c76a67aff8dde0ded2cda364799b265f193c",
+        "P1_3L_Production_Standard.pdf": "ef0cc709af8401d0de9847cc391a139a4137f72eb3a357c8d66f5fe980ceccef",
+        "P2_3L_Production_Event_Bulk.pdf": "04639af7f2c47aa8830ef34e9bc4833c10b858dece2e2d358db5b5408a94fd2d",
+        "P1_3L_Unpaid_and_Missing_Snapshot.pdf": "486d1a24f4906a398ca829d87b3754c8d9cd2489476b90c4156ecfdff486c7b8",
+        "P1_Overflow.pdf": "0fffeeb9375b095a0594258fd4775858d546347969810080b135ecfac515b983",
+        "P2_Overflow.pdf": "3866370df0bc613782b41c7220e541ee660fe64bfae2e505f9ba4694ccfb4aaf"
+      },
+      "zipSha256": "b977b2e05d76f3f0d64ec4aa0c03e5ff3a8cccd0faec4975b208b6e60b652bca",
+      "entries": [
+        {
+          "name": "001-packing-slip-TL-BULK000.pdf",
+          "sha256": "0efc705df9a065f25683807ad77e5d7a49c17d2584489707d428432f13842c17",
+          "bytes": 45332,
+          "crc32": 1379562768
+        },
+        {
+          "name": "002-packing-slip-TL-BULK001.pdf",
+          "sha256": "3aa6095f677015209d226532c839f4fef191f1e1edceb3b09c26419f1ca28137",
+          "bytes": 45372,
+          "crc32": 2584153755
+        },
+        {
+          "name": "003-packing-slip-TL-BULK002.pdf",
+          "sha256": "140454ce6d8b244b6ece2274771fb8433a66ec72651cefda224aab83f9b823bb",
+          "bytes": 45328,
+          "crc32": 421101056
+        },
+        {
+          "name": "004-packing-slip-TL-BULK003.pdf",
+          "sha256": "d8ca509286fe9d425209f5d2003abfd96a78a7ae678a2997a08a3945d9b74408",
+          "bytes": 45430,
+          "crc32": 2233903750
+        },
+        {
+          "name": "005-packing-slip-TL-BULK004.pdf",
+          "sha256": "204079d3fb04ee4150ae48c722a48a2abf6bc47f44e56ce0486a4f5254af97da",
+          "bytes": 45448,
+          "crc32": 2944766649
+        },
+        {
+          "name": "006-packing-slip-TL-BULK005.pdf",
+          "sha256": "f8c8945f3e5cb40e647cb9fcb9898d1c58699cb263e1f5dc0c6040c0981e81c2",
+          "bytes": 45428,
+          "crc32": 2453862155
+        },
+        {
+          "name": "007-packing-slip-TL-BULK006.pdf",
+          "sha256": "88c8640060a1af9bb40ab92bd70e75523de2a34f9b821fed0cdcc45d50680c30",
+          "bytes": 45447,
+          "crc32": 1528910120
+        },
+        {
+          "name": "008-packing-slip-TL-BULK007.pdf",
+          "sha256": "2fee8def2751b7c6ca818ead8849c03624536f8df84773375575fd5aa02a8005",
+          "bytes": 45435,
+          "crc32": 3159918642
+        },
+        {
+          "name": "009-packing-slip-TL-BULK008.pdf",
+          "sha256": "22cec462adf83b349be0980be08d601943412740fc0e0c874cfb5863d8e04bac",
+          "bytes": 45578,
+          "crc32": 1037508954
+        },
+        {
+          "name": "010-packing-slip-TL-BULK009.pdf",
+          "sha256": "5b8e63309f944ad89bfe3b2c7fe28fe2183384dc943b5d6f8f7b0b4b7ae9be6b",
+          "bytes": 45547,
+          "crc32": 872464814
+        },
+        {
+          "name": "011-packing-slip-TL-BULK010.pdf",
+          "sha256": "51e67db0ba584b7ee485694e2ee01b43c972f7ffee2e9a18f39ab75175cee815",
+          "bytes": 45371,
+          "crc32": 1198668291
+        },
+        {
+          "name": "012-packing-slip-TL-BULK011.pdf",
+          "sha256": "327c21ceb45292bba6c786dbe22acada928d8526aaf8d55a8a9f32bff002e40d",
+          "bytes": 45373,
+          "crc32": 1662522173
+        },
+        {
+          "name": "013-packing-slip-TL-BULK012.pdf",
+          "sha256": "984918e74365e64cdfbef76d3f93d85ea5198051c88bfb84d93425e5977e82a0",
+          "bytes": 45372,
+          "crc32": 4205440428
+        },
+        {
+          "name": "014-packing-slip-TL-BULK013.pdf",
+          "sha256": "756f80192a8b2f95c1fce30200d5691d08040ee004be2bca6a98f8c66f3863a0",
+          "bytes": 45476,
+          "crc32": 2435606289
+        },
+        {
+          "name": "015-packing-slip-TL-BULK014.pdf",
+          "sha256": "ca1a934ac3b388c906518883c599fa80fa525a97d9395966f093ef66f27d2b1d",
+          "bytes": 45492,
+          "crc32": 1853229040
+        },
+        {
+          "name": "016-packing-slip-TL-BULK015.pdf",
+          "sha256": "0b72eeda0ac537ebcd7530fe1b36eafd702ae310f06871b69b3ffcc180f2d7a1",
+          "bytes": 45472,
+          "crc32": 3519177826
+        },
+        {
+          "name": "017-packing-slip-TL-BULK016.pdf",
+          "sha256": "59c6dc50c6a074571dfdb87f172a85073c08803039eae3805e4f96e787d7a117",
+          "bytes": 45494,
+          "crc32": 3555521156
+        },
+        {
+          "name": "018-packing-slip-TL-BULK017.pdf",
+          "sha256": "d6f336a0baa2f8d492b38c16c466a0801885ad28a53ed847d197168b3e5df37d",
+          "bytes": 45478,
+          "crc32": 1128430172
+        },
+        {
+          "name": "019-packing-slip-TL-BULK018.pdf",
+          "sha256": "ab91469e47535f4c5acd5848c66b0df47a36c51ac28511e0cf51e4ad07c0ec74",
+          "bytes": 45621,
+          "crc32": 1617486368
+        },
+        {
+          "name": "020-packing-slip-TL-BULK019.pdf",
+          "sha256": "a2100a53ac49b3b0883b6f7a983b355f512a0212195c7a3e5b3149ab39aff546",
+          "bytes": 45593,
+          "crc32": 540866
+        },
+        {
+          "name": "021-packing-slip-TL-BULK020.pdf",
+          "sha256": "e400c40e719d8a341d8878d4b3b464a4edc7836fd3ae902ba3d93757c88d0aa5",
+          "bytes": 45329,
+          "crc32": 3901972454
+        },
+        {
+          "name": "022-packing-slip-TL-BULK021.pdf",
+          "sha256": "9b6b950f1fdec061e148586f6cfe2690000105b0e9f1c7abdd98aaea52279770",
+          "bytes": 45368,
+          "crc32": 1695103119
+        },
+        {
+          "name": "023-packing-slip-TL-BULK022.pdf",
+          "sha256": "7e4bd7a8b8c39e0a2ee365ed6be8344540d328ac0c4a83b3deec727fd6ecd225",
+          "bytes": 45330,
+          "crc32": 4112329100
+        },
+        {
+          "name": "024-packing-slip-TL-BULK023.pdf",
+          "sha256": "2df6bf67ec090fe860b5e7fc35a79ba15a7fa37cebdfbb65b591f6acc4233928",
+          "bytes": 45427,
+          "crc32": 1221630858
+        },
+        {
+          "name": "025-packing-slip-TL-BULK024.pdf",
+          "sha256": "c2131780e05ce81af1c6d77102b987023821fde1644ca7e87fcd2a925a7a7109",
+          "bytes": 45450,
+          "crc32": 4006035454
+        },
+        {
+          "name": "026-packing-slip-TL-BULK025.pdf",
+          "sha256": "8a0c9952aa77ed710061ea431f769696f2262884199c96c3b6852d7ae9e845bc",
+          "bytes": 45422,
+          "crc32": 1183936998
+        },
+        {
+          "name": "027-packing-slip-TL-BULK026.pdf",
+          "sha256": "0371e4164c39bf952e454d209b5164d91ab1572222518733cb0a86b3d109f591",
+          "bytes": 45448,
+          "crc32": 3853473496
+        },
+        {
+          "name": "028-packing-slip-TL-BULK027.pdf",
+          "sha256": "19556e96db869a5a8f2430c171d943ef1291e91b532adb4ce8ede646ab634184",
+          "bytes": 45428,
+          "crc32": 3483338451
+        },
+        {
+          "name": "029-packing-slip-TL-BULK028.pdf",
+          "sha256": "b063a2ec3c5b0b03d0074bde90b343f71e19c840bf103b0c950b8e645e812d73",
+          "bytes": 45575,
+          "crc32": 1531940779
+        },
+        {
+          "name": "030-packing-slip-TL-BULK029.pdf",
+          "sha256": "16d2dda46fcb320d8437a68b63ad874f08f8be98bccaeabce07ec74a740d5083",
+          "bytes": 45545,
+          "crc32": 2915542989
+        },
+        {
+          "name": "031-packing-slip-TL-BULK030.pdf",
+          "sha256": "79f85725ffa095931f1ae3e7e6bb2e68d4827ae7c91ec07e9f97337aea06b724",
+          "bytes": 45434,
+          "crc32": 556600495
+        },
+        {
+          "name": "032-packing-slip-TL-BULK031.pdf",
+          "sha256": "1741ea7fdf392f65917e8005ae0469bd3acee93597b500dda905776112d5760b",
+          "bytes": 45479,
+          "crc32": 1642037927
+        },
+        {
+          "name": "033-packing-slip-TL-BULK032.pdf",
+          "sha256": "bad0b79b482534c99d354b2e7929a49127e2c8f4d8744410fe9d22f01ae761e1",
+          "bytes": 45432,
+          "crc32": 3578786346
+        },
+        {
+          "name": "034-packing-slip-TL-BULK033.pdf",
+          "sha256": "9e5443f899604903d745d13a6330d064e3a35f5718b09a14b1c706e79002367b",
+          "bytes": 45434,
+          "crc32": 1407670165
+        },
+        {
+          "name": "035-packing-slip-TL-BULK034.pdf",
+          "sha256": "a9bf99a51cf4a712845e1c6c0eb5e75276b848a1a29a2382d9224e627c4cd836",
+          "bytes": 45554,
+          "crc32": 3688376262
+        },
+        {
+          "name": "036-packing-slip-TL-BULK035.pdf",
+          "sha256": "bd604faf111618feddb52161a272d6813e8eec0bafed3af23be4ba42deb32804",
+          "bytes": 45515,
+          "crc32": 1941513853
+        },
+        {
+          "name": "037-packing-slip-TL-BULK036.pdf",
+          "sha256": "61110b5da7d54d7beb258b037eff7829285db003cb505ea8932dbeaa64dc3808",
+          "bytes": 45551,
+          "crc32": 2116547841
+        },
+        {
+          "name": "038-packing-slip-TL-BULK037.pdf",
+          "sha256": "fafd8e2825a743e69ad405275a606d3bdbef4961369d4dd62e1f1dc31b7aff07",
+          "bytes": 45539,
+          "crc32": 1144075171
+        },
+        {
+          "name": "039-packing-slip-TL-BULK038.pdf",
+          "sha256": "c34104439c5330336b83a747f88c358a139e52d3cca882afefe291117637a6b2",
+          "bytes": 45681,
+          "crc32": 758864124
+        },
+        {
+          "name": "040-packing-slip-TL-BULK039.pdf",
+          "sha256": "ec4ebdf673c19bc8c44f6cb1b17a2981f3bced7c2966ef17b2b4b3e750d2e96e",
+          "bytes": 45645,
+          "crc32": 1466914788
+        },
+        {
+          "name": "041-packing-slip-TL-BULK040.pdf",
+          "sha256": "4bb472ad242f3c0f115975bbf380db972a38bccd2268af32b82ec7324936df65",
+          "bytes": 45450,
+          "crc32": 1864548788
+        },
+        {
+          "name": "042-packing-slip-TL-BULK041.pdf",
+          "sha256": "8f88ae6d6bd4560608f649c3a474a149bc40ded47219048e93bc81159589bfa4",
+          "bytes": 45502,
+          "crc32": 3353379066
+        },
+        {
+          "name": "043-packing-slip-TL-BULK042.pdf",
+          "sha256": "42bbf0062dd2ec0dbe3ceedf8ca29dc3e6114e0718be89b13cc05729ca3cbf7c",
+          "bytes": 45450,
+          "crc32": 2915106590
+        },
+        {
+          "name": "044-packing-slip-TL-BULK043.pdf",
+          "sha256": "8cdeaef639a2b72b4ae2ca1420aec2b92da508ca55ac8d5bc7e3d87eec39ce04",
+          "bytes": 45558,
+          "crc32": 2941899594
+        },
+        {
+          "name": "045-packing-slip-TL-BULK044.pdf",
+          "sha256": "522417ecf0018bd128667963ad51f7fdf86bdc92841e36f619253e123d810f4e",
+          "bytes": 45450,
+          "crc32": 4223146894
+        },
+        {
+          "name": "046-packing-slip-TL-BULK045.pdf",
+          "sha256": "bfdba27ce34c848e8a2cee0b118088fdaeeb6a714b5d69e1da1e412903c7791d",
+          "bytes": 45550,
+          "crc32": 452444414
+        },
+        {
+          "name": "047-packing-slip-TL-BULK046.pdf",
+          "sha256": "dda6241e4354dd85e7febc2d1e9f357a8eed0e7c27bb55fbd37c62360b92bb03",
+          "bytes": 45573,
+          "crc32": 3083994167
+        },
+        {
+          "name": "048-packing-slip-TL-BULK047.pdf",
+          "sha256": "1bffb606fe418c256f9637501081f94c8f4076df44fa76d4653a393d650b4257",
+          "bytes": 45571,
+          "crc32": 2818575856
+        },
+        {
+          "name": "049-packing-slip-TL-BULK048.pdf",
+          "sha256": "f4d4fff220b96dddd8b0d9b3a0895c0195b8ff6e6f60f6a044eb978e0b6c38bc",
+          "bytes": 45713,
+          "crc32": 2623508389
+        },
+        {
+          "name": "050-packing-slip-TL-BULK049.pdf",
+          "sha256": "208d2e0cf89b9c081faa8d59b75b8186428cbdf9992d677f5d869f5c2f71777d",
+          "bytes": 45679,
+          "crc32": 3202196733
+        },
+        {
+          "name": "051-packing-slip-TL-BULK050.pdf",
+          "sha256": "ea3ebbcccefbfb4af79142c1cb93338f2752f6279951754518ecc7fc4ace30d4",
+          "bytes": 45432,
+          "crc32": 2496452225
+        },
+        {
+          "name": "052-packing-slip-TL-BULK051.pdf",
+          "sha256": "1044f80cc9d4eed3d72fab924c5ca010519304dc98b5cba954a21e770789c510",
+          "bytes": 45474,
+          "crc32": 2635384882
+        },
+        {
+          "name": "053-packing-slip-TL-BULK052.pdf",
+          "sha256": "6647bce118dc8f74ac9601827e1ef463b3efe25b6f7e7fd170ff9472634689da",
+          "bytes": 45430,
+          "crc32": 426825986
+        },
+        {
+          "name": "054-packing-slip-TL-BULK053.pdf",
+          "sha256": "fde2bc25d1a82240abb06b6c095a363828ab6f6ce8d4edf2f46a8c6830163b53",
+          "bytes": 45518,
+          "crc32": 2560883828
+        },
+        {
+          "name": "055-packing-slip-TL-BULK054.pdf",
+          "sha256": "f2c74dbdca7dd0820680d22843de6ca75f5b52a666072e2b1f89c517fb443e8b",
+          "bytes": 45547,
+          "crc32": 6945691
+        },
+        {
+          "name": "056-packing-slip-TL-BULK055.pdf",
+          "sha256": "6cdeb6c49040b4e725606f2ac60fd9c0b3ba060a159e7a2188970cbd572e7baf",
+          "bytes": 45433,
+          "crc32": 1584630667
+        },
+        {
+          "name": "057-packing-slip-TL-BULK056.pdf",
+          "sha256": "2210b902500bea49630110afdb7ff1a72182bb12ab4219a79bf7ed199a19dc36",
+          "bytes": 45552,
+          "crc32": 400210840
+        },
+        {
+          "name": "058-packing-slip-TL-BULK057.pdf",
+          "sha256": "20250b22f230f78e73485542fc77e619b45e7ca4fc7d50e622baf3f0fc905c0a",
+          "bytes": 45542,
+          "crc32": 331669477
+        },
+        {
+          "name": "059-packing-slip-TL-BULK058.pdf",
+          "sha256": "f84a87703ad98a0919bbe6647a746b4496572b8aa99b7fc53830a92f00169fbc",
+          "bytes": 45680,
+          "crc32": 3185883243
+        },
+        {
+          "name": "060-packing-slip-TL-BULK059.pdf",
+          "sha256": "f67f8561449923d703c487eb80a886def7445774ffeb9a2472701a8ffdb0094e",
+          "bytes": 45644,
+          "crc32": 26848932
+        }
+      ]
+    }
+  ]
+}

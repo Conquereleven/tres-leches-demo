@@ -750,7 +750,7 @@ function OrderRow({
             type="checkbox"
             checked={selected}
             aria-label={t("Select order {{order}}", {
-              order: orderReference(o),
+              order: number === null ? o.id : orderReference(o),
             })}
             onChange={(e) => onSelect(e.target.checked)}
           />

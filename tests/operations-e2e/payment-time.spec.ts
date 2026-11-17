@@ -1,6 +1,49 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import { omsWorkspace } from "../fixtures/oms";
 import { status } from "../fixtures/ux-states";
+
+// A loaded, identified held order must be positively observed before absence checks.
+async function loadedHold(page: Page, id: string) {
+  await page.goto("/operations/orders");
+  const row = page.locator(`[data-order="${id}"]`);
+  await expect(row).toBeVisible();
+  await expect(row).toContainText("#012");
+  await expect(row).toContainText("Fulfillment review required");
+  await expect(row).not.toContainText("4:00 PM");
+  await page.goto(`/operations/orders/${id}`);
+  await expect(
+    page.getByRole("heading", { name: "#012", exact: true }),
+  ).toBeVisible();
+  const region = page.getByRole("region", { name: "Fulfillment", exact: true });
+  await expect(region.getByRole("alert")).toContainText(
+    "Fulfillment review required",
+  );
+  await expect(region).not.toContainText(
+    /Original:|Proposed:|2026-11-1[345]|4:00 PM|Synthetic policy check|Synthetic missing intent/,
+  );
+  for (const action of ["Start preparation", "Mark ready", "Send for delivery"])
+    await expect(
+      page.getByRole("button", { name: action, exact: true }),
+    ).toHaveCount(0);
+  await page.goto("/operations/overview");
+  const attention = page
+    .locator(".ops-v2-priorities > li")
+    .filter({ has: page.locator(`a[href="/operations/orders/${id}"]`) });
+  await expect(attention).toBeVisible();
+  await expect(attention).toContainText("Fulfillment review required");
+  await expect(attention).not.toContainText(/2026-11-1[345]|4:00 PM/);
+}
+async function loadedProduction(page: Page) {
+  await page
+    .getByRole("button", { name: "Kitchen / Production", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/operations\/production$/);
+  await expect(
+    page.getByRole("button", { name: "Kitchen / Production", exact: true }),
+  ).toHaveAttribute("aria-current", "page");
+  await expect(page.locator(".co-board")).toBeVisible();
+  await expect(page.locator(".co-skeleton")).toHaveCount(0);
+}
 
 // UI contract only; the real decision/reconciliation is covered by the SQLite tests.
 test("P0 legacy proposal remains on review hold", async ({
@@ -9,6 +52,7 @@ test("P0 legacy proposal remains on review hold", async ({
 }) => {
   const data = omsWorkspace();
   const o = data.orders[0]!;
+  data.orders = [o];
   o.fulfillmentMethod = "pickup";
   o.pickup = { pickupDate: "2026-11-14", preferredTime: "4:00 PM – 9:00 PM" };
   o.paymentFulfillment = {
@@ -31,16 +75,15 @@ test("P0 legacy proposal remains on review hold", async ({
     },
   };
   await page.route("**/api/**", (r) => r.fulfill({ json: data }));
-  await page.goto("/operations/orders");
-  await expect(page.locator(`[data-order="${o.id}"]`)).toContainText(
-    "Fulfillment review required",
-  );
-  await page.goto(`/operations/orders/${o.id}`);
-  const notice = page
-    .getByRole("alert")
-    .filter({ hasText: "Fulfillment review required" });
-  await expect(notice).toContainText("Original: 2026-11-13");
-  await expect(notice).toContainText("Proposed: 2026-11-14");
+  await loadedHold(page, o.id);
+  await loadedProduction(page);
+  await expect(page.locator(".ops-board-empty")).toBeVisible();
+  await expect(
+    page.getByRole("article", { name: "Order #012", exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Start preparation", exact: true }),
+  ).toHaveCount(0);
   await page.screenshot({
     path: `${process.env.PAYMENT_TIME_EVIDENCE_DIR ?? "/tmp/payment-contract-browser"}/${browserName}-operations.png`,
     fullPage: true,
@@ -95,6 +138,7 @@ for (const width of [390, 1440])
 
 for (const decision of [
   "auto-rescheduled",
+  "auto-rescheduled-delivery",
   "review-required",
   "proposed",
   "unknown",
@@ -108,9 +152,17 @@ for (const decision of [
   }) => {
     const data = omsWorkspace(),
       o = data.orders[0]!;
-    o.fulfillmentMethod = "pickup";
+    data.orders = [o];
+    const delivery = decision === "auto-rescheduled-delivery";
+    o.fulfillmentMethod = delivery ? "delivery" : "pickup";
     o.state = "Confirmed";
     o.pickup = { pickupDate: "2026-11-14", preferredTime: "4:00 PM – 9:00 PM" };
+    if (delivery)
+      o.delivery = {
+        ...o.delivery,
+        date: "2026-11-14",
+        slot: "4:00 PM – 9:00 PM",
+      };
     o.paymentFulfillment = {
       paymentId: o.paymentId,
       acknowledgedAt: "2026-11-13T12:51:00Z",
@@ -119,12 +171,12 @@ for (const decision of [
       reason: "Synthetic policy check",
       status: "auto-rescheduled",
       original: {
-        method: "pickup",
+        method: delivery ? "delivery" : "pickup",
         date: "2026-11-13",
         slot: o.pickup.preferredTime,
       },
       effective: {
-        method: "pickup",
+        method: delivery ? "delivery" : "pickup",
         date: "2026-11-14",
         slot: o.pickup.preferredTime,
       },
@@ -135,9 +187,17 @@ for (const decision of [
     if (decision === "mismatch")
       o.paymentFulfillment.effective.date = "2026-11-15";
     if (decision === "historical") delete o.paymentFulfillment;
-    const held = !["auto-rescheduled", "historical"].includes(decision);
+    const held = ![
+      "auto-rescheduled",
+      "auto-rescheduled-delivery",
+      "historical",
+    ].includes(decision);
     await page.route("**/api/**", (r) => r.fulfill({ json: data }));
+    if (held) await loadedHold(page, o.id);
     await page.goto(`/operations/orders/${o.id}`);
+    await expect(
+      page.getByRole("heading", { name: "#012", exact: true }),
+    ).toBeVisible();
     const notice = page
       .getByRole("alert")
       .filter({ hasText: "Fulfillment review required" });
@@ -145,19 +205,26 @@ for (const decision of [
     await expect(
       page.getByRole("button", { name: "Start preparation", exact: true }),
     ).toHaveCount(held ? 0 : 1);
-    // Navigate through the hydrated shell; an absent action alone is not readiness.
-    await page
-      .getByRole("button", { name: "Kitchen / Production", exact: true })
-      .click();
-    await expect(page).toHaveURL(/\/operations\/production$/);
-    await expect(
-      page.getByRole("button", { name: "Kitchen / Production", exact: true }),
-    ).toHaveAttribute("aria-current", "page");
+    await loadedProduction(page);
     const card = page.getByRole("article", { name: "Order #012", exact: true });
-    await expect(card).toBeVisible();
-    await expect(
-      card.getByRole("button", { name: "Start preparation", exact: true }),
-    ).toHaveCount(held ? 0 : 1);
+    if (held) {
+      await expect(page.locator(".ops-board-empty")).toBeVisible();
+      await expect(card).toHaveCount(0);
+      for (const action of [
+        "Start preparation",
+        "Mark ready",
+        "Send for delivery",
+      ])
+        await expect(
+          page.getByRole("button", { name: action, exact: true }),
+        ).toHaveCount(0);
+    } else {
+      await expect(card).toBeVisible();
+      await expect(
+        card.getByRole("button", { name: "Start preparation", exact: true }),
+      ).toHaveCount(1);
+      await expect(card).toContainText("4:00 PM");
+    }
     await page
       .getByRole("button", { name: "Print Center", exact: true })
       .click();
@@ -174,7 +241,10 @@ for (const decision of [
       await expect(page.locator(".ops-ticket")).toContainText(
         "4:00 PM – 9:00 PM",
       );
-      await expect(page.locator(".ops-ticket")).toContainText("14");
+      await expect(page.locator(".ops-ticket")).toContainText("14 Nov 2026");
+      await expect(page.locator(".ops-ticket")).not.toContainText(
+        "13 Nov 2026",
+      );
     }
     await page.screenshot({
       path: `${process.env.PAYMENT_TIME_EVIDENCE_DIR ?? "/tmp/payment-contract-browser"}/${browserName}-${decision}-print.png`,
@@ -184,11 +254,12 @@ for (const decision of [
 
 // Executable regression for the false-negative readiness seam shown in CI's
 // empty <main> snapshot: zero actions says nothing while workspace is loading.
-test("P0 held checks require a rendered card after deferred workspace hydration", async ({
+test("P0 held checks require an identified held order after deferred workspace hydration", async ({
   page,
 }) => {
   const data = omsWorkspace(),
     o = data.orders[0]!;
+  data.orders = [o];
   o.state = "Confirmed";
   o.paymentFulfillment = {
     status: "review-required",
@@ -209,19 +280,22 @@ test("P0 held checks require a rendered card after deferred workspace hydration"
     await route.fulfill({ json: data });
   });
   try {
-    await page.goto("/operations/production");
+    await page.goto("/operations/orders");
     await requestSeen;
-    // The old zero-count condition succeeds here even though no card exists.
+    await expect(page.locator(".co-skeleton[aria-busy=true]")).toBeVisible();
+    const row = page.locator(`[data-order="${o.id}"]`);
+    await expect(row).toHaveCount(0); // deliberately not considered a passed hold check
+    release();
+    await expect(row).toBeVisible();
+    await expect(row).toContainText("Fulfillment review required");
+    await loadedHold(page, o.id);
+    await loadedProduction(page);
+    await expect(page.locator(".ops-board-empty")).toBeVisible();
+    await expect(
+      page.getByRole("article", { name: "Order #012", exact: true }),
+    ).toHaveCount(0);
     await expect(
       page.getByRole("button", { name: "Start preparation", exact: true }),
-    ).toHaveCount(0);
-    const card = page.getByRole("article", { name: "Order #012", exact: true });
-    await expect(card).toHaveCount(0);
-    release();
-    await expect(card).toBeVisible();
-    await expect(card).toContainText("Fulfillment review required");
-    await expect(
-      card.getByRole("button", { name: "Start preparation", exact: true }),
     ).toHaveCount(0);
     await page
       .getByRole("button", { name: "Print Center", exact: true })

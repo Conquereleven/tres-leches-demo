@@ -626,11 +626,10 @@ test("counted-units text including its total stays within the authored right mar
 });
 
 test("Founder-approved P1/P2 corpus stays byte-identical, including the 60-order ZIP", async () => {
-  const { createHash } = await import("node:crypto");
-  const { default: golden } =
-    await import("../fixtures/production-print-golden.json");
+  const { verifyProductionGoldenDirectory } =
+    await import("../fixtures/production-print-golden-check");
   const { spawnSync } = await import("node:child_process");
-  const { mkdtempSync, readFileSync, rmSync } = await import("node:fs");
+  const { mkdtempSync, rmSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
   const { join } = await import("node:path");
   const dir = mkdtempSync(join(tmpdir(), "p3-production-golden-"));
@@ -651,13 +650,7 @@ test("Founder-approved P1/P2 corpus stays byte-identical, including the 60-order
       },
     );
     assert.equal(run.status, 0, run.stderr);
-    const hash = (name: string) =>
-      createHash("sha256")
-        .update(readFileSync(join(dir, name)))
-        .digest("hex");
-    for (const doc of golden.documents)
-      assert.equal(hash(doc.name), doc.sha256, doc.name);
-    assert.equal(hash("SYNTHETIC_60_Orders.zip"), golden.zipSha256);
+    verifyProductionGoldenDirectory(dir);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
