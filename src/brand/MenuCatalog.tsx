@@ -14,6 +14,7 @@ import {
 import { CustomerCopy } from "./localization";
 import { availableSku } from "../../shared/commerce-policy";
 import { useEffect, useId, useRef, useState } from "react";
+import { localizedKey } from "./locales/engine";
 import { AddToCart } from "./Shop";
 import { useCheckoutConfig, useCheckoutNow } from "./cart";
 import { liveOrderable, refreshLiveCatalog } from "./live-catalog";
@@ -24,6 +25,12 @@ import {
   useMenu,
   type StorefrontProduct,
 } from "./menu";
+
+/** Presentation-only grouping. Published family/category/SKU records remain authoritative. */
+export const publicMenuCategoryId = (id: string) =>
+  id === "pan" || id === "conchas" ? "bakery" : id;
+export const publicMenuCategories = (categories: {id: string; name: string}[]) =>
+  categories.filter(category => category.id !== "pan" && category.id !== "conchas");
 
 export function ProductOptions({
   product,
@@ -240,11 +247,24 @@ export function MenuCatalog() {
       : new URLSearchParams(location.search);
   const menu = useMenu();
   const [chosen, setCategory] = useState(
-    () => params.get("category") ?? "cakes",
+    () => publicMenuCategoryId(params.get("category") ?? "cakes"),
   );
-  const category = menu.categories.some((c) => c.id === chosen)
+  const publicCategories = publicMenuCategories(menu.categories);
+  const category = publicCategories.some((c) => c.id === chosen)
     ? chosen
-    : (menu.categories.find((c) => c.id === "cakes") ?? menu.categories[0])?.id;
+    : (publicCategories.find((c) => c.id === "cakes") ?? publicCategories[0])?.id;
+  const [activeProductId, setActiveProductId] = useState<string | null>(null);
+  const [floatingAt, setFloatingAt] = useState({left: 16, top: 16});
+  const openButton = useRef<HTMLButtonElement | null>(null);
+  const panel = useRef<HTMLDivElement | null>(null);
+  const activeProduct = menu.products.find(p => p.id === activeProductId);
+  const { language } = useCustomerLanguage();
+  const close = () => { setActiveProductId(null); openButton.current?.focus(); };
+  useEffect(() => {
+    if (!activeProductId) return;
+    const frame = requestAnimationFrame(() => panel.current?.querySelector<HTMLButtonElement>(".s02-close")?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [activeProductId]);
   const slug = params.get("product");
   // Dynamic catalog without a published revision yet (or at all): sell nothing.
   if (menu.status === "loading" || menu.status === "unavailable" || !category)
@@ -323,7 +343,7 @@ export function MenuCatalog() {
       </section>
     );
   }
-  const current = menu.categories.find((c) => c.id === category)!;
+  const current = publicCategories.find((c) => c.id === category)!;
   const editorial = categoryEditorialMedia(category);
   return (
     <section
@@ -332,20 +352,37 @@ export function MenuCatalog() {
       aria-label={localize("Full menu")}
       data-catalog-status={menu.status}
     >
-      <p className="b-label">
-        {" "}
-        <CustomerCopy>THE 3L MENU</CustomerCopy>{" "}
-      </p>
-      <h2 className="b-heading">
-        {" "}
-        <CustomerCopy>FIND YOUR FAVOURITE.</CustomerCopy>{" "}
-      </h2>
-      <ProductSearch />
+      <header className="s02-menu-intro">
+        <p className="b-label"><CustomerCopy>THE 3L MENU</CustomerCopy></p>
+        <h2 className="s02-title">
+          {category === "bakery"
+            ? <CustomerCopy>Panadería Mexicana</CustomerCopy>
+            : <CustomerCopy>EXPLORE THE MENU</CustomerCopy>}
+        </h2>
+        <p className="s02-subtitle"><CustomerCopy>Cakes, jars, bakery</CustomerCopy></p>
+        <ProductSearch />
+        <div className="s02-doors">
+          <button className="s02-door" type="button" onClick={() => {
+            setCategory("cakes");
+            history.replaceState(history.state,"", "/menu?category=cakes");
+          }}>
+            <img src="/brand/menu/cakes.webp" alt="" loading="lazy" />
+            <span><CustomerCopy>CAKES</CustomerCopy></span>
+          </button>
+          <button className="s02-door" type="button" onClick={() => {
+            setCategory("bakery");
+            history.replaceState(history.state,"", "/menu?category=bakery");
+          }}>
+            <img src="/brand/menu/bakery.webp" alt="" loading="lazy" />
+            <span><CustomerCopy>BAKERY</CustomerCopy></span>
+          </button>
+        </div>
+      </header>
       <nav
         className="b-menu-categories"
         aria-label={localize("Menu categories")}
       >
-        {menu.categories.map((c) => (
+        {publicCategories.map((c) => (
           <button
             key={c.id}
             type="button"
@@ -373,22 +410,99 @@ export function MenuCatalog() {
           />
         </figure>
       )}
-      <div className="b-menu-grid">
+      <div className="b-menu-grid s02-grid">
         {menu.products
-          .filter((p) => menuProductFamily(menu, p).category === category)
-          .map((p) => (
-            <article
-              className="b-menu-card"
-              key={p.id}
-              aria-label={localize(p.title)}
-              id={`product-${p.slug}`}
-              data-product-id={p.id}
-              data-menu-family={p.familyId}
-            >
-              <ProductOptions product={p} />
-            </article>
-          ))}
+          .filter(p => publicMenuCategoryId(menuProductFamily(menu,p).category) === category)
+          .map(p => {
+            const family = menuProductFamily(menu,p);
+            const size = family.options[0]?.size;
+            const assigned = selectedProductMedia(p.id, family.id, p.variant, size);
+            const fallback = menu.status === "bundled"
+              ? family.id === "conchas-traditional" && p.variant !== "Chocolate"
+                ? "/brand/icon.png" : family.image
+              : null;
+            return (
+              <article
+                key={p.id}
+                className="b-menu-card s02-card"
+                data-product-id={p.id}
+                data-menu-family={p.familyId}
+                id={`product-${p.slug}`}
+                aria-label={localize(p.title)}
+              >
+                <figure className="b-menu-photo s02-photo">
+                  {assigned || fallback
+                    ? <ResponsiveMedia
+                        productId={p.id} family={family.id} variant={p.variant}
+                        size={size} fallback={fallback} alt={p.title}
+                      />
+                    : <div className="b-menu-no-photo" aria-label={localize("Product photograph coming soon")}>
+                        <span><CustomerCopy>3L</CustomerCopy></span>
+                      </div>}
+                </figure>
+                <div className="s02-card-body">
+                  <h4><a href={productHref(p)}><CustomerCopy>{p.title}</CustomerCopy></a></h4>
+                  {p.description && <p className="s02-description"><CustomerCopy>{p.description}</CustomerCopy></p>}
+                  {!!family.options.length && <p className="s02-price">
+                    {formatAed(Math.min(...family.options.map(o => o.priceFils)))}
+                  </p>}
+                  <button
+                    className="s02-open" type="button" aria-haspopup="dialog"
+                    aria-expanded={activeProductId === p.id}
+                    onClick={event => {
+                      openButton.current = event.currentTarget;
+                      const rect = event.currentTarget.closest("article")?.getBoundingClientRect();
+                      if (rect) {
+                        const w = Math.min(460, innerWidth - 24);
+                        const right = rect.right + 12;
+                        setFloatingAt({
+                          left: right + w < innerWidth - 12 ? right : Math.max(12, rect.left - w - 12),
+                          top: Math.max(12, Math.min(rect.top, innerHeight - Math.min(520, innerHeight - 24))),
+                        });
+                      }
+                      setActiveProductId(p.id);
+                    }}
+                  >
+                    {localizedKey("menu:conversion_configure", language)}
+                    <span aria-hidden="true">→</span>
+                  </button>
+                </div>
+              </article>
+            );
+          })}
       </div>
+      {activeProduct && (
+        <div className="s02-overlay" onPointerDown={e => {
+          if (e.target === e.currentTarget) close();
+        }}>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={localize(activeProduct.title)}
+            ref={panel}
+            className="s02-config"
+            style={{left:floatingAt.left,top:floatingAt.top}}
+            onKeyDown={e => {
+              if (e.key === "Escape") { e.preventDefault(); close(); }
+              if (e.key !== "Tab") return;
+              const items = Array.from(panel.current?.querySelectorAll<HTMLElement>(
+                'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled])'
+              ) ?? []).filter(el => el.getClientRects().length > 0);
+              if (!items.length) return;
+              if (e.shiftKey && document.activeElement === items[0]) {
+                e.preventDefault(); items[items.length - 1]!.focus();
+              } else if (!e.shiftKey && document.activeElement === items[items.length - 1]) {
+                e.preventDefault(); items[0]!.focus();
+              }
+            }}
+          >
+            <button className="s02-close" type="button" aria-label={localize("Close dialog")} onClick={close}>
+              <span aria-hidden="true">×</span>
+            </button>
+            <ProductOptions key={activeProduct.id} product={activeProduct} />
+          </div>
+        </div>
+      )}
       <a className="b-link" href="/cart">
         {" "}
         <CustomerCopy>VIEW CART</CustomerCopy>{" "}
