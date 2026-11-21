@@ -260,6 +260,39 @@ export function MenuCatalog() {
   const activeProduct = menu.products.find(p => p.id === activeProductId);
   const { language } = useCustomerLanguage();
   const close = () => { setActiveProductId(null); openButton.current?.focus(); };
+  const choosePublicCategory = (id: string) => {
+    setActiveProductId(null);
+    setCategory(id);
+    const url = new URL(location.href);
+    url.searchParams.set("category", id);
+    history.replaceState(history.state, "", url);
+    requestAnimationFrame(() => {
+      document.querySelector(".b-menu-categories")?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+        block: "start",
+      });
+    });
+  };
+  useEffect(() => {
+    if (!activeProductId) return;
+    const reposition = () => {
+      const rect = openButton.current?.closest("article")?.getBoundingClientRect();
+      if (!rect) return;
+      const width = Math.min(460, innerWidth - 24);
+      const right = rect.right + 12;
+      setFloatingAt({
+        left: right + width < innerWidth - 12 ? right : Math.max(12, rect.left - width - 12),
+        top: Math.max(12, Math.min(rect.top, innerHeight - Math.min(520, innerHeight - 24))),
+      });
+    };
+    window.addEventListener("resize", reposition);
+    window.addEventListener("scroll", reposition, true);
+    return () => {
+      window.removeEventListener("resize", reposition);
+      window.removeEventListener("scroll", reposition, true);
+    };
+  }, [activeProductId]);
+
   useEffect(() => {
     if (!activeProductId) return;
     const frame = requestAnimationFrame(() => panel.current?.querySelector<HTMLButtonElement>(".s02-close")?.focus());
@@ -354,25 +387,19 @@ export function MenuCatalog() {
     >
       <header className="s02-menu-intro">
         <p className="b-label"><CustomerCopy>THE 3L MENU</CustomerCopy></p>
-        <h2 className="s02-title">
+        <h1 className="s02-title">
           {category === "bakery"
             ? <CustomerCopy>Panadería Mexicana</CustomerCopy>
             : <CustomerCopy>EXPLORE THE MENU</CustomerCopy>}
-        </h2>
+        </h1>
         <p className="s02-subtitle"><CustomerCopy>Cakes, jars, bakery</CustomerCopy></p>
         <ProductSearch />
         <div className="s02-doors">
-          <button className="s02-door" type="button" onClick={() => {
-            setCategory("cakes");
-            history.replaceState(history.state,"", "/menu?category=cakes");
-          }}>
+          <button className="s02-door" type="button" onClick={() => choosePublicCategory("cakes")}>
             <img src="/brand/menu/cakes.webp" alt="" loading="lazy" />
             <span><CustomerCopy>CAKES</CustomerCopy></span>
           </button>
-          <button className="s02-door" type="button" onClick={() => {
-            setCategory("bakery");
-            history.replaceState(history.state,"", "/menu?category=bakery");
-          }}>
+          <button className="s02-door" type="button" onClick={() => choosePublicCategory("bakery")}>
             <img src="/brand/menu/bakery.webp" alt="" loading="lazy" />
             <span><CustomerCopy>BAKERY</CustomerCopy></span>
           </button>
@@ -387,12 +414,7 @@ export function MenuCatalog() {
             key={c.id}
             type="button"
             aria-pressed={category === c.id}
-            onClick={() => {
-              setCategory(c.id);
-              const url = new URL(location.href);
-              url.searchParams.set("category", c.id);
-              history.replaceState(history.state, "", url);
-            }}
+            onClick={() => choosePublicCategory(c.id)}
           >
             <CustomerCopy>{c.name}</CustomerCopy>
           </button>
@@ -449,6 +471,7 @@ export function MenuCatalog() {
                   <button
                     className="s02-open" type="button" aria-haspopup="dialog"
                     aria-expanded={activeProductId === p.id}
+                    disabled={!family.options.length}
                     onClick={event => {
                       openButton.current = event.currentTarget;
                       const rect = event.currentTarget.closest("article")?.getBoundingClientRect();
