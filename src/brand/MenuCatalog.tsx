@@ -254,11 +254,15 @@ export function MenuCatalog() {
       ? new URLSearchParams()
       : new URLSearchParams(location.search);
   const menu = useMenu();
+  // Legacy deep links must retain their own product lists and editorial media.
+  // Only the clickable category navigation is grouped under the public bakery.
   const [chosen, setCategory] = useState(
-    () => publicMenuCategoryId(params.get("category") ?? "cakes"),
+    () => params.get("category") ?? "cakes",
   );
   const publicCategories = publicMenuCategories(menu.categories);
-  const category = publicCategories.some((c) => c.id === chosen)
+  const legacyBakeryLink = (chosen === "pan" || chosen === "conchas") &&
+    menu.categories.some(c => c.id === chosen);
+  const category = legacyBakeryLink || publicCategories.some(c => c.id === chosen)
     ? chosen
     : (publicCategories.find((c) => c.id === "cakes") ?? publicCategories[0])?.id;
   const [activeProductId, setActiveProductId] = useState<string | null>(null);
@@ -384,7 +388,8 @@ export function MenuCatalog() {
       </section>
     );
   }
-  const current = publicCategories.find((c) => c.id === category)!;
+  const current = menu.categories.find(c => c.id === category)
+    ?? publicCategories.find(c => c.id === category)!;
   const editorial = categoryEditorialMedia(category);
   return (
     <section
@@ -421,7 +426,7 @@ export function MenuCatalog() {
           <button
             key={c.id}
             type="button"
-            aria-pressed={category === c.id}
+            aria-pressed={publicMenuCategoryId(category) === c.id}
             onClick={() => choosePublicCategory(c.id)}
           >
             <CustomerCopy>{c.name}</CustomerCopy>
@@ -442,7 +447,12 @@ export function MenuCatalog() {
       )}
       <div className="b-menu-grid s02-grid">
         {menu.products
-          .filter(p => publicMenuCategoryId(menuProductFamily(menu,p).category) === category)
+          .filter(p => {
+            const familyCategory = menuProductFamily(menu,p).category;
+            return category === "bakery"
+              ? publicMenuCategoryId(familyCategory) === "bakery"
+              : familyCategory === category;
+          })
           .map(p => {
             const family = menuProductFamily(menu,p);
             const size = family.options[0]?.size;

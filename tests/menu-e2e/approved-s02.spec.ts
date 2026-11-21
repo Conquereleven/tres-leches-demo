@@ -1,15 +1,22 @@
 import { test, expect } from "@playwright/test";
 
 test("S02 public bakery groups Pan de Muerto and Conchas without changing product ids", async ({ page }) => {
-  await page.goto("/menu?category=pan");
+  await page.goto("/menu?category=bakery");
   const nav = page.getByRole("navigation", { name: "Menu categories" });
   await expect(nav.getByRole("button", { name: "Pan de Muerto" })).toHaveCount(0);
   await expect(nav.getByRole("button", { name: "Conchas" })).toHaveCount(0);
   await expect(nav.getByRole("button", { name: "Panadería Mexicana" })).toBeVisible();
   await expect(page.locator('[data-menu-family^="pan-de-muerto"]').first()).toBeVisible();
   await expect(page.locator('[data-menu-family^="conchas"]').first()).toBeVisible();
-  await page.goto("/menu?category=conchas");
-  await expect(nav.getByRole("button", { name: "Panadería Mexicana" })).toHaveAttribute("aria-pressed", "true");
+  for (const [legacy, familyPrefix, otherPrefix] of [
+    ["conchas", "conchas-", "pan-de-muerto-"],
+    ["pan", "pan-de-muerto-", "conchas-"],
+  ] as const) {
+    await page.goto(`/menu?category=${legacy}`);
+    await expect(nav.getByRole("button", { name: "Panadería Mexicana" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator(`[data-menu-family^="${familyPrefix}"]`).first()).toBeVisible();
+    await expect(page.locator(`[data-menu-family^="${otherPrefix}"]`)).toHaveCount(0);
+  }
 });
 
 for (const width of [320, 390, 1440]) {
