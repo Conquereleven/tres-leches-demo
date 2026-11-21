@@ -10,6 +10,7 @@ const photos = "work/qa/master-sprint";
 const family = (page: Page, id: string) =>
   page.locator(`[data-menu-family="${id}"]`).first();
 const category = async (page: Page, name: string) => {
+  if (await page.getByRole("dialog").count()) await page.keyboard.press("Escape");
   const publicName = name === "Pan de Muerto" || name === "Conchas"
     ? "Panadería Mexicana" : name;
   await page
@@ -78,12 +79,9 @@ test("multiple menu SKUs go through cart and existing web checkout with authorit
 }) => {
   await page.goto("/menu");
   await category(page, "Pan de Muerto");
-  await (await openFamily(page, "pan-de-muerto-traditional-pack"))
-    .getByRole("combobox")
-    .selectOption("6 mini");
-  await (await openFamily(page, "pan-de-muerto-traditional-pack"))
-    .getByRole("button", { name: "ADD TO CART · AED 72" })
-    .click();
+  const panPack = await openFamily(page, "pan-de-muerto-traditional-pack");
+  await panPack.getByRole("combobox").selectOption("6 mini");
+  await panPack.getByRole("button", { name: "ADD TO CART · AED 72" }).click();
   await category(page, "Cake Jars");
   const bundle = (await openFamily(page, "cake-jar-bundle"));
   await expect(bundle.locator("select")).toHaveCount(1);
