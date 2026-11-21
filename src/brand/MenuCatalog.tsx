@@ -445,73 +445,92 @@ export function MenuCatalog() {
           />
         </figure>
       )}
-      <div className="b-menu-grid s02-grid">
-        {menu.products
-          .filter(p => {
-            const familyCategory = menuProductFamily(menu,p).category;
-            return category === "bakery"
-              ? publicMenuCategoryId(familyCategory) === "bakery"
-              : familyCategory === category;
-          })
-          .map(p => {
-            const family = menuProductFamily(menu,p);
-            const size = family.options[0]?.size;
-            const assigned = selectedProductMedia(p.id, family.id, p.variant, size);
-            const fallback = menu.status === "bundled"
-              ? family.id === "conchas-traditional" && p.variant !== "Chocolate"
-                ? "/brand/icon.png" : family.image
-              : null;
-            return (
+      {legacyBakeryLink ? (
+        <div className="b-menu-grid s02-legacy-grid" data-legacy-category={category}>
+          {menu.products
+            .filter(p => menuProductFamily(menu, p).category === category)
+            .map(p => (
               <article
+                className="b-menu-card"
                 key={p.id}
-                className="b-menu-card s02-card"
+                aria-label={localize(p.title)}
+                id={`product-${p.slug}`}
                 data-product-id={p.id}
                 data-menu-family={p.familyId}
-                id={`product-${p.slug}`}
-                aria-label={localize(p.title)}
               >
-                <figure className="b-menu-photo s02-photo">
-                  {assigned || fallback
-                    ? <ResponsiveMedia
-                        productId={p.id} family={family.id} variant={p.variant}
-                        size={size} fallback={fallback} alt={p.title}
-                      />
-                    : <div className="b-menu-no-photo" aria-label={localize("Product photograph coming soon")}>
-                        <span><CustomerCopy>3L</CustomerCopy></span>
-                      </div>}
-                </figure>
-                <div className="s02-card-body">
-                  <h4><a href={productHref(p)}><CustomerCopy>{p.title}</CustomerCopy></a></h4>
-                  {p.description && <p className="s02-description"><CustomerCopy>{p.description}</CustomerCopy></p>}
-                  {!!family.options.length && <p className="s02-price">
-                    {formatAed(Math.min(...family.options.map(o => o.priceFils)))}
-                  </p>}
-                  <button
-                    className="s02-open" type="button" aria-haspopup="dialog"
-                    aria-expanded={activeProductId === p.id}
-                    disabled={!family.options.length}
-                    onClick={event => {
-                      openButton.current = event.currentTarget;
-                      const rect = event.currentTarget.closest("article")?.getBoundingClientRect();
-                      if (rect) {
-                        const w = Math.min(460, innerWidth - 24);
-                        const right = rect.right + 12;
-                        setFloatingAt({
-                          left: right + w < innerWidth - 12 ? right : Math.max(12, rect.left - w - 12),
-                          top: Math.max(12, Math.min(rect.top, innerHeight - Math.min(520, innerHeight - 24))),
-                        });
-                      }
-                      setActiveProductId(p.id);
-                    }}
-                  >
-                    {localizedKey("menu:conversion_configure", language)}
-                    <span aria-hidden="true">→</span>
-                  </button>
-                </div>
+                <ProductOptions product={p} />
               </article>
-            );
-          })}
-      </div>
+            ))}
+        </div>
+      ) : (
+        <div className="b-menu-grid s02-grid">
+          {menu.products
+            .filter(p => {
+              const familyCategory = menuProductFamily(menu,p).category;
+              return category === "bakery"
+                ? publicMenuCategoryId(familyCategory) === "bakery"
+                : familyCategory === category;
+            })
+            .map(p => {
+              const family = menuProductFamily(menu,p);
+              const size = family.options[0]?.size;
+              const assigned = selectedProductMedia(p.id, family.id, p.variant, size);
+              const fallback = menu.status === "bundled"
+                ? family.id === "conchas-traditional" && p.variant !== "Chocolate"
+                  ? "/brand/icon.png" : family.image
+                : null;
+              return (
+                <article
+                  key={p.id}
+                  className="b-menu-card s02-card"
+                  data-product-id={p.id}
+                  data-menu-family={p.familyId}
+                  id={`product-${p.slug}`}
+                  aria-label={localize(p.title)}
+                >
+                  <figure className="b-menu-photo s02-photo">
+                    {assigned || fallback
+                      ? <ResponsiveMedia
+                          productId={p.id} family={family.id} variant={p.variant}
+                          size={size} fallback={fallback} alt={p.title}
+                        />
+                      : <div className="b-menu-no-photo" aria-label={localize("Product photograph coming soon")}>
+                          <span><CustomerCopy>3L</CustomerCopy></span>
+                        </div>}
+                  </figure>
+                  <div className="s02-card-body">
+                    <h4><a href={productHref(p)}><CustomerCopy>{p.title}</CustomerCopy></a></h4>
+                    {p.description && <p className="s02-description"><CustomerCopy>{p.description}</CustomerCopy></p>}
+                    {!!family.options.length && <p className="s02-price">
+                      {formatAed(Math.min(...family.options.map(o => o.priceFils)))}
+                    </p>}
+                    <button
+                      className="s02-open" type="button" aria-haspopup="dialog"
+                      aria-expanded={activeProductId === p.id}
+                      disabled={!family.options.length}
+                      onClick={event => {
+                        openButton.current = event.currentTarget;
+                        const rect = event.currentTarget.closest("article")?.getBoundingClientRect();
+                        if (rect) {
+                          const w = Math.min(460, innerWidth - 24);
+                          const right = rect.right + 12;
+                          setFloatingAt({
+                            left: right + w < innerWidth - 12 ? right : Math.max(12, rect.left - w - 12),
+                            top: Math.max(12, Math.min(rect.top, innerHeight - Math.min(520, innerHeight - 24))),
+                          });
+                        }
+                        setActiveProductId(p.id);
+                      }}
+                    >
+                      {localizedKey("menu:conversion_configure", language)}
+                      <span aria-hidden="true">→</span>
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+        </div>
+      )}
       {activeProduct && (
         <div className="s02-overlay" onPointerDown={e => {
           if (e.target === e.currentTarget) close();

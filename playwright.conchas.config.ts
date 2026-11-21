@@ -4,7 +4,14 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 const dir = mkdtempSync(join(tmpdir(), "3l-conchas-"));
 export default defineConfig({
-  testDir: "tests/conchas-e2e",
+  // Include the new S01/S02 acceptance specs in the existing isolated browser QA.
+  // This does not publish, mutate providers or access production data.
+  testDir: "tests",
+  testMatch: [
+    "**/conchas-e2e/**/*.spec.ts",
+    "**/brand02-e2e/approved-s01.spec.ts",
+    "**/menu-e2e/approved-s02.spec.ts",
+  ],
   outputDir: "test-results/conchas",
   workers: 1,
   timeout: 60000,
