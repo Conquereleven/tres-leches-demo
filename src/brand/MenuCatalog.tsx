@@ -29,8 +29,16 @@ import {
 /** Presentation-only grouping. Published family/category/SKU records remain authoritative. */
 export const publicMenuCategoryId = (id: string) =>
   id === "pan" || id === "conchas" ? "bakery" : id;
-export const publicMenuCategories = (categories: {id: string; name: string}[]) =>
-  categories.filter(category => category.id !== "pan" && category.id !== "conchas");
+export const publicMenuCategories = (categories: {id: string; name: string}[]) => {
+  const seen = new Set<string>();
+  return categories.reduce<{id:string;name:string}[]>((result, category) => {
+    const id = publicMenuCategoryId(category.id);
+    if (seen.has(id)) return result;
+    seen.add(id);
+    result.push({id, name: id === "bakery" ? "Panadería Mexicana" : category.name});
+    return result;
+  }, []);
+};
 
 export function ProductOptions({
   product,
