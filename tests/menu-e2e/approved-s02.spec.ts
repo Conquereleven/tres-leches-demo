@@ -1,6 +1,8 @@
 import { test, expect } from "@playwright/test";
+import { mkdirSync } from "node:fs";
 
-test("S02 public bakery groups Pan de Muerto and Conchas without changing product ids", async ({ page }) => {
+test("S02 public bakery groups Pan de Muerto and Conchas without changing product ids", async ({ page }, info) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/menu?category=bakery");
   const nav = page.getByRole("navigation", { name: "Menu categories" });
   await expect(nav.getByRole("button", { name: "Pan de Muerto" })).toHaveCount(0);
@@ -8,6 +10,14 @@ test("S02 public bakery groups Pan de Muerto and Conchas without changing produc
   await expect(nav.getByRole("button", { name: "Panadería Mexicana" })).toBeVisible();
   await expect(page.locator('[data-menu-family^="pan-de-muerto"]').first()).toBeVisible();
   await expect(page.locator('[data-menu-family^="conchas"]').first()).toBeVisible();
+  if (info.project.name === "chromium") {
+    mkdirSync("docs/brand/brand02/conchas", { recursive: true });
+    await page.screenshot({
+      path: "docs/brand/brand02/conchas/s02-bakery-1440.png",
+      fullPage: true,
+      animations: "disabled",
+    });
+  }
   for (const [legacy, familyPrefix, otherPrefix] of [
     ["conchas", "conchas-", "pan-de-muerto-"],
     ["pan", "pan-de-muerto-", "conchas-"],
@@ -20,7 +30,7 @@ test("S02 public bakery groups Pan de Muerto and Conchas without changing produc
 });
 
 for (const width of [320, 390, 1440]) {
-  test(`S02 floating options never reflow cards at ${width}px; Escape restores keyboard focus`, async ({ page }) => {
+  test(`S02 floating options never reflow cards at ${width}px; Escape restores keyboard focus`, async ({ page }, info) => {
     await page.setViewportSize({ width, height: 850 });
     await page.goto("/menu?category=bakery");
     const card = page.locator('[data-menu-family="pan-de-muerto-traditional-pack"]').first();
@@ -30,6 +40,14 @@ for (const width of [320, 390, 1440]) {
     const dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog.locator("select")).toHaveCount(1);
+    if (info.project.name === "chromium" && (width === 390 || width === 1440)) {
+      mkdirSync("docs/brand/brand02/conchas", { recursive: true });
+      await page.screenshot({
+        path: `docs/brand/brand02/conchas/s02-floating-${width}.png`,
+        fullPage: true,
+        animations: "disabled",
+      });
+    }
     const after = await card.boundingBox();
     expect(after?.height).toBe(before?.height);
     expect(after?.width).toBe(before?.width);
