@@ -191,10 +191,9 @@ for (const width of [390, 768, 1440]) {
       .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
       .analyze();
     expect(axe.violations).toEqual([]);
-    await (await openFamily(page, "pan-de-muerto-traditional-pack"))
-      .getByRole("combobox")
-      .selectOption("6 mini");
-    await (await openFamily(page, "pan-de-muerto-traditional-pack"))
+    const selectedPack = await openFamily(page, "pan-de-muerto-traditional-pack");
+    await selectedPack.getByRole("combobox").selectOption("6 mini");
+    await selectedPack
       .getByRole("button", { name: "ADD TO CART · AED 72" })
       .click();
     await page.goto("/cart");

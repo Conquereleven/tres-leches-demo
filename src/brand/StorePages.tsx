@@ -10,7 +10,6 @@ const contact = () => {
   location.href = "/contact";
 };
 export function MenuPage() {
-  const { t } = useLanguage();
   return (
     <div className="brand-experience b-entered b-menu-page">
       <a className="b-skip" href="#main-content">
