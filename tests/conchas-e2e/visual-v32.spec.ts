@@ -151,3 +151,25 @@ test("isolated preview refuses unknown routes",async ({request})=>{
   const res=await request.get("/visual-v32/not-authorized");
   expect(res.status()).toBe(404);
 });
+
+
+test("V3.2 commerce pill variants use canonical SKU prices and preserve AddToCart",async ({page})=>{
+  await page.setViewportSize({width:390,height:844});
+  await page.goto("/visual-v32/bakery?category=cakes&lang=en");
+  const classic=page.locator('[data-product-id="tres-leches--classic"]');
+  await expect(classic).toBeVisible();
+  await classic.click();
+  const dlg=page.getByRole("dialog");
+  const pills=dlg.locator(".v32-variant");
+  expect(await pills.count()).toBeGreaterThan(1);
+  await expect(pills.first()).toHaveAttribute("aria-pressed","true");
+  const before=await dlg.locator(".v32-popup-unit .b-menu-price").innerText();
+  await pills.nth(1).click();
+  await expect(pills.nth(1)).toHaveAttribute("aria-pressed","true");
+  const after=await dlg.locator(".v32-popup-unit .b-menu-price").innerText();
+  expect(after).not.toBe(before);
+  await expect(dlg.locator(".b-add-to-cart button").last()).toBeEnabled();
+  const rect=await dlg.boundingBox();
+  expect(rect).not.toBeNull();expect(rect!.y).toBeGreaterThanOrEqual(0);
+  expect(rect!.y+rect!.height).toBeLessThanOrEqual(845);
+});

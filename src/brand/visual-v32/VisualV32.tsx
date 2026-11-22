@@ -5,7 +5,7 @@ import { useCheckoutConfig, useCheckoutNow, useCart, cartCount } from "../cart";
 import { useLanguage } from "../localization";
 import { availableSku } from "../../../shared/commerce-policy";
 import { liveOrderable } from "../live-catalog";
-import { ProductOptions } from "../MenuCatalog";
+import { AddToCart } from "../Shop";
 import { ResponsiveMedia } from "../media";
 import { formatAed } from "../content";
 import "./visual-v32.css";
@@ -54,17 +54,17 @@ function Header(){
   </header>;
 }
 function Home(){
-  return <main className="v32-home" id="main">
+  return <main className="v32-home v32-home-fidelity" id="main">
     <h1>More than a cake.<br/>A family tradition.</h1>
     <section className="v32-journey" aria-label="Mexico City 1982 to Dubai Today">
-      <div className="v32-city"><img src="/brand/reference/mexico-dubai.png" alt="Mexico to Dubai heritage illustration"/>
+      <div className="v32-city v32-city-left"><div className="v32-city-crop"><img src="/brand/reference/mexico-dubai.png" alt="Mexico City 1982 illustration"/></div>
         <b>MEXICO CITY</b><span>1982</span></div>
       <svg viewBox="0 0 540 100" className="v32-route" aria-hidden="true">
         <path d="M8 39 C90 -24 150 138 267 55 S417 56 529 38" fill="none" stroke="#b98a4e" strokeWidth="2"/>
         <circle cx="98" cy="37" r="17" fill="none" stroke="#b98a4e" strokeWidth="2"/>
         <circle cx="529" cy="38" r="9" fill="#f8ebe4" stroke="#b98a4e" strokeWidth="3"/>
       </svg>
-      <div className="v32-city"><img src="/brand/approved/editorial-mexico-dubai.webp" alt="Dubai skyline illustration"/>
+      <div className="v32-city v32-city-right"><div className="v32-city-crop"><img src="/brand/reference/mexico-dubai.png" alt="Dubai Today illustration"/></div>
         <b>DUBAI</b><span>TODAY</span></div>
     </section>
     <section className="v32-story" id="journal">
@@ -80,7 +80,7 @@ function Home(){
   </main>;
 }
 function Landing(){
-  return <main className="v32-landing" id="main">
+  return <main className="v32-landing v32-landing-fidelity" id="main">
     <span className="v32-eyebrow">THE 3L MENU</span><h1>Explore Our Menu</h1>
     <p className="v32-tagline">CAKES, BAKERY &amp; OUR SIGNATURE CREATIONS</p>
     <form action={origin+"/bakery"} className="v32-search">
@@ -102,17 +102,38 @@ function Landing(){
 function ProductDialog({product,onClose,anchor}:{
   product:StorefrontProduct;onClose:()=>void;anchor:HTMLElement|null;
 }){
+  const menu=useMenu();
+  const {config,loading}=useCheckoutConfig();
+  const now=useCheckoutNow(config);
+  const family=menuProductFamily(menu,product);
+  // The UI is a port of the V3.2 reference: pill variants + scrolling content +
+  // persistent checkout action. All SKU/price/orderability decisions stay canonical.
+  const allowed=family.options.filter(o=>{
+    const server=config?.products.find(p=>p.id===o.id);
+    return availableSku(o.id,now)&&!!server&&server.priceFils===o.priceFils&&
+      (menu.status!=="live"||liveOrderable(o.id)===true);
+  });
+  const [sku,setSku]=useState<string|null>(allowed[0]?.id??null);
+  const chosen=allowed.find(o=>o.id===sku)??allowed[0];
   const [place,setPlace]=useState<CSSProperties>({left:12,top:12,maxHeight:"calc(100dvh - 24px)"});
+  const [side,setSide]=useState<"right"|"left"|"overlap"|"mobile"|"mobile-compact">("mobile");
   const panel=useRef<HTMLDivElement>(null);
   const closeButton=useRef<HTMLButtonElement>(null);
   useLayoutEffect(()=>{
     const recalc=()=>{
       const w=window.innerWidth,h=Math.round(window.visualViewport?.height??window.innerHeight);
       const r=anchor?.getBoundingClientRect(),pw=Math.min(490,w-24),ph=Math.min(650,h-24);
-      if(w<=640||!r){const top=h<=720?12:Math.max(12,Math.min(r?.top??12,h-ph-12));
-        setPlace({left:12,top,maxHeight:h-top-12});return;}
-      const left=r.right+pw+12<=w?r.right+6:r.left-pw-12>=12?r.left-pw-6:Math.max(12,Math.min(w-pw-12,r.left+30));
-      setPlace({left,top:Math.max(12,Math.min(r.top,h-ph-12)),maxHeight:ph});
+      if(w<=640||!r){
+        const compact=h<=720;
+        const top=compact?Math.max(12,Math.min(54,Math.round((h-540)/2))):
+          Math.max(12,Math.min(Math.max(82,Math.min(r?.top??12,h*.28)),Math.max(12,h-580)));
+        setPlace({left:12,top,maxHeight:h-top-12});setSide(compact?"mobile-compact":"mobile");
+        return;
+      }
+      const alignment=r.right+pw+12<=w?"right":r.left-pw-12>=12?"left":"overlap";
+      const left=alignment==="right"?r.right+6:alignment==="left"?r.left-pw-6:Math.max(12,Math.min(w-pw-12,r.right-pw*.35));
+      const top=Math.max(12,Math.min(Math.max(90,r.top-12),Math.max(12,h-ph-12)));
+      setPlace({left,top,maxHeight:ph});setSide(alignment);
     };
     recalc();window.addEventListener("resize",recalc);window.addEventListener("scroll",recalc,true);
     window.visualViewport?.addEventListener("resize",recalc);
@@ -127,16 +148,39 @@ function ProductDialog({product,onClose,anchor}:{
       const controls=Array.from(panel.current.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled])'));
       if(!controls.length)return;
       if(e.shiftKey&&document.activeElement===controls[0]){e.preventDefault();controls.at(-1)?.focus();}
-      if(!e.shiftKey&&document.activeElement===controls.at(-1)){e.preventDefault();controls[0]?.focus();}
+      else if(!e.shiftKey&&document.activeElement===controls.at(-1)){e.preventDefault();controls[0]?.focus();}
     };
     window.addEventListener("keydown",onKey);
     return ()=>{document.body.style.overflow=old;window.removeEventListener("keydown",onKey);};
   },[onClose]);
   return createPortal(<div className="v32-overlay">
     <div className="v32-scrim" onClick={onClose} aria-hidden/>
-    <div ref={panel} className="v32-popup" role="dialog" aria-modal="true" aria-label={product.title} style={place}>
-      <button ref={closeButton} type="button" className="v32-close" aria-label="Close" onClick={onClose}>×</button>
-      <ProductOptions product={product} detail/>
+    <div ref={panel} className="v32-popup" data-anchor-side={side}
+      role="dialog" aria-modal="true" aria-label={product.title} style={place}>
+      <div className="v32-popup-scroll">
+        <div className="v32-popup-heading">
+          <div><h2>{product.title}</h2>{product.description&&<p>{product.description}</p>}</div>
+          <button ref={closeButton} type="button" className="v32-close"
+            aria-label="Close" onClick={onClose}>×</button>
+        </div>
+        <p className="v32-section-caption">CHOOSE A VARIANT</p>
+        <div className="v32-variants" role="group" aria-label="Choose a variant">
+          {allowed.map(o=><button key={o.id} type="button" className={o.id===chosen?.id?"v32-variant v32-variant-current":"v32-variant"}
+            aria-pressed={o.id===chosen?.id} onClick={()=>setSku(o.id)}>
+            <span>{o.size}</span><small>{formatAed(o.priceFils)}</small>
+          </button>)}
+        </div>
+        {chosen&&<div className="v32-popup-unit">
+          <p className="v32-section-caption">PRICE</p>
+          <strong className="b-menu-price">{formatAed(chosen.priceFils)}</strong>
+        </div>}
+        {!chosen&&!loading&&<p role="status">Online ordering is unavailable for this product.</p>}
+      </div>
+      <div className="v32-popup-footer b-menu-options">
+        {chosen?<AddToCart key={chosen.id} productId={chosen.id}
+          fallback={<p role="status">Online ordering is unavailable for this variant.</p>}/>:
+          <button disabled type="button">ADD TO CART · UNAVAILABLE</button>}
+      </div>
     </div>
   </div>,document.body);
 }
@@ -161,7 +205,7 @@ function Bakery(){
       (!q||[p.title,p.description??"",family.name,p.variant].some(t=>t.toLowerCase().includes(q)));
   }):[];
   const active=items.find(p=>p.id===selected);
-  return <main className="v32-catalog" id="main">
+  return <main className="v32-catalog v32-catalog-fidelity" id="main">
     <span className="v32-eyebrow">OUR MENU</span><h1>Traditional Mexican Bakery</h1>
     <p className="v32-tagline">CAKES, BREADS &amp; SIGNATURE CREATIONS</p>
     <form className="v32-search" onSubmit={e=>e.preventDefault()}>
