@@ -16,8 +16,8 @@ test("approved V3.2 desktop retains four catalog columns and live SKU authority"
   await card.click();
   const dialog=page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  await expect(dialog.locator(".b-menu-options")).toBeVisible();
-  await expect(dialog.locator(".b-add-to-cart")).toBeVisible();
+  await expect(dialog.locator(".v32-popup-footer")).toBeVisible();
+  await expect(dialog.locator(".v32-buy-form")).toBeVisible();
   if(info.project.name==="chromium"){
     mkdirSync("docs/brand/brand02/conchas",{recursive:true});
     await page.screenshot({path:"docs/brand/brand02/conchas/v32-integrated-desktop.png",fullPage:true,animations:"disabled"});
@@ -42,7 +42,7 @@ test("approved V3.2 mobile dialog fits short viewports",async ({page},info)=>{
   expect(rect!.x+rect!.width).toBeLessThanOrEqual(376);
   expect(rect!.y+rect!.height).toBeLessThanOrEqual(668);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
-  await expect(dialog.locator(".b-add-to-cart button").first()).toBeAttached();
+  await expect(dialog.locator(".v32-buy-cta").first()).toBeAttached();
   if(info.project.name==="chromium"){
     mkdirSync("docs/brand/brand02/conchas",{recursive:true});
     await page.screenshot({path:"docs/brand/brand02/conchas/v32-integrated-mobile.png",animations:"disabled"});
@@ -64,9 +64,9 @@ test("V3.2 mock TatbiQ prices never enter the real cart",async ({page})=>{
   await expect(first).toBeVisible();
   await first.click();
   const popup=page.getByRole("dialog");
-  await expect(popup.locator(".b-menu-options")).toBeVisible();
+  await expect(popup.locator(".v32-popup-footer")).toBeVisible();
   // The product control is the existing commercial ProductOptions, not a toast.
-  await expect(popup.locator(".b-add-to-cart")).toBeVisible();
+  await expect(popup.locator(".v32-buy-form")).toBeVisible();
   await expect(page.locator("button", {hasText:"(preview)"})).toHaveCount(0);
 });
 
@@ -84,8 +84,8 @@ test("V3.2 real cake SKU flows through cart to existing checkout without creatin
   await expect(classic).toBeEnabled();
   await classic.click();
   const panel=page.getByRole("dialog");
-  await expect(panel.locator(".b-menu-options")).toBeVisible();
-  const add=panel.locator(".b-add-to-cart > button").first();
+  await expect(panel.locator(".v32-popup-footer")).toBeVisible();
+  const add=panel.locator(".v32-buy-cta").first();
   await expect(add).toBeEnabled();
   await add.click();
   await expect.poll(()=>page.evaluate(()=>{
@@ -93,10 +93,10 @@ test("V3.2 real cake SKU flows through cart to existing checkout without creatin
     return lines.reduce((sum:number,line:{productId:string;quantity:number})=>
       sum+(line.productId.startsWith("tres-leches-classic-")?line.quantity:0),0);
   })).toBeGreaterThan(0);
-  await page.goto("/cart?lang=en");
-  await expect(page.locator(".b-co-items")).toBeVisible();
-  await expect(page.locator(".b-co-items")).toContainText("Classic");
-  await page.goto("/checkout?lang=en");
+  await page.goto("/visual-v32/cart?lang=en");
+  await expect(page.locator(".v32-new-cart-items")).toBeVisible();
+  await expect(page.locator(".v32-new-cart-items")).toContainText("Classic");
+  await page.goto("/visual-v32/checkout?lang=en");
   await expect(page.locator("main")).toBeVisible();
   expect(await page.locator("main").innerText()).toMatch(/checkout|pickup|delivery|Classic/i);
   expect(paymentActions).toEqual([]);
@@ -168,7 +168,7 @@ test("V3.2 commerce pill variants use canonical SKU prices and preserve AddToCar
   await expect(pills.nth(1)).toHaveAttribute("aria-pressed","true");
   const after=await dlg.locator(".v32-popup-unit .b-menu-price").innerText();
   expect(after).not.toBe(before);
-  await expect(dlg.locator(".b-add-to-cart button").last()).toBeEnabled();
+  await expect(dlg.locator(".v32-buy-cta").last()).toBeEnabled();
   const rect=await dlg.boundingBox();
   expect(rect).not.toBeNull();expect(rect!.y).toBeGreaterThanOrEqual(0);
   expect(rect!.y+rect!.height).toBeLessThanOrEqual(845);
@@ -180,7 +180,7 @@ test("V3.2 Contact and customer policies stay inside the visual preview",async (
   await page.locator(".v32-nav-right a[href='/visual-v32/contact']").click();
   await expect(page).toHaveURL(/\/visual-v32\/contact/);
   await expect(page.locator('[data-visual-preview="v32"]')).toBeVisible();
-  await expect(page.locator('.v32-commerce-shell .b-policy-page')).toBeVisible();
+  await expect(page.locator('.v32-commerce-shell .v32-new-page')).toBeVisible();
   await expect(page.locator('.v32-commerce-shell .b-header, .v32-commerce-shell .b-footer').first()).toBeHidden();
   if(info.project.name==="chromium"){
     mkdirSync("docs/brand/brand02/conchas",{recursive:true});
@@ -188,7 +188,7 @@ test("V3.2 Contact and customer policies stay inside the visual preview",async (
   }
   await page.locator('.v32-site-footer a[href="/visual-v32/terms"]').click();
   await expect(page).toHaveURL(/\/visual-v32\/terms/);
-  await expect(page.locator('.v32-commerce-shell .b-policy-page')).toBeVisible();
+  await expect(page.locator('.v32-commerce-shell .v32-new-page')).toBeVisible();
   await expect(page.locator('.v32-nav')).toBeVisible();
 });
 test("V3.2 Cart and Checkout keep visual navigation and canonical commerce",async ({page},info)=>{
@@ -196,22 +196,22 @@ test("V3.2 Cart and Checkout keep visual navigation and canonical commerce",asyn
   await page.goto("/visual-v32/bakery?category=cakes&lang=en");
   const classic=page.locator('[data-product-id="tres-leches--classic"]');
   await expect(classic).toBeEnabled();await classic.click();
-  const add=page.getByRole("dialog").locator(".b-add-to-cart > button").first();
+  const add=page.getByRole("dialog").locator(".v32-buy-cta").first();
   await expect(add).toBeEnabled();await add.click();
   await page.locator('.v32-nav-right a[href="/visual-v32/cart"]').click();
   await expect(page).toHaveURL(/\/visual-v32\/cart/);
-  await expect(page.locator(".v32-commerce-shell .b-co-items")).toContainText("Classic");
+  await expect(page.locator(".v32-commerce-shell .v32-new-cart-items")).toContainText("Classic");
   await expect(page.locator(".v32-nav")).toBeVisible();
-  await expect(page.locator(".v32-commerce-shell .b-co-header")).toBeHidden();
+  await expect(page.locator(".v32-commerce-shell [class^='b-']")).toHaveCount(0);
   if(info.project.name==="chromium"){
     mkdirSync("docs/brand/brand02/conchas",{recursive:true});
     await page.screenshot({path:"docs/brand/brand02/conchas/v32-cart-1440.png",fullPage:true,animations:"disabled"});
   }
-  const proceed=page.locator(".v32-commerce-shell a.b-co-cta");
-  await expect(proceed).toHaveAttribute("href","/checkout");
+  const proceed=page.locator(".v32-commerce-shell a[href='/visual-v32/checkout']");
+  await expect(proceed).toBeVisible();
   await proceed.click();
   await expect(page).toHaveURL(/\/visual-v32\/checkout/);
-  await expect(page.locator(".v32-commerce-shell .b-shop")).toBeVisible();
+  await expect(page.locator(".v32-commerce-shell .v32-new-page")).toBeVisible();
   await expect(page.locator(".v32-nav")).toBeVisible();
   if(info.project.name==="chromium")
     await page.screenshot({path:"docs/brand/brand02/conchas/v32-checkout-1440.png",fullPage:true,animations:"disabled"});
@@ -231,7 +231,7 @@ test("V3.2 mobile Contact, Cart and Checkout retain the connected visual shell",
     await page.goto("/visual-v32/"+part+"?lang=en");
     await expect(page.locator(".v32-nav")).toBeVisible();
     await expect(page.locator(".v32-commerce-shell")).toBeVisible();
-    await expect(page.locator(".v32-commerce-shell .b-header, .v32-commerce-shell .b-co-header")).toBeHidden();
+    await expect(page.locator(".v32-commerce-shell .b-header, .v32-commerce-shell .b-header")).toBeHidden();
     if(info.project.name==="chromium"){
       mkdirSync("docs/brand/brand02/conchas",{recursive:true});
       await page.screenshot({path:"docs/brand/brand02/conchas/v32-"+part+"-390.png",fullPage:true,animations:"disabled"});
@@ -268,7 +268,7 @@ test("V3.2 add-to-cart commits canonical item and closes without legacy suggesti
   const dialog=page.getByRole("dialog");
   await expect(dialog).toBeVisible();
   const oldCount=await page.locator(".v32-nav-right a[href='/visual-v32/cart'] span").innerText();
-  const add=dialog.locator(".b-add-to-cart > button").first();
+  const add=dialog.locator(".v32-buy-cta").first();
   await expect(add).toBeEnabled();
   await add.click();
   await expect(dialog).toHaveCount(0);
@@ -287,7 +287,7 @@ test("V3.2 short-screen product selector keeps checkout action visible",async ({
     const product=page.locator(".v32-product:not([disabled])").first();
     await expect(product).toBeVisible();await product.click();
     const dialog=page.getByRole("dialog");
-    const action=dialog.locator(".b-add-to-cart > button").first();
+    const action=dialog.locator(".v32-buy-cta").first();
     await expect(action).toBeVisible();
     const panel=await dialog.boundingBox(),button=await action.boundingBox();
     expect(panel).not.toBeNull();expect(button).not.toBeNull();
@@ -307,9 +307,9 @@ test("ZIP V3.2 layout: visible price opposite quantity with primary CTA below",a
   const product=page.locator(".v32-product:not([disabled])").first();
   await product.click();
   const popup=page.getByRole("dialog");
-  const price=popup.locator(".v32-popup-footer .v32-popup-unit").first();
-  const qty=popup.locator(".v32-popup-footer .b-qty").first();
-  const cta=popup.locator(".v32-popup-footer .b-add-to-cart>button").first();
+  const price=popup.locator(".v32-buy-form .v32-buy-price").first();
+  const qty=popup.locator(".v32-popup-footer .v32-buy-qty").first();
+  const cta=popup.locator(".v32-popup-footer .v32-buy-cta").first();
   await expect(price).toBeVisible();
   await expect(qty).toBeVisible();
   await expect(cta).toBeVisible();
@@ -327,4 +327,19 @@ test("ZIP V3.2 mobile navigation does not overflow at 320, 375 or 390",async ({p
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth))
       .toBe(true);
   }
+});
+
+test("V3.2 customer flow contains zero mounted legacy UI components",async ({page})=>{
+  for(const screen of ["contact","cart","checkout","terms","how-to-order","checkout/return"]){
+    await page.goto("/visual-v32/"+screen+"?lang=en");
+    await expect(page.locator('[data-frontend="standalone-v32"]')).toBeVisible();
+    await expect(page.locator(".v32-commerce-shell [class^='b-']")).toHaveCount(0);
+  }
+});
+test("V3.2 checkout does not create a payment in the synthetic preview",async ({page})=>{
+  const unsafe:string[]=[];
+  page.on("request",r=>{if(r.method()!=="GET"&&/\/api\/checkout\/(web|prepare|reconcile)|\/api\/payments\//.test(r.url())) unsafe.push(r.url());});
+  await page.goto("/visual-v32/checkout?lang=en");
+  await expect(page.locator('[data-new-ui="checkout"]')).toBeVisible();
+  expect(unsafe).toEqual([]);
 });

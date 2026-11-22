@@ -43,3 +43,22 @@ Compared actual source `src/components/ProductPopup.jsx`, `src/refidelity-v2.css
 - The original source includes a mock `Personalization` note that is not a
   real cart field. The exact source visual does not grant authority to store or
   silently drop that note. Preserved as explicit functional acceptance gap.
+
+## New architecture after Founder clarification, 22-Nov-2026
+- Founder rejects the earlier approach of wrapping legacy Shop/Policies/StorePages.
+  New V3.2 customer pages are **standalone presentation components**, kept on
+  isolated test-only routes. Production legacy UI remains untouched until separate GO.
+- New src/brand/visual-v32/V32Commerce.tsx renders Contact, How to order,
+  Policies, Cart, Checkout (synthetic no-payment preview) and Return using only
+  domain business facts, authoritative cart/config, and quote endpoints.
+- Product dialog now renders V32AddToCart, directly calling domain cart.add
+  and supporting canonical six-piece minimums, tricolor color selection,
+  conditional box composition. It does NOT import the legacy Shop frontend.
+- Existing server quote, catalog authority and session storage contracts stay.
+  Online payment is NOT wired yet: real payment requires separate verified
+  integration preserving idempotency/reconciliation. No false payment success.
+- Motion recaptured from source as CSS transitions/entrance and route stroke
+  animation (supports prefers-reduced-motion); no third-party motion dependency.
+- Required E2E: zero mounted legacy .b-* UI in /visual-v32 customer pages;
+  functional cart; checkout has no payment side effects, responsive and no
+  cross-route escape. All screenshots must be reviewed against ZIP REF_A/B/C/D.

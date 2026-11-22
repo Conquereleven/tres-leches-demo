@@ -165,103 +165,6 @@
 @media(max-width:360px){.v32-catalog-fidelity .v32-grid{grid-template-columns:1fr}}
 
 
-/* Founder GO 22-Nov: V3.2 complete navigation and commercial visual shell.
- * Preview-only scope; preserve Shop/Policy commercial implementation and data.
- * Old storefront headers/footers are suppressed only beneath the V3.2 route.
- */
-.v32-app .v32-commerce-shell{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:34px 30px 85px}
-.v32-app .v32-commerce-shell .brand-experience{
-  background:transparent!important;color:#27242D;min-height:0;font-family:"3L Montserrat",Arial,sans-serif;
-}
-.v32-app .v32-commerce-shell .b-co-header,
-.v32-app .v32-commerce-shell .b-site-header,
-.v32-app .v32-commerce-shell .b-header,
-.v32-app .v32-commerce-shell .b-footer,
-.v32-app .v32-commerce-shell .b-floating-shopping,
-.v32-app .v32-commerce-shell .b-floating,
-.v32-app .v32-commerce-shell .b-skip{display:none!important}
-.v32-app .v32-commerce-shell .b-shop-main,
-.v32-app .v32-commerce-shell .b-policy{
-  width:100%;max-width:1240px!important;margin:0 auto!important;padding:38px 10px 45px!important;
-}
-.v32-app .v32-commerce-shell .b-shop-main>h1,
-.v32-app .v32-commerce-shell .b-policy-hero h1,
-.v32-app .v32-commerce-shell .b-co-status h1,
-.v32-app .v32-commerce-shell .b-co-confirm-hero h1{
-  font-family:"3L Abril",Georgia,serif!important;color:#27242D!important;
-  font-size:clamp(43px,5.6vw,78px)!important;font-weight:400!important;letter-spacing:-.035em!important;line-height:1.04;
-}
-.v32-app .v32-commerce-shell .b-shop-main>h1{margin:18px 0 30px!important;text-align:center}
-.v32-app .v32-commerce-shell .b-policy-hero{padding:30px 0 38px!important;max-width:1000px}
-.v32-app .v32-commerce-shell .b-policy-hero h1{margin:14px 0 24px!important}
-.v32-app .v32-commerce-shell .b-policy-intro{font-size:clamp(16px,1.55vw,20px);line-height:1.5;max-width:740px}
-.v32-app .v32-commerce-shell .b-policy-body,
-.v32-app .v32-commerce-shell .b-policy-related{max-width:1000px}
-.v32-app .v32-commerce-shell .b-policy-body article>section{margin:22px 0 55px}
-.v32-app .v32-commerce-shell .b-policy-body article>section h2{
-  font:400 clamp(24px,2.6vw,37px)/1.13 "3L Abril",Georgia,serif!important;color:#27242D
-}
-.v32-app .v32-commerce-shell .b-policy-channels{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:15px;list-style:none;padding:0}
-.v32-app .v32-commerce-shell .b-policy-channels li,
-.v32-app .v32-commerce-shell .b-policy-summary li,
-.v32-app .v32-commerce-shell .b-co-card,
-.v32-app .v32-commerce-shell .b-co-summary,
-.v32-app .v32-commerce-shell .b-shop-panel,
-.v32-app .v32-commerce-shell .b-co-status,
-.v32-app .v32-commerce-shell .b-co-confirm-hero{
-  background:rgba(255,255,255,.75)!important;border:1px solid rgba(255,255,255,.93)!important;
-  border-radius:24px!important;box-shadow:0 18px 45px rgba(102,57,60,.12);
-}
-.v32-app .v32-commerce-shell .b-policy-channels li{padding:20px 18px;min-width:0}
-.v32-app .v32-commerce-shell .b-policy-channels a{overflow-wrap:anywhere;color:#27242D;text-decoration:underline;text-decoration-color:#A28D5B}
-.v32-app .v32-commerce-shell .b-co-card,
-.v32-app .v32-commerce-shell .b-co-summary,
-.v32-app .v32-commerce-shell .b-shop-panel{padding:clamp(18px,2vw,32px)!important}
-.v32-app .v32-commerce-shell .b-co-item{background:#fff9!important;border-radius:16px!important}
-.v32-app .v32-commerce-shell .b-co-progress li.current{border-top-color:#A93C68;color:#27242D}
-.v32-app .v32-commerce-shell .b-co-progress li.done{border-top-color:#A28D5B}
-.v32-app .v32-commerce-shell .b-button,
-.v32-app .v32-commerce-shell .b-co-cta,
-.v32-app .v32-commerce-shell button[type="submit"]{
-  border-radius:999px!important;background:#A93C68!important;color:#fff!important;
-  box-shadow:0 8px 20px rgba(169,60,104,.18);
-}
-.v32-app .v32-commerce-shell .b-button[aria-disabled="true"],
-.v32-app .v32-commerce-shell button:disabled{opacity:.6;cursor:not-allowed}
-.v32-app .v32-commerce-shell input,
-.v32-app .v32-commerce-shell select,
-.v32-app .v32-commerce-shell textarea{border-radius:12px}
-.v32-app .v32-commerce-shell a:focus-visible,
-.v32-app .v32-commerce-shell button:focus-visible,
-.v32-app .v32-commerce-shell input:focus-visible,
-.v32-app .v32-commerce-shell select:focus-visible{outline:2px solid #27242D;outline-offset:3px;box-shadow:0 0 0 5px #A28D5B}
-.v32-app .v32-commerce-shell .b-co-assurance{color:#27242D}
-.v32-site-footer{position:relative;z-index:1;max-width:1400px;margin:10px auto 0;padding:38px 40px 48px;border-top:1px solid rgba(255,255,255,.8);display:flex;justify-content:space-between;align-items:center;gap:26px;color:#27242D}
-.v32-site-footer-brand{display:flex;flex-direction:column;gap:5px}
-.v32-site-footer-brand strong{color:#A28D5B;font:400 25px "3L Abril",Georgia,serif}
-.v32-site-footer-brand small{font-size:9px;letter-spacing:.2em;color:#815c44}
-.v32-site-footer nav{display:flex;flex-wrap:wrap;gap:18px;font-size:11px;letter-spacing:.08em}
-.v32-site-footer a{color:#27242D;text-decoration:none}
-.v32-site-footer a:hover,.v32-site-footer a:focus-visible{text-decoration:underline;text-decoration-color:#A28D5B}
-@media(max-width:640px){
-  .v32-app .v32-commerce-shell{padding:15px 14px 55px}
-  .v32-app .v32-commerce-shell .b-shop-main,
-  .v32-app .v32-commerce-shell .b-policy{padding:22px 0 35px!important}
-  .v32-app .v32-commerce-shell .b-co-card,
-  .v32-app .v32-commerce-shell .b-co-summary,
-  .v32-app .v32-commerce-shell .b-shop-panel{padding:16px!important}
-  .v32-app .v32-commerce-shell .b-policy-channels{grid-template-columns:1fr}
-  .v32-site-footer{padding:26px 18px 35px;display:grid}
-  .v32-site-footer nav{gap:14px}
-}
-
-/* Keep legacy floating-shopping control out of the connected preview: the
- * V3.2 navigation already exposes the same real cart state. */
-.v32-app .v32-commerce-shell .brand-experience > aside,
-.v32-app .v32-commerce-shell .b-floating-cart,
-.v32-app .v32-commerce-shell .b-shopping-wa{display:none!important}
-
-
 /* V3.2 fidelity correction, founder feedback 22-Nov-2026.
  * Native selects previously sat on a different text baseline; fixed-height
  * control and centralized flex alignment share one true nav centreline.
@@ -515,28 +418,83 @@
   box-shadow:0 16px 60px #925a5a75,inset 0 2px 1px #fff
 }
 
-/* All connected customer pages share the source's body typography, not just
- * the Home/Menu routes. CSS scope prevents leakage into public and Operations.
- */
-.v32-app .v32-commerce-shell .brand-experience,
-.v32-app .v32-commerce-shell .b-policy,
-.v32-app .v32-commerce-shell .b-shop-main,
-.v32-app .v32-commerce-shell input,
-.v32-app .v32-commerce-shell select,
-.v32-app .v32-commerce-shell textarea,
-.v32-app .v32-commerce-shell button{
-  font-family:"Jost","3L Montserrat",Arial,sans-serif!important;
-}
-.v32-app .v32-commerce-shell h1,
-.v32-app .v32-commerce-shell h2,
-.v32-app .v32-commerce-shell .b-co-card>header h2,
-.v32-app .v32-commerce-shell .b-policy-body article h2{
-  font-family:"Cormorant Garamond",Georgia,serif!important;
-}
 
-/* Mobile drawer click-through regression: a more-specific older selector set
- * .v32-header and main to the SAME z-index. As main is later in DOM it covered
- * the open drawer and intercepted pointer clicks. Keep header above main. */
-.v32-app .v32-header{position:relative;z-index:30}
-.v32-app .v32-mobile-drawer{z-index:31;pointer-events:auto}
-.v32-app .v32-mobile-drawer a{position:relative;z-index:1;pointer-events:auto}
+
+/* V3.2 standalone customer storefront, source-faithful from Founder's ZIP.
+   No Shop/StorePages/Policies selectors. Commerce data comes from cart.ts, menu.ts. */
+.v32-app .v32-new-page{max-width:1260px;margin:0 auto;padding:68px 30px 110px;color:#22181d;position:relative;z-index:2;min-height:70vh;animation:v32-enter .65s both}
+.v32-app .v32-new-page>h1{font:500 clamp(48px,6vw,85px)/.94 "Cormorant Garamond",Georgia,serif!important;letter-spacing:-.04em;text-align:center;margin:18px auto 26px}
+.v32-app .v32-new-eyebrow{color:#976b46;font:500 11px/1.4 Jost,Arial,sans-serif;letter-spacing:.32em;text-align:center;text-transform:uppercase}
+.v32-app .v32-new-lead{max-width:680px;text-align:center;margin:0 auto 80px;font:400 19px/1.55 Jost,Arial,sans-serif;color:#514046}
+.v32-app .v32-new-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.85fr);gap:32px;margin-top:48px;align-items:start}
+.v32-app .v32-new-panel,.v32-app .v32-new-summary,.v32-app .v32-new-empty,.v32-app .v32-new-quote{
+  border:1px solid rgba(255,255,255,.85);border-radius:26px;padding:clamp(22px,3vw,42px);
+  background:rgba(255,255,255,.60);box-shadow:0 20px 45px rgba(139,89,90,.14);backdrop-filter:blur(17px)
+}
+.v32-app .v32-new-panel h2,.v32-app .v32-new-summary h2{font:500 clamp(29px,3vw,39px)/1.1 "Cormorant Garamond",Georgia,serif!important;margin:0 0 24px}
+.v32-app .v32-new-panel h3{font:500 23px/1.1 "Cormorant Garamond",Georgia,serif!important;margin:0 0 8px}
+.v32-app .v32-new-panel p,.v32-app .v32-new-summary p{font:400 14px/1.65 Jost,Arial,sans-serif}
+.v32-app .v32-new-action{display:flex;align-items:center;justify-content:center;width:100%;min-height:51px;margin-top:16px;padding:12px 23px;background:#ac3168;color:#fff!important;border:1px solid #ac3168;border-radius:99px;text-align:center;text-decoration:none!important;font:600 13px Jost,Arial,sans-serif;letter-spacing:.035em;cursor:pointer;box-shadow:0 8px 24px #9d416b30}
+.v32-app .v32-new-action:disabled{opacity:.45;cursor:not-allowed}
+.v32-app .v32-new-action-secondary{display:inline-flex;width:auto;color:#814e32!important;background:#fff9;border:1px solid #d9a99b;border-radius:99px;padding:12px 22px;cursor:pointer;font:500 13px Jost,Arial,sans-serif}
+.v32-app .v32-new-empty{max-width:700px;margin:80px auto;text-align:center;font:italic 28px "Cormorant Garamond",Georgia,serif}
+.v32-app .v32-new-contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 auto 55px}
+.v32-app .v32-new-contact-card{display:flex;flex-direction:column;gap:10px;min-height:142px;color:#27242d!important;transition:transform .25s;text-decoration:none}
+.v32-app .v32-new-contact-card:hover{transform:translateY(-4px)}
+.v32-app .v32-new-contact-card small{font:600 11px Jost,Arial,sans-serif;text-transform:uppercase;letter-spacing:.14em}
+.v32-app .v32-new-contact-card strong{font:500 25px/1.15 "Cormorant Garamond",Georgia,serif!important;overflow-wrap:anywhere}
+.v32-app .v32-new-contact-card span{align-self:end;color:#b47b48}
+.v32-app .v32-new-contact address{font-style:normal;line-height:1.7}
+.v32-app .v32-new-policy{max-width:940px;margin:55px auto}
+.v32-app .v32-new-cart-items,.v32-app .v32-new-summary ul{padding:0;margin:0;list-style:none}
+.v32-app .v32-new-cart-row{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:22px 0;border-bottom:1px solid #dbc3ba}
+.v32-app .v32-new-cart-row:first-child{padding-top:0}
+.v32-app .v32-new-cart-row small{display:block;color:#875d4a;margin-top:6px}
+.v32-app .v32-new-cart-row p{margin:8px 0}
+.v32-app .v32-new-cart-controls{display:flex;flex-direction:column;align-items:end;gap:13px;min-width:120px}
+.v32-app .v32-new-cart-controls input{display:block;margin-top:5px;width:79px;padding:9px;background:#fff9;border:1px solid #d2a69a;border-radius:10px}
+.v32-app .v32-new-cart-controls button{border:0;background:none;text-decoration:underline;color:#975b48}
+.v32-app .v32-new-summary li,.v32-app .v32-new-total{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #dbc3ba}
+.v32-app .v32-new-summary li span{font:400 13px Jost,Arial,sans-serif}
+.v32-app .v32-new-summary li strong,.v32-app .v32-new-total strong{white-space:nowrap;font:600 16px Jost,Arial,sans-serif!important}
+.v32-app .v32-new-total{padding:18px 0 0;border:0;font-weight:600}
+.v32-app .v32-new-progress{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:40px 0 0}
+.v32-app .v32-new-progress span{padding:10px 15px;border-top:2px solid #d9b9ad;font:500 11px Jost,Arial,sans-serif;color:#79676a}
+.v32-app .v32-new-progress .active{border-top-color:#aa3369;color:#22181d}
+.v32-app .v32-new-form label{display:flex;flex-direction:column;gap:8px;margin-bottom:21px;font:500 12px Jost,Arial,sans-serif;color:#503b40}
+.v32-app .v32-new-form :is(input,select),.v32-app .v32-buy-form select{width:100%;min-height:47px;border:1px solid #d3aaa0;border-radius:12px;background:#fffc;padding:10px 13px;color:#27242d;font:400 14px Jost,Arial,sans-serif}
+.v32-app .v32-new-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.v32-app .v32-new-switch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 26px}
+.v32-app .v32-new-switch button{padding:12px;border:1px solid #d9a99b;border-radius:99px;background:#fff9}
+.v32-app .v32-new-switch button.active{background:#aa3369;color:#fff;border-color:#aa3369}
+.v32-app .v32-new-steps{display:flex;align-items:center;justify-content:end;gap:14px}
+.v32-app .v32-new-footnote{color:#79686a;font:400 12px/1.5 Jost,Arial,sans-serif}
+.v32-app .v32-new-quote{padding:16px 22px;font-size:13px;margin-top:20px}
+.v32-app .v32-new-payment-block{padding:20px;border:1px dashed #ad7a5c;border-radius:13px;background:#fbe9e5}
+.v32-popup .v32-popup-footer{display:block!important;padding:12px 22px 18px!important}
+.v32-popup .v32-buy-form{display:block;width:100%}
+.v32-popup .v32-buy-row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:13px}
+.v32-popup .v32-buy-price{display:flex;flex-direction:column;gap:4px}
+.v32-popup .v32-buy-price span{font:500 10px Jost,Arial,sans-serif;letter-spacing:.23em;color:#8c6a5d;text-transform:uppercase}
+.v32-popup .v32-buy-price strong{font:600 32px/1 "Cormorant Garamond",Georgia,serif!important;color:#27212a}
+.v32-popup .v32-buy-qty{display:flex;align-items:center;gap:8px;border:1px solid #d4b2a0;border-radius:99px;padding:5px 8px;background:#fff9;min-height:47px}
+.v32-popup .v32-buy-qty button{min-width:32px;min-height:32px;border:0;background:none;color:#8c5a30;font-size:20px}
+.v32-popup .v32-buy-qty output{min-width:25px;text-align:center;font:500 14px Jost,Arial,sans-serif}
+.v32-popup .v32-buy-cta{width:100%;min-height:50px;border:0;border-radius:999px;background:#af3269;color:#fff;font:600 13px Jost,Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase;box-shadow:0 9px 22px #a83a6652}
+.v32-popup .v32-buy-cta:disabled{opacity:.55;cursor:not-allowed}
+.v32-popup .v32-buy-form>label{display:block;font:500 12px Jost,Arial,sans-serif;margin:0 0 12px}
+.v32-popup .v32-new-pack{max-height:170px;overflow:auto;padding:7px 10px;border:1px solid #deb7ac;border-radius:14px;margin-bottom:10px}
+.v32-popup .v32-new-pack>div{display:flex;align-items:center;gap:7px;padding:5px 0;font-size:12px}
+.v32-popup .v32-new-pack>div span:first-child{flex:1}
+.v32-popup .v32-new-pack button{width:28px;height:28px;border:1px solid #cba08f;border-radius:50%;background:#fff8}
+.v32-popup .v32-popup-footer .v32-buy-form .v32-buy-price strong{font-family:"Cormorant Garamond",Georgia,serif!important}
+.v32-popup .v32-minimum{margin-top:11px}
+.v32-app .v32-tile,.v32-app .v32-product{transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s}
+.v32-app .v32-product:hover,.v32-app .v32-tile:hover{transform:translateY(-4px)}
+.v32-app .v32-home h1,.v32-app .v32-landing h1,.v32-app .v32-catalog h1{animation:v32-enter .7s both}
+.v32-app .v32-route path{stroke-dasharray:720;stroke-dashoffset:720;animation:v32-route-draw 3.4s .3s ease forwards}
+@keyframes v32-enter{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+@keyframes v32-route-draw{to{stroke-dashoffset:0}}
+@media(max-width:800px){.v32-app .v32-new-layout{grid-template-columns:1fr}.v32-app .v32-new-contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.v32-app .v32-new-page{padding:44px 15px 70px}.v32-app .v32-new-contact-grid{grid-template-columns:1fr;gap:14px;margin-bottom:32px}.v32-app .v32-new-lead{margin-bottom:35px}.v32-app .v32-new-fields{grid-template-columns:1fr}.v32-app .v32-new-cart-row{gap:10px}.v32-app .v32-new-progress{gap:6px}.v32-app .v32-new-progress span{padding:7px;font-size:10px}}
+@media(prefers-reduced-motion:reduce){.v32-app .v32-route path{animation:none;stroke-dashoffset:0}.v32-app .v32-new-page,.v32-app .v32-home h1,.v32-app .v32-landing h1,.v32-app .v32-catalog h1{animation:none}.v32-app .v32-product,.v32-app .v32-tile{transition:none}}

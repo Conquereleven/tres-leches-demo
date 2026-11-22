@@ -1,13 +1,11 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type SyntheticEvent, type MouseEvent as ReactMouseEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type SyntheticEvent } from "react";
 import { createPortal } from "react-dom";
 import { useMenu, menuProductFamily, type StorefrontProduct } from "../menu";
 import { useCheckoutConfig, useCheckoutNow, useCart, cartCount, minQty } from "../cart";
 import { useLanguage } from "../localization";
 import { availableSku } from "../../../shared/commerce-policy";
 import { liveOrderable } from "../live-catalog";
-import { AddToCart, CartPage, CheckoutPage, CheckoutReturn } from "../Shop";
-import { PolicyPage } from "../Policies";
-import { HowToOrder } from "../StorePages";
+import { VisualAddToCart, VisualCart, VisualCheckout, VisualReturn, VisualContact, VisualPolicy, VisualHowToOrder } from "./V32Commerce";
 import { isPolicyPath, policyRoutes } from "../business";
 import { ResponsiveMedia } from "../media";
 import { formatAed } from "../content";
@@ -97,29 +95,6 @@ const visualCopy = {
   added:"أُضيف إلى السلة"
  }
 } as const;
-
-/** A preview navigation boundary: keep every internal shopper link within V3.2.
- * Never intercept external, payment-provider, download, modified-click or in-page links.
- */
-function keepInVisualPreview(event: ReactMouseEvent<HTMLDivElement>) {
-  if (event.defaultPrevented || event.button !== 0 ||
-      event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-  const element = event.target;
-  if (!(element instanceof Element)) return;
-  const anchor = element.closest("a[href]");
-  if (!(anchor instanceof HTMLAnchorElement) ||
-      anchor.hasAttribute("download") || (anchor.target && anchor.target !== "_self")) return;
-  const href = anchor.getAttribute("href");
-  if (!href || href.startsWith("#")) return;
-  const url = new URL(href, window.location.href);
-  if (url.origin !== window.location.origin || url.pathname.startsWith(origin)) return;
-  const known = ["/", "/menu", "/how-to-order", "/cart", "/checkout", "/checkout/return",
-    ...policyRoutes.map(item=>item.path)] as string[];
-  if (!known.includes(url.pathname)) return;
-  event.preventDefault();
-  const page = url.pathname === "/" ? "" : url.pathname === "/menu" ? "/bakery" : url.pathname;
-  window.location.assign(origin + page + url.search + url.hash);
-}
 
 const groups: {id: Filter; en: string; es: string; ar: string}[] = [
   {id:"all",en:"All Products",es:"Todos",ar:"الكل"},
@@ -298,13 +273,7 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
         {!chosen&&!loading&&<p role="status">{t.orderingUnavailable}</p>}
       </div>
       <div className="v32-popup-footer b-menu-options">
-        {chosen&&<div className="v32-popup-unit">
-          <p className="v32-section-caption">{t.price}</p>
-          <strong className="b-menu-price">{formatAed(chosen.priceFils)}</strong>
-        </div>}
-        {chosen?<AddToCart key={chosen.id} productId={chosen.id}
-          onAdded={onAdded}
-          fallback={<p role="status">{t.variantUnavailable}</p>}/>:
+        {chosen?<VisualAddToCart key={chosen.id} productId={chosen.id} onAdded={onAdded}/>:
           <button disabled type="button">ADD TO CART · UNAVAILABLE</button>}
       </div>
     </div>
@@ -380,11 +349,12 @@ function Bakery(){
  * only their visual frame/navigation in isolated preview, never payment logic.
  */
 function VisualCommerce({path}:{path:string}) {
-  if (path==="/cart") return <CartPage/>;
-  if (path==="/checkout") return <CheckoutPage/>;
-  if (path==="/checkout/return") return <CheckoutReturn/>;
-  if (path==="/how-to-order") return <HowToOrder/>;
-  if (isPolicyPath(path)) return <PolicyPage path={path}/>;
+  if(path==="/cart")return <VisualCart/>;
+  if(path==="/checkout")return <VisualCheckout/>;
+  if(path==="/checkout/return")return <VisualReturn/>;
+  if(path==="/how-to-order")return <VisualHowToOrder/>;
+  if(path==="/contact")return <VisualContact/>;
+  if(isPolicyPath(path))return <VisualPolicy path={path}/>;
   return null;
 }
 function VisualFooter(){
@@ -416,8 +386,8 @@ export function VisualV32(){
   },[]);
   const path=location.pathname.replace(/\/+$/,"").slice(origin.length) || "/";
   const commerce = ["/cart","/checkout","/checkout/return","/how-to-order"].includes(path) || isPolicyPath(path);
-  return <div className="v32-app" data-visual-preview="v32" onClickCapture={keepInVisualPreview}>
-    <a className="v32-skip" href={commerce?"#main-content":"#main"}>Skip to content</a>
+  return <div className="v32-app" data-visual-preview="v32" data-frontend="standalone-v32">
+    <a className="v32-skip" href="#main">Skip to content</a>
     <Header/>
     {path==="/menu"?<Landing/>:path==="/bakery"?<Bakery/>:commerce?
       <div className="v32-commerce-shell" data-visual-route={path}><VisualCommerce path={path}/></div>:<Home/>}
