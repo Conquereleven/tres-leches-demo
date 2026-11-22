@@ -9,15 +9,15 @@ test("approved V3.2 desktop retains four catalog columns and live SKU authority"
   await expect(grid).toBeVisible();
   const columns=await grid.evaluate(e=>getComputedStyle(e).gridTemplateColumns.split(" ").length);
   expect(columns).toBe(4);
-  const card=page.locator(".v32-product:not([disabled])").first();
+  const card=page.locator(".ref32-product:not([disabled])").first();
   await expect(card).toBeVisible();
-  const price=await card.locator(".v32-product-copy > span").innerText();
+  const price=await card.locator(".ref32-product-copy > span").innerText();
   expect(price).toMatch(/AED/);
   await card.click();
   const dialog=page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  await expect(dialog.locator(".v32-popup-footer")).toBeVisible();
-  await expect(dialog.locator(".v32-buy-form")).toBeVisible();
+  await expect(dialog.locator(".ref32-dialog-footer")).toBeVisible();
+  await expect(dialog.locator(".ref32-dialog-footer")).toBeVisible();
   if(info.project.name==="chromium"){
     mkdirSync("docs/brand/brand02/conchas",{recursive:true});
     await page.screenshot({path:"docs/brand/brand02/conchas/v32-integrated-desktop.png",fullPage:true,animations:"disabled"});
@@ -30,7 +30,7 @@ test("approved V3.2 desktop retains four catalog columns and live SKU authority"
 test("approved V3.2 mobile dialog fits short viewports",async ({page},info)=>{
   await page.setViewportSize({width:375,height:667});
   await page.goto("/visual-v32/bakery?lang=en");
-  const card=page.locator(".v32-product:not([disabled])").first();
+  const card=page.locator(".ref32-product:not([disabled])").first();
   await expect(card).toBeVisible();
   await card.click();
   const dialog=page.getByRole("dialog");
@@ -42,7 +42,7 @@ test("approved V3.2 mobile dialog fits short viewports",async ({page},info)=>{
   expect(rect!.x+rect!.width).toBeLessThanOrEqual(376);
   expect(rect!.y+rect!.height).toBeLessThanOrEqual(668);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
-  await expect(dialog.locator(".v32-buy-cta").first()).toBeAttached();
+  await expect(dialog.locator(".ref32-buy").first()).toBeAttached();
   if(info.project.name==="chromium"){
     mkdirSync("docs/brand/brand02/conchas",{recursive:true});
     await page.screenshot({path:"docs/brand/brand02/conchas/v32-integrated-mobile.png",animations:"disabled"});
@@ -54,19 +54,19 @@ test("V3.2 fails closed when authoritative checkout config is unavailable",async
     status:503,contentType:"application/json",body:"{}"
   }));
   await page.goto("/visual-v32/bakery?lang=en");
-  await expect(page.locator(".v32-product:not([disabled])")).toHaveCount(0);
+  await expect(page.locator(".ref32-product:not([disabled])")).toHaveCount(0);
   await expect(page.getByRole("dialog")).toHaveCount(0);
 });
 
 test("V3.2 mock TatbiQ prices never enter the real cart",async ({page})=>{
   await page.goto("/visual-v32/bakery?lang=en");
-  const first=page.locator(".v32-product:not([disabled])").first();
+  const first=page.locator(".ref32-product:not([disabled])").first();
   await expect(first).toBeVisible();
   await first.click();
   const popup=page.getByRole("dialog");
-  await expect(popup.locator(".v32-popup-footer")).toBeVisible();
+  await expect(popup.locator(".ref32-dialog-footer")).toBeVisible();
   // The product control is V3.2 native UI backed by the canonical cart, not legacy Shop UI.
-  await expect(popup.locator(".v32-buy-form")).toBeVisible();
+  await expect(popup.locator(".ref32-dialog-footer")).toBeVisible();
   await expect(page.locator("button", {hasText:"(preview)"})).toHaveCount(0);
 });
 
@@ -84,8 +84,8 @@ test("V3.2 real cake SKU flows through new cart and synthetic checkout without c
   await expect(classic).toBeEnabled();
   await classic.click();
   const panel=page.getByRole("dialog");
-  await expect(panel.locator(".v32-popup-footer")).toBeVisible();
-  const add=panel.locator(".v32-buy-cta").first();
+  await expect(panel.locator(".ref32-dialog-footer")).toBeVisible();
+  const add=panel.locator(".ref32-buy").first();
   await expect(add).toBeEnabled();
   await add.click();
   await expect.poll(()=>page.evaluate(()=>{
@@ -140,7 +140,7 @@ test("V3.2 keeps real SKU price unchanged across languages",async ({page})=>{
     await page.goto("/visual-v32/bakery?category=cakes&lang="+lang);
     const item=page.locator('[data-product-id="tres-leches--classic"]');
     await expect(item).toBeVisible();
-    const raw=await item.locator(".v32-product-copy > span").innerText();
+    const raw=await item.locator(".ref32-product-copy > span").innerText();
     amounts.push((raw.match(/AED\s?[\d,.]+/)??[])[0]??"");
   }
   expect(amounts[0]).toMatch(/^AED/);
@@ -160,15 +160,15 @@ test("V3.2 commerce pill variants use canonical SKU prices and preserve AddToCar
   await expect(classic).toBeVisible();
   await classic.click();
   const dlg=page.getByRole("dialog");
-  const pills=dlg.locator(".v32-variant");
+  const pills=dlg.locator(".ref32-option");
   expect(await pills.count()).toBeGreaterThan(1);
   await expect(pills.first()).toHaveAttribute("aria-pressed","true");
-  const before=await dlg.locator(".v32-buy-price strong").innerText();
+  const before=await dlg.locator(".ref32-price strong").innerText();
   await pills.nth(1).click();
   await expect(pills.nth(1)).toHaveAttribute("aria-pressed","true");
-  const after=await dlg.locator(".v32-buy-price strong").innerText();
+  const after=await dlg.locator(".ref32-price strong").innerText();
   expect(after).not.toBe(before);
-  await expect(dlg.locator(".v32-buy-cta").last()).toBeEnabled();
+  await expect(dlg.locator(".ref32-buy").last()).toBeEnabled();
   const rect=await dlg.boundingBox();
   expect(rect).not.toBeNull();expect(rect!.y).toBeGreaterThanOrEqual(0);
   expect(rect!.y+rect!.height).toBeLessThanOrEqual(845);
@@ -196,7 +196,7 @@ test("V3.2 Cart and Checkout keep visual navigation and canonical commerce",asyn
   await page.goto("/visual-v32/bakery?category=cakes&lang=en");
   const classic=page.locator('[data-product-id="tres-leches--classic"]');
   await expect(classic).toBeEnabled();await classic.click();
-  const add=page.getByRole("dialog").locator(".v32-buy-cta").first();
+  const add=page.getByRole("dialog").locator(".ref32-buy").first();
   await expect(add).toBeEnabled();await add.click();
   await page.locator('.v32-nav-right a[href="/visual-v32/cart"]').click();
   await expect(page).toHaveURL(/\/visual-v32\/cart/);
@@ -262,13 +262,13 @@ test("V3.2 add-to-cart commits canonical item and closes without legacy suggesti
   await page.setViewportSize({width:1440,height:900});
   await page.goto("/visual-v32/bakery?category=mexican&lang=en");
   const item=page.locator('[data-product-id="pan-azucar-chocolate-covering"]');
-  const open=await item.count()?item:page.locator(".v32-product:not([disabled])").first();
+  const open=await item.count()?item:page.locator(".ref32-product:not([disabled])").first();
   await expect(open).toBeEnabled();
   await open.click();
   const dialog=page.getByRole("dialog");
   await expect(dialog).toBeVisible();
   const oldCount=await page.locator(".v32-nav-right a[href='/visual-v32/cart'] span[aria-live='polite']").innerText();
-  const add=dialog.locator(".v32-buy-cta").first();
+  const add=dialog.locator(".ref32-buy").first();
   await expect(add).toBeEnabled();
   await add.click();
   await expect(dialog).toHaveCount(0);
@@ -284,10 +284,10 @@ test("V3.2 short-screen product selector keeps checkout action visible",async ({
   for(const size of [{width:390,height:844},{width:375,height:667},{width:320,height:568}]){
     await page.setViewportSize(size);
     await page.goto("/visual-v32/bakery?category=mexican&lang=en");
-    const product=page.locator(".v32-product:not([disabled])").first();
+    const product=page.locator(".ref32-product:not([disabled])").first();
     await expect(product).toBeVisible();await product.click();
     const dialog=page.getByRole("dialog");
-    const action=dialog.locator(".v32-buy-cta").first();
+    const action=dialog.locator(".ref32-buy").first();
     await expect(action).toBeVisible();
     const panel=await dialog.boundingBox(),button=await action.boundingBox();
     expect(panel).not.toBeNull();expect(button).not.toBeNull();
@@ -305,19 +305,19 @@ test("V3.2 short-screen product selector keeps checkout action visible",async ({
 test("REF_C desktop layout: quantity and CTA share horizontal anchored footer",async ({page},info)=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto("/visual-v32/bakery?category=mexican&lang=en");
- await page.locator(".v32-product:not([disabled])").first().click();
+ await page.locator(".ref32-product:not([disabled])").first().click();
  const popup=page.getByRole("dialog");
  await expect.poll(()=>popup.evaluate(e=>e.getAnimations().filter(a=>a.playState==="running").length)).toBe(0);
- const desktopQty=popup.locator(".v32-desktop-qty-target .v32-buy-qty");
- const cta=popup.locator(".v32-popup-footer .v32-buy-cta");
+ const desktopQty=popup.locator(".ref32-desktop-quantity .ref32-quantity");
+ const cta=popup.locator(".ref32-dialog-footer .ref32-buy");
  await expect(desktopQty).toBeVisible();
  await expect(cta).toBeVisible();
- await expect(popup.locator(".v32-popup-scroll .v32-buy-row")).toBeHidden();
+ await expect(popup.locator(".ref32-price-quantity .ref32-quantity")).toBeHidden();
  const a=await desktopQty.boundingBox(),b=await cta.boundingBox();
  expect(a).not.toBeNull();expect(b).not.toBeNull();
  expect(Math.abs(a!.y+a!.height/2-(b!.y+b!.height/2))).toBeLessThan(20);
  expect(b!.x).toBeGreaterThan(a!.x+a!.width);
- await expect(popup.locator(".v32-personalization input")).toBeVisible();
+ await expect(popup.locator(".ref32-note input")).toBeVisible();
  if(info.project.name==="chromium"){
    mkdirSync("docs/brand/brand02/conchas",{recursive:true});
    await page.screenshot({path:"docs/brand/brand02/conchas/v32-ref-c-desktop-1440.png",animations:"disabled"});
@@ -328,10 +328,10 @@ test("REF_D mobile layout: price+quantity row above note with fixed full-width C
  await page.goto("/visual-v32/bakery?category=cakes&lang=es");
  await page.locator('[data-product-id="tres-leches--classic"]').click();
  const popup=page.getByRole("dialog");
- const price=popup.locator(".v32-popup-scroll .v32-buy-price");
- const qty=popup.locator(".v32-popup-scroll .v32-buy-qty-mobile");
- const note=popup.locator(".v32-personalization input");
- const cta=popup.locator(".v32-popup-footer .v32-buy-cta");
+ const price=popup.locator(".ref32-details .ref32-price");
+ const qty=popup.locator(".ref32-price-quantity .ref32-quantity");
+ const note=popup.locator(".ref32-note input");
+ const cta=popup.locator(".ref32-dialog-footer .ref32-buy");
  await expect(price).toBeVisible();await expect(qty).toBeVisible();
  await expect(note).toBeVisible();await expect(cta).toBeVisible();
  const a=await price.boundingBox(),b=await qty.boundingBox(),c=await cta.boundingBox();
@@ -398,11 +398,11 @@ test("ZIP REF_C price changes with quantity without altering authoritative unit 
  const card=page.locator('[data-product-id="tres-leches--classic"]');
  await card.click();
  const popup=page.getByRole("dialog");
- const before=await popup.locator(".v32-buy-price strong").innerText();
+ const before=await popup.locator(".ref32-price strong").innerText();
  await popup.getByRole("button",{name:"Increase quantity"}).click();
- const after=await popup.locator(".v32-buy-price strong").innerText();
+ const after=await popup.locator(".ref32-price strong").innerText();
  expect(after).not.toBe(before);
- await expect(popup.locator(".v32-buy-cta")).toContainText(after);
+ await expect(popup.locator(".ref32-buy")).toContainText(after);
 });
 
 test("approved REF_C input: note maximum 40 and value preserved across variant change",async ({page})=>{
@@ -414,10 +414,10 @@ test("approved REF_C input: note maximum 40 and value preserved across variant c
  await expect(note).toBeVisible();
  await note.fill("x".repeat(55));
  await expect(note).toHaveValue("x".repeat(40));
- await expect(popup.locator(".v32-personalization-field output")).toHaveText("40/40");
- await popup.locator(".v32-variant").nth(1).click();
+ await expect(popup.locator(".ref32-note-field output")).toHaveText("40/40");
+ await popup.locator(".ref32-option").nth(1).click();
  await expect(note).toHaveValue("x".repeat(40));
- await expect(popup.locator(".v32-popup-footer .v32-buy-cta")).toBeVisible();
+ await expect(popup.locator(".ref32-dialog-footer .ref32-buy")).toBeVisible();
 });
 test("approved REF_D short screens: scrollable fields with persistent single CTA",async ({page},info)=>{
  for(const size of [{width:390,height:844},{width:375,height:667},{width:320,height:568}]){
@@ -425,16 +425,16 @@ test("approved REF_D short screens: scrollable fields with persistent single CTA
   await page.goto("/visual-v32/bakery?category=cakes&lang=en");
   await page.locator('[data-product-id="tres-leches--classic"]').click();
   const popup=page.getByRole("dialog");
-  const button=popup.locator(".v32-popup-footer .v32-buy-cta");
-  await expect(popup.locator(".v32-personalization input")).toBeAttached();
+  const button=popup.locator(".ref32-dialog-footer .ref32-buy");
+  await expect(popup.locator(".ref32-note input")).toBeAttached();
   await expect(button).toBeVisible();
   const before=await button.boundingBox();
-  await popup.locator(".v32-popup-scroll").evaluate(el=>{el.scrollTop=el.scrollHeight});
+  await popup.locator(".ref32-details").evaluate(el=>{el.scrollTop=el.scrollHeight});
   const after=await button.boundingBox();
   expect(before).not.toBeNull();expect(after).not.toBeNull();
   expect(Math.abs(before!.y-after!.y)).toBeLessThanOrEqual(2);
   expect(after!.y+after!.height).toBeLessThanOrEqual(size.height+1);
-  await expect(popup.locator(".v32-popup-footer .v32-buy-cta")).toHaveCount(1);
+  await expect(popup.locator(".ref32-dialog-footer .ref32-buy")).toHaveCount(1);
   if(info.project.name==="chromium"&&size.width===390){
     mkdirSync("docs/brand/brand02/conchas",{recursive:true});
     await page.screenshot({path:"docs/brand/brand02/conchas/v32-approved-popup-notes-390.png",animations:"disabled"});
@@ -446,24 +446,24 @@ test("source reference note is visual-only and never silently attached to mercha
  await page.goto("/visual-v32/bakery?category=cakes&lang=en");
  await page.locator('[data-product-id="tres-leches--classic"]').click();
  const popup=page.getByRole("dialog");
- await popup.locator(".v32-personalization input").fill("private gift message");
- await expect(popup.locator(".v32-buy-cta")).toBeDisabled();
- await expect(popup.locator(".v32-note-warning")).toBeVisible();
+ await popup.locator(".ref32-note input").fill("private gift message");
+ await expect(popup.locator(".ref32-buy")).toBeDisabled();
+ await expect(popup.locator(".ref32-note-warning")).toBeVisible();
  expect(await page.evaluate(()=>String(localStorage.getItem("3l-cart")).includes("private gift message"))).toBe(false);
- await popup.locator(".v32-personalization input").fill("");
- await expect(popup.locator(".v32-buy-cta")).toBeEnabled();
+ await popup.locator(".ref32-note input").fill("");
+ await expect(popup.locator(".ref32-buy")).toBeEnabled();
 });
 
 test("REF_C and REF_D have distinct approved backdrop sharpness",async ({page})=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto("/visual-v32/bakery?category=cakes&lang=en");
  await page.locator('[data-product-id="tres-leches--classic"]').click();
- expect(await page.locator(".v32-scrim").evaluate(el=>getComputedStyle(el).backdropFilter)).toBe("none");
+ expect(await page.locator(".ref32-backdrop").evaluate(el=>getComputedStyle(el).backdropFilter)).toBe("none");
  await page.keyboard.press("Escape");
  await page.setViewportSize({width:390,height:844});
  await page.goto("/visual-v32/bakery?category=cakes&lang=en");
  await page.locator('[data-product-id="tres-leches--classic"]').click();
- expect(await page.locator(".v32-scrim").evaluate(el=>getComputedStyle(el).backdropFilter)).toContain("blur(");
+ expect(await page.locator(".ref32-backdrop").evaluate(el=>getComputedStyle(el).backdropFilter)).toContain("blur(");
 });
 
 test("V3.2 published subcategories refine 3L products without mock category IDs",async ({page},info)=>{
@@ -481,7 +481,7 @@ test("V3.2 published subcategories refine 3L products without mock category IDs"
    mkdirSync("docs/brand/brand02/conchas",{recursive:true});
    await page.screenshot({path:"docs/brand/brand02/conchas/v32-3l-categories-desktop.png",animations:"disabled"});
  }
- const cards=page.locator(".v32-product");
+ const cards=page.locator(".ref32-product");
  await expect(cards.first()).toBeVisible();
  expect(await cards.evaluateAll(list=>list.every(node=>node.getAttribute("data-category-id")==="conchas"))).toBe(true);
 });
@@ -492,13 +492,13 @@ test("V3.2 3L half-dozen/dozen selection follows actual Orejas SKUs, not box qua
  await expect(card).toBeEnabled();
  await card.click();
  const popup=page.getByRole("dialog");
- await expect(popup.locator('[data-commerce-options="canonical"]')).toBeVisible();
+ await expect(popup.locator(".ref32-options")).toBeVisible();
  await popup.locator('[data-pack-presentation="individual"]').click();
  await popup.locator('[data-pack-pieces="12"]').click();
  await expect(popup).toHaveAttribute("data-selected-sku","orejas-12-individuales-100-g-cada-uno");
  await expect(popup.locator('[data-pack-piece-count]')).toContainText("12");
- await expect(popup.locator(".v32-buy-qty-desktop output")).toHaveText("1");
- const price=await popup.locator(".v32-buy-cta").innerText();
+ await expect(popup.locator(".ref32-desktop-quantity .ref32-quantity output")).toHaveText("1");
+ const price=await popup.locator(".ref32-buy").innerText();
  const checkout=await page.request.get("/api/checkout/config");
  expect(checkout.ok()).toBe(true);
  const body=await checkout.json();
@@ -509,7 +509,7 @@ test("V3.2 3L half-dozen/dozen selection follows actual Orejas SKUs, not box qua
    mkdirSync("docs/brand/brand02/conchas",{recursive:true});
    await page.screenshot({path:"docs/brand/brand02/conchas/v32-3l-dozen-desktop-1440.png",animations:"disabled"});
  }
- await popup.locator(".v32-buy-cta").click();
+ await popup.locator(".ref32-buy").click();
  await expect(popup).toHaveCount(0);
  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("3l-cart")||"[]").some((l:{productId:string;quantity:number})=>
    l.productId==="orejas-12-individuales-100-g-cada-uno"&&l.quantity===1))).toBe(true);
@@ -525,12 +525,12 @@ test("V3.2 3L mobile package selector remains usable at 390 and 375",async ({pag
   await expect(card).toBeEnabled();
   await card.click();
   const popup=page.getByRole("dialog");
-  await expect(popup.locator('[data-commerce-options="canonical"]')).toBeVisible();
+  await expect(popup.locator(".ref32-options")).toBeVisible();
   await popup.locator('[data-pack-presentation="mini"]').click();
   await popup.locator('[data-pack-pieces="6"]').click();
   await expect(popup).toHaveAttribute("data-selected-sku","orejas-6-mini-60-g-cada-uno");
   await expect(popup.locator("[data-pack-piece-count]")).toContainText("6");
-  const action=popup.locator(".v32-popup-footer .v32-buy-cta");
+  const action=popup.locator(".ref32-dialog-footer .ref32-buy");
   await expect(action).toBeVisible();
   const rect=await action.boundingBox();
   expect(rect).not.toBeNull();
@@ -553,7 +553,7 @@ test("REF_C approved: Pan de Muerto has four complete SKU choices with real AED 
  await expect(card).toBeEnabled();
  await card.click();
  const popup=page.getByRole("dialog");
- const choices=popup.locator(".v32-quick-four .v32-quick-options");
+ const choices=popup.locator(".ref32-options-four");
  await expect(choices.locator("button")).toHaveCount(4);
  await expect(choices).toContainText("Media docena");
  await expect(choices).toContainText("Docena");
@@ -564,8 +564,8 @@ test("REF_C approved: Pan de Muerto has four complete SKU choices with real AED 
    :"conchas-traditional-pack-12-individuales";
  await choices.locator('[data-sku="'+expectedSku+'"]').click();
  await expect(popup).toHaveAttribute("data-selected-sku",expectedSku);
- await expect(popup.locator(".v32-buy-cta")).toContainText("AED 140");
- await expect(popup.locator(".v32-desktop-qty-target .v32-buy-qty")).toBeVisible();
+ await expect(popup.locator(".ref32-buy")).toContainText("AED 140");
+ await expect(popup.locator(".ref32-desktop-quantity .ref32-quantity")).toBeVisible();
  await expect(card).toHaveAttribute("data-selected-product","true");
  if(info.project.name==="chromium"){
    mkdirSync("docs/brand/brand02/conchas",{recursive:true});
@@ -579,7 +579,7 @@ test("REF_D approved: mobile Orejas shows three direct purchase sizes",async ({p
  await expect(card).toBeEnabled();
  await card.click();
  const popup=page.getByRole("dialog");
- const sizes=popup.locator(".v32-three-quantities");
+ const sizes=popup.locator(".ref32-options-three");
  await expect(sizes.locator("button")).toHaveCount(3);
  await expect(sizes).toContainText("1 pieza");
  await expect(sizes).toContainText("Media docena");
@@ -587,9 +587,9 @@ test("REF_D approved: mobile Orejas shows three direct purchase sizes",async ({p
  await popup.locator('[data-pack-presentation="mini"]').click();
  await sizes.locator('[data-pack-pieces="6"]').click();
  await expect(popup).toHaveAttribute("data-selected-sku","orejas-6-mini-60-g-cada-uno");
- await expect(popup.locator(".v32-buy-price strong")).toContainText("AED 50");
- await expect(popup.locator(".v32-personalization input")).toBeVisible();
- await expect(popup.locator(".v32-popup-footer .v32-buy-cta")).toBeVisible();
+ await expect(popup.locator(".ref32-price strong")).toContainText("AED 50");
+ await expect(popup.locator(".ref32-note input")).toBeVisible();
+ await expect(popup.locator(".ref32-dialog-footer .ref32-buy")).toBeVisible();
  await expect(card).toHaveAttribute("data-selected-product","true");
  if(info.project.name==="chromium"){
    mkdirSync("docs/brand/brand02/conchas",{recursive:true});
@@ -600,9 +600,9 @@ test("REF_C functionality: non-persisted personalization can never silently ente
  await page.goto("/visual-v32/bakery?category=cakes&lang=es");
  await page.locator('[data-product-id="tres-leches--classic"]').click();
  const popup=page.getByRole("dialog");
- await popup.locator(".v32-personalization input").fill("Feliz cumpleaños");
- await expect(popup.locator(".v32-buy-cta")).toBeDisabled();
- await expect(popup.locator(".v32-note-warning")).toBeVisible();
- await popup.locator(".v32-personalization input").fill("");
- await expect(popup.locator(".v32-buy-cta")).toBeEnabled();
+ await popup.locator(".ref32-note input").fill("Feliz cumpleaños");
+ await expect(popup.locator(".ref32-buy")).toBeDisabled();
+ await expect(popup.locator(".ref32-note-warning")).toBeVisible();
+ await popup.locator(".ref32-note input").fill("");
+ await expect(popup.locator(".ref32-buy")).toBeEnabled();
 });
