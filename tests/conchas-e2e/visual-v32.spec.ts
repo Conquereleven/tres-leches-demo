@@ -69,3 +69,35 @@ test("V3.2 mock TatbiQ prices never enter the real cart",async ({page})=>{
   await expect(popup.locator(".b-add-to-cart")).toBeVisible();
   await expect(page.locator("button", {hasText:"(preview)"})).toHaveCount(0);
 });
+
+
+test("V3.2 real cake SKU flows through cart to existing checkout without creating payment",async ({page})=>{
+  await page.setViewportSize({width:1440,height:900});
+  const paymentActions:string[]=[];
+  page.on("request",r=>{
+    if(r.method()!=="GET"&&/(\/api\/checkout\/(?:web|prepare|token)|\/api\/payments\/)/.test(r.url()))
+      paymentActions.push(r.url());
+  });
+  await page.goto("/visual-v32/bakery?category=cakes&lang=en");
+  const classic=page.locator('[data-product-id="tres-leches--classic"]');
+  await expect(classic).toBeVisible({timeout:12000});
+  await expect(classic).toBeEnabled();
+  await classic.click();
+  const panel=page.getByRole("dialog");
+  await expect(panel.locator(".b-menu-options")).toBeVisible();
+  const add=panel.locator(".b-add-to-cart > button").first();
+  await expect(add).toBeEnabled();
+  await add.click();
+  await expect.poll(()=>page.evaluate(()=>{
+    const lines=JSON.parse(localStorage.getItem("3l-cart")??"[]");
+    return lines.reduce((sum:number,line:{productId:string;quantity:number})=>
+      sum+(line.productId.startsWith("tres-leches-classic-")?line.quantity:0),0);
+  })).toBeGreaterThan(0);
+  await page.goto("/cart?lang=en");
+  await expect(page.locator(".b-co-items")).toBeVisible();
+  await expect(page.locator(".b-co-items")).toContainText("Classic");
+  await page.goto("/checkout?lang=en");
+  await expect(page.locator("main")).toBeVisible();
+  expect(await page.locator("main").innerText()).toMatch(/checkout|pickup|delivery|Classic/i);
+  expect(paymentActions).toEqual([]);
+});
