@@ -6,7 +6,7 @@ import { useLanguage } from "../localization";
 import { availableSku } from "../../../shared/commerce-policy";
 import { liveOrderable } from "../live-catalog";
 import { VisualAddToCart, VisualCart, VisualCheckout, VisualReturn, VisualContact, VisualPolicy, VisualHowToOrder } from "./V32Commerce";
-import { isPolicyPath, policyRoutes } from "../business";
+import { isPolicyPath } from "../business";
 import { ResponsiveMedia } from "../media";
 import { formatAed } from "../content";
 import "./visual-v32.css";
@@ -272,7 +272,7 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
           <p className="v32-minimum" data-minimum-notice>{t.minimum(minQty(chosen.id))}</p>}
         {!chosen&&!loading&&<p role="status">{t.orderingUnavailable}</p>}
       </div>
-      <div className="v32-popup-footer b-menu-options">
+      <div className="v32-popup-footer">
         {chosen?<VisualAddToCart key={chosen.id} productId={chosen.id} onAdded={onAdded}/>:
           <button disabled type="button">ADD TO CART · UNAVAILABLE</button>}
       </div>
