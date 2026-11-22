@@ -287,8 +287,8 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
         // REF_D: the selected product's picture stays above the purchasing card.
         // Short viewports retain the existing safe, scrollable action-first fallback.
         const width=Math.min(320,w-48);
-        const photoHeight=Math.min(174,Math.max(108,(r?.width??120)*1.1));
-        const visualAnchor=(r?.top??12)+photoHeight-7;
+        const photoBottom=anchor?.querySelector(".v32-photo")?.getBoundingClientRect().bottom;
+        const visualAnchor=(photoBottom??(r?.top??12)+120)-7;
         const top=compact?Math.max(12,Math.min(54,Math.round((h-540)/2))):
           Math.max(12,Math.min(visualAnchor,Math.max(12,h-440)));
         setPlace({left:Math.round((w-width)/2),top,width,maxHeight:h-top-12});
