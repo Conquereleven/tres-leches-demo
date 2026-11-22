@@ -30,9 +30,12 @@ const categoryFor=(category:string):Filter=>
 
 function Header(){
   const {language,setLanguage}=useLanguage();
+  const [mobileOpen,setMobileOpen]=useState(false);
   const count=cartCount(useCart());
   return <header className="v32-header">
     <nav className="v32-nav" aria-label="3L Visual Lab">
+      <button className="v32-mobile-toggle" type="button" aria-label={mobileOpen?"Close navigation":"Open navigation"}
+        aria-controls="v32-mobile-links" aria-expanded={mobileOpen} onClick={()=>setMobileOpen(value=>!value)}>☰</button>
       <span className="v32-nav-left"><a href={origin}>HOME</a><a href={origin+"/menu"}>Menu</a></span>
       <a className="v32-logo" href={origin}><strong>✧ 3L pastelerías</strong><small>MEXICO CITY SINCE 1982</small></a>
       <span className="v32-nav-right">
@@ -44,6 +47,10 @@ function Header(){
         <a href="/cart">CART ({count})</a>
       </span>
     </nav>
+    {mobileOpen&&<nav className="v32-mobile-drawer" id="v32-mobile-links" aria-label="Mobile navigation">
+      <a href={origin}>HOME</a><a href={origin+"/menu"}>Menu</a>
+      <a href={origin+"/#journal"}>JOURNAL</a><a href="/contact">Contact</a>
+    </nav>}
   </header>;
 }
 function Home(){

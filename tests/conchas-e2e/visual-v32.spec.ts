@@ -113,7 +113,15 @@ for (const viewport of [{width:1440,height:900},{width:390,height:844}]) {
       mkdirSync("docs/brand/brand02/conchas",{recursive:true});
       await page.screenshot({path:"docs/brand/brand02/conchas/v32-home-"+viewport.width+".png",fullPage:true,animations:"disabled"});
     }
-    await page.goto("/visual-v32/menu?lang=en");
+    if (viewport.width===390) {
+      const menuToggle=page.getByRole("button",{name:"Open navigation"});
+      await expect(menuToggle).toBeVisible();
+      await menuToggle.click();
+      await expect(menuToggle).toHaveAttribute("aria-expanded","true");
+      await page.locator('.v32-mobile-drawer a[href="/visual-v32/menu"]').click();
+    } else {
+      await page.goto("/visual-v32/menu?lang=en");
+    }
     await expect(page.getByRole("heading",{name:"Explore Our Menu"})).toBeVisible();
     await expect(page.locator(".v32-tile")).toHaveCount(2);
     if(info.project.name==="chromium")
