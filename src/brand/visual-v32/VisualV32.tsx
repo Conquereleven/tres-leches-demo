@@ -7,7 +7,7 @@ import { availableSku } from "../../../shared/commerce-policy";
 import { liveOrderable } from "../live-catalog";
 import { VisualAddToCart, VisualCart, VisualCheckout, VisualReturn, VisualContact, VisualPolicy, VisualHowToOrder } from "./V32Commerce";
 import { isPolicyPath } from "../business";
-import { ResponsiveMedia } from "../media";
+import { selectedProductMedia, publishedMediaAuthority } from "../media";
 import { formatAed } from "../content";
 import "./visual-v32.css";
 
@@ -332,9 +332,14 @@ function Bakery(){
           return <button type="button" key={product.id} className="v32-product" data-product-id={product.id}
             aria-haspopup="dialog" aria-expanded={selected===product.id} disabled={price===null}
             onClick={e=>{trigger.current=e.currentTarget;setAddedMessage("");setSelected(product.id);}}>
-            <span className="v32-photo"><ResponsiveMedia productId={product.id} family={family.id}
-              variant={product.variant} alt={product.title}
-              fallback={menu.status==="bundled"?family.image:null}/></span>
+            <span className="v32-photo">{(()=>{
+              const canonical=selectedProductMedia(product.id,family.id,product.variant);
+              const src=canonical?.derivatives.find(d=>d.format==="webp")?.src
+                ??canonical?.derivatives[0]?.src
+                ??(!publishedMediaAuthority()?family.image:null);
+              return src?<img src={src} alt={product.title} loading="lazy"/>:
+                <span className="v32-photo-empty" role="img" aria-label={product.title}/>;
+            })()}</span>
             <span className="v32-product-copy"><strong>{product.title}</strong><em>{product.description}</em>
               <span>{price===null?t.unavailable:t.from+formatAed(price)}<b aria-hidden>→</b></span>
             </span>
