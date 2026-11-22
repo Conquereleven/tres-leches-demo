@@ -9,6 +9,7 @@ import { VisualAddToCart, VisualCart, VisualCheckout, VisualReturn, VisualContac
 import { isPolicyPath } from "../business";
 import { selectedProductMedia, publishedMediaAuthority } from "../media";
 import { formatAed } from "../content";
+import { packChoices, packQtyLabel, presentationLabel, toPackChoice } from "./catalog-options";
 import "./visual-v32.css";
 
 /** Approved Visual Lab V3.2, isolated until separate merge/deploy approval.
@@ -259,8 +260,18 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
     return availableSku(o.id,now)&&!!server&&server.priceFils===o.priceFils&&
       (menu.status!=="live"||liveOrderable(o.id)===true);
   });
-  const [sku,setSku]=useState<string|null>(allowed[0]?.id??null);
+  const pack=packChoices(allowed);
+  const initialPack=pack?.choices.find(c=>c.pieces===6&&c.presentation==="mini")??pack?.choices.find(c=>c.pieces===6);
+  const [sku,setSku]=useState<string|null>(initialPack?.option.id??allowed[0]?.id??null);
   const chosen=allowed.find(o=>o.id===sku)??allowed[0];
+  const selection=chosen?toPackChoice(chosen):null;
+  const presentation=selection?.presentation??pack?.presentations[0]??"";
+  const pick=(name:string,pieces:number)=>{
+    const next=pack?.choices.find(c=>c.presentation===name&&c.pieces===pieces)
+       ??pack?.choices.find(c=>c.presentation===name)
+       ??pack?.choices.find(c=>c.pieces===pieces);
+    if(next)setSku(next.option.id);
+  };
   const [place,setPlace]=useState<CSSProperties>({left:12,top:12,maxHeight:"calc(100dvh - 24px)"});
   const [side,setSide]=useState<"right"|"left"|"overlap"|"mobile"|"mobile-compact">("mobile");
   const panel=useRef<HTMLDivElement>(null);
@@ -312,12 +323,43 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
             aria-label="Close" onClick={onClose}>×</button>
         </div>
         <p className="v32-section-caption">{t.variants}</p>
-        <div className="v32-variants" role="group" aria-label="Choose a variant">
+        {pack?<div className="v32-pack-selector" data-commerce-options="canonical">
+          {pack.presentations.length>1&&<div className="v32-option-group" role="group" aria-label="Choose presentation">
+            <span className="v32-option-caption">{language==="es"?"Presentación":language==="ar"?"الحجم":"Presentation"}</span>
+            <div className="v32-variants v32-pack-presentations">
+              {pack.presentations.map(name=><button key={name} type="button"
+                className={presentation===name?"v32-variant v32-variant-current":"v32-variant"}
+                aria-pressed={presentation===name} onClick={()=>pick(name,selection?.pieces??6)}>
+                <span>{presentationLabel(name,language)}</span>
+              </button>)}
+            </div>
+          </div>}
+          <div className="v32-option-group" role="group" aria-label="Choose pack quantity">
+            <span className="v32-option-caption">{language==="es"?"Contenido de la caja":language==="ar"?"عدد القطع":"Pack size"}</span>
+            <div className="v32-variants v32-pack-quantities">
+              {pack.quantities.map(pieces=>{
+                const candidate=pack.choices.find(c=>c.presentation===presentation&&c.pieces===pieces);
+                return <button key={pieces} type="button"
+                  className={pieces===selection?.pieces?"v32-variant v32-variant-current":"v32-variant"}
+                  aria-pressed={pieces===selection?.pieces} disabled={!candidate}
+                  onClick={()=>pick(presentation,pieces)}>
+                  <span>{packQtyLabel(pieces,language)}</span>
+                  <small>{candidate?formatAed(candidate.option.priceFils):"—"}</small>
+                </button>;
+              })}
+            </div>
+          </div>
+          {selection&&selection.pieces>1&&<p className="v32-pack-helper" data-pack-piece-count>
+            {language==="es"?`Cada caja tiene ${selection.pieces} piezas; la cantidad indica cajas.`:
+              language==="ar"?`كل علبة تحتوي على ${selection.pieces} قطع؛ الكمية تعني عدد العلب.`:
+              `Each box contains ${selection.pieces} pieces; quantity counts boxes.`}
+          </p>}
+        </div>:<div className="v32-variants" role="group" aria-label="Choose a variant">
           {allowed.map(o=><button key={o.id} type="button" className={o.id===chosen?.id?"v32-variant v32-variant-current":"v32-variant"}
             aria-pressed={o.id===chosen?.id} onClick={()=>setSku(o.id)}>
             <span>{o.size}</span><small>{formatAed(o.priceFils)}</small>
           </button>)}
-        </div>
+        </div>}
         <div className="v32-popup-controls-anchor" ref={setControlsTarget}/>
         {chosen&&minQty(chosen.id)>1&&
           <p className="v32-minimum" data-minimum-notice>{t.minimum(minQty(chosen.id))}</p>}
@@ -342,6 +384,7 @@ function Bakery(){
   const initial:Filter=groups.some(g=>g.id===raw)?raw as Filter:
     raw==="pan"||raw==="conchas"?"mexican":"all";
   const [filter,setFilter]=useState<Filter>(initial);
+  const [subcategory,setSubcategory]=useState<string|null>(params.get("subcategory"));
   const [query,setQuery]=useState(params.get("q")??"");
   const [selected,setSelected]=useState<string|null>(null);
   const [addedMessage,setAddedMessage]=useState("");
@@ -349,9 +392,11 @@ function Bakery(){
   const close=useCallback(()=>{setSelected(null);trigger.current?.focus();},[]);
   const afterAdd=useCallback(()=>{setAddedMessage(visualCopy[language].added);close();},[language,close]);
   const available=menu.status!=="unavailable"&&menu.status!=="loading"&&!loading&&!!config;
+  const collections=filter==="all"?[]:menu.categories.filter(c=>categoryFor(c.id)===filter);
   const items=available?menu.products.filter(p=>{
     const family=menuProductFamily(menu,p),q=query.trim().toLowerCase();
     return (filter==="all"||categoryFor(family.category)===filter)&&
+      (!subcategory||family.category===subcategory)&&
       (!q||[p.title,p.description??"",family.name,p.variant].some(t=>t.toLowerCase().includes(q)));
   }):[];
   const active=items.find(p=>p.id===selected);
@@ -365,10 +410,17 @@ function Bakery(){
     </form>
     <div className="v32-filters" role="group" aria-label="Categories">
       {groups.map(g=><button key={g.id} type="button" className={filter===g.id?"v32-selected":""}
-        aria-pressed={filter===g.id} onClick={()=>{setFilter(g.id);setSelected(null);}}>
+        aria-pressed={filter===g.id} onClick={()=>{setFilter(g.id);setSubcategory(null);setSelected(null);}}>
         {g[language]}
       </button>)}
     </div>
+    {collections.length>1&&<div className="v32-subcategories" role="group" aria-label="Published 3L categories" data-category-source="published">
+      <button type="button" className={!subcategory?"v32-subcategory-active":""} aria-pressed={!subcategory}
+        onClick={()=>{setSubcategory(null);setSelected(null);}}>{language==="es"?"Todos":language==="ar"?"الكل":"All"}</button>
+      {collections.map(cat=><button key={cat.id} type="button" data-category-id={cat.id}
+        className={subcategory===cat.id?"v32-subcategory-active":""} aria-pressed={subcategory===cat.id}
+        onClick={()=>{setSubcategory(cat.id);setSelected(null);}}>{cat.name}</button>)}
+    </div>}
     {!available?<div className="v32-message" role="status">
       <p>{loading||menu.status==="loading"?t.loading:t.orderingUnavailable}</p>
       <button type="button" onClick={retry}>{t.retry}</button></div>:
@@ -398,7 +450,10 @@ function Bakery(){
                   <path d="M20.8 8.1c0 4-5 7.4-8.8 10.9C8.2 15.5 3.2 12.1 3.2 8.1c0-4 5.2-5.8 8.8-2.2 3.6-3.6 8.8-1.8 8.8 2.2z"/>
                 </svg>
               </span></span>
-            <span className="v32-product-copy"><strong>{product.title}</strong><em>{product.description}</em>
+            <span className="v32-product-copy"><strong>{product.title}</strong>
+              <em>{family.options.some(o=>toPackChoice(o).pieces>=6)?
+                (language==="es"?"Presentaciones disponibles: media docena y docena":language==="ar"?"تتوفر عبوات متعددة":"Half-dozen and dozen options"):
+                product.description}</em>
               <span>{price===null?t.unavailable:t.from+formatAed(price)}<b aria-hidden>→</b></span>
             </span>
           </button>;
