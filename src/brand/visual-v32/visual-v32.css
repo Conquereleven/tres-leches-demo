@@ -777,3 +777,48 @@
 @media(prefers-reduced-motion:reduce){
  .v32-app .v32-product .v32-photo img{transition:none!important;transform:none!important}
 }
+
+/* Founder REF_D photo-to-popup composition, kept isolated to V3.2.
+   Cards are stable click targets; background stays sharp just like source.
+   Real catalog media authority is unchanged. */
+@media(max-width:640px){
+  .v32-app .v32-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:9px!important;
+    align-items:start;
+  }
+  .v32-app .v32-photo{height:auto!important;aspect-ratio:4/3}
+  .v32-app .v32-product{border-radius:17px!important}
+  .v32-app .v32-product-copy{padding:8px!important}
+  .v32-app .v32-product-copy strong{font-size:15px!important;line-height:1.04!important}
+  .v32-app .v32-product-copy em{font-size:11px!important;line-height:1.15!important;min-height:0!important}
+  .v32-app .v32-product-copy>span{font-size:10px!important}
+  .v32-app .v32-product-copy b{height:22px!important;width:22px!important}
+  .v32-overlay .v32-scrim{
+    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+    background:rgba(87,44,46,.07)!important;
+  }
+  .v32-overlay .v32-popup{
+    max-width:calc(100vw - 48px)!important;
+    border-radius:24px!important;
+    box-shadow:0 24px 55px rgba(108,59,68,.38),0 0 0 1px #fff8!important;
+  }
+  .v32-popup[data-anchor-side="mobile"]::before{
+    top:-12px!important;left:calc(50% - 12px)!important;
+    width:24px!important;height:24px!important;
+    background:#f9dfdb!important;
+    border-top:2px solid #fff!important;border-left:2px solid #fff!important;
+    transform:rotate(45deg)!important;
+  }
+  .v32-popup .v32-popup-scroll{padding:15px 17px 6px!important}
+  .v32-popup .v32-popup-heading{margin-bottom:11px!important}
+  .v32-popup .v32-popup-heading h2{font-size:30px!important}
+  .v32-popup .v32-popup-heading p{font-size:16px!important}
+  .v32-popup .v32-section-caption{margin:7px 0!important}
+  .v32-popup .v32-config-fields{gap:9px!important;margin-top:9px!important}
+  .v32-popup .v32-popup-footer{padding:7px 17px 13px!important}
+  .v32-popup .v32-buy-cta{font-size:11px!important}
+}
+@media(max-width:360px){
+  .v32-app .v32-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}

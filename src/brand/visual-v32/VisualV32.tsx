@@ -284,9 +284,15 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
       const r=anchor?.getBoundingClientRect(),pw=Math.min(448,w-24),ph=Math.min(610,h-50);
       if(w<=640||!r){
         const compact=h<=720;
+        // REF_D: the selected product's picture stays above the purchasing card.
+        // Short viewports retain the existing safe, scrollable action-first fallback.
+        const width=Math.min(320,w-48);
+        const photoHeight=Math.min(174,Math.max(108,(r?.width??120)*1.1));
+        const visualAnchor=(r?.top??12)+photoHeight-7;
         const top=compact?Math.max(12,Math.min(54,Math.round((h-540)/2))):
-          Math.max(12,Math.min(Math.max(82,Math.min(r?.top??12,h*.28)),Math.max(12,h-580)));
-        setPlace({left:12,top,maxHeight:h-top-12});setSide(compact?"mobile-compact":"mobile");
+          Math.max(12,Math.min(visualAnchor,Math.max(12,h-440)));
+        setPlace({left:Math.round((w-width)/2),top,width,maxHeight:h-top-12});
+        setSide(compact?"mobile-compact":"mobile");
         return;
       }
       const alignment=r.right+pw+12<=w?"right":r.left-pw-12>=12?"left":"overlap";
@@ -449,7 +455,17 @@ function Bakery(){
           const price=valid.length?Math.min(...valid.map(v=>v.priceFils)):null;
           return <button type="button" key={product.id} className="v32-product" data-category-id={family.category} data-product-id={product.id}
             aria-haspopup="dialog" aria-expanded={selected===product.id} data-selected-product={selected===product.id} disabled={price===null}
-            onClick={e=>{trigger.current=e.currentTarget;setAddedMessage("");setSelected(product.id);}}>
+            onClick={e=>{
+              const el=e.currentTarget;
+              trigger.current=el;setAddedMessage("");
+              // Bring the selected photo into the visible three-card row before
+              // opening the overlay. Never move the interactive card on hover.
+              if(window.innerWidth<=640&&window.innerHeight>720){
+                const rect=el.getBoundingClientRect();
+                window.scrollTo({top:Math.max(0,window.scrollY+rect.top-100),behavior:"auto"});
+              }
+              setSelected(product.id);
+            }}>
             <span className="v32-photo">{(()=>{
               const canonical=selectedProductMedia(product.id,family.id,product.variant);
               const src=canonical?.derivatives.find(d=>d.format==="webp")?.src
