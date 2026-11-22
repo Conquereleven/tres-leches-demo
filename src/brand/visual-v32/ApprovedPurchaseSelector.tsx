@@ -86,6 +86,16 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const productId=chosen?.id??"";
  const selected=chosen?toPackChoice(chosen):null;
  const [presentation,setPresentation]=useState(selected?.presentation??"");
+ // Checkout config/live catalog are asynchronous. Initial state can be empty:
+ // synchronize the chosen SKU and presentation when authoritative options arrive.
+ const availableKey=allowed.map(option=>option.id).join("|");
+ useEffect(()=>{
+  if(!allowed.length)return;
+  const first=sorted[0]!;
+  setSku(current=>allowed.some(option=>option.id===current)?current:first.id);
+  setPresentation(current=>grouped?.presentations.includes(current)?current:toPackChoice(first).presentation);
+  setQty(current=>Math.max(current,minQty(first.id)));
+ },[availableKey,product.id]);
  const spec=packSpec(productId),tricolor=tricolorSpec(productId);
  const configured=config?.products.find(p=>p.id===productId);
  const personalizedRule=config?.personalizedPacks?.rules.find(rule=>rule.packSkuId===productId);
@@ -146,7 +156,10 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
    const position=right?"right":left?"left":"overlap";
    const x=right?br.right+6:left?br.left-width-6:Math.max(12,Math.min(viewportWidth-width-12,br.right-width*.35));
    const maxHeight=Math.min(610,height-32);
-   setPlace({left:x,top:Math.max(12,Math.min(br.top-12,height-maxHeight-12)),width,maxHeight});
+   // Align to the actual dialog height, not the allowed 610px cap.
+   // Otherwise a 440px dialog jumps 170px above the selected card.
+   const renderedHeight=Math.min(maxHeight,Math.max(360,dialog.current?.offsetHeight??480));
+   setPlace({left:x,top:Math.max(12,Math.min(br.top-12,height-renderedHeight-12)),width,maxHeight});
    setSide(position);
   };
   measure();window.addEventListener("resize",measure);window.addEventListener("scroll",measure,true);

@@ -77,6 +77,8 @@ test("short REF_D: footer stays in viewport while only details scroll",async ({p
   await page.locator('.ref32-product:not([disabled])').first().click();
   const dialog=page.getByRole("dialog"),action=dialog.locator(".ref32-buy");
   await expect(action).toBeVisible();
+  // Measure final geometry only after the source spring entrance completes.
+  await expect.poll(()=>dialog.evaluate(el=>el.getAnimations().filter(a=>a.playState==="running").length)).toBe(0);
   const before=await action.boundingBox();
   await dialog.locator(".ref32-details").evaluate(el=>{el.scrollTop=el.scrollHeight;});
   const after=await action.boundingBox();
@@ -95,6 +97,9 @@ test("real purchase: Orejas selected box SKU and amount reach canonical cart",as
  await page.goto("/visual-v32/bakery?category=bakery&lang=es");
  await page.locator('[data-product-id="orejas"]').click();
  const dialog=page.getByRole("dialog");
+ await expect(dialog.locator('.ref32-presentation button[aria-pressed="true"]')).toHaveCount(1);
+ await expect(dialog.locator('[data-pack-pieces="6"]')).toBeEnabled();
+ await expect(dialog.locator('[data-pack-pieces="12"]')).toBeEnabled();
  await dialog.locator('[data-pack-presentation="individual"]').click();
  await dialog.locator('[data-pack-pieces="12"]').click();
  await expect(dialog).toHaveAttribute("data-selected-sku","orejas-12-individuales-100-g-cada-uno");
