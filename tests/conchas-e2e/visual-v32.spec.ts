@@ -584,6 +584,7 @@ test("REF_D approved: mobile Orejas shows three direct purchase sizes",async ({p
  await expect(sizes).toContainText("1 pieza");
  await expect(sizes).toContainText("Media docena");
  await expect(sizes).toContainText("Docena");
+ await popup.locator('[data-pack-presentation="mini"]').click();
  await sizes.locator('[data-pack-pieces="6"]').click();
  await expect(popup).toHaveAttribute("data-selected-sku","orejas-6-mini-60-g-cada-uno");
  await expect(popup.locator(".v32-buy-price strong")).toContainText("AED 50");

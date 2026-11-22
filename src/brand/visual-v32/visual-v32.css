@@ -758,3 +758,22 @@
  .v32-popup .v32-popup-footer{padding:7px 19px 13px!important}
  .v32-popup .v32-popup-footer .v32-buy-cta{min-height:43px!important}
 }
+
+/* WebKit pointer-stability fix: animating the hit-target itself can cause
+ * hover oscillation during a click (Playwright waits for stable geometry).
+ * Preserve photo zoom and shadow motion, but never translate the button. */
+.v32-app .v32-product,.v32-app .v32-product:hover{
+ transform:none!important;
+ animation:none!important;
+ transition:box-shadow .28s cubic-bezier(.22,1,.36,1),border-color .28s!important
+}
+.v32-app .v32-product:hover{box-shadow:0 27px 48px #b4868685!important}
+.v32-app .v32-product .v32-photo img{transition:transform .65s cubic-bezier(.22,1,.36,1)}
+.v32-app .v32-product:hover .v32-photo img{transform:scale(1.035)}
+.v32-app .v32-subcategories button,.v32-app .v32-subcategories button:hover{
+ transform:none!important;animation:none!important;
+ transition:background-color .18s,border-color .18s!important
+}
+@media(prefers-reduced-motion:reduce){
+ .v32-app .v32-product .v32-photo img{transition:none!important;transform:none!important}
+}
