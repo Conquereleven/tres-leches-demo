@@ -318,44 +318,57 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
       role="dialog" aria-modal="true" aria-label={family.name} style={place}>
       <div className="v32-popup-scroll">
         <div className="v32-popup-heading">
-          <div><h2>{family.name}</h2>{product.description&&<p>{product.description}</p>}</div>
+          <div><h2>{family.name.replace(/\s*[·–—-]\s*Pack\b.*$/i,"")}</h2>{product.description&&<p>{product.description}</p>}</div>
           <button ref={closeButton} type="button" className="v32-close"
             aria-label="Close" onClick={onClose}>×</button>
         </div>
         <p className="v32-section-caption">{t.variants}</p>
-        {pack?<div className="v32-pack-selector" data-commerce-options="canonical">
-          {pack.presentations.length>1&&<div className="v32-option-group" role="group" aria-label="Choose presentation">
-            <span className="v32-option-caption">{language==="es"?"Presentación":language==="ar"?"الحجم":"Presentation"}</span>
-            <div className="v32-variants v32-pack-presentations">
-              {pack.presentations.map(name=><button key={name} type="button"
-                className={presentation===name?"v32-variant v32-variant-current":"v32-variant"} data-pack-presentation={name}
-                aria-pressed={presentation===name} onClick={()=>pick(name,selection?.pieces??6)}>
-                <span>{presentationLabel(name,language)}</span>
-              </button>)}
+        {pack?<div className={"v32-pack-selector "+(pack.choices.length<=4?"v32-quick-four":"v32-guided-packs")}
+          data-commerce-options="canonical" data-choice-count={pack.choices.length}>
+          {pack.choices.length<=4?<div className="v32-variants v32-quick-options" role="group" aria-label="Choose a variant">
+            {pack.choices.map(choice=><button key={choice.option.id} type="button"
+              className={choice.option.id===chosen?.id?"v32-variant v32-variant-current":"v32-variant"}
+              data-pack-presentation={choice.presentation} data-pack-pieces={choice.pieces} data-sku={choice.option.id}
+              aria-pressed={choice.option.id===chosen?.id} onClick={()=>setSku(choice.option.id)}>
+              <span>{packQtyLabel(choice.pieces,language)} {choice.presentation==="mini"?"(Mini)":choice.presentation==="individual"?"(Individual)":""}</span>
+              <small>{formatAed(choice.option.priceFils)}</small>
+            </button>)}
+          </div>:<>
+            <div className="v32-option-group" role="group" aria-label="Choose presentation">
+              <span className="v32-option-caption">{language==="es"?"Presentación":language==="ar"?"الحجم":"Presentation"}</span>
+              <div className="v32-variants v32-pack-presentations">
+                {pack.presentations.map(name=><button key={name} type="button"
+                  className={presentation===name?"v32-variant v32-variant-current":"v32-variant"}
+                  data-pack-presentation={name} aria-pressed={presentation===name}
+                  onClick={()=>pick(name,selection?.pieces??1)}>
+                  <span>{presentationLabel(name,language)}</span>
+                </button>)}
+              </div>
             </div>
-          </div>}
-          <div className="v32-option-group" role="group" aria-label="Choose pack quantity">
-            <span className="v32-option-caption">{language==="es"?"Contenido de la caja":language==="ar"?"عدد القطع":"Pack size"}</span>
-            <div className="v32-variants v32-pack-quantities">
-              {pack.quantities.map(pieces=>{
-                const candidate=pack.choices.find(c=>c.presentation===presentation&&c.pieces===pieces);
-                return <button key={pieces} type="button"
-                  className={pieces===selection?.pieces?"v32-variant v32-variant-current":"v32-variant"} data-pack-pieces={pieces}
-                  aria-pressed={pieces===selection?.pieces} disabled={!candidate}
-                  onClick={()=>pick(presentation,pieces)}>
-                  <span>{packQtyLabel(pieces,language)}</span>
-                  <small>{candidate?formatAed(candidate.option.priceFils):"—"}</small>
-                </button>;
-              })}
+            <div className="v32-option-group" role="group" aria-label="Choose pack quantity">
+              <span className="v32-option-caption">{language==="es"?"¿Qué cantidad deseas?":language==="ar"?"ما هي الكمية؟":"How would you like it?"}</span>
+              <div className={"v32-variants v32-pack-quantities "+(pack.quantities.length===3?"v32-three-quantities":"")}>
+                {pack.quantities.map(pieces=>{
+                  const candidate=pack.choices.find(c=>c.presentation===presentation&&c.pieces===pieces);
+                  return <button key={pieces} type="button" data-pack-pieces={pieces}
+                    className={candidate?.option.id===chosen?.id?"v32-variant v32-variant-current":"v32-variant"}
+                    aria-pressed={candidate?.option.id===chosen?.id} disabled={!candidate}
+                    onClick={()=>pick(presentation,pieces)}>
+                    <span>{packQtyLabel(pieces,language)}</span>
+                    <small>{candidate?formatAed(candidate.option.priceFils):"—"}</small>
+                  </button>;
+                })}
+              </div>
             </div>
-          </div>
-          {selection&&selection.pieces>1&&<p className="v32-pack-helper" data-pack-piece-count>
-            {language==="es"?`Cada caja tiene ${selection.pieces} piezas; la cantidad indica cajas.`:
-              language==="ar"?`كل علبة تحتوي على ${selection.pieces} قطع؛ الكمية تعني عدد العلب.`:
-              `Each box contains ${selection.pieces} pieces; quantity counts boxes.`}
+          </>}
+          {selection?.pieces&&selection.pieces>1&&<p className="v32-pack-helper" data-pack-piece-count>
+            {language==="es"?"Incluye "+selection.pieces+" piezas · se compra por caja":
+             language==="ar"?"تحتوي العلبة على "+selection.pieces+" قطع":
+             selection.pieces+" pieces in each box"}
           </p>}
-        </div>:<div className="v32-variants" role="group" aria-label="Choose a variant">
-          {allowed.map(o=><button key={o.id} type="button" className={o.id===chosen?.id?"v32-variant v32-variant-current":"v32-variant"}
+        </div>:<div className="v32-variants v32-standard-options" role="group" aria-label="Choose a variant">
+          {allowed.map(o=><button key={o.id} type="button" data-sku={o.id}
+            className={o.id===chosen?.id?"v32-variant v32-variant-current":"v32-variant"}
             aria-pressed={o.id===chosen?.id} onClick={()=>setSku(o.id)}>
             <span>{o.size}</span><small>{formatAed(o.priceFils)}</small>
           </button>)}
@@ -435,7 +448,7 @@ function Bakery(){
           });
           const price=valid.length?Math.min(...valid.map(v=>v.priceFils)):null;
           return <button type="button" key={product.id} className="v32-product" data-category-id={family.category} data-product-id={product.id}
-            aria-haspopup="dialog" aria-expanded={selected===product.id} disabled={price===null}
+            aria-haspopup="dialog" aria-expanded={selected===product.id} data-selected-product={selected===product.id} disabled={price===null}
             onClick={e=>{trigger.current=e.currentTarget;setAddedMessage("");setSelected(product.id);}}>
             <span className="v32-photo">{(()=>{
               const canonical=selectedProductMedia(product.id,family.id,product.variant);
@@ -446,10 +459,10 @@ function Bakery(){
                 <span className="v32-photo-empty" role="img" aria-label={product.title+" — photograph pending"}
                   data-media-state="unassigned"><strong>✧ 3L</strong><small>{language==="es"?"Fotografía pendiente":language==="ar"?"الصورة قيد الإعداد":"Photo pending"}</small></span>;
             })()}
-              <span className="v32-card-heart" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20.8 8.1c0 4-5 7.4-8.8 10.9C8.2 15.5 3.2 12.1 3.2 8.1c0-4 5.2-5.8 8.8-2.2 3.6-3.6 8.8-1.8 8.8 2.2z"/>
-                </svg>
+              <span className={selected===product.id?"v32-card-heart v32-card-chosen":"v32-card-heart"} aria-hidden="true">
+                {selected===product.id?
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m4 12 5 5L20 6"/></svg>:
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20.8 8.1c0 4-5 7.4-8.8 10.9C8.2 15.5 3.2 12.1 3.2 8.1c0-4 5.2-5.8 8.8-2.2 3.6-3.6 8.8 2.2z"/></svg>}
               </span></span>
             <span className="v32-product-copy"><strong>{product.title}</strong>
               <em>{family.options.some(o=>toPackChoice(o).pieces>=6)?
