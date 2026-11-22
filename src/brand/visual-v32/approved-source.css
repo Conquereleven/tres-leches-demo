@@ -214,3 +214,7 @@
  .ref32-dialog,.ref32-backdrop{animation:none!important}
  .ref32-product,.ref32-photo img{transition:none!important}
 }
+
+/* Founder 8.7/10: cake-only inscription and size/servings, without changing card design. */
+.ref32-dialog .ref32-servings{font:500 13px/1.3 "Jost",Arial,sans-serif;color:#785d48;margin:7px 0 0}
+.ref32-dialog .ref32-note-field output{min-width:35px;text-align:right;font-variant-numeric:tabular-nums}

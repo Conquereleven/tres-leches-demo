@@ -39,7 +39,7 @@ export function VisualCart(){
  {loading?<p role="status">Loading…</p>:!config?<div role="alert">{t.notReady}<button onClick={retry}>{t.retry}</button></div>:
  !lines.length?<Empty message={t.empty}/>:<div className="v32-new-layout">
  <Panel title={t.cart}><ul className="v32-new-cart-items">{lines.map(l=>{const p=config.products.find(x=>x.id===l.productId);return <li key={lineKey(l)} className="v32-new-cart-row">
-  <div><h3>{p?.name||l.productId}</h3>{l.color&&<p>{tricolorCopy.en[l.color]}</p>}{l.composition?.map(c=><small key={c.componentSkuId}>{componentName(c.componentSkuId)} × {c.units} </small>)}
+  <div><h3>{p?.name||l.productId}</h3>{l.color&&<p>{tricolorCopy.en[l.color]}</p>}{l.cakeMessage&&<p data-cart-cake-message>{t.selection==="Select a color"?"Cake inscription":"Inscripción"}: {l.cakeMessage}</p>}{l.composition?.map(c=><small key={c.componentSkuId}>{componentName(c.componentSkuId)} × {c.units} </small>)}
   <p>{p?money(displayLinePrice(l,p.priceFils,config.packPricing))+" each":t.notReady}</p></div>
   <div className="v32-new-cart-controls"><label>{t.quantity}<input type="number" min={minQty(l.productId)} max="100" value={l.quantity} onChange={e=>cart.set(lineKey(l),Number(e.target.value))}/></label><button type="button" onClick={()=>cart.remove(lineKey(l))}>{t.remove}</button></div></li>})}</ul>
  <a className="v32-new-action v32-new-action-secondary" href={suffix("/bakery")}>{t.continue}</a></Panel>

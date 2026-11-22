@@ -14,15 +14,16 @@ import { availableSku } from "../../../shared/commerce-policy";
 import { liveOrderable } from "../live-catalog";
 import { selectedProductMedia, publishedMediaAuthority } from "../media";
 import { formatAed } from "../content";
+import { cakeSizeForSku, cakeSizeName, cakeServingCopy, validCakeMessage } from "../../../shared/cake-personalization";
 import { packChoices, packQtyLabel, presentationLabel, toPackChoice } from "./catalog-options";
 import { packSpec, componentName, type Composition } from "../../../shared/pack-composition";
 import { tricolorSpec, TRICOLOR_COLORS, tricolorCopy, type TricolorColor } from "../../../shared/tricolor";
 import "./approved-source.css";
 
 const words={
- es:{variant:"Variante",presentation:"Presentación",price:"Precio",quantity:"Cantidad",boxes:"Cantidad de cajas",note:"Personalización",optional:"(opcional)",placeholder:'Ej. "Feliz cumpleaños"',add:"Agregar al carrito",unavailable:"No disponible",notReady:"Selecciona todos los sabores antes de continuar",noteHold:"La personalización todavía no llega a cocina. Borra la nota para continuar.",pieces:"piezas por caja",unit:"pieza",close:"Cerrar",min:"Pedido mínimo",select:"Seleccionar color",contains:"Contenido de la caja"},
- en:{variant:"Choose a variant",presentation:"Presentation",price:"Price",quantity:"Quantity",boxes:"Number of boxes",note:"Personalization",optional:"(optional)",placeholder:"e.g. Happy birthday",add:"Add to cart",unavailable:"Unavailable",notReady:"Select every flavor before continuing",noteHold:"Personalization is not yet delivered to the kitchen. Clear the note to continue.",pieces:"pieces per box",unit:"piece",close:"Close",min:"Minimum order",select:"Select color",contains:"Pieces in box"},
- ar:{variant:"اختر النوع",presentation:"الحجم",price:"السعر",quantity:"الكمية",boxes:"عدد العلب",note:"التخصيص",optional:"(اختياري)",placeholder:"مثلاً عيد ميلاد سعيد",add:"أضف إلى السلة",unavailable:"غير متاح",notReady:"اختر الأصناف للمتابعة",noteHold:"لا يمكن إرسال الملاحظة إلى المطبخ حالياً. امسحها للمتابعة.",pieces:"قطع في العلبة",unit:"قطعة",close:"إغلاق",min:"الحد الأدنى للطلب",select:"اختر اللون",contains:"القطع في العلبة"}
+ es:{size:"Tamaño",variant:"Variante",presentation:"Presentación",price:"Precio",quantity:"Cantidad",boxes:"Cantidad de cajas",note:"Personalización",optional:"(opcional)",placeholder:'Ej. "Feliz cumpleaños"',add:"Agregar al carrito",unavailable:"No disponible",notReady:"Selecciona todos los sabores antes de continuar",noteHold:"La inscripción supera el límite del tamaño seleccionado.",pieces:"piezas por caja",unit:"pieza",close:"Cerrar",min:"Pedido mínimo",select:"Seleccionar color",contains:"Contenido de la caja"},
+ en:{size:"Size",variant:"Choose a variant",presentation:"Presentation",price:"Price",quantity:"Quantity",boxes:"Number of boxes",note:"Personalization",optional:"(optional)",placeholder:"e.g. Happy birthday",add:"Add to cart",unavailable:"Unavailable",notReady:"Select every flavor before continuing",noteHold:"The inscription exceeds the character limit for this size.",pieces:"pieces per box",unit:"piece",close:"Close",min:"Minimum order",select:"Select color",contains:"Pieces in box"},
+ ar:{size:"الحجم",variant:"اختر النوع",presentation:"الحجم",price:"السعر",quantity:"الكمية",boxes:"عدد العلب",note:"التخصيص",optional:"(اختياري)",placeholder:"مثلاً عيد ميلاد سعيد",add:"أضف إلى السلة",unavailable:"غير متاح",notReady:"اختر الأصناف للمتابعة",noteHold:"الكتابة تتجاوز الحد المسموح لهذا الحجم.",pieces:"قطع في العلبة",unit:"قطعة",close:"إغلاق",min:"الحد الأدنى للطلب",select:"اختر اللون",contains:"القطع في العلبة"}
 } as const;
 type AnchorSide="left"|"right"|"overlap"|"mobile"|"compact";
 type AnchorPlace=CSSProperties&{left:number;top:number;width:number;maxHeight:number};
@@ -74,8 +75,14 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
     (menu.status!=="live"||liveOrderable(option.id)===true);
  });
  const grouped=packChoices(allowed);
- const sorted=[...allowed].sort((a,b)=>toPackChoice(a).pieces-toPackChoice(b).pieces||
-  (toPackChoice(a).presentation==="mini"?-1:toPackChoice(b).presentation==="mini"?1:0));
+ const cakeSizing=family.category==="cakes" && allowed.length>0 &&
+   allowed.every(option=>cakeSizeForSku(option.id)!==null);
+ const rank={mini:0,small:1,medium:2};
+ const sorted=[...allowed].sort((a,b)=>{
+  if(cakeSizing) return rank[cakeSizeForSku(a.id)!.key]-rank[cakeSizeForSku(b.id)!.key];
+  return toPackChoice(a).pieces-toPackChoice(b).pieces||
+   (toPackChoice(a).presentation==="mini"?-1:toPackChoice(b).presentation==="mini"?1:0);
+ });
  const initial=sorted[0]?.id??"";
  const [sku,setSku]=useState(initial);
  const [qty,setQty]=useState(initial?minQty(initial):1);
@@ -85,6 +92,9 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const chosen=allowed.find(o=>o.id===sku)??sorted[0];
  const productId=chosen?.id??"";
  const selected=chosen?toPackChoice(chosen):null;
+ const activeCake=cakeSizing?cakeSizeForSku(productId):null;
+ const serving=activeCake?cakeServingCopy(activeCake,language):null;
+ const noteTooLong=!!activeCake&&note.trim().length>activeCake.maxCharacters;
  const [presentation,setPresentation]=useState(selected?.presentation??"");
  // Checkout config/live catalog are asynchronous. Initial state can be empty:
  // synchronize the chosen SKU and presentation when authoritative options arrive.
@@ -108,7 +118,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const total=unit*qty;
  const canBuy=!!config?.enabled&&!loading&&!!configured&&
   packValid&&Number.isFinite(total)&&total>=0&&qty>=minQty(productId)&&
-  inCart+qty<=MAX_QTY&&note.trim().length===0&&
+  inCart+qty<=MAX_QTY&&(!note.trim()||!!activeCake&&validCakeMessage(productId,note.trim()))&&
   (!tricolor||tricolor.kind==="fixed"||!!color);
  const [place,setPlace]=useState<AnchorPlace>({left:12,top:12,width:420,maxHeight:600});
  const [side,setSide]=useState<AnchorSide>("right");
@@ -133,7 +143,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
    <button type="button" aria-label="Increase quantity" disabled={inCart+qty>=MAX_QTY}
      onClick={()=>setQty(q=>q+1)}>+</button>
  </div>;
- const buy=()=>{if(!canBuy)return;cart.add(productId,qty,customized?composition:undefined,color??undefined);onAdded();};
+ const buy=()=>{if(!canBuy)return;cart.add(productId,qty,customized?composition:undefined,color??undefined,note.trim()||undefined);onAdded();};
  useLayoutEffect(()=>{
   const measure=()=>{
    const viewportWidth=window.innerWidth;
@@ -191,10 +201,11 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
    <div className="ref32-details">
     <header className="ref32-dialog-heading">
      <div><h2>{family.name.replace(/\s*[·–—-]\s*Pack\b.*$/i,"")}</h2>
-      {product.description&&<p>{product.description}</p>}</div>
+      {product.description&&<p>{product.description}</p>}
+      {serving&&<p className="ref32-servings" data-cake-serves>{serving}</p>}</div>
      <button className="ref32-close" type="button" ref={closeControl} aria-label="Close" onClick={onClose}>×</button>
     </header>
-    <p className="ref32-section-label">{t.variant}</p>
+    <p className="ref32-section-label">{cakeSizing?t.size:t.variant}</p>
     {grouped?.choices.length===4?
       <div className="ref32-options ref32-options-four" role="group" aria-label={t.variant}>
        {[...grouped.choices].sort((a,b)=>a.pieces-b.pieces||
@@ -234,7 +245,8 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
          aria-pressed={option.id===productId}
          className={option.id===productId?"ref32-option ref32-option-active":"ref32-option"}
          onClick={()=>chooseSku(option.id)}>
-         <span>{option.size}</span><small>{formatAed(option.priceFils)}</small>
+         <span>{cakeSizing?cakeSizeName(cakeSizeForSku(option.id)!):option.size}</span>
+         <small>{formatAed(option.priceFils)}</small>
        </button>)}
       </div>}
     {tricolor?.kind==="single"&&<label className="ref32-extra">{t.select}
@@ -257,14 +269,14 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
     </div>
     {minQty(productId)>1&&<p className="ref32-min" data-minimum-notice>{t.min}: {minQty(productId)} {t.unit}</p>}
     {selected&&selected.pieces>1&&<p className="ref32-count" data-pack-piece-count>{selected.pieces} {t.pieces}</p>}
-    <label className="ref32-note"><span>{t.note} <em>{t.optional}</em></span>
+    {activeCake&&<label className="ref32-note"><span>{t.note} <em>{t.optional}</em></span>
       <span className="ref32-note-field"><span aria-hidden="true">✎</span>
-       <input value={note} maxLength={40} aria-label={t.note} placeholder={t.placeholder}
-        onChange={e=>setNote(e.target.value.slice(0,40))}/>
-       <output aria-live="polite">{note.length}/40</output>
+       <input value={note} maxLength={activeCake.maxCharacters} aria-label={t.note} placeholder={t.placeholder}
+        onChange={e=>setNote(e.target.value.slice(0,activeCake.maxCharacters))}/>
+       <output aria-live="polite" data-cake-message-count>{note.length}/{activeCake.maxCharacters}</output>
       </span>
-    </label>
-    {note.trim()&&<p role="alert" className="ref32-note-warning">{t.noteHold}</p>}
+    </label>}
+    {noteTooLong&&<p role="alert" className="ref32-note-warning">{t.noteHold}</p>}
     {!packValid&&<p role="alert" className="ref32-note-warning">{t.notReady}</p>}
    </div>
    <footer className="ref32-dialog-footer">

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { validCakeMessage } from "./cake-personalization";
 import { MAX_ITEM_QUANTITY } from "./commerce-policy";
 import {
   tricolorSpec,
@@ -93,10 +94,11 @@ export type CommerceLine = {
   quantity: number;
   composition?: Composition;
   color?: TricolorColor;
+  cakeMessage?: string;
 };
 /** A canonical, browser-independent identity. Box quantity is deliberately excluded. */
 export function lineKey(
-  l: Pick<CommerceLine, "productId" | "composition" | "color">,
+  l: Pick<CommerceLine, "productId" | "composition" | "color" | "cakeMessage">,
 ) {
   return (
     l.productId +
@@ -105,7 +107,8 @@ export function lineKey(
       ? `~${normalizeComposition(l.composition)
           .map((c) => `${c.componentSkuId}:${c.units}`)
           .join(",")}`
-      : "")
+      : "") +
+    (l.cakeMessage ? `~cake:${encodeURIComponent(l.cakeMessage)}` : "")
   );
 }
 export const commerceLineSchema = z
@@ -114,9 +117,14 @@ export const commerceLineSchema = z
     quantity: z.number().int().min(1).max(MAX_ITEM_QUANTITY),
     composition: compositionSchema.optional(),
     color: z.enum(["red", "white", "green"]).optional(),
+    cakeMessage: z.string().trim().min(1).max(30).optional(),
   })
   .strict()
   .superRefine((line, ctx) => {
+    if (line.cakeMessage !== undefined && !validCakeMessage(line.productId, line.cakeMessage)) {
+      ctx.addIssue({ code: "custom", path: ["cakeMessage"],
+        message: "Cake inscription is only allowed for supported cake SKUs, up to 15/20/30 characters by size" });
+    }
     if (
       line.color !== undefined &&
       tricolorSpec(line.productId)?.kind !== "single"
