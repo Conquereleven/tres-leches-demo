@@ -24,6 +24,63 @@ const visualNav = {
   es: {home:"INICIO",menu:"Menú",journal:"HISTORIA",contact:"Contacto",cart:"CARRITO",story:"La historia de 3L",support:"Atención al cliente"},
   ar: {home:"الرئيسية",menu:"القائمة",journal:"قصتنا",contact:"اتصل بنا",cart:"السلة",story:"قصة 3L",support:"خدمة العملاء"},
 } as const;
+const visualCopy = {
+ en: {
+  hero1:"More than a cake.",hero2:"A family tradition.",today:"TODAY",
+  legacy:"Crafted with Love: The 3L Family Legacy",
+  story1:"Hello everyone! I'm Liza, the founder of 3L in Dubai. Step into our world, where each Tres Leches cake is a symbol of our family's heritage, made with love and the finest natural ingredients.",
+  story2:"Our culinary story begins in 1982 in Mexico City, where Alicia Luna Baeza crafted Tres Leches Cakes for her loved ones. Today this family tradition continues in Dubai.",
+  storyQuote:"Nuestra historia también huele a amor ♡",explore:"TREAT YOURSELF TO OUR TRES LECHES CAKES →",
+  menuEyebrow:"THE 3L MENU",menuTitle:"Explore Our Menu",menuTag:"CAKES, BAKERY & OUR SIGNATURE CREATIONS",
+  searchBakery:"Search the bakery...",searchMenu:"Search our menu...",find:"FIND →",
+  cakes:"Cake",bakery:"Bakery",cakesTag:"PASTRY",bakeryTag:"BAKERY",
+  cakesDesc:"Our signature cakes, fine pastries and seasonal creations.",
+  bakeryDesc:"Artisanal breads, classic favorites and freshly baked goods.",
+  exploreCakes:"EXPLORE CAKES →",exploreBakery:"EXPLORE BAKERY →",
+  catalogEyebrow:"OUR MENU",catalogTitle:"Traditional Mexican Bakery",catalogTag:"CAKES, BREADS & SIGNATURE CREATIONS",
+  variants:"CHOOSE A VARIANT",price:"PRICE",from:"From ",unavailable:"UNAVAILABLE",
+  loading:"Loading available products...",orderingUnavailable:"Online ordering is unavailable.",
+  notFound:"No matching products.",retry:"TRY AGAIN",variantUnavailable:"Online ordering is unavailable for this variant.",
+  legalTerms:"Terms & Conditions",privacy:"Privacy"
+ },
+ es: {
+  hero1:"Más que un pastel.",hero2:"Una tradición familiar.",today:"HOY",
+  legacy:"Hecho con amor: el legado familiar de 3L",
+  story1:"Hola, soy Liza, fundadora de 3L en Dubái. Bienvenidos a nuestro mundo, donde cada pastel de tres leches representa la herencia de nuestra familia, preparado con amor e ingredientes naturales.",
+  story2:"Nuestra historia comenzó en 1982 en Ciudad de México, cuando Alicia Luna Baeza preparaba pasteles de tres leches para sus seres queridos. Hoy seguimos esta tradición familiar en Dubái.",
+  storyQuote:"Nuestra historia también huele a amor ♡",explore:"DESCUBRE NUESTROS PASTELES DE TRES LECHES →",
+  menuEyebrow:"EL MENÚ DE 3L",menuTitle:"Explora nuestro menú",menuTag:"PASTELES, PANADERÍA Y NUESTRAS ESPECIALIDADES",
+  searchBakery:"Busca en la panadería...",searchMenu:"Busca en el menú...",find:"BUSCAR →",
+  cakes:"Pasteles",bakery:"Panadería",cakesTag:"PASTELERÍA",bakeryTag:"PANADERÍA",
+  cakesDesc:"Nuestros pasteles de la casa, repostería y especialidades de temporada.",
+  bakeryDesc:"Panes artesanales, clásicos favoritos y productos recién horneados.",
+  exploreCakes:"EXPLORAR PASTELES →",exploreBakery:"EXPLORAR PANADERÍA →",
+  catalogEyebrow:"NUESTRO MENÚ",catalogTitle:"Panadería mexicana tradicional",catalogTag:"PASTELES, PANES Y ESPECIALIDADES",
+  variants:"ELIGE UNA VARIANTE",price:"PRECIO",from:"Desde ",unavailable:"NO DISPONIBLE",
+  loading:"Cargando productos disponibles...",orderingUnavailable:"Los pedidos en línea no están disponibles.",
+  notFound:"No se encontraron productos.",retry:"REINTENTAR",variantUnavailable:"Esta variante no está disponible para pedidos en línea.",
+  legalTerms:"Términos y condiciones",privacy:"Privacidad"
+ },
+ ar: {
+  hero1:"أكثر من مجرد كعكة.",hero2:"تقليد عائلي.",today:"اليوم",
+  legacy:"صنع بحب: إرث عائلة 3L",
+  story1:"مرحباً، أنا ليزا، مؤسسة 3L في دبي. أهلاً بكم في عالمنا، حيث تمثل كل كعكة تريس ليتشيس تراث عائلتنا، وتُحضّر بحب وبمكونات طبيعية.",
+  story2:"بدأت قصتنا عام 1982 في مكسيكو سيتي، عندما أعدّت أليسيا لونا بايثا كعكات تريس ليتشيس لأحبتها. واليوم يستمر هذا التقليد العائلي في دبي.",
+  storyQuote:"قصتنا تفوح أيضاً برائحة الحب ♡",explore:"اكتشفوا كعكات تريس ليتشيس ←",
+  menuEyebrow:"قائمة 3L",menuTitle:"استكشفوا قائمتنا",menuTag:"كعكات ومخبوزات وإبداعاتنا المميزة",
+  searchBakery:"ابحث في المخبز...",searchMenu:"ابحث في القائمة...",find:"بحث ←",
+  cakes:"الكعكات",bakery:"المخبوزات",cakesTag:"الحلويات",bakeryTag:"المخبوزات",
+  cakesDesc:"كعكاتنا المميزة وحلوياتنا وإبداعاتنا الموسمية.",
+  bakeryDesc:"خبز حرفي ومفضلات كلاسيكية ومخبوزات طازجة.",
+  exploreCakes:"استكشف الكعكات ←",exploreBakery:"استكشف المخبوزات ←",
+  catalogEyebrow:"قائمتنا",catalogTitle:"المخبوزات المكسيكية التقليدية",catalogTag:"كعكات وخبز وإبداعات مميزة",
+  variants:"اختر النوع",price:"السعر",from:"ابتداءً من ",unavailable:"غير متاح",
+  loading:"جارٍ تحميل المنتجات المتاحة...",orderingUnavailable:"الطلبات عبر الإنترنت غير متاحة.",
+  notFound:"لا توجد منتجات مطابقة.",retry:"حاول مجدداً",variantUnavailable:"هذا الخيار غير متاح للطلب عبر الإنترنت.",
+  legalTerms:"الشروط والأحكام",privacy:"الخصوصية"
+ }
+} as const;
+
 /** A preview navigation boundary: keep every internal shopper link within V3.2.
  * Never intercept external, payment-provider, download, modified-click or in-page links.
  */
@@ -87,8 +144,9 @@ function Header(){
   </header>;
 }
 function Home(){
+  const {language}=useLanguage();const t=visualCopy[language];
   return <main className="v32-home v32-home-fidelity" id="main">
-    <h1>More than a cake.<br/>A family tradition.</h1>
+    <h1>{t.hero1}<br/>{t.hero2}</h1>
     <section className="v32-journey" aria-label="Mexico City 1982 to Dubai Today">
       <div className="v32-city v32-city-left"><div className="v32-city-crop"><img src="/brand/reference/mexico-dubai.png" alt="Mexico City 1982 illustration"/></div>
         <b>MEXICO CITY</b><span>1982</span></div>
@@ -98,36 +156,37 @@ function Home(){
         <circle cx="529" cy="38" r="9" fill="#f8ebe4" stroke="#b98a4e" strokeWidth="3"/>
       </svg>
       <div className="v32-city v32-city-right"><div className="v32-city-crop"><img src="/brand/reference/mexico-dubai.png" alt="Dubai Today illustration"/></div>
-        <b>DUBAI</b><span>TODAY</span></div>
+        <b>DUBAI</b><span>{t.today}</span></div>
     </section>
     <section className="v32-story" id="journal">
       <div className="v32-family"><img src="/brand/reference/alicia.webp" alt="Alicia Luna Baeza"/>
         <img src="/brand/reference/liza.webp" alt="Liza preparing a cake"/>
-        <i>Nuestra historia también huele a amor ♡</i></div>
-      <div className="v32-legacy"><h2>Crafted with Love: The 3L Family Legacy</h2>
-        <p>Hello everyone! I'm Liza, the founder of 3L in Dubai. Step into our world, where each Tres Leches cake is a symbol of our family's heritage, made with love and the finest natural ingredients.</p>
-        <p>Our culinary story begins in 1982 in Mexico City, where Alicia Luna Baeza crafted Tres Leches Cakes for her loved ones. Today this family tradition continues in Dubai.</p>
-        <a href={origin+"/menu"}>TREAT YOURSELF TO OUR TRES LECHES CAKES →</a>
+        <i>{t.storyQuote}</i></div>
+      <div className="v32-legacy"><h2>{t.legacy}</h2>
+        <p>{t.story1}</p>
+        <p>{t.story2}</p>
+        <a href={origin+"/menu"}>{t.explore}</a>
       </div>
     </section>
   </main>;
 }
 function Landing(){
+  const {language}=useLanguage();const t=visualCopy[language];
   return <main className="v32-landing v32-landing-fidelity" id="main">
-    <span className="v32-eyebrow">THE 3L MENU</span><h1>Explore Our Menu</h1>
-    <p className="v32-tagline">CAKES, BAKERY &amp; OUR SIGNATURE CREATIONS</p>
+    <span className="v32-eyebrow">{t.menuEyebrow}</span><h1>{t.menuTitle}</h1>
+    <p className="v32-tagline">{t.menuTag}</p>
     <form action={origin+"/bakery"} className="v32-search">
-      <span aria-hidden>⌕</span><input name="q" type="search" aria-label="Search the bakery" placeholder="Search the bakery..."/>
-      <button type="submit">FIND →</button>
+      <span aria-hidden>⌕</span><input name="q" type="search" aria-label="Search the bakery" placeholder={t.searchBakery}/>
+      <button type="submit">{t.find}</button>
     </form>
     <div className="v32-tiles">
       <a href={origin+"/bakery?category=cakes"} className="v32-tile v32-cakes">
-        <small>PASTELERÍA</small><strong>Cake</strong><em>Our signature cakes,<br/>fine pastries and<br/>seasonal creations.</em>
-        <b>EXPLORE CAKES →</b>
+        <small>{t.cakesTag}</small><strong>{t.cakes}</strong><em>{t.cakesDesc}</em>
+        <b>{t.exploreCakes}</b>
       </a>
       <a href={origin+"/bakery?category=mexican"} className="v32-tile v32-breads">
-        <small>PANADERÍA</small><strong>Bakery</strong><em>Artisanal breads,<br/>classic favorites and<br/>freshly baked goods.</em>
-        <b>EXPLORE BAKERY →</b>
+        <small>{t.bakeryTag}</small><strong>{t.bakery}</strong><em>{t.bakeryDesc}</em>
+        <b>{t.exploreBakery}</b>
       </a>
     </div>
   </main>;
@@ -136,6 +195,7 @@ function ProductDialog({product,onClose,anchor}:{
   product:StorefrontProduct;onClose:()=>void;anchor:HTMLElement|null;
 }){
   const menu=useMenu();
+  const {language}=useLanguage();const t=visualCopy[language];
   const {config,loading}=useCheckoutConfig();
   const now=useCheckoutNow(config);
   const family=menuProductFamily(menu,product);
@@ -196,7 +256,7 @@ function ProductDialog({product,onClose,anchor}:{
           <button ref={closeButton} type="button" className="v32-close"
             aria-label="Close" onClick={onClose}>×</button>
         </div>
-        <p className="v32-section-caption">CHOOSE A VARIANT</p>
+        <p className="v32-section-caption">{t.variants}</p>
         <div className="v32-variants" role="group" aria-label="Choose a variant">
           {allowed.map(o=><button key={o.id} type="button" className={o.id===chosen?.id?"v32-variant v32-variant-current":"v32-variant"}
             aria-pressed={o.id===chosen?.id} onClick={()=>setSku(o.id)}>
@@ -204,21 +264,21 @@ function ProductDialog({product,onClose,anchor}:{
           </button>)}
         </div>
         {chosen&&<div className="v32-popup-unit">
-          <p className="v32-section-caption">PRICE</p>
+          <p className="v32-section-caption">{t.price}</p>
           <strong className="b-menu-price">{formatAed(chosen.priceFils)}</strong>
         </div>}
-        {!chosen&&!loading&&<p role="status">Online ordering is unavailable for this product.</p>}
+        {!chosen&&!loading&&<p role="status">{t.orderingUnavailable}</p>}
       </div>
       <div className="v32-popup-footer b-menu-options">
         {chosen?<AddToCart key={chosen.id} productId={chosen.id}
-          fallback={<p role="status">Online ordering is unavailable for this variant.</p>}/>:
+          fallback={<p role="status">{t.variantUnavailable}</p>}/>:
           <button disabled type="button">ADD TO CART · UNAVAILABLE</button>}
       </div>
     </div>
   </div>,document.body);
 }
 function Bakery(){
-  const {language}=useLanguage();
+  const {language}=useLanguage();const t=visualCopy[language];
   const menu=useMenu();
   const {config,loading,retry}=useCheckoutConfig();
   const now=useCheckoutNow(config);
@@ -239,12 +299,12 @@ function Bakery(){
   }):[];
   const active=items.find(p=>p.id===selected);
   return <main className="v32-catalog v32-catalog-fidelity" id="main">
-    <span className="v32-eyebrow">OUR MENU</span><h1>Traditional Mexican Bakery</h1>
-    <p className="v32-tagline">CAKES, BREADS &amp; SIGNATURE CREATIONS</p>
+    <span className="v32-eyebrow">{t.catalogEyebrow}</span><h1>{t.catalogTitle}</h1>
+    <p className="v32-tagline">{t.catalogTag}</p>
     <form className="v32-search" onSubmit={e=>e.preventDefault()}>
       <span aria-hidden>⌕</span><input value={query} onChange={e=>setQuery(e.target.value)}
-      type="search" aria-label="Search the menu" placeholder="Search our menu..."/>
-      <button type="submit">FIND →</button>
+      type="search" aria-label="Search the menu" placeholder={t.searchMenu}/>
+      <button type="submit">{t.find}</button>
     </form>
     <div className="v32-filters" role="group" aria-label="Categories">
       {groups.map(g=><button key={g.id} type="button" className={filter===g.id?"v32-selected":""}
@@ -253,9 +313,9 @@ function Bakery(){
       </button>)}
     </div>
     {!available?<div className="v32-message" role="status">
-      <p>{loading||menu.status==="loading"?"Loading available products...":"Online ordering is unavailable."}</p>
-      <button type="button" onClick={retry}>TRY AGAIN</button></div>:
-      !items.length?<p className="v32-message" role="status">No matching products.</p>:
+      <p>{loading||menu.status==="loading"?t.loading:t.orderingUnavailable}</p>
+      <button type="button" onClick={retry}>{t.retry}</button></div>:
+      !items.length?<p className="v32-message" role="status">{t.notFound}</p>:
       <div className="v32-grid" data-grid-columns="4">
         {items.map(product=>{
           const family=menuProductFamily(menu,product);
@@ -272,7 +332,7 @@ function Bakery(){
               variant={product.variant} alt={product.title}
               fallback={menu.status==="bundled"?family.image:null}/></span>
             <span className="v32-product-copy"><strong>{product.title}</strong><em>{product.description}</em>
-              <span>{price===null?"UNAVAILABLE":"From "+formatAed(price)}<b aria-hidden>→</b></span>
+              <span>{price===null?t.unavailable:t.from+formatAed(price)}<b aria-hidden>→</b></span>
             </span>
           </button>;
         })}
@@ -293,15 +353,15 @@ function VisualCommerce({path}:{path:string}) {
 }
 function VisualFooter(){
   const {language}=useLanguage();
-  const labels=visualNav[language];
+  const labels=visualNav[language];const t=visualCopy[language];
   return <footer className="v32-site-footer">
     <div className="v32-site-footer-brand"><strong>✧ 3L pastelerías</strong><small>MEXICO CITY SINCE 1982</small></div>
     <nav aria-label="V3.2 footer navigation">
       <a href={origin+"/menu"}>{labels.menu}</a>
       <a href={origin+"/contact"}>{labels.contact}</a>
       <a href={origin+"/cart"}>{labels.cart}</a>
-      <a href={origin+"/terms"}>Terms &amp; Conditions</a>
-      <a href={origin+"/privacy"}>Privacy</a>
+      <a href={origin+"/terms"}>{t.legalTerms}</a>
+      <a href={origin+"/privacy"}>{t.privacy}</a>
     </nav>
   </footer>;
 }
