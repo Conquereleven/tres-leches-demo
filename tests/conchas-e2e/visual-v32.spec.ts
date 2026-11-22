@@ -540,3 +540,60 @@ test("V3.2 3L mobile package selector remains usable at 390 and 375",async ({pag
   await page.keyboard.press("Escape");
  }
 });
+
+test("REF_C approved: Pan de Muerto has four complete SKU choices with real AED prices",async ({page},info)=>{
+ await page.setViewportSize({width:1440,height:900});
+ await page.goto("/visual-v32/bakery?category=mexican&lang=es");
+ const card=page.locator('[data-product-id="pan-de-muerto-traditional-pack"]');
+ await expect(card).toBeEnabled();
+ await card.click();
+ const popup=page.getByRole("dialog");
+ const choices=popup.locator(".v32-quick-four .v32-quick-options");
+ await expect(choices.locator("button")).toHaveCount(4);
+ await expect(choices).toContainText("Media docena");
+ await expect(choices).toContainText("Docena");
+ await expect(choices).toContainText("Mini");
+ await expect(choices).toContainText("Individual");
+ await choices.locator('[data-sku="pan-de-muerto-traditional-pack-12-individuales"]').click();
+ await expect(popup).toHaveAttribute("data-selected-sku","pan-de-muerto-traditional-pack-12-individuales");
+ await expect(popup.locator(".v32-buy-cta")).toContainText("AED 140");
+ await expect(popup.locator(".v32-desktop-qty-target .v32-buy-qty")).toBeVisible();
+ await expect(card).toHaveAttribute("data-selected-product","true");
+ if(info.project.name==="chromium"){
+   mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+   await page.screenshot({path:"docs/brand/brand02/conchas/v32-REF-C-direct-four-1440.png",animations:"disabled"});
+ }
+});
+test("REF_D approved: mobile Orejas shows three direct purchase sizes",async ({page},info)=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/visual-v32/bakery?category=bakery&lang=es");
+ const card=page.locator('[data-product-id="orejas"]');
+ await expect(card).toBeEnabled();
+ await card.click();
+ const popup=page.getByRole("dialog");
+ const sizes=popup.locator(".v32-three-quantities");
+ await expect(sizes.locator("button")).toHaveCount(3);
+ await expect(sizes).toContainText("Por pieza");
+ await expect(sizes).toContainText("Media docena");
+ await expect(sizes).toContainText("Docena");
+ await sizes.locator('[data-pack-pieces="6"]').click();
+ await expect(popup).toHaveAttribute("data-selected-sku","orejas-6-mini-60-g-cada-uno");
+ await expect(popup.locator(".v32-buy-price strong")).toContainText("AED 50");
+ await expect(popup.locator(".v32-personalization input")).toBeVisible();
+ await expect(popup.locator(".v32-popup-footer .v32-buy-cta")).toBeVisible();
+ await expect(card).toHaveAttribute("data-selected-product","true");
+ if(info.project.name==="chromium"){
+   mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+   await page.screenshot({path:"docs/brand/brand02/conchas/v32-REF-D-direct-three-390.png",animations:"disabled"});
+ }
+});
+test("REF_C functionality: non-persisted personalization can never silently enter real cart",async ({page})=>{
+ await page.goto("/visual-v32/bakery?category=cakes&lang=es");
+ await page.locator('[data-product-id="tres-leches--classic"]').click();
+ const popup=page.getByRole("dialog");
+ await popup.locator(".v32-personalization input").fill("Feliz cumpleaños");
+ await expect(popup.locator(".v32-buy-cta")).toBeDisabled();
+ await expect(popup.locator(".v32-note-warning")).toBeVisible();
+ await popup.locator(".v32-personalization input").fill("");
+ await expect(popup.locator(".v32-buy-cta")).toBeEnabled();
+});

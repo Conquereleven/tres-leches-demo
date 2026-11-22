@@ -691,3 +691,45 @@
 .v32-app .v32-photo-empty small{font:500 10px/1.4 "Jost",Arial,sans-serif;text-transform:uppercase;letter-spacing:.15em}
 .v32-app .v32-subcategories{position:relative;z-index:5;will-change:auto;transform:none;animation:none}
 .v32-app .v32-subcategories button{position:relative;transform:none;animation:none}
+
+/* REF_C/REF_D · Founder 7.9/10. Four published SKU offers are presented as
+   one-click product choices; six offers use Mini/Individual + single/6/12.
+   Styles are scoped exclusively to the standalone V3.2 preview. */
+.v32-popup .v32-quick-four .v32-quick-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.v32-popup .v32-quick-four .v32-variant{min-height:64px;padding:10px 7px}
+.v32-popup .v32-quick-four .v32-variant span{font:600 12px/1.3 "Jost",Arial,sans-serif}
+.v32-popup .v32-quick-four .v32-variant small{font:500 11px/1.2 "Jost",Arial,sans-serif}
+.v32-popup .v32-three-quantities{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+.v32-popup .v32-three-quantities .v32-variant{min-height:61px;padding:7px 4px;gap:4px}
+.v32-popup .v32-three-quantities .v32-variant span{font-size:11px!important;text-align:center}
+.v32-popup .v32-three-quantities .v32-variant small{font-size:10px!important}
+.v32-popup .v32-pack-selector{gap:10px}
+.v32-popup .v32-pack-helper{margin:0!important;font:italic 14px/1.15 "Cormorant Garamond",Georgia,serif;color:#795748;text-align:center}
+.v32-popup .v32-popup-heading h2{font:600 clamp(33px,3.3vw,43px)/.95 "Cormorant Garamond",Georgia,serif!important;letter-spacing:-.035em!important;color:#1c1517}
+.v32-popup .v32-popup-heading p{font:italic 18px/1.25 "Cormorant Garamond",Georgia,serif!important}
+.v32-popup .v32-section-caption{letter-spacing:.14em;color:#7b5543;font-weight:600;margin:9px 0 11px}
+.v32-popup .v32-variant{border:1px solid #fffdf4!important;background:rgba(255,255,255,.45);border-radius:15px;box-shadow:0 6px 15px #b88a8230}
+.v32-popup .v32-variant-current{background:#b12e64!important;color:#fff!important;border-color:#fff!important;box-shadow:0 6px 19px #b12e6477!important}
+.v32-popup .v32-variant-current small{color:#fff!important}
+.v32-popup .v32-personalization-field{border-color:#fff9!important;border-radius:999px!important;box-shadow:inset 0 1px 2px #ffffff8c}
+.v32-popup .v32-note-warning{display:block;font:500 11px/1.4 "Jost",Arial,sans-serif;padding:9px 12px;border-radius:11px;color:#7b3a45;background:rgba(255,255,255,.66);border:1px solid #b12e6445}
+.v32-popup .v32-buy-cta-arrow{font-size:23px;margin-left:auto;font-weight:400;line-height:1}
+.v32-popup .v32-buy-cta-label{white-space:nowrap}
+.v32-popup .v32-buy-cta-price{font:500 11px/1.1 "Jost",Arial,sans-serif;white-space:nowrap}
+.v32-popup .v32-buy-cta{padding:0 16px;text-align:center;letter-spacing:.085em!important}
+.v32-product[data-selected-product="true"]{
+  outline:3px solid #fff!important;outline-offset:0;position:relative;
+  box-shadow:0 0 0 6px rgba(255,255,255,.68),0 0 30px #fff9,0 24px 45px #b4868677!important
+}
+.v32-card-heart.v32-card-chosen{width:43px;height:43px;background:#fff;color:#a87b3a;box-shadow:0 6px 20px #76524355}
+.v32-card-heart.v32-card-chosen svg{width:25px;height:25px}
+@media(max-width:640px){
+ .v32-popup .v32-quick-four .v32-variant{min-height:58px}
+ .v32-popup .v32-popup-heading h2{font-size:clamp(31px,7vw,39px)!important}
+ .v32-popup .v32-popup-heading p{font-size:17px!important}
+ .v32-popup .v32-buy-cta-price{display:none}
+ .v32-popup .v32-buy-cta-arrow{font-size:21px}
+ .v32-popup .v32-buy-cta{padding:0 21px;min-height:51px;letter-spacing:.15em!important}
+ .v32-popup .v32-pack-helper{font-size:13px}
+ .v32-popup .v32-personalization{gap:7px}
+}

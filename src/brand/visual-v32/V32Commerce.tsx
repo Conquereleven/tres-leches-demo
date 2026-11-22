@@ -129,7 +129,7 @@ export function VisualAddToCart({productId,onAdded,controlsTarget,desktopQtyTarg
    composition.every(piece=>publishedRule.componentSkuIds.includes(piece.componentSkuId));
  const amount=product?displayLinePrice({productId,quantity:qty,...(custom?{composition}:{})},product.priceFils,config?.packPricing)*qty:Number.NaN;
  const amountValid=Number.isFinite(amount)&&amount>=0;
- const canAdd=!!config?.enabled&&!!product&&!loading&&valid&&amountValid&&
+ const canAdd=!!config?.enabled&&!!product&&!loading&&valid&&amountValid&&note.trim().length===0&&
    (!tricolor||tricolor.kind==="fixed"||!!color)&&inCart+qty<=MAX_QTY;
  // Variant changes preserve the visual note, as in the original ProductPopup.
  useEffect(()=>{setQty(minQty(productId));setColor(null);setComposition([]);},[productId]);
@@ -171,7 +171,9 @@ export function VisualAddToCart({productId,onAdded,controlsTarget,desktopQtyTarg
           aria-describedby="v32-note-disclaimer" placeholder={placeholder}/>
        <output aria-live="polite">{note.length}/40</output>
      </div>
-     <span className="v32-sr" id="v32-note-disclaimer">Visual preview only: this note is not saved to a real order.</span>
+     <span className={note.trim()?"v32-note-warning":"v32-sr"} id="v32-note-disclaimer">
+    {language==="es"?"La personalización aún no se envía a cocina. Borra la nota para continuar.":language==="ar"?"هذه الملاحظة غير متاحة للطلب بعد؛ امسحها للمتابعة.":"Personalization is not yet sent to the kitchen. Clear the note to continue."}
+   </span>
    </div>
  </div>;
  return <>
@@ -180,7 +182,9 @@ export function VisualAddToCart({productId,onAdded,controlsTarget,desktopQtyTarg
    <div className="v32-buy-form" data-new-ui="add-to-cart">
      <button className="v32-buy-cta" type="button" disabled={!canAdd} onClick={add}>
        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
-       {t.add} — {amountValid?money(amount):"—"}
+       <span className="v32-buy-cta-label">{t.add}</span>
+       <span className="v32-buy-cta-price">{amountValid?" · "+money(amount):"—"}</span>
+       <span className="v32-buy-cta-arrow" aria-hidden="true">→</span>
      </button>
      {!valid&&<small role="alert">{t.invalid}</small>}
    </div>
