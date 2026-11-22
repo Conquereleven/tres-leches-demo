@@ -1,0 +1,77 @@
+/* Approved 3L Visual Lab V3.2 composition: isolated preview path only. */
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@400;500;600&display=swap");
+.v32-app,.v32-overlay{--ink:#1c1517;--gold:#b98a4e;--rose:#b12e64;font-family:Jost,Arial,sans-serif;color:var(--ink)}
+.v32-app{min-height:100vh;isolation:isolate;padding:1px 0;background:radial-gradient(ellipse at 50% 9%,#fff9f7 0%,transparent 44%),linear-gradient(130deg,#f5ccc7,#f9e7e2 45%,#f1c4c3);position:relative}
+.v32-app::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(112deg,transparent 15%,#fff6 28%,transparent 40%,#fff3 52%,transparent 66%)}
+.v32-app *,.v32-overlay *{box-sizing:border-box}.v32-app a{text-decoration:none;color:inherit}
+.v32-app h1,.v32-app h2,.v32-app strong,.v32-overlay h1,.v32-overlay h2{font-family:"Cormorant Garamond",Georgia,serif}
+.v32-app button,.v32-overlay button{font-family:inherit;cursor:pointer}
+.v32-app button:focus-visible,.v32-app a:focus-visible,.v32-overlay button:focus-visible,.v32-overlay select:focus-visible{outline:3px solid #884535;outline-offset:3px}
+.v32-sr,.v32-skip:not(:focus){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.v32-skip:focus{position:absolute;z-index:200;top:0;background:white;padding:10px}
+.v32-header{position:relative;z-index:10}
+.v32-nav{max-width:1408px;margin:25px auto 0;min-height:68px;padding:10px 35px;display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;border:1px solid #fffe;border-radius:99px;background:#ffffff75;box-shadow:0 14px 30px #a8747440;backdrop-filter:blur(18px)}
+.v32-nav-left,.v32-nav-right{display:flex;align-items:center;gap:25px;font:500 11px Jost;letter-spacing:.20em}
+.v32-nav-right{justify-content:flex-end;gap:17px}
+.v32-logo{white-space:nowrap;display:flex;flex-direction:column;align-items:center;color:#b57939!important}
+.v32-logo strong{font-size:29px;line-height:1}.v32-logo small{margin-top:5px;font:500 9px Jost;letter-spacing:.24em}
+.v32-nav select{border:0;border-radius:99px;background:#fffa;padding:8px;color:#7f5731}
+.v32-home,.v32-landing,.v32-catalog{max-width:1440px;margin:auto;padding:48px 35px 70px}
+.v32-home h1,.v32-landing h1,.v32-catalog h1{text-align:center;font-size:clamp(48px,5.5vw,83px);font-weight:500;letter-spacing:-.03em;line-height:.95;margin:15px 0 26px}
+.v32-journey{display:grid;grid-template-columns:1fr 1.2fr 1fr;align-items:end;gap:20px}
+.v32-city{display:flex;flex-direction:column;align-items:center;text-align:center}
+.v32-city img{width:100%;height:235px;object-fit:contain;mix-blend-mode:multiply;mask-image:radial-gradient(ellipse,#000 48%,transparent 85%)}
+.v32-city b{font:500 23px Georgia;letter-spacing:.18em;color:#87551d}.v32-city span{font:500 21px Georgia;letter-spacing:.18em;color:#87551d}
+.v32-route{width:100%;align-self:center}
+.v32-story{margin-top:24px;padding:35px 0;border-top:2px solid #fffb;display:grid;grid-template-columns:1fr 1.12fr;gap:5%;align-items:center}
+.v32-family{display:flex;position:relative;align-items:flex-end;justify-content:center;min-height:400px}
+.v32-family img:first-child{width:60%;height:360px;object-fit:contain;border:7px solid #fff9;border-radius:25px;transform:rotate(-3deg);box-shadow:0 12px 25px #a9878777}
+.v32-family img:nth-child(2){width:38%;height:265px;object-fit:cover;margin-left:-9%;border:7px solid #fff9;border-radius:25px;transform:rotate(6deg);box-shadow:0 12px 25px #a9878777}
+.v32-family i{position:absolute;top:4px;right:0;max-width:130px;color:#8d5c32;font:italic 21px "Cormorant Garamond"}
+.v32-legacy{padding:10px 0 10px 35px;border-left:1px solid var(--gold)}
+.v32-legacy h2{font-size:clamp(38px,4vw,59px);line-height:.94;font-weight:600;margin:0 0 20px}
+.v32-legacy p{font-size:14px;line-height:1.6;margin:0 0 15px}
+.v32-legacy a{display:block;border:1px solid white;border-radius:99px;background:#fff8;padding:17px 24px;font-size:12px;font-weight:600;color:#935a24}
+.v32-eyebrow{display:block;text-align:center;letter-spacing:.3em;font-size:12px;color:#a37139}
+.v32-landing h1,.v32-catalog h1{margin:25px 0 11px}.v32-tagline{text-align:center;font-size:12px;letter-spacing:.30em;color:#a37139}
+.v32-search{display:flex;align-items:center;gap:15px;max-width:670px;margin:39px auto 45px;padding:13px 20px;border:1px solid #fff9;border-radius:99px;background:#fff9;backdrop-filter:blur(10px);box-shadow:0 13px 35px #c18a8a66}
+.v32-search span{font-size:25px;color:#825835}
+.v32-search input{border:0;min-width:0;flex:1;background:transparent;outline:none;font:italic 19px "Cormorant Garamond"}
+.v32-search button{border:0;border-left:1px solid #b98a4e55;padding-left:18px;background:transparent;color:#925c27;font-size:11px;letter-spacing:.18em}
+.v32-tiles{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.v32-tile{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:13px;min-height:510px;padding:60px;border-radius:28px;color:white!important;background-position:center;background-size:cover;box-shadow:0 24px 40px #b78c8c77}
+.v32-cakes{background-image:linear-gradient(90deg,#654035ee,transparent 88%),url("/brand/approved/tres-leches-classic-960.webp")}
+.v32-breads{background-image:linear-gradient(90deg,#654035ee,transparent 88%),url("/brand/approved/3l-media-002/bakery-0-m002-002-1440.webp")}
+.v32-tile small{font-size:14px;letter-spacing:.25em;color:#ecc689}
+.v32-tile strong{font-size:clamp(65px,5.8vw,94px);font-style:italic;font-weight:400;line-height:.92}
+.v32-tile em{font:italic 23px/1.35 "Cormorant Garamond",Georgia}
+.v32-tile b{border-radius:99px;background:#ffebe4;color:#875221;padding:15px 24px;font:600 11px Jost;letter-spacing:.15em}
+.v32-filters{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;margin:-12px auto 35px}
+.v32-filters button{border:1px solid #fffa;border-radius:99px;background:#fff8;color:#895522;padding:10px 20px;font-size:12px}
+.v32-filters .v32-selected{background:var(--rose);border-color:transparent;color:white;box-shadow:0 5px 12px #b66a7e77}
+.v32-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.v32-product{padding:0;overflow:hidden;display:flex;flex-direction:column;text-align:left;min-width:0;border:1px solid #fffd;border-radius:25px;background:#fff9;box-shadow:0 19px 37px #b4868677}
+.v32-product[aria-expanded=true]{outline:2px solid #b98a4e}
+.v32-product:disabled{opacity:.58;cursor:not-allowed}
+.v32-photo{display:block;width:100%;height:250px;overflow:hidden;background:#f1d9ce}
+.v32-photo img,.v32-photo picture,.v32-photo .b-co-thumb-empty{height:100%;width:100%;object-fit:cover}
+.v32-product-copy{display:flex;flex-direction:column;flex:1;padding:15px 19px}
+.v32-product-copy strong{font-size:22px;font-weight:500}.v32-product-copy em{color:#895e4d;font:italic 15px/1.35 "Cormorant Garamond";min-height:41px}
+.v32-product-copy>span{display:flex;align-items:center;justify-content:space-between;margin-top:auto;font-size:12px;font-weight:600;color:#915a26}
+.v32-product-copy b{display:grid;place-items:center;width:33px;height:33px;border:1px solid #b98a4e;border-radius:50%;font-weight:500}
+.v32-message{text-align:center;margin:35px auto;padding:25px;background:#fff9;border-radius:22px}
+.v32-overlay{position:fixed;inset:0;z-index:1001;pointer-events:none}
+.v32-scrim{position:absolute;inset:0;pointer-events:auto;background:#45242a35;backdrop-filter:blur(4px)}
+.v32-popup{position:fixed;z-index:1;width:min(490px,calc(100vw - 24px));pointer-events:auto;overflow-y:auto;overscroll-behavior:contain;padding:24px;border:2px solid white;border-radius:32px;background:linear-gradient(135deg,#ffe9e5f8,#f1c8c1f8);box-shadow:0 18px 55px #a25d5d88}
+.v32-close{position:sticky;top:0;z-index:4;float:right;width:38px;height:38px;border:0;border-radius:50%;background:#fffd;color:#5c3f35;font-size:26px}
+.v32-popup .b-menu-options{margin:0!important;padding:0!important;background:transparent!important;border:0!important}
+.v32-popup .b-menu-photo,.v32-popup .b-product-gallery{display:none!important}
+.v32-popup .b-product-title{font:600 35px/1 "Cormorant Garamond",Georgia!important}
+.v32-popup .b-menu-price{font:600 30px "Cormorant Garamond",Georgia!important}
+.v32-popup select{border:1px solid #b98a4e66;border-radius:12px;background:#fff9;padding:10px}
+.v32-popup .b-add-to-cart>button{position:sticky;bottom:0;width:100%;min-height:51px;border:0;border-radius:99px;background:var(--rose);color:white;font-weight:600}
+.v32-popup .b-add-to-cart>button:disabled{opacity:.55}
+@media(max-width:1000px){.v32-nav{margin:12px}.v32-nav-left,.v32-nav-right{gap:10px}.v32-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.v32-journey{grid-template-columns:1fr 1fr}.v32-route{grid-column:1/-1;grid-row:2;max-width:350px;margin:auto}.v32-story{grid-template-columns:1fr}.v32-legacy{border-left:0;border-top:1px solid #b98a4e;padding:25px 0}.v32-tile{min-height:440px;padding:35px}}
+@media(max-width:640px){.v32-nav{grid-template-columns:1fr auto;gap:10px;padding:8px 13px}.v32-nav-left{display:none}.v32-nav-right>a:not(:last-child){display:none}.v32-logo strong{font-size:22px}.v32-logo small{font-size:7px}.v32-home,.v32-landing,.v32-catalog{padding:35px 14px}.v32-home h1{font-size:44px}.v32-city img{height:125px}.v32-city b,.v32-city span{font-size:12px}.v32-family{min-height:270px}.v32-family img:first-child{height:230px}.v32-family img:nth-child(2){height:190px}.v32-landing h1,.v32-catalog h1{font-size:49px}.v32-tagline{font-size:10px}.v32-search{margin:30px auto}.v32-tiles{grid-template-columns:1fr}.v32-tile{min-height:390px}.v32-filters{gap:6px}.v32-filters button{padding:8px 10px;font-size:10px}.v32-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.v32-photo{height:164px}.v32-product-copy{padding:11px}.v32-product-copy strong{font-size:18px}.v32-product-copy em{font-size:14px}.v32-popup{padding:15px;max-height:calc(100dvh - 24px)!important}}
+@media(max-width:360px){.v32-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.v32-app *,.v32-overlay *{animation:none!important;transition:none!important}}

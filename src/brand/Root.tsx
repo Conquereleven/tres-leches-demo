@@ -1,4 +1,5 @@
 import { MenuPage, HowToOrder } from "./StorePages";
+import { VisualV32 } from "./visual-v32/VisualV32";
 import { LocalizationProvider, useLanguage } from "./localization";
 import { CartPage, CheckoutPage, CheckoutReturn } from "./Shop";
 import { Suspense, lazy, useEffect, useState } from "react";
@@ -58,6 +59,7 @@ function RoutedApp() {
       </Suspense>
     );
   const page = path.replace(/\/+$/, "");
+  if (page === "/visual-v32" || page.startsWith("/visual-v32/")) return <VisualV32 />;
   if (page === "/menu") return <MenuPage />;
   if (page === "/how-to-order") return <HowToOrder />;
   if (page === "/checkout/return") return <CheckoutReturn />;
