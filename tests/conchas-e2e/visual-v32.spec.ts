@@ -309,7 +309,7 @@ test("ZIP V3.2 layout: visible price opposite quantity with primary CTA below",a
   const popup=page.getByRole("dialog");
   // The approved popover animates on entrance. Measure final geometry only.
   await expect.poll(()=>popup.evaluate(element=>element.getAnimations().filter(a=>a.playState==="running").length)).toBe(0);
-  const price=popup.locator(".v32-buy-form .v32-buy-price").first();
+  const price=popup.locator(".v32-popup-scroll .v32-buy-price").first();
   const qty=popup.locator(".v32-popup-footer .v32-buy-qty").first();
   const cta=popup.locator(".v32-popup-footer .v32-buy-cta").first();
   await expect(price).toBeVisible();
@@ -379,4 +379,51 @@ test("ZIP REF_C price changes with quantity without altering authoritative unit 
  const after=await popup.locator(".v32-buy-price strong").innerText();
  expect(after).not.toBe(before);
  await expect(popup.locator(".v32-buy-cta")).toContainText(after);
+});
+
+test("approved REF_C input: note maximum 40 and value preserved across variant change",async ({page})=>{
+ await page.setViewportSize({width:1440,height:900});
+ await page.goto("/visual-v32/bakery?category=cakes&lang=en");
+ await page.locator('[data-product-id="tres-leches--classic"]').click();
+ const popup=page.getByRole("dialog");
+ const note=popup.getByRole("textbox",{name:/personalization/i});
+ await expect(note).toBeVisible();
+ await note.fill("x".repeat(55));
+ await expect(note).toHaveValue("x".repeat(40));
+ await expect(popup.locator(".v32-personalization-field output")).toHaveText("40/40");
+ await popup.locator(".v32-variant").nth(1).click();
+ await expect(note).toHaveValue("x".repeat(40));
+ await expect(popup.locator(".v32-popup-footer .v32-buy-cta")).toBeVisible();
+});
+test("approved REF_D short screens: scrollable fields with persistent single CTA",async ({page},info)=>{
+ for(const size of [{width:390,height:844},{width:375,height:667},{width:320,height:568}]){
+  await page.setViewportSize(size);
+  await page.goto("/visual-v32/bakery?category=cakes&lang=en");
+  await page.locator('[data-product-id="tres-leches--classic"]').click();
+  const popup=page.getByRole("dialog");
+  const button=popup.locator(".v32-popup-footer .v32-buy-cta");
+  await expect(popup.locator(".v32-personalization input")).toBeAttached();
+  await expect(button).toBeVisible();
+  const before=await button.boundingBox();
+  await popup.locator(".v32-popup-scroll").evaluate(el=>{el.scrollTop=el.scrollHeight});
+  const after=await button.boundingBox();
+  expect(before).not.toBeNull();expect(after).not.toBeNull();
+  expect(Math.abs(before!.y-after!.y)).toBeLessThanOrEqual(2);
+  expect(after!.y+after!.height).toBeLessThanOrEqual(size.height+1);
+  await expect(popup.locator(".v32-popup-footer .v32-buy-cta")).toHaveCount(1);
+  if(info.project.name==="chromium"&&size.width===390){
+    mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+    await page.screenshot({path:"docs/brand/brand02/conchas/v32-approved-popup-notes-390.png",animations:"disabled"});
+  }
+  await page.keyboard.press("Escape");
+ }
+});
+test("source reference note is visual-only and never silently attached to merchant cart",async ({page})=>{
+ await page.goto("/visual-v32/bakery?category=cakes&lang=en");
+ await page.locator('[data-product-id="tres-leches--classic"]').click();
+ const popup=page.getByRole("dialog");
+ await popup.locator(".v32-personalization input").fill("private gift message");
+ await popup.locator(".v32-buy-cta").click();
+ await expect(popup).toHaveCount(0);
+ expect(await page.evaluate(()=>String(localStorage.getItem("3l-cart")).includes("private gift message"))).toBe(false);
 });
