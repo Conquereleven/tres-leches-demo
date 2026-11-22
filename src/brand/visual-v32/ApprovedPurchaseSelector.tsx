@@ -19,7 +19,6 @@ import { packSpec, componentName, type Composition } from "../../../shared/pack-
 import { tricolorSpec, TRICOLOR_COLORS, tricolorCopy, type TricolorColor } from "../../../shared/tricolor";
 import "./approved-source.css";
 
-type Language = "en"|"es"|"ar";
 const words={
  es:{variant:"Variante",presentation:"Presentación",price:"Precio",quantity:"Cantidad",boxes:"Cantidad de cajas",note:"Personalización",optional:"(opcional)",placeholder:'Ej. "Feliz cumpleaños"',add:"Agregar al carrito",unavailable:"No disponible",notReady:"Selecciona todos los sabores antes de continuar",noteHold:"La personalización todavía no llega a cocina. Borra la nota para continuar.",pieces:"piezas por caja",unit:"pieza",close:"Cerrar",min:"Pedido mínimo",select:"Seleccionar color",contains:"Contenido de la caja"},
  en:{variant:"Choose a variant",presentation:"Presentation",price:"Price",quantity:"Quantity",boxes:"Number of boxes",note:"Personalization",optional:"(optional)",placeholder:"e.g. Happy birthday",add:"Add to cart",unavailable:"Unavailable",notReady:"Select every flavor before continuing",noteHold:"Personalization is not yet delivered to the kitchen. Clear the note to continue.",pieces:"pieces per box",unit:"piece",close:"Close",min:"Minimum order",select:"Select color",contains:"Pieces in box"},

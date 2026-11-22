@@ -8,7 +8,6 @@ import { liveOrderable } from "../live-catalog";
 import { VisualCart, VisualCheckout, VisualReturn, VisualContact, VisualPolicy, VisualHowToOrder } from "./V32Commerce";
 import { ApprovedProductCard, ApprovedPurchasePopup } from "./ApprovedPurchaseSelector";
 import { isPolicyPath } from "../business";
-import { formatAed } from "../content";
 import "./visual-v32.css";
 
 /** Approved Visual Lab V3.2, isolated until separate merge/deploy approval.
