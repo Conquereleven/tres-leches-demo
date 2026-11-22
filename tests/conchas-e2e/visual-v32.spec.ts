@@ -101,3 +101,45 @@ test("V3.2 real cake SKU flows through cart to existing checkout without creatin
   expect(await page.locator("main").innerText()).toMatch(/checkout|pickup|delivery|Classic/i);
   expect(paymentActions).toEqual([]);
 });
+
+
+for (const viewport of [{width:1440,height:900},{width:390,height:844}]) {
+  test("V3.2 HOME -> Menu -> Mexican Bakery journey "+viewport.width,async ({page},info)=>{
+    await page.setViewportSize(viewport);
+    await page.goto("/visual-v32?lang=en");
+    await expect(page.getByRole("heading",{name:/More than a cake/i})).toBeVisible();
+    await expect(page.locator("#journal")).toBeVisible();
+    if(info.project.name==="chromium"){
+      mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+      await page.screenshot({path:"docs/brand/brand02/conchas/v32-home-"+viewport.width+".png",fullPage:true,animations:"disabled"});
+    }
+    await page.goto("/visual-v32/menu?lang=en");
+    await expect(page.getByRole("heading",{name:"Explore Our Menu"})).toBeVisible();
+    await expect(page.locator(".v32-tile")).toHaveCount(2);
+    if(info.project.name==="chromium")
+      await page.screenshot({path:"docs/brand/brand02/conchas/v32-menu-"+viewport.width+".png",fullPage:true,animations:"disabled"});
+    await page.locator(".v32-breads").click();
+    await expect(page.locator(".v32-catalog")).toBeVisible();
+    await expect(page.getByRole("button",{name:"Mexican Bakery"})).toHaveAttribute("aria-pressed","true");
+    if(info.project.name==="chromium")
+      await page.screenshot({path:"docs/brand/brand02/conchas/v32-catalog-"+viewport.width+".png",fullPage:viewport.width===1440,animations:"disabled"});
+  });
+}
+
+test("V3.2 keeps real SKU price unchanged across languages",async ({page})=>{
+  const amounts:string[]=[];
+  for(const lang of ["en","es","ar"]){
+    await page.goto("/visual-v32/bakery?category=cakes&lang="+lang);
+    const item=page.locator('[data-product-id="tres-leches--classic"]');
+    await expect(item).toBeVisible();
+    const raw=await item.locator(".v32-product-copy > span").innerText();
+    amounts.push((raw.match(/AED\s?[\d,.]+/)??[])[0]??"");
+  }
+  expect(amounts[0]).toMatch(/^AED/);
+  expect(new Set(amounts).size).toBe(1);
+});
+
+test("isolated preview refuses unknown routes",async ({request})=>{
+  const res=await request.get("/visual-v32/not-authorized");
+  expect(res.status()).toBe(404);
+});
