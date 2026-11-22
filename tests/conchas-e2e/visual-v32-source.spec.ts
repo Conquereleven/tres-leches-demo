@@ -160,6 +160,30 @@ test("Founder 8.7: cakes use Mini/Small/Medium with 15/20/30 characters and serv
  await page.goto("/visual-v32/cart?lang=es");
  await expect(page.locator("[data-cart-cake-message]")).toContainText("Feliz cumple");
 });
+test("Founder 8.7 mobile: three cake sizes, 15/20/30 limits and visible CTA",async ({page},info)=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/visual-v32/bakery?category=cakes&lang=en");
+ await page.locator('[data-product-id="tres-leches--classic"]').click();
+ const popup=page.getByRole("dialog");
+ const sizes=popup.locator('[data-cake-sizes="Mini-Small-Medium"]');
+ await expect(sizes).toBeVisible();
+ expect(await sizes.evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(" ").length)).toBe(3);
+ const choices=sizes.locator("button");
+ await expect(choices).toHaveCount(3);
+ await choices.nth(2).click();
+ await expect(popup.locator("[data-cake-serves]")).toContainText("14–16");
+ await expect(popup.locator("[data-cake-message-count]")).toHaveText("0/30");
+ await popup.locator(".ref32-note input").fill("Happy Birthday 3L");
+ const action=popup.locator(".ref32-buy");
+ await expect(action).toBeEnabled();
+ const rect=await action.boundingBox();
+ expect(rect).not.toBeNull();
+ expect(rect!.y+rect!.height).toBeLessThanOrEqual(845);
+ if(info.project.name==="chromium"){
+   mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+   await page.screenshot({path:"docs/brand/brand02/conchas/v32-source-cake-Mini-Small-Medium-390.png",animations:"disabled"});
+ }
+});
 test("Founder 8.7: no inscription field for Bakery, Conchas or Orejas",async ({page})=>{
  await page.goto("/visual-v32/bakery?category=bakery&lang=es");
  await page.locator('[data-product-id="orejas"]').click();

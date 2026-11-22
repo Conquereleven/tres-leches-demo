@@ -240,7 +240,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
         })}
        </div>
       </div>:
-      <div className="ref32-options ref32-options-four" role="group" aria-label={t.variant}>
+      <div className={"ref32-options "+(cakeSizing&&sorted.length===3?"ref32-options-three":"ref32-options-four")} role="group" aria-label={cakeSizing?t.size:t.variant} data-cake-sizes={cakeSizing?"Mini-Small-Medium":undefined}>
        {sorted.map(option=><button type="button" key={option.id} data-sku={option.id}
          aria-pressed={option.id===productId}
          className={option.id===productId?"ref32-option ref32-option-active":"ref32-option"}
