@@ -3,10 +3,11 @@
  * LOCAL synthetic V3.2 preview: offline checkout fixture only.
  * No credentials, real payments, Railway, or persistent customer data.
  */
-import { mkdtempSync, existsSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { mkdtempSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawn, spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 const root=process.cwd();
 if (!existsSync(join(root,"package.json")) ||
     !existsSync(join(root,"tests/fixtures/web-checkout-server.ts"))) {
@@ -28,6 +29,41 @@ const build=spawnSync("npm",["run","build"],{stdio:"inherit",env:{
   ...process.env,APP_ENV:"test",NODE_ENV:"test",PROVIDER_MODE:"offline",META_OUTBOUND_ENABLED:"false"
 }});
 if(build.status!==0){console.error("BLOCKED: build failed.");process.exit(build.status||1);}
+/* Source ZIP is only a visual-comparison fixture. Never commit screenshot crops
+ * or conceptual photos into public/. This works only in APP_ENV=test,
+ * copies to the temporary built preview, and checks the canonical ZIP hash.
+ */
+const referenceSha="508d0e624f51242b2eb35a4ab301080028a9687e632204623608b192f7c7bf9b";
+const sourceName="3L_VisualLab_V3_2_2026-11-22";
+const options=[
+ process.env.V32_REFERENCE_ZIP,
+ join(homedir(),"Downloads",sourceName+"(1).zip"),
+ join(homedir(),"Downloads",sourceName+".zip"),
+].filter(Boolean);
+const reference=options.find(path=>existsSync(path));
+const assets=[
+ ["reference-derived/mexico-city-illustration.jpg","mexico-city-illustration.jpg"],
+ ["reference-derived/dubai-illustration.jpg","dubai-illustration.jpg"],
+ ["reference-derived/family-collage-composite.jpg","family-collage-composite.jpg"],
+ ["reference-derived/cake-photographic-detail.jpg","cake-photographic-detail.jpg"],
+ ["visual-lab/bakery-atelier-concept.webp","bakery-atelier-concept.webp"],
+];
+if(reference){
+ const {readFileSync}=await import("node:fs");
+ const digest=createHash("sha256").update(readFileSync(reference)).digest("hex");
+ if(digest!==referenceSha)throw new Error("BLOCKED: V3.2 reference ZIP hash mismatch");
+ const destination=join(root,"dist/client/visual-v32-reference");
+ mkdirSync(destination,{recursive:true});
+ for(const [src,dst] of assets){
+  const member=sourceName+"/code/frontend/public/"+src;
+  const result=spawnSync("unzip",["-p",reference,member],{encoding:null,maxBuffer:2*1024*1024});
+  if(result.status!==0||!result.stdout?.length)throw new Error("BLOCKED: missing visual reference asset "+src);
+  writeFileSync(join(destination,dst),result.stdout,{flag:"w"});
+ }
+ console.log("V3.2 original reference assets staged TEST-ONLY: "+assets.length);
+} else {
+ console.log("V3.2 original crops not staged (optional ZIP absent); legacy media fallback retained.");
+}
 const dir=mkdtempSync(join(tmpdir(),"3l-v32-preview-"));
 const env={
  ...process.env,APP_ENV:"test",NODE_ENV:"test",PROVIDER_MODE:"offline",META_OUTBOUND_ENABLED:"false",
@@ -38,8 +74,8 @@ const env={
 console.log("Open HOME    "+base+"/visual-v32");
 console.log("Open MENU    "+base+"/visual-v32/menu");
 console.log("Open BAKERY  "+base+"/visual-v32/bakery");
-console.log("Open CART    "+base+"/cart");
-console.log("Open CHECKOUT"+base+"/checkout");
+console.log("Open CART    "+base+"/visual-v32/cart");
+console.log("Open CHECKOUT"+base+"/visual-v32/checkout");
 console.log("No external payment provider is configured.");
 const child=spawn(process.execPath,["--import","tsx","tests/fixtures/web-checkout-server.ts"],{stdio:"inherit",env});
 const shutdown=()=>{if(!child.killed)child.kill("SIGTERM");};

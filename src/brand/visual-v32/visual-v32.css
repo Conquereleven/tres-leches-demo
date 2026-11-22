@@ -452,3 +452,48 @@
   .v32-nav-right .v32-language-control,
   .v32-nav-right .v32-language-control select{min-width:52px}
 }
+
+/* Exact original V3.2 ZIP visual crops only inside the isolated synthetic
+ * preview. Never merge/deploy these as authentic 3L product photography.
+ * Local preview script can stage them into dist after test-only build.
+ */
+.v32-city-reference img{
+  width:100%!important;height:100%!important;max-width:100%;
+  transform:none!important;object-fit:contain!important;mix-blend-mode:multiply;
+}
+.v32-city-reference[data-fallback="true"] img{width:200%!important;max-width:none}
+.v32-city-right .v32-city-reference[data-fallback="true"] img{transform:translateX(-50%)!important}
+.v32-family>.v32-family-reference{
+  display:block;width:100%!important;max-width:100%;height:auto!important;
+  max-height:455px;object-fit:contain!important;transform:none!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  mix-blend-mode:multiply;mask-image:radial-gradient(ellipse at 50% 50%,#000 52%,transparent 82%);
+}
+.v32-family-fallback{
+  display:flex;position:relative;align-items:flex-end;justify-content:center;
+  width:100%;min-height:360px
+}
+.v32-family-fallback img:first-child{width:60%;height:360px;object-fit:contain;transform:rotate(-3deg)}
+.v32-family-fallback img:nth-child(2){width:38%;height:270px;object-fit:cover;transform:rotate(6deg)}
+.v32-family-fallback i{position:absolute;top:4px;right:0;color:#8d5c32}
+.v32-landing-fidelity .v32-cakes{
+  background-image:
+    linear-gradient(90deg,#3e2423df 0%,#53332ba2 39%,#4e2e2b29 77%,transparent),
+    url("/visual-v32-reference/cake-photographic-detail.jpg"),
+    url("/brand/approved/tres-leches-classic-960.webp");
+}
+.v32-landing-fidelity .v32-breads{
+  background-image:
+    linear-gradient(90deg,#3e2423df 0%,#53332ba2 39%,#4e2e2b29 77%,transparent),
+    url("/visual-v32-reference/bakery-atelier-concept.webp"),
+    url("/brand/approved/3l-media-002/bakery-1-m002-041-1440.webp");
+}
+.v32-landing-fidelity .v32-tile{
+  background-size:cover,cover,cover;background-position:center,center,center
+}
+@media(max-width:640px){
+  .v32-family>.v32-family-reference{max-height:345px}
+  .v32-family-fallback{min-height:270px}
+  .v32-family-fallback img:first-child{height:230px}
+  .v32-family-fallback img:nth-child(2){height:190px}
+}

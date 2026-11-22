@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type SyntheticEvent, type MouseEvent as ReactMouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { useMenu, menuProductFamily, type StorefrontProduct } from "../menu";
 import { useCheckoutConfig, useCheckoutNow, useCart, cartCount, minQty } from "../cart";
@@ -19,6 +19,17 @@ import "./visual-v32.css";
  */
 type Filter = "all" | "cakes" | "bakery" | "mexican" | "special";
 const origin = "/visual-v32";
+const previewAssets = "/visual-v32-reference";
+const fallbackPreviewAsset = (
+  event: SyntheticEvent<HTMLImageElement>,
+  fallback: string
+) => {
+  const image = event.currentTarget;
+  image.onerror = null;
+  image.src = fallback;
+  image.parentElement?.setAttribute("data-fallback", "true");
+};
+
 const visualNav = {
   en: {home:"Home",menu:"Menu",journal:"Journal",contact:"Contact",cart:"Cart",story:"The 3L story",support:"Customer care"},
   es: {home:"Inicio",menu:"Menú",journal:"Historia",contact:"Contacto",cart:"Carrito",story:"La historia de 3L",support:"Atención al cliente"},
@@ -153,23 +164,34 @@ function Header(){
 }
 function Home(){
   const {language}=useLanguage();const t=visualCopy[language];
+  const [familyRefFailed,setFamilyRefFailed]=useState(false);
   return <main className="v32-home v32-home-fidelity" id="main">
     <h1>{t.hero1}<br/>{t.hero2}</h1>
     <section className="v32-journey" aria-label="Mexico City 1982 to Dubai Today">
-      <div className="v32-city v32-city-left"><div className="v32-city-crop"><img src="/brand/reference/mexico-dubai.png" alt="Mexico City 1982 illustration"/></div>
+      <div className="v32-city v32-city-left"><div className="v32-city-crop v32-city-reference"><img
+        src={previewAssets+"/mexico-city-illustration.jpg"} onError={e=>fallbackPreviewAsset(e,"/brand/reference/mexico-dubai.png")}
+        alt="Mexico City 1982 illustration"/></div>
         <b>MEXICO CITY</b><span>1982</span></div>
       <svg viewBox="0 0 540 100" className="v32-route" aria-hidden="true">
         <path d="M8 39 C90 -24 150 138 267 55 S417 56 529 38" fill="none" stroke="#b98a4e" strokeWidth="2"/>
         <circle cx="98" cy="37" r="17" fill="none" stroke="#b98a4e" strokeWidth="2"/>
         <circle cx="529" cy="38" r="9" fill="#f8ebe4" stroke="#b98a4e" strokeWidth="3"/>
       </svg>
-      <div className="v32-city v32-city-right"><div className="v32-city-crop"><img src="/brand/reference/mexico-dubai.png" alt="Dubai Today illustration"/></div>
+      <div className="v32-city v32-city-right"><div className="v32-city-crop v32-city-reference"><img
+        src={previewAssets+"/dubai-illustration.jpg"} onError={e=>fallbackPreviewAsset(e,"/brand/reference/mexico-dubai.png")}
+        alt="Dubai Today illustration"/></div>
         <b>DUBAI</b><span>{t.today}</span></div>
     </section>
     <section className="v32-story" id="journal">
-      <div className="v32-family"><img src="/brand/reference/alicia.webp" alt="Alicia Luna Baeza"/>
-        <img src="/brand/reference/liza.webp" alt="Liza preparing a cake"/>
-        <i>{t.storyQuote}</i></div>
+      <div className="v32-family">
+        {!familyRefFailed?<img className="v32-family-reference"
+          src={previewAssets+"/family-collage-composite.jpg"}
+          alt="Visual reference collage from the approved V3.2 mockup (not launch-ready photography)"
+          onError={()=>setFamilyRefFailed(true)}/>:
+          <div className="v32-family-fallback"><img src="/brand/reference/alicia.webp" alt="Alicia Luna Baeza"/>
+            <img src="/brand/reference/liza.webp" alt="Liza preparing a cake"/>
+            <i>{t.storyQuote}</i></div>}
+      </div>
       <div className="v32-legacy"><h2>{t.legacy}</h2>
         <p>{t.story1}</p>
         <p>{t.story2}</p>

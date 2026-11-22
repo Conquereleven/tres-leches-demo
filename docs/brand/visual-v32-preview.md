@@ -40,3 +40,19 @@ Four desktop columns preserved. No custom payment logic.
 - Add browser checks for title case, selector alignment, clean after-add,
   canonical cart-count increase, Escape/focus, 320/375/390 short viewports.
 - Visual fidelity still awaiting reference source assets and Founder approval.
+
+## Source ZIP recovered and validated, Preview-only asset injection
+- Source ZIP: `3L_VisualLab_V3_2_2026-11-22(1).zip`.
+  SHA-256 `508d0e624f51242b2eb35a4ab301080028a9687e632204623608b192f7c7bf9b`.
+- Original source components inspected: Layout.jsx, ProductPopup.jsx,
+  HomePage.jsx, MenuPage.jsx, BakeryPage.jsx and refidelity-v2.css.
+- The preview script will, **only in APP_ENV=test**, read the matching ZIP from
+  `V32_REFERENCE_ZIP` or recognised Downloads filenames. It extracts five exact
+  authored preview-only visual source assets into `dist/client/visual-v32-reference`
+  **after** the test build. No image is committed into public/ or main.
+- When source ZIP is absent, the preview falls back to already-released media.
+  The reference imagery includes screenshots crops and a conceptual bakery photo
+  and must NEVER ship as true 3L product photos to Production.
+- Verify image parity using the original ZIP assets in preview, then replace
+  with true founder-approved source photos before release. The standalone visual
+  was approved, **not** this PR candidate.
