@@ -648,3 +648,14 @@
  .v32-popup .v32-variant{min-width:0;padding:10px 7px}
  .v32-popup .v32-variant-current{background:#b12e64!important;color:#fff!important;border-color:#b12e64!important}
 }
+
+/* Founder-approved REF_C vs REF_D backdrop behavior. Desktop keeps the
+   surrounding catalog sharp; handset applies soft blur to the catalog. */
+@media(min-width:641px){
+ .v32-overlay .v32-scrim{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+   background:rgba(74,41,43,.08)!important}
+}
+@media(max-width:640px){
+ .v32-overlay .v32-scrim{backdrop-filter:blur(6px)!important;-webkit-backdrop-filter:blur(6px)!important;
+   background:rgba(89,46,47,.20)!important}
+}

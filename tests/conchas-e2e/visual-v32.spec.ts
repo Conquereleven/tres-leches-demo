@@ -451,3 +451,15 @@ test("source reference note is visual-only and never silently attached to mercha
  await expect(popup).toHaveCount(0);
  expect(await page.evaluate(()=>String(localStorage.getItem("3l-cart")).includes("private gift message"))).toBe(false);
 });
+
+test("REF_C and REF_D have distinct approved backdrop sharpness",async ({page})=>{
+ await page.setViewportSize({width:1440,height:900});
+ await page.goto("/visual-v32/bakery?category=cakes&lang=en");
+ await page.locator('[data-product-id="tres-leches--classic"]').click();
+ expect(await page.locator(".v32-scrim").evaluate(el=>getComputedStyle(el).backdropFilter)).toBe("none");
+ await page.keyboard.press("Escape");
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/visual-v32/bakery?category=cakes&lang=en");
+ await page.locator('[data-product-id="tres-leches--classic"]').click();
+ expect(await page.locator(".v32-scrim").evaluate(el=>getComputedStyle(el).backdropFilter)).toContain("blur(");
+});
