@@ -402,6 +402,18 @@ function VisualFooter(){
   </footer>;
 }
 export function VisualV32(){
+  // Load the reference's Google Fonts stylesheet only inside the isolated V3.2
+  // visual route. Global CSS @import triggered CSP connect-src errors across
+  // the legacy storefront; stylesheet <link> follows existing style-src rules.
+  useEffect(()=>{
+    const link=document.createElement("link");
+    link.rel="stylesheet";
+    link.href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@400;500;600&display=swap";
+    link.referrerPolicy="no-referrer";
+    link.dataset.v32FontSheet="true";
+    document.head.appendChild(link);
+    return ()=>{link.remove();};
+  },[]);
   const path=location.pathname.replace(/\/+$/,"").slice(origin.length) || "/";
   const commerce = ["/cart","/checkout","/checkout/return","/how-to-order"].includes(path) || isPolicyPath(path);
   return <div className="v32-app" data-visual-preview="v32" onClickCapture={keepInVisualPreview}>

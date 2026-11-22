@@ -56,3 +56,16 @@ Four desktop columns preserved. No custom payment logic.
 - Verify image parity using the original ZIP assets in preview, then replace
   with true founder-approved source photos before release. The standalone visual
   was approved, **not** this PR candidate.
+
+## CI root-cause repair · latest failing SHA a023bda (2026-11-22)
+- Browser suite 82 PASS / 8 FAIL: six existing conchas specs at 390/768/1440
+  (Chromium/WebKit) failed because global CSS `@import` Google Fonts was
+  blocked by `connect-src 'self'`; two V3.2 mobile journeys failed due to
+  mobile navigation drawer being covered by the main stacking context.
+- Repair: drop global font `@import`; only V3.2 mounts a `<link rel=stylesheet>`
+  to Google Fonts, which is allowed by the existing `style-src` and `font-src`.
+  No broader CSP, server policy, third-party merchant data or payments change.
+- Repair: promote `.v32-header` z-index above `main` (and its child drawer),
+  allowing real pointer interaction with mobile links.
+- Must verify new SHA CI and actual rendered/browser screenshots. Google font
+  network availability may vary; fallback typography is explicit, not "pixel perfect."
