@@ -2,7 +2,15 @@
 
 ## CornerTech AI Execution Standard
 
-For every task here, read and follow [Execution Standard 1.0](https://github.com/Conquereleven/cornertech-ai/blob/7bb1b4766180b0090ddba71741e4ed8d4a7d2990/docs/governance/execution-standard.md). It is the canonical source for ownership, evidence and closure; do not copy it into this repository. Report work as **PREPARED → EXECUTED → VERIFIED → CLOSED**, or **BLOCKED** when evidence or authorization is missing. A merge, green CI, a deployment or a handoff never closes work by itself. The more restrictive rule wins; the dated decisions below stay in force unless a newer founder decision replaces them. CT-WCOS (cornertech-ai PR #106) is not adopted here unless it is merged and adopted explicitly.
+## 3L corporate Anti-Friction + REG-01 adoption (CTAI-REG-01 2026-11-22)
+
+**3L adopts** CornerTech AI Execution 1.0, CT-WCOS v1.1 + 9D, AMAE v0.1 and [Anti-Friction v0.1 + REG-01](https://github.com/Conquereleven/cornertech-ai/blob/db31f24032b87371e650b54a3f2ae6da5a05c4bf/docs/governance/anti-friction-amendment.md), pinned to corporate commit `db31f24032b87371e650b54a3f2ae6da5a05c4bf`. Read the relevant canonical policies before execution; a link alone is not proof an agent loaded the policy. **All stricter 3L customer, production, visual-approval, payment, data and release gates below prevail.** No GO or product changes follow from this document.
+
+**Make this operational, not bureaucratic:** one DRI, minimal qualified agents, direct execution within existing GO, no repeated handoffs/GO/test suites for the same SHA, and outcome-first updates. Before model work confirm actual capability and quota (UNKNOWN if unobservable). Two REVISE rounds for the same root cause => diagnose before another cycle. Preserve required independent review for high-risk payment/production changes. Distinguish PREPARED / EXECUTED / VERIFIED / CLOSED; do not call CI, mock or preview a Production acceptance.
+
+**Today's storefront priority:** use the Founder-approved visual references as acceptance targets; provide an actual browser preview, test positive/negative flows, and never substitute a different layout or reuse unapproved legacy frontend components. Keep all Production and merchant/payment modifications outside this governance task.
+
+For every task here, read and follow [Execution Standard 1.0](https://github.com/Conquereleven/cornertech-ai/blob/7bb1b4766180b0090ddba71741e4ed8d4a7d2990/docs/governance/execution-standard.md). It is the canonical source for ownership, evidence and closure; do not copy it into this repository. Report work as **PREPARED → EXECUTED → VERIFIED → CLOSED**, or **BLOCKED** when evidence or authorization is missing. A merge, green CI, a deployment or a handoff never closes work by itself. The more restrictive rule wins; the dated decisions below stay in force unless a newer founder decision replaces them. CT-WCOS v1.1 is adopted for 3L through this scoped local instructions update; corporate PR #109 is merged. The more restrictive 3L gates below take precedence.
 
 3L specifics:
 
