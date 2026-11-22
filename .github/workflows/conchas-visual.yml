@@ -10,6 +10,7 @@ on:
       - "src/brand/media.tsx"
       - "src/brand/media-manifest.json"
       - "tests/conchas-e2e/**"
+      - "src/brand/visual-v32/**"
       - "playwright.conchas.config.ts"
       - ".github/workflows/conchas-visual.yml"
 permissions:

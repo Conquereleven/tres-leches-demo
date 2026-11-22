@@ -463,3 +463,46 @@ test("REF_C and REF_D have distinct approved backdrop sharpness",async ({page})=
  await page.locator('[data-product-id="tres-leches--classic"]').click();
  expect(await page.locator(".v32-scrim").evaluate(el=>getComputedStyle(el).backdropFilter)).toContain("blur(");
 });
+
+test("V3.2 published subcategories refine 3L products without mock category IDs",async ({page})=>{
+ await page.goto("/visual-v32/bakery?category=mexican&lang=es");
+ const category=page.locator(".v32-subcategories");
+ await expect(category).toBeVisible();
+ await expect(category.locator('[data-category-id="pan"]')).toBeVisible();
+ await expect(category.locator('[data-category-id="conchas"]')).toBeVisible();
+ await category.locator('[data-category-id="conchas"]').click();
+ const cards=page.locator(".v32-product");
+ await expect(cards.first()).toBeVisible();
+ expect(await cards.evaluateAll(list=>list.every(node=>node.getAttribute("data-category-id")==="conchas"))).toBe(true);
+});
+test("V3.2 3L half-dozen/dozen selection follows actual Orejas SKUs, not box quantity",async ({page},info)=>{
+ await page.setViewportSize({width:1440,height:900});
+ await page.goto("/visual-v32/bakery?category=bakery&lang=es");
+ const card=page.locator('[data-product-id="orejas"]');
+ await expect(card).toBeEnabled();
+ await card.click();
+ const popup=page.getByRole("dialog");
+ await expect(popup.locator('[data-commerce-options="canonical"]')).toBeVisible();
+ await popup.locator('[data-pack-presentation="individual"]').click();
+ await popup.locator('[data-pack-pieces="12"]').click();
+ await expect(popup).toHaveAttribute("data-selected-sku","orejas-12-individuales-100-g-cada-uno");
+ await expect(popup.locator('[data-pack-piece-count]')).toContainText("12");
+ await expect(popup.locator(".v32-buy-qty-desktop output")).toHaveText("1");
+ const price=await popup.locator(".v32-buy-cta").innerText();
+ const checkout=await page.request.get("/api/checkout/config");
+ expect(checkout.ok()).toBe(true);
+ const body=await checkout.json();
+ const option=body.products.find((item:{id:string;priceFils:number})=>item.id==="orejas-12-individuales-100-g-cada-uno");
+ expect(option).toBeDefined();
+ expect(price).toContain("AED "+(option.priceFils/100).toFixed(2).replace(/\.00$/,""));
+ if(info.project.name==="chromium"){
+   mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+   await page.screenshot({path:"docs/brand/brand02/conchas/v32-3l-dozen-desktop-1440.png",animations:"disabled"});
+ }
+ await popup.locator(".v32-buy-cta").click();
+ await expect(popup).toHaveCount(0);
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem("3l-cart")||"[]").some((l:{productId:string;quantity:number})=>
+   l.productId==="orejas-12-individuales-100-g-cada-uno"&&l.quantity===1))).toBe(true);
+ await page.goto("/visual-v32/cart?lang=es");
+ await expect(page.locator("[data-cart-pack-count]")).toContainText("12 piezas");
+});

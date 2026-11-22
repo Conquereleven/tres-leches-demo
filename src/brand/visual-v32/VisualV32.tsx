@@ -314,7 +314,7 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
   },[onClose]);
   return createPortal(<div className="v32-overlay">
     <div className="v32-scrim" onClick={onClose} aria-hidden/>
-    <div ref={panel} className="v32-popup" data-anchor-side={side}
+    <div ref={panel} className="v32-popup" data-selected-sku={chosen?.id??""} data-anchor-side={side}
       role="dialog" aria-modal="true" aria-label={family.name} style={place}>
       <div className="v32-popup-scroll">
         <div className="v32-popup-heading">
@@ -328,7 +328,7 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
             <span className="v32-option-caption">{language==="es"?"Presentación":language==="ar"?"الحجم":"Presentation"}</span>
             <div className="v32-variants v32-pack-presentations">
               {pack.presentations.map(name=><button key={name} type="button"
-                className={presentation===name?"v32-variant v32-variant-current":"v32-variant"}
+                className={presentation===name?"v32-variant v32-variant-current":"v32-variant"} data-pack-presentation={name}
                 aria-pressed={presentation===name} onClick={()=>pick(name,selection?.pieces??6)}>
                 <span>{presentationLabel(name,language)}</span>
               </button>)}
@@ -340,7 +340,7 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
               {pack.quantities.map(pieces=>{
                 const candidate=pack.choices.find(c=>c.presentation===presentation&&c.pieces===pieces);
                 return <button key={pieces} type="button"
-                  className={pieces===selection?.pieces?"v32-variant v32-variant-current":"v32-variant"}
+                  className={pieces===selection?.pieces?"v32-variant v32-variant-current":"v32-variant"} data-pack-pieces={pieces}
                   aria-pressed={pieces===selection?.pieces} disabled={!candidate}
                   onClick={()=>pick(presentation,pieces)}>
                   <span>{packQtyLabel(pieces,language)}</span>
@@ -434,7 +434,7 @@ function Bakery(){
               (menu.status!=="live"||liveOrderable(option.id)===true);
           });
           const price=valid.length?Math.min(...valid.map(v=>v.priceFils)):null;
-          return <button type="button" key={product.id} className="v32-product" data-product-id={product.id}
+          return <button type="button" key={product.id} className="v32-product" data-category-id={family.category} data-product-id={product.id}
             aria-haspopup="dialog" aria-expanded={selected===product.id} disabled={price===null}
             onClick={e=>{trigger.current=e.currentTarget;setAddedMessage("");setSelected(product.id);}}>
             <span className="v32-photo">{(()=>{
