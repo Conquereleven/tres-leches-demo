@@ -65,13 +65,13 @@ test("V3.2 mock TatbiQ prices never enter the real cart",async ({page})=>{
   await first.click();
   const popup=page.getByRole("dialog");
   await expect(popup.locator(".v32-popup-footer")).toBeVisible();
-  // The product control is the existing commercial ProductOptions, not a toast.
+  // The product control is V3.2 native UI backed by the canonical cart, not legacy Shop UI.
   await expect(popup.locator(".v32-buy-form")).toBeVisible();
   await expect(page.locator("button", {hasText:"(preview)"})).toHaveCount(0);
 });
 
 
-test("V3.2 real cake SKU flows through cart to existing checkout without creating payment",async ({page})=>{
+test("V3.2 real cake SKU flows through new cart and synthetic checkout without creating payment",async ({page})=>{
   await page.setViewportSize({width:1440,height:900});
   const paymentActions:string[]=[];
   page.on("request",r=>{
@@ -163,10 +163,10 @@ test("V3.2 commerce pill variants use canonical SKU prices and preserve AddToCar
   const pills=dlg.locator(".v32-variant");
   expect(await pills.count()).toBeGreaterThan(1);
   await expect(pills.first()).toHaveAttribute("aria-pressed","true");
-  const before=await dlg.locator(".v32-popup-unit .b-menu-price").innerText();
+  const before=await dlg.locator(".v32-buy-price strong").innerText();
   await pills.nth(1).click();
   await expect(pills.nth(1)).toHaveAttribute("aria-pressed","true");
-  const after=await dlg.locator(".v32-popup-unit .b-menu-price").innerText();
+  const after=await dlg.locator(".v32-buy-price strong").innerText();
   expect(after).not.toBe(before);
   await expect(dlg.locator(".v32-buy-cta").last()).toBeEnabled();
   const rect=await dlg.boundingBox();

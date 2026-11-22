@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { cart, cartCount, cartSubtotalFils, displayLinePrice, minQty, useCart, useCheckoutConfig, type CheckoutConfig } from "../cart";
+import { cart, cartCount, cartSubtotalFils, displayLinePrice, minQty, MAX_QTY, useCart, useCheckoutConfig, type CheckoutConfig } from "../cart";
 import { useLanguage } from "../localization";
 import { formatAed } from "../content";
 import { business, phoneHref, policyDecisions, type PolicyPath } from "../business";
@@ -106,15 +106,16 @@ export function VisualAddToCart({productId,onAdded}:{productId:string;onAdded:()
  const allowedPack=spec&&config?.personalizedPacks?.enabled&&config.personalizedPacks.rules.some(rule=>rule.packSkuId===productId);
  const cap=spec?.capacity||0;const picked=composition.reduce((sum,x)=>sum+x.units,0);
  const valid=!spec||!!allowedPack&&picked===cap;
- const canAdd=!!product&&!loading&&valid&&(!tricolor||tricolor.kind==="fixed"||!!color)&&inCart+qty<=100;
- const add=()=>{if(!canAdd)return;const prev=cartCount(lines);cart.add(productId,qty,spec?composition:undefined,color||undefined); // Order identity and pricing remain server authoritative.
-  if(cartCount((JSON.parse(localStorage.getItem("3l-cart")||"[]")) as typeof lines)>prev)onAdded();
+ const canAdd=!!config?.enabled&&!!product&&!loading&&valid&&(!tricolor||tricolor.kind==="fixed"||!!color)&&inCart+qty<=MAX_QTY;
+ const add=()=>{if(!canAdd)return;cart.add(productId,qty,spec?composition:undefined,color||undefined);
+  // Existing domain validation already enforced; UI completion is storage-independent.
+  onAdded();
  };
  const choose=(id:string,delta:number)=>setComposition(old=>{const units=Math.max(0,Math.min(cap, (old.find(x=>x.componentSkuId===id)?.units||0)+delta));const other=old.filter(x=>x.componentSkuId!==id);return units?[...other,{componentSkuId:id,units}]:other;});
  return <div className="v32-buy-form" data-new-ui="add-to-cart">
   {tricolor?.kind==="single"&&<label>{t.selection}<select value={color||""} onChange={e=>setColor(e.target.value as TricolorColor)}><option value="">{t.choose}</option>{TRICOLOR_COLORS.map(c=><option key={c} value={c}>{tricolorCopy[language][c]}</option>)}</select></label>}
   {spec&&<div className="v32-new-pack"><p>{t.boxes} · {t.pieces}: {picked}/{cap}</p>{allowedPack?spec.components.map(c=><div key={c.componentSkuId}><span>{componentName(c.componentSkuId,language)}</span><button type="button" aria-label="Decrease selection" onClick={()=>choose(c.componentSkuId,-1)}>−</button><span>{composition.find(x=>x.componentSkuId===c.componentSkuId)?.units||0}</span><button type="button" aria-label="Increase selection" disabled={picked>=cap} onClick={()=>choose(c.componentSkuId,1)}>+</button></div>):<p role="alert">{t.notReady}</p>}</div>}
-  <div className="v32-buy-row"><div className="v32-buy-price"><span>{t.price}</span><strong>{product?money(product.priceFils):t.notReady}</strong></div><div className="v32-buy-qty" role="group" aria-label={t.quantity}><button type="button" aria-label="Decrease quantity" disabled={qty<=minQty(productId)} onClick={()=>setQty(n=>Math.max(minQty(productId),n-1))}>−</button><output>{qty}</output><button type="button" aria-label="Increase quantity" disabled={qty+inCart>=100} onClick={()=>setQty(n=>n+1)}>+</button></div></div>
+  <div className="v32-buy-row"><div className="v32-buy-price"><span>{t.price}</span><strong>{product?money(product.priceFils):t.notReady}</strong></div><div className="v32-buy-qty" role="group" aria-label={t.quantity}><button type="button" aria-label="Decrease quantity" disabled={qty<=minQty(productId)} onClick={()=>setQty(n=>Math.max(minQty(productId),n-1))}>−</button><output>{qty}</output><button type="button" aria-label="Increase quantity" disabled={qty+inCart>=MAX_QTY} onClick={()=>setQty(n=>n+1)}>+</button></div></div>
   <button className="v32-buy-cta" type="button" disabled={!canAdd} onClick={add}>{t.add} · {product?money(displayLinePrice({productId,quantity:qty,...(spec?{composition}:{})},product.priceFils,config?.packPricing)*qty):"—"}</button>
   {!valid&&<small role="alert">{t.invalid}</small>}
  </div>;
