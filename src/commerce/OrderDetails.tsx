@@ -465,6 +465,7 @@ export function OrderItemsCard({ order: o, data }: CardProps) {
                   </span>
                   <small className="oms-ref">{l.productId}</small>
                   {preparationText(l) && <p lang="en">{preparationText(l)}</p>}
+                  {l.cakeMessage && <p lang="en" data-cake-inscription><strong>Cake inscription:</strong> {l.cakeMessage}</p>}
                   {l.product.reviewRequired && (
                     <small className="oms-item-review">
                       <Translate aria-hidden />
