@@ -32,3 +32,14 @@ Compared actual source `src/components/ProductPopup.jsx`, `src/refidelity-v2.css
 - Original selected product personalisation free-text input is a MOCK behavior not supported by 3L's current cart/checkout data model; do not fake customer notes or accept unsupported order instructions.
 - Original ZIP contains temporary reference-derived visual crops and synthetic conceptual artwork. The source explicitly prohibits using these as real production catalog photography. They are not yet carried into the deployable public asset bundle. Exact photo fidelity therefore still NO-GO, independently of markup fidelity.
 - Founder retains final visual decision. Never claim this branch is Production ready.
+
+### Source geometry fidelity
+- `src/components/ProductPopup.jsx` original selects a desktop anchor
+  width = `min(448, vw-24)`, height = `min(610, vh-50)` and mobile compact
+  top = `max(12,min(54,round((vh-540)/2)))`. The integrated preview restores
+  these parameters, keeping actual product triggers and real SKU pricing.
+- `src/components/Layout.jsx` original backdrop `#F8E3DE` /
+  `#FBEFEA` and glass header are now scoped to `.v32-app`.
+- The original source includes a mock `Personalization` note that is not a
+  real cart field. The exact source visual does not grant authority to store or
+  silently drop that note. Preserved as explicit functional acceptance gap.

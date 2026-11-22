@@ -497,3 +497,24 @@
   .v32-family-fallback img:first-child{height:230px}
   .v32-family-fallback img:nth-child(2){height:190px}
 }
+
+/* Original source's base glass-pink background (isolated preview only).
+ * Follow `bg-gradient-to-br from-[#F8E3DE] via-[#FBEFEA] to-[#F8E3DE]`
+ * from src/components/Layout.jsx in the uploaded ZIP, without changing
+ * the live public brand/operations palette. */
+.v32-app{
+  background:
+    radial-gradient(ellipse at 50% 26%,rgba(255,255,255,.72),transparent 40%),
+    linear-gradient(135deg,#F8E3DE 0%,#FBEFEA 52%,#F8E3DE 100%)!important
+}
+.v32-nav{
+  border-color:rgba(255,255,255,.88);
+  background:rgba(255,255,255,.42);
+  box-shadow:0 12px 30px rgba(147,81,82,.17),inset 0 1px 0 #fff;
+}
+.v32-scrim{background:rgba(89,46,47,.20);backdrop-filter:blur(6px)}
+.v32-popup{
+  border:2px solid #fff;
+  background:linear-gradient(140deg,#ffeae5ed,#f3c5c0f2 85%,#ffebe6f0)!important;
+  box-shadow:0 16px 60px #925a5a75,inset 0 2px 1px #fff
+}

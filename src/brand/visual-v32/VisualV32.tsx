@@ -245,7 +245,7 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
   useLayoutEffect(()=>{
     const recalc=()=>{
       const w=window.innerWidth,h=Math.round(window.visualViewport?.height??window.innerHeight);
-      const r=anchor?.getBoundingClientRect(),pw=Math.min(490,w-24),ph=Math.min(650,h-24);
+      const r=anchor?.getBoundingClientRect(),pw=Math.min(448,w-24),ph=Math.min(610,h-50);
       if(w<=640||!r){
         const compact=h<=720;
         const top=compact?Math.max(12,Math.min(54,Math.round((h-540)/2))):
