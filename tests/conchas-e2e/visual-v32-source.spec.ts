@@ -114,17 +114,74 @@ test("real purchase: Orejas selected box SKU and amount reach canonical cart",as
   return items.some(x=>x.productId==="orejas-12-individuales-100-g-cada-uno"&&x.quantity===1);
  })).toBe(true);
 });
-test("note safety: 40 character maximum and no silently lost kitchen instructions",async ({page})=>{
+test("Founder 8.7: cakes use Mini/Small/Medium with 15/20/30 characters and servings in description",async ({page},info)=>{
+ await page.setViewportSize({width:1440,height:900});
  await page.goto("/visual-v32/bakery?category=cakes&lang=es");
- await page.locator('[data-product-id="tres-leches--classic"]').click();
- const popup=page.getByRole("dialog"),note=popup.locator(".ref32-note input");
- await note.fill("Feliz cumpleaños ".repeat(5));
- await expect(note).toHaveValue("Feliz cumpleaños ".repeat(5).slice(0,40));
- await expect(popup.locator(".ref32-note-field output")).toHaveText("40/40");
- await expect(popup.locator(".ref32-buy")).toBeDisabled();
- await expect(popup.locator(".ref32-note-warning")).toBeVisible();
- await note.fill("");
+ const card=page.locator('[data-product-id="tres-leches--classic"]');
+ await card.click();
+ const popup=page.getByRole("dialog");
+ const options=popup.locator(".ref32-options .ref32-option");
+ await expect(options).toHaveCount(3);
+ await expect(options.nth(0)).toContainText("Mini");
+ await expect(options.nth(1)).toContainText("Small");
+ await expect(options.nth(2)).toContainText("Medium");
+ await expect(popup.locator("[data-cake-serves]")).toHaveText("Para 1–3 personas");
+ await expect(popup.locator("[data-cake-message-count]")).toHaveText("0/15");
+ await options.nth(1).click();
+ await expect(popup.locator("[data-cake-serves]")).toHaveText("Para 6–8 personas");
+ await expect(popup.locator("[data-cake-message-count]")).toHaveText("0/20");
+ await options.nth(2).click();
+ await expect(popup.locator("[data-cake-serves]")).toHaveText("Para 14–16 personas");
+ await expect(popup.locator("[data-cake-message-count]")).toHaveText("0/30");
+ const text=popup.locator(".ref32-note input");
+ await text.fill("Feliz cumple 3L");
  await expect(popup.locator(".ref32-buy")).toBeEnabled();
+ if(info.project.name==="chromium"){
+  mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+  await page.screenshot({path:"docs/brand/brand02/conchas/v32-source-cake-Mini-Small-Medium-1440.png",animations:"disabled"});
+ }
+ await options.nth(0).click();
+ await expect(text).toHaveValue("Feliz cumple 3L");
+ await expect(popup.locator("[data-cake-message-count]")).toHaveText("15/15");
+ await expect(popup.locator(".ref32-buy")).toBeEnabled();
+ await options.nth(2).click();
+ await text.fill("Feliz cumpleaños y mucho amor");
+ await expect(popup.locator("[data-cake-message-count]")).toHaveText("29/30");
+ await options.nth(0).click();
+ await expect(popup.locator("[data-cake-message-count]")).toHaveText("29/15");
+ await expect(popup.locator(".ref32-note-warning")).toBeVisible();
+ await expect(popup.locator(".ref32-buy")).toBeDisabled();
+ await text.fill("Feliz cumple");
+ await expect(popup.locator(".ref32-buy")).toBeEnabled();
+ await popup.locator(".ref32-buy").click();
+ await expect(popup).toHaveCount(0);
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem("3l-cart")||"[]"));
+ expect(saved.some((l:{productId:string;cakeMessage?:string})=>l.productId==="tres-leches-classic-13-personas"&&l.cakeMessage==="Feliz cumple")).toBe(true);
+ await page.goto("/visual-v32/cart?lang=es");
+ await expect(page.locator("[data-cart-cake-message]")).toContainText("Feliz cumple");
+});
+test("Founder 8.7: no inscription field for Bakery, Conchas or Orejas",async ({page})=>{
+ await page.goto("/visual-v32/bakery?category=bakery&lang=es");
+ await page.locator('[data-product-id="orejas"]').click();
+ await expect(page.getByRole("dialog").locator(".ref32-note")).toHaveCount(0);
+ await page.keyboard.press("Escape");
+ await page.goto("/visual-v32/bakery?category=mexican&lang=es");
+ await page.locator('[data-product-id="conchas-traditional-pack"]').click();
+ await expect(page.getByRole("dialog").locator(".ref32-note")).toHaveCount(0);
+});
+test("Founder 8.7: Special Flavours Big displays Medium, with no invented serving range",async ({page})=>{
+ await page.goto("/visual-v32/bakery?category=cakes&lang=en");
+ const card=page.locator('[data-product-id="special-flavours-cake--berries"]');
+ await expect(card).toBeEnabled();
+ await card.click();
+ const popup=page.getByRole("dialog"),buttons=popup.locator(".ref32-option");
+ await expect(buttons).toHaveCount(3);
+ await expect(buttons.nth(0)).toContainText("Mini");
+ await expect(buttons.nth(1)).toContainText("Small");
+ await expect(buttons.nth(2)).toContainText("Medium");
+ await expect(popup.locator("[data-cake-serves]")).toHaveCount(0);
+ await buttons.nth(2).click();
+ await expect(popup.locator("[data-cake-message-count]")).toHaveText("0/30");
 });
 test("authoritative checkout disabled remains fail-closed",async ({page})=>{
  await page.route("**/api/checkout/config",route=>route.fulfill({status:503,contentType:"application/json",body:"{}"}));
