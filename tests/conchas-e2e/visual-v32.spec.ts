@@ -300,3 +300,31 @@ test("V3.2 short-screen product selector keeps checkout action visible",async ({
     await expect(dialog).toHaveCount(0);
   }
 });
+
+test("ZIP V3.2 layout: visible price opposite quantity with primary CTA below",async ({page})=>{
+  await page.setViewportSize({width:1440,height:900});
+  await page.goto("/visual-v32/bakery?category=mexican&lang=en");
+  const product=page.locator(".v32-product:not([disabled])").first();
+  await product.click();
+  const popup=page.getByRole("dialog");
+  const price=popup.locator(".v32-popup-footer .v32-popup-unit").first();
+  const qty=popup.locator(".v32-popup-footer .b-qty").first();
+  const cta=popup.locator(".v32-popup-footer .b-add-to-cart>button").first();
+  await expect(price).toBeVisible();
+  await expect(qty).toBeVisible();
+  await expect(cta).toBeVisible();
+  const a=await price.boundingBox(), b=await qty.boundingBox(),c=await cta.boundingBox();
+  expect(a).not.toBeNull();expect(b).not.toBeNull();expect(c).not.toBeNull();
+  expect(Math.abs(a!.y+a!.height/2-(b!.y+b!.height/2))).toBeLessThan(32);
+  expect(c!.y).toBeGreaterThanOrEqual(Math.max(a!.y+a!.height,b!.y+b!.height)-2);
+  expect(await popup.evaluate(el=>getComputedStyle(el).fontFamily)).toContain("Jost");
+});
+test("ZIP V3.2 mobile navigation does not overflow at 320, 375 or 390",async ({page})=>{
+  for(const width of [320,375,390]){
+    await page.setViewportSize({width,height:667});
+    await page.goto("/visual-v32?lang=en");
+    await expect(page.locator(".v32-nav")).toBeVisible();
+    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth))
+      .toBe(true);
+  }
+});

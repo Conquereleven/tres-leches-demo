@@ -271,14 +271,15 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
             <span>{o.size}</span><small>{formatAed(o.priceFils)}</small>
           </button>)}
         </div>
-        {chosen&&<div className="v32-popup-unit">
-          <p className="v32-section-caption">{t.price}</p>
-          <strong className="b-menu-price">{formatAed(chosen.priceFils)}</strong>
-          {minQty(chosen.id)>1&&<p className="v32-minimum" data-minimum-notice>{t.minimum(minQty(chosen.id))}</p>}
-        </div>}
+        {chosen&&minQty(chosen.id)>1&&
+          <p className="v32-minimum" data-minimum-notice>{t.minimum(minQty(chosen.id))}</p>}
         {!chosen&&!loading&&<p role="status">{t.orderingUnavailable}</p>}
       </div>
       <div className="v32-popup-footer b-menu-options">
+        {chosen&&<div className="v32-popup-unit">
+          <p className="v32-section-caption">{t.price}</p>
+          <strong className="b-menu-price">{formatAed(chosen.priceFils)}</strong>
+        </div>}
         {chosen?<AddToCart key={chosen.id} productId={chosen.id}
           onAdded={onAdded}
           fallback={<p role="status">{t.variantUnavailable}</p>}/>:

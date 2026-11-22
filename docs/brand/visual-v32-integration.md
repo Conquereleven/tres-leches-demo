@@ -22,3 +22,13 @@ Founder approved V3.2 visually on 2026-11-22 at 390×844, 375×667 and 320×568,
 
 ## Status
 EXECUTED remote branch/commits; end-to-end CI and screenshot verification pending.
+
+## Source ZIP fidelity pass (2026-11-22)
+Founder uploaded `3L_VisualLab_V3_2_2026-11-22(1).zip`, SHA source to record in evidence separately.
+Compared actual source `src/components/ProductPopup.jsx`, `src/refidelity-v2.css`,
+`src/components/Layout.jsx`, Home/Menu/Bakery sources and preview asset PROVENANCE.md.
+- Source typography: Cormorant Garamond headings, Jost body; original CSS uses Google Fonts. This isolated preview now imports the same font definitions under existing allowed CSP (network availability affects actual load).
+- Source popup: price and quantity on the same row, CTA below, preserved independent scroll area with responsive height and visible CTA; use real cart engine and server-authoritative pricing instead of original mock prices.
+- Original selected product personalisation free-text input is a MOCK behavior not supported by 3L's current cart/checkout data model; do not fake customer notes or accept unsupported order instructions.
+- Original ZIP contains temporary reference-derived visual crops and synthetic conceptual artwork. The source explicitly prohibits using these as real production catalog photography. They are not yet carried into the deployable public asset bundle. Exact photo fidelity therefore still NO-GO, independently of markup fidelity.
+- Founder retains final visual decision. Never claim this branch is Production ready.

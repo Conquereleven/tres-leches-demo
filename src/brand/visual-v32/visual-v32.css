@@ -1,3 +1,7 @@
+/* Visual Lab V3.2 approved source uses Cormorant Garamond + Jost.
+ * Google Fonts access is allowed by the existing CSP; no third-party
+ * commerce requests, API data, or credentials are involved. */
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@400;500;600&display=swap");
 /* Approved 3L Visual Lab V3.2 composition: isolated preview path only. */
 .v32-app,.v32-overlay{--ink:#1c1517;--gold:#a28d5b;--rose:#a93c68;font-family:3L Montserrat,Arial,sans-serif;color:var(--ink)}
 .v32-app{min-height:100vh;isolation:isolate;padding:1px 0;background:radial-gradient(ellipse at 50% 9%,#fff9f7 0%,transparent 44%),linear-gradient(130deg,#f5ccc7,#f9e7e2 45%,#f1c4c3);position:relative}
@@ -339,4 +343,112 @@
   .v32-popup .v32-popup-footer.b-menu-options{padding:8px 15px 12px!important}
   .v32-popup .v32-popup-footer .b-add-to-cart{gap:8px}
   .v32-popup .v32-minimum{margin-top:10px}
+}
+
+/* Source-fidelity pass 22-Nov-2026: original ZIP inspected.
+ * Reuse original visual hierarchy; keep original live catalog and payment
+ * rules, no demo values. Assets are NOT approved for production.
+ */
+.v32-app,.v32-overlay{font-family:"Jost","3L Montserrat",Arial,sans-serif}
+.v32-app h1,.v32-app h2,.v32-app strong,
+.v32-overlay h1,.v32-overlay h2,
+.v32-app .v32-product-copy strong,
+.v32-popup .v32-popup-unit strong{
+  font-family:"Cormorant Garamond",Georgia,serif!important
+}
+.v32-app .v32-home h1,.v32-app .v32-landing h1,.v32-app .v32-catalog h1{
+  font-family:"Cormorant Garamond",Georgia,serif!important;font-weight:500!important;
+  letter-spacing:-.038em;line-height:.96;
+}
+.v32-app .v32-nav-left,.v32-app .v32-nav-right,
+.v32-app .v32-nav-left>a,.v32-app .v32-nav-right>a{
+  font-family:"Jost","3L Montserrat",Arial,sans-serif;
+  font-size:12px;line-height:1.25;
+  letter-spacing:.17em;text-transform:none;
+}
+.v32-app .v32-nav-right .v32-language-control select{font-family:"Jost",Arial,sans-serif}
+.v32-app .v32-logo strong{font-family:"Cormorant Garamond",Georgia,serif!important;font-size:30px;font-weight:600!important}
+.v32-app .v32-legacy h2{font-family:"Cormorant Garamond",Georgia,serif!important;font-weight:500!important;line-height:.99}
+.v32-app .v32-legacy p,.v32-app .v32-legacy a{font-family:"Jost",Arial,sans-serif}
+.v32-app .v32-landing-fidelity .v32-tile strong{
+  font:italic 400 clamp(64px,5.7vw,91px)/.96 "Cormorant Garamond",Georgia,serif!important
+}
+.v32-app .v32-landing-fidelity .v32-tile em{font:italic 21px/1.3 "Cormorant Garamond",Georgia,serif!important}
+.v32-app .v32-product-copy strong{font-size:clamp(20px,1.65vw,26px);font-weight:500!important}
+.v32-app .v32-search input{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic}
+.v32-app .v32-commerce-shell .b-shop-main>h1,
+.v32-app .v32-commerce-shell .b-policy-hero h1,
+.v32-app .v32-commerce-shell .b-co-status h1,
+.v32-app .v32-commerce-shell .b-co-confirm-hero h1,
+.v32-app .v32-commerce-shell .b-policy-body article>section h2{
+  font-family:"Cormorant Garamond",Georgia,serif!important;font-weight:500!important
+}
+/* Source V3.2: price and quantity share a row, CTA stays below as permanent footer. */
+.v32-popup .v32-popup-footer.b-menu-options{
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"price quantity" "cta cta";
+  gap:12px 14px;align-items:end;
+  padding:12px 22px 18px!important;background:linear-gradient(180deg,#f9dfd9f0,#f1c8c1f8)!important
+}
+.v32-popup .v32-popup-footer .v32-popup-unit{
+  grid-area:price;display:flex;flex-direction:column;align-self:end;
+  gap:5px;margin:0;min-width:0
+}
+.v32-popup .v32-popup-footer .v32-popup-unit strong{
+  font:600 33px/1 "Cormorant Garamond",Georgia,serif!important
+}
+.v32-popup .v32-popup-footer .b-add-to-cart{display:contents!important}
+.v32-popup .v32-popup-footer .b-add-to-cart>.b-qty{
+  grid-area:quantity;align-self:end;margin:0;display:flex;align-items:center
+}
+.v32-popup .v32-popup-footer .b-add-to-cart>button{
+  grid-area:cta;align-self:stretch;font-family:"Jost","3L Montserrat",Arial,sans-serif;
+  min-height:48px;letter-spacing:.065em;text-transform:uppercase
+}
+.v32-popup .v32-popup-footer .b-add-to-cart>.b-menu-advance{display:none!important}
+/* Special commercial products retain their mandatory real selectors/builders.
+ * Never hide an input required to construct a valid live order. */
+.v32-popup .v32-popup-footer:has(.b-menu-selectors) .b-add-to-cart,
+.v32-popup .v32-popup-footer:has(.b-pack-builder) .b-add-to-cart,
+.v32-popup .v32-popup-footer:has(.b-box-label) .b-add-to-cart{
+  display:flex!important;grid-column:1/-1;flex-direction:column;gap:12px
+}
+.v32-popup .v32-popup-footer:has(.b-menu-selectors) .b-add-to-cart>button,
+.v32-popup .v32-popup-footer:has(.b-pack-builder) .b-add-to-cart>button,
+.v32-popup .v32-popup-footer:has(.b-box-label) .b-add-to-cart>button{width:100%}
+.v32-popup .v32-popup-footer:has(.b-menu-selectors) .v32-popup-unit,
+.v32-popup .v32-popup-footer:has(.b-pack-builder) .v32-popup-unit,
+.v32-popup .v32-popup-footer:has(.b-box-label) .v32-popup-unit{grid-column:1/-1}
+.v32-popup .v32-popup-heading h2{
+  font:500 clamp(29px,3vw,38px)/1.02 "Cormorant Garamond",Georgia,serif!important
+}
+.v32-popup .v32-popup-heading p{font:italic 16px/1.3 "Cormorant Garamond",Georgia,serif}
+.v32-popup .v32-variants span{font:500 12px/1.2 "Jost",Arial,sans-serif}
+.v32-popup .v32-variants small{font:400 11px/1.1 "Jost",Arial,sans-serif}
+.v32-popup .v32-minimum{font:500 12px/1.5 "Jost",Arial,sans-serif}
+@media(max-width:640px){
+  .v32-nav{min-width:0}
+  .v32-nav>.v32-logo{min-width:0;white-space:normal}
+  .v32-logo strong{font-size:22px!important;white-space:nowrap}
+  .v32-nav-right{gap:6px}
+  .v32-nav-right>a[href$="/cart"]{
+    display:inline-flex!important;align-items:center;justify-content:center;
+    width:39px;height:39px;min-width:39px;overflow:visible;
+    font-size:0!important;letter-spacing:0
+  }
+  .v32-nav-right>a[href$="/cart"]::before{
+    content:"🛍";font-size:17px;line-height:1
+  }
+  .v32-nav-right>a[href$="/cart"] span{
+    font:500 10px/1 "Jost",Arial,sans-serif;position:absolute;
+    align-self:flex-end;margin:0 0 -1px 27px;min-width:14px;text-align:center
+  }
+  .v32-popup .v32-popup-footer.b-menu-options{padding:9px 15px 12px!important;gap:9px 10px}
+}
+@media(max-width:360px){
+  .v32-nav{padding:7px 9px;gap:4px}
+  .v32-logo strong{font-size:19px!important}
+  .v32-logo small{font-size:6px}
+  .v32-nav-right .v32-language-control,
+  .v32-nav-right .v32-language-control select{min-width:52px}
 }
