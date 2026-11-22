@@ -10,7 +10,7 @@ test("3L publishes real half-dozen/dozen SKUs at both mini and individual sizes"
  const pack=packChoices(family.options);
  assert.ok(pack);
  assert.deepEqual(pack.quantities,[6,12]);
- assert.deepEqual(pack.presentations,["individual","mini"]); // authored price-desc sorting may differ; order is not a price authority
+ assert.deepEqual(pack.presentations,["mini","individual"]); // order is sourced from the canonical menu option data
  const six=pack.choices.find(c=>c.pieces===6&&c.presentation==="mini");
  const twelve=pack.choices.find(c=>c.pieces===12&&c.presentation==="mini");
  assert.equal(six?.option.id,"pan-de-muerto-traditional-pack-6-mini");
