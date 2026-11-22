@@ -117,7 +117,7 @@ for (const viewport of [{width:1440,height:900},{width:390,height:844}]) {
       const menuToggle=page.getByRole("button",{name:"Open navigation"});
       await expect(menuToggle).toBeVisible();
       await menuToggle.click();
-      await expect(page.getByRole("button",{name:"Close navigation"})).toHaveAttribute("aria-expanded","true");
+      await expect(page.getByRole("button",{name:"Close navigation",exact:true})).toHaveAttribute("aria-expanded","true");
       await page.locator('.v32-mobile-drawer a[href="/visual-v32/menu"]').click();
     } else {
       await page.goto("/visual-v32/menu?lang=en");
@@ -267,14 +267,14 @@ test("V3.2 add-to-cart commits canonical item and closes without legacy suggesti
   await open.click();
   const dialog=page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  const oldCount=await page.locator(".v32-nav-right a[href='/visual-v32/cart'] span").innerText();
+  const oldCount=await page.locator(".v32-nav-right a[href='/visual-v32/cart'] span[aria-live='polite']").innerText();
   const add=dialog.locator(".v32-buy-cta").first();
   await expect(add).toBeEnabled();
   await add.click();
   await expect(dialog).toHaveCount(0);
   await expect(open).toBeFocused();
   await expect(page.locator(".v32-cart-status")).toContainText("Added to cart");
-  await expect.poll(async()=>Number(await page.locator(".v32-nav-right a[href='/visual-v32/cart'] span").innerText()))
+  await expect.poll(async()=>Number(await page.locator(".v32-nav-right a[href='/visual-v32/cart'] span[aria-live='polite']").innerText()))
     .toBeGreaterThan(Number(oldCount));
   await expect(page.getByText("Anything else for your order?")).toHaveCount(0);
   await expect(page.getByText("Continue shopping")).toHaveCount(0);
@@ -307,6 +307,8 @@ test("ZIP V3.2 layout: visible price opposite quantity with primary CTA below",a
   const product=page.locator(".v32-product:not([disabled])").first();
   await product.click();
   const popup=page.getByRole("dialog");
+  // The approved popover animates on entrance. Measure final geometry only.
+  await expect.poll(()=>popup.evaluate(element=>element.getAnimations().filter(a=>a.playState==="running").length)).toBe(0);
   const price=popup.locator(".v32-buy-form .v32-buy-price").first();
   const qty=popup.locator(".v32-popup-footer .v32-buy-qty").first();
   const cta=popup.locator(".v32-popup-footer .v32-buy-cta").first();

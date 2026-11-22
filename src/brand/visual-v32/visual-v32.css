@@ -563,3 +563,7 @@
   .v32-app:before,.v32-blossom,.v32-overlay .v32-popup,.v32-overlay .v32-scrim,
   .v32-mobile-backdrop,.v32-mobile-portal .v32-mobile-sheet{animation:none!important;transition:none!important}
 }
+
+/* ZIP header exact lightweight shopping-bag line art, no legacy icon. */
+.v32-cart-glyph{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
+.v32-cart-glyph svg{width:16px;height:16px;display:block}

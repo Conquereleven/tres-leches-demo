@@ -140,7 +140,7 @@ function Header(){
               <option value="en">🇬🇧 EN</option><option value="es">🇲🇽 ES</option><option value="ar">🇦🇪 AR</option>
             </select>
           </label>
-          <a href={origin+"/cart"}><span className="v32-cart-glyph" aria-hidden="true">♧</span>{labels.cart} (<span aria-live="polite">{count}</span>)</a>
+          <a href={origin+"/cart"}><span className="v32-cart-glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 8.5h15l-1 12h-13z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg></span>{labels.cart} (<span aria-live="polite">{count}</span>)</a>
         </span>
       </nav>
     </header>
