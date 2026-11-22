@@ -1,4 +1,5 @@
 import { acceptedLinePrice } from "../../shared/pack-pricing";
+import { validCakeMessage } from "../../shared/cake-personalization";
 import {
   distinctLines,
   validPackSnapshot,
@@ -18,7 +19,8 @@ export function frozenCheckout(order: Order, payment: Payment) {
       order.lines.length > 0 &&
       order.catalogSnapshot &&
       distinctLines(order.lines) &&
-      order.lines.every(validPackSnapshot),
+      order.lines.every(validPackSnapshot) &&
+      order.lines.every(l => !l.cakeMessage || validCakeMessage(l.productId, l.cakeMessage)),
     held,
     409,
   );
@@ -43,6 +45,7 @@ export function frozenCheckout(order: Order, payment: Payment) {
     return {
       sku: product.id,
       ...(line.color ? { color: line.color } : {}),
+      ...(line.cakeMessage ? { cakeMessage: line.cakeMessage } : {}),
       ...(line.packSnapshot ? { packSnapshot: line.packSnapshot } : {}),
       ...(line.composition
         ? { composition: line.composition, packSnapshot: line.packSnapshot }

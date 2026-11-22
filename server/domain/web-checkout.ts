@@ -390,6 +390,7 @@ export function canonicalCartHash(
       return {
         sku: line.productId,
         ...(line.color ? { color: line.color } : {}),
+        ...(line.cakeMessage ? { cakeMessage: line.cakeMessage } : {}),
         ...(line.composition ? { composition: line.composition } : {}),
         quantity: line.quantity,
         unitPriceFils: liveLinePrice(line, catalog),
@@ -399,11 +400,13 @@ export function canonicalCartHash(
       lineKey({
         productId: a.sku,
         color: a.color,
+          cakeMessage: "cakeMessage" in a ? a.cakeMessage : undefined,
         composition: "composition" in a ? a.composition : undefined,
       }).localeCompare(
         lineKey({
           productId: b.sku,
           color: b.color,
+          cakeMessage: "cakeMessage" in b ? b.cakeMessage : undefined,
           composition: "composition" in b ? b.composition : undefined,
         }),
       ),
@@ -460,6 +463,7 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
               .map((i) => ({
                 sku: i.sku,
                 ...(i.color ? { color: i.color } : {}),
+                ...(i.cakeMessage ? { cakeMessage: i.cakeMessage } : {}),
                 ...(i.composition ? { composition: i.composition } : {}),
                 quantity: i.quantity,
                 unitPriceFils: i.unitPriceFils,
@@ -468,11 +472,13 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
                 lineKey({
                   productId: a.sku,
                   color: a.color,
+          cakeMessage: "cakeMessage" in a ? a.cakeMessage : undefined,
                   composition: "composition" in a ? a.composition : undefined,
                 }).localeCompare(
                   lineKey({
                     productId: b.sku,
                     color: b.color,
+          cakeMessage: "cakeMessage" in b ? b.cakeMessage : undefined,
                     composition: "composition" in b ? b.composition : undefined,
                   }),
                 ),
@@ -842,6 +848,7 @@ export type WebCheckoutSummary = {
     color?: Order["lines"][number]["color"];
     composition?: Order["lines"][number]["composition"];
     packSnapshot?: Order["lines"][number]["packSnapshot"];
+    cakeMessage?: string;
     name: string;
     quantity: number;
     lineFils: number;
@@ -949,6 +956,7 @@ export function readWebCheckoutStatus(
           items: frozen.items.map((i) => ({
             productId: i.sku,
             ...(i.color ? { color: i.color } : {}),
+            ...(i.cakeMessage ? { cakeMessage: i.cakeMessage } : {}),
             ...(i.packSnapshot ? { packSnapshot: i.packSnapshot } : {}),
             ...(i.composition
               ? { composition: i.composition, packSnapshot: i.packSnapshot }

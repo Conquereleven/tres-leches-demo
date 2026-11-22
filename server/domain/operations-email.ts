@@ -83,6 +83,7 @@ export function recordPaidOperationsEmail(
     return {
       sku: line.productId,
       name,
+      ...(line.cakeMessage ? { cakeMessage: line.cakeMessage } : {}),
       quantity: line.quantity,
       priceFils: p
         ? (acceptedLinePrice(line, p.priceFils) ?? undefined)

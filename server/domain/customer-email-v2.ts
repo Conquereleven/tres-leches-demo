@@ -53,6 +53,7 @@ type Line = {
   components: { name: string; units: number }[];
   boxCapacity?: number;
   contentsUnavailable: boolean;
+  cakeMessage?: string;
 };
 
 /** Accepted items with reviewed English names; never the current catalog. */
@@ -92,6 +93,7 @@ function lines(s: State, order: Order): Line[] {
         ? { boxCapacity: item.boxCapacity }
         : {}),
       contentsUnavailable: item.contentsUnavailable,
+      ...(item.cakeMessage ? { cakeMessage: item.cakeMessage } : {}),
     };
   });
 }
@@ -186,6 +188,7 @@ export function renderCustomerEmailV2(
     text.push(
       `- ${l.quantity ?? "Quantity unavailable"} × ${l.name}${l.lineTotalFils !== undefined && reconciles ? ` · ${money(l.lineTotalFils)}` : ""}`,
     );
+    if (l.cakeMessage) text.push(`  Cake inscription: ${l.cakeMessage}`);
     if (l.boxCapacity !== undefined) {
       text.push(
         `  Each box (${l.boxCapacity} pieces):`,
@@ -220,7 +223,8 @@ export function renderCustomerEmailV2(
             : l.components.length === 1
               ? `<p style="margin:3px 0 0;">Selection: ${escapeHtml(l.components[0]!.name)}</p>`
               : "";
-      return `<tr><th scope="row" style="text-align:left;vertical-align:top;padding:9px;font-weight:normal;border-bottom:1px solid #dbcbb3;overflow-wrap:anywhere;"><span style="font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:1.2;">${escapeHtml(l.name)}</span><div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#5A565F;">${contents}</div></th><td style="vertical-align:top;text-align:center;padding:10px 2px;font-size:17px;border-bottom:1px solid #dbcbb3;">${l.quantity ?? "–"}</td><td style="vertical-align:top;text-align:right;padding:10px 9px;font-size:16px;white-space:nowrap;border-bottom:1px solid #dbcbb3;">${reconciles && l.lineTotalFils !== undefined ? money(l.lineTotalFils) : "&nbsp;"}</td></tr>`;
+      const inscription = l.cakeMessage ? `<p data-cake-inscription style="margin:5px 0 0;font-weight:bold;">Cake inscription: ${escapeHtml(l.cakeMessage)}</p>` : "";
+      return `<tr><th scope="row" style="text-align:left;vertical-align:top;padding:9px;font-weight:normal;border-bottom:1px solid #dbcbb3;overflow-wrap:anywhere;"><span style="font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:1.2;">${escapeHtml(l.name)}</span><div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#5A565F;">${contents}${inscription}</div></th><td style="vertical-align:top;text-align:center;padding:10px 2px;font-size:17px;border-bottom:1px solid #dbcbb3;">${l.quantity ?? "–"}</td><td style="vertical-align:top;text-align:right;padding:10px 9px;font-size:16px;white-space:nowrap;border-bottom:1px solid #dbcbb3;">${reconciles && l.lineTotalFils !== undefined ? money(l.lineTotalFils) : "&nbsp;"}</td></tr>`;
     })
     .join("");
   const totals = [
