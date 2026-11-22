@@ -301,25 +301,49 @@ test("V3.2 short-screen product selector keeps checkout action visible",async ({
   }
 });
 
-test("ZIP V3.2 layout: visible price opposite quantity with primary CTA below",async ({page})=>{
-  await page.setViewportSize({width:1440,height:900});
-  await page.goto("/visual-v32/bakery?category=mexican&lang=en");
-  const product=page.locator(".v32-product:not([disabled])").first();
-  await product.click();
-  const popup=page.getByRole("dialog");
-  // The approved popover animates on entrance. Measure final geometry only.
-  await expect.poll(()=>popup.evaluate(element=>element.getAnimations().filter(a=>a.playState==="running").length)).toBe(0);
-  const price=popup.locator(".v32-popup-scroll .v32-buy-price").first();
-  const qty=popup.locator(".v32-popup-footer .v32-buy-qty").first();
-  const cta=popup.locator(".v32-popup-footer .v32-buy-cta").first();
-  await expect(price).toBeVisible();
-  await expect(qty).toBeVisible();
-  await expect(cta).toBeVisible();
-  const a=await price.boundingBox(), b=await qty.boundingBox(),c=await cta.boundingBox();
-  expect(a).not.toBeNull();expect(b).not.toBeNull();expect(c).not.toBeNull();
-  expect(Math.abs(a!.y+a!.height/2-(b!.y+b!.height/2))).toBeLessThan(32);
-  expect(c!.y).toBeGreaterThanOrEqual(Math.max(a!.y+a!.height,b!.y+b!.height)-2);
-  expect(await popup.evaluate(el=>getComputedStyle(el).fontFamily)).toContain("Jost");
+
+test("REF_C desktop layout: quantity and CTA share horizontal anchored footer",async ({page},info)=>{
+ await page.setViewportSize({width:1440,height:900});
+ await page.goto("/visual-v32/bakery?category=mexican&lang=en");
+ await page.locator(".v32-product:not([disabled])").first().click();
+ const popup=page.getByRole("dialog");
+ await expect.poll(()=>popup.evaluate(e=>e.getAnimations().filter(a=>a.playState==="running").length)).toBe(0);
+ const desktopQty=popup.locator(".v32-desktop-qty-target .v32-buy-qty");
+ const cta=popup.locator(".v32-popup-footer .v32-buy-cta");
+ await expect(desktopQty).toBeVisible();
+ await expect(cta).toBeVisible();
+ await expect(popup.locator(".v32-popup-scroll .v32-buy-row")).toBeHidden();
+ const a=await desktopQty.boundingBox(),b=await cta.boundingBox();
+ expect(a).not.toBeNull();expect(b).not.toBeNull();
+ expect(Math.abs(a!.y+a!.height/2-(b!.y+b!.height/2))).toBeLessThan(20);
+ expect(b!.x).toBeGreaterThan(a!.x+a!.width);
+ await expect(popup.locator(".v32-personalization input")).toBeVisible();
+ if(info.project.name==="chromium"){
+   mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+   await page.screenshot({path:"docs/brand/brand02/conchas/v32-ref-c-desktop-1440.png",animations:"disabled"});
+ }
+});
+test("REF_D mobile layout: price+quantity row above note with fixed full-width CTA",async ({page},info)=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/visual-v32/bakery?category=cakes&lang=es");
+ await page.locator('[data-product-id="tres-leches--classic"]').click();
+ const popup=page.getByRole("dialog");
+ const price=popup.locator(".v32-popup-scroll .v32-buy-price");
+ const qty=popup.locator(".v32-popup-scroll .v32-buy-qty-mobile");
+ const note=popup.locator(".v32-personalization input");
+ const cta=popup.locator(".v32-popup-footer .v32-buy-cta");
+ await expect(price).toBeVisible();await expect(qty).toBeVisible();
+ await expect(note).toBeVisible();await expect(cta).toBeVisible();
+ const a=await price.boundingBox(),b=await qty.boundingBox(),c=await cta.boundingBox();
+ expect(a).not.toBeNull();expect(b).not.toBeNull();expect(c).not.toBeNull();
+ expect(Math.abs(a!.y+a!.height/2-(b!.y+b!.height/2))).toBeLessThan(28);
+ expect(c!.y).toBeGreaterThan(a!.y+a!.height);
+ expect(c!.x).toBeLessThanOrEqual(28);
+ expect(c!.x+c!.width).toBeGreaterThanOrEqual(362);
+ if(info.project.name==="chromium"){
+   mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+   await page.screenshot({path:"docs/brand/brand02/conchas/v32-ref-d-mobile-390.png",animations:"disabled"});
+ }
 });
 test("ZIP V3.2 mobile navigation does not overflow at 320, 375 or 390",async ({page})=>{
   for(const width of [320,375,390]){
