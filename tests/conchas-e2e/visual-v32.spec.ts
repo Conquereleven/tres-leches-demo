@@ -117,7 +117,7 @@ for (const viewport of [{width:1440,height:900},{width:390,height:844}]) {
       const menuToggle=page.getByRole("button",{name:"Open navigation"});
       await expect(menuToggle).toBeVisible();
       await menuToggle.click();
-      await expect(menuToggle).toHaveAttribute("aria-expanded","true");
+      await expect(page.getByRole("button",{name:"Close navigation"})).toHaveAttribute("aria-expanded","true");
       await page.locator('.v32-mobile-drawer a[href="/visual-v32/menu"]').click();
     } else {
       await page.goto("/visual-v32/menu?lang=en");
