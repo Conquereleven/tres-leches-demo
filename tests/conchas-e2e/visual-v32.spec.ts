@@ -173,3 +173,44 @@ test("V3.2 commerce pill variants use canonical SKU prices and preserve AddToCar
   expect(rect).not.toBeNull();expect(rect!.y).toBeGreaterThanOrEqual(0);
   expect(rect!.y+rect!.height).toBeLessThanOrEqual(845);
 });
+
+test("V3.2 Contact and customer policies stay inside the visual preview",async ({page})=>{
+  await page.setViewportSize({width:1440,height:900});
+  await page.goto("/visual-v32?lang=en");
+  await page.locator(".v32-nav-right a[href='/visual-v32/contact']").click();
+  await expect(page).toHaveURL(/\/visual-v32\/contact/);
+  await expect(page.locator('[data-visual-preview="v32"]')).toBeVisible();
+  await expect(page.locator('.v32-commerce-shell .b-policy-page')).toBeVisible();
+  await expect(page.locator('.v32-commerce-shell .b-header, .v32-commerce-shell .b-footer').first()).toBeHidden();
+  await page.locator('.v32-site-footer a[href="/visual-v32/terms"]').click();
+  await expect(page).toHaveURL(/\/visual-v32\/terms/);
+  await expect(page.locator('.v32-commerce-shell .b-policy-page')).toBeVisible();
+  await expect(page.locator('.v32-nav')).toBeVisible();
+});
+test("V3.2 Cart and Checkout keep visual navigation and canonical commerce",async ({page})=>{
+  await page.setViewportSize({width:1440,height:900});
+  await page.goto("/visual-v32/bakery?category=cakes&lang=en");
+  const classic=page.locator('[data-product-id="tres-leches--classic"]');
+  await expect(classic).toBeEnabled();await classic.click();
+  const add=page.getByRole("dialog").locator(".b-add-to-cart > button").first();
+  await expect(add).toBeEnabled();await add.click();
+  await page.locator('.v32-nav-right a[href="/visual-v32/cart"]').click();
+  await expect(page).toHaveURL(/\/visual-v32\/cart/);
+  await expect(page.locator(".v32-commerce-shell .b-co-items")).toContainText("Classic");
+  await expect(page.locator(".v32-nav")).toBeVisible();
+  await expect(page.locator(".v32-commerce-shell .b-co-header")).toBeHidden();
+  const proceed=page.locator(".v32-commerce-shell a.b-co-cta");
+  await expect(proceed).toHaveAttribute("href","/checkout");
+  await proceed.click();
+  await expect(page).toHaveURL(/\/visual-v32\/checkout/);
+  await expect(page.locator(".v32-commerce-shell .b-shop")).toBeVisible();
+  await expect(page.locator(".v32-nav")).toBeVisible();
+});
+test("V3.2 isolated route allowlist blocks unknown paths and checkout outside tests",async ({request})=>{
+  const ok=await request.get("/visual-v32/contact");
+  expect(ok.status()).toBe(200);
+  for(const path of ["/visual-v32/not-authorized","/visual-v32/checkout/anything"]){
+    const response=await request.get(path);
+    expect(response.status()).toBe(404);
+  }
+});

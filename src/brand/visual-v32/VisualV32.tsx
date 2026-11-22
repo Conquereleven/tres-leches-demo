@@ -1,11 +1,14 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { useMenu, menuProductFamily, type StorefrontProduct } from "../menu";
 import { useCheckoutConfig, useCheckoutNow, useCart, cartCount } from "../cart";
 import { useLanguage } from "../localization";
 import { availableSku } from "../../../shared/commerce-policy";
 import { liveOrderable } from "../live-catalog";
-import { AddToCart } from "../Shop";
+import { AddToCart, CartPage, CheckoutPage, CheckoutReturn } from "../Shop";
+import { PolicyPage } from "../Policies";
+import { HowToOrder } from "../StorePages";
+import { isPolicyPath, policyRoutes } from "../business";
 import { ResponsiveMedia } from "../media";
 import { formatAed } from "../content";
 import "./visual-v32.css";
@@ -16,6 +19,34 @@ import "./visual-v32.css";
  */
 type Filter = "all" | "cakes" | "bakery" | "mexican" | "special";
 const origin = "/visual-v32";
+const visualNav = {
+  en: {home:"HOME",menu:"Menu",journal:"JOURNAL",contact:"Contact",cart:"CART",story:"The 3L story",support:"Customer care"},
+  es: {home:"INICIO",menu:"Menú",journal:"HISTORIA",contact:"Contacto",cart:"CARRITO",story:"La historia de 3L",support:"Atención al cliente"},
+  ar: {home:"الرئيسية",menu:"القائمة",journal:"قصتنا",contact:"اتصل بنا",cart:"السلة",story:"قصة 3L",support:"خدمة العملاء"},
+} as const;
+/** A preview navigation boundary: keep every internal shopper link within V3.2.
+ * Never intercept external, payment-provider, download, modified-click or in-page links.
+ */
+function keepInVisualPreview(event: ReactMouseEvent<HTMLDivElement>) {
+  if (event.defaultPrevented || event.button !== 0 ||
+      event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  const element = event.target;
+  if (!(element instanceof Element)) return;
+  const anchor = element.closest("a[href]");
+  if (!(anchor instanceof HTMLAnchorElement) ||
+      anchor.hasAttribute("download") || (anchor.target && anchor.target !== "_self")) return;
+  const href = anchor.getAttribute("href");
+  if (!href || href.startsWith("#")) return;
+  const url = new URL(href, window.location.href);
+  if (url.origin !== window.location.origin || url.pathname.startsWith(origin)) return;
+  const known = ["/", "/menu", "/how-to-order", "/cart", "/checkout", "/checkout/return",
+    ...policyRoutes.map(item=>item.path)] as string[];
+  if (!known.includes(url.pathname)) return;
+  event.preventDefault();
+  const page = url.pathname === "/" ? "" : url.pathname === "/menu" ? "/bakery" : url.pathname;
+  window.location.assign(origin + page + url.search + url.hash);
+}
+
 const groups: {id: Filter; en: string; es: string; ar: string}[] = [
   {id:"all",en:"All Products",es:"Todos",ar:"الكل"},
   {id:"cakes",en:"Cakes",es:"Pasteles",ar:"كيك"},
@@ -30,26 +61,28 @@ const categoryFor=(category:string):Filter=>
 
 function Header(){
   const {language,setLanguage}=useLanguage();
+  const labels=visualNav[language];
   const [mobileOpen,setMobileOpen]=useState(false);
   const count=cartCount(useCart());
   return <header className="v32-header">
     <nav className="v32-nav" aria-label="3L Visual Lab">
       <button className="v32-mobile-toggle" type="button" aria-label={mobileOpen?"Close navigation":"Open navigation"}
         aria-controls="v32-mobile-links" aria-expanded={mobileOpen} onClick={()=>setMobileOpen(value=>!value)}>☰</button>
-      <span className="v32-nav-left"><a href={origin}>HOME</a><a href={origin+"/menu"}>Menu</a></span>
+      <span className="v32-nav-left"><a href={origin}>{labels.home}</a><a href={origin+"/menu"}>{labels.menu}</a></span>
       <a className="v32-logo" href={origin}><strong>✧ 3L pastelerías</strong><small>MEXICO CITY SINCE 1982</small></a>
       <span className="v32-nav-right">
-        <a href={origin+"/#journal"}>JOURNAL</a><a href="/contact">Contact</a>
+        <a href={origin+"/#journal"}>{labels.journal}</a><a href={origin+"/contact"}>{labels.contact}</a>
         <label><span className="v32-sr">Language</span><select aria-label="Language" value={language}
           onChange={e=>setLanguage(e.target.value as typeof language)}>
           <option value="en">EN</option><option value="es">ES</option><option value="ar">AR</option>
         </select></label>
-        <a href="/cart">CART ({count})</a>
+        <a href={origin+"/cart"}>{labels.cart} ({count})</a>
       </span>
     </nav>
     {mobileOpen&&<nav className="v32-mobile-drawer" id="v32-mobile-links" aria-label="Mobile navigation">
-      <a href={origin}>HOME</a><a href={origin+"/menu"}>Menu</a>
-      <a href={origin+"/#journal"}>JOURNAL</a><a href="/contact">Contact</a>
+      <a href={origin}>{labels.home}</a><a href={origin+"/menu"}>{labels.menu}</a>
+      <a href={origin+"/#journal"}>{labels.journal}</a><a href={origin+"/contact"}>{labels.contact}</a>
+      <a href={origin+"/cart"}>{labels.cart} ({count})</a>
     </nav>}
   </header>;
 }
@@ -247,11 +280,39 @@ function Bakery(){
     {active&&<ProductDialog product={active} onClose={close} anchor={trigger.current}/>}
   </main>;
 }
+/** The existing commercial components own checkout and policy facts. V3.2 owns
+ * only their visual frame/navigation in isolated preview, never payment logic.
+ */
+function VisualCommerce({path}:{path:string}) {
+  if (path==="/cart") return <CartPage/>;
+  if (path==="/checkout") return <CheckoutPage/>;
+  if (path==="/checkout/return") return <CheckoutReturn/>;
+  if (path==="/how-to-order") return <HowToOrder/>;
+  if (isPolicyPath(path)) return <PolicyPage path={path}/>;
+  return null;
+}
+function VisualFooter(){
+  const {language}=useLanguage();
+  const labels=visualNav[language];
+  return <footer className="v32-site-footer">
+    <div className="v32-site-footer-brand"><strong>✧ 3L pastelerías</strong><small>MEXICO CITY SINCE 1982</small></div>
+    <nav aria-label="V3.2 footer navigation">
+      <a href={origin+"/menu"}>{labels.menu}</a>
+      <a href={origin+"/contact"}>{labels.contact}</a>
+      <a href={origin+"/cart"}>{labels.cart}</a>
+      <a href={origin+"/terms"}>Terms &amp; Conditions</a>
+      <a href={origin+"/privacy"}>Privacy</a>
+    </nav>
+  </footer>;
+}
 export function VisualV32(){
-  const path=location.pathname.replace(/\/+$/,"");
-  const page=path.endsWith("/bakery")?"bakery":path.endsWith("/menu")?"menu":"home";
-  return <div className="v32-app" data-visual-preview="v32">
-    <a className="v32-skip" href="#main">Skip to content</a><Header/>
-    {page==="home"?<Home/>:page==="menu"?<Landing/>:<Bakery/>}
+  const path=location.pathname.replace(/\/+$/,"").slice(origin.length) || "/";
+  const commerce = ["/cart","/checkout","/checkout/return","/how-to-order"].includes(path) || isPolicyPath(path);
+  return <div className="v32-app" data-visual-preview="v32" onClickCapture={keepInVisualPreview}>
+    <a className="v32-skip" href={commerce?"#main-content":"#main"}>Skip to content</a>
+    <Header/>
+    {path==="/menu"?<Landing/>:path==="/bakery"?<Bakery/>:commerce?
+      <div className="v32-commerce-shell" data-visual-route={path}><VisualCommerce path={path}/></div>:<Home/>}
+    <VisualFooter/>
   </div>;
 }

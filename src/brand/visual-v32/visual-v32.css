@@ -164,3 +164,93 @@
 }
 @media(max-width:360px){.v32-catalog-fidelity .v32-grid{grid-template-columns:1fr}}
 
+
+/* Founder GO 22-Nov: V3.2 complete navigation and commercial visual shell.
+ * Preview-only scope; preserve Shop/Policy commercial implementation and data.
+ * Old storefront headers/footers are suppressed only beneath the V3.2 route.
+ */
+.v32-app .v32-commerce-shell{position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:34px 30px 85px}
+.v32-app .v32-commerce-shell .brand-experience{
+  background:transparent!important;color:#27242D;min-height:0;font-family:"3L Montserrat",Arial,sans-serif;
+}
+.v32-app .v32-commerce-shell .b-co-header,
+.v32-app .v32-commerce-shell .b-site-header,
+.v32-app .v32-commerce-shell .b-header,
+.v32-app .v32-commerce-shell .b-footer,
+.v32-app .v32-commerce-shell .b-floating-shopping,
+.v32-app .v32-commerce-shell .b-floating,
+.v32-app .v32-commerce-shell .b-skip{display:none!important}
+.v32-app .v32-commerce-shell .b-shop-main,
+.v32-app .v32-commerce-shell .b-policy{
+  width:100%;max-width:1240px!important;margin:0 auto!important;padding:38px 10px 45px!important;
+}
+.v32-app .v32-commerce-shell .b-shop-main>h1,
+.v32-app .v32-commerce-shell .b-policy-hero h1,
+.v32-app .v32-commerce-shell .b-co-status h1,
+.v32-app .v32-commerce-shell .b-co-confirm-hero h1{
+  font-family:"3L Abril",Georgia,serif!important;color:#27242D!important;
+  font-size:clamp(43px,5.6vw,78px)!important;font-weight:400!important;letter-spacing:-.035em!important;line-height:1.04;
+}
+.v32-app .v32-commerce-shell .b-shop-main>h1{margin:18px 0 30px!important;text-align:center}
+.v32-app .v32-commerce-shell .b-policy-hero{padding:30px 0 38px!important;max-width:1000px}
+.v32-app .v32-commerce-shell .b-policy-hero h1{margin:14px 0 24px!important}
+.v32-app .v32-commerce-shell .b-policy-intro{font-size:clamp(16px,1.55vw,20px);line-height:1.5;max-width:740px}
+.v32-app .v32-commerce-shell .b-policy-body,
+.v32-app .v32-commerce-shell .b-policy-related{max-width:1000px}
+.v32-app .v32-commerce-shell .b-policy-body article>section{margin:22px 0 55px}
+.v32-app .v32-commerce-shell .b-policy-body article>section h2{
+  font:400 clamp(24px,2.6vw,37px)/1.13 "3L Abril",Georgia,serif!important;color:#27242D
+}
+.v32-app .v32-commerce-shell .b-policy-channels{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:15px;list-style:none;padding:0}
+.v32-app .v32-commerce-shell .b-policy-channels li,
+.v32-app .v32-commerce-shell .b-policy-summary li,
+.v32-app .v32-commerce-shell .b-co-card,
+.v32-app .v32-commerce-shell .b-co-summary,
+.v32-app .v32-commerce-shell .b-shop-panel,
+.v32-app .v32-commerce-shell .b-co-status,
+.v32-app .v32-commerce-shell .b-co-confirm-hero{
+  background:rgba(255,255,255,.75)!important;border:1px solid rgba(255,255,255,.93)!important;
+  border-radius:24px!important;box-shadow:0 18px 45px rgba(102,57,60,.12);
+}
+.v32-app .v32-commerce-shell .b-policy-channels li{padding:20px 18px;min-width:0}
+.v32-app .v32-commerce-shell .b-policy-channels a{overflow-wrap:anywhere;color:#27242D;text-decoration:underline;text-decoration-color:#A28D5B}
+.v32-app .v32-commerce-shell .b-co-card,
+.v32-app .v32-commerce-shell .b-co-summary,
+.v32-app .v32-commerce-shell .b-shop-panel{padding:clamp(18px,2vw,32px)!important}
+.v32-app .v32-commerce-shell .b-co-item{background:#fff9!important;border-radius:16px!important}
+.v32-app .v32-commerce-shell .b-co-progress li.current{border-top-color:#A93C68;color:#27242D}
+.v32-app .v32-commerce-shell .b-co-progress li.done{border-top-color:#A28D5B}
+.v32-app .v32-commerce-shell .b-button,
+.v32-app .v32-commerce-shell .b-co-cta,
+.v32-app .v32-commerce-shell button[type="submit"]{
+  border-radius:999px!important;background:#A93C68!important;color:#fff!important;
+  box-shadow:0 8px 20px rgba(169,60,104,.18);
+}
+.v32-app .v32-commerce-shell .b-button[aria-disabled="true"],
+.v32-app .v32-commerce-shell button:disabled{opacity:.6;cursor:not-allowed}
+.v32-app .v32-commerce-shell input,
+.v32-app .v32-commerce-shell select,
+.v32-app .v32-commerce-shell textarea{border-radius:12px}
+.v32-app .v32-commerce-shell a:focus-visible,
+.v32-app .v32-commerce-shell button:focus-visible,
+.v32-app .v32-commerce-shell input:focus-visible,
+.v32-app .v32-commerce-shell select:focus-visible{outline:2px solid #27242D;outline-offset:3px;box-shadow:0 0 0 5px #A28D5B}
+.v32-app .v32-commerce-shell .b-co-assurance{color:#27242D}
+.v32-site-footer{position:relative;z-index:1;max-width:1400px;margin:10px auto 0;padding:38px 40px 48px;border-top:1px solid rgba(255,255,255,.8);display:flex;justify-content:space-between;align-items:center;gap:26px;color:#27242D}
+.v32-site-footer-brand{display:flex;flex-direction:column;gap:5px}
+.v32-site-footer-brand strong{color:#A28D5B;font:400 25px "3L Abril",Georgia,serif}
+.v32-site-footer-brand small{font-size:9px;letter-spacing:.2em;color:#815c44}
+.v32-site-footer nav{display:flex;flex-wrap:wrap;gap:18px;font-size:11px;letter-spacing:.08em}
+.v32-site-footer a{color:#27242D;text-decoration:none}
+.v32-site-footer a:hover,.v32-site-footer a:focus-visible{text-decoration:underline;text-decoration-color:#A28D5B}
+@media(max-width:640px){
+  .v32-app .v32-commerce-shell{padding:15px 14px 55px}
+  .v32-app .v32-commerce-shell .b-shop-main,
+  .v32-app .v32-commerce-shell .b-policy{padding:22px 0 35px!important}
+  .v32-app .v32-commerce-shell .b-co-card,
+  .v32-app .v32-commerce-shell .b-co-summary,
+  .v32-app .v32-commerce-shell .b-shop-panel{padding:16px!important}
+  .v32-app .v32-commerce-shell .b-policy-channels{grid-template-columns:1fr}
+  .v32-site-footer{padding:26px 18px 35px;display:grid}
+  .v32-site-footer nav{gap:14px}
+}
