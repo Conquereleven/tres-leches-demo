@@ -1,15 +1,14 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type SyntheticEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type SyntheticEvent } from "react";
 import { createPortal } from "react-dom";
-import { useMenu, menuProductFamily, type StorefrontProduct } from "../menu";
-import { useCheckoutConfig, useCheckoutNow, useCart, cartCount, minQty } from "../cart";
+import { useMenu, menuProductFamily } from "../menu";
+import { useCheckoutConfig, useCheckoutNow, useCart, cartCount } from "../cart";
 import { useLanguage } from "../localization";
 import { availableSku } from "../../../shared/commerce-policy";
 import { liveOrderable } from "../live-catalog";
-import { VisualAddToCart, VisualCart, VisualCheckout, VisualReturn, VisualContact, VisualPolicy, VisualHowToOrder } from "./V32Commerce";
+import { VisualCart, VisualCheckout, VisualReturn, VisualContact, VisualPolicy, VisualHowToOrder } from "./V32Commerce";
+import { ApprovedProductCard, ApprovedPurchasePopup } from "./ApprovedPurchaseSelector";
 import { isPolicyPath } from "../business";
-import { selectedProductMedia, publishedMediaAuthority } from "../media";
 import { formatAed } from "../content";
-import { packChoices, packQtyLabel, presentationLabel, toPackChoice } from "./catalog-options";
 import "./visual-v32.css";
 
 /** Approved Visual Lab V3.2, isolated until separate merge/deploy approval.
@@ -245,154 +244,6 @@ function Landing(){
     </div>
   </main>;
 }
-function ProductDialog({product,onClose,onAdded,anchor}:{
-  product:StorefrontProduct;onClose:()=>void;onAdded:()=>void;anchor:HTMLElement|null;
-}){
-  const menu=useMenu();
-  const {language}=useLanguage();const t=visualCopy[language];
-  const {config,loading}=useCheckoutConfig();
-  const now=useCheckoutNow(config);
-  const family=menuProductFamily(menu,product);
-  // The UI is a port of the V3.2 reference: pill variants + scrolling content +
-  // persistent checkout action. All SKU/price/orderability decisions stay canonical.
-  const allowed=family.options.filter(o=>{
-    const server=config?.products.find(p=>p.id===o.id);
-    return availableSku(o.id,now)&&!!server&&server.priceFils===o.priceFils&&
-      (menu.status!=="live"||liveOrderable(o.id)===true);
-  });
-  const pack=packChoices(allowed);
-  const initialPack=pack?.choices.find(c=>c.pieces===6&&c.presentation==="mini")??pack?.choices.find(c=>c.pieces===6);
-  const [sku,setSku]=useState<string|null>(initialPack?.option.id??allowed[0]?.id??null);
-  const chosen=allowed.find(o=>o.id===sku)??allowed[0];
-  const selection=chosen?toPackChoice(chosen):null;
-  const presentation=selection?.presentation??pack?.presentations[0]??"";
-  const pick=(name:string,pieces:number)=>{
-    const next=pack?.choices.find(c=>c.presentation===name&&c.pieces===pieces)
-       ??pack?.choices.find(c=>c.presentation===name)
-       ??pack?.choices.find(c=>c.pieces===pieces);
-    if(next)setSku(next.option.id);
-  };
-  const [place,setPlace]=useState<CSSProperties>({left:12,top:12,maxHeight:"calc(100dvh - 24px)"});
-  const [side,setSide]=useState<"right"|"left"|"overlap"|"mobile"|"mobile-compact">("mobile");
-  const panel=useRef<HTMLDivElement>(null);
-  const [controlsTarget,setControlsTarget]=useState<HTMLDivElement|null>(null);
-  const [desktopQtyTarget,setDesktopQtyTarget]=useState<HTMLDivElement|null>(null);
-  const closeButton=useRef<HTMLButtonElement>(null);
-  useLayoutEffect(()=>{
-    const recalc=()=>{
-      const w=window.innerWidth,h=Math.round(window.visualViewport?.height??window.innerHeight);
-      const r=anchor?.getBoundingClientRect(),pw=Math.min(448,w-24),ph=Math.min(610,h-50);
-      if(w<=640||!r){
-        const compact=h<=720;
-        // REF_D: the selected product's picture stays above the purchasing card.
-        // Short viewports retain the existing safe, scrollable action-first fallback.
-        const width=Math.min(320,w-48);
-        const photoBottom=anchor?.querySelector(".v32-photo")?.getBoundingClientRect().bottom;
-        const visualAnchor=(photoBottom??(r?.top??12)+120)-7;
-        const top=compact?Math.max(12,Math.min(54,Math.round((h-540)/2))):
-          Math.max(12,Math.min(visualAnchor,Math.max(12,h-440)));
-        setPlace({left:Math.round((w-width)/2),top,width,maxHeight:h-top-12});
-        setSide(compact?"mobile-compact":"mobile");
-        return;
-      }
-      const alignment=r.right+pw+12<=w?"right":r.left-pw-12>=12?"left":"overlap";
-      const left=alignment==="right"?r.right+6:alignment==="left"?r.left-pw-6:Math.max(12,Math.min(w-pw-12,r.right-pw*.35));
-      const top=Math.max(12,Math.min(Math.max(90,r.top-12),Math.max(12,h-ph-12)));
-      setPlace({left,top,maxHeight:ph});setSide(alignment);
-    };
-    recalc();window.addEventListener("resize",recalc);window.addEventListener("scroll",recalc,true);
-    window.visualViewport?.addEventListener("resize",recalc);
-    return ()=>{window.removeEventListener("resize",recalc);window.removeEventListener("scroll",recalc,true);
-      window.visualViewport?.removeEventListener("resize",recalc);};
-  },[anchor,product.id]);
-  useEffect(()=>{
-    const old=document.body.style.overflow;document.body.style.overflow="hidden";closeButton.current?.focus();
-    const onKey=(e:KeyboardEvent)=>{
-      if(e.key==="Escape")onClose();
-      if(e.key!=="Tab"||!panel.current)return;
-      const controls=Array.from(panel.current.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input:not([disabled]),select:not([disabled])'));
-      if(!controls.length)return;
-      if(e.shiftKey&&document.activeElement===controls[0]){e.preventDefault();controls.at(-1)?.focus();}
-      else if(!e.shiftKey&&document.activeElement===controls.at(-1)){e.preventDefault();controls[0]?.focus();}
-    };
-    window.addEventListener("keydown",onKey);
-    return ()=>{document.body.style.overflow=old;window.removeEventListener("keydown",onKey);};
-  },[onClose]);
-  return createPortal(<div className="v32-overlay">
-    <div className="v32-scrim" onClick={onClose} aria-hidden/>
-    <div ref={panel} className="v32-popup" data-selected-sku={chosen?.id??""} data-anchor-side={side}
-      role="dialog" aria-modal="true" aria-label={family.name} style={place}>
-      <div className="v32-popup-scroll">
-        <div className="v32-popup-heading">
-          <div><h2>{family.name.replace(/\s*[·–—-]\s*Pack\b.*$/i,"")}</h2>{product.description&&<p>{product.description}</p>}</div>
-          <button ref={closeButton} type="button" className="v32-close"
-            aria-label="Close" onClick={onClose}>×</button>
-        </div>
-        <p className="v32-section-caption">{t.variants}</p>
-        {pack?<div className={"v32-pack-selector "+(pack.choices.length<=4?"v32-quick-four":"v32-guided-packs")}
-          data-commerce-options="canonical" data-choice-count={pack.choices.length}>
-          {pack.choices.length<=4?<div className="v32-variants v32-quick-options" role="group" aria-label="Choose a variant">
-            {[...pack.choices].sort((a,b)=>a.pieces-b.pieces||((a.presentation==="mini"?0:1)-(b.presentation==="mini"?0:1))).map(choice=><button key={choice.option.id} type="button"
-              className={choice.option.id===chosen?.id?"v32-variant v32-variant-current":"v32-variant"}
-              data-pack-presentation={choice.presentation} data-pack-pieces={choice.pieces} data-sku={choice.option.id}
-              aria-pressed={choice.option.id===chosen?.id} onClick={()=>setSku(choice.option.id)}>
-              <span>{packQtyLabel(choice.pieces,language)} {choice.presentation==="mini"?"(Mini)":choice.presentation==="individual"?"(Individual)":""}</span>
-              <small>{formatAed(choice.option.priceFils)}</small>
-            </button>)}
-          </div>:<>
-            <div className="v32-option-group" role="group" aria-label="Choose presentation">
-              <span className="v32-option-caption">{language==="es"?"Presentación":language==="ar"?"الحجم":"Presentation"}</span>
-              <div className="v32-variants v32-pack-presentations">
-                {pack.presentations.map(name=><button key={name} type="button"
-                  className={presentation===name?"v32-variant v32-variant-current":"v32-variant"}
-                  data-pack-presentation={name} aria-pressed={presentation===name}
-                  onClick={()=>pick(name,selection?.pieces??1)}>
-                  <span>{presentationLabel(name,language)}</span>
-                </button>)}
-              </div>
-            </div>
-            <div className="v32-option-group" role="group" aria-label="Choose pack quantity">
-              <span className="v32-option-caption">{language==="es"?"¿Qué cantidad deseas?":language==="ar"?"ما هي الكمية؟":"How would you like it?"}</span>
-              <div className={"v32-variants v32-pack-quantities "+(pack.quantities.length===3?"v32-three-quantities":"")}>
-                {pack.quantities.map(pieces=>{
-                  const candidate=pack.choices.find(c=>c.presentation===presentation&&c.pieces===pieces);
-                  return <button key={pieces} type="button" data-pack-pieces={pieces}
-                    className={candidate?.option.id===chosen?.id?"v32-variant v32-variant-current":"v32-variant"}
-                    aria-pressed={candidate?.option.id===chosen?.id} disabled={!candidate}
-                    onClick={()=>pick(presentation,pieces)}>
-                    <span>{packQtyLabel(pieces,language)}</span>
-                    <small>{candidate?formatAed(candidate.option.priceFils):"—"}</small>
-                  </button>;
-                })}
-              </div>
-            </div>
-          </>}
-          {selection?.pieces&&selection.pieces>1&&<p className="v32-pack-helper" data-pack-piece-count>
-            {language==="es"?"Incluye "+selection.pieces+" piezas · se compra por caja":
-             language==="ar"?"تحتوي العلبة على "+selection.pieces+" قطع":
-             selection.pieces+" pieces in each box"}
-          </p>}
-        </div>:<div className="v32-variants v32-standard-options" role="group" aria-label="Choose a variant">
-          {allowed.map(o=><button key={o.id} type="button" data-sku={o.id}
-            className={o.id===chosen?.id?"v32-variant v32-variant-current":"v32-variant"}
-            aria-pressed={o.id===chosen?.id} onClick={()=>setSku(o.id)}>
-            <span>{o.size}</span><small>{formatAed(o.priceFils)}</small>
-          </button>)}
-        </div>}
-        <div className="v32-popup-controls-anchor" ref={setControlsTarget}/>
-        {chosen&&minQty(chosen.id)>1&&
-          <p className="v32-minimum" data-minimum-notice>{t.minimum(minQty(chosen.id))}</p>}
-        {!chosen&&!loading&&<p role="status">{t.orderingUnavailable}</p>}
-      </div>
-      <div className="v32-popup-footer">
-        <div className="v32-desktop-qty-target" ref={setDesktopQtyTarget}/>
-        {chosen?<VisualAddToCart key={product.id} productId={chosen.id} onAdded={onAdded}
-          controlsTarget={controlsTarget} desktopQtyTarget={desktopQtyTarget}/>:
-          <button disabled type="button">ADD TO CART · UNAVAILABLE</button>}
-      </div>
-    </div>
-  </div>,document.body);
-}
 function Bakery(){
   const {language}=useLanguage();const t=visualCopy[language];
   const menu=useMenu();
@@ -444,7 +295,7 @@ function Bakery(){
       <p>{loading||menu.status==="loading"?t.loading:t.orderingUnavailable}</p>
       <button type="button" onClick={retry}>{t.retry}</button></div>:
       !items.length?<p className="v32-message" role="status">{t.notFound}</p>:
-      <div className="v32-grid" data-grid-columns="4">
+      <div className="ref32-grid" data-grid-columns="4">
         {items.map(product=>{
           const family=menuProductFamily(menu,product);
           const valid=family.options.filter(option=>{
@@ -453,44 +304,22 @@ function Bakery(){
               (menu.status!=="live"||liveOrderable(option.id)===true);
           });
           const price=valid.length?Math.min(...valid.map(v=>v.priceFils)):null;
-          return <button type="button" key={product.id} className="v32-product" data-category-id={family.category} data-product-id={product.id}
-            aria-haspopup="dialog" aria-expanded={selected===product.id} data-selected-product={selected===product.id} disabled={price===null}
-            onClick={e=>{
-              const el=e.currentTarget;
-              trigger.current=el;setAddedMessage("");
-              // Bring the selected photo into the visible three-card row before
-              // opening the overlay. Never move the interactive card on hover.
+          return <ApprovedProductCard key={product.id} product={product}
+            familyId={family.id} variant={product.variant} price={price}
+            active={selected===product.id} onSelect={element=>{
+              trigger.current=element;setAddedMessage("");
+              // Match REF_D: selected picture remains in view above the
+              // anchored source popover. Do not animate the hit-target.
               if(window.innerWidth<=640&&window.innerHeight>720){
-                const rect=el.getBoundingClientRect();
-                window.scrollTo({top:Math.max(0,window.scrollY+rect.top-100),behavior:"auto"});
+                const bounds=element.getBoundingClientRect();
+                window.scrollTo({top:Math.max(0,window.scrollY+bounds.top-98),behavior:"instant"});
               }
               setSelected(product.id);
-            }}>
-            <span className="v32-photo">{(()=>{
-              const canonical=selectedProductMedia(product.id,family.id,product.variant);
-              const src=canonical?.derivatives.find(d=>d.format==="webp")?.src
-                ??canonical?.derivatives[0]?.src
-                ??(!publishedMediaAuthority()?family.image:null);
-              return src?<img src={src} alt={product.title} loading="lazy"/>:
-                <span className="v32-photo-empty" role="img" aria-label={product.title+" — photograph pending"}
-                  data-media-state="unassigned"><strong>✧ 3L</strong><small>{language==="es"?"Fotografía pendiente":language==="ar"?"الصورة قيد الإعداد":"Photo pending"}</small></span>;
-            })()}
-              <span className={selected===product.id?"v32-card-heart v32-card-chosen":"v32-card-heart"} aria-hidden="true">
-                {selected===product.id?
-                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m4 12 5 5L20 6"/></svg>:
-                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M20.8 8.1c0 4-5 7.4-8.8 10.9C8.2 15.5 3.2 12.1 3.2 8.1c0-4 5.2-5.8 8.8-2.2 3.6-3.6 8.8 2.2z"/></svg>}
-              </span></span>
-            <span className="v32-product-copy"><strong>{product.title}</strong>
-              <em>{family.options.some(o=>toPackChoice(o).pieces>=6)?
-                (language==="es"?"Presentaciones disponibles: media docena y docena":language==="ar"?"تتوفر عبوات متعددة":"Half-dozen and dozen options"):
-                product.description}</em>
-              <span>{price===null?t.unavailable:t.from+formatAed(price)}<b aria-hidden>→</b></span>
-            </span>
-          </button>;
+            }}/>;
         })}
       </div>}
     <p className="v32-cart-status" role="status" aria-live="polite">{addedMessage}</p>
-    {active&&<ProductDialog product={active} onClose={close} onAdded={afterAdd} anchor={trigger.current}/>}
+    {active&&<ApprovedPurchasePopup product={active} onClose={close} onAdded={afterAdd} anchor={trigger.current}/>}
   </main>;
 }
 /** The existing commercial components own checkout and policy facts. V3.2 owns
