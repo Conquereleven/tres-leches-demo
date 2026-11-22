@@ -100,8 +100,8 @@ export function VisualCheckout(){
 }
 export function VisualReturn(){const {t}=useVisualCopy();return <main className="v32-new-page" id="main" data-new-ui="return"><p className="v32-new-eyebrow">3L · CUSTOMER CARE</p><h1>{t.checkout}</h1><div className="v32-new-panel"><p>{t.notice}</p><p>This preview cannot confirm a payment. If you have an existing real order, do not pay again to check its status. Please contact 3L support.</p><a className="v32-new-action" href={suffix("/contact")}>{t.contact}</a></div></main>;}
 
-export function VisualAddToCart({productId,onAdded,controlsTarget}:{
- productId:string;onAdded:()=>void;controlsTarget:HTMLDivElement|null;
+export function VisualAddToCart({productId,onAdded,controlsTarget,desktopQtyTarget}:{
+ productId:string;onAdded:()=>void;controlsTarget:HTMLDivElement|null;desktopQtyTarget:HTMLDivElement|null;
 }){
  const {language,t}=useVisualCopy();
  const {config,loading}=useCheckoutConfig();
@@ -130,16 +130,17 @@ export function VisualAddToCart({productId,onAdded,controlsTarget}:{
  });
  const noteLabel=language==="es"?"PERSONALIZACIÓN (OPCIONAL)":language==="ar"?"تخصيص (اختياري)":"PERSONALIZATION (OPTIONAL)";
  const placeholder=language==="es"?'Ej. "Feliz cumpleaños"':language==="ar"?"أضف ملاحظة (40 حرفاً)":"Add a note (e.g. no sugar, gift message…)";
+ const quantityControl=(kind:"mobile"|"desktop")=><div className={"v32-buy-qty v32-buy-qty-"+kind} role="group" aria-label={t.quantity}>
+   <button type="button" aria-label="Decrease quantity" disabled={qty<=minQty(productId)} onClick={()=>setQty(n=>Math.max(minQty(productId),n-1))}>−</button>
+   <output aria-live="polite">{qty}</output>
+   <button type="button" aria-label="Increase quantity" disabled={qty+inCart>=MAX_QTY} onClick={()=>setQty(n=>n+1)}>+</button>
+ </div>;
  const controls=<div className="v32-config-fields" data-source-component="ProductPopup">
    {tricolor?.kind==="single"&&<label className="v32-config-extra">{t.selection}<select value={color||""} onChange={e=>setColor(e.target.value as TricolorColor)}><option value="">{t.choose}</option>{TRICOLOR_COLORS.map(c=><option key={c} value={c}>{tricolorCopy[language][c]}</option>)}</select></label>}
    {spec&&<div className="v32-new-pack"><p>{t.boxes} · {t.pieces}: {picked}/{cap}</p>{allowedPack?spec.components.map(c=><div key={c.componentSkuId}><span>{componentName(c.componentSkuId,language)}</span><button type="button" aria-label="Decrease selection" onClick={()=>choose(c.componentSkuId,-1)}>−</button><span>{composition.find(x=>x.componentSkuId===c.componentSkuId)?.units||0}</span><button type="button" aria-label="Increase selection" disabled={picked>=cap} onClick={()=>choose(c.componentSkuId,1)}>+</button></div>):<p role="alert">{t.notReady}</p>}</div>}
    <div className="v32-buy-row">
      <div className="v32-buy-price"><span>{t.price}</span><strong>{amountValid?money(amount):t.notReady}</strong></div>
-     <div className="v32-buy-qty" role="group" aria-label={t.quantity}>
-       <button type="button" aria-label="Decrease quantity" disabled={qty<=minQty(productId)} onClick={()=>setQty(n=>Math.max(minQty(productId),n-1))}>−</button>
-       <output aria-live="polite">{qty}</output>
-       <button type="button" aria-label="Increase quantity" disabled={qty+inCart>=MAX_QTY} onClick={()=>setQty(n=>n+1)}>+</button>
-     </div>
+     {quantityControl("mobile")}
    </div>
    <div className="v32-personalization">
      <label htmlFor="v32-product-note">{noteLabel}</label>
@@ -155,6 +156,7 @@ export function VisualAddToCart({productId,onAdded,controlsTarget}:{
  </div>;
  return <>
    {controlsTarget?createPortal(controls,controlsTarget):null}
+   {desktopQtyTarget?createPortal(quantityControl("desktop"),desktopQtyTarget):null}
    <div className="v32-buy-form" data-new-ui="add-to-cart">
      <button className="v32-buy-cta" type="button" disabled={!canAdd} onClick={add}>
        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>

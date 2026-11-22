@@ -621,3 +621,30 @@
 .v32-product[aria-expanded="true"]{border-color:#b98a4e;box-shadow:0 0 0 2px #b98a4e80,0 24px 45px #b4868677}
 .v32-product .v32-photo img{transition:transform .7s cubic-bezier(.22,1,.36,1)}
 .v32-product:hover .v32-photo img{transform:scale(1.05)}
+
+/* Founder-approved reference images override generic source layout.
+ * REF_C desktop: selected variant with rose outline, editable note,
+ * quantity+CTA share a single footer row. REF_D handset: three compact
+ * variant chips when three options fit, price+qty inside scroll body,
+ * standalone full-width fixed CTA in footer. */
+.v32-popup .v32-desktop-qty-target{display:none}
+.v32-popup .v32-variant-current{transition:background-color .2s,border-color .2s,color .2s}
+@media(min-width:641px){
+ .v32-popup .v32-config-fields .v32-buy-row{display:none}
+ .v32-popup .v32-popup-footer{display:flex!important;flex-direction:row;align-items:center;gap:12px}
+ .v32-popup .v32-desktop-qty-target{display:flex;flex:none}
+ .v32-popup .v32-buy-form{flex:1;min-width:0}
+ .v32-popup .v32-buy-cta{min-height:48px}
+ .v32-popup .v32-variants .v32-variant-current{
+   background:rgba(255,255,255,.38)!important;color:#1c1517!important;
+   border:2px solid #b12e64!important;box-shadow:0 0 0 2px #b12e6424!important}
+ .v32-popup .v32-variants .v32-variant-current :is(span,small){color:#1c1517!important}
+}
+@media(max-width:640px){
+ .v32-popup .v32-popup-footer{display:block!important}
+ .v32-popup .v32-desktop-qty-target{display:none!important}
+ .v32-popup .v32-buy-row{display:flex}
+ .v32-popup .v32-variants{grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:8px}
+ .v32-popup .v32-variant{min-width:0;padding:10px 7px}
+ .v32-popup .v32-variant-current{background:#b12e64!important;color:#fff!important;border-color:#b12e64!important}
+}

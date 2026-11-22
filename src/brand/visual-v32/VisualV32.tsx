@@ -265,6 +265,7 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
   const [side,setSide]=useState<"right"|"left"|"overlap"|"mobile"|"mobile-compact">("mobile");
   const panel=useRef<HTMLDivElement>(null);
   const [controlsTarget,setControlsTarget]=useState<HTMLDivElement|null>(null);
+  const [desktopQtyTarget,setDesktopQtyTarget]=useState<HTMLDivElement|null>(null);
   const closeButton=useRef<HTMLButtonElement>(null);
   useLayoutEffect(()=>{
     const recalc=()=>{
@@ -323,8 +324,9 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
         {!chosen&&!loading&&<p role="status">{t.orderingUnavailable}</p>}
       </div>
       <div className="v32-popup-footer">
+        <div className="v32-desktop-qty-target" ref={setDesktopQtyTarget}/>
         {chosen?<VisualAddToCart key={product.id} productId={chosen.id} onAdded={onAdded}
-          controlsTarget={controlsTarget}/>:
+          controlsTarget={controlsTarget} desktopQtyTarget={desktopQtyTarget}/>:
           <button disabled type="button">ADD TO CART · UNAVAILABLE</button>}
       </div>
     </div>
