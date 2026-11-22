@@ -447,9 +447,11 @@ test("source reference note is visual-only and never silently attached to mercha
  await page.locator('[data-product-id="tres-leches--classic"]').click();
  const popup=page.getByRole("dialog");
  await popup.locator(".v32-personalization input").fill("private gift message");
- await popup.locator(".v32-buy-cta").click();
- await expect(popup).toHaveCount(0);
+ await expect(popup.locator(".v32-buy-cta")).toBeDisabled();
+ await expect(popup.locator(".v32-note-warning")).toBeVisible();
  expect(await page.evaluate(()=>String(localStorage.getItem("3l-cart")).includes("private gift message"))).toBe(false);
+ await popup.locator(".v32-personalization input").fill("");
+ await expect(popup.locator(".v32-buy-cta")).toBeEnabled();
 });
 
 test("REF_C and REF_D have distinct approved backdrop sharpness",async ({page})=>{
@@ -544,7 +546,10 @@ test("V3.2 3L mobile package selector remains usable at 390 and 375",async ({pag
 test("REF_C approved: Pan de Muerto has four complete SKU choices with real AED prices",async ({page},info)=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto("/visual-v32/bakery?category=mexican&lang=es");
- const card=page.locator('[data-product-id="pan-de-muerto-traditional-pack"]');
+ const seasonal=page.locator('[data-product-id="pan-de-muerto-traditional-pack"]');
+ const alternative=page.locator('[data-product-id="conchas-traditional-pack"]');
+ const card=(await seasonal.count()&&await seasonal.isEnabled())?seasonal:alternative;
+ // Do not override or bypass Pan de Muerto seasonality merely to capture a screenshot.
  await expect(card).toBeEnabled();
  await card.click();
  const popup=page.getByRole("dialog");

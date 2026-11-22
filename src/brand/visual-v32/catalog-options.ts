@@ -14,5 +14,5 @@ export const packChoices=(options:MenuOption[])=>{
  if(new Set(choices.map(c=>c.presentation+"|"+c.pieces)).size!==choices.length)return null;
  return {choices,presentations,quantities};
 };
-export const packQtyLabel=(n:number,lang:"en"|"es"|"ar")=>n===6?({en:"Half dozen",es:"Media docena",ar:"نصف دزينة"})[lang]:n===12?({en:"Dozen",es:"Docena",ar:"دزينة"})[lang]:({en:"Single",es:"Por pieza",ar:"بالقطعة"})[lang];
+export const packQtyLabel=(n:number,lang:"en"|"es"|"ar")=>n===6?({en:"Half dozen",es:"Media docena",ar:"نصف دزينة"})[lang]:n===12?({en:"Dozen",es:"Docena",ar:"دزينة"})[lang]:({en:"1 piece",es:"1 pieza",ar:"بالقطعة"})[lang];
 export const presentationLabel=(s:string,lang:"en"|"es"|"ar")=>s==="mini"?({en:"Mini",es:"Mini",ar:"ميني"})[lang]:s==="individual"?({en:"Individual",es:"Individual",ar:"فردي"})[lang]:s==="piece"?({en:"Pieces",es:"Piezas",ar:"قطع"})[lang]:s;

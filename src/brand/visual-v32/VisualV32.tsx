@@ -326,7 +326,7 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
         {pack?<div className={"v32-pack-selector "+(pack.choices.length<=4?"v32-quick-four":"v32-guided-packs")}
           data-commerce-options="canonical" data-choice-count={pack.choices.length}>
           {pack.choices.length<=4?<div className="v32-variants v32-quick-options" role="group" aria-label="Choose a variant">
-            {pack.choices.map(choice=><button key={choice.option.id} type="button"
+            {[...pack.choices].sort((a,b)=>a.pieces-b.pieces||((a.presentation==="mini"?0:1)-(b.presentation==="mini"?0:1))).map(choice=><button key={choice.option.id} type="button"
               className={choice.option.id===chosen?.id?"v32-variant v32-variant-current":"v32-variant"}
               data-pack-presentation={choice.presentation} data-pack-pieces={choice.pieces} data-sku={choice.option.id}
               aria-pressed={choice.option.id===chosen?.id} onClick={()=>setSku(choice.option.id)}>
