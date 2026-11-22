@@ -343,3 +343,38 @@ test("V3.2 checkout does not create a payment in the synthetic preview",async ({
   await expect(page.locator('[data-new-ui="checkout"]')).toBeVisible();
   expect(unsafe).toEqual([]);
 });
+
+test("ZIP REF_A menu search highlights Cake/Bakery with gold chips and reports no matches",async ({page})=>{
+ await page.goto("/visual-v32/menu?lang=en");
+ const input=page.getByRole("searchbox",{name:"Search the bakery"});
+ await input.fill("croissant");
+ await expect(page.locator(".v32-result-pill")).toContainText(["Bakery"]);
+ await expect(page.locator(".v32-breads")).toHaveClass(/v32-tile-highlight/);
+ await expect(page.locator(".v32-cakes")).not.toHaveClass(/v32-tile-highlight/);
+ await input.fill("impossiblezzzza");
+ await page.locator(".v32-search button[type='submit']").click();
+ await expect(page.locator(".v32-search-empty")).toContainText("Nothing found");
+ await input.fill("");
+ await expect(page.locator(".v32-search-empty")).toHaveCount(0);
+ await expect(page.locator(".v32-result-pill")).toHaveCount(0);
+});
+test("ZIP REF_A mobile sheet is above Home and navigates with genuine pointer clicks",async ({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto("/visual-v32?lang=en");
+ await page.getByRole("button",{name:"Open navigation"}).click();
+ await expect(page.locator('[data-v32-mobile-menu="true"]')).toBeVisible();
+ await page.locator('.v32-mobile-drawer a[href="/visual-v32/menu"]').click({timeout:10000});
+ await expect(page).toHaveURL(/\/visual-v32\/menu/);
+ await expect(page.getByRole("heading",{name:"Explore Our Menu"})).toBeVisible();
+});
+test("ZIP REF_C price changes with quantity without altering authoritative unit price",async ({page})=>{
+ await page.goto("/visual-v32/bakery?category=cakes&lang=en");
+ const card=page.locator('[data-product-id="tres-leches--classic"]');
+ await card.click();
+ const popup=page.getByRole("dialog");
+ const before=await popup.locator(".v32-buy-price strong").innerText();
+ await popup.getByRole("button",{name:"Increase quantity"}).click();
+ const after=await popup.locator(".v32-buy-price strong").innerText();
+ expect(after).not.toBe(before);
+ await expect(popup.locator(".v32-buy-cta")).toContainText(after);
+});

@@ -47,6 +47,7 @@ const assets=[
  ["reference-derived/family-collage-composite.jpg","family-collage-composite.jpg"],
  ["reference-derived/cake-photographic-detail.jpg","cake-photographic-detail.jpg"],
  ["visual-lab/bakery-atelier-concept.webp","bakery-atelier-concept.webp"],
+ ["attachments/attachment_1795346117_a2c61825.png","ref-home.png"],
 ];
 if(reference){
  const {readFileSync}=await import("node:fs");

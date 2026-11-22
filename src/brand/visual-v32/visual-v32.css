@@ -498,3 +498,68 @@
 @media(max-width:800px){.v32-app .v32-new-layout{grid-template-columns:1fr}.v32-app .v32-new-contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.v32-app .v32-new-page{padding:44px 15px 70px}.v32-app .v32-new-contact-grid{grid-template-columns:1fr;gap:14px;margin-bottom:32px}.v32-app .v32-new-lead{margin-bottom:35px}.v32-app .v32-new-fields{grid-template-columns:1fr}.v32-app .v32-new-cart-row{gap:10px}.v32-app .v32-new-progress{gap:6px}.v32-app .v32-new-progress span{padding:7px;font-size:10px}}
 @media(prefers-reduced-motion:reduce){.v32-app .v32-route path{animation:none;stroke-dashoffset:0}.v32-app .v32-new-page,.v32-app .v32-home h1,.v32-app .v32-landing h1,.v32-app .v32-catalog h1{animation:none}.v32-app .v32-product,.v32-app .v32-tile{transition:none}}
+
+
+/* Source-fidelity correction from REF_A/B/C/D ZIP + Founder prior approvals.
+   The mobile sheet is rendered through document.body Portal: main/H1 can no
+   longer intercept its links, regardless of stacking contexts in Home. */
+.v32-mobile-portal{position:fixed;inset:0;z-index:2147480000}
+.v32-mobile-backdrop{position:absolute;inset:0;width:100%;height:100%;border:0;
+  background:rgba(28,21,23,.4);backdrop-filter:blur(2px);animation:v32-veil .25s both}
+.v32-mobile-portal .v32-mobile-sheet{display:flex!important;position:fixed!important;
+  inset:0 auto 0 0!important;top:0!important;left:0!important;right:auto!important;
+  height:100dvh!important;max-height:100dvh;min-width:0;width:min(310px,84vw);
+  flex-direction:column;gap:25px;overflow-y:auto;pointer-events:auto;
+  padding:28px 22px!important;border-radius:0 26px 26px 0!important;
+  background:linear-gradient(165deg,rgba(255,255,255,.94),rgba(248,227,222,.94))!important;
+  border-right:1px solid #fff9!important;box-shadow:18px 0 55px #67434355;
+  backdrop-filter:blur(24px);animation:v32-sheet-in .43s cubic-bezier(.2,1,.28,1) both}
+.v32-mobile-sheet-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.v32-mobile-sheet-top strong{font:600 26px/1 "Cormorant Garamond",Georgia,serif;color:#ac793f}
+.v32-mobile-sheet-top button{border:0;border-radius:50%;background:#fff9;
+  height:42px;width:42px;color:#482f37;font-size:27px}
+.v32-mobile-sheet nav{display:flex;flex-direction:column;gap:9px}
+.v32-mobile-sheet nav a{display:block;color:#1c1517!important;padding:14px 18px;border-radius:13px;
+  font:500 15px/1.4 "Jost",Arial,sans-serif;letter-spacing:.08em}
+.v32-mobile-sheet nav a:hover,.v32-mobile-sheet nav a:focus-visible{background:#fff9}
+.v32-logo-micro{display:flex;align-items:center;gap:8px}
+.v32-logo-micro i{height:1px;width:24px;background:#b98a4eaa}
+.v32-logo-micro small{white-space:nowrap}
+.v32-cart-glyph{font:400 17px/1 Georgia,serif;color:#a97741;margin-right:6px}
+.v32-eyebrow:before,.v32-eyebrow:after{content:"";display:inline-block;
+  width:40px;height:1px;background:#b98a4eaa;vertical-align:middle;margin:0 13px 4px}
+.v32-search-results{display:flex;gap:8px;justify-content:center;align-items:center;
+  min-height:31px;margin:-25px auto 21px;max-width:670px;flex-wrap:wrap}
+.v32-result-pill{padding:6px 15px;border:1px solid #b98a4e77;background:#ebd9d0b3;
+  border-radius:99px;color:#865b37;font:500 11px/1.1 Jost,Arial,sans-serif;letter-spacing:.12em}
+.v32-search-empty{font:italic 19px/1 "Cormorant Garamond",Georgia,serif;color:#8c6a5d;margin:0}
+.v32-tile-highlight{outline:4px solid #b98a4e!important;outline-offset:5px}
+.v32-gold-rule{display:block;width:41px;height:1px;background:#b98a4e}
+.v32-app .v32-tile{overflow:hidden;background-size:cover;
+  transition:transform .5s cubic-bezier(.22,1,.36,1),box-shadow .4s,background-size .8s}
+.v32-app .v32-tile:hover{box-shadow:0 27px 55px #86565770}
+.v32-app .v32-tile b{transition:transform .3s,background-color .3s}
+.v32-app .v32-tile:hover b{transform:translateY(-2px);background:#fbe6d9}
+.v32-app:before{animation:v32-window-light 22s ease-in-out infinite alternate}
+.v32-blossom{position:absolute;top:110px;left:-14px;z-index:3;pointer-events:none;
+  width:230px;height:225px;opacity:.86;
+  background-image:url("/visual-v32-reference/ref-home.png");
+  background-size:1100px auto;background-position:0 -80px;background-repeat:no-repeat;
+  mask-image:radial-gradient(ellipse at 42% 42%,#000 38%,transparent 73%);
+  animation:v32-blossom 8s ease-in-out infinite;transform-origin:15% 0}
+.v32-overlay .v32-popup{animation:v32-modal-arrive .38s cubic-bezier(.22,1,.36,1) both}
+.v32-overlay .v32-scrim{animation:v32-veil .27s ease-out both}
+@keyframes v32-blossom{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+@keyframes v32-window-light{from{transform:translateX(-18px)}to{transform:translateX(28px)}}
+@keyframes v32-modal-arrive{from{opacity:.5;transform:translateY(54px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes v32-sheet-in{from{transform:translateX(-103%)}to{transform:translateX(0)}}
+@keyframes v32-veil{from{opacity:0}to{opacity:1}}
+@media(max-width:640px){
+  .v32-blossom{width:140px;height:155px;top:94px;background-size:770px auto;background-position:0 -56px;opacity:.64}
+  .v32-logo-micro i{display:none}
+  .v32-eyebrow:before,.v32-eyebrow:after{width:17px;margin-inline:8px}
+}
+@media(prefers-reduced-motion:reduce){
+  .v32-app:before,.v32-blossom,.v32-overlay .v32-popup,.v32-overlay .v32-scrim,
+  .v32-mobile-backdrop,.v32-mobile-portal .v32-mobile-sheet{animation:none!important;transition:none!important}
+}

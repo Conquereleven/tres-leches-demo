@@ -113,29 +113,55 @@ function Header(){
   const labels=visualNav[language];
   const [mobileOpen,setMobileOpen]=useState(false);
   const count=cartCount(useCart());
-  return <header className="v32-header">
-    <nav className="v32-nav" aria-label="3L Visual Lab">
-      <button className="v32-mobile-toggle" type="button" aria-label={mobileOpen?"Close navigation":"Open navigation"}
-        aria-controls="v32-mobile-links" aria-expanded={mobileOpen} onClick={()=>setMobileOpen(value=>!value)}>☰</button>
-      <span className="v32-nav-left"><a href={origin}>{labels.home}</a><a href={origin+"/menu"}>{labels.menu}</a></span>
-      <a className="v32-logo" href={origin}><strong>✧ 3L pastelerías</strong><small>MEXICO CITY SINCE 1982</small></a>
-      <span className="v32-nav-right">
-        <a href={origin+"/#journal"}>{labels.journal}</a><a href={origin+"/contact"}>{labels.contact}</a>
-        <label className="v32-language-control"><span className="v32-sr">Language</span>
-          <select aria-label="Language" value={language}
-            onChange={e=>setLanguage(e.target.value as typeof language)}>
-            <option value="en">EN</option><option value="es">ES</option><option value="ar">AR</option>
-          </select>
-        </label>
-        <a href={origin+"/cart"}>{labels.cart} (<span aria-live="polite">{count}</span>)</a>
-      </span>
-    </nav>
-    {mobileOpen&&<nav className="v32-mobile-drawer" id="v32-mobile-links" aria-label="Mobile navigation">
-      <a href={origin}>{labels.home}</a><a href={origin+"/menu"}>{labels.menu}</a>
-      <a href={origin+"/#journal"}>{labels.journal}</a><a href={origin+"/contact"}>{labels.contact}</a>
-      <a href={origin+"/cart"}>{labels.cart} ({count})</a>
-    </nav>}
-  </header>;
+  useEffect(()=>{
+    if(!mobileOpen)return;
+    const prior=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    const onKey=(event:KeyboardEvent)=>{if(event.key==="Escape")setMobileOpen(false);};
+    window.addEventListener("keydown",onKey);
+    return ()=>{document.body.style.overflow=prior;window.removeEventListener("keydown",onKey);};
+  },[mobileOpen]);
+  return <>
+    <header className="v32-header">
+      <nav className="v32-nav" aria-label="3L Visual Lab">
+        <button className="v32-mobile-toggle" type="button" aria-label={mobileOpen?"Close navigation":"Open navigation"}
+          aria-controls="v32-mobile-links" aria-expanded={mobileOpen}
+          onClick={()=>setMobileOpen(value=>!value)}>{mobileOpen?"×":"☰"}</button>
+        <span className="v32-nav-left"><a href={origin}>{labels.home}</a><a href={origin+"/menu"}>{labels.menu}</a></span>
+        <a className="v32-logo" href={origin}>
+          <strong>✧ 3L pastelerías</strong>
+          <span className="v32-logo-micro"><i/><small>MEXICO CITY SINCE 1982</small><i/></span>
+        </a>
+        <span className="v32-nav-right">
+          <a href={origin+"/#journal"}>{labels.journal}</a><a href={origin+"/contact"}>{labels.contact}</a>
+          <label className="v32-language-control"><span className="v32-sr">Language</span>
+            <select aria-label="Language" value={language}
+              onChange={e=>setLanguage(e.target.value as typeof language)}>
+              <option value="en">🇬🇧 EN</option><option value="es">🇲🇽 ES</option><option value="ar">🇦🇪 AR</option>
+            </select>
+          </label>
+          <a href={origin+"/cart"}><span className="v32-cart-glyph" aria-hidden="true">♧</span>{labels.cart} (<span aria-live="polite">{count}</span>)</a>
+        </span>
+      </nav>
+    </header>
+    {mobileOpen&&createPortal(<div className="v32-mobile-portal" data-v32-mobile-menu="true">
+      <button type="button" className="v32-mobile-backdrop"
+        onClick={()=>setMobileOpen(false)} aria-label="Close navigation backdrop"/>
+      <aside className="v32-mobile-drawer v32-mobile-sheet" id="v32-mobile-links" aria-label="Mobile navigation">
+        <div className="v32-mobile-sheet-top">
+          <strong>✧ 3L pastelerías</strong>
+          <button type="button" aria-label="Close menu" onClick={()=>setMobileOpen(false)}>×</button>
+        </div>
+        <nav>
+          <a href={origin} onClick={()=>setMobileOpen(false)}>{labels.home}</a>
+          <a href={origin+"/menu"} onClick={()=>setMobileOpen(false)}>{labels.menu}</a>
+          <a href={origin+"/#journal"} onClick={()=>setMobileOpen(false)}>{labels.journal}</a>
+          <a href={origin+"/contact"} onClick={()=>setMobileOpen(false)}>{labels.contact}</a>
+          <a href={origin+"/cart"} onClick={()=>setMobileOpen(false)}>{labels.cart} ({count})</a>
+        </nav>
+      </aside>
+    </div>,document.body)}
+  </>;
 }
 function Home(){
   const {language}=useLanguage();const t=visualCopy[language];
@@ -177,21 +203,43 @@ function Home(){
 }
 function Landing(){
   const {language}=useLanguage();const t=visualCopy[language];
-  return <main className="v32-landing v32-landing-fidelity" id="main">
+  const [query,setQuery]=useState("");
+  const [submitted,setSubmitted]=useState(false);
+  const keywords={
+    cakes:["cake","pastel","berry","slice","pastries","seasonal","tres leches"],
+    bakery:["bread","concha","croissant","pan","bakery","palmier","orejas"]
+  };
+  const normalized=query.trim().toLocaleLowerCase();
+  const matches=normalized?Object.entries(keywords).filter(([,words])=>
+    words.some(word=>word.includes(normalized)||normalized.includes(word))).map(([key])=>key):[];
+  const noMatch=submitted&&!!normalized&&!matches.length;
+  const search=(event:React.FormEvent<HTMLFormElement>)=>{event.preventDefault();setSubmitted(true);};
+  return <main className="v32-landing v32-landing-fidelity" id="main" data-visual-source="REF_A">
     <span className="v32-eyebrow">{t.menuEyebrow}</span><h1>{t.menuTitle}</h1>
     <p className="v32-tagline">{t.menuTag}</p>
-    <form action={origin+"/bakery"} className="v32-search">
-      <span aria-hidden>⌕</span><input name="q" type="search" aria-label="Search the bakery" placeholder={t.searchBakery}/>
+    <form onSubmit={search} className="v32-search" role="search">
+      <span aria-hidden="true">⌕</span><input value={query}
+        onChange={event=>{setQuery(event.target.value);if(!event.target.value.trim())setSubmitted(false)}}
+        name="q" type="search" aria-label="Search the bakery" placeholder={t.searchBakery}/>
       <button type="submit">{t.find}</button>
     </form>
+    <div className="v32-search-results" aria-live="polite">
+      {!!normalized&&matches.map(key=><span className="v32-result-pill" key={key}>
+        {key==="cakes"?t.cakes:t.bakery}</span>)}
+      {noMatch&&<p className="v32-search-empty">{language==="es"?
+        "No encontramos resultados. Prueba pastel, pan o croissant.":language==="ar"?
+        "لا توجد نتائج. جرّب الكعك أو الخبز أو الكرواسون.":"Nothing found. Try cake, bread or croissant."}</p>}
+    </div>
     <div className="v32-tiles">
-      <a href={origin+"/bakery?category=cakes"} className="v32-tile v32-cakes">
-        <small>{t.cakesTag}</small><strong>{t.cakes}</strong><em>{t.cakesDesc}</em>
-        <b>{t.exploreCakes}</b>
+      <a href={origin+"/bakery?category=cakes"}
+        className={"v32-tile v32-cakes"+(matches.includes("cakes")?" v32-tile-highlight":"")}>
+        <small>{t.cakesTag}</small><strong>{t.cakes}</strong><span className="v32-gold-rule" aria-hidden="true"/>
+        <em>{t.cakesDesc}</em><b>{t.exploreCakes}</b>
       </a>
-      <a href={origin+"/bakery?category=mexican"} className="v32-tile v32-breads">
-        <small>{t.bakeryTag}</small><strong>{t.bakery}</strong><em>{t.bakeryDesc}</em>
-        <b>{t.exploreBakery}</b>
+      <a href={origin+"/bakery?category=mexican"}
+        className={"v32-tile v32-breads"+(matches.includes("bakery")?" v32-tile-highlight":"")}>
+        <small>{t.bakeryTag}</small><strong>{t.bakery}</strong><span className="v32-gold-rule" aria-hidden="true"/>
+        <em>{t.bakeryDesc}</em><b>{t.exploreBakery}</b>
       </a>
     </div>
   </main>;
@@ -394,6 +442,7 @@ export function VisualV32(){
   return <div className="v32-app" data-visual-preview="v32" data-frontend="standalone-v32">
     <a className="v32-skip" href="#main">Skip to content</a>
     <Header/>
+    <div className="v32-blossom" aria-hidden="true"/>
     {path==="/menu"?<Landing/>:path==="/bakery"?<Bakery/>:commerce?
       <div className="v32-commerce-shell" data-visual-route={path}><VisualCommerce path={path}/></div>:<Home/>}
     <VisualFooter/>
