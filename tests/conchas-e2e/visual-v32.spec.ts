@@ -506,3 +506,29 @@ test("V3.2 3L half-dozen/dozen selection follows actual Orejas SKUs, not box qua
  await page.goto("/visual-v32/cart?lang=es");
  await expect(page.locator("[data-cart-pack-count]")).toContainText("12 piezas");
 });
+
+test("V3.2 3L mobile package selector remains usable at 390 and 375",async ({page},info)=>{
+ for(const width of [390,375]){
+  await page.setViewportSize({width,height:width===390?844:667});
+  await page.goto("/visual-v32/bakery?category=bakery&lang=es");
+  const card=page.locator('[data-product-id="orejas"]');
+  await expect(card).toBeEnabled();
+  await card.click();
+  const popup=page.getByRole("dialog");
+  await expect(popup.locator('[data-commerce-options="canonical"]')).toBeVisible();
+  await popup.locator('[data-pack-presentation="mini"]').click();
+  await popup.locator('[data-pack-pieces="6"]').click();
+  await expect(popup).toHaveAttribute("data-selected-sku","orejas-6-mini-60-g-cada-uno");
+  await expect(popup.locator("[data-pack-piece-count]")).toContainText("6");
+  const action=popup.locator(".v32-popup-footer .v32-buy-cta");
+  await expect(action).toBeVisible();
+  const rect=await action.boundingBox();
+  expect(rect).not.toBeNull();
+  expect(rect!.y+rect!.height).toBeLessThanOrEqual((width===390?844:667)+1);
+  if(info.project.name==="chromium"){
+    mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+    await page.screenshot({path:"docs/brand/brand02/conchas/v32-3l-half-dozen-mobile-"+width+".png",animations:"disabled"});
+  }
+  await page.keyboard.press("Escape");
+ }
+});

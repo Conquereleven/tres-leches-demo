@@ -1,0 +1,49 @@
+name: 3L V3.2 focused visual proof
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/brand/visual-v32/**"
+      - "tests/conchas-e2e/visual-v32.spec.ts"
+      - ".github/workflows/v32-preview-evidence.yml"
+permissions:
+  contents: read
+concurrency:
+  group: 3l-v32-proof-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+jobs:
+  v32-commerce-proof:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      options: --user 1001
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22.23.1"
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Verify actual 3L categories and package choices
+        run: npx playwright test --config=playwright.conchas.config.ts tests/conchas-e2e/visual-v32.spec.ts --grep "V3.2 published subcategories|V3.2 3L half-dozen/dozen|V3.2 3L mobile package" --workers=1
+      - name: Record exact SHA and scope
+        if: always()
+        run: |
+          mkdir -p docs/brand/brand02/conchas
+          git rev-parse HEAD > docs/brand/brand02/conchas/v32-proof-head.txt
+          echo "PREVIEW ONLY, no payment, no deploy" >> docs/brand/brand02/conchas/v32-proof-head.txt
+      - if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: v32-3l-packages-${{ github.run_attempt }}
+          path: |
+            docs/brand/brand02/conchas/v32-3l*.png
+            docs/brand/brand02/conchas/v32-proof-head.txt
+            test-results/conchas/
+          retention-days: 7
+          if-no-files-found: error
