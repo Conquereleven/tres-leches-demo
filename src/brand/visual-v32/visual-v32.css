@@ -518,3 +518,22 @@
   background:linear-gradient(140deg,#ffeae5ed,#f3c5c0f2 85%,#ffebe6f0)!important;
   box-shadow:0 16px 60px #925a5a75,inset 0 2px 1px #fff
 }
+
+/* All connected customer pages share the source's body typography, not just
+ * the Home/Menu routes. CSS scope prevents leakage into public and Operations.
+ */
+.v32-app .v32-commerce-shell .brand-experience,
+.v32-app .v32-commerce-shell .b-policy,
+.v32-app .v32-commerce-shell .b-shop-main,
+.v32-app .v32-commerce-shell input,
+.v32-app .v32-commerce-shell select,
+.v32-app .v32-commerce-shell textarea,
+.v32-app .v32-commerce-shell button{
+  font-family:"Jost","3L Montserrat",Arial,sans-serif!important;
+}
+.v32-app .v32-commerce-shell h1,
+.v32-app .v32-commerce-shell h2,
+.v32-app .v32-commerce-shell .b-co-card>header h2,
+.v32-app .v32-commerce-shell .b-policy-body article h2{
+  font-family:"Cormorant Garamond",Georgia,serif!important;
+}
