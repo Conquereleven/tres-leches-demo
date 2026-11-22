@@ -303,10 +303,10 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
   return createPortal(<div className="v32-overlay">
     <div className="v32-scrim" onClick={onClose} aria-hidden/>
     <div ref={panel} className="v32-popup" data-anchor-side={side}
-      role="dialog" aria-modal="true" aria-label={product.title} style={place}>
+      role="dialog" aria-modal="true" aria-label={family.name} style={place}>
       <div className="v32-popup-scroll">
         <div className="v32-popup-heading">
-          <div><h2>{product.title}</h2>{product.description&&<p>{product.description}</p>}</div>
+          <div><h2>{family.name}</h2>{product.description&&<p>{product.description}</p>}</div>
           <button ref={closeButton} type="button" className="v32-close"
             aria-label="Close" onClick={onClose}>×</button>
         </div>
@@ -390,7 +390,12 @@ function Bakery(){
                 ??(!publishedMediaAuthority()?family.image:null);
               return src?<img src={src} alt={product.title} loading="lazy"/>:
                 <span className="v32-photo-empty" role="img" aria-label={product.title}/>;
-            })()}</span>
+            })()}
+              <span className="v32-card-heart" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20.8 8.1c0 4-5 7.4-8.8 10.9C8.2 15.5 3.2 12.1 3.2 8.1c0-4 5.2-5.8 8.8-2.2 3.6-3.6 8.8-1.8 8.8 2.2z"/>
+                </svg>
+              </span></span>
             <span className="v32-product-copy"><strong>{product.title}</strong><em>{product.description}</em>
               <span>{price===null?t.unavailable:t.from+formatAed(price)}<b aria-hidden>→</b></span>
             </span>

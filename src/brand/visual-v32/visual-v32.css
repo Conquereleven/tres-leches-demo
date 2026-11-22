@@ -611,3 +611,13 @@
  .v32-popup .v32-popup-scroll{padding:12px 14px 7px}
  .v32-popup .v32-config-fields{gap:9px;margin-top:11px}
 }
+
+/* REF_C cards: source image-side heart is decorative (whole card is dialog
+   trigger), not a fake wishlist API. Media remains canonical. */
+.v32-photo{position:relative}
+.v32-card-heart{position:absolute;top:11px;right:11px;display:grid;place-items:center;
+ width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.80);
+ color:#8c5a2f;backdrop-filter:blur(12px);pointer-events:none}
+.v32-product[aria-expanded="true"]{border-color:#b98a4e;box-shadow:0 0 0 2px #b98a4e80,0 24px 45px #b4868677}
+.v32-product .v32-photo img{transition:transform .7s cubic-bezier(.22,1,.36,1)}
+.v32-product:hover .v32-photo img{transform:scale(1.05)}
