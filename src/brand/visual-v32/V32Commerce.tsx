@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { createPortal } from "react-dom";
-import { cart, cartCount, cartSubtotalFils, displayLinePrice, minQty, MAX_QTY, useCart, useCheckoutConfig, type CheckoutConfig } from "../cart";
+import { cart, cartCount, cartSubtotalFils, displayLinePrice, minQty, useCart, useCheckoutConfig, type CheckoutConfig } from "../cart";
 import { useLanguage } from "../localization";
 import { formatAed } from "../content";
 import { business, phoneHref, policyDecisions, type PolicyPath } from "../business";
-import { lineKey, packSpec, componentName, type Composition } from "../../../shared/pack-composition";
+import { lineKey, componentName } from "../../../shared/pack-composition";
 import { menuFamilyForSku } from "../menu";
 import { packQtyLabel, toPackChoice } from "./catalog-options";
-import { tricolorCopy, tricolorSpec, TRICOLOR_COLORS, type TricolorColor } from "../../../shared/tricolor";
+import { tricolorCopy } from "../../../shared/tricolor";
 
 const root="/visual-v32";
 const copy={
@@ -107,82 +106,3 @@ export function VisualCheckout(){
  </main>;
 }
 export function VisualReturn(){const {t}=useVisualCopy();return <main className="v32-new-page" id="main" data-new-ui="return"><p className="v32-new-eyebrow">3L · CUSTOMER CARE</p><h1>{t.checkout}</h1><div className="v32-new-panel"><p>{t.notice}</p><p>This preview cannot confirm a payment. If you have an existing real order, do not pay again to check its status. Please contact 3L support.</p><a className="v32-new-action" href={suffix("/contact")}>{t.contact}</a></div></main>;}
-
-export function VisualAddToCart({productId,onAdded,controlsTarget,desktopQtyTarget}:{
- productId:string;onAdded:()=>void;controlsTarget:HTMLDivElement|null;desktopQtyTarget:HTMLDivElement|null;
-}){
- const {language,t}=useVisualCopy();
- const {config,loading}=useCheckoutConfig();
- const lines=useCart();
- const product=config?.products.find(p=>p.id===productId);
- const spec=packSpec(productId),tricolor=tricolorSpec(productId);
- const [qty,setQty]=useState(minQty(productId));
- const [note,setNote]=useState("");
- const [color,setColor]=useState<TricolorColor|null>(null);
- const [composition,setComposition]=useState<Composition>([]);
- const inCart=lines.filter(l=>l.productId===productId).reduce((sum,l)=>sum+l.quantity,0);
- const allowedPack=spec&&config?.personalizedPacks?.enabled&&config.personalizedPacks.rules.some(rule=>rule.packSkuId===productId);
- const cap=spec?.capacity||0;const picked=composition.reduce((sum,x)=>sum+x.units,0);
- const publishedRule=config?.personalizedPacks?.rules.find(rule=>rule.packSkuId===productId);
- const custom=!!spec&&!!config?.personalizedPacks?.enabled;
- const valid=!custom||!!allowedPack&&!!publishedRule&&picked===cap&&
-   composition.every(piece=>publishedRule.componentSkuIds.includes(piece.componentSkuId));
- const amount=product?displayLinePrice({productId,quantity:qty,...(custom?{composition}:{})},product.priceFils,config?.packPricing)*qty:Number.NaN;
- const amountValid=Number.isFinite(amount)&&amount>=0;
- const canAdd=!!config?.enabled&&!!product&&!loading&&valid&&amountValid&&note.trim().length===0&&
-   (!tricolor||tricolor.kind==="fixed"||!!color)&&inCart+qty<=MAX_QTY;
- // Variant changes preserve the visual note, as in the original ProductPopup.
- useEffect(()=>{setQty(minQty(productId));setColor(null);setComposition([]);},[productId]);
- const add=()=>{if(!canAdd)return;cart.add(productId,qty,custom?composition:undefined,color||undefined);onAdded();};
- const choose=(id:string,delta:number)=>setComposition(old=>{
-   const units=Math.max(0,Math.min(cap,(old.find(x=>x.componentSkuId===id)?.units||0)+delta));
-   const other=old.filter(x=>x.componentSkuId!==id);
-   return units?[...other,{componentSkuId:id,units}]:other;
- });
- const noteLabel=language==="es"?"PERSONALIZACIÓN (OPCIONAL)":language==="ar"?"تخصيص (اختياري)":"PERSONALIZATION (OPTIONAL)";
- const placeholder=language==="es"?'Ej. "Feliz cumpleaños"':language==="ar"?"أضف ملاحظة (40 حرفاً)":"Add a note (e.g. no sugar, gift message…)";
- const catalogOption=menuFamilyForSku(productId)?.options.find(o=>o.id===productId);
- const packChoice=catalogOption?toPackChoice(catalogOption):null;
- const quantityLabel=packChoice&&packChoice.pieces>1
-   ?language==="es"?"Número de cajas":language==="ar"?"عدد العلب":"Number of boxes"
-   :t.quantity;
- const quantityControl=(kind:"mobile"|"desktop")=><div className={"v32-buy-qty v32-buy-qty-"+kind} role="group" aria-label={quantityLabel}>
-   <button type="button" aria-label="Decrease quantity" disabled={qty<=minQty(productId)} onClick={()=>setQty(n=>Math.max(minQty(productId),n-1))}>−</button>
-   <output aria-live="polite">{qty}</output>
-   <button type="button" aria-label="Increase quantity" disabled={qty+inCart>=MAX_QTY} onClick={()=>setQty(n=>n+1)}>+</button>
- </div>;
- const controls=<div className="v32-config-fields" data-source-component="ProductPopup">
-   {tricolor?.kind==="single"&&<label className="v32-config-extra">{t.selection}<select value={color||""} onChange={e=>setColor(e.target.value as TricolorColor)}><option value="">{t.choose}</option>{TRICOLOR_COLORS.map(c=><option key={c} value={c}>{tricolorCopy[language][c]}</option>)}</select></label>}
-   {custom&&<div className="v32-new-pack"><p>{t.boxes} · {t.pieces}: {picked}/{cap}</p>{allowedPack?spec!.components.filter(piece=>publishedRule?.componentSkuIds.includes(piece.componentSkuId)).map(c=><div key={c.componentSkuId}><span>{componentName(c.componentSkuId,language)}</span><button type="button" aria-label="Decrease selection" onClick={()=>choose(c.componentSkuId,-1)}>−</button><span>{composition.find(x=>x.componentSkuId===c.componentSkuId)?.units||0}</span><button type="button" aria-label="Increase selection" disabled={picked>=cap} onClick={()=>choose(c.componentSkuId,1)}>+</button></div>):<p role="alert">{t.notReady}</p>}</div>}
-   <div className="v32-buy-row">
-     <div className="v32-buy-price"><span>{t.price}</span><strong>{amountValid?money(amount):t.notReady}</strong></div>
-     {quantityControl("mobile")}
-   </div>
-   <div className="v32-personalization">
-     <label htmlFor="v32-product-note">{noteLabel}</label>
-     <div className="v32-personalization-field">
-       <span aria-hidden="true" className="v32-pencil">✎</span>
-       <input id="v32-product-note" value={note} maxLength={40}
-          onChange={e=>setNote(e.target.value.slice(0,40))}
-          aria-describedby="v32-note-disclaimer" placeholder={placeholder}/>
-       <output aria-live="polite">{note.length}/40</output>
-     </div>
-     <span className={note.trim()?"v32-note-warning":"v32-sr"} id="v32-note-disclaimer">
-    {language==="es"?"La personalización aún no se envía a cocina. Borra la nota para continuar.":language==="ar"?"هذه الملاحظة غير متاحة للطلب بعد؛ امسحها للمتابعة.":"Personalization is not yet sent to the kitchen. Clear the note to continue."}
-   </span>
-   </div>
- </div>;
- return <>
-   {controlsTarget?createPortal(controls,controlsTarget):null}
-   {desktopQtyTarget?createPortal(quantityControl("desktop"),desktopQtyTarget):null}
-   <div className="v32-buy-form" data-new-ui="add-to-cart">
-     <button className="v32-buy-cta" type="button" disabled={!canAdd} onClick={add}>
-       <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
-       <span className="v32-buy-cta-label">{t.add}</span>
-       <span className="v32-buy-cta-price">{amountValid?" · "+money(amount):"—"}</span>
-       <span className="v32-buy-cta-arrow" aria-hidden="true">→</span>
-     </button>
-     {!valid&&<small role="alert">{t.invalid}</small>}
-   </div>
- </>;
-}
