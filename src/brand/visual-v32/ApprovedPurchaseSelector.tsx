@@ -155,18 +155,20 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
    const left=!right&&br.left-width-8>=12;
    const position=right?"right":left?"left":"overlap";
    const x=right?br.right+6:left?br.left-width-6:Math.max(12,Math.min(viewportWidth-width-12,br.right-width*.35));
-   const maxHeight=Math.min(610,height-32);
-   // Align to the actual dialog height, not the allowed 610px cap.
-   // Otherwise a 440px dialog jumps 170px above the selected card.
-   const renderedHeight=Math.min(maxHeight,Math.max(360,dialog.current?.offsetHeight??480));
-   setPlace({left:x,top:Math.max(12,Math.min(br.top-12,height-renderedHeight-12)),width,maxHeight});
+   // Reserve enough room for the actual source fields even if CheckoutConfig
+   // arrives AFTER the dialog opened. Never allow the purchase footer below
+   // the viewport; the details pane owns any necessary scrolling.
+   const preferredHeight=Math.min(height-24,grouped?.choices.length===4?460:
+      grouped?.choices.length&&grouped.choices.length>4?500:440);
+   const top=Math.max(12,Math.min(br.top-12,height-preferredHeight-12));
+   setPlace({left:x,top,width,maxHeight:height-top-12});
    setSide(position);
   };
   measure();window.addEventListener("resize",measure);window.addEventListener("scroll",measure,true);
   window.visualViewport?.addEventListener("resize",measure);
   return ()=>{window.removeEventListener("resize",measure);window.removeEventListener("scroll",measure,true);
    window.visualViewport?.removeEventListener("resize",measure);};
- },[anchor,product.id]);
+ },[anchor,product.id,availableKey]);
  useEffect(()=>{
   const before=document.body.style.overflow;document.body.style.overflow="hidden";
   const raf=requestAnimationFrame(()=>closeControl.current?.focus());

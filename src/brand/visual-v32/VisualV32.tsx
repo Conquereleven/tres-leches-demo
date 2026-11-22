@@ -368,6 +368,6 @@ export function VisualV32(){
     <div className="v32-blossom" aria-hidden="true"/>
     {path==="/menu"?<Landing/>:path==="/bakery"?<Bakery/>:commerce?
       <div className="v32-commerce-shell" data-visual-route={path}><VisualCommerce path={path}/></div>:<Home/>}
-    <VisualFooter/>
+    {path==="/bakery"?null:<VisualFooter/>}
   </div>;
 }

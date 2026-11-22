@@ -104,6 +104,9 @@ test("real purchase: Orejas selected box SKU and amount reach canonical cart",as
  await dialog.locator('[data-pack-pieces="12"]').click();
  await expect(dialog).toHaveAttribute("data-selected-sku","orejas-12-individuales-100-g-cada-uno");
  await expect(dialog.locator(".ref32-buy")).toBeEnabled();
+ const ctaBounds=await dialog.locator(".ref32-buy").boundingBox();
+ expect(ctaBounds).not.toBeNull();
+ expect(ctaBounds!.y+ctaBounds!.height).toBeLessThanOrEqual(901);
  await dialog.locator(".ref32-buy").click();
  await expect(dialog).toHaveCount(0);
  expect(await page.evaluate(()=>{
