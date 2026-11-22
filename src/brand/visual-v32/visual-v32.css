@@ -254,3 +254,9 @@
   .v32-site-footer{padding:26px 18px 35px;display:grid}
   .v32-site-footer nav{gap:14px}
 }
+
+/* Keep legacy floating-shopping control out of the connected preview: the
+ * V3.2 navigation already exposes the same real cart state. */
+.v32-app .v32-commerce-shell .brand-experience > aside,
+.v32-app .v32-commerce-shell .b-floating-cart,
+.v32-app .v32-commerce-shell .b-shopping-wa{display:none!important}
