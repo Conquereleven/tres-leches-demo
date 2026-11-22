@@ -737,12 +737,9 @@ function EmptyCart() {
 export function AddToCart({
   productId,
   fallback,
-  onAdded,
 }: {
   productId: string;
   fallback: ReactNode;
-  /** Preview-only UI completion. Omitted by all production storefront callers. */
-  onAdded?: () => void;
 }) {
   const { text: localize, language } = useCustomerLanguage();
 
@@ -857,11 +854,8 @@ export function AddToCart({
             custom ? composition : undefined,
             color || undefined,
           );
-          if (onAdded) onAdded();
-          else {
-            setAdded(true);
-            setQuantity(min);
-          }
+          setAdded(true);
+          setQuantity(min);
         }}
       >
         {custom && !packComplete(productId, composition, config!) ? (
@@ -895,8 +889,8 @@ export function AddToCart({
           </>
         )}
       </Button>
-      {!onAdded && added && <ComplementarySuggestions contextSku={productId} afterAdd />}
-      {!onAdded && (added || inCart > 0) && (
+      {added && <ComplementarySuggestions contextSku={productId} afterAdd />}
+      {(added || inCart > 0) && (
         <a className="b-link" href="/cart" aria-live="polite">
           {inCart} <CustomerCopy>in your cart · View cart</CustomerCopy>
         </a>
