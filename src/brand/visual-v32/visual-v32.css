@@ -678,3 +678,16 @@
  .v32-popup .v32-pack-selector{gap:9px}
  .v32-popup .v32-pack-helper{font-size:12px}
 }
+
+/* Unassigned published-media state is explicit, never substituted by unrelated
+ * preview concepts. Preserve editorial styling while keeping provenance honest. */
+.v32-app .v32-photo-empty{
+  display:flex;position:relative;align-items:center;justify-content:center;
+  flex-direction:column;gap:10px;width:100%;height:100%;
+  min-height:160px;background:linear-gradient(145deg,#f1d5d0,#f7e6e0 56%,#e9c5bf);
+  color:#8a604c;text-align:center;
+}
+.v32-app .v32-photo-empty strong{font:500 clamp(27px,2.5vw,37px)/1 "Cormorant Garamond",Georgia,serif!important;letter-spacing:.02em}
+.v32-app .v32-photo-empty small{font:500 10px/1.4 "Jost",Arial,sans-serif;text-transform:uppercase;letter-spacing:.15em}
+.v32-app .v32-subcategories{position:relative;z-index:5;will-change:auto;transform:none;animation:none}
+.v32-app .v32-subcategories button{position:relative;transform:none;animation:none}

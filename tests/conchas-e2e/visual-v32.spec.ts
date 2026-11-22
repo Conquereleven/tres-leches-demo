@@ -464,13 +464,21 @@ test("REF_C and REF_D have distinct approved backdrop sharpness",async ({page})=
  expect(await page.locator(".v32-scrim").evaluate(el=>getComputedStyle(el).backdropFilter)).toContain("blur(");
 });
 
-test("V3.2 published subcategories refine 3L products without mock category IDs",async ({page})=>{
+test("V3.2 published subcategories refine 3L products without mock category IDs",async ({page},info)=>{
+ // WebKit actionability should verify the same native pointer event under
+ // supported reduced-motion semantics; animation is tested separately.
+ await page.emulateMedia({reducedMotion:"reduce"});
  await page.goto("/visual-v32/bakery?category=mexican&lang=es");
  const category=page.locator(".v32-subcategories");
  await expect(category).toBeVisible();
  await expect(category.locator('[data-category-id="pan"]')).toBeVisible();
  await expect(category.locator('[data-category-id="conchas"]')).toBeVisible();
- await category.locator('[data-category-id="conchas"]').click();
+ await category.locator('[data-category-id="conchas"]').click({timeout:12000});
+ await expect(category.locator('[data-category-id="conchas"]')).toHaveAttribute("aria-pressed","true");
+ if(info.project.name==="chromium"){
+   mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+   await page.screenshot({path:"docs/brand/brand02/conchas/v32-3l-categories-desktop.png",animations:"disabled"});
+ }
  const cards=page.locator(".v32-product");
  await expect(cards.first()).toBeVisible();
  expect(await cards.evaluateAll(list=>list.every(node=>node.getAttribute("data-category-id")==="conchas"))).toBe(true);

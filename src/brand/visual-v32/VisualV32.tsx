@@ -443,7 +443,8 @@ function Bakery(){
                 ??canonical?.derivatives[0]?.src
                 ??(!publishedMediaAuthority()?family.image:null);
               return src?<img src={src} alt={product.title} loading="lazy"/>:
-                <span className="v32-photo-empty" role="img" aria-label={product.title}/>;
+                <span className="v32-photo-empty" role="img" aria-label={product.title+" — photograph pending"}
+                  data-media-state="unassigned"><strong>✧ 3L</strong><small>{language==="es"?"Fotografía pendiente":language==="ar"?"الصورة قيد الإعداد":"Photo pending"}</small></span>;
             })()}
               <span className="v32-card-heart" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
