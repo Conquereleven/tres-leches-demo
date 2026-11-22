@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { createPortal } from "react-dom";
 import { cart, cartCount, cartSubtotalFils, displayLinePrice, minQty, MAX_QTY, useCart, useCheckoutConfig, type CheckoutConfig } from "../cart";
 import { useLanguage } from "../localization";
 import { formatAed } from "../content";
@@ -98,25 +99,68 @@ export function VisualCheckout(){
  </main>;
 }
 export function VisualReturn(){const {t}=useVisualCopy();return <main className="v32-new-page" id="main" data-new-ui="return"><p className="v32-new-eyebrow">3L · CUSTOMER CARE</p><h1>{t.checkout}</h1><div className="v32-new-panel"><p>{t.notice}</p><p>This preview cannot confirm a payment. If you have an existing real order, do not pay again to check its status. Please contact 3L support.</p><a className="v32-new-action" href={suffix("/contact")}>{t.contact}</a></div></main>;}
-export function VisualAddToCart({productId,onAdded}:{productId:string;onAdded:()=>void}){
- const {language,t}=useVisualCopy();const {config,loading}=useCheckoutConfig();const lines=useCart();
- const product=config?.products.find(p=>p.id===productId);const spec=packSpec(productId),tricolor=tricolorSpec(productId);
- const [qty,setQty]=useState(minQty(productId)),[color,setColor]=useState<TricolorColor|null>(null),[composition,setComposition]=useState<Composition>([]);
+
+export function VisualAddToCart({productId,onAdded,controlsTarget}:{
+ productId:string;onAdded:()=>void;controlsTarget:HTMLDivElement|null;
+}){
+ const {language,t}=useVisualCopy();
+ const {config,loading}=useCheckoutConfig();
+ const lines=useCart();
+ const product=config?.products.find(p=>p.id===productId);
+ const spec=packSpec(productId),tricolor=tricolorSpec(productId);
+ const [qty,setQty]=useState(minQty(productId));
+ const [note,setNote]=useState("");
+ const [color,setColor]=useState<TricolorColor|null>(null);
+ const [composition,setComposition]=useState<Composition>([]);
  const inCart=lines.filter(l=>l.productId===productId).reduce((sum,l)=>sum+l.quantity,0);
  const allowedPack=spec&&config?.personalizedPacks?.enabled&&config.personalizedPacks.rules.some(rule=>rule.packSkuId===productId);
  const cap=spec?.capacity||0;const picked=composition.reduce((sum,x)=>sum+x.units,0);
  const valid=!spec||!!allowedPack&&picked===cap;
- const canAdd=!!config?.enabled&&!!product&&!loading&&valid&&(!tricolor||tricolor.kind==="fixed"||!!color)&&inCart+qty<=MAX_QTY;
- const add=()=>{if(!canAdd)return;cart.add(productId,qty,spec?composition:undefined,color||undefined);
-  // Existing domain validation already enforced; UI completion is storage-independent.
-  onAdded();
- };
- const choose=(id:string,delta:number)=>setComposition(old=>{const units=Math.max(0,Math.min(cap, (old.find(x=>x.componentSkuId===id)?.units||0)+delta));const other=old.filter(x=>x.componentSkuId!==id);return units?[...other,{componentSkuId:id,units}]:other;});
- return <div className="v32-buy-form" data-new-ui="add-to-cart">
-  {tricolor?.kind==="single"&&<label>{t.selection}<select value={color||""} onChange={e=>setColor(e.target.value as TricolorColor)}><option value="">{t.choose}</option>{TRICOLOR_COLORS.map(c=><option key={c} value={c}>{tricolorCopy[language][c]}</option>)}</select></label>}
-  {spec&&<div className="v32-new-pack"><p>{t.boxes} · {t.pieces}: {picked}/{cap}</p>{allowedPack?spec.components.map(c=><div key={c.componentSkuId}><span>{componentName(c.componentSkuId,language)}</span><button type="button" aria-label="Decrease selection" onClick={()=>choose(c.componentSkuId,-1)}>−</button><span>{composition.find(x=>x.componentSkuId===c.componentSkuId)?.units||0}</span><button type="button" aria-label="Increase selection" disabled={picked>=cap} onClick={()=>choose(c.componentSkuId,1)}>+</button></div>):<p role="alert">{t.notReady}</p>}</div>}
-  <div className="v32-buy-row"><div className="v32-buy-price"><span>{t.price}</span><strong>{product?money(displayLinePrice({productId,quantity:qty,...(spec?{composition}:{})},product.priceFils,config?.packPricing)*qty):t.notReady}</strong></div><div className="v32-buy-qty" role="group" aria-label={t.quantity}><button type="button" aria-label="Decrease quantity" disabled={qty<=minQty(productId)} onClick={()=>setQty(n=>Math.max(minQty(productId),n-1))}>−</button><output>{qty}</output><button type="button" aria-label="Increase quantity" disabled={qty+inCart>=MAX_QTY} onClick={()=>setQty(n=>n+1)}>+</button></div></div>
-  <button className="v32-buy-cta" type="button" disabled={!canAdd} onClick={add}>{t.add} · {product?money(displayLinePrice({productId,quantity:qty,...(spec?{composition}:{})},product.priceFils,config?.packPricing)*qty):"—"}</button>
-  {!valid&&<small role="alert">{t.invalid}</small>}
+ const amount=product?displayLinePrice({productId,quantity:qty,...(spec?{composition}:{})},product.priceFils,config?.packPricing)*qty:Number.NaN;
+ const amountValid=Number.isFinite(amount)&&amount>=0;
+ const canAdd=!!config?.enabled&&!!product&&!loading&&valid&&amountValid&&
+   (!tricolor||tricolor.kind==="fixed"||!!color)&&inCart+qty<=MAX_QTY;
+ // Variant changes preserve the visual note, as in the original ProductPopup.
+ useEffect(()=>{setQty(minQty(productId));setColor(null);setComposition([]);},[productId]);
+ const add=()=>{if(!canAdd)return;cart.add(productId,qty,spec?composition:undefined,color||undefined);onAdded();};
+ const choose=(id:string,delta:number)=>setComposition(old=>{
+   const units=Math.max(0,Math.min(cap,(old.find(x=>x.componentSkuId===id)?.units||0)+delta));
+   const other=old.filter(x=>x.componentSkuId!==id);
+   return units?[...other,{componentSkuId:id,units}]:other;
+ });
+ const noteLabel=language==="es"?"PERSONALIZACIÓN (OPCIONAL)":language==="ar"?"تخصيص (اختياري)":"PERSONALIZATION (OPTIONAL)";
+ const placeholder=language==="es"?'Ej. "Feliz cumpleaños"':language==="ar"?"أضف ملاحظة (40 حرفاً)":"Add a note (e.g. no sugar, gift message…)";
+ const controls=<div className="v32-config-fields" data-source-component="ProductPopup">
+   {tricolor?.kind==="single"&&<label className="v32-config-extra">{t.selection}<select value={color||""} onChange={e=>setColor(e.target.value as TricolorColor)}><option value="">{t.choose}</option>{TRICOLOR_COLORS.map(c=><option key={c} value={c}>{tricolorCopy[language][c]}</option>)}</select></label>}
+   {spec&&<div className="v32-new-pack"><p>{t.boxes} · {t.pieces}: {picked}/{cap}</p>{allowedPack?spec.components.map(c=><div key={c.componentSkuId}><span>{componentName(c.componentSkuId,language)}</span><button type="button" aria-label="Decrease selection" onClick={()=>choose(c.componentSkuId,-1)}>−</button><span>{composition.find(x=>x.componentSkuId===c.componentSkuId)?.units||0}</span><button type="button" aria-label="Increase selection" disabled={picked>=cap} onClick={()=>choose(c.componentSkuId,1)}>+</button></div>):<p role="alert">{t.notReady}</p>}</div>}
+   <div className="v32-buy-row">
+     <div className="v32-buy-price"><span>{t.price}</span><strong>{amountValid?money(amount):t.notReady}</strong></div>
+     <div className="v32-buy-qty" role="group" aria-label={t.quantity}>
+       <button type="button" aria-label="Decrease quantity" disabled={qty<=minQty(productId)} onClick={()=>setQty(n=>Math.max(minQty(productId),n-1))}>−</button>
+       <output aria-live="polite">{qty}</output>
+       <button type="button" aria-label="Increase quantity" disabled={qty+inCart>=MAX_QTY} onClick={()=>setQty(n=>n+1)}>+</button>
+     </div>
+   </div>
+   <div className="v32-personalization">
+     <label htmlFor="v32-product-note">{noteLabel}</label>
+     <div className="v32-personalization-field">
+       <span aria-hidden="true" className="v32-pencil">✎</span>
+       <input id="v32-product-note" value={note} maxLength={40}
+          onChange={e=>setNote(e.target.value.slice(0,40))}
+          aria-describedby="v32-note-disclaimer" placeholder={placeholder}/>
+       <output aria-live="polite">{note.length}/40</output>
+     </div>
+     <span className="v32-sr" id="v32-note-disclaimer">Visual preview only: this note is not saved to a real order.</span>
+   </div>
  </div>;
+ return <>
+   {controlsTarget?createPortal(controls,controlsTarget):null}
+   <div className="v32-buy-form" data-new-ui="add-to-cart">
+     <button className="v32-buy-cta" type="button" disabled={!canAdd} onClick={add}>
+       <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
+       {t.add} — {amountValid?money(amount):"—"}
+     </button>
+     {!valid&&<small role="alert">{t.invalid}</small>}
+   </div>
+ </>;
 }

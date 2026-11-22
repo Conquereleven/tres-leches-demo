@@ -567,3 +567,47 @@
 /* ZIP header exact lightweight shopping-bag line art, no legacy icon. */
 .v32-cart-glyph{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
 .v32-cart-glyph svg{width:16px;height:16px;display:block}
+
+/* REF_C/D exact anatomy: variants -> price & quantity -> 40-char note.
+   Only CTA is in the pinned footer; body scrolls on short screens. */
+.v32-popup .v32-popup-controls-anchor{display:contents}
+.v32-popup .v32-config-fields{display:flex;flex-direction:column;gap:15px;margin-top:18px}
+.v32-popup .v32-config-fields .v32-buy-row{display:flex;gap:12px;align-items:flex-end;justify-content:space-between;margin:0}
+.v32-popup .v32-buy-price{display:flex;flex-direction:column;gap:4px}
+.v32-popup .v32-buy-price span,.v32-popup .v32-personalization label{
+ font:500 10px/1.35 "Jost",Arial,sans-serif;letter-spacing:.20em;text-transform:uppercase;color:#8c6a5d}
+.v32-popup .v32-buy-price strong{font:600 31px/1 "Cormorant Garamond",Georgia,serif!important;color:#1c1517}
+.v32-popup .v32-buy-qty{display:flex;align-items:center;justify-content:center;gap:8px;
+ border:1px solid #b98a4e66;border-radius:999px;background:rgba(255,255,255,.60);min-height:42px;padding:4px 9px}
+.v32-popup .v32-buy-qty button{width:30px;height:30px;display:grid;place-items:center;border:0;border-radius:50%;font-size:19px;background:transparent;color:#8c5a2f}
+.v32-popup .v32-buy-qty output{min-width:20px;text-align:center;font:500 14px "Jost",Arial,sans-serif}
+.v32-popup .v32-personalization{display:flex;flex-direction:column;gap:8px}
+.v32-popup .v32-personalization-field{display:flex;align-items:center;gap:9px;min-height:44px;
+ padding:8px 13px;border:1px solid #b98a4e66;border-radius:12px;background:#ffffff8c}
+.v32-popup .v32-personalization-field input{display:block;min-width:0;flex:1;border:0;box-shadow:none;background:transparent;outline:none;
+ font:italic 16px/1.2 "Cormorant Garamond",Georgia,serif;color:#1c1517}
+.v32-popup .v32-personalization-field input::placeholder{color:#8c6a5dba}
+.v32-popup .v32-personalization-field output{flex:none;font:400 11px/1.2 "Jost",Arial,sans-serif;color:#8c6a5d}
+.v32-popup .v32-pencil{font:19px/1 "Cormorant Garamond",Georgia,serif;color:#8c6a5d}
+.v32-popup .v32-popup-footer{flex:0 0 auto;display:block!important;
+ padding:12px 20px max(14px,env(safe-area-inset-bottom))!important;border-top:0;
+ background:linear-gradient(180deg,#ffe8e200,#ffe3decf 17px)!important}
+.v32-popup .v32-popup-footer .v32-buy-form{display:block!important;width:100%}
+.v32-popup .v32-popup-footer .v32-buy-cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:49px;
+ border:0;border-radius:999px;background:#b12e64!important;color:white!important;font:600 12px/1.35 "Jost",Arial,sans-serif;
+ letter-spacing:.12em;text-transform:uppercase;box-shadow:0 14px 30px -10px #b12e6499}
+.v32-popup .v32-popup-footer .v32-buy-cta svg{flex:none}
+.v32-popup .v32-popup-footer .v32-buy-cta:hover:not(:disabled){background:#9c2656!important;transform:translateY(-2px)}
+.v32-popup .v32-popup-scroll{min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden}
+.v32-popup .v32-minimum{margin:12px 0 0}
+@media(max-width:640px){
+ .v32-popup .v32-config-fields{gap:12px;margin-top:14px}
+ .v32-popup .v32-popup-scroll{padding:16px 17px 8px}
+ .v32-popup .v32-popup-footer{padding:8px 16px max(11px,env(safe-area-inset-bottom))!important}
+ .v32-popup .v32-personalization-field{min-height:40px;padding:6px 10px}
+ .v32-popup .v32-buy-qty{min-height:40px}
+}
+@media(max-height:600px) and (max-width:640px){
+ .v32-popup .v32-popup-scroll{padding:12px 14px 7px}
+ .v32-popup .v32-config-fields{gap:9px;margin-top:11px}
+}

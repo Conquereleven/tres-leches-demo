@@ -264,6 +264,7 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
   const [place,setPlace]=useState<CSSProperties>({left:12,top:12,maxHeight:"calc(100dvh - 24px)"});
   const [side,setSide]=useState<"right"|"left"|"overlap"|"mobile"|"mobile-compact">("mobile");
   const panel=useRef<HTMLDivElement>(null);
+  const [controlsTarget,setControlsTarget]=useState<HTMLDivElement|null>(null);
   const closeButton=useRef<HTMLButtonElement>(null);
   useLayoutEffect(()=>{
     const recalc=()=>{
@@ -316,12 +317,14 @@ function ProductDialog({product,onClose,onAdded,anchor}:{
             <span>{o.size}</span><small>{formatAed(o.priceFils)}</small>
           </button>)}
         </div>
+        <div className="v32-popup-controls-anchor" ref={setControlsTarget}/>
         {chosen&&minQty(chosen.id)>1&&
           <p className="v32-minimum" data-minimum-notice>{t.minimum(minQty(chosen.id))}</p>}
         {!chosen&&!loading&&<p role="status">{t.orderingUnavailable}</p>}
       </div>
       <div className="v32-popup-footer">
-        {chosen?<VisualAddToCart key={chosen.id} productId={chosen.id} onAdded={onAdded}/>:
+        {chosen?<VisualAddToCart key={product.id} productId={chosen.id} onAdded={onAdded}
+          controlsTarget={controlsTarget}/>:
           <button disabled type="button">ADD TO CART · UNAVAILABLE</button>}
       </div>
     </div>
