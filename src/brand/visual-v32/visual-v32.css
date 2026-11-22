@@ -260,3 +260,83 @@
 .v32-app .v32-commerce-shell .brand-experience > aside,
 .v32-app .v32-commerce-shell .b-floating-cart,
 .v32-app .v32-commerce-shell .b-shopping-wa{display:none!important}
+
+
+/* V3.2 fidelity correction, founder feedback 22-Nov-2026.
+ * Native selects previously sat on a different text baseline; fixed-height
+ * control and centralized flex alignment share one true nav centreline.
+ */
+.v32-nav-left,.v32-nav-right{
+  min-height:40px;align-items:center;
+  line-height:1.25;
+  text-transform:none;
+}
+.v32-nav-left>a,.v32-nav-right>a{
+  display:inline-flex;align-items:center;min-height:40px;line-height:1.25;
+  text-transform:none;
+}
+.v32-nav-right .v32-language-control{
+  display:inline-flex;align-items:center;justify-content:center;
+  position:relative;height:40px;min-width:61px;margin:0;padding:0;
+  flex:none;vertical-align:middle;
+}
+.v32-nav-right .v32-language-control select{
+  -webkit-appearance:none;appearance:none;display:block;
+  margin:0;min-width:61px;height:38px;padding:0 23px 0 12px;
+  border:1px solid rgba(255,255,255,.85);border-radius:999px;
+  background:rgba(255,255,255,.75);
+  font:600 11px/38px "3L Montserrat",Arial,sans-serif;
+  color:#7f5731;letter-spacing:0;cursor:pointer;
+}
+.v32-nav-right .v32-language-control::after{
+  content:"⌄";position:absolute;right:9px;top:50%;transform:translateY(-56%);
+  font:14px/1 Arial,sans-serif;color:#7f5731;pointer-events:none;
+}
+.v32-nav-right .v32-language-control select:focus-visible{
+  outline:2px solid #27242D;outline-offset:2px;box-shadow:0 0 0 4px #A28D5B;
+}
+.v32-popup .v32-popup-scroll{min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden}
+.v32-popup .v32-popup-unit{gap:4px;margin-top:17px}
+.v32-popup .v32-minimum{margin:14px 0 0;color:#35282b;font:500 12px/1.5 "3L Montserrat",Arial,sans-serif}
+.v32-popup .v32-popup-footer{
+  flex:none;position:relative;overflow:visible;
+  border-top:1px solid rgba(255,255,255,.72);
+  padding:9px 20px 19px;
+}
+.v32-popup .v32-popup-footer.b-menu-options{padding:9px 20px 19px!important}
+.v32-popup .v32-popup-footer .b-add-to-cart{display:grid;gap:12px}
+.v32-popup .v32-popup-footer .b-menu-advance{display:none!important}
+.v32-popup .v32-popup-footer .b-qty{
+  margin-left:auto;padding:6px 10px;min-height:45px;
+  border:1px solid #d6b49d;border-radius:99px;background:#fff9;
+}
+.v32-popup .v32-popup-footer .b-qty button{
+  display:grid;place-items:center;min-height:32px;min-width:32px;
+  color:#985d25;background:transparent;box-shadow:none!important;
+}
+.v32-popup .v32-popup-footer .b-qty input{
+  width:42px;min-width:32px;text-align:center;font-size:14px;
+}
+.v32-popup .v32-popup-footer .b-add-to-cart>button{
+  width:100%;min-height:49px;margin:0;border:0;border-radius:99px;
+  background:#A93C68!important;color:#fff!important;font:600 13px/1.35 "3L Montserrat",Arial,sans-serif;
+  box-shadow:0 11px 23px rgba(169,60,104,.18)!important;
+}
+.v32-popup .v32-popup-footer .b-add-to-cart>button:focus-visible{
+  outline:2px solid #27242D;outline-offset:3px;box-shadow:0 0 0 5px #A28D5B!important;
+}
+.v32-popup .v32-popup-footer .b-add-to-cart>button:active{transform:translateY(1px)}
+.v32-cart-status:empty{
+  position:absolute;height:1px;width:1px;overflow:hidden;clip-path:inset(50%);
+}
+.v32-cart-status:not(:empty){
+  max-width:max-content;margin:24px auto 0;padding:10px 17px;
+  border-radius:99px;border:1px solid #fff9;background:#fff9;
+  color:#27242D;font-size:12px;text-align:center;
+}
+@media(max-width:640px){
+  .v32-nav-right{gap:8px}
+  .v32-popup .v32-popup-footer.b-menu-options{padding:8px 15px 12px!important}
+  .v32-popup .v32-popup-footer .b-add-to-cart{gap:8px}
+  .v32-popup .v32-minimum{margin-top:10px}
+}

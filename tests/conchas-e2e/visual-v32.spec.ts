@@ -238,3 +238,65 @@ test("V3.2 mobile Contact, Cart and Checkout retain the connected visual shell",
     }
   }
 });
+
+test("V3.2 header uses natural capitalization and language selector shares nav centreline",async ({page})=>{
+  await page.setViewportSize({width:1440,height:900});
+  await page.goto("/visual-v32?lang=en");
+  await expect(page.locator(".v32-nav-left a").first()).toHaveText("Home");
+  await expect(page.locator(".v32-nav-left a").nth(1)).toHaveText("Menu");
+  await expect(page.locator(".v32-nav-right a").first()).toHaveText("Journal");
+  await expect(page.locator(".v32-nav-right a").nth(1)).toHaveText("Contact");
+  await expect(page.locator(".v32-nav-right a").last()).toContainText("Cart (");
+  const lang=await page.locator(".v32-nav-right select").boundingBox();
+  const contact=await page.locator(".v32-nav-right a").nth(1).boundingBox();
+  expect(lang).not.toBeNull();expect(contact).not.toBeNull();
+  const center=(box:{y:number;height:number})=>box.y+box.height/2;
+  expect(Math.abs(center(lang!)-center(contact!))).toBeLessThanOrEqual(2);
+  await page.locator(".v32-nav-right select").selectOption("es");
+  await expect(page.locator(".v32-nav-left a").first()).toHaveText("Inicio");
+  await expect(page.locator(".v32-nav-right a").first()).toHaveText("Historia");
+  await expect(page.locator(".v32-nav-right a").last()).toContainText("Carrito (");
+});
+
+test("V3.2 add-to-cart commits canonical item and closes without legacy suggestion UI",async ({page})=>{
+  await page.setViewportSize({width:1440,height:900});
+  await page.goto("/visual-v32/bakery?category=mexican&lang=en");
+  const item=page.locator('[data-product-id="pan-azucar-chocolate-covering"]');
+  const open=await item.count()?item:page.locator(".v32-product:not([disabled])").first();
+  await expect(open).toBeEnabled();
+  await open.click();
+  const dialog=page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  const oldCount=await page.locator(".v32-nav-right a[href='/visual-v32/cart'] span").innerText();
+  const add=dialog.locator(".b-add-to-cart > button").first();
+  await expect(add).toBeEnabled();
+  await add.click();
+  await expect(dialog).toHaveCount(0);
+  await expect(open).toBeFocused();
+  await expect(page.locator(".v32-cart-status")).toContainText("Added to cart");
+  await expect.poll(async()=>Number(await page.locator(".v32-nav-right a[href='/visual-v32/cart'] span").innerText()))
+    .toBeGreaterThan(Number(oldCount));
+  await expect(page.getByText("Anything else for your order?")).toHaveCount(0);
+  await expect(page.getByText("Continue shopping")).toHaveCount(0);
+});
+
+test("V3.2 short-screen product selector keeps checkout action visible",async ({page})=>{
+  for(const size of [{width:390,height:844},{width:375,height:667},{width:320,height:568}]){
+    await page.setViewportSize(size);
+    await page.goto("/visual-v32/bakery?category=mexican&lang=en");
+    const product=page.locator(".v32-product:not([disabled])").first();
+    await expect(product).toBeVisible();await product.click();
+    const dialog=page.getByRole("dialog");
+    const action=dialog.locator(".b-add-to-cart > button").first();
+    await expect(action).toBeVisible();
+    const panel=await dialog.boundingBox(),button=await action.boundingBox();
+    expect(panel).not.toBeNull();expect(button).not.toBeNull();
+    expect(panel!.y).toBeGreaterThanOrEqual(0);
+    expect(panel!.y+panel!.height).toBeLessThanOrEqual(size.height+1);
+    expect(button!.y).toBeGreaterThanOrEqual(0);
+    expect(button!.y+button!.height).toBeLessThanOrEqual(size.height+1);
+    await expect(dialog.getByText("Anything else for your order?")).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
+  }
+});

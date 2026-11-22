@@ -1,7 +1,7 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from "react";
 import { createPortal } from "react-dom";
 import { useMenu, menuProductFamily, type StorefrontProduct } from "../menu";
-import { useCheckoutConfig, useCheckoutNow, useCart, cartCount } from "../cart";
+import { useCheckoutConfig, useCheckoutNow, useCart, cartCount, minQty } from "../cart";
 import { useLanguage } from "../localization";
 import { availableSku } from "../../../shared/commerce-policy";
 import { liveOrderable } from "../live-catalog";
@@ -20,8 +20,8 @@ import "./visual-v32.css";
 type Filter = "all" | "cakes" | "bakery" | "mexican" | "special";
 const origin = "/visual-v32";
 const visualNav = {
-  en: {home:"HOME",menu:"Menu",journal:"JOURNAL",contact:"Contact",cart:"CART",story:"The 3L story",support:"Customer care"},
-  es: {home:"INICIO",menu:"Menú",journal:"HISTORIA",contact:"Contacto",cart:"CARRITO",story:"La historia de 3L",support:"Atención al cliente"},
+  en: {home:"Home",menu:"Menu",journal:"Journal",contact:"Contact",cart:"Cart",story:"The 3L story",support:"Customer care"},
+  es: {home:"Inicio",menu:"Menú",journal:"Historia",contact:"Contacto",cart:"Carrito",story:"La historia de 3L",support:"Atención al cliente"},
   ar: {home:"الرئيسية",menu:"القائمة",journal:"قصتنا",contact:"اتصل بنا",cart:"السلة",story:"قصة 3L",support:"خدمة العملاء"},
 } as const;
 const visualCopy = {
@@ -41,7 +41,9 @@ const visualCopy = {
   variants:"CHOOSE A VARIANT",price:"PRICE",from:"From ",unavailable:"UNAVAILABLE",
   loading:"Loading available products...",orderingUnavailable:"Online ordering is unavailable.",
   notFound:"No matching products.",retry:"TRY AGAIN",variantUnavailable:"Online ordering is unavailable for this variant.",
-  legalTerms:"Terms & Conditions",privacy:"Privacy"
+  legalTerms:"Terms & Conditions",privacy:"Privacy",
+  minimum:(count:number)=>`Minimum order: ${count} pieces`,
+  added:"Added to cart"
  },
  es: {
   hero1:"Más que un pastel.",hero2:"Una tradición familiar.",today:"HOY",
@@ -59,7 +61,9 @@ const visualCopy = {
   variants:"ELIGE UNA VARIANTE",price:"PRECIO",from:"Desde ",unavailable:"NO DISPONIBLE",
   loading:"Cargando productos disponibles...",orderingUnavailable:"Los pedidos en línea no están disponibles.",
   notFound:"No se encontraron productos.",retry:"REINTENTAR",variantUnavailable:"Esta variante no está disponible para pedidos en línea.",
-  legalTerms:"Términos y condiciones",privacy:"Privacidad"
+  legalTerms:"Términos y condiciones",privacy:"Privacidad",
+  minimum:(count:number)=>`Pedido mínimo: ${count} piezas`,
+  added:"Añadido al carrito"
  },
  ar: {
   hero1:"أكثر من مجرد كعكة.",hero2:"تقليد عائلي.",today:"اليوم",
@@ -77,7 +81,9 @@ const visualCopy = {
   variants:"اختر النوع",price:"السعر",from:"ابتداءً من ",unavailable:"غير متاح",
   loading:"جارٍ تحميل المنتجات المتاحة...",orderingUnavailable:"الطلبات عبر الإنترنت غير متاحة.",
   notFound:"لا توجد منتجات مطابقة.",retry:"حاول مجدداً",variantUnavailable:"هذا الخيار غير متاح للطلب عبر الإنترنت.",
-  legalTerms:"الشروط والأحكام",privacy:"الخصوصية"
+  legalTerms:"الشروط والأحكام",privacy:"الخصوصية",
+  minimum:(count:number)=>`الحد الأدنى للطلب: ${count} قطع`,
+  added:"أُضيف إلى السلة"
  }
 } as const;
 
@@ -129,11 +135,13 @@ function Header(){
       <a className="v32-logo" href={origin}><strong>✧ 3L pastelerías</strong><small>MEXICO CITY SINCE 1982</small></a>
       <span className="v32-nav-right">
         <a href={origin+"/#journal"}>{labels.journal}</a><a href={origin+"/contact"}>{labels.contact}</a>
-        <label><span className="v32-sr">Language</span><select aria-label="Language" value={language}
-          onChange={e=>setLanguage(e.target.value as typeof language)}>
-          <option value="en">EN</option><option value="es">ES</option><option value="ar">AR</option>
-        </select></label>
-        <a href={origin+"/cart"}>{labels.cart} ({count})</a>
+        <label className="v32-language-control"><span className="v32-sr">Language</span>
+          <select aria-label="Language" value={language}
+            onChange={e=>setLanguage(e.target.value as typeof language)}>
+            <option value="en">EN</option><option value="es">ES</option><option value="ar">AR</option>
+          </select>
+        </label>
+        <a href={origin+"/cart"}>{labels.cart} (<span aria-live="polite">{count}</span>)</a>
       </span>
     </nav>
     {mobileOpen&&<nav className="v32-mobile-drawer" id="v32-mobile-links" aria-label="Mobile navigation">
@@ -191,8 +199,8 @@ function Landing(){
     </div>
   </main>;
 }
-function ProductDialog({product,onClose,anchor}:{
-  product:StorefrontProduct;onClose:()=>void;anchor:HTMLElement|null;
+function ProductDialog({product,onClose,onAdded,anchor}:{
+  product:StorefrontProduct;onClose:()=>void;onAdded:()=>void;anchor:HTMLElement|null;
 }){
   const menu=useMenu();
   const {language}=useLanguage();const t=visualCopy[language];
@@ -266,11 +274,13 @@ function ProductDialog({product,onClose,anchor}:{
         {chosen&&<div className="v32-popup-unit">
           <p className="v32-section-caption">{t.price}</p>
           <strong className="b-menu-price">{formatAed(chosen.priceFils)}</strong>
+          {minQty(chosen.id)>1&&<p className="v32-minimum" data-minimum-notice>{t.minimum(minQty(chosen.id))}</p>}
         </div>}
         {!chosen&&!loading&&<p role="status">{t.orderingUnavailable}</p>}
       </div>
       <div className="v32-popup-footer b-menu-options">
         {chosen?<AddToCart key={chosen.id} productId={chosen.id}
+          onAdded={onAdded}
           fallback={<p role="status">{t.variantUnavailable}</p>}/>:
           <button disabled type="button">ADD TO CART · UNAVAILABLE</button>}
       </div>
@@ -289,8 +299,10 @@ function Bakery(){
   const [filter,setFilter]=useState<Filter>(initial);
   const [query,setQuery]=useState(params.get("q")??"");
   const [selected,setSelected]=useState<string|null>(null);
+  const [addedMessage,setAddedMessage]=useState("");
   const trigger=useRef<HTMLButtonElement|null>(null);
-  const close=()=>{setSelected(null);trigger.current?.focus();};
+  const close=useCallback(()=>{setSelected(null);trigger.current?.focus();},[]);
+  const afterAdd=useCallback(()=>{setAddedMessage(visualCopy[language].added);close();},[language,close]);
   const available=menu.status!=="unavailable"&&menu.status!=="loading"&&!loading&&!!config;
   const items=available?menu.products.filter(p=>{
     const family=menuProductFamily(menu,p),q=query.trim().toLowerCase();
@@ -327,7 +339,7 @@ function Bakery(){
           const price=valid.length?Math.min(...valid.map(v=>v.priceFils)):null;
           return <button type="button" key={product.id} className="v32-product" data-product-id={product.id}
             aria-haspopup="dialog" aria-expanded={selected===product.id} disabled={price===null}
-            onClick={e=>{trigger.current=e.currentTarget;setSelected(product.id);}}>
+            onClick={e=>{trigger.current=e.currentTarget;setAddedMessage("");setSelected(product.id);}}>
             <span className="v32-photo"><ResponsiveMedia productId={product.id} family={family.id}
               variant={product.variant} alt={product.title}
               fallback={menu.status==="bundled"?family.image:null}/></span>
@@ -337,7 +349,8 @@ function Bakery(){
           </button>;
         })}
       </div>}
-    {active&&<ProductDialog product={active} onClose={close} anchor={trigger.current}/>}
+    <p className="v32-cart-status" role="status" aria-live="polite">{addedMessage}</p>
+    {active&&<ProductDialog product={active} onClose={close} onAdded={afterAdd} anchor={trigger.current}/>}
   </main>;
 }
 /** The existing commercial components own checkout and policy facts. V3.2 owns

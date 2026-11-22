@@ -25,3 +25,18 @@ Four desktop columns preserved. No custom payment logic.
 - No current visual sign-off: original standalone V3.2 ZIP refs/assets Cormorant and
   reference photographs are not available in this checkout; visual comparison remains NO-GO.
 - CI browser evidence is required at the new SHA. No merge/deploy/Production authorization.
+
+## V3.2 fidelity correction F01/F02 (22-Nov-2026)
+- Founder feedback: header navigation should use natural case (Home/Menu/Journal/
+  Contact/Cart) and language control must share the vertical centreline.
+- Product selector must use approved V3.2 anatomy, including scrollable variant
+  section, price and explicit minimum within the scroll body, quantity and single
+  CTA in the persistent footer. No legacy after-add recommendations, duplicate
+  bottom links, or distorted modal from the existing commercial AddToCart UI.
+- `AddToCart.onAdded` is an optional preview-only completion hook. Its absence
+  preserves all existing store behavior; when present it closes V3.2 dialog,
+  restores product-card focus and exposes an accessible catalog status while
+  retaining the canonical cart.add process. No extra payment or price logic.
+- Add browser checks for title case, selector alignment, clean after-add,
+  canonical cart-count increase, Escape/focus, 320/375/390 short viewports.
+- Visual fidelity still awaiting reference source assets and Founder approval.
