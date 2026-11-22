@@ -5,6 +5,8 @@ import { useLanguage } from "../localization";
 import { formatAed } from "../content";
 import { business, phoneHref, policyDecisions, type PolicyPath } from "../business";
 import { lineKey, packSpec, componentName, type Composition } from "../../../shared/pack-composition";
+import { menuFamilyForSku } from "../menu";
+import { packQtyLabel, presentationLabel, toPackChoice } from "./catalog-options";
 import { tricolorCopy, tricolorSpec, TRICOLOR_COLORS, type TricolorColor } from "../../../shared/tricolor";
 
 const root="/visual-v32";
@@ -19,10 +21,16 @@ function useVisualCopy(){const {language}=useLanguage();return {language,t:copy[
 function Panel({title,children}:{title:string;children:React.ReactNode}){return <section className="v32-new-panel"><h2>{title}</h2>{children}</section>;}
 function Empty({message}:{message:string}){return <div className="v32-new-empty"><p>{message}</p><a className="v32-new-action" href={suffix("/bakery")}>{copy.en.continue} ↗</a></div>;}
 function Summary({config}:{config:CheckoutConfig}){
- const lines=useCart();const {t}=useVisualCopy();
+ const lines=useCart();const {language,t}=useVisualCopy();
  const good=lines.filter(l=>config.products.some(p=>p.id===l.productId));
  return <aside className="v32-new-summary"><h2>{t.cart} · {cartCount(lines)}</h2>
- <ul>{good.map(l=>{const p=config.products.find(p=>p.id===l.productId)!;return <li key={lineKey(l)}><span>{p.name}<small> × {l.quantity}</small></span><strong>{money(displayLinePrice(l,p.priceFils,config.packPricing)*l.quantity)}</strong></li>})}</ul>
+ <ul>{good.map(l=>{const p=config.products.find(p=>p.id===l.productId)!;return <li key={lineKey(l)}><span>{p.name}<small> × {l.quantity}</small>
+  {(()=>{const option=menuFamilyForSku(l.productId)?.options.find(o=>o.id===l.productId);
+    const choice=option?toPackChoice(option):null;
+    return choice&&choice.pieces>1?<small data-cart-pack-count>
+      {packQtyLabel(choice.pieces,language)} · {l.quantity} × {choice.pieces} = {l.quantity*choice.pieces} {language==="es"?"piezas":language==="ar"?"قطع":"pieces"}
+    </small>:null;})()}
+  </span><strong>{money(displayLinePrice(l,p.priceFils,config.packPricing)*l.quantity)}</strong></li>})}</ul>
  <div className="v32-new-total"><span>{t.total}</span><strong>{money(cartSubtotalFils(good,config.products,config.packPricing))}</strong></div></aside>;
 }
 export function VisualCart(){
@@ -115,14 +123,17 @@ export function VisualAddToCart({productId,onAdded,controlsTarget,desktopQtyTarg
  const inCart=lines.filter(l=>l.productId===productId).reduce((sum,l)=>sum+l.quantity,0);
  const allowedPack=spec&&config?.personalizedPacks?.enabled&&config.personalizedPacks.rules.some(rule=>rule.packSkuId===productId);
  const cap=spec?.capacity||0;const picked=composition.reduce((sum,x)=>sum+x.units,0);
- const valid=!spec||!!allowedPack&&picked===cap;
- const amount=product?displayLinePrice({productId,quantity:qty,...(spec?{composition}:{})},product.priceFils,config?.packPricing)*qty:Number.NaN;
+ const publishedRule=config?.personalizedPacks?.rules.find(rule=>rule.packSkuId===productId);
+ const custom=!!spec&&!!config?.personalizedPacks?.enabled;
+ const valid=!custom||!!allowedPack&&!!publishedRule&&picked===cap&&
+   composition.every(piece=>publishedRule.componentSkuIds.includes(piece.componentSkuId));
+ const amount=product?displayLinePrice({productId,quantity:qty,...(custom?{composition}:{})},product.priceFils,config?.packPricing)*qty:Number.NaN;
  const amountValid=Number.isFinite(amount)&&amount>=0;
  const canAdd=!!config?.enabled&&!!product&&!loading&&valid&&amountValid&&
    (!tricolor||tricolor.kind==="fixed"||!!color)&&inCart+qty<=MAX_QTY;
  // Variant changes preserve the visual note, as in the original ProductPopup.
  useEffect(()=>{setQty(minQty(productId));setColor(null);setComposition([]);},[productId]);
- const add=()=>{if(!canAdd)return;cart.add(productId,qty,spec?composition:undefined,color||undefined);onAdded();};
+ const add=()=>{if(!canAdd)return;cart.add(productId,qty,custom?composition:undefined,color||undefined);onAdded();};
  const choose=(id:string,delta:number)=>setComposition(old=>{
    const units=Math.max(0,Math.min(cap,(old.find(x=>x.componentSkuId===id)?.units||0)+delta));
    const other=old.filter(x=>x.componentSkuId!==id);
@@ -130,14 +141,23 @@ export function VisualAddToCart({productId,onAdded,controlsTarget,desktopQtyTarg
  });
  const noteLabel=language==="es"?"PERSONALIZACIÓN (OPCIONAL)":language==="ar"?"تخصيص (اختياري)":"PERSONALIZATION (OPTIONAL)";
  const placeholder=language==="es"?'Ej. "Feliz cumpleaños"':language==="ar"?"أضف ملاحظة (40 حرفاً)":"Add a note (e.g. no sugar, gift message…)";
- const quantityControl=(kind:"mobile"|"desktop")=><div className={"v32-buy-qty v32-buy-qty-"+kind} role="group" aria-label={t.quantity}>
+ const catalogOption=menuFamilyForSku(productId)?.options.find(o=>o.id===productId);
+ const packChoice=catalogOption?toPackChoice(catalogOption):null;
+ const quantityLabel=packChoice&&packChoice.pieces>1
+   ?language==="es"?"Número de cajas":language==="ar"?"عدد العلب":"Number of boxes"
+   :t.quantity;
+ const quantityControl=(kind:"mobile"|"desktop")=><div className={"v32-buy-qty v32-buy-qty-"+kind} role="group" aria-label={quantityLabel}>
    <button type="button" aria-label="Decrease quantity" disabled={qty<=minQty(productId)} onClick={()=>setQty(n=>Math.max(minQty(productId),n-1))}>−</button>
    <output aria-live="polite">{qty}</output>
    <button type="button" aria-label="Increase quantity" disabled={qty+inCart>=MAX_QTY} onClick={()=>setQty(n=>n+1)}>+</button>
  </div>;
  const controls=<div className="v32-config-fields" data-source-component="ProductPopup">
+   {packChoice&&packChoice.pieces>1&&<p className="v32-pack-selection-line" data-selection-pack>
+     {presentationLabel(packChoice.presentation,language)} · {packQtyLabel(packChoice.pieces,language)} ·
+     {language==="es"?` ${packChoice.pieces} piezas por caja`:language==="ar"?` ${packChoice.pieces} قطع في العلبة`:` ${packChoice.pieces} pieces per box`}
+   </p>}
    {tricolor?.kind==="single"&&<label className="v32-config-extra">{t.selection}<select value={color||""} onChange={e=>setColor(e.target.value as TricolorColor)}><option value="">{t.choose}</option>{TRICOLOR_COLORS.map(c=><option key={c} value={c}>{tricolorCopy[language][c]}</option>)}</select></label>}
-   {spec&&<div className="v32-new-pack"><p>{t.boxes} · {t.pieces}: {picked}/{cap}</p>{allowedPack?spec.components.map(c=><div key={c.componentSkuId}><span>{componentName(c.componentSkuId,language)}</span><button type="button" aria-label="Decrease selection" onClick={()=>choose(c.componentSkuId,-1)}>−</button><span>{composition.find(x=>x.componentSkuId===c.componentSkuId)?.units||0}</span><button type="button" aria-label="Increase selection" disabled={picked>=cap} onClick={()=>choose(c.componentSkuId,1)}>+</button></div>):<p role="alert">{t.notReady}</p>}</div>}
+   {custom&&<div className="v32-new-pack"><p>{t.boxes} · {t.pieces}: {picked}/{cap}</p>{allowedPack?spec!.components.filter(piece=>publishedRule?.componentSkuIds.includes(piece.componentSkuId)).map(c=><div key={c.componentSkuId}><span>{componentName(c.componentSkuId,language)}</span><button type="button" aria-label="Decrease selection" onClick={()=>choose(c.componentSkuId,-1)}>−</button><span>{composition.find(x=>x.componentSkuId===c.componentSkuId)?.units||0}</span><button type="button" aria-label="Increase selection" disabled={picked>=cap} onClick={()=>choose(c.componentSkuId,1)}>+</button></div>):<p role="alert">{t.notReady}</p>}</div>}
    <div className="v32-buy-row">
      <div className="v32-buy-price"><span>{t.price}</span><strong>{amountValid?money(amount):t.notReady}</strong></div>
      {quantityControl("mobile")}
