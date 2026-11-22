@@ -733,3 +733,28 @@
  .v32-popup .v32-pack-helper{font-size:13px}
  .v32-popup .v32-personalization{gap:7px}
 }
+
+/* Integrated screenshot review: remove unintended see-through text and shrink
+   desktop popup anatomy toward approved REF_C proportions. */
+.v32-overlay .v32-popup{
+ background:linear-gradient(144deg,#fbe5e1 0%,#f7d5d0 48%,#f0c5c0 100%)!important;
+ backdrop-filter:blur(25px)!important;
+ -webkit-backdrop-filter:blur(25px)!important;
+ box-shadow:0 24px 65px rgba(92,47,52,.32),inset 0 1px 1px #fff!important;
+}
+.v32-popup[data-anchor-side="right"]::before,.v32-popup[data-anchor-side="left"]::before{
+ background:#f9dfdb!important;
+}
+@media(min-width:641px){
+ .v32-popup .v32-popup-scroll{padding:17px 22px 8px!important}
+ .v32-popup .v32-popup-heading{margin-bottom:9px!important}
+ .v32-popup .v32-popup-heading h2{font-size:35px!important}
+ .v32-popup .v32-popup-heading p{font-size:15px!important}
+ .v32-popup .v32-section-caption{margin:7px 0 9px!important}
+ .v32-popup .v32-quick-four .v32-variant{min-height:54px!important;padding:7px 8px!important}
+ .v32-popup .v32-config-fields{margin-top:10px!important;gap:8px!important}
+ .v32-popup .v32-personalization{gap:6px!important}
+ .v32-popup .v32-personalization-field{min-height:40px!important}
+ .v32-popup .v32-popup-footer{padding:7px 19px 13px!important}
+ .v32-popup .v32-popup-footer .v32-buy-cta{min-height:43px!important}
+}

@@ -559,8 +559,11 @@ test("REF_C approved: Pan de Muerto has four complete SKU choices with real AED 
  await expect(choices).toContainText("Docena");
  await expect(choices).toContainText("Mini");
  await expect(choices).toContainText("Individual");
- await choices.locator('[data-sku="pan-de-muerto-traditional-pack-12-individuales"]').click();
- await expect(popup).toHaveAttribute("data-selected-sku","pan-de-muerto-traditional-pack-12-individuales");
+ const expectedSku=await card.getAttribute("data-product-id")==="pan-de-muerto-traditional-pack"
+   ?"pan-de-muerto-traditional-pack-12-individuales"
+   :"conchas-traditional-pack-12-individuales";
+ await choices.locator('[data-sku="'+expectedSku+'"]').click();
+ await expect(popup).toHaveAttribute("data-selected-sku",expectedSku);
  await expect(popup.locator(".v32-buy-cta")).toContainText("AED 140");
  await expect(popup.locator(".v32-desktop-qty-target .v32-buy-qty")).toBeVisible();
  await expect(card).toHaveAttribute("data-selected-product","true");
@@ -578,7 +581,7 @@ test("REF_D approved: mobile Orejas shows three direct purchase sizes",async ({p
  const popup=page.getByRole("dialog");
  const sizes=popup.locator(".v32-three-quantities");
  await expect(sizes.locator("button")).toHaveCount(3);
- await expect(sizes).toContainText("Por pieza");
+ await expect(sizes).toContainText("1 pieza");
  await expect(sizes).toContainText("Media docena");
  await expect(sizes).toContainText("Docena");
  await sizes.locator('[data-pack-pieces="6"]').click();

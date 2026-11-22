@@ -6,7 +6,7 @@ import { formatAed } from "../content";
 import { business, phoneHref, policyDecisions, type PolicyPath } from "../business";
 import { lineKey, packSpec, componentName, type Composition } from "../../../shared/pack-composition";
 import { menuFamilyForSku } from "../menu";
-import { packQtyLabel, presentationLabel, toPackChoice } from "./catalog-options";
+import { packQtyLabel, toPackChoice } from "./catalog-options";
 import { tricolorCopy, tricolorSpec, TRICOLOR_COLORS, type TricolorColor } from "../../../shared/tricolor";
 
 const root="/visual-v32";
@@ -152,10 +152,6 @@ export function VisualAddToCart({productId,onAdded,controlsTarget,desktopQtyTarg
    <button type="button" aria-label="Increase quantity" disabled={qty+inCart>=MAX_QTY} onClick={()=>setQty(n=>n+1)}>+</button>
  </div>;
  const controls=<div className="v32-config-fields" data-source-component="ProductPopup">
-   {packChoice&&packChoice.pieces>1&&<p className="v32-pack-selection-line" data-selection-pack>
-     {presentationLabel(packChoice.presentation,language)} · {packQtyLabel(packChoice.pieces,language)} ·
-     {language==="es"?` ${packChoice.pieces} piezas por caja`:language==="ar"?` ${packChoice.pieces} قطع في العلبة`:` ${packChoice.pieces} pieces per box`}
-   </p>}
    {tricolor?.kind==="single"&&<label className="v32-config-extra">{t.selection}<select value={color||""} onChange={e=>setColor(e.target.value as TricolorColor)}><option value="">{t.choose}</option>{TRICOLOR_COLORS.map(c=><option key={c} value={c}>{tricolorCopy[language][c]}</option>)}</select></label>}
    {custom&&<div className="v32-new-pack"><p>{t.boxes} · {t.pieces}: {picked}/{cap}</p>{allowedPack?spec!.components.filter(piece=>publishedRule?.componentSkuIds.includes(piece.componentSkuId)).map(c=><div key={c.componentSkuId}><span>{componentName(c.componentSkuId,language)}</span><button type="button" aria-label="Decrease selection" onClick={()=>choose(c.componentSkuId,-1)}>−</button><span>{composition.find(x=>x.componentSkuId===c.componentSkuId)?.units||0}</span><button type="button" aria-label="Increase selection" disabled={picked>=cap} onClick={()=>choose(c.componentSkuId,1)}>+</button></div>):<p role="alert">{t.notReady}</p>}</div>}
    <div className="v32-buy-row">

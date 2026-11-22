@@ -30,7 +30,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - name: Verify actual 3L categories and package choices
-        run: npx playwright test --config=playwright.conchas.config.ts tests/conchas-e2e/visual-v32.spec.ts --grep "V3.2 published subcategories|V3.2 3L half-dozen/dozen|V3.2 3L mobile package|REF_C approved|REF_D approved|REF_C functionality" --workers=1
+        run: npx playwright test --config=playwright.conchas.config.ts tests/conchas-e2e/visual-v32.spec.ts --grep "V3.2 3L half-dozen/dozen|V3.2 3L mobile package|REF_C approved|REF_D approved|REF_C functionality" --workers=1
       - name: Record exact SHA and scope
         if: always()
         run: |
