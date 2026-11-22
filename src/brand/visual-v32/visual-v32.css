@@ -54,29 +54,10 @@
 .v32-filters button{border:1px solid #fffa;border-radius:99px;background:#fff8;color:#895522;padding:10px 20px;font-size:12px}
 .v32-filters .v32-selected{background:var(--rose);border-color:transparent;color:white;box-shadow:0 5px 12px #b66a7e77}
 .v32-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
-.v32-product{padding:0;overflow:hidden;display:flex;flex-direction:column;text-align:left;min-width:0;border:1px solid #fffd;border-radius:25px;background:#fff9;box-shadow:0 19px 37px #b4868677}
-.v32-product[aria-expanded=true]{outline:2px solid #b98a4e}
-.v32-product:disabled{opacity:.58;cursor:not-allowed}
-.v32-photo{display:block;width:100%;height:250px;overflow:hidden;background:#f1d9ce}
-.v32-photo img,.v32-photo picture,.v32-photo .b-co-thumb-empty{height:100%;width:100%;object-fit:cover}
-.v32-product-copy{display:flex;flex-direction:column;flex:1;padding:15px 19px}
-.v32-product-copy strong{font-size:22px;font-weight:500}.v32-product-copy em{color:#895e4d;font:italic 15px/1.35 "3L Abril";min-height:41px}
-.v32-product-copy>span{display:flex;align-items:center;justify-content:space-between;margin-top:auto;font-size:12px;font-weight:600;color:#915a26}
-.v32-product-copy b{display:grid;place-items:center;width:33px;height:33px;border:1px solid #b98a4e;border-radius:50%;font-weight:500}
 .v32-message{text-align:center;margin:35px auto;padding:25px;background:#fff9;border-radius:22px}
-.v32-overlay{position:fixed;inset:0;z-index:1001;pointer-events:none}
-.v32-scrim{position:absolute;inset:0;pointer-events:auto;background:#45242a35;backdrop-filter:blur(4px)}
-.v32-popup{position:fixed;z-index:1;width:min(490px,calc(100vw - 24px));pointer-events:auto;overflow-y:auto;overscroll-behavior:contain;padding:24px;border:2px solid white;border-radius:32px;background:linear-gradient(135deg,#ffe9e5f8,#f1c8c1f8);box-shadow:0 18px 55px #a25d5d88}
 .v32-close{position:sticky;top:0;z-index:4;float:right;width:38px;height:38px;border:0;border-radius:50%;background:#fffd;color:#5c3f35;font-size:26px}
-.v32-popup .b-menu-options{margin:0!important;padding:0!important;background:transparent!important;border:0!important}
-.v32-popup .b-menu-photo,.v32-popup .b-product-gallery{display:none!important}
-.v32-popup .b-product-title{font:600 35px/1 "3L Abril",Georgia!important}
-.v32-popup .b-menu-price{font:600 30px "3L Abril",Georgia!important}
-.v32-popup select{border:1px solid #b98a4e66;border-radius:12px;background:#fff9;padding:10px}
-.v32-popup .b-add-to-cart>button{position:sticky;bottom:0;width:100%;min-height:51px;border:0;border-radius:99px;background:var(--rose);color:white;font-weight:600}
-.v32-popup .b-add-to-cart>button:disabled{opacity:.55}
 @media(max-width:1000px){.v32-nav{margin:12px}.v32-nav-left,.v32-nav-right{gap:10px}.v32-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.v32-journey{grid-template-columns:1fr 1fr}.v32-route{grid-column:1/-1;grid-row:2;max-width:350px;margin:auto}.v32-story{grid-template-columns:1fr}.v32-legacy{border-left:0;border-top:1px solid #b98a4e;padding:25px 0}.v32-tile{min-height:440px;padding:35px}}
-@media(max-width:640px){.v32-nav{grid-template-columns:auto 1fr auto;gap:6px;padding:8px 13px}.v32-mobile-toggle{display:inline-flex;align-items:center;justify-content:center}.v32-mobile-drawer{display:flex}.v32-nav-left{display:none}.v32-nav-right>a:not(:last-child){display:none}.v32-logo strong{font-size:22px}.v32-logo small{font-size:7px}.v32-home,.v32-landing,.v32-catalog{padding:35px 14px}.v32-home h1{font-size:44px}.v32-city img{height:125px}.v32-city b,.v32-city span{font-size:12px}.v32-family{min-height:270px}.v32-family img:first-child{height:230px}.v32-family img:nth-child(2){height:190px}.v32-landing h1,.v32-catalog h1{font-size:49px}.v32-tagline{font-size:10px}.v32-search{margin:30px auto}.v32-tiles{grid-template-columns:1fr}.v32-tile{min-height:390px}.v32-filters{gap:6px}.v32-filters button{padding:8px 10px;font-size:10px}.v32-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.v32-photo{height:164px}.v32-product-copy{padding:11px}.v32-product-copy strong{font-size:18px}.v32-product-copy em{font-size:14px}.v32-popup{padding:15px;max-height:calc(100dvh - 24px)!important}}
+@media(max-width:640px){.v32-nav{grid-template-columns:auto 1fr auto;gap:6px;padding:8px 13px}.v32-mobile-toggle{display:inline-flex;align-items:center;justify-content:center}.v32-mobile-drawer{display:flex}.v32-nav-left{display:none}.v32-nav-right>a:not(:last-child){display:none}.v32-logo strong{font-size:22px}.v32-logo small{font-size:7px}.v32-home,.v32-landing,.v32-catalog{padding:35px 14px}.v32-home h1{font-size:44px}.v32-city img{height:125px}.v32-city b,.v32-city span{font-size:12px}.v32-family{min-height:270px}.v32-family img:first-child{height:230px}.v32-family img:nth-child(2){height:190px}.v32-landing h1,.v32-catalog h1{font-size:49px}.v32-tagline{font-size:10px}.v32-search{margin:30px auto}.v32-tiles{grid-template-columns:1fr}.v32-tile{min-height:390px}.v32-filters{gap:6px}.v32-filters button{padding:8px 10px;font-size:10px}.v32-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}
 @media(max-width:360px){.v32-grid{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.v32-app *,.v32-overlay *{animation:none!important;transition:none!important}}
 
@@ -110,37 +91,7 @@
 .v32-landing-fidelity .v32-breads{background-image:linear-gradient(90deg,#3e2423df 0%,#53332ba2 39%,#4e2e2b29 77%,transparent),url("/brand/approved/3l-media-002/bakery-1-m002-041-1440.webp")}
 .v32-landing-fidelity .v32-tile b{font-size:11px;border-radius:99px;padding:13px 24px;letter-spacing:.2em}
 .v32-catalog-fidelity .v32-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-.v32-catalog-fidelity .v32-product-copy strong{font-size:22px}
-.v32-popup{padding:0;display:flex;flex-direction:column;overflow:hidden!important;
-  width:min(448px,calc(100vw - 24px));max-height:calc(100dvh - 24px)}
-.v32-popup[data-anchor-side="right"]::before,.v32-popup[data-anchor-side="left"]::before,
-.v32-popup[data-anchor-side="mobile"]::before{content:"";position:absolute;z-index:3;top:28px;left:-9px;
-  width:17px;height:17px;transform:rotate(45deg);background:#f9ddd7;border-left:2px solid white;border-bottom:2px solid white}
-.v32-popup[data-anchor-side="left"]::before{left:auto;right:-9px;transform:rotate(225deg)}
-.v32-popup[data-anchor-side="mobile"]::before{left:calc(50% - 9px);top:-9px;transform:rotate(135deg)}
-.v32-popup-scroll{padding:22px 23px 12px;min-height:0;flex:1 1 auto;overflow:auto;overscroll-behavior:contain}
-.v32-popup-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:17px}
-.v32-popup-heading h2{font-size:clamp(29px,3vw,37px);line-height:1.03;margin:0 0 8px}
-.v32-popup-heading p{font:italic 16px/1.3 Georgia,serif;color:#795b4f;margin:0}
-.v32-popup .v32-close{flex:0 0 auto;position:static;float:none;width:38px;height:38px;border:0;box-shadow:none}
 .v32-section-caption{margin:0 0 10px;font-size:11px;letter-spacing:.22em;color:#846353}
-.v32-variants{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.v32-variant{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;
-  background:#fff9!important;border:1px solid #d6b49d!important;color:#1b1515!important;border-radius:13px!important;
-  padding:11px 8px;min-height:60px;font-size:12px;line-height:1.1}
-.v32-variant span{font-weight:600}.v32-variant small{font-size:11px;color:#865c42}
-.v32-variant.v32-variant-current{background:#b12e64!important;color:white!important;border-color:#b12e64!important;box-shadow:0 8px 15px #b12e6444}
-.v32-variant-current small{color:white!important}
-.v32-popup-unit{margin-top:20px;display:flex;flex-direction:column;gap:3px}
-.v32-popup-unit strong{font-size:32px;line-height:1.1}
-.v32-popup-footer{padding:10px 23px 20px;background:linear-gradient(180deg,#f9dfd9e3,#f1c8c1f8);flex:0 0 auto;min-height:80px}
-.v32-popup-footer .b-add-to-cart{display:flex;flex-direction:column;gap:7px}
-.v32-popup-footer .b-qty{display:flex;align-items:center;gap:12px;align-self:flex-end;border:1px solid #d6b49d;border-radius:999px;padding:5px 12px;background:#fff8}
-.v32-popup-footer .b-qty button{width:32px;height:32px;border:0;background:transparent;color:#985d25}
-.v32-popup-footer .b-qty input{width:38px;max-width:38px;text-align:center;border:0;background:transparent}
-.v32-popup-footer .b-add-to-cart>button{position:static;display:block;margin:0;min-height:49px;width:100%;border-radius:999px;
-  background:#b12e64!important;color:white!important;border:0;box-shadow:0 13px 24px #b12e644a}
-.v32-popup-footer .b-link{font-size:11px}
 @media(max-width:900px){
   .v32-home-fidelity .v32-journey{margin-top:10px;grid-template-columns:1fr 1fr;gap:16px}
   .v32-home-fidelity .v32-route{grid-row:2;grid-column:1/-1;justify-self:center}
@@ -156,11 +107,6 @@
   .v32-landing-fidelity .v32-tile{min-height:420px;padding:30px}
   .v32-landing-fidelity .v32-tile strong{font-size:65px}
   .v32-catalog-fidelity .v32-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .v32-popup{width:calc(100vw - 24px);max-height:calc(100dvh - 24px)!important}
-  .v32-popup-scroll{padding:16px 17px 8px}
-  .v32-popup-heading h2{font-size:clamp(25px,7vw,34px)}
-  .v32-popup-footer{padding:8px 17px 14px}
-  .v32-variant{min-height:55px;padding:8px}
 }
 @media(max-width:360px){.v32-catalog-fidelity .v32-grid{grid-template-columns:1fr}}
 
@@ -198,37 +144,6 @@
 .v32-nav-right .v32-language-control select:focus-visible{
   outline:2px solid #27242D;outline-offset:2px;box-shadow:0 0 0 4px #A28D5B;
 }
-.v32-popup .v32-popup-scroll{min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden}
-.v32-popup .v32-popup-unit{gap:4px;margin-top:17px}
-.v32-popup .v32-minimum{margin:14px 0 0;color:#35282b;font:500 12px/1.5 "3L Montserrat",Arial,sans-serif}
-.v32-popup .v32-popup-footer{
-  flex:none;position:relative;overflow:visible;
-  border-top:1px solid rgba(255,255,255,.72);
-  padding:9px 20px 19px;
-}
-.v32-popup .v32-popup-footer.b-menu-options{padding:9px 20px 19px!important}
-.v32-popup .v32-popup-footer .b-add-to-cart{display:grid;gap:12px}
-.v32-popup .v32-popup-footer .b-menu-advance{display:none!important}
-.v32-popup .v32-popup-footer .b-qty{
-  margin-left:auto;padding:6px 10px;min-height:45px;
-  border:1px solid #d6b49d;border-radius:99px;background:#fff9;
-}
-.v32-popup .v32-popup-footer .b-qty button{
-  display:grid;place-items:center;min-height:32px;min-width:32px;
-  color:#985d25;background:transparent;box-shadow:none!important;
-}
-.v32-popup .v32-popup-footer .b-qty input{
-  width:42px;min-width:32px;text-align:center;font-size:14px;
-}
-.v32-popup .v32-popup-footer .b-add-to-cart>button{
-  width:100%;min-height:49px;margin:0;border:0;border-radius:99px;
-  background:#A93C68!important;color:#fff!important;font:600 13px/1.35 "3L Montserrat",Arial,sans-serif;
-  box-shadow:0 11px 23px rgba(169,60,104,.18)!important;
-}
-.v32-popup .v32-popup-footer .b-add-to-cart>button:focus-visible{
-  outline:2px solid #27242D;outline-offset:3px;box-shadow:0 0 0 5px #A28D5B!important;
-}
-.v32-popup .v32-popup-footer .b-add-to-cart>button:active{transform:translateY(1px)}
 .v32-cart-status:empty{
   position:absolute;height:1px;width:1px;overflow:hidden;clip-path:inset(50%);
 }
@@ -239,9 +154,6 @@
 }
 @media(max-width:640px){
   .v32-nav-right{gap:8px}
-  .v32-popup .v32-popup-footer.b-menu-options{padding:8px 15px 12px!important}
-  .v32-popup .v32-popup-footer .b-add-to-cart{gap:8px}
-  .v32-popup .v32-minimum{margin-top:10px}
 }
 
 /* Source-fidelity pass 22-Nov-2026: original ZIP inspected.
@@ -273,7 +185,6 @@
   font:italic 400 clamp(64px,5.7vw,91px)/.96 "Cormorant Garamond",Georgia,serif!important
 }
 .v32-app .v32-landing-fidelity .v32-tile em{font:italic 21px/1.3 "Cormorant Garamond",Georgia,serif!important}
-.v32-app .v32-product-copy strong{font-size:clamp(20px,1.65vw,26px);font-weight:500!important}
 .v32-app .v32-search input{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic}
 .v32-app .v32-commerce-shell .b-shop-main>h1,
 .v32-app .v32-commerce-shell .b-policy-hero h1,
@@ -282,49 +193,6 @@
 .v32-app .v32-commerce-shell .b-policy-body article>section h2{
   font-family:"Cormorant Garamond",Georgia,serif!important;font-weight:500!important
 }
-/* Source V3.2: price and quantity share a row, CTA stays below as permanent footer. */
-.v32-popup .v32-popup-footer.b-menu-options{
-  display:grid!important;grid-template-columns:minmax(0,1fr) auto;
-  grid-template-areas:"price quantity" "cta cta";
-  gap:12px 14px;align-items:end;
-  padding:12px 22px 18px!important;background:linear-gradient(180deg,#f9dfd9f0,#f1c8c1f8)!important
-}
-.v32-popup .v32-popup-footer .v32-popup-unit{
-  grid-area:price;display:flex;flex-direction:column;align-self:end;
-  gap:5px;margin:0;min-width:0
-}
-.v32-popup .v32-popup-footer .v32-popup-unit strong{
-  font:600 33px/1 "Cormorant Garamond",Georgia,serif!important
-}
-.v32-popup .v32-popup-footer .b-add-to-cart{display:contents!important}
-.v32-popup .v32-popup-footer .b-add-to-cart>.b-qty{
-  grid-area:quantity;align-self:end;margin:0;display:flex;align-items:center
-}
-.v32-popup .v32-popup-footer .b-add-to-cart>button{
-  grid-area:cta;align-self:stretch;font-family:"Jost","3L Montserrat",Arial,sans-serif;
-  min-height:48px;letter-spacing:.065em;text-transform:uppercase
-}
-.v32-popup .v32-popup-footer .b-add-to-cart>.b-menu-advance{display:none!important}
-/* Special commercial products retain their mandatory real selectors/builders.
- * Never hide an input required to construct a valid live order. */
-.v32-popup .v32-popup-footer:has(.b-menu-selectors) .b-add-to-cart,
-.v32-popup .v32-popup-footer:has(.b-pack-builder) .b-add-to-cart,
-.v32-popup .v32-popup-footer:has(.b-box-label) .b-add-to-cart{
-  display:flex!important;grid-column:1/-1;flex-direction:column;gap:12px
-}
-.v32-popup .v32-popup-footer:has(.b-menu-selectors) .b-add-to-cart>button,
-.v32-popup .v32-popup-footer:has(.b-pack-builder) .b-add-to-cart>button,
-.v32-popup .v32-popup-footer:has(.b-box-label) .b-add-to-cart>button{width:100%}
-.v32-popup .v32-popup-footer:has(.b-menu-selectors) .v32-popup-unit,
-.v32-popup .v32-popup-footer:has(.b-pack-builder) .v32-popup-unit,
-.v32-popup .v32-popup-footer:has(.b-box-label) .v32-popup-unit{grid-column:1/-1}
-.v32-popup .v32-popup-heading h2{
-  font:500 clamp(29px,3vw,38px)/1.02 "Cormorant Garamond",Georgia,serif!important
-}
-.v32-popup .v32-popup-heading p{font:italic 16px/1.3 "Cormorant Garamond",Georgia,serif}
-.v32-popup .v32-variants span{font:500 12px/1.2 "Jost",Arial,sans-serif}
-.v32-popup .v32-variants small{font:400 11px/1.1 "Jost",Arial,sans-serif}
-.v32-popup .v32-minimum{font:500 12px/1.5 "Jost",Arial,sans-serif}
 @media(max-width:640px){
   .v32-nav{min-width:0}
   .v32-nav>.v32-logo{min-width:0;white-space:normal}
@@ -342,7 +210,6 @@
     font:500 10px/1 "Jost",Arial,sans-serif;position:absolute;
     align-self:flex-end;margin:0 0 -1px 27px;min-width:14px;text-align:center
   }
-  .v32-popup .v32-popup-footer.b-menu-options{padding:9px 15px 12px!important;gap:9px 10px}
 }
 @media(max-width:360px){
   .v32-nav{padding:7px 9px;gap:4px}
@@ -411,12 +278,6 @@
   background:rgba(255,255,255,.42);
   box-shadow:0 12px 30px rgba(147,81,82,.17),inset 0 1px 0 #fff;
 }
-.v32-scrim{background:rgba(89,46,47,.20);backdrop-filter:blur(6px)}
-.v32-popup{
-  border:2px solid #fff;
-  background:linear-gradient(140deg,#ffeae5ed,#f3c5c0f2 85%,#ffebe6f0)!important;
-  box-shadow:0 16px 60px #925a5a75,inset 0 2px 1px #fff
-}
 
 
 
@@ -471,24 +332,6 @@
 .v32-app .v32-new-footnote{color:#79686a;font:400 12px/1.5 Jost,Arial,sans-serif}
 .v32-app .v32-new-quote{padding:16px 22px;font-size:13px;margin-top:20px}
 .v32-app .v32-new-payment-block{padding:20px;border:1px dashed #ad7a5c;border-radius:13px;background:#fbe9e5}
-.v32-popup .v32-popup-footer{display:block!important;padding:12px 22px 18px!important}
-.v32-popup .v32-buy-form{display:block;width:100%}
-.v32-popup .v32-buy-row{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:13px}
-.v32-popup .v32-buy-price{display:flex;flex-direction:column;gap:4px}
-.v32-popup .v32-buy-price span{font:500 10px Jost,Arial,sans-serif;letter-spacing:.23em;color:#8c6a5d;text-transform:uppercase}
-.v32-popup .v32-buy-price strong{font:600 32px/1 "Cormorant Garamond",Georgia,serif!important;color:#27212a}
-.v32-popup .v32-buy-qty{display:flex;align-items:center;gap:8px;border:1px solid #d4b2a0;border-radius:99px;padding:5px 8px;background:#fff9;min-height:47px}
-.v32-popup .v32-buy-qty button{min-width:32px;min-height:32px;border:0;background:none;color:#8c5a30;font-size:20px}
-.v32-popup .v32-buy-qty output{min-width:25px;text-align:center;font:500 14px Jost,Arial,sans-serif}
-.v32-popup .v32-buy-cta{width:100%;min-height:50px;border:0;border-radius:999px;background:#af3269;color:#fff;font:600 13px Jost,Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase;box-shadow:0 9px 22px #a83a6652}
-.v32-popup .v32-buy-cta:disabled{opacity:.55;cursor:not-allowed}
-.v32-popup .v32-buy-form>label{display:block;font:500 12px Jost,Arial,sans-serif;margin:0 0 12px}
-.v32-popup .v32-new-pack{max-height:170px;overflow:auto;padding:7px 10px;border:1px solid #deb7ac;border-radius:14px;margin-bottom:10px}
-.v32-popup .v32-new-pack>div{display:flex;align-items:center;gap:7px;padding:5px 0;font-size:12px}
-.v32-popup .v32-new-pack>div span:first-child{flex:1}
-.v32-popup .v32-new-pack button{width:28px;height:28px;border:1px solid #cba08f;border-radius:50%;background:#fff8}
-.v32-popup .v32-popup-footer .v32-buy-form .v32-buy-price strong{font-family:"Cormorant Garamond",Georgia,serif!important}
-.v32-popup .v32-minimum{margin-top:11px}
 .v32-app .v32-tile,.v32-app .v32-product{transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s}
 .v32-app .v32-product:hover,.v32-app .v32-tile:hover{transform:translateY(-4px)}
 .v32-app .v32-home h1,.v32-app .v32-landing h1,.v32-app .v32-catalog h1{animation:v32-enter .7s both}
@@ -547,8 +390,6 @@
   background-size:1100px auto;background-position:0 -80px;background-repeat:no-repeat;
   mask-image:radial-gradient(ellipse at 42% 42%,#000 38%,transparent 73%);
   animation:v32-blossom 8s ease-in-out infinite;transform-origin:15% 0}
-.v32-overlay .v32-popup{animation:v32-modal-arrive .38s cubic-bezier(.22,1,.36,1) both}
-.v32-overlay .v32-scrim{animation:v32-veil .27s ease-out both}
 @keyframes v32-blossom{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
 @keyframes v32-window-light{from{transform:translateX(-18px)}to{transform:translateX(28px)}}
 @keyframes v32-modal-arrive{from{opacity:.5;transform:translateY(54px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
@@ -567,97 +408,21 @@
 /* ZIP header exact lightweight shopping-bag line art, no legacy icon. */
 .v32-cart-glyph{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
 .v32-cart-glyph svg{width:16px;height:16px;display:block}
-
-/* REF_C/D exact anatomy: variants -> price & quantity -> 40-char note.
-   Only CTA is in the pinned footer; body scrolls on short screens. */
-.v32-popup .v32-popup-controls-anchor{display:contents}
-.v32-popup .v32-config-fields{display:flex;flex-direction:column;gap:15px;margin-top:18px}
-.v32-popup .v32-config-fields .v32-buy-row{display:flex;gap:12px;align-items:flex-end;justify-content:space-between;margin:0}
-.v32-popup .v32-buy-price{display:flex;flex-direction:column;gap:4px}
-.v32-popup .v32-buy-price span,.v32-popup .v32-personalization label{
- font:500 10px/1.35 "Jost",Arial,sans-serif;letter-spacing:.20em;text-transform:uppercase;color:#8c6a5d}
-.v32-popup .v32-buy-price strong{font:600 31px/1 "Cormorant Garamond",Georgia,serif!important;color:#1c1517}
-.v32-popup .v32-buy-qty{display:flex;align-items:center;justify-content:center;gap:8px;
- border:1px solid #b98a4e66;border-radius:999px;background:rgba(255,255,255,.60);min-height:42px;padding:4px 9px}
-.v32-popup .v32-buy-qty button{width:30px;height:30px;display:grid;place-items:center;border:0;border-radius:50%;font-size:19px;background:transparent;color:#8c5a2f}
-.v32-popup .v32-buy-qty output{min-width:20px;text-align:center;font:500 14px "Jost",Arial,sans-serif}
-.v32-popup .v32-personalization{display:flex;flex-direction:column;gap:8px}
-.v32-popup .v32-personalization-field{display:flex;align-items:center;gap:9px;min-height:44px;
- padding:8px 13px;border:1px solid #b98a4e66;border-radius:12px;background:#ffffff8c}
-.v32-popup .v32-personalization-field input{display:block;min-width:0;flex:1;border:0;box-shadow:none;background:transparent;outline:none;
- font:italic 16px/1.2 "Cormorant Garamond",Georgia,serif;color:#1c1517}
-.v32-popup .v32-personalization-field input::placeholder{color:#8c6a5dba}
-.v32-popup .v32-personalization-field output{flex:none;font:400 11px/1.2 "Jost",Arial,sans-serif;color:#8c6a5d}
-.v32-popup .v32-pencil{font:19px/1 "Cormorant Garamond",Georgia,serif;color:#8c6a5d}
-.v32-popup .v32-popup-footer{flex:0 0 auto;display:block!important;
- padding:12px 20px max(14px,env(safe-area-inset-bottom))!important;border-top:0;
- background:linear-gradient(180deg,#ffe8e200,#ffe3decf 17px)!important}
-.v32-popup .v32-popup-footer .v32-buy-form{display:block!important;width:100%}
-.v32-popup .v32-popup-footer .v32-buy-cta{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:49px;
- border:0;border-radius:999px;background:#b12e64!important;color:white!important;font:600 12px/1.35 "Jost",Arial,sans-serif;
- letter-spacing:.12em;text-transform:uppercase;box-shadow:0 14px 30px -10px #b12e6499}
-.v32-popup .v32-popup-footer .v32-buy-cta svg{flex:none}
-.v32-popup .v32-popup-footer .v32-buy-cta:hover:not(:disabled){background:#9c2656!important;transform:translateY(-2px)}
-.v32-popup .v32-popup-scroll{min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden}
-.v32-popup .v32-minimum{margin:12px 0 0}
 @media(max-width:640px){
- .v32-popup .v32-config-fields{gap:12px;margin-top:14px}
- .v32-popup .v32-popup-scroll{padding:16px 17px 8px}
- .v32-popup .v32-popup-footer{padding:8px 16px max(11px,env(safe-area-inset-bottom))!important}
- .v32-popup .v32-personalization-field{min-height:40px;padding:6px 10px}
- .v32-popup .v32-buy-qty{min-height:40px}
 }
 @media(max-height:600px) and (max-width:640px){
- .v32-popup .v32-popup-scroll{padding:12px 14px 7px}
- .v32-popup .v32-config-fields{gap:9px;margin-top:11px}
 }
-
-/* REF_C cards: source image-side heart is decorative (whole card is dialog
-   trigger), not a fake wishlist API. Media remains canonical. */
-.v32-photo{position:relative}
-.v32-card-heart{position:absolute;top:11px;right:11px;display:grid;place-items:center;
- width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.80);
- color:#8c5a2f;backdrop-filter:blur(12px);pointer-events:none}
-.v32-product[aria-expanded="true"]{border-color:#b98a4e;box-shadow:0 0 0 2px #b98a4e80,0 24px 45px #b4868677}
-.v32-product .v32-photo img{transition:transform .7s cubic-bezier(.22,1,.36,1)}
-.v32-product:hover .v32-photo img{transform:scale(1.05)}
-
-/* Founder-approved reference images override generic source layout.
- * REF_C desktop: selected variant with rose outline, editable note,
- * quantity+CTA share a single footer row. REF_D handset: three compact
- * variant chips when three options fit, price+qty inside scroll body,
- * standalone full-width fixed CTA in footer. */
-.v32-popup .v32-desktop-qty-target{display:none}
-.v32-popup .v32-variant-current{transition:background-color .2s,border-color .2s,color .2s}
 @media(min-width:641px){
- .v32-popup .v32-config-fields .v32-buy-row{display:none}
- .v32-popup .v32-popup-footer{display:flex!important;flex-direction:row;align-items:center;gap:12px}
- .v32-popup .v32-desktop-qty-target{display:flex;flex:none}
- .v32-popup .v32-buy-form{flex:1;min-width:0}
- .v32-popup .v32-buy-cta{min-height:48px}
- .v32-popup .v32-variants .v32-variant-current{
-   background:rgba(255,255,255,.38)!important;color:#1c1517!important;
-   border:2px solid #b12e64!important;box-shadow:0 0 0 2px #b12e6424!important}
  .v32-popup .v32-variants .v32-variant-current :is(span,small){color:#1c1517!important}
 }
 @media(max-width:640px){
- .v32-popup .v32-popup-footer{display:block!important}
- .v32-popup .v32-desktop-qty-target{display:none!important}
- .v32-popup .v32-buy-row{display:flex}
- .v32-popup .v32-variants{grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:8px}
- .v32-popup .v32-variant{min-width:0;padding:10px 7px}
- .v32-popup .v32-variant-current{background:#b12e64!important;color:#fff!important;border-color:#b12e64!important}
 }
 
 /* Founder-approved REF_C vs REF_D backdrop behavior. Desktop keeps the
    surrounding catalog sharp; handset applies soft blur to the catalog. */
 @media(min-width:641px){
- .v32-overlay .v32-scrim{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
-   background:rgba(74,41,43,.08)!important}
 }
 @media(max-width:640px){
- .v32-overlay .v32-scrim{backdrop-filter:blur(6px)!important;-webkit-backdrop-filter:blur(6px)!important;
-   background:rgba(89,46,47,.20)!important}
 }
 
 /* Published collection and package size selectors; no duplicated commercial catalog. */
@@ -665,117 +430,22 @@
 .v32-subcategories button{font:500 11px/1.4 "Jost",Arial,sans-serif;padding:8px 15px;border:1px solid #b98a4e70;border-radius:999px;color:#865b37;background:#ffffff9e;cursor:pointer}
 .v32-subcategories button:hover{border-color:#b98a4e;background:#fff}
 .v32-subcategories button.v32-subcategory-active{border-color:#b12e64;color:#fff;background:#b12e64}
-.v32-popup .v32-pack-selector{display:grid;gap:12px}
-.v32-popup .v32-option-group{display:grid;gap:8px}
-.v32-popup .v32-option-caption{font:500 10px/1.4 "Jost",Arial,sans-serif;letter-spacing:.19em;color:#8c6a5d;text-transform:uppercase}
-.v32-popup .v32-pack-selector .v32-variants{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
-.v32-popup .v32-pack-helper{font:italic 14px/1.3 "Cormorant Garamond",Georgia,serif;color:#815e4d;margin:0}
-.v32-popup .v32-pack-selection-line{margin:0;font:500 11px/1.4 "Jost",Arial,sans-serif;color:#875b39}
 .v32-app [data-cart-pack-count]{display:block;font-size:12px;color:#875b39;margin-top:4px}
 @media(max-width:640px){
  .v32-subcategories{gap:6px;margin:0 auto 18px;padding:0 10px}
  .v32-subcategories button{font-size:10px;padding:7px 11px}
- .v32-popup .v32-pack-selector{gap:9px}
- .v32-popup .v32-pack-helper{font-size:12px}
 }
-
-/* Unassigned published-media state is explicit, never substituted by unrelated
- * preview concepts. Preserve editorial styling while keeping provenance honest. */
-.v32-app .v32-photo-empty{
-  display:flex;position:relative;align-items:center;justify-content:center;
-  flex-direction:column;gap:10px;width:100%;height:100%;
-  min-height:160px;background:linear-gradient(145deg,#f1d5d0,#f7e6e0 56%,#e9c5bf);
-  color:#8a604c;text-align:center;
-}
-.v32-app .v32-photo-empty strong{font:500 clamp(27px,2.5vw,37px)/1 "Cormorant Garamond",Georgia,serif!important;letter-spacing:.02em}
-.v32-app .v32-photo-empty small{font:500 10px/1.4 "Jost",Arial,sans-serif;text-transform:uppercase;letter-spacing:.15em}
 .v32-app .v32-subcategories{position:relative;z-index:5;will-change:auto;transform:none;animation:none}
 .v32-app .v32-subcategories button{position:relative;transform:none;animation:none}
-
-/* REF_C/REF_D · Founder 7.9/10. Four published SKU offers are presented as
-   one-click product choices; six offers use Mini/Individual + single/6/12.
-   Styles are scoped exclusively to the standalone V3.2 preview. */
-.v32-popup .v32-quick-four .v32-quick-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.v32-popup .v32-quick-four .v32-variant{min-height:64px;padding:10px 7px}
-.v32-popup .v32-quick-four .v32-variant span{font:600 12px/1.3 "Jost",Arial,sans-serif}
-.v32-popup .v32-quick-four .v32-variant small{font:500 11px/1.2 "Jost",Arial,sans-serif}
-.v32-popup .v32-three-quantities{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
-.v32-popup .v32-three-quantities .v32-variant{min-height:61px;padding:7px 4px;gap:4px}
-.v32-popup .v32-three-quantities .v32-variant span{font-size:11px!important;text-align:center}
-.v32-popup .v32-three-quantities .v32-variant small{font-size:10px!important}
-.v32-popup .v32-pack-selector{gap:10px}
-.v32-popup .v32-pack-helper{margin:0!important;font:italic 14px/1.15 "Cormorant Garamond",Georgia,serif;color:#795748;text-align:center}
-.v32-popup .v32-popup-heading h2{font:600 clamp(33px,3.3vw,43px)/.95 "Cormorant Garamond",Georgia,serif!important;letter-spacing:-.035em!important;color:#1c1517}
-.v32-popup .v32-popup-heading p{font:italic 18px/1.25 "Cormorant Garamond",Georgia,serif!important}
-.v32-popup .v32-section-caption{letter-spacing:.14em;color:#7b5543;font-weight:600;margin:9px 0 11px}
-.v32-popup .v32-variant{border:1px solid #fffdf4!important;background:rgba(255,255,255,.45);border-radius:15px;box-shadow:0 6px 15px #b88a8230}
-.v32-popup .v32-variant-current{background:#b12e64!important;color:#fff!important;border-color:#fff!important;box-shadow:0 6px 19px #b12e6477!important}
-.v32-popup .v32-variant-current small{color:#fff!important}
-.v32-popup .v32-personalization-field{border-color:#fff9!important;border-radius:999px!important;box-shadow:inset 0 1px 2px #ffffff8c}
-.v32-popup .v32-note-warning{display:block;font:500 11px/1.4 "Jost",Arial,sans-serif;padding:9px 12px;border-radius:11px;color:#7b3a45;background:rgba(255,255,255,.66);border:1px solid #b12e6445}
-.v32-popup .v32-buy-cta-arrow{font-size:23px;margin-left:auto;font-weight:400;line-height:1}
-.v32-popup .v32-buy-cta-label{white-space:nowrap}
-.v32-popup .v32-buy-cta-price{font:500 11px/1.1 "Jost",Arial,sans-serif;white-space:nowrap}
-.v32-popup .v32-buy-cta{padding:0 16px;text-align:center;letter-spacing:.085em!important}
-.v32-product[data-selected-product="true"]{
-  outline:3px solid #fff!important;outline-offset:0;position:relative;
-  box-shadow:0 0 0 6px rgba(255,255,255,.68),0 0 30px #fff9,0 24px 45px #b4868677!important
-}
-.v32-card-heart.v32-card-chosen{width:43px;height:43px;background:#fff;color:#a87b3a;box-shadow:0 6px 20px #76524355}
-.v32-card-heart.v32-card-chosen svg{width:25px;height:25px}
 @media(max-width:640px){
- .v32-popup .v32-quick-four .v32-variant{min-height:58px}
- .v32-popup .v32-popup-heading h2{font-size:clamp(31px,7vw,39px)!important}
- .v32-popup .v32-popup-heading p{font-size:17px!important}
- .v32-popup .v32-buy-cta-price{display:none}
- .v32-popup .v32-buy-cta-arrow{font-size:21px}
- .v32-popup .v32-buy-cta{padding:0 21px;min-height:51px;letter-spacing:.15em!important}
- .v32-popup .v32-pack-helper{font-size:13px}
- .v32-popup .v32-personalization{gap:7px}
-}
-
-/* Integrated screenshot review: remove unintended see-through text and shrink
-   desktop popup anatomy toward approved REF_C proportions. */
-.v32-overlay .v32-popup{
- background:linear-gradient(144deg,#fbe5e1 0%,#f7d5d0 48%,#f0c5c0 100%)!important;
- backdrop-filter:blur(25px)!important;
- -webkit-backdrop-filter:blur(25px)!important;
- box-shadow:0 24px 65px rgba(92,47,52,.32),inset 0 1px 1px #fff!important;
-}
-.v32-popup[data-anchor-side="right"]::before,.v32-popup[data-anchor-side="left"]::before{
- background:#f9dfdb!important;
 }
 @media(min-width:641px){
- .v32-popup .v32-popup-scroll{padding:17px 22px 8px!important}
- .v32-popup .v32-popup-heading{margin-bottom:9px!important}
- .v32-popup .v32-popup-heading h2{font-size:35px!important}
- .v32-popup .v32-popup-heading p{font-size:15px!important}
- .v32-popup .v32-section-caption{margin:7px 0 9px!important}
- .v32-popup .v32-quick-four .v32-variant{min-height:54px!important;padding:7px 8px!important}
- .v32-popup .v32-config-fields{margin-top:10px!important;gap:8px!important}
- .v32-popup .v32-personalization{gap:6px!important}
- .v32-popup .v32-personalization-field{min-height:40px!important}
- .v32-popup .v32-popup-footer{padding:7px 19px 13px!important}
- .v32-popup .v32-popup-footer .v32-buy-cta{min-height:43px!important}
 }
-
-/* WebKit pointer-stability fix: animating the hit-target itself can cause
- * hover oscillation during a click (Playwright waits for stable geometry).
- * Preserve photo zoom and shadow motion, but never translate the button. */
-.v32-app .v32-product,.v32-app .v32-product:hover{
- transform:none!important;
- animation:none!important;
- transition:box-shadow .28s cubic-bezier(.22,1,.36,1),border-color .28s!important
-}
-.v32-app .v32-product:hover{box-shadow:0 27px 48px #b4868685!important}
-.v32-app .v32-product .v32-photo img{transition:transform .65s cubic-bezier(.22,1,.36,1)}
-.v32-app .v32-product:hover .v32-photo img{transform:scale(1.035)}
 .v32-app .v32-subcategories button,.v32-app .v32-subcategories button:hover{
  transform:none!important;animation:none!important;
  transition:background-color .18s,border-color .18s!important
 }
 @media(prefers-reduced-motion:reduce){
- .v32-app .v32-product .v32-photo img{transition:none!important;transform:none!important}
 }
 
 /* Founder REF_D photo-to-popup composition, kept isolated to V3.2.
@@ -787,38 +457,22 @@
     gap:9px!important;
     align-items:start;
   }
-  .v32-app .v32-photo{height:auto!important;aspect-ratio:4/3}
-  .v32-app .v32-product{border-radius:17px!important}
-  .v32-app .v32-product-copy{padding:8px!important}
-  .v32-app .v32-product-copy strong{font-size:15px!important;line-height:1.04!important}
-  .v32-app .v32-product-copy em{font-size:11px!important;line-height:1.15!important;min-height:0!important}
-  .v32-app .v32-product-copy>span{font-size:10px!important}
-  .v32-app .v32-product-copy b{height:22px!important;width:22px!important}
-  .v32-overlay .v32-scrim{
-    -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
-    background:rgba(87,44,46,.07)!important;
-  }
-  .v32-overlay .v32-popup{
-    max-width:calc(100vw - 48px)!important;
-    border-radius:24px!important;
-    box-shadow:0 24px 55px rgba(108,59,68,.38),0 0 0 1px #fff8!important;
-  }
-  .v32-popup[data-anchor-side="mobile"]::before{
-    top:-12px!important;left:calc(50% - 12px)!important;
-    width:24px!important;height:24px!important;
-    background:#f9dfdb!important;
-    border-top:2px solid #fff!important;border-left:2px solid #fff!important;
-    transform:rotate(45deg)!important;
-  }
-  .v32-popup .v32-popup-scroll{padding:15px 17px 6px!important}
-  .v32-popup .v32-popup-heading{margin-bottom:11px!important}
-  .v32-popup .v32-popup-heading h2{font-size:30px!important}
-  .v32-popup .v32-popup-heading p{font-size:16px!important}
-  .v32-popup .v32-section-caption{margin:7px 0!important}
-  .v32-popup .v32-config-fields{gap:9px!important;margin-top:9px!important}
-  .v32-popup .v32-popup-footer{padding:7px 17px 13px!important}
-  .v32-popup .v32-buy-cta{font-size:11px!important}
 }
 @media(max-width:360px){
   .v32-app .v32-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
+
+
+/* Source V3.2 has no footer on Bakery. Remaining commercial/legal routes
+   retain a clean 3L navigation rather than unstyled raw anchor links. */
+.v32-site-footer{max-width:1340px;margin:55px auto 15px;padding:25px 30px;
+ display:flex;justify-content:space-between;align-items:center;gap:25px;flex-wrap:wrap;
+ border-top:1px solid #b98a4e55;color:#7c5541}
+.v32-site-footer-brand{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.v32-site-footer-brand strong{font:600 24px/1 "Cormorant Garamond",Georgia,serif!important;color:#b57939}
+.v32-site-footer-brand small{font:500 9px/1.3 "Jost",Arial,sans-serif;letter-spacing:.2em}
+.v32-site-footer nav{display:flex;align-items:center;flex-wrap:wrap;gap:12px 24px}
+.v32-site-footer nav a{font:500 11px/1.5 "Jost",Arial,sans-serif;letter-spacing:.06em;text-decoration:none}
+.v32-site-footer nav a:hover{text-decoration:underline}
+@media(max-width:640px){.v32-site-footer{margin:28px 12px 12px;padding:20px 12px;gap:15px}
+ .v32-site-footer nav{gap:8px 16px}}
