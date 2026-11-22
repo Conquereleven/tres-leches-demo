@@ -174,7 +174,7 @@ test("V3.2 commerce pill variants use canonical SKU prices and preserve AddToCar
   expect(rect!.y+rect!.height).toBeLessThanOrEqual(845);
 });
 
-test("V3.2 Contact and customer policies stay inside the visual preview",async ({page})=>{
+test("V3.2 Contact and customer policies stay inside the visual preview",async ({page},info)=>{
   await page.setViewportSize({width:1440,height:900});
   await page.goto("/visual-v32?lang=en");
   await page.locator(".v32-nav-right a[href='/visual-v32/contact']").click();
@@ -182,12 +182,16 @@ test("V3.2 Contact and customer policies stay inside the visual preview",async (
   await expect(page.locator('[data-visual-preview="v32"]')).toBeVisible();
   await expect(page.locator('.v32-commerce-shell .b-policy-page')).toBeVisible();
   await expect(page.locator('.v32-commerce-shell .b-header, .v32-commerce-shell .b-footer').first()).toBeHidden();
+  if(info.project.name==="chromium"){
+    mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+    await page.screenshot({path:"docs/brand/brand02/conchas/v32-contact-1440.png",fullPage:true,animations:"disabled"});
+  }
   await page.locator('.v32-site-footer a[href="/visual-v32/terms"]').click();
   await expect(page).toHaveURL(/\/visual-v32\/terms/);
   await expect(page.locator('.v32-commerce-shell .b-policy-page')).toBeVisible();
   await expect(page.locator('.v32-nav')).toBeVisible();
 });
-test("V3.2 Cart and Checkout keep visual navigation and canonical commerce",async ({page})=>{
+test("V3.2 Cart and Checkout keep visual navigation and canonical commerce",async ({page},info)=>{
   await page.setViewportSize({width:1440,height:900});
   await page.goto("/visual-v32/bakery?category=cakes&lang=en");
   const classic=page.locator('[data-product-id="tres-leches--classic"]');
@@ -199,12 +203,18 @@ test("V3.2 Cart and Checkout keep visual navigation and canonical commerce",asyn
   await expect(page.locator(".v32-commerce-shell .b-co-items")).toContainText("Classic");
   await expect(page.locator(".v32-nav")).toBeVisible();
   await expect(page.locator(".v32-commerce-shell .b-co-header")).toBeHidden();
+  if(info.project.name==="chromium"){
+    mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+    await page.screenshot({path:"docs/brand/brand02/conchas/v32-cart-1440.png",fullPage:true,animations:"disabled"});
+  }
   const proceed=page.locator(".v32-commerce-shell a.b-co-cta");
   await expect(proceed).toHaveAttribute("href","/checkout");
   await proceed.click();
   await expect(page).toHaveURL(/\/visual-v32\/checkout/);
   await expect(page.locator(".v32-commerce-shell .b-shop")).toBeVisible();
   await expect(page.locator(".v32-nav")).toBeVisible();
+  if(info.project.name==="chromium")
+    await page.screenshot({path:"docs/brand/brand02/conchas/v32-checkout-1440.png",fullPage:true,animations:"disabled"});
 });
 test("V3.2 isolated route allowlist blocks unknown paths and checkout outside tests",async ({request})=>{
   const ok=await request.get("/visual-v32/contact");
@@ -212,5 +222,19 @@ test("V3.2 isolated route allowlist blocks unknown paths and checkout outside te
   for(const path of ["/visual-v32/not-authorized","/visual-v32/checkout/anything"]){
     const response=await request.get(path);
     expect(response.status()).toBe(404);
+  }
+});
+
+test("V3.2 mobile Contact, Cart and Checkout retain the connected visual shell",async ({page},info)=>{
+  await page.setViewportSize({width:390,height:844});
+  for(const part of ["contact","cart","checkout"]){
+    await page.goto("/visual-v32/"+part+"?lang=en");
+    await expect(page.locator(".v32-nav")).toBeVisible();
+    await expect(page.locator(".v32-commerce-shell")).toBeVisible();
+    await expect(page.locator(".v32-commerce-shell .b-header, .v32-commerce-shell .b-co-header")).toBeHidden();
+    if(info.project.name==="chromium"){
+      mkdirSync("docs/brand/brand02/conchas",{recursive:true});
+      await page.screenshot({path:"docs/brand/brand02/conchas/v32-"+part+"-390.png",fullPage:true,animations:"disabled"});
+    }
   }
 });
