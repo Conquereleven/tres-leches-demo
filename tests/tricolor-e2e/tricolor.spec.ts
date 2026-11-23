@@ -5,114 +5,87 @@ import { tricolorCopy } from "../../shared/tricolor";
 const shots = "docs/tricolor/screenshots";
 mkdirSync(shots, { recursive: true });
 
-const fixedPacks = [
-  { productId: "conchas-tricolor-pack-3-mini", priceFils: 3300 },
-  { productId: "conchas-tricolor-pack-3-individuales", priceFils: 3900 },
-] as const;
+/**
+ * V3.2 Tricolor contract.
+ *
+ * The approved V3.2 customer front owns Home/Menu/Bakery/Contact/Cart while
+ * the canonical Shop checkout intentionally retains `.b-shop` with valid
+ * order/payment continuity. The legacy `/menu?product=…` selectors
+ * (`.b-add-to-cart > button`, `.b-menu-selectors select`, `.b-menu-price`,
+ * `.b-pack-composition`, `.b-co-item`, cart color control) are therefore not
+ * mounted on the customer path anymore; asserting them tested a UI that no
+ * longer ships. This spec exercises the mounted V3.2 instead:
+ *
+ * - catalog: `/bakery?category=conchas&lang=…` cards
+ *   `.ref32-product[data-product-id]`
+ * - purchase: portal dialog `.ref32-dialog` with `[data-selected-sku]`,
+ *   SKU buttons `button[data-sku]`, CTA `.ref32-buy` and — for single-piece
+ *   tricolor only — a labelled color select under `.ref32-extra`
+ * - cart: `/cart` rows `.v32-new-cart-row` (V3.2 fixes the color at purchase;
+ *   the cart has no inline color editor by design)
+ * - review: canonical `/checkout` Shop summary
+ *   `.b-co-summary-items .b-pack-composition` plus a server quote
+ *
+ * No catalog, pricing, availability or payment rule changes: every price is
+ * re-asserted against `/api/checkout/config` (server authority) and the
+ * fixture catalog stays disposable.
+ */
+const SINGLE_MINI = "conchas-traditional-tricolor-mini-40-g" as const;
+const SINGLE_IND = "conchas-traditional-tricolor-individual-70-g" as const;
+const PACK_MINI = "conchas-tricolor-pack-3-mini" as const;
+const PACK_IND = "conchas-tricolor-pack-3-individuales" as const;
+const SINGLES_CARD = "conchas-traditional--tricolor" as const;
+const PACKS_CARD = "conchas-tricolor-pack" as const;
 const readCart = (page: Page): Promise<CartLine[]> =>
   page.evaluate(() => JSON.parse(localStorage.getItem("3l-cart") ?? "[]"));
-async function addAndVerify(page: Page, expected: CartLine[], info: TestInfo) {
+
+async function expectServerPrices(page: Page) {
+  const config = await (await page.request.get("/api/checkout/config")).json();
+  const priceOf = (id: string) =>
+    config.products.find((p: { id: string; priceFils: number }) => p.id === id)
+      ?.priceFils;
+  expect(priceOf(SINGLE_MINI)).toBe(1100);
+  expect(priceOf(SINGLE_IND)).toBe(1300);
+  expect(priceOf(PACK_MINI)).toBe(3300);
+  expect(priceOf(PACK_IND)).toBe(3900);
+}
+
+async function openDialog(page: Page, cardProductId: string) {
+  await page
+    .locator(`.ref32-product[data-product-id="${cardProductId}"]`)
+    .first()
+    .click();
+  const dialog = page.locator(".ref32-dialog");
+  await expect(dialog).toBeVisible();
+  return dialog;
+}
+
+async function chooseSku(
+  dialog: ReturnType<Page["locator"]>,
+  sku: string,
+) {
+  await dialog.locator(`button[data-sku="${sku}"]`).click();
+  await expect(dialog).toHaveAttribute("data-selected-sku", sku);
+}
+
+async function buyAndVerify(
+  page: Page,
+  dialog: ReturnType<Page["locator"]>,
+  expected: CartLine[],
+  info: TestInfo,
+) {
   const before = await readCart(page);
-  const button = page.locator(".b-add-to-cart > button");
-  const color = expected.at(-1)?.color;
-  if (color) {
-    const lang = new URL(page.url()).searchParams.get(
-      "lang",
-    ) as keyof typeof tricolorCopy;
-    await expect(
-      page.getByRole("combobox", {
-        name: tricolorCopy[lang].color,
-        exact: true,
-      }),
-    ).toHaveValue(color);
-    await expect(page.locator(".b-pack-composition")).toContainText(
-      tricolorCopy[lang][color],
-    );
-  }
-  await expect(button).toBeEnabled();
-  // WebKit can complete a pointer action while smooth scrolling moves the
-  // button between its header-obscured and bottom-edge positions. Centre the
-  // actual control and verify a stable, unobscured hit target before one click.
-  await button.evaluate((el) =>
-    el.scrollIntoView({ block: "center", behavior: "instant" }),
-  );
-  await expect
-    .poll(() =>
-      button.evaluate(async (el) => {
-        const before = el.getBoundingClientRect();
-        await new Promise<void>((resolve) =>
-          requestAnimationFrame(() => resolve()),
-        );
-        const after = el.getBoundingClientRect();
-        const target = document.elementFromPoint(
-          after.x + after.width / 2,
-          after.y + after.height / 2,
-        );
-        return (
-          before.x === after.x &&
-          before.y === after.y &&
-          before.height === after.height &&
-          target?.closest("button") === el
-        );
-      }),
-    )
-    .toBe(true);
-  await button.click();
+  const buy = dialog.locator(".ref32-buy");
+  await expect(buy).toBeEnabled();
+  await buy.scrollIntoViewIfNeeded();
+  await buy.click();
   // A dispatched click alone does not establish the accepted cart state.
   await expect.poll(() => readCart(page)).toEqual(expected);
+  await expect(page.locator(".ref32-dialog")).toHaveCount(0);
   await info.attach(`cart-add-${expected.length}.json`, {
     body: JSON.stringify({ before, after: await readCart(page) }),
     contentType: "application/json",
   });
-}
-async function addFixedPacks(
-  page: Page,
-  lang: keyof typeof tricolorCopy,
-  expected: CartLine[],
-  info: TestInfo,
-  width: number,
-) {
-  const packSizes = page.locator(".b-menu-selectors select").first();
-  // evaluateAll() does not wait: while the published catalog is loading it
-  // returns [], silently skipping the entire old pack-addition loop.
-  await expect(packSizes.locator("option")).toHaveCount(2);
-  const sizes = await packSizes
-    .locator("option")
-    .evaluateAll((options) =>
-      options.map((o) => (o as HTMLOptionElement).value),
-    );
-  expect(sizes.filter((size) => /mini/i.test(size))).toHaveLength(1);
-  const config = await (await page.request.get("/api/checkout/config")).json();
-  for (const [productId, priceFils] of [
-    ["conchas-traditional-tricolor-mini-40-g", 1100],
-    ["conchas-traditional-tricolor-individual-70-g", 1300],
-  ] as const) {
-    expect(
-      config.products.find((p: { id: string }) => p.id === productId)
-        ?.priceFils,
-    ).toBe(priceFils);
-  }
-  for (const [i, pack] of fixedPacks.entries()) {
-    expect(
-      config.products.find((p: { id: string }) => p.id === pack.productId)
-        ?.priceFils,
-    ).toBe(pack.priceFils);
-    const size = sizes.find((size) => /mini/i.test(size) === (i === 0))!;
-    await packSizes.selectOption(size);
-    await expect(packSizes).toHaveValue(size);
-    await expect(page.locator(".b-menu-price")).toContainText(
-      i === 0 ? /33|٣٣/ : /39|٣٩/,
-    );
-    await expect(page.locator(".b-pack-composition")).toContainText(
-      tricolorCopy[lang].pack,
-    );
-    await page.screenshot({
-      path: `${shots}/${info.project.name}-${width}-${lang}-pack-${i}.png`,
-      fullPage: true,
-    });
-    expected.push({ productId: pack.productId, quantity: 1 });
-    await addAndVerify(page, expected, info);
-  }
 }
 
 for (const width of [390, 768, 1440])
@@ -121,86 +94,167 @@ for (const width of [390, 768, 1440])
       page,
     }, info) => {
       await page.setViewportSize({ width, height: 900 });
-      const copy = tricolorCopy[lang];
       const errors: string[] = [];
       page.on("pageerror", (error) => errors.push(error.message));
       const expected: CartLine[] = [];
-      await page.goto(
-        `/menu?product=conchas-traditional--tricolor&lang=${lang}`,
-      );
-      await expect(page.locator(".b-add-to-cart > button")).toBeDisabled();
-      const sizes = page.locator(".b-menu-selectors select").first();
-      await expect(sizes.locator("option")).toHaveCount(2);
-      const ids = await sizes
-        .locator("option")
-        .evaluateAll((options) =>
-          options.map((o) => (o as HTMLOptionElement).value),
+      // Server is the price authority; the dialog must echo it, never invent it.
+      await expectServerPrices(page);
+      await page.goto(`/bakery?category=conchas&lang=${lang}`);
+      await expect(
+        page.locator(
+          `.ref32-product[data-product-id="${SINGLES_CARD}"]`,
+        ),
+      ).toBeVisible();
+      await expect(
+        page.locator(`.ref32-product[data-product-id="${PACKS_CARD}"]`),
+      ).toBeVisible();
+
+      // Two single SKUs (Mini 40 g AED 11, Individual 70 g AED 13): the CTA
+      // stays disabled until a color is chosen, for each SKU in turn.
+      const singles = [
+        { sku: SINGLE_MINI, color: "red", price: /11/ },
+        { sku: SINGLE_IND, color: "white", price: /13/ },
+      ] as const;
+      for (const [i, single] of singles.entries()) {
+        const dialog = await openDialog(page, SINGLES_CARD);
+        await chooseSku(dialog, single.sku);
+        await expect(dialog.locator(".ref32-buy")).toBeDisabled();
+        await expect(dialog.locator(".ref32-price strong")).toContainText(
+          single.price,
         );
-      for (const [i, sku] of ids.entries()) {
-        await sizes.selectOption(sku);
-        await expect(page.locator(".b-menu-price")).toContainText(
-          /mini/i.test(sku) ? /11|١١/ : /13|١٣/,
-        );
-        const color = page.getByRole("combobox", {
-          name: copy.color,
-          exact: true,
-        });
-        await color.selectOption(i === 0 ? "red" : "white");
-        await expect(page.locator(".b-add-to-cart > button")).toBeEnabled();
+        await dialog
+          .locator(".ref32-extra select")
+          .selectOption(single.color);
+        await expect(dialog.locator(".ref32-buy")).toBeEnabled();
         await page.screenshot({
           path: `${shots}/${info.project.name}-${width}-${lang}-single-${i}.png`,
           fullPage: true,
         });
         expected.push({
-          productId: /mini/i.test(sku)
-            ? "conchas-traditional-tricolor-mini-40-g"
-            : "conchas-traditional-tricolor-individual-70-g",
+          productId: single.sku,
           quantity: 1,
-          color: i === 0 ? "red" : "white",
+          color: single.color,
         });
-        await addAndVerify(page, expected, info);
+        await buyAndVerify(page, dialog, expected, info);
       }
-      await sizes.selectOption(ids[0]!);
-      await page
-        .getByRole("combobox", { name: copy.color, exact: true })
-        .selectOption("green");
-      expected.push({
-        productId: /mini/i.test(ids[0]!)
-          ? "conchas-traditional-tricolor-mini-40-g"
-          : "conchas-traditional-tricolor-individual-70-g",
-        quantity: 1,
-        color: "green",
-      });
-      await addAndVerify(page, expected, info);
-      await page.goto(`/menu?product=conchas-tricolor-pack&lang=${lang}`);
-      await expect(
-        page.getByRole("combobox", { name: copy.color, exact: true }),
-      ).toHaveCount(0);
-      await addFixedPacks(page, lang, expected, info, width);
+
+      // Third exact color on the Mini SKU; reopening resets the color, so the
+      // negative holds again before the green selection.
+      {
+        const dialog = await openDialog(page, SINGLES_CARD);
+        await chooseSku(dialog, SINGLE_MINI);
+        await expect(dialog.locator(".ref32-buy")).toBeDisabled();
+        await dialog.locator(".ref32-extra select").selectOption("green");
+        await expect(dialog.locator(".ref32-buy")).toBeEnabled();
+        expected.push({
+          productId: SINGLE_MINI,
+          quantity: 1,
+          color: "green",
+        });
+        await buyAndVerify(page, dialog, expected, info);
+      }
+
+      // Fixed 3-piece packs (AED 33/39): no editable color by design.
+      const packs = [
+        { sku: PACK_MINI, price: /33/ },
+        { sku: PACK_IND, price: /39/ },
+      ] as const;
+      for (const [i, pack] of packs.entries()) {
+        const dialog = await openDialog(page, PACKS_CARD);
+        await expect(dialog.locator(".ref32-extra")).toHaveCount(0);
+        await chooseSku(dialog, pack.sku);
+        await expect(dialog.locator(".ref32-price strong")).toContainText(
+          pack.price,
+        );
+        await page.screenshot({
+          path: `${shots}/${info.project.name}-${width}-${lang}-pack-${i}.png`,
+          fullPage: true,
+        });
+        expected.push({ productId: pack.sku, quantity: 1 });
+        await buyAndVerify(page, dialog, expected, info);
+      }
+
+      // V3.2 cart: five rows with the exact identities above.
       await page.goto(`/cart?lang=${lang}`);
-      await expect(page.locator(".b-co-item")).toHaveCount(5);
+      await expect(page.locator(".v32-new-cart-row")).toHaveCount(5);
       expect(await readCart(page)).toEqual(expected);
-      const cartColor = page
-        .getByRole("combobox", { name: copy.color, exact: true })
-        .first();
-      await cartColor.selectOption("white");
-      await page.reload();
-      await expect(cartColor).toHaveValue("white");
-      await cartColor.selectOption("red");
-      await page.reload();
-      await expect(cartColor).toHaveValue("red");
-      await expect(page.locator(".b-co-item")).toHaveCount(5);
-      await expect(
-        page.getByRole("combobox", { name: copy.color, exact: true }),
-      ).toHaveCount(3);
+      // V3.2 renders the chosen preparation colors in the cart rows.
+      for (const name of [
+        tricolorCopy.en.red,
+        tricolorCopy.en.white,
+        tricolorCopy.en.green,
+      ] as const)
+        await expect(
+          page.locator(".v32-new-cart-row", { hasText: name }).first(),
+        ).toBeVisible();
       await page.screenshot({
         path: `${shots}/${info.project.name}-${width}-${lang}-cart.png`,
         fullPage: true,
       });
-      await page.goto(`/checkout?lang=${lang}`);
+
+      // Quantity via the real V3.2 number controls, persisted across reload.
+      const quantities = page.locator(
+        ".v32-new-cart-row input[type='number']",
+      );
+      await expect(quantities).toHaveCount(5);
+      await quantities.first().fill("2");
+      expected[0]!.quantity = 2;
+      await expect.poll(() => readCart(page)).toEqual(expected);
+      await page.reload();
+      await expect(page.locator(".v32-new-cart-row")).toHaveCount(5);
+      expect(await readCart(page)).toEqual(expected);
+      await quantities.first().fill("1");
+      expected[0]!.quantity = 1;
+      await expect.poll(() => readCart(page)).toEqual(expected);
+      await page.reload();
+      expect(await readCart(page)).toEqual(expected);
+
+      // V3.2 fixes the color at purchase: the cart carries no inline color
+      // editor. Color changes after navigation go through the same cart
+      // persistence authority (validated localStorage), not around it.
+      await expect(page.locator(".v32-new-cart-row select")).toHaveCount(0);
+      await page.evaluate(() => {
+        const raw = JSON.parse(localStorage.getItem("3l-cart") ?? "[]");
+        raw[0].color = "white";
+        localStorage.setItem("3l-cart", JSON.stringify(raw));
+      });
+      await page.reload();
+      await expect(page.locator(".v32-new-cart-row")).toHaveCount(5);
+      const edited: CartLine[] = expected.map((line, i) =>
+        i === 0 ? { ...line, color: "white" as const } : line,
+      );
+      expect(await readCart(page)).toEqual(edited);
       await expect(
-        page.locator(".b-co-summary-items .b-pack-composition"),
-      ).toHaveCount(5);
+        page.locator(".v32-new-cart-row", { hasText: "Mini" }).first(),
+      ).toBeVisible();
+      await page.evaluate(() => {
+        const raw = JSON.parse(localStorage.getItem("3l-cart") ?? "[]");
+        raw[0].color = "red";
+        localStorage.setItem("3l-cart", JSON.stringify(raw));
+      });
+      await page.reload();
+      expect(await readCart(page)).toEqual(expected);
+
+      // Server quote for the exact five lines, then the real Shop review.
+      const quote = await (
+        await page.request.post("/api/checkout/quote", {
+          headers: {
+            Origin: "http://127.0.0.1:3272",
+            "Idempotency-Key": crypto.randomUUID(),
+          },
+          data: { lines: expected, fulfillmentMethod: "pickup" },
+        })
+      ).json();
+      expect(quote.totalFils).toBe(1100 + 1300 + 1100 + 3300 + 3900);
+      await page.goto(`/checkout?lang=${lang}`);
+      const compositions = page.locator(
+        ".b-co-summary-items .b-pack-composition",
+      );
+      await expect(compositions).toHaveCount(5);
+      const texts = await compositions.allTextContents();
+      // Accurate physical piece totals per line: 3 singles × 1, 2 packs × 3.
+      expect(texts.filter((text) => /:\s*1\s*$/.test(text))).toHaveLength(3);
+      expect(texts.filter((text) => /:\s*3\s*$/.test(text))).toHaveLength(2);
       await page.screenshot({
         path: `${shots}/${info.project.name}-${width}-${lang}-checkout.png`,
         fullPage: true,
@@ -212,35 +266,27 @@ test("active scroll retains three chosen colours and both fixed packs through na
 }, info) => {
   const lang = "ar" as const;
   await page.setViewportSize({ width: 768, height: 900 });
-  await page.goto(`/menu?product=conchas-traditional--tricolor&lang=${lang}`);
-  const sizes = page.locator(".b-menu-selectors select").first();
-  await expect(sizes.locator("option")).toHaveCount(2);
-  const values = await sizes
-    .locator("option")
-    .evaluateAll((options) =>
-      options.map((option) => (option as HTMLOptionElement).value),
-    );
+  await expectServerPrices(page);
+  await page.goto(`/bakery?category=conchas&lang=${lang}`);
   const expected: CartLine[] = [];
   for (const [i, color] of (["red", "white", "green"] as const).entries()) {
-    const size = values[i % 2]!;
-    await sizes.selectOption(size);
-    await page
-      .getByRole("combobox", { name: tricolorCopy[lang].color, exact: true })
-      .selectOption(color);
-    expected.push({
-      productId: /mini/i.test(size)
-        ? "conchas-traditional-tricolor-mini-40-g"
-        : "conchas-traditional-tricolor-individual-70-g",
-      quantity: 1,
-      color,
-    });
+    const sku = i % 2 === 0 ? SINGLE_MINI : SINGLE_IND;
+    const dialog = await openDialog(page, SINGLES_CARD);
+    await chooseSku(dialog, sku);
+    await dialog.locator(".ref32-extra select").selectOption(color);
+    expected.push({ productId: sku, quantity: 1, color });
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: "smooth" }));
-    await addAndVerify(page, expected, info);
+    await buyAndVerify(page, dialog, expected, info);
   }
-  await page.goto(`/menu?product=conchas-tricolor-pack&lang=${lang}`);
-  await addFixedPacks(page, lang, expected, info, 768);
+  for (const sku of [PACK_MINI, PACK_IND] as const) {
+    const dialog = await openDialog(page, PACKS_CARD);
+    await expect(dialog.locator(".ref32-extra")).toHaveCount(0);
+    await chooseSku(dialog, sku);
+    expected.push({ productId: sku, quantity: 1 });
+    await buyAndVerify(page, dialog, expected, info);
+  }
   await page.goto(`/cart?lang=${lang}`);
-  await expect(page.locator(".b-co-item")).toHaveCount(5);
+  await expect(page.locator(".v32-new-cart-row")).toHaveCount(5);
   expect(await readCart(page)).toEqual(expected);
 });
 test("fixed packs wait for delayed published catalog and survive navigation", async ({
@@ -261,25 +307,34 @@ test("fixed packs wait for delayed published catalog and survive navigation", as
     await held;
     await route.continue();
   });
-  await page.goto("/menu?product=conchas-tricolor-pack&lang=en");
+  await page.goto("/bakery?category=conchas&lang=en");
   await started;
   const expected: CartLine[] = [];
   try {
-    // Reproduces the empty immediate read which used to skip both packs.
-    expect(await page.locator(".b-menu-selectors select option").count()).toBe(
-      0,
-    );
-    const adding = addFixedPacks(page, "en", expected, info, 1280);
+    // While the published catalog is held, V3.2 mounts no product cards:
+    // the previous empty-select read that silently skipped packs is now an
+    // explicit zero-card assertion on the mounted UI.
+    expect(await page.locator(".ref32-product").count()).toBe(0);
+    const adding = (async () => {
+      const dialog = await openDialog(page, PACKS_CARD);
+      await chooseSku(dialog, PACK_MINI);
+      expected.push({ productId: PACK_MINI, quantity: 1 });
+      await buyAndVerify(page, dialog, expected, info);
+      const second = await openDialog(page, PACKS_CARD);
+      await chooseSku(second, PACK_IND);
+      expected.push({ productId: PACK_IND, quantity: 1 });
+      await buyAndVerify(page, second, expected, info);
+    })();
     release();
     await adding;
   } finally {
     release();
   }
   await page.goto("/cart?lang=en");
-  await expect(page.locator(".b-co-item")).toHaveCount(2);
+  await expect(page.locator(".v32-new-cart-row")).toHaveCount(2);
   expect(await readCart(page)).toEqual(expected);
   await page.reload();
-  await expect(page.locator(".b-co-item")).toHaveCount(2);
+  await expect(page.locator(".v32-new-cart-row")).toHaveCount(2);
   expect(await readCart(page)).toEqual(expected);
   expect(errors).toEqual([]);
 });
