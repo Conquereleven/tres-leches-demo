@@ -1,6 +1,10 @@
 /* Approved 3L Visual Lab V3.2 composition: isolated preview path only. */
 .v32-app,.v32-overlay{--ink:#1c1517;--gold:#a28d5b;--rose:#a93c68;font-family:3L Montserrat,Arial,sans-serif;color:var(--ink)}
-.v32-app{min-height:100vh;isolation:isolate;padding:1px 0;background:radial-gradient(ellipse at 50% 9%,#fff9f7 0%,transparent 44%),linear-gradient(130deg,#f5ccc7,#f9e7e2 45%,#f1c4c3);position:relative}
+.v32-app{min-height:100vh;isolation:isolate;padding:1px 0;background:radial-gradient(ellipse at 50% 9%,#fff9f7 0%,transparent 44%),linear-gradient(130deg,#f5ccc7,#f9e7e2 45%,#f1c4c3);position:relative;overflow-x:clip}
+/* RTL page health: the decorative .v32-blossom intentionally bleeds 14px past
+   the left edge. In RTL that bleed expands document scrollWidth and allows
+   horizontal panning. Clipping it here changes no pixel: the bleed stays
+   visually identical, it just stops creating scrollable overflow. */
 .v32-app::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(112deg,transparent 15%,#fff6 28%,transparent 40%,#fff3 52%,transparent 66%)}
 .v32-app *,.v32-overlay *{box-sizing:border-box}.v32-app a{text-decoration:none;color:inherit}
 .v32-app h1,.v32-app h2,.v32-app strong,.v32-overlay h1,.v32-overlay h2{font-family:"3L Abril",Georgia,serif}

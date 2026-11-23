@@ -49,7 +49,7 @@ export function ApprovedProductCard({product,familyId,variant,price,active,onSel
        </span>}
      <span className={"ref32-card-mark"+(active?" ref32-card-mark-selected":"")} aria-hidden="true">
        {active?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="m4 12 5 5L20 6"/></svg>:
-       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M20.8 8.1c0 4-5 7.4-8.8 10.9C8.2 15.5 3.2 12.1 3.2 8.1c0-4 5.2-5.8 8.8-2.2 3.6-3.6 8.8 2.2z"/></svg>}
+       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M20.8 8.1c0 4-5 7.4-8.8 10.9C8.2 15.5 3.2 12.1 3.2 8.1c0-4 5.2-5.8 8.8-2.2 3.6-3.6 8.8-1.8 8.8 2.2Z"/></svg>}
      </span>
    </span>
    <span className="ref32-product-copy">

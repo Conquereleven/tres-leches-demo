@@ -51,7 +51,17 @@ function readCache(): Cache {
 
 function writeCache(cache: Cache): void {
   mkdirSync(dirname(FILE), { recursive: true });
-  writeFileSync(FILE, JSON.stringify(cache));
+  // Create with 0600 from the first byte: no window where the cookie cache
+  // is readable by other users on shared runners. chmodSync below only
+  // repairs caches written before the 0600 rule.
+  try {
+    writeFileSync(FILE, JSON.stringify(cache), { mode: 0o600 });
+  } catch (error) {
+    // A failed cache write must never break the suite silently: reuse is
+    // best-effort, the next login will retry. Surface the cause in logs.
+    console.error(`analytics session cache write failed: ${String(error)}`);
+    return;
+  }
   // Cookies on disk are readable by the owner only, even on shared runners.
   chmodSync(FILE, 0o600);
 }
@@ -87,7 +97,7 @@ async function loginOnce(
  * name the exact synthetic actor. Anything else (expired, forbidden,
  * rate-limited, error) discards the cached cookie without reusing it.
  */
-async function reusableSession(
+export async function reusableSession(
   request: APIRequestContext,
   role: string,
   cookie: string,
@@ -100,12 +110,15 @@ async function reusableSession(
     const body = (await probe.json()) as {
       actor?: { id?: string; role?: string };
     };
-    if (!body.actor) return true; // No identity exposed: status 200 suffices.
+    // Fail closed: reuse requires proof of the exact synthetic actor.
+    // A 200 without identity, a wrong id/role, or an unparseable body
+    // forces a fresh login and never reuses the cookie.
+    if (!body.actor) return false;
     return (
       body.actor.id === `fixture-${role}` && body.actor.role === role
     );
   } catch {
-    return true; // Unparseable body: the 200 status is the reuse signal.
+    return false;
   }
 }
 

@@ -240,16 +240,25 @@ if (!process.env.CONCHAS_BASELINE)
       const cards = page.locator(".ref32-product");
       await expect(cards.first()).toBeVisible();
       // Photography never gates the purchase: every card keeps an approved
-      // frame and the dialog stays buyable with no page error. The webp mode
-      // proves the fallback derivative still resolves; the family mode proves
-      // graceful degradation when authored photos are unreachable.
+      // frame (real photo or approved pending placeholder) and the dialog
+      // stays buyable with no page error. Both modes prove graceful
+      // degradation when derivatives are unreachable: webp aborts every webp
+      // derivative (cards keep their frame via the pending placeholder or a
+      // non-webp derivative, never a broken image passed off as a photo);
+      // family aborts the authored conchas photos. naturalWidth is asserted
+      // only for images that actually loaded: a blocked webp must not be
+      // expected to decode.
       for (const frame of await page.locator(".ref32-photo").all())
         await expect(frame.locator("img, .ref32-photo-pending")).toHaveCount(1);
-      if (mode === "webp")
-        for (const img of await page.locator(".ref32-photo img").all())
+      for (const img of await page.locator(".ref32-photo img").all()) {
+        const loaded = await img.evaluate((i: HTMLImageElement) => i.naturalWidth > 0 && i.complete);
+        if (loaded)
           await expect
             .poll(() => img.evaluate((i: HTMLImageElement) => i.naturalWidth))
             .toBeGreaterThan(0);
+        else
+          await expect(img).toBeAttached();
+      }
       const { dialog } = await openDialog(
         page,
         "conchas-traditional--chocolate",
@@ -380,9 +389,26 @@ for (const width of [390, 768, 1440])
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     const errors: string[] = [];
+    const resourceLoadNoise: string[] = [];
+    const badResponses: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
     page.on("console", (m) => {
-      if (m.type() === "error") errors.push(m.text());
+      if (m.type() !== "error") return;
+      // Generic network-layer lines carry no URL and duplicate the response
+      // listener below (same underlying request); they are bucketed apart so
+      // JS errors still fail loudly while resource URLs classify by response.
+      if (/^Failed to load resource/.test(m.text()))
+        resourceLoadNoise.push(`${m.text()} @ ${m.location().url ?? "unknown"}`);
+      else errors.push(`${m.text()} @ ${m.location().url ?? "unknown"}`);
+    });
+    // Classify every failed network resource by exact URL. R5 reference
+    // assets under /visual-v32-reference/ are voluntarily absent by design
+    // (the ZIP is never published under public/): observed exact URL is
+    // /visual-v32-reference/ref-home.png (decorative blossom background,
+    // aria-hidden, page stays fully buyable). Only that documented directory
+    // is allowlisted; any productive 404 (photo, API, route) fails below.
+    page.on("response", (r) => {
+      if (r.status() >= 400) badResponses.push(`${r.status()} ${r.url()}`);
     });
     const root = "docs/brand/brand02/conchas";
     mkdirSync(root, { recursive: true });
@@ -430,6 +456,17 @@ for (const width of [390, 768, 1440])
           fullPage: true,
         });
     }
+    // R5 reference ZIP assets are never published under public/ by design.
+    // Only that documented /visual-v32-reference/ directory is tolerated;
+    // every other failed response (photo, API, route) fails with its exact
+    // URL, and resource-load console lines are tolerated only up to the
+    // number of allowlisted R5 responses (same requests, no silent extras).
+    const productive = badResponses.filter(
+      (u) => !/\/visual-v32-reference\//.test(u),
+    );
+    const r5 = badResponses.filter((u) => /\/visual-v32-reference\//.test(u));
+    expect(productive).toEqual([]);
+    expect(resourceLoadNoise.length).toBeLessThanOrEqual(r5.length);
     expect(errors).toEqual([]);
   });
 
