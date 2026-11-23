@@ -199,12 +199,12 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
   <section className="ref32-dialog" ref={dialog} role="dialog" aria-modal="true"
     data-anchor-side={side} data-selected-sku={productId} style={place} aria-label={family.name}>
    <div className="ref32-details">
-    <header className="ref32-dialog-heading">
+    <div className="ref32-dialog-heading">
      <div><h2>{family.name.replace(/\s*[·–—-]\s*Pack\b.*$/i,"")}</h2>
       {product.description&&<p>{product.description}</p>}
       {serving&&<p className="ref32-servings" data-cake-serves>{serving}</p>}</div>
      <button className="ref32-close" type="button" ref={closeControl} aria-label="Close" onClick={onClose}>×</button>
-    </header>
+    </div>
     <p className="ref32-section-label">{cakeSizing?t.size:t.variant}</p>
     {grouped?.choices.length===4?
       <div className="ref32-options ref32-options-four" role="group" aria-label={t.variant}>

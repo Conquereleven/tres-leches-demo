@@ -5,6 +5,7 @@
  */
 import { test, expect, type Page } from "@playwright/test";
 import { clickStableControl } from "../helpers/stable-control";
+import { gotoStorefront } from "../helpers/storefront";
 import { status, workspace } from "../fixtures/ux-states";
 
 const SHOTS = "work/qa/ux";
@@ -17,7 +18,7 @@ async function mockReturn(page: Page, body: Record<string, unknown>) {
   await page.route("**/api/checkout/reconcile", (r) =>
     r.fulfill({ json: body }),
   );
-  await page.goto("/");
+  await gotoStorefront(page, "/");
   await page.evaluate(() =>
     sessionStorage.setItem(
       "3l-checkout",
@@ -125,16 +126,10 @@ test.describe("payment step", () => {
         }),
       }),
     );
-    // Complete homepage config hydration before replacing the document. The
-    // retained CI trace otherwise reports an aborted config fetch/access-control
-    // page error during goto('/cart'), before this payment scenario even starts.
-    const configReady = page.waitForResponse((response) =>
-      response.url().endsWith("/api/checkout/config"),
-    );
-    await page.goto("/");
-    const config = await configReady;
-    expect(config.status()).toBe(200);
-    expect(await config.finished()).toBeNull();
+    // Home V3.2 never fetches /api/checkout/config: seed storage after
+    // visible home readiness. The config 200 coverage lives in the
+    // checkout flow specs as an explicit API check, not a navigation wait.
+    await gotoStorefront(page, "/");
     await page.evaluate(() => {
       const date = new Date(Date.now() + 172_800_000)
         .toISOString()
@@ -162,9 +157,9 @@ test.describe("payment step", () => {
         }),
       );
     });
-    await page.goto("/cart");
+    await gotoStorefront(page, "/cart", '[data-new-ui="cart"]');
     await shot(page, "cart-390");
-    await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
+    await page.locator('a[href="/checkout"]').click();
     await expect(page.locator(".b-co-fee")).toHaveCount(0);
     await expect(page.locator(".b-shop-totals")).not.toContainText("Delivery");
     await shot(page, "checkout-delivery-390");

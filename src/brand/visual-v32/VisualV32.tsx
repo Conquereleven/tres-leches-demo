@@ -15,7 +15,10 @@ import "./visual-v32.css";
  * The catalog grid MUST remain four columns on desktop.
  */
 type Filter = "all" | "cakes" | "bakery" | "mexican" | "special";
-const origin = "/visual-v32";
+// Only explicit /visual-v32/* routes remain synthetic preview.
+// Canonical /, /menu, /bakery, /cart use unprefixed customer routes.
+const origin = typeof location !== "undefined" && location.pathname.startsWith("/visual-v32")
+  ? "/visual-v32" : "";
 const previewAssets = "/visual-v32-reference";
 const fallbackPreviewAsset = (
   event: SyntheticEvent<HTMLImageElement>,
@@ -126,8 +129,8 @@ function Header(){
         <button className="v32-mobile-toggle" type="button" aria-label={mobileOpen?"Close navigation":"Open navigation"}
           aria-controls="v32-mobile-links" aria-expanded={mobileOpen}
           onClick={()=>setMobileOpen(value=>!value)}>{mobileOpen?"×":"☰"}</button>
-        <span className="v32-nav-left"><a href={origin}>{labels.home}</a><a href={origin+"/menu"}>{labels.menu}</a></span>
-        <a className="v32-logo" href={origin}>
+        <span className="v32-nav-left"><a href={origin || "/"}>{labels.home}</a><a href={origin+"/menu"}>{labels.menu}</a></span>
+        <a className="v32-logo" href={origin || "/"}>
           <strong>✧ 3L pastelerías</strong>
           <span className="v32-logo-micro"><i/><small>MEXICO CITY SINCE 1982</small><i/></span>
         </a>
@@ -152,7 +155,7 @@ function Header(){
           <button type="button" aria-label="Close menu" onClick={()=>setMobileOpen(false)}>×</button>
         </div>
         <nav>
-          <a href={origin} onClick={()=>setMobileOpen(false)}>{labels.home}</a>
+          <a href={origin || "/"} onClick={()=>setMobileOpen(false)}>{labels.home}</a>
           <a href={origin+"/menu"} onClick={()=>setMobileOpen(false)}>{labels.menu}</a>
           <a href={origin+"/#journal"} onClick={()=>setMobileOpen(false)}>{labels.journal}</a>
           <a href={origin+"/contact"} onClick={()=>setMobileOpen(false)}>{labels.contact}</a>

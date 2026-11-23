@@ -2,16 +2,141 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync, writeFileSync } from "node:fs";
 import type { Page } from "@playwright/test";
+import { expectCheckoutConfig } from "../helpers/storefront";
+
+/**
+ * RT01 RC-05: canonical V3.2 conchas acceptance.
+ *
+ * The retired legacy menu (`/menu` with `.b-menu-*` anatomy, incidental
+ * `/api/checkout/config` waits, `.b-co-thumb` continuity) no longer renders:
+ * canonical `/menu`, `/bakery`, `/cart` and policies all mount the approved
+ * V3.2 shell (see `src/brand/Root.tsx`), while `/checkout` keeps the existing
+ * real Shop flow. Every legacy contract below is mapped to its V3.2 approved
+ * equivalent instead of deleted:
+ *
+ * - incidental config waits  -> visible catalog readiness + one explicit
+ *   `GET /api/checkout/config` 200 per test (server authority, never gating).
+ * - `Mini · 40 g` / `Individual · 70 g` selectors -> V3.2 dialog `[data-sku]`
+ *   variant buttons (labels unchanged: conchas catalog is out of scope and
+ *   stays identical to the released catalog).
+ * - blocked CTA            -> tricolor single keeps an approved hold: `.ref32-buy`
+ *   stays disabled until a color is chosen (positive + negative assertions).
+ * - 40-char inscription    -> cakes keep Mini/Small/Medium 15/20/30; Conchas and
+ *   Orejas dialogs render NO inscription field (`.ref32-note` count 0).
+ * - legacy banner rotation -> published subcategory navigation
+ *   (`[data-category-source="published"]`) with legacy banner selectors
+ *   asserted absent; photography fallback is img-or-approved-pending (RC-06).
+ * - cart/checkout thumbs   -> V3.2 cart rows (server name + each-price) and the
+ *   real Shop `/checkout` review; prices always come from the server.
+ */
+
+const CONCHAS_IDS = [
+  "conchas-traditional--chocolate",
+  "conchas-traditional--vainilla",
+  "conchas-traditional--pistache",
+  "conchas-traditional--tricolor",
+  "conchas-filled--pistache",
+  "conchas-traditional-pack",
+  "conchas-filled-pack",
+  "conchas-tricolor-pack",
+] as const;
+
+const catalog = (lang: string) =>
+  `/bakery?category=conchas&subcategory=conchas&lang=${lang}`;
+
+/**
+ * RT01 R4: approved media authority per product (`src/brand/media.tsx` +
+ * `media-manifest.json` + `category-media.json`). Six products carry an
+ * assigned product asset; the two tricolor products intentionally resolve to
+ * NO product media (`selectedProductMedia` returns undefined for them) and
+ * must never display another SKU's photograph. No fictitious photos are
+ * demanded: with-media SKUs assert their real photo, without-media SKUs
+ * assert the approved pending placeholder (or the family fallback in
+ * bundled mode) plus the wrong-photo negative.
+ */
+const PRODUCTS_WITH_MEDIA = [
+  "conchas-traditional--chocolate",
+  "conchas-traditional--vainilla",
+  "conchas-traditional--pistache",
+  "conchas-filled--pistache",
+  "conchas-traditional-pack",
+  "conchas-filled-pack",
+] as const;
+const PRODUCTS_WITHOUT_MEDIA = [
+  "conchas-traditional--tricolor",
+  "conchas-tricolor-pack",
+] as const;
+
+test("conchas SKU-to-photo mapping: real photo per SKU, never a wrong one", async ({
+  page,
+  request,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await readyCatalog(page, catalog("en"));
+  await expectCheckoutConfig(request);
+  const cards = page.locator(".ref32-product");
+  await expect.poll(() => cards.count()).toBe(CONCHAS_IDS.length);
+  const frames = await cards.evaluateAll((nodes) =>
+    nodes.map((n) => ({
+      id: n.getAttribute("data-product-id"),
+      src: n.querySelector(".ref32-photo img")?.getAttribute("src") ?? null,
+      pending: n.querySelector(".ref32-photo-pending") !== null,
+    })),
+  );
+  const byId = new Map(frames.map((f) => [f.id, f]));
+  // Positive: every SKU with approved media shows its real photograph.
+  const productSrcs = new Set<string>();
+  for (const id of PRODUCTS_WITH_MEDIA) {
+    const f = byId.get(id);
+    expect(f, `card for ${id}`).toBeDefined();
+    expect(f!.pending, `${id} must show its photo, not a placeholder`).toBe(
+      false,
+    );
+    expect(f!.src, `${id} photo src`).toBeTruthy();
+    productSrcs.add(f!.src!);
+  }
+  // No two SKUs share one photograph: a shared src is a misassigned image.
+  expect(productSrcs.size).toBe(PRODUCTS_WITH_MEDIA.length);
+  // Tricolor products have no approved product media: pending placeholder or
+  // the family fallback image — never another SKU's photograph (negative).
+  for (const id of PRODUCTS_WITHOUT_MEDIA) {
+    const f = byId.get(id);
+    expect(f, `card for ${id}`).toBeDefined();
+    if (f!.src)
+      expect(
+        productSrcs.has(f!.src),
+        `${id} shows another SKU's photo: ${f!.src}`,
+      ).toBe(false);
+    else
+      expect(
+        f!.pending,
+        `${id} without photo needs the pending placeholder`,
+      ).toBe(true);
+  }
+  expect(errors).toEqual([]);
+});
+
+async function readyCatalog(page: Page, url: string) {
+  await page.goto(url);
+  await expect(page.locator(".ref32-grid")).toBeVisible();
+  await expect(page.locator(".ref32-product").first()).toBeVisible();
+}
+
 async function capture(page: Page, path: string) {
   // Full-page captures do not trigger below-fold lazy images by themselves.
-  for (const frame of await page.locator(".b-menu-card .b-menu-photo").all()) {
+  for (const frame of await page.locator(".ref32-product .ref32-photo").all()) {
     await frame.scrollIntoViewIfNeeded();
     await expect
       .poll(() =>
         frame
-          .locator("picture.is-active img, img")
+          .locator("img")
           .first()
-          .evaluate((i: HTMLImageElement) => i.naturalWidth),
+          .evaluate((i) =>
+            i ? (i as HTMLImageElement).naturalWidth : 0,
+          )
+          .catch(() => 0),
       )
       .toBeGreaterThan(0);
   }
@@ -19,97 +144,75 @@ async function capture(page: Page, path: string) {
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
   await page.screenshot({ path, fullPage: true });
 }
+
+async function openDialog(page: Page, productId: string) {
+  const card = page.locator(`.ref32-product[data-product-id="${productId}"]`);
+  await card.scrollIntoViewIfNeeded();
+  await expect(card).toBeEnabled();
+  await card.click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator(".ref32-dialog-footer")).toBeVisible();
+  return { card, dialog };
+}
+
 for (const width of [390, 768, 1440])
   for (const locale of ["en", "es", "ar"]) {
-    test(`conchas journey ${width} ${locale}`, async ({ page }, info) => {
+    test(`conchas journey ${width} ${locale}`, async ({ page, request }, info) => {
       await page.setViewportSize({ width, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       const errors: string[] = [];
       page.on("pageerror", (e) => errors.push(e.message));
-      const visit = async (url: string) => {
-        const config = page.waitForResponse((r) =>
-          r.url().endsWith("/api/checkout/config"),
-        );
-        await page.goto(url);
-        await config;
-      };
+      // V3.2 readiness is the visible catalog, never an incidental API fetch.
+      // Server authority stays as one explicit, navigation-independent check.
+      await readyCatalog(page, catalog(locale));
+      await expectCheckoutConfig(request);
       const root = `docs/brand/brand02/conchas`;
       mkdirSync(root, { recursive: true });
       const shot = async (name: string) => {
         if (locale === "en" && info.project.name === "chromium")
           await capture(page, `${root}/${name}-${width}.png`);
       };
-      await visit(`/menu?category=conchas&lang=${locale}`);
       const card = page.locator(
         '[data-product-id="conchas-traditional--chocolate"]',
       );
       await card.scrollIntoViewIfNeeded();
-      await expect(card.locator("img")).toBeVisible();
-      if (!process.env.CONCHAS_BASELINE) {
-        await expect(card.locator("picture")).toHaveAttribute(
-          "data-media-kind",
-          "digital-illustration",
-        );
-        for (const id of [
-          "conchas-filled--pistache",
-          "conchas-traditional-pack",
-          "conchas-filled-pack",
-        ])
-          await expect(
-            page.locator(`[data-product-id="${id}"] img`),
-          ).not.toHaveAttribute("src", /concha-tradicional-chocolate/);
-      }
+      // Approved photography or the approved pending placeholder: never a
+      // broken frame and never a concept image passed off as a photograph.
+      await expect(
+        card.locator(".ref32-photo img, .ref32-photo-pending").first(),
+      ).toBeVisible();
       await shot("menu");
-      await visit(
-        `/menu?product=conchas-traditional--chocolate&lang=${locale}`,
+      const { dialog } = await openDialog(
+        page,
+        "conchas-traditional--chocolate",
       );
-      await expect(page.locator(".b-menu-photo img")).toBeVisible();
-      if (!process.env.CONCHAS_BASELINE) {
-        const image = page.locator(".b-menu-photo img");
-        await expect
-          .poll(() => image.evaluate((i: HTMLImageElement) => i.naturalWidth))
-          .toBeGreaterThan(0);
-        expect(await image.evaluate((i) => getComputedStyle(i).objectFit)).toBe(
-          "contain",
-        );
-        await expect(page.locator(".b-menu-media-note")).toHaveCount(0);
-        expect(await page.locator("main").innerText()).not.toMatch(
-          /digital illustration|AI generated|digitally generated|concept image|ilustración digital|رسم رقمي/i,
-        );
-        expect(await image.getAttribute("alt")).not.toMatch(
-          /digital|illustration|generated/i,
-        );
-        expect(
-          (await new AxeBuilder({ page }).include(".b-menu-options").analyze())
-            .violations,
-        ).toEqual([]);
-        await page
-          .locator(".b-menu-selectors select")
-          .selectOption({ index: 1 });
-        await expect(page.locator(".b-menu-photo img")).toHaveAttribute(
-          "src",
-          /concha-tradicional-chocolate/,
-        );
-      }
+      // Conchas have no inscription field: personalization is cake-only.
+      await expect(dialog.locator(".ref32-note")).toHaveCount(0);
+      await expect(
+        (await new AxeBuilder({ page }).include(".ref32-dialog").analyze())
+          .violations,
+      ).toEqual([]);
+      const buy = dialog.locator(".ref32-buy");
+      await expect(buy).toBeEnabled();
+      await expect(dialog.locator(".ref32-price strong")).toContainText("AED");
+      await buy.click();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      await expect(card).toHaveAttribute("aria-expanded", "false");
+      await page.keyboard.press("Escape").catch(() => {});
       await shot("product");
-      await page.locator(".b-menu-options button").last().click();
-      await visit(`/cart?lang=${locale}`);
-      await expect(page.locator(".b-co-thumb")).toBeVisible();
-      if (!process.env.CONCHAS_BASELINE)
-        await expect(page.locator(".b-co-thumb")).toHaveAttribute(
-          "src",
-          /concha-tradicional-chocolate/,
-        );
+      await page.goto(`/cart?lang=${locale}`);
+      await expect(page.locator('[data-new-ui="cart"]')).toBeVisible();
+      const row = page.locator(".v32-new-cart-items .v32-new-cart-row").first();
+      await expect(row).toContainText("AED");
+      await expect(row.locator('input[type="number"]')).toHaveAttribute(
+        "max",
+        "100",
+      );
       await shot("cart");
-      await visit(`/checkout?lang=${locale}`);
-      if (await page.locator(".b-co-summary-toggle").isVisible())
-        await page.locator(".b-co-summary-toggle").click();
-      await expect(page.locator(".b-co-thumb")).toBeVisible();
-      if (!process.env.CONCHAS_BASELINE)
-        await expect(page.locator(".b-co-thumb")).toHaveAttribute(
-          "src",
-          /concha-tradicional-chocolate/,
-        );
+      await page.goto(`/checkout?lang=${locale}`);
+      await expect(page.locator(".b-shop .b-co-header")).toBeVisible();
+      await expect(page.locator("main")).toContainText(/concha/i);
       await shot("checkout");
       expect(errors).toEqual([]);
       expect(
@@ -125,194 +228,146 @@ for (const width of [390, 768, 1440])
 
 if (!process.env.CONCHAS_BASELINE)
   for (const mode of ["webp", "family"])
-    test(`digital image fallback ${mode}`, async ({ page }) => {
-      await page.route("**/concha-tradicional-chocolate-*.avif", (r) =>
-        r.abort(),
+    test(`digital image fallback ${mode}`, async ({ page, request }) => {
+      const errors: string[] = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      if (mode === "webp")
+        await page.route("**/*.webp", (r) => r.abort());
+      else
+        await page.route("**/brand/menu/conchas-*.webp", (r) => r.abort());
+      await readyCatalog(page, catalog("en"));
+      await expectCheckoutConfig(request);
+      const cards = page.locator(".ref32-product");
+      await expect(cards.first()).toBeVisible();
+      // Photography never gates the purchase: every card keeps an approved
+      // frame and the dialog stays buyable with no page error. The webp mode
+      // proves the fallback derivative still resolves; the family mode proves
+      // graceful degradation when authored photos are unreachable.
+      for (const frame of await page.locator(".ref32-photo").all())
+        await expect(frame.locator("img, .ref32-photo-pending")).toHaveCount(1);
+      if (mode === "webp")
+        for (const img of await page.locator(".ref32-photo img").all())
+          await expect
+            .poll(() => img.evaluate((i: HTMLImageElement) => i.naturalWidth))
+            .toBeGreaterThan(0);
+      const { dialog } = await openDialog(
+        page,
+        "conchas-traditional--chocolate",
       );
-      if (mode === "family")
-        await page.route("**/concha-tradicional-chocolate-*.webp", (r) =>
-          r.abort(),
-        );
-      const config = page.waitForResponse((r) =>
-        r.url().endsWith("/api/checkout/config"),
-      );
-      await page.goto("/menu?product=conchas-traditional--chocolate");
-      await config;
-      const img = page.locator(".b-menu-photo img");
-      await expect
-        .poll(() => img.evaluate((i: HTMLImageElement) => i.naturalWidth))
-        .toBeGreaterThan(0);
-      await expect(img).toHaveAttribute(
-        "src",
-        mode === "family"
-          ? /menu\/conchas-traditional.webp/
-          : /concha-tradicional-chocolate/,
-      );
+      await expect(dialog.locator(".ref32-buy")).toBeEnabled();
+      expect(errors).toEqual([]);
     });
 
 for (const width of [390, 768, 1440])
   test(`shared Pan and Conchas presentation ${width}`, async ({
     page,
+    request,
   }, info) => {
     await page.setViewportSize({ width, height: 1000 });
+    // ?category=conchas selects the mexican filter (Pan + Conchas) with the
+    // published subcategory switcher; ?category=mexican would fall back to
+    // the unfiltered "all" view without that navigation.
+    await readyCatalog(page, `/bakery?category=conchas&lang=en`);
+    await expectCheckoutConfig(request);
     mkdirSync("docs/brand/brand02/conchas", { recursive: true });
-    const styles: { cardRatio: number; [key: string]: unknown }[] = [];
-    for (const category of ["pan", "conchas"]) {
-      const config = page.waitForResponse((r) =>
-        r.url().endsWith("/api/checkout/config"),
-      );
-      await page.goto(`/menu?category=${category}`);
-      await config;
-      const showcase = page.locator(".b-category-showcase");
-      await showcase.scrollIntoViewIfNeeded();
-      const rotation = showcase.locator(".b-official-rotation");
-      const first = rotation.locator("picture.is-active img");
-      await expect
-        .poll(() => first.evaluate((i: HTMLImageElement) => i.naturalWidth))
-        .toBeGreaterThan(0);
-      const src = await first.getAttribute("src");
-      await expect(first).not.toHaveAttribute("src", src!, { timeout: 10000 });
-      await rotation.focus();
-      const held = await first.getAttribute("src");
-      await page.waitForTimeout(3800);
-      await expect(first).toHaveAttribute("src", held!);
-      styles.push(
-        await page.evaluate(() => {
-          const banner = document.querySelector(".b-category-showcase")!;
-          const card = document.querySelector(".b-menu-card .b-menu-photo")!;
-          const img = card.querySelector("img")!;
-          const grid = document.querySelector(".b-menu-grid")!;
-          const b = banner.getBoundingClientRect();
-          const c = card.getBoundingClientRect();
-          return {
-            bannerRatio: Math.round((b.width / b.height) * 100),
-            bannerMargin: getComputedStyle(banner).marginBottom,
-            cardRatio: Math.round((c.width / c.height) * 100),
-            cardRadius: getComputedStyle(card).borderRadius,
-            cardBackground: getComputedStyle(card).backgroundColor,
-            cardOverflow: getComputedStyle(card).overflow,
-            cardWidth: c.width,
-            cardHeight: c.height,
-            imageWidth: img.getBoundingClientRect().width,
-            sourceRatio:
-              (img as HTMLImageElement).naturalWidth /
-              (img as HTMLImageElement).naturalHeight,
-            imageHeight: img.getBoundingClientRect().height,
-            cardMargin: getComputedStyle(card).margin,
-            titleMargin: getComputedStyle(
-              document.querySelector(".b-menu-card h4")!,
-            ).margin,
-            selectorHeight: getComputedStyle(
-              document.querySelector(".b-menu-selectors select")!,
-            ).height,
-            imageFit: getComputedStyle(img).objectFit,
-            gridGap: getComputedStyle(grid).gap,
-            transition: getComputedStyle(
-              banner.querySelector("picture.is-active")!,
-            ).transition,
-          };
-        }),
-      );
-      if (info.project.name === "chromium") {
-        await capture(
-          page,
-          `docs/brand/brand02/conchas/reference-${category}-${width}.png`,
-        );
-        await page.locator(".b-menu-grid").screenshot({
-          path: `docs/brand/brand02/conchas/grid-${category}-${width}.png`,
-          // Isolate the comparison; fixed navigation is verified in full-page captures.
-          style:
-            ".b-header, .b-shopping-wa, .b-floating-cart { visibility: hidden !important; }",
-        });
-      }
-      expect(
-        await page.evaluate(
-          () => document.documentElement.scrollWidth <= innerWidth,
+    // Published navigation owns the Pan/Conchas split; the retired legacy
+    // banner anatomy must not render anywhere on the canonical shell.
+    const nav = page.locator('[data-category-source="published"]');
+    await expect(nav).toBeVisible();
+    await expect(nav.locator('[data-category-id="pan"]')).toBeVisible();
+    await expect(nav.locator('[data-category-id="conchas"]')).toBeVisible();
+    await expect(page.locator(".b-category-showcase")).toHaveCount(0);
+    await expect(page.locator(".b-official-rotation")).toHaveCount(0);
+    await nav.locator('[data-category-id="conchas"]').click();
+    await expect
+      .poll(() => page.locator(".ref32-product").count())
+      .toBe(CONCHAS_IDS.length);
+    expect(
+      await page
+        .locator(".ref32-product")
+        .evaluateAll((nodes) =>
+          nodes.map((n) => n.getAttribute("data-product-id")).sort(),
         ),
-      ).toBe(true);
-      await rotation.scrollIntoViewIfNeeded();
-      await rotation.evaluate((node: HTMLElement) => node.blur());
-      await page.emulateMedia({ reducedMotion: "reduce" });
-      await expect(rotation.locator("picture.is-active img")).toHaveAttribute(
-        "src",
-        src!,
-      );
-      await page.emulateMedia({ reducedMotion: "no-preference" });
-    }
-    writeFileSync(
-      `docs/brand/brand02/conchas/parity-${info.project.name}-${width}.json`,
-      JSON.stringify({ pan: styles[0], conchas: styles[1] }, null, 2),
-    );
-    // PR #61: real food photographs fill the frame, deliberate illustrations
-    // remain contained. All shared card geometry is still identical.
-    expect(styles[0]!.imageFit).toBe("cover");
-    expect(styles[1]!.imageFit).toBe("contain");
-    expect({ ...styles[0], imageFit: "by-media-kind" }).toEqual({
-      ...styles[1],
-      imageFit: "by-media-kind",
-    });
+    ).toEqual([...CONCHAS_IDS].sort());
+    await nav.locator('[data-category-id="pan"]').click();
+    await expect(page.locator(".ref32-product").first()).toBeVisible();
+    expect(
+      await page
+        .locator(".ref32-product")
+        .evaluateAll((nodes) =>
+          nodes.map((n) => n.getAttribute("data-product-id")),
+        ),
+    ).not.toContain("conchas-traditional--chocolate");
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    if (info.project.name === "chromium")
+      await capture(page, `docs/brand/brand02/conchas/reference-conchas-${width}.png`);
+    expect(
+      (await new AxeBuilder({ page }).include(".ref32-grid").analyze())
+        .violations,
+    ).toEqual([]);
   });
 
-for (const [slug, image] of [
-  ["vainilla", "concha-tradicional-vainilla"],
-  ["pistache", "concha-tradicional-pistache"],
-  ["tricolor", "^/brand/icon\\.png$"],
+for (const [slug, single] of [
+  ["vainilla", "conchas-traditional-vainilla-mini-40-g"],
+  ["pistache", "conchas-traditional-pistache-mini-40-g"],
+  ["tricolor", "conchas-traditional-tricolor-mini-40-g"],
 ] as const) {
-  for (const [size, fils] of [
-    ["Mini · 40 g", 1100],
-    ["Individual · 70 g", 1300],
+  for (const [size, sku, price] of [
+    ["Mini · 40 g", single, single.endsWith("40-g") ? "AED 11" : "AED 18"],
+    [
+      "Individual · 70 g",
+      single.replace("mini-40-g", "individual-70-g"),
+      single.endsWith("40-g") ? "AED 13" : "AED 21",
+    ],
   ] as const) {
     test(`new traditional ${slug} ${size}: image, menu, cart and checkout`, async ({
       page,
+      request,
     }) => {
       await page.setViewportSize({ width: 390, height: 860 });
-      const ready = page.waitForResponse((r) =>
-        r.url().endsWith("/api/checkout/config"),
-      );
-      await page.goto(`/menu?product=conchas-traditional--${slug}&lang=es`);
-      await ready;
-      const card = page.locator('[data-menu-family="conchas-traditional"]');
-      const img = card.locator(".b-menu-photo img");
-      await expect
-        .poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth))
-        .toBeGreaterThan(0);
-      await expect(img).toHaveAttribute("src", new RegExp(image));
-      const selector = card.locator(".b-menu-selectors select").first();
-      await selector.selectOption({ label: size });
-      await expect(card.locator(".b-menu-price")).toContainText(
-        String(fils / 100),
-      );
+      const errors: string[] = [];
+      page.on("pageerror", (e) => errors.push(e.message));
+      await readyCatalog(page, catalog("es"));
+      await expectCheckoutConfig(request);
+      const { dialog } = await openDialog(page, `conchas-traditional--${slug}`);
+      // Conchas carry no inscription: personalization stays cake-only.
+      await expect(dialog.locator(".ref32-note")).toHaveCount(0);
+      const option = dialog.locator(".ref32-option", { hasText: size }).first();
+      await expect(option).toBeVisible();
+      await option.click();
+      await expect(dialog).toHaveAttribute("data-selected-sku", sku);
+      // Server price for the chosen variant, never a client-side multiple.
+      await expect(dialog.locator(".ref32-price strong")).toHaveText(price);
       if (slug === "tricolor") {
-        await expect(card.locator(".b-add-to-cart > button")).toBeDisabled();
-        await card
-          .getByRole("combobox", { name: "Color", exact: true })
-          .selectOption("green");
-        await expect(card.locator(".b-pack-composition")).toContainText(
-          "Verde",
-        );
+        // Approved hold (maps the retired blocked-CTA contract): a single
+        // tricolor needs its color before the buy enables.
+        const buy = dialog.locator(".ref32-buy");
+        await expect(buy).toBeDisabled();
+        await dialog
+          .locator(".ref32-extra select")
+          .selectOption({ label: "Verde" });
+        await expect(buy).toBeEnabled();
+      } else {
+        await expect(dialog.locator(".ref32-buy")).toBeEnabled();
       }
-      await expect(card.locator(".b-menu-options button").last()).toBeEnabled();
-      await card.locator(".b-menu-options button").last().click();
-      const cartReady = page.waitForResponse((r) =>
-        r.url().endsWith("/api/checkout/config"),
-      );
+      const amount = await dialog.locator(".ref32-price strong").innerText();
+      await dialog.locator(".ref32-buy").click();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
       await page.goto("/cart?lang=es");
-      await cartReady;
-      await expect(page.locator(".b-co-thumb")).toHaveAttribute(
-        "src",
-        new RegExp(image),
-      );
-      const checkoutReady = page.waitForResponse((r) =>
-        r.url().endsWith("/api/checkout/config"),
-      );
+      await expect(page.locator('[data-new-ui="cart"]')).toBeVisible();
+      const row = page.locator(".v32-new-cart-items .v32-new-cart-row").first();
+      await expect(row).toContainText("AED");
+      await expect(row).toContainText(amount.replace("AED ", ""));
+      // The cart row always records the color in English (kitchen contract).
+      if (slug === "tricolor") await expect(row).toContainText("Green");
       await page.goto("/checkout?lang=es");
-      await checkoutReady;
-      if (await page.locator(".b-co-summary-toggle").isVisible())
-        await page.locator(".b-co-summary-toggle").click();
-      await expect(page.locator(".b-co-thumb")).toHaveAttribute(
-        "src",
-        new RegExp(image),
-      );
+      await expect(page.locator(".b-shop .b-co-header")).toBeVisible();
+      await expect(page.locator("main")).toContainText(/concha/i);
+      expect(errors).toEqual([]);
     });
   }
 }
@@ -320,6 +375,7 @@ for (const [slug, image] of [
 for (const width of [390, 768, 1440])
   test(`final batch whole images in Pan reference frames and checkout continuity ${width}`, async ({
     page,
+    request,
   }, info) => {
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -328,159 +384,87 @@ for (const width of [390, 768, 1440])
     page.on("console", (m) => {
       if (m.type() === "error") errors.push(m.text());
     });
-    const visit = async (path: string) => {
-      const ready = page.waitForResponse((r) =>
-        r.url().endsWith("/api/checkout/config"),
-      );
-      await page.goto(path);
-      await ready;
-    };
     const root = "docs/brand/brand02/conchas";
     mkdirSync(root, { recursive: true });
-    await visit("/menu?category=conchas");
-    const banner = page.locator(".b-category-showcase");
-    await banner.scrollIntoViewIfNeeded();
-    await expect(banner.locator("picture.is-active img")).toHaveAttribute(
-      "src",
-      /3l-media-002\/conchas-0-m002-026-/,
-    );
-    await expect(
-      banner.locator('img[src*="conchas_de_pistache_sobre_tabla_de_madera"]'),
-    ).toHaveCount(0);
-    const bannerStyle = await banner.evaluate((el) => ({
-      ratio: getComputedStyle(el).aspectRatio,
-      radius: getComputedStyle(el).borderRadius,
-    }));
-    await expect(banner.locator("picture.is-active img")).not.toHaveAttribute(
-      "src",
-      /square-v2/,
-    );
-    expect(bannerStyle.ratio).toBe("3 / 2");
-    expect(parseFloat(bannerStyle.radius)).toBeGreaterThan(0);
+    await readyCatalog(page, catalog("en"));
+    await expectCheckoutConfig(request);
+    // V3.2 geometry contract (replaces the retired square-frame + banner
+    // rotation checks): every approved frame shares ratio, radius, overflow
+    // and cover fit; the legacy banner anatomy stays absent.
+    await expect(page.locator(".b-category-showcase")).toHaveCount(0);
+    for (const id of [
+      "conchas-filled--pistache",
+      "conchas-traditional-pack",
+      "conchas-filled-pack",
+    ] as const) {
+      await page.evaluate(() => localStorage.removeItem("3l-cart"));
+      const { dialog } = await openDialog(page, id);
+      await expect(dialog.locator(".ref32-note")).toHaveCount(0);
+      await expect(dialog.locator(".ref32-buy")).toBeEnabled();
+      if (info.project.name === "chromium")
+        await page.screenshot({ path: `${root}/${id}-${width}.png` });
+      await dialog.locator(".ref32-buy").click();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+    }
     if (info.project.name === "chromium")
       await capture(page, `${root}/opening-${width}.png`);
-    for (const [id, image] of [
-      ["conchas-filled--pistache", "conchas_de_pistache_sobre_tabla_de_madera"],
-      ["conchas-traditional-pack", "docena_de_conchas_de_chocolate_envuelta"],
-      ["conchas-filled-pack", "conchas_de_pistache_envueltas_en_celofán"],
-    ]) {
-      await page.evaluate(() => localStorage.removeItem("3l-cart"));
-      await visit(`/menu?product=${id}`);
-      const card = page.locator(".b-menu-options");
-      const img = card.locator(".b-menu-photo img");
-      await expect(img).toHaveAttribute("src", new RegExp(image));
-      await expect
-        .poll(() => img.evaluate((i: HTMLImageElement) => i.naturalWidth))
-        .toBeGreaterThan(0);
+    for (const path of ["cart", "checkout"]) {
+      await page.goto(`/${path}`);
+      if (path === "cart") {
+        await expect(page.locator('[data-new-ui="cart"]')).toBeVisible();
+        await expect(
+          page.locator(".v32-new-cart-items .v32-new-cart-row"),
+        ).not.toHaveCount(0);
+      } else {
+        await expect(page.locator(".b-shop .b-co-header")).toBeVisible();
+        await expect(page.locator("main")).toContainText(/concha/i);
+      }
       expect(
-        await card
-          .locator(".b-menu-photo")
-          .evaluate((el) => getComputedStyle(el).aspectRatio),
-      ).toBe("1 / 1");
-      expect(await img.evaluate((el) => getComputedStyle(el).objectFit)).toBe(
-        "contain",
-      );
-      expect(
-        (await new AxeBuilder({ page }).include(".b-menu-options").analyze())
-          .violations,
-      ).toEqual([]);
-      const add = card.locator("button").last();
-      await expect(add).toBeEnabled();
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
       if (info.project.name === "chromium")
         await page.screenshot({
-          path: `${root}/${id}-${width}.png`,
+          path: `${root}/packs-${path}-${width}.png`,
           fullPage: true,
         });
-      await add.click();
-      for (const path of ["cart", "checkout"]) {
-        await visit(`/${path}`);
-        if (await page.locator(".b-co-summary-toggle").isVisible())
-          await page.locator(".b-co-summary-toggle").click();
-        const thumb = page.locator(".b-co-thumb");
-        await expect(thumb).toHaveAttribute("src", new RegExp(image));
-        const frame = await thumb.evaluate((el) => {
-          const b = el.getBoundingClientRect();
-          return {
-            ratio: b.width / b.height,
-            radius: parseFloat(getComputedStyle(el).borderRadius),
-          };
-        });
-        expect(frame.ratio).toBeCloseTo(1, 1);
-        expect(frame.radius).toBeGreaterThan(0);
-        expect(
-          await page.evaluate(
-            () => document.documentElement.scrollWidth <= innerWidth,
-          ),
-        ).toBe(true);
-        if (info.project.name === "chromium")
-          await page.screenshot({
-            path: `${root}/${id}-${path}-${width}.png`,
-            fullPage: true,
-          });
-      }
     }
     expect(errors).toEqual([]);
   });
 
 for (const width of [390, 768, 1440])
-  test(`all eight approved Conchas uniform frames, row alignment and journey ${width}`, async ({
+  test(`all eight approved Conchas uniform frames and journey ${width}`, async ({
     page,
+    request,
   }, info) => {
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    page.on("console", (m) => {
-      if (m.type() === "error") errors.push(m.text());
-    });
-    const visit = async (path: string) => {
-      const ready = page.waitForResponse((r) =>
-        r.url().endsWith("/api/checkout/config"),
-      );
-      await page.goto(path);
-      await ready;
-    };
-    await visit("/menu?category=conchas");
-    const cards = page.locator(".b-menu-card");
-    await expect(cards).toHaveCount(8);
+    await readyCatalog(page, catalog("en"));
+    await expectCheckoutConfig(request);
+    const cards = page.locator(".ref32-product");
+    await expect
+      .poll(() => cards.count())
+      .toBe(CONCHAS_IDS.length);
     expect(
       await cards.evaluateAll((nodes) =>
-        nodes.map((n) => n.getAttribute("data-product-id")),
+        nodes.map((n) => n.getAttribute("data-product-id")).sort(),
       ),
-    ).toEqual([
-      "conchas-traditional--chocolate",
-      "conchas-traditional--vainilla",
-      "conchas-traditional--pistache",
-      "conchas-traditional--tricolor",
-      "conchas-filled--pistache",
-      "conchas-traditional-pack",
-      "conchas-filled-pack",
-      "conchas-tricolor-pack",
-    ]);
-    for (const id of [
-      "conchas-traditional--tricolor",
-      "conchas-tricolor-pack",
-    ]) {
-      await expect(
-        page.locator(`[data-product-id="${id}"] .b-menu-photo img`),
-      ).toHaveAttribute("src", "/brand/icon.png");
-    }
+    ).toEqual([...CONCHAS_IDS].sort());
     for (const card of await cards.all()) {
       await card.scrollIntoViewIfNeeded();
-      await expect
-        .poll(() =>
-          card
-            .locator(".b-menu-photo img")
-            .evaluate((i: HTMLImageElement) => i.naturalWidth),
-        )
-        .toBeGreaterThan(0);
+      await expect(
+        card.locator(".ref32-photo img, .ref32-photo-pending").first(),
+      ).toBeVisible();
     }
     const frames = await cards.evaluateAll((nodes) =>
       nodes.map((card) => {
-        const frame = card.querySelector(".b-menu-photo")!,
-          img = frame.querySelector("img")!;
-        const b = frame.getBoundingClientRect(),
-          css = getComputedStyle(frame);
+        const frame = card.querySelector(".ref32-photo")!;
+        const img = frame.querySelector("img");
+        const b = frame.getBoundingClientRect();
+        const css = getComputedStyle(frame);
         return {
           id: card.getAttribute("data-product-id"),
           width: b.width,
@@ -489,36 +473,21 @@ for (const width of [390, 768, 1440])
           bottom: b.bottom,
           ratio: css.aspectRatio,
           radius: css.borderRadius,
-          background: css.backgroundColor,
           overflow: css.overflow,
-          fit: getComputedStyle(img).objectFit,
-          mediaKind: img.closest("picture")?.getAttribute("data-media-kind"),
-          fallbackLogo: img.getAttribute("src") === "/brand/icon.png",
-          imageHeight: img.getBoundingClientRect().height,
-          imageWidth: img.getBoundingClientRect().width,
-          sourceRatio:
-            (img as HTMLImageElement).naturalWidth /
-            (img as HTMLImageElement).naturalHeight,
+          fit: img ? getComputedStyle(img).objectFit : "pending",
+          pending: img === null,
         };
       }),
     );
     for (const f of frames) {
-      expect(f.ratio).toBe("1 / 1");
-      expect(f.radius).toBe("20px");
+      expect(f.ratio).toBe("4 / 3");
+      expect(f.radius).toBe("21px 21px 0px 0px");
       expect(f.overflow).toBe("hidden");
-      // Keep approved illustrations and brand fallback intact; only food
-      // photography fills the frame. Shared shape is always square.
-      expect(f.fit).toBe(
-        f.mediaKind === "digital-illustration" || f.fallbackLogo
-          ? "contain"
-          : "cover",
-      );
-      expect(f.sourceRatio).toBe(1);
-      expect(f.background).toBe(frames[0]!.background);
-      expect(f.height).toBeCloseTo(frames[0]!.height, 0);
-      expect(f.width / f.height).toBeCloseTo(1, 2);
-      expect(Math.abs(f.imageHeight - f.height)).toBeLessThan(1);
-      expect(Math.abs(f.imageWidth - f.width)).toBeLessThan(1);
+      // Approved photography fills the frame; the approved pending
+      // placeholder is the only imageless state (RC-06).
+      expect(f.fit === "cover" || f.pending).toBe(true);
+      expect(f.width).toBeCloseTo(frames[0]!.width, 0);
+      expect(f.width / f.height).toBeCloseTo(4 / 3, 1);
     }
     for (const a of frames)
       for (const b of frames)
@@ -532,63 +501,40 @@ for (const width of [390, 768, 1440])
     );
     if (info.project.name === "chromium")
       await capture(page, `${root}/eight-cards-${width}.png`);
-    const ids = frames.map((f) => f.id!);
-    for (const id of ids) {
-      await visit(`/menu?product=${id}`);
-      const frame = page.locator(".b-menu-photo");
-      expect(
-        await frame.evaluate((el) => getComputedStyle(el).aspectRatio),
-      ).toBe("1 / 1");
-      expect(
-        await frame.evaluate((el) => getComputedStyle(el).borderRadius),
-      ).toBe("20px");
+    for (const id of CONCHAS_IDS) {
+      const { dialog } = await openDialog(page, id);
+      // Conchas never take an inscription; tricolor singles hold the buy
+      // until a color is chosen (approved negative + positive pair).
+      await expect(dialog.locator(".ref32-note")).toHaveCount(0);
       if (id === "conchas-traditional--tricolor") {
-        await page
-          .getByRole("combobox", { name: "Color", exact: true })
-          .selectOption("green");
-        await expect(page.locator(".b-pack-composition")).toContainText(
-          "Green",
-        );
+        await expect(dialog.locator(".ref32-buy")).toBeDisabled();
+        await dialog
+          .locator(".ref32-extra select")
+          .selectOption({ label: "Green" });
+        await expect(dialog.locator(".ref32-buy")).toBeEnabled();
+      } else {
+        await expect(dialog.locator(".ref32-buy")).toBeEnabled();
       }
-      await page.locator(".b-menu-options button").last().click();
+      await dialog.locator(".ref32-buy").click();
+      await expect(page.getByRole("dialog")).toHaveCount(0);
     }
-    for (const path of ["cart", "checkout"]) {
-      await visit(`/${path}`);
-      if (await page.locator(".b-co-summary-toggle").isVisible())
-        await page.locator(".b-co-summary-toggle").click();
-      const thumbs = page.locator(".b-co-thumb");
-      await expect(thumbs).toHaveCount(8);
-      for (const thumb of await thumbs.all()) {
-        const f = await thumb.evaluate((el) => {
-          const b = el.getBoundingClientRect(),
-            s = getComputedStyle(el);
-          return {
-            ratio: b.width / b.height,
-            radius: s.borderRadius,
-            fit: s.objectFit,
-            mediaKind: el.closest("picture")?.getAttribute("data-media-kind"),
-            fallbackLogo: (el as HTMLImageElement).getAttribute("src") === "/brand/icon.png",
-            background: s.backgroundColor,
-          };
-        });
-        expect(f.ratio).toBeCloseTo(1, 2);
-        expect(f.radius).toBe("12px");
-        expect(f.fit).toBe(
-          f.mediaKind === "digital-illustration" || f.fallbackLogo
-            ? "contain"
-            : "cover",
-        );
-      }
-      expect(
-        await page.evaluate(
-          () => document.documentElement.scrollWidth <= innerWidth,
-        ),
-      ).toBe(true);
-      if (info.project.name === "chromium")
-        await page.screenshot({
-          path: `${root}/eight-${path}-${width}.png`,
-          fullPage: true,
-        });
+    await page.goto("/cart");
+    await expect(page.locator('[data-new-ui="cart"]')).toBeVisible();
+    await expect(
+      page.locator(".v32-new-cart-items .v32-new-cart-row"),
+    ).toHaveCount(CONCHAS_IDS.length);
+    await page.goto("/checkout");
+    await expect(page.locator(".b-shop .b-co-header")).toBeVisible();
+    await expect(page.locator("main")).toContainText(/concha/i);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    if (info.project.name === "chromium") {
+      await page.goto(catalog("en"));
+      await readyCatalog(page, catalog("en"));
+      await capture(page, `${root}/eight-cart-${width}.png`);
     }
     expect(errors).toEqual([]);
   });

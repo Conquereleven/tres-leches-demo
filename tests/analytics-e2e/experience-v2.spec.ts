@@ -1,7 +1,8 @@
 import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync, readFileSync } from "node:fs";
-const cookies = new Map<string, string>();
+import { ensureSessions } from "./sessions";
+let cookies = new Map<string, string>();
 const resources = Object.fromEntries(
   ["en", "tl"].map((l) => [
     l,
@@ -9,14 +10,9 @@ const resources = Object.fromEntries(
   ]),
 );
 test.beforeAll(async ({ request }) => {
-  for (const role of ["admin", "operator"]) {
-    const r = await request.post("/api/login", {
-      headers: { Origin: "https://127.0.0.1:3339" },
-      data: { id: `fixture-${role}`, password: "fictional-password" },
-    });
-    expect(r.status()).toBe(200);
-    cookies.set(role, r.headers()["set-cookie"]!.split(";")[0]!.split("=")[1]!);
-  }
+  // Shared logins (see sessions.ts): this file reuses the admin/operator
+  // sessions created once per server run instead of bursting logins again.
+  cookies = await ensureSessions(request, ["admin", "operator"]);
 });
 async function login(page: Page, path: string, role = "admin") {
   await page.context().addCookies([

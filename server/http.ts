@@ -1177,6 +1177,9 @@ export async function startServer(
         ![
           "/",
           "/menu",
+          "/bakery",
+          "/contact",
+          "/journal",
           "/how-to-order",
           "/cart",
           "/checkout",

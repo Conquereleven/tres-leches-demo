@@ -2,13 +2,17 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { cart, cartCount, cartSubtotalFils, displayLinePrice, minQty, useCart, useCheckoutConfig, type CheckoutConfig } from "../cart";
 import { useLanguage } from "../localization";
 import { formatAed } from "../content";
-import { business, phoneHref, policyDecisions, type PolicyPath } from "../business";
+import { business, legalEntityLabel, phoneHref, type PolicyPath } from "../business";
+import { pages } from "../Policies";
 import { lineKey, componentName } from "../../../shared/pack-composition";
 import { menuFamilyForSku } from "../menu";
 import { packQtyLabel, toPackChoice } from "./catalog-options";
 import { tricolorCopy } from "../../../shared/tricolor";
 
-const root="/visual-v32";
+// In canonical V3.2, cart actions go to the existing REAL /checkout.
+// The /visual-v32 preview stays isolated and payment-free.
+const root = typeof location !== "undefined" && location.pathname.startsWith("/visual-v32")
+  ? "/visual-v32" : "";
 const copy={
  en:{empty:"Your basket is waiting for something delicious.",cart:"Your basket",continue:"Explore our menu",checkout:"Checkout",remove:"Remove",total:"Subtotal",quantity:"Quantity",delivery:"Delivery",pickup:"Pickup",fulfillment:"Delivery or pickup",details:"Your details",review:"Review your order",next:"Continue",back:"Back",date:"Choose a date",slot:"Time window",zone:"Delivery area",address:"Street and building",unit:"Apartment / unit",first:"Full name",phone:"Phone number",email:"Email",notice:"This isolated preview does not take payments. Your order is not placed.",notReady:"Ordering is temporarily unavailable.",minimum:"Minimum purchase requirements must be met before checkout.",contact:"We're here to help",contactIntro:"Questions about your order, delivery or a custom cake? Reach our 3L team.",company:"Company",location:"Visit us",help:"How to order",helpText:"Select your cake or bakery items, choose pickup or delivery, and review your details before payment.",price:"Price",add:"Add to cart",choose:"Choose one",selection:"Select a color",boxes:"Choose the pieces in each box",pieces:"Pieces selected",invalid:"Please complete the selections to continue.",saved:"Added to cart",start:"Continue shopping",policy:"Customer information",verify:"Delivery fee and minimum are verified by our server.",retry:"Try again"},
  es:{empty:"Tu carrito espera algo delicioso.",cart:"Tu carrito",continue:"Explora nuestro menú",checkout:"Finalizar pedido",remove:"Eliminar",total:"Subtotal",quantity:"Cantidad",delivery:"Entrega",pickup:"Recoger",fulfillment:"Entrega o recogida",details:"Tus datos",review:"Revisa tu pedido",next:"Continuar",back:"Volver",date:"Elige una fecha",slot:"Horario",zone:"Zona de entrega",address:"Calle y edificio",unit:"Apartamento / unidad",first:"Nombre completo",phone:"Teléfono",email:"Correo electrónico",notice:"Esta vista de prueba no acepta pagos ni crea pedidos.",notReady:"Los pedidos no están disponibles temporalmente.",minimum:"Debes completar los mínimos antes del checkout.",contact:"Estamos para ayudarte",contactIntro:"¿Preguntas sobre tu pedido, entrega o un pastel especial? Contacta al equipo 3L.",company:"Empresa",location:"Visítanos",help:"Cómo ordenar",helpText:"Elige tus productos, selecciona entrega o recogida y revisa los datos antes del pago.",price:"Precio",add:"Añadir al carrito",choose:"Elige uno",selection:"Elige un color",boxes:"Elige las piezas de cada caja",pieces:"Piezas seleccionadas",invalid:"Completa tu selección para continuar.",saved:"Añadido al carrito",start:"Seguir comprando",policy:"Información al cliente",verify:"El cargo y el mínimo de entrega los valida nuestro servidor.",retry:"Reintentar"},
@@ -55,19 +59,20 @@ export function VisualContact(){
  </main>;
 }
 export function VisualHowToOrder(){const {t}=useVisualCopy();return <main className="v32-new-page" id="main" data-new-ui="how"><p className="v32-new-eyebrow">3L PASTELERÍAS</p><h1>{t.help}</h1><div className="v32-new-layout"><Panel title={t.help}><p>{t.helpText}</p><p>{t.verify}</p></Panel><Panel title={t.contact}><p>{t.contactIntro}</p><a href={suffix("/contact")} className="v32-new-action">{t.contact} →</a></Panel></div></main>;}
-const policyNames:Record<Exclude<PolicyPath,"/contact">,string>={
- "/terms":"Terms & Conditions","/privacy":"Privacy Policy","/refund-policy":"Refund & Cancellation","/delivery-policy":"Delivery Policy"
-};
 export function VisualPolicy({path}:{path:PolicyPath}){
- const {t}=useVisualCopy();const title=path==="/contact"?t.contact:policyNames[path];if(path==="/contact")return <VisualContact/>;
- return <main id="main" className="v32-new-page" data-new-ui="policy"><p className="v32-new-eyebrow">{t.policy}</p><h1>{title}</h1>
- <div className="v32-new-policy"><Panel title={title}>
- {path==="/terms"&&<><p>{business.tradingName} operates in {business.city}, {business.country}, under {business.legalName}.</p><p>Orders are confirmed only after payment verification. The official cart, delivery fee and minimum values are validated by the 3L server.</p></>}
- {path==="/privacy"&&<><p>Customer information is requested only as needed to process and support an order. Payment card details are handled by {business.paymentProcessor} on its hosted secure checkout, not in this visual preview.</p><p>Contact our team for questions about your information.</p></>}
- {path==="/refund-policy"&&<><p>Paid cancellations: {policyDecisions.paidCancellationWindow}.</p><p>Eligible refunds: {policyDecisions.paidCancellationRefund}.</p><p>Other damage, delivery and product concerns are reviewed by the team; no unconfirmed deadline is implied.</p></>}
- {path==="/delivery-policy"&&<><p>Delivery area and minimum order depend on server-verified zones in Dubai. Order totals and delivery charges are checked before payment.</p><p>Delivery dates and availability are confirmed in checkout, not guaranteed by this visual preview.</p></>}
- <p>Last updated: {business.policiesUpdated}.</p></Panel>
- <a href={suffix("/contact")} className="v32-new-action">{t.contact} →</a></div></main>;
+ // The V3.2 shell owns only frame/navigation. Every legal sentence below is
+ // the authorized commercial copy from src/brand/Policies.tsx (single source
+ // of truth with business.ts): never preview-simplified text.
+ const {t}=useVisualCopy();const {language}=useLanguage();
+ if(path==="/contact")return <VisualContact/>;
+ const page=pages[path];
+ useEffect(()=>{document.title=`${page.metaTitle} — ${business.tradingName} Dubai`;},[page]);
+ return <main id="main" className="v32-new-page" data-new-ui="policy"><p className="v32-new-eyebrow">{t.policy}</p><h1>{page.title}</h1>
+ <div className="v32-new-policy b-policy-body">{page.intro}
+ {page.summary&&<ul className="b-policy-summary" aria-label="Summary">{page.summary.map(s=><li key={s.title}><p className="b-label">{s.title}</p><p>{s.text}</p></li>)}</ul>}
+ {page.sections.map(s=><section key={s.id} aria-label={s.title}><h2>{s.title}</h2>{s.body}</section>)}
+ <p className="b-caption">Last updated {new Date(`${business.policiesUpdated} 12:00:00 UTC`).toLocaleDateString(language==="en"?"en-GB":language,{day:"numeric",month:"long",year:"numeric",timeZone:"UTC"})} · {legalEntityLabel()}</p></div>
+ <a href={suffix("/contact")} className="v32-new-action">{t.contact} →</a></main>;
 }
 type Quote={eligible?:boolean;totalFils?:number;subtotalFils?:number;feeFils?:number;minOrderAed?:number;reason?:string};
 export function VisualCheckout(){
