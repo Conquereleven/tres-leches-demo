@@ -79,17 +79,21 @@ export const cart = {
     quantity = 1,
     composition?: Composition,
     color?: TricolorColor,
+    cakeMessage?: string,
   ) {
     if (!productId || !Number.isInteger(quantity) || quantity < 1) return;
     const entry = {
       productId,
       quantity,
       ...(color ? { color } : {}),
+      ...(cakeMessage?.trim() ? { cakeMessage: cakeMessage.trim() } : {}),
       ...(composition
         ? { composition: normalizeComposition(composition) }
         : {}),
     };
-    const key = lineKey(entry);
+    const parsed = commerceLineSchema.safeParse(entry);
+    if (!parsed.success) return;
+    const key = lineKey(parsed.data);
     const total = lines
       .filter((l) => l.productId === productId)
       .reduce((n, l) => n + l.quantity, 0);
@@ -106,7 +110,7 @@ export const cart = {
               ? { ...l, quantity: Math.min(MAX_QTY, l.quantity + quantity) }
               : l,
           )
-        : [...lines, entry],
+        : [...lines, parsed.data],
     );
   },
   set(key: string, quantity: number) {

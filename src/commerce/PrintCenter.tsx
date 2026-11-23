@@ -110,6 +110,7 @@ export function PrintCenter({ data }: { data: Workspace }) {
                     total: AED {((l.priceFils * l.quantity) / 100).toFixed(2)}
                   </p>
                   {preparationText(l) && <p lang="en">{preparationText(l)}</p>}
+                  {l.cakeMessage && <p lang="en" data-cake-inscription><strong>Cake inscription:</strong> {l.cakeMessage}</p>}
                 </li>
               ))}
             </ul>

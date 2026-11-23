@@ -1133,6 +1133,10 @@ export async function startServer(
       // out of search indexes.
       const robots = robotsDirective(path, runtime.environment);
       if (robots) res.setHeader("X-Robots-Tag", robots);
+      // The Founder-approved V3.2 integration preview exists ONLY in isolated tests.
+      // It must never create a new public route in staging or Production.
+      if (isolatedTest && path.startsWith("/visual-v32"))
+        res.setHeader("X-Robots-Tag", "noindex, nofollow");
       // Uploaded catalog images live in SQLite, not in the static bundle.
       if (
         serveHubMedia(req, res, path, store, () => {
@@ -1177,6 +1181,13 @@ export async function startServer(
           "/cart",
           "/checkout",
           "/checkout/return",
+          ...(isolatedTest ? [
+             "/visual-v32", "/visual-v32/menu", "/visual-v32/bakery",
+             "/visual-v32/contact", "/visual-v32/cart", "/visual-v32/checkout",
+             "/visual-v32/checkout/return", "/visual-v32/how-to-order",
+             "/visual-v32/terms", "/visual-v32/privacy",
+             "/visual-v32/refund-policy", "/visual-v32/delivery-policy",
+           ] : []),
           "/operations/overview",
           "/operations/analytics",
           "/operations/products",

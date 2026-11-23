@@ -10,6 +10,7 @@ export type KitchenEmailItem = {
   pack?: PackSnapshot;
   review?: string;
   preparation?: string;
+  cakeMessage?: string;
 };
 export type KitchenEmail = {
   reference: string;
@@ -153,6 +154,10 @@ export function renderOperationsEmail(email: KitchenEmail) {
       if (item.review) {
         text.push(item.review);
         preparation += warning(item.review);
+      }
+      if (item.cakeMessage) {
+        text.push(`Cake inscription: ${item.cakeMessage}`);
+        preparation += `<p data-cake-inscription style="font-weight:bold;margin:6px 0 0;color:#27242D;">Cake inscription: ${escapeHtml(item.cakeMessage)}</p>`;
       }
       // Each accepted line owns its row group, including any frozen box contents.
       return `<tbody data-kitchen-item="${item.isPack ? "pack" : "single"}"><tr><th scope="row" style="text-align:left;vertical-align:top;padding:8px 9px ${preparation ? "3px" : "8px"};font-weight:normal;overflow-wrap:anywhere;word-break:break-word;${preparation ? "" : "border-bottom:1px solid #dbcbb3;"}">${item.isPack ? '<p style="font:10px Arial,Helvetica,sans-serif;letter-spacing:1px;color:#6f5733;margin:0 0 3px;">PACK / BOX</p>' : ""}<h2 style="font-family:Georgia,'Times New Roman',serif;font-size:18px;line-height:1.14;margin:0;font-weight:normal;">${escapeHtml(item.name)}</h2></th><td data-kitchen-quantity style="vertical-align:top;text-align:center;padding:10px 2px 4px;font-size:18px;${preparation ? "" : "border-bottom:1px solid #dbcbb3;"}">${Number.isSafeInteger(item.quantity) && item.quantity > 0 ? item.quantity : "Review"}</td><td style="vertical-align:top;text-align:right;padding:10px 9px 4px;font-size:17px;${preparation ? "" : "border-bottom:1px solid #dbcbb3;"}"><span data-kitchen-price style="white-space:nowrap;">${escapeHtml(priceValid ? money(item.priceFils! * item.quantity) : "Review required")}</span>${item.quantity !== 1 ? `<p style="font-size:13px;line-height:1.25;margin:3px 0 0;color:#6f5733;">${escapeHtml(priceValid ? `${money(item.priceFils!)} ${item.isPack ? "per box" : "each"}` : visiblePrice)}</p>` : ""}</td></tr>${preparation ? `<tr><td colspan="3" style="padding:0 9px 8px;border-bottom:1px solid #dbcbb3;color:#6f5733;">${preparation}</td></tr>` : ""}</tbody>`;
