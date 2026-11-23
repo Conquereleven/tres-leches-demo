@@ -1,4 +1,3 @@
-import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { homedir } from "node:os";
@@ -29,23 +28,24 @@ if (process.platform !== "linux") {
     .find(existsSync);
   if (!library)
     throw new Error("Cannot verify the installed WebKit libsoup library");
-  const match = execFileSync("strings", [library], {
-    encoding: "utf8",
-    maxBuffer: 16 * 1024 * 1024,
-  }).match(/^libsoup\/(\d+)\.(\d+)\.(\d+)$/m);
+  // CI Playwright containers do not necessarily provide GNU binutils/strings.
+  // Inspect the bundled shared library directly using Node, avoiding apt or
+  // platform utility dependencies while keeping the same fail-closed guard.
+  const binary = readFileSync(library).toString("latin1");
+  const match = binary.match(/(?:^|[\x00-\x1f])libsoup\/(\d+)\.(\d+)\.(\d+)(?=[\x00-\x1f]|$)/);
   if (!match) throw new Error("Bundled libsoup version is unavailable");
   const [, major, minor, patch] = match.map(Number);
   if (!(
     major > 3 ||
     (major === 3 && (minor > 6 || (minor === 6 && patch >= 6)))
   )) {
-    throw new Error(`Unsafe WebKit networking library: ${match[0]}`);
+    throw new Error(`Unsafe WebKit networking library: libsoup/${major}.${minor}.${patch}`);
   }
   console.log(
     JSON.stringify({
       webkitRevision: revision,
       browserVersion,
-      libsoup: match[0],
+      libsoup: `libsoup/${major}.${minor}.${patch}`,
     }),
   );
 }
