@@ -114,6 +114,7 @@ export function paidFixture(path = ":memory:") {
     store,
     service,
     providerState,
+    payment, // reusable injected fake transport for integrated HTTP fixtures
     since,
     place,
     order,

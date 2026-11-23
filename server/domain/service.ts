@@ -13,6 +13,12 @@ import {
 } from "../../shared/minimum-quantity";
 import { provablyUninitiated, verifiedLocalRejection } from "./local-rejection";
 import { frozenCheckout } from "./frozen-checkout";
+import {
+  fulfillmentPending,
+  fulfillmentIntent,
+  requestedFulfillment,
+  revalidatePaidFulfillment,
+} from "./payment-fulfillment";
 import { PaymenntProvider } from "../adapters/paymennt";
 import { orderBillingAddress, toPaymenntDeliveryAddress } from "./billing";
 import {
@@ -63,6 +69,12 @@ import {
 const hash = (v: unknown) =>
   createHash("sha256").update(JSON.stringify(v)).digest("hex");
 const at = () => ({ at: now() });
+const settledPaymentStatuses: readonly Payment["status"][] = [
+  "paid",
+  "partially_refunded",
+  "refunded",
+  "chargeback",
+];
 export class CommerceService {
   agentAutomationAllowed = false;
   deliveryAddressMode: "legacy" | "google" = "google";
@@ -585,6 +597,8 @@ export class CommerceService {
         ),
       );
       s.payments.push(p);
+      p.fulfillmentIntent = fulfillmentIntent(o);
+      p.fulfillmentRequested = requestedFulfillment(o);
       o.paymentId = p.id;
       transition(o, "Awaiting Payment", actor.id);
       this.enqueue(s, "payment", p.id);
@@ -626,6 +640,16 @@ export class CommerceService {
         requireThat(
           s.payments.find((p) => p.id === o.paymentId)?.status === "paid",
           "Pago requiere revisión antes de fulfillment",
+        );
+      if (
+        ["Production", "Ready", "Out for Delivery", "Delivered"].includes(
+          cmd.state,
+        )
+      )
+        requireThat(
+          !fulfillmentPending(o),
+          "Fulfillment review required; preparation and dispatch are on hold",
+          409,
         );
       requireThat(
         !["Paid", "Confirmed", "Awaiting Payment"].includes(cmd.state),
@@ -840,21 +864,40 @@ export class CommerceService {
         );
         p.status = "paid";
         p.transactionId = e.transactionId;
-        // A late success is money received, but must never silently resurrect a cancelled/replaced order.
-        if (
+        const firstRecognition = !p.paidAt && !o.paidAt;
+        const eligible =
           o.state === "Awaiting Payment" &&
-          acceptedPackPricesCurrent(s, o) &&
           o.paymentId === p.id &&
+          acceptedPackPricesCurrent(s, o) &&
           !s.payments.some(
             (other) =>
               other.id !== p.id &&
               other.orderId === o.id &&
-              other.status === "paid",
-          )
-        ) {
+              settledPaymentStatuses.includes(other.status),
+          );
+        if (firstRecognition) {
+          // First server acknowledgement, never a provider transaction timestamp.
+          p.paidAt = now();
+          const decision = revalidatePaidFulfillment(
+            o,
+            p,
+            p.paidAt,
+            "payment-webhook",
+            "verified-alternative-event",
+            eligible,
+          );
+          o.audit.push({
+            at: p.paidAt,
+            actor: "payment-webhook",
+            action: `Payment fulfillment ${decision.status}: ${decision.reason}`,
+          });
+        }
+        // A late success is money received, but must never silently resurrect a cancelled/replaced order.
+        if (firstRecognition && eligible) {
           transition(o, "Paid", "payment-webhook");
           transition(o, "Confirmed", "payment-webhook");
           assignPublicOrderNumber(s, o);
+          o.paidAt = p.paidAt;
         } else {
           p.timeline.push({
             ...at(),
@@ -1159,7 +1202,7 @@ export class CommerceService {
           action:
             "Revisión requerida: devolución/disputa; historial de fulfillment conservado",
         });
-      const settled = ["paid", "partially_refunded", "refunded", "chargeback"];
+      const settled = settledPaymentStatuses;
       const regression =
         (settled.includes(previous) && !settled.includes(checkout.status)) ||
         (previous === "refunded" &&
@@ -1186,9 +1229,38 @@ export class CommerceService {
           actor,
           action: `Conciliación Paymennt: ${previous} → ${p.status}`,
         });
-      if (p.status === "paid" && !p.paidAt) {
+      if (
+        p.status === "paid" &&
+        previous !== "paid" &&
+        !p.paidAt &&
+        !o.paidAt
+      ) {
         // Receipt time, not a fabricated provider transaction timestamp.
         p.paidAt = now();
+        const eligible =
+          o.state === "Awaiting Payment" &&
+          acceptedPackPricesCurrent(s, o) &&
+          o.paymentId === p.id &&
+          !s.payments.some(
+            (other) =>
+              other.id !== p.id &&
+              other.orderId === o.id &&
+              settled.includes(other.status),
+          );
+        const decision = revalidatePaidFulfillment(
+          o,
+          p,
+          p.paidAt,
+          actor,
+          receiptId ? "verified-notification-get" : "authoritative-checkout",
+          eligible,
+          receiptId,
+        );
+        o.audit.push({
+          at: p.paidAt,
+          actor,
+          action: `Payment fulfillment ${decision.status}: ${decision.reason}`,
+        });
         if (
           o.state === "Awaiting Payment" &&
           acceptedPackPricesCurrent(s, o) &&

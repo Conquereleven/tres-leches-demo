@@ -1,6 +1,6 @@
 import { build } from "esbuild";
 import { execFileSync } from "node:child_process";
-import { copyFileSync, mkdirSync } from "node:fs";
+import { copyFileSync, cpSync, mkdirSync } from "node:fs";
 let revision = process.env.BUILD_SOURCE_SHA;
 if (!revision) {
   try {
@@ -26,6 +26,10 @@ await build({
 });
 mkdirSync("dist/node", { recursive: true });
 copyFileSync("server/db/schema.sql", "dist/node/schema.sql");
+// OFL fonts and wordmark for order documents, resolved next to the bundle.
+cpSync("server/orders/print-assets", "dist/node/print-assets", {
+  recursive: true,
+});
 
 await build({
   entryPoints: [

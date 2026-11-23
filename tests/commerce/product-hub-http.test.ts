@@ -1,3 +1,4 @@
+import { CATALOG_FIXTURE_NOW } from "../fixtures/catalog-clock";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
@@ -32,7 +33,11 @@ function png(width: number, height: number) {
   ]);
 }
 /** A real server process in staging mode: real login, real sessions, real roles. */
-async function server(port: number, flags: Record<string, string>) {
+async function server(
+  port: number,
+  flags: Record<string, string>,
+  now = CATALOG_FIXTURE_NOW,
+) {
   const dir = mkdtempSync(join(tmpdir(), "hub-http-"));
   const env = { ...stagingEnv(dir), ...flags };
   mkdirSync(dirname(env.DB_PATH!), { recursive: true });
@@ -45,17 +50,22 @@ async function server(port: number, flags: Record<string, string>) {
   ).foundation;
   new Store(env.DB_PATH!, "release-staging", state).close();
   const base = `http://127.0.0.1:${port}`;
-  const child = spawn(process.execPath, ["--import", "tsx", "server/main.ts"], {
-    env: {
-      ...process.env,
-      ...env,
-      APP_ORIGIN: origin,
-      HOST: "127.0.0.1",
-      PORT: String(port),
-      API_PORT: String(port + 1),
+  const child = spawn(
+    process.execPath,
+    ["--import", "tsx", "tests/fixtures/product-hub-staging-server.ts"],
+    {
+      env: {
+        ...process.env,
+        ...env,
+        PRODUCT_HUB_FIXTURE_NOW: now,
+        APP_ORIGIN: origin,
+        HOST: "127.0.0.1",
+        PORT: String(port),
+        API_PORT: String(port + 1),
+      },
+      stdio: "ignore",
     },
-    stdio: "ignore",
-  });
+  );
   let ready = false;
   for (let i = 0; i < 150 && child.exitCode === null; i++) {
     try {
@@ -350,6 +360,10 @@ test("HTTP RBAC: sessions, roles, origin and idempotency are enforced by the API
     const before = (
       await (await fetch(s.base + "/api/checkout/config")).json()
     ).products.find((p: { id: string }) => p.id === sku);
+    assert.ok(
+      before,
+      "reviewed seasonal SKU must exist in the in-season public API",
+    );
     assert.equal(before.priceFils, command.variants[0].priceFils - 100);
 
     // Publish as admin; the published price is what checkout quotes next.
@@ -362,6 +376,10 @@ test("HTTP RBAC: sessions, roles, origin and idempotency are enforced by the API
     const after = (
       await (await fetch(s.base + "/api/checkout/config")).json()
     ).products.find((p: { id: string }) => p.id === sku);
+    assert.ok(
+      after,
+      "published seasonal SKU must remain in the in-season public API",
+    );
     assert.equal(after.priceFils, command.variants[0].priceFils);
   } finally {
     await s.close();
@@ -525,3 +543,75 @@ test("HTTP manager draft/media access stays private; publish and privilege injec
     await s.close();
   }
 });
+
+for (const [now, inSeason, port] of [
+  ["2026-11-15T19:59:59.999Z", true, 3177],
+  ["2026-11-15T20:00:00.000Z", false, 3178],
+] as const)
+  test(`real public API preserves the Dubai Nov15/16 boundary at ${now}`, async () => {
+    const s = await server(
+      port,
+      {
+        PRODUCT_HUB_ENABLED: "true",
+        PRODUCT_HUB_PUBLISH_ENABLED: "true",
+        STOREFRONT_DYNAMIC_CATALOG_ENABLED: "true",
+      },
+      now,
+    );
+    try {
+      const admin = await s.login("admin");
+      const hub = await (await s.call("/api/product-hub", admin)).json();
+      const sku = "pan-de-muerto-traditional-azucar-individual-70-g";
+      assert.ok(
+        hub.products.some((p: { variants: { skuId: string }[] }) =>
+          p.variants.some((v) => v.skuId === sku),
+        ),
+        "published authority retains the deliberately initialized seasonal SKU",
+      );
+      const response = await fetch(s.base + "/api/checkout/config");
+      assert.equal(response.status, 200);
+      const config = await response.json();
+      const row = config.products.find((p: { id: string }) => p.id === sku);
+      assert.equal(
+        !!row,
+        inSeason,
+        "only public orderability changes at Dubai midnight",
+      );
+      assert.ok(
+        config.products.some(
+          (p: { id: string }) =>
+            p.id === "pan-de-muerto-traditional-pack-6-mini",
+        ),
+        "packs remain independently orderable",
+      );
+      const quote = await fetch(s.base + "/api/checkout/quote", {
+        method: "POST",
+        headers: { Origin: origin, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fulfillmentMethod: "pickup",
+          lines: [{ productId: sku, quantity: 6 }],
+        }),
+      });
+      // This RBAC fixture has providers offline; no quote/payment route is enabled.
+      assert.equal(quote.status, 503);
+      assert.match(
+        (await quote.json()).message,
+        /Online payment is currently unavailable/,
+      );
+      const publicCatalog = await (
+        await fetch(s.base + "/api/storefront/catalog")
+      ).json();
+      const visible = publicCatalog.products
+        .flatMap(
+          (p: { options: { id: string; available: boolean }[] }) => p.options,
+        )
+        .find((v: { id: string }) => v.id === sku);
+      assert.ok(
+        visible,
+        "published identity is retained across seasonal closure",
+      );
+      assert.equal(visible.available, inSeason);
+    } finally {
+      await s.close();
+    }
+  });

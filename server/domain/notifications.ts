@@ -1,4 +1,5 @@
 import { preparationText } from "../../shared/pack-composition";
+import { fulfillmentNotice } from "./payment-fulfillment";
 /**
  * Operations notifications: the paid-order alert for the 3L team.
  *
@@ -73,7 +74,7 @@ export function renderOrderPaidMessage(input: {
     pickup
       ? `PICKUP at ${PICKUP_LOCATION.name}`
       : `DELIVERY to ${zone?.name ?? order.quote?.zoneName ?? "—"}`,
-    `When: ${when || "—"}`,
+    `When: ${fulfillmentNotice(order) || when || "—"}`,
     `Total paid: AED ${aed(payment.amountFils)}`,
     "",
     // A short summary; the full order is one tap away.

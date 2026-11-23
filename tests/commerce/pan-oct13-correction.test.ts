@@ -1,3 +1,4 @@
+import { CATALOG_FIXTURE_NOW } from "../fixtures/catalog-clock";
 import * as requireFs from "node:fs";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -52,7 +53,8 @@ test("exactly ten price fields change from Production baseline; all other identi
     "older updater cannot revert the new prices",
   );
 });
-test("all ten server quotes preserve fixed packs, quantities, pickup and per-zone delivery minimums", () => {
+test("all ten server quotes preserve fixed packs, quantities, pickup and per-zone delivery minimums", (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: new Date(CATALOG_FIXTURE_NOW) });
   const store = new Store(":memory:", "test");
   store.write((s) => {
     s.catalog = approved();

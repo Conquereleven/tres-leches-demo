@@ -1,3 +1,5 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
+import { fulfillmentSchedule } from "../../shared/fulfillment-schedule";
 import type { Workspace } from "./api";
 export function overviewMetrics(
   data: Pick<Workspace, "orders" | "payments" | "jobs" | "integrationHealth">,
@@ -5,21 +7,23 @@ export function overviewMetrics(
   const open = data.orders.filter(
     (o) => !["Delivered", "Cancelled"].includes(o.state),
   );
+  const accepted = open.filter((o) => !fulfillmentPending(o));
   return {
     manualReview: open.filter(
       (o) => o.delivery?.addressVerification === "UNVERIFIED",
     ).length,
     attention: open.filter(
       (o) =>
+        fulfillmentPending(o) ||
         o.delivery?.addressVerification === "UNVERIFIED" ||
         data.payments.find((p) => p.id === o.paymentId)?.directAttempt ===
           "unknown",
     ).length,
-    confirmed: open.filter((o) => ["Paid", "Confirmed"].includes(o.state))
+    confirmed: accepted.filter((o) => ["Paid", "Confirmed"].includes(o.state))
       .length,
-    preparing: open.filter((o) => o.state === "Production").length,
-    ready: open.filter((o) => o.state === "Ready").length,
-    deliveries: open.filter(
+    preparing: accepted.filter((o) => o.state === "Production").length,
+    ready: accepted.filter((o) => o.state === "Ready").length,
+    deliveries: accepted.filter(
       (o) =>
         o.fulfillmentMethod !== "pickup" &&
         ["Ready", "Out for Delivery"].includes(o.state),
@@ -36,11 +40,13 @@ export function overviewAgenda(data: Workspace, today: string) {
   const open = data.orders.filter(
     (o) => !["Delivered", "Cancelled"].includes(o.state),
   );
+  const accepted = open.filter((o) => !fulfillmentPending(o));
   const scheduled = (o: Workspace["orders"][number]) =>
-    o.pickup?.pickupDate ?? o.delivery?.date;
+    fulfillmentSchedule(o).date;
   const reasons = (o: Workspace["orders"][number]) => {
     const payment = data.payments.find((p) => p.id === o.paymentId);
     const tags: string[] = [];
+    if (fulfillmentPending(o)) tags.push("Fulfillment pending confirmation");
     if (scheduled(o) === today) tags.push("Scheduled today");
     if (
       o.fulfillmentMethod !== "pickup" &&
@@ -72,6 +78,8 @@ export function overviewAgenda(data: Workspace, today: string) {
     .filter((x) => x.reasons.length)
     .sort(
       (a, b) =>
+        Number(fulfillmentPending(b.order)) -
+          Number(fulfillmentPending(a.order)) ||
         Number(b.reasons.includes("Scheduled today")) -
           Number(a.reasons.includes("Scheduled today")) ||
         (scheduled(a.order) ?? "9999").localeCompare(
@@ -90,18 +98,28 @@ export function overviewAgenda(data: Workspace, today: string) {
   return {
     priorities,
     scheduledToday: data.orders.filter((o) => scheduled(o) === today).length,
-    pipeline: stages.map((state) => ({
-      state,
-      count: open.filter((o) => o.state === state).length,
-    })),
-    confirmed: open.filter((o) => o.state === "Confirmed").length,
-    pickupReady: open.filter(
+    pipeline: [
+      ...stages.map((state) => ({
+        state,
+        count: accepted.filter((o) => o.state === state).length,
+      })),
+      ...(open.some(fulfillmentPending)
+        ? [
+            {
+              state: "Fulfillment pending confirmation",
+              count: open.filter(fulfillmentPending).length,
+            },
+          ]
+        : []),
+    ],
+    confirmed: accepted.filter((o) => o.state === "Confirmed").length,
+    pickupReady: accepted.filter(
       (o) => o.state === "Ready" && o.fulfillmentMethod === "pickup",
     ).length,
-    deliveryReady: open.filter(
+    deliveryReady: accepted.filter(
       (o) => o.state === "Ready" && o.fulfillmentMethod !== "pickup",
     ).length,
-    out: open.filter((o) => o.state === "Out for Delivery").length,
+    out: accepted.filter((o) => o.state === "Out for Delivery").length,
     emailIssues: (data.customerNotifications ?? []).filter(
       (n) => n.status === "failed",
     ).length,

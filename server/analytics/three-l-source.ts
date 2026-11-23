@@ -1,3 +1,4 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import type { State, Payment } from "../domain/model";
 import { frozenCheckout } from "../domain/frozen-checkout";
 import type { ReportingFacts, ReportingSource } from "./contract";
@@ -131,7 +132,10 @@ export class ThreeLReportingSource implements ReportingSource {
       facts.captures.push({
         day,
         amountFils: p.amountFils,
-        state: o.state,
+        // Read-only presentation; amounts, snapshots and persisted state are untouched.
+        state: fulfillmentPending(o)
+          ? "Fulfillment pending confirmation"
+          : o.state,
         fulfillment: o.fulfillmentMethod ?? "unknown",
         paymentState: p.status,
         lines,
