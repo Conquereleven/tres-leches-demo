@@ -30,22 +30,9 @@ export const business = {
   country: "United Arab Emirates",
   /** OWNER INPUT: no customer-service email has been confirmed yet. */
   email: null as string | null,
-  /**
-   * Confirmed customer-support numbers, 22 September 2026. Display format is
-   * the UAE international form; `phoneHref` derives the dialable E.164 value.
-   * These are support numbers. None of them is confirmed as the WhatsApp
-   * ordering number — that remains `whatsapp` below and is still unset.
-   */
   supportContacts: [
-    { name: "Liza", phone: "+971 52 168 3319" },
-    { name: "Sebastiano", phone: "+971 50 675 7352" },
     { name: "Golositalia store", phone: "+971 55 640 6776" },
   ] as SupportContact[],
-  /**
-   * Same source as every ORDER ON WHATSAPP button (content.ts). Still unset:
-   * which of the support numbers is the WhatsApp ordering line has not been
-   * confirmed, and it must not be guessed.
-   */
   whatsapp: destinations.whatsapp,
   /** OWNER INPUT: e.g. "Daily, 9:00 am – 9:00 pm (GST)". */
   supportHours: null as string | null,
@@ -223,12 +210,16 @@ export type ContactChannel = {
   value: string;
   href: string;
 };
-export function contactChannels({
-  contactPage = false,
-}: { contactPage?: boolean } = {}): ContactChannel[] {
+export function contactChannelLabel(channel: ContactChannel, locale: "en" | "es" | "ar") {
+  if (locale === "en" || channel.kind === "email") return channel.label;
+  if (channel.kind === "whatsapp")
+    return locale === "es" ? "WhatsApp — pedidos" : "واتساب للطلبات";
+  return locale === "es" ? "Tienda Golositalia" : "متجر Golositalia";
+}
+
+export function contactChannels(): ContactChannel[] {
   const channels: ContactChannel[] = [];
-  // Contact-page orders line is distinct from the unchanged floating support line.
-  const phone = contactPage ? "+971585943319" : business.whatsapp;
+  const phone = business.whatsapp;
   const wa = whatsappUrl(phone, "Hello 3L, I have a question about my order.");
   if (wa && phone)
     channels.push({
@@ -240,7 +231,7 @@ export function contactChannels({
   for (const contact of business.supportContacts)
     channels.push({
       kind: "phone",
-      label: contactPage && contact.name === "Liza" ? "La Liza" : contact.name,
+      label: contact.name,
       value: contact.phone,
       href: phoneHref(contact.phone),
     });

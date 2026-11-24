@@ -1,5 +1,6 @@
 import { serveAnalytics } from "./analytics/api";
 import { serveOrderDocuments } from "./orders/documents";
+import { isProductPagePath, renderProductPage } from "./catalog/product-page";
 import { withoutBundledProductMedia } from "./catalog/product-media-html";
 import { packPricingPolicy } from "./domain/pack-pricing";
 import { packBuilderEnabled, publishedPackRules } from "./domain/packs";
@@ -122,6 +123,8 @@ export const customerPages = [
 export const prerenderedPages = [
   ...customerPages,
   "/menu",
+  "/bakery",
+  "/journal",
   "/how-to-order",
 ] as const;
 /** Vite content-hashed bundles: the name changes whenever the bytes do. */
@@ -1152,25 +1155,33 @@ export async function startServer(
         candidate = resolve(root, "." + decodeURIComponent(path));
       if (candidate !== root && !candidate.startsWith(root + "/"))
         throw new DomainError(404, "No encontrado");
-      // Public customer pages are prerendered to <page>.html at build time.
-      const customerPage = prerenderedPages.find((p) => p === path);
-      if (customerPage) {
-        const page = resolve(root, `.${customerPage}.html`);
-        const file = existsSync(page) ? page : resolve(root, "index.html");
+      if (path === "/app-shell.html" || path === "/product-shell.html")
+        throw new DomainError(404, "Ruta no encontrada");
+      const linkedProduct = path === "/menu" && url.searchParams.get("product");
+      if (linkedProduct && isProductPagePath(`/menu/${linkedProduct}`)) {
+        url.searchParams.delete("product");
+        res.writeHead(301, { Location: `/menu/${linkedProduct}${url.search}` });
+        return res.end();
+      }
+      // Public pages use the same V3.2 layout before and after scripts load.
+      const productPage = isProductPagePath(path);
+      if (path === "/" || prerenderedPages.some((page) => page === path) || productPage) {
+        const page = productPage ? "product-shell" : path === "/" ? "index" : path.slice(1);
+        const file = resolve(root, page + ".html");
         if (!existsSync(file))
-          throw new DomainError(
-            404,
-            "Ejecuta el build para servir la aplicación",
-          );
+          throw new DomainError(404, "Ejecuta el build para servir la aplicación");
+        const html = markDynamicCatalog(file);
+        const body = productPage
+          ? renderProductPage(html.toString("utf8"), path, store.read(), storefrontCatalogMode(process.env))
+          : html;
         res.writeHead(200, {
           "Content-Type": "text/html",
           "X-Content-Type-Options": "nosniff",
           "Referrer-Policy": "same-origin",
           "Content-Security-Policy": customerCsp,
+          ...(productPage ? { "Cache-Control": "no-cache" } : {}),
         });
-        return res.end(
-          req.method === "HEAD" ? undefined : markDynamicCatalog(file),
-        );
+        return res.end(req.method === "HEAD" ? undefined : body);
       }
       if (
         !existsSync(candidate) &&
@@ -1186,7 +1197,7 @@ export async function startServer(
           "/checkout/return",
           ...(isolatedTest ? [
              "/visual-v32", "/visual-v32/menu", "/visual-v32/bakery",
-             "/visual-v32/contact", "/visual-v32/cart", "/visual-v32/checkout",
+             "/visual-v32/journal", "/visual-v32/contact", "/visual-v32/cart", "/visual-v32/checkout",
              "/visual-v32/checkout/return", "/visual-v32/how-to-order",
              "/visual-v32/terms", "/visual-v32/privacy",
              "/visual-v32/refund-policy", "/visual-v32/delivery-policy",
@@ -1211,7 +1222,7 @@ export async function startServer(
       const file =
         existsSync(candidate) && statSync(candidate).isFile()
           ? candidate
-          : resolve(root, "index.html");
+          : resolve(root, "app-shell.html");
       if (!existsSync(file))
         throw new DomainError(
           404,

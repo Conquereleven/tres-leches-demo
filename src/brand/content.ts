@@ -181,7 +181,7 @@ export const destinations: {
 } = {
   /**
    * Official WhatsApp support number, confirmed by the owner 22 September
-   * 2026 (Liza). Stored unspaced so `whatsappUrl` produces wa.me/971521683319.
+   * 2026. Stored unspaced for `whatsappUrl`.
    * Support only; customer orders are placed through the web cart and checkout.
    */
   whatsapp: "+971585943319",

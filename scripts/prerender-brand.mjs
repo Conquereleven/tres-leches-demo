@@ -7,21 +7,17 @@ import { resolve } from "node:path";
 mkdirSync("work/brand", { recursive: true });
 await build({
   stdin: {
-    contents: `import React from 'react'; import {renderToStaticMarkup} from 'react-dom/server'; import {BrandExperience} from './src/brand/Experience'; import {PolicyPage, pages} from './src/brand/Policies'; import {HowToOrder} from './src/brand/StorePages'; import {MenuShell} from './src/seo/MenuShell'; import {pendingBusinessFacts} from './src/brand/business'; import {seoPages, siteName, socialImage} from './src/seo/pages';
+    contents: `import React from 'react'; import {renderToStaticMarkup} from 'react-dom/server'; import {VisualV32} from './src/brand/visual-v32/VisualV32'; import {LocalizationProvider} from './src/brand/localization'; import {pages} from './src/brand/Policies'; import {pendingBusinessFacts} from './src/brand/business'; import {seoPages, siteName, socialImage} from './src/seo/pages';
 export * from './shared/seo';
 export {seoPages, siteName, socialImage, pages as policyMeta};
-const render = (component, props) => renderToStaticMarkup(React.createElement(component, props));
-export const bodies = {
-  '/': render(BrandExperience, {onManage:()=>{},onDemo:()=>{}}),
-  '/menu': render(MenuShell),
-  '/how-to-order': render(HowToOrder),
-  ...Object.fromEntries(Object.keys(pages).map((path) => [path, render(PolicyPage, {path})])),
-};
+export const renderPage = (pathname) => renderToStaticMarkup(
+  <LocalizationProvider><VisualV32 pathname={pathname} staticPage /></LocalizationProvider>);
 export const pending = pendingBusinessFacts();`,
     resolveDir: process.cwd(),
     loader: "tsx",
   },
   bundle: true,
+  jsx: "automatic",
   platform: "node",
   format: "esm",
   packages: "external",
@@ -29,7 +25,7 @@ export const pending = pendingBusinessFacts();`,
   outfile: "work/brand/prerender.mjs",
 });
 const {
-  bodies,
+  renderPage,
   pending,
   policyMeta,
   seoPages,
@@ -46,18 +42,26 @@ const path = "dist/client/index.html";
 const shell = readFileSync(path, "utf8");
 if (!shell.includes('<div id="root"></div>'))
   throw new Error("Static storefront root is missing");
+const fontSheet =
+  '<link data-v32-font-sheet="true" rel="stylesheet" referrerpolicy="no-referrer" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=Jost:wght@400;500;600&amp;display=swap">';
+const withFonts = shell.replace("</head>", () => fontSheet + "</head>");
+const withBody = (html, body) =>
+  html.replace('<div id="root"></div>', () => `<div id="root">${body}</div>`);
+// Cart, checkout and staff routes use the client shell. Product pages get their
+// own request-time body from the current catalog rather than bundled prices.
+writeFileSync("dist/client/app-shell.html", shell);
+writeFileSync(
+  "dist/client/product-shell.html",
+  withBody(withFonts, renderPage("/menu/product")),
+);
 const site = { origin: SITE_ORIGIN, name: siteName, image: socialImage };
 const pages = seoPages(SITE_ORIGIN, shellMeta(shell), policyMeta);
 // Every public page: same shell and bundle, own head and own content.
 for (const page of pages) {
-  const body = bodies[page.path];
-  if (!body) throw new Error(`No prerendered content for ${page.path}`);
+  const body = renderPage(page.path);
   writeFileSync(
     page.path === "/" ? path : `dist/client${page.path}.html`,
-    applyHead(shell, headTags(page, site)).replace(
-      '<div id="root"></div>',
-      () => `<div id="root">${body}</div>`,
-    ),
+    withBody(applyHead(withFonts, headTags(page, site)), body),
   );
 }
 writeFileSync("dist/client/robots.txt", robotsTxt(SITE_ORIGIN));

@@ -6,7 +6,7 @@
  * availability belong to the published catalog revision (Product Hub) and get
  * no structured data until pages are rendered from it.
  */
-import { business, policyRoutes, type PolicyPath } from "../brand/business";
+import { business, contactChannels, policyRoutes, type PolicyPath } from "../brand/business";
 import { destinations } from "../brand/content";
 import { absoluteUrl, type SeoPage, type SocialImage } from "../../shared/seo";
 
@@ -26,6 +26,16 @@ export const storePages = {
     name: "Menu",
     title: `Menu — ${siteName}`,
     description: `Tres Leches cakes, cake jars, conchas, Pan de Muerto and Mexican bakery from ${business.tradingName} in Dubai. Order online for delivery or pickup.`,
+  },
+  "/bakery": {
+    name: "Bakery",
+    title: `Bakery — ${siteName}`,
+    description: `Explore the traditional Mexican bakery and signature cakes from ${business.tradingName} in Dubai.`,
+  },
+  "/journal": {
+    name: "The 3L Journal",
+    title: `Rosca de Reyes · The 3L Journal — ${siteName}`,
+    description: `From ${business.tradingName}: discover why families in Mexico share Rosca de Reyes on January 6 and celebrate Día de la Candelaria.`,
   },
   "/how-to-order": {
     name: "How to order",
@@ -92,17 +102,14 @@ export function businessJsonLd(origin: string, description: string) {
     currenciesAccepted: business.currency,
     paymentAccepted: "Visa, Mastercard",
     ...(business.email ? { email: business.email } : {}),
-    ...(business.supportContacts.length
-      ? {
-          contactPoint: business.supportContacts.map((contact) => ({
-            "@type": "ContactPoint",
-            contactType: "customer support",
-            name: contact.name,
-            telephone: dial(contact.phone),
-            areaServed: "AE",
-          })),
-        }
-      : {}),
+    contactPoint: contactChannels().map((contact) => ({
+      "@type": "ContactPoint",
+      contactType: contact.kind === "whatsapp" ? "orders" : "customer support",
+      name: contact.label,
+      ...(contact.kind === "email" ? { email: contact.value } : { telephone: dial(contact.value) }),
+      ...(contact.kind === "whatsapp" ? { url: contact.href } : {}),
+      areaServed: "AE",
+    })),
     ...(destinations.instagram ? { sameAs: [destinations.instagram] } : {}),
   };
 }

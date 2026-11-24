@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState, type SyntheticEvent } from "react";
 import { createPortal } from "react-dom";
-import { useMenu, menuProductFamily } from "../menu";
+import { useMenu, menuProductFamily, type StorefrontProduct } from "../menu";
 import { useCheckoutConfig, useCheckoutNow, useCart, cartCount } from "../cart";
 import { useLanguage } from "../localization";
-import { availableSku } from "../../../shared/commerce-policy";
-import { liveOrderable } from "../live-catalog";
+import { useLiveCatalog } from "../live-catalog";
+import { purchasableOptions } from "./catalog-availability";
+import { EntranceSketch } from "../ScrollSketch";
+import { Journal } from "./Journal";
 import { VisualCart, VisualCheckout, VisualReturn, VisualContact, VisualPolicy, VisualHowToOrder } from "./V32Commerce";
-import { ApprovedProductCard, ApprovedPurchasePopup } from "./ApprovedPurchaseSelector";
+import { ApprovedProductCard, ApprovedPurchasePopup, productTitle, useProductTitle } from "./ApprovedPurchaseSelector";
 import { isPolicyPath } from "../business";
 import "./visual-v32.css";
 
@@ -14,7 +16,7 @@ import "./visual-v32.css";
  * All commerce data is from 3L's authoritative runtime catalog and checkout config.
  * The catalog grid MUST remain four columns on desktop.
  */
-type Filter = "all" | "cakes" | "bakery" | "mexican" | "special";
+type Filter = "all" | "cakes" | "bakery" | "mexican" | "panettone" | "special";
 // Only explicit /visual-v32/* routes remain synthetic preview.
 // Canonical /, /menu, /bakery, /cart use unprefixed customer routes.
 const origin = typeof location !== "undefined" && location.pathname.startsWith("/visual-v32")
@@ -32,8 +34,8 @@ const fallbackPreviewAsset = (
 
 const visualNav = {
   en: {home:"Home",menu:"Menu",journal:"Journal",contact:"Contact",cart:"Cart",story:"The 3L story",support:"Customer care"},
-  es: {home:"Inicio",menu:"Menú",journal:"Historia",contact:"Contacto",cart:"Carrito",story:"La historia de 3L",support:"Atención al cliente"},
-  ar: {home:"الرئيسية",menu:"القائمة",journal:"قصتنا",contact:"اتصل بنا",cart:"السلة",story:"قصة 3L",support:"خدمة العملاء"},
+  es: {home:"Inicio",menu:"Menú",journal:"Diario",contact:"Contacto",cart:"Carrito",story:"La historia de 3L",support:"Atención al cliente"},
+  ar: {home:"الرئيسية",menu:"القائمة",journal:"المجلة",contact:"اتصل بنا",cart:"السلة",story:"قصة 3L",support:"خدمة العملاء"},
 } as const;
 const visualCopy = {
  en: {
@@ -103,11 +105,13 @@ const groups: {id: Filter; en: string; es: string; ar: string}[] = [
   {id:"cakes",en:"Cakes",es:"Pasteles",ar:"كيك"},
   {id:"bakery",en:"Bakery",es:"Panadería",ar:"مخبوزات"},
   {id:"mexican",en:"Mexican Bakery",es:"Panadería Mexicana",ar:"مخبوزات مكسيكية"},
+  {id:"panettone",en:"Panettone",es:"Panettone",ar:"بانيتوني"},
   {id:"special",en:"Special Flavors",es:"Sabores Especiales",ar:"نكهات خاصة"},
 ];
 const categoryFor=(category:string):Filter=>
   category==="cakes"||category==="jars"?"cakes":
   category==="bakery"?"bakery":
+  category==="panettone"?"panettone":
   category==="pan"||category==="conchas"?"mexican":"special";
 
 function Header(){
@@ -135,7 +139,7 @@ function Header(){
           <span className="v32-logo-micro"><i/><small>MEXICO CITY SINCE 1982</small><i/></span>
         </a>
         <span className="v32-nav-right">
-          <a href={origin+"/#journal"}>{labels.journal}</a><a href={origin+"/contact"}>{labels.contact}</a>
+          <a href={origin+"/journal"}>{labels.journal}</a><a href={origin+"/contact"}>{labels.contact}</a>
           <label className="v32-language-control"><span className="v32-sr">Language</span>
             <select aria-label="Language" value={language}
               onChange={e=>setLanguage(e.target.value as typeof language)}>
@@ -157,7 +161,7 @@ function Header(){
         <nav>
           <a href={origin || "/"} onClick={()=>setMobileOpen(false)}>{labels.home}</a>
           <a href={origin+"/menu"} onClick={()=>setMobileOpen(false)}>{labels.menu}</a>
-          <a href={origin+"/#journal"} onClick={()=>setMobileOpen(false)}>{labels.journal}</a>
+          <a href={origin+"/journal"} onClick={()=>setMobileOpen(false)}>{labels.journal}</a>
           <a href={origin+"/contact"} onClick={()=>setMobileOpen(false)}>{labels.contact}</a>
           <a href={origin+"/cart"} onClick={()=>setMobileOpen(false)}>{labels.cart} ({count})</a>
         </nav>
@@ -165,14 +169,14 @@ function Header(){
     </div>,document.body)}
   </>;
 }
-function Home(){
+function Home({staticPage}:{staticPage:boolean}){
   const {language}=useLanguage();const t=visualCopy[language];
-  const [familyRefFailed,setFamilyRefFailed]=useState(false);
+  const combinedCityArt="/brand/reference/mexico-dubai.png";
   return <main className="v32-home v32-home-fidelity" id="main">
     <h1>{t.hero1}<br/>{t.hero2}</h1>
     <section className="v32-journey" aria-label="Mexico City 1982 to Dubai Today">
-      <div className="v32-city v32-city-left"><div className="v32-city-crop v32-city-reference"><img
-        src={previewAssets+"/mexico-city-illustration.jpg"} onError={e=>fallbackPreviewAsset(e,"/brand/reference/mexico-dubai.png")}
+      <div className="v32-city v32-city-left"><div className="v32-city-crop v32-city-reference" data-fallback={!origin || undefined}><img
+        src={origin?previewAssets+"/mexico-city-illustration.jpg":combinedCityArt} onError={e=>fallbackPreviewAsset(e,combinedCityArt)}
         alt="Mexico City 1982 illustration"/></div>
         <b>MEXICO CITY</b><span>1982</span></div>
       <svg viewBox="0 0 540 100" className="v32-route" aria-hidden="true">
@@ -180,20 +184,18 @@ function Home(){
         <circle cx="98" cy="37" r="17" fill="none" stroke="#b98a4e" strokeWidth="2"/>
         <circle cx="529" cy="38" r="9" fill="#f8ebe4" stroke="#b98a4e" strokeWidth="3"/>
       </svg>
-      <div className="v32-city v32-city-right"><div className="v32-city-crop v32-city-reference"><img
-        src={previewAssets+"/dubai-illustration.jpg"} onError={e=>fallbackPreviewAsset(e,"/brand/reference/mexico-dubai.png")}
+      <div className="v32-city v32-city-right"><div className="v32-city-crop v32-city-reference" data-fallback={!origin || undefined}><img
+        src={origin?previewAssets+"/dubai-illustration.jpg":combinedCityArt} onError={e=>fallbackPreviewAsset(e,combinedCityArt)}
         alt="Dubai Today illustration"/></div>
         <b>DUBAI</b><span>{t.today}</span></div>
     </section>
-    <section className="v32-story" id="journal">
+    <section className="v32-story" id="family-story">
       <div className="v32-family">
-        {!familyRefFailed?<img className="v32-family-reference"
-          src={previewAssets+"/family-collage-composite.jpg"}
-          alt="Visual reference collage from the approved V3.2 mockup (not launch-ready photography)"
-          onError={()=>setFamilyRefFailed(true)}/>:
-          <div className="v32-family-fallback"><img src="/brand/reference/alicia.webp" alt="Alicia Luna Baeza"/>
-            <img src="/brand/reference/liza.webp" alt="Liza preparing a cake"/>
-            <i>{t.storyQuote}</i></div>}
+        <div className="v32-family-collage">
+          {staticPage?<div className="v32-family-portrait"><img src="/brand/reference/alicia.webp" alt="Alicia Luna Baeza"/></div>:<EntranceSketch label="Alicia Luna Baeza"/>}
+          <img src="/brand/reference/liza.webp" alt={{en:"Liza preparing a cake",es:"Liza preparando un pastel",ar:"ليزا تحضّر كعكة"}[language]}/>
+          <i>{t.storyQuote}</i>
+        </div>
       </div>
       <div className="v32-legacy"><h2>{t.legacy}</h2>
         <p>{t.story1}</p>
@@ -206,7 +208,6 @@ function Home(){
 function Landing(){
   const {language}=useLanguage();const t=visualCopy[language];
   const [query,setQuery]=useState("");
-  const [submitted,setSubmitted]=useState(false);
   const keywords={
     cakes:["cake","pastel","berry","slice","pastries","seasonal","tres leches"],
     bakery:["bread","concha","croissant","pan","bakery","palmier","orejas"]
@@ -214,23 +215,19 @@ function Landing(){
   const normalized=query.trim().toLocaleLowerCase();
   const matches=normalized?Object.entries(keywords).filter(([,words])=>
     words.some(word=>word.includes(normalized)||normalized.includes(word))).map(([key])=>key):[];
-  const noMatch=submitted&&!!normalized&&!matches.length;
-  const search=(event:React.FormEvent<HTMLFormElement>)=>{event.preventDefault();setSubmitted(true);};
   return <main className="v32-landing v32-landing-fidelity" id="main" data-visual-source="REF_A">
     <span className="v32-eyebrow">{t.menuEyebrow}</span><h1>{t.menuTitle}</h1>
     <p className="v32-tagline">{t.menuTag}</p>
-    <form onSubmit={search} className="v32-search" role="search">
+    <form action={origin+"/bakery"} className="v32-search" role="search">
       <span aria-hidden="true">⌕</span><input value={query}
-        onChange={event=>{setQuery(event.target.value);if(!event.target.value.trim())setSubmitted(false)}}
+        onChange={event=>setQuery(event.target.value)}
         name="q" type="search" aria-label="Search the bakery" placeholder={t.searchBakery}/>
       <button type="submit">{t.find}</button>
     </form>
     <div className="v32-search-results" aria-live="polite">
       {!!normalized&&matches.map(key=><span className="v32-result-pill" key={key}>
         {key==="cakes"?t.cakes:t.bakery}</span>)}
-      {noMatch&&<p className="v32-search-empty">{language==="es"?
-        "No encontramos resultados. Prueba pastel, pan o croissant.":language==="ar"?
-        "لا توجد نتائج. جرّب الكعك أو الخبز أو الكرواسون.":"Nothing found. Try cake, bread or croissant."}</p>}
+
     </div>
     <div className="v32-tiles">
       <a href={origin+"/bakery?category=cakes"}
@@ -246,17 +243,18 @@ function Landing(){
     </div>
   </main>;
 }
-function Bakery(){
-  const {language}=useLanguage();const t=visualCopy[language];
+function Bakery({search,staticPage=false}:{search:string;staticPage?:boolean}){
+  const {language,text}=useLanguage();
+  const published=useLiveCatalog();const t=visualCopy[language];
   const menu=useMenu();
   const {config,loading,retry}=useCheckoutConfig();
   const now=useCheckoutNow(config);
-  const params=new URLSearchParams(location.search);
+  const params=new URLSearchParams(search);
   const raw=params.get("category")??"all";
   const initial:Filter=groups.some(g=>g.id===raw)?raw as Filter:
     raw==="pan"||raw==="conchas"?"mexican":"all";
   const [filter,setFilter]=useState<Filter>(initial);
-  const [subcategory,setSubcategory]=useState<string|null>(params.get("subcategory"));
+  const [subcategory,setSubcategory]=useState<string|null>(params.get("subcategory")??(raw==="pan"||raw==="conchas"?raw:null));
   const [query,setQuery]=useState(params.get("q")??"");
   const [selected,setSelected]=useState<string|null>(null);
   const [addedMessage,setAddedMessage]=useState("");
@@ -265,14 +263,24 @@ function Bakery(){
   const afterAdd=useCallback(()=>{setAddedMessage(visualCopy[language].added);close();},[language,close]);
   const available=menu.status!=="unavailable"&&menu.status!=="loading"&&!loading&&!!config;
   const waiting=menu.status!=="unavailable"&&(loading||menu.status==="loading");
-  const collections=filter==="all"?[]:menu.categories.filter(c=>categoryFor(c.id)===filter);
-  const items=available?menu.products.filter(p=>{
-    const family=menuProductFamily(menu,p),q=query.trim().toLowerCase();
-    return (filter==="all"||categoryFor(family.category)===filter)&&
-      (!subcategory||family.category===subcategory)&&
-      (!q||[p.title,p.description??"",family.name,p.variant].some(t=>t.toLowerCase().includes(q)));
-  }):[];
-  const active=items.find(p=>p.id===selected);
+  const catalog = available ? menu.products.flatMap(product => {
+    const family = menuProductFamily(menu,product);
+    const options = purchasableOptions(family,menu.status,config,now);
+    if (family.category === "pan" && !options.length) return [];
+    return [{product, family, price: options.length ? Math.min(...options.map(o=>o.priceFils)) : null}];
+  }) : [];
+  const categoriesWithProducts = new Set(catalog.map(item=>item.family.category));
+  const collections = filter==="all" ? [] : menu.categories.filter(c=>
+    categoryFor(c.id)===filter && categoriesWithProducts.has(c.id));
+  const q=query.trim().toLocaleLowerCase(language);
+  const items=catalog.filter(({product,family})=>
+    (filter==="all"||categoryFor(family.category)===filter)&&
+    (!subcategory||family.category===subcategory)&&
+    (!q||[product.title, productTitle(product,language,published,text), product.description??"", product.variant,
+      menu.categories.find(c=>c.id===family.category)?.name??"",
+      ...groups.filter(g=>g.id===categoryFor(family.category)).flatMap(g=>[g.en,g.es,g.ar]),
+    ].some(value=>value.toLocaleLowerCase(language).includes(q))));
+  const active=items.find(({product,price})=>product.id===selected&&price!==null)?.product;
   return <main className="v32-catalog v32-catalog-fidelity" id="main">
     <span className="v32-eyebrow">{t.catalogEyebrow}</span><h1>{t.catalogTitle}</h1>
     <p className="v32-tagline">{t.catalogTag}</p>
@@ -294,19 +302,12 @@ function Bakery(){
         className={subcategory===cat.id?"v32-subcategory-active":""} aria-pressed={subcategory===cat.id}
         onClick={()=>{setSubcategory(cat.id);setSelected(null);}}>{cat.name}</button>)}
     </div>}
-    {!available?<div className="v32-message" role="status">
+    {staticPage?<noscript><p className="v32-message">Enable JavaScript to view current products and order online. <a href="/contact">Contact 3L</a></p></noscript>:!available?<div className="v32-message" role="status">
       <p>{waiting?t.loading:t.orderingUnavailable}</p>
       <button type="button" onClick={retry}>{t.retry}</button></div>:
       !items.length?<p className="v32-message" role="status">{t.notFound}</p>:
       <div className="ref32-grid" data-grid-columns="4">
-        {items.map(product=>{
-          const family=menuProductFamily(menu,product);
-          const valid=family.options.filter(option=>{
-            const server=config?.products.find(p=>p.id===option.id);
-            return availableSku(option.id,now)&&!!server&&server.priceFils===option.priceFils&&
-              (menu.status!=="live"||liveOrderable(option.id)===true);
-          });
-          const price=valid.length?Math.min(...valid.map(v=>v.priceFils)):null;
+        {items.map(({product,family,price})=>{
           return <ApprovedProductCard key={product.id} product={product}
             familyId={family.id} variant={product.variant} price={price}
             active={selected===product.id} onSelect={element=>{
@@ -322,9 +323,59 @@ function Bakery(){
         })}
       </div>}
     <p className="v32-cart-status" role="status" aria-live="polite">{addedMessage}</p>
-    {active&&<ApprovedPurchasePopup product={active} onClose={close} onAdded={afterAdd} anchor={trigger.current}/>}
+    {active&&<ApprovedPurchasePopup key={active.id} product={active} onClose={close} onAdded={afterAdd} anchor={trigger.current}/>}
   </main>;
 }
+function MissingPage(){
+  const {language}=useLanguage();
+  return <main className="v32-new-page" id="main">
+    <h1>{{en:"Page not found",es:"Página no encontrada",ar:"الصفحة غير موجودة"}[language]}</h1>
+    <a href={origin+"/menu"}>{visualNav[language].menu}</a>
+  </main>;
+}
+
+function ProductRoute({slug}:{slug:string}){
+  const {language}=useLanguage();
+  const menu=useMenu();
+  const {config,loading,retry}=useCheckoutConfig();
+  const now=useCheckoutNow(config);
+  const product=menu.products.find(item=>item.slug===slug);
+  if(menu.status==="unavailable")return <main className="v32-new-page" id="main">
+    <p role="status">{visualCopy[language].orderingUnavailable}</p>
+    <button type="button" onClick={retry}>{visualCopy[language].retry}</button>
+  </main>;
+  if(loading||menu.status==="loading")return <main className="v32-new-page" id="main">
+    <p role="status">{visualCopy[language].loading}</p>
+  </main>;
+  if(!product)return <MissingPage/>;
+  const family=menuProductFamily(menu,product);
+  const options=purchasableOptions(family,menu.status,config,now);
+  if(family.category==="pan"&&!options.length)return <MissingPage/>;
+  return <ProductDetail key={product.id} product={product} family={family}
+    price={options.length?Math.min(...options.map(option=>option.priceFils)):null}/>;
+}
+
+function ProductDetail({product,family,price}:{
+  product:StorefrontProduct;family:ReturnType<typeof menuProductFamily>;price:number|null;
+}){
+  const {language}=useLanguage();
+  const title=useProductTitle(product);
+  const [anchor,setAnchor]=useState<HTMLButtonElement|null>(null);
+  const [message,setMessage]=useState("");
+  const close=useCallback(()=>{setAnchor(null);anchor?.focus();},[anchor]);
+  return <main className="v32-new-page v32-product-page" id="main">
+    <a href={origin+"/bakery"}>{visualNav[language].menu}</a>
+    <h1>{title}</h1>
+    <div className="v32-product-page-card">
+      <ApprovedProductCard product={product} familyId={family.id} variant={product.variant}
+        price={price} active={!!anchor} onSelect={element=>{setMessage("");setAnchor(element);}}/>
+    </div>
+    <p role="status" aria-live="polite">{message}</p>
+    {anchor&&price!==null&&<ApprovedPurchasePopup key={product.id} product={product}
+      anchor={anchor} onClose={close} onAdded={()=>{setMessage(visualCopy[language].added);close();}}/>}
+  </main>;
+}
+
 /** The existing commercial components own checkout and policy facts. V3.2 owns
  * only their visual frame/navigation in isolated preview, never payment logic.
  */
@@ -344,6 +395,8 @@ function VisualFooter(){
     <div className="v32-site-footer-brand"><strong>✧ 3L pastelerías</strong><small>MEXICO CITY SINCE 1982</small></div>
     <nav aria-label="V3.2 footer navigation">
       <a href={origin+"/menu"}>{labels.menu}</a>
+      <a href={origin+"/journal"}>{labels.journal}</a>
+      <a href={origin+"/#family-story"}>{labels.story}</a>
       <a href={origin+"/contact"}>{labels.contact}</a>
       <a href={origin+"/cart"}>{labels.cart}</a>
       <a href={origin+"/terms"}>{t.legalTerms}</a>
@@ -351,11 +404,12 @@ function VisualFooter(){
     </nav>
   </footer>;
 }
-export function VisualV32(){
+export function VisualV32({pathname,search="",staticPage=false}:{pathname:string;search?:string;staticPage?:boolean}){
   // Load the reference's Google Fonts stylesheet only inside the isolated V3.2
   // visual route. Global CSS @import triggered CSP connect-src errors across
   // the legacy storefront; stylesheet <link> follows existing style-src rules.
   useEffect(()=>{
+    if(document.querySelector("[data-v32-font-sheet]"))return;
     const link=document.createElement("link");
     link.rel="stylesheet";
     link.href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@400;500;600&display=swap";
@@ -364,14 +418,15 @@ export function VisualV32(){
     document.head.appendChild(link);
     return ()=>{link.remove();};
   },[]);
-  const path=location.pathname.replace(/\/+$/,"").slice(origin.length) || "/";
+  const path=pathname.replace(/\/+$/,"").slice(origin.length) || "/";
   const commerce = ["/cart","/checkout","/checkout/return","/how-to-order"].includes(path) || isPolicyPath(path);
   return <div className="v32-app" data-visual-preview="v32" data-frontend="standalone-v32">
     <a className="v32-skip" href="#main">Skip to content</a>
     <Header/>
     <div className="v32-blossom" aria-hidden="true"/>
-    {path==="/menu"?<Landing/>:path==="/bakery"?<Bakery/>:commerce?
-      <div className="v32-commerce-shell" data-visual-route={path}><VisualCommerce path={path}/></div>:<Home/>}
+    {path==="/"?<Home staticPage={staticPage}/>:path==="/menu"?<Landing/>:path==="/bakery"?<Bakery search={search} staticPage={staticPage}/>:path==="/journal"?<Journal/>:
+      path.startsWith("/menu/")?(staticPage?<main id="main" data-product-slot="true"/>:<ProductRoute slug={path.slice(6)}/>):commerce?
+      <div className="v32-commerce-shell" data-visual-route={path}><VisualCommerce key={path} path={path}/></div>:<MissingPage/>}
     {path==="/bakery"?null:<VisualFooter/>}
   </div>;
 }

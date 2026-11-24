@@ -1,3 +1,4 @@
+import { withdrawnConchaSku } from "../../shared/storefront-visibility";
 import {
   savedCheckout,
   rememberCheckout,
@@ -1207,6 +1208,7 @@ export function CheckoutPage() {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [error, setError] = useState("");
   const heading = useRef<HTMLHeadingElement>(null);
+  const needsCartReview = lines.some((line) => withdrawnConchaSku(line.productId));
   const cartLines = useMemo(
     () =>
       config
@@ -1227,7 +1229,7 @@ export function CheckoutPage() {
   useEffect(() => {
     let active = true;
     setQuote(null);
-    if (!config?.enabled || (!pickup && !delivery.zoneId) || !cartLines.length)
+    if (needsCartReview || !config?.enabled || (!pickup && !delivery.zoneId) || !cartLines.length)
       return;
     post<Quote>("/api/checkout/quote", {
       lines: cartLines,
@@ -1240,10 +1242,10 @@ export function CheckoutPage() {
     return () => {
       active = false;
     };
-  }, [delivery.zoneId, cartLines, config, pickup]);
+  }, [delivery.zoneId, cartLines, config, pickup, needsCartReview]);
 
   useEffect(() => {
-    if (!resumeSaved.current || !config?.enabled || !quote?.eligible) return;
+    if (needsCartReview || !resumeSaved.current || !config?.enabled || !quote?.eligible) return;
     resumeSaved.current = false;
     let active = true;
     void heldCheckout(
@@ -1284,6 +1286,7 @@ export function CheckoutPage() {
     delivery,
     customer,
     billing,
+    needsCartReview,
   ]);
 
   if (loading)
@@ -1292,6 +1295,15 @@ export function CheckoutPage() {
         <p role="status">
           <CustomerCopy>Preparing checkout…</CustomerCopy>
         </p>
+      </ShopShell>
+    );
+  if (needsCartReview)
+    return (
+      <ShopShell step={1} title={localize("Checkout")}>
+        <div className="b-shop-panel" role="alert">
+          <p><CustomerCopy>This item is no longer available.</CustomerCopy></p>
+          <a className="b-button" href="/cart"><CustomerCopy>Your cart</CustomerCopy></a>
+        </div>
       </ShopShell>
     );
   if (!config?.enabled)

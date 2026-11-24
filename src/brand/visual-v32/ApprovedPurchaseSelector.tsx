@@ -9,9 +9,9 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from
 import { createPortal } from "react-dom";
 import { useMenu, menuProductFamily, type StorefrontProduct } from "../menu";
 import { useCheckoutConfig, useCheckoutNow, useCart, cart, displayLinePrice, minQty, MAX_QTY } from "../cart";
-import { useLanguage } from "../localization";
-import { availableSku } from "../../../shared/commerce-policy";
-import { liveOrderable } from "../live-catalog";
+import { useLanguage, type Locale } from "../localization";
+import { useLiveCatalog, type LiveState } from "../live-catalog";
+import { purchasableOptions } from "./catalog-availability";
 import { selectedProductMedia, publishedMediaAuthority } from "../media";
 import { formatAed } from "../content";
 import { cakeSizeForSku, cakeSizeName, cakeServingCopy, validCakeMessage } from "../../../shared/cake-personalization";
@@ -28,11 +28,22 @@ const words={
 type AnchorSide="left"|"right"|"overlap"|"mobile"|"compact";
 type AnchorPlace=CSSProperties&{left:number;top:number;width:number;maxHeight:number};
 
+export function productTitle(product: StorefrontProduct, language: Locale, catalog: LiveState, text: (source: string) => string) {
+ const published=catalog.status==="live"?catalog.catalog.products.find(entry=>entry.id===product.id):null;
+ return published?.content[language]?.name ?? (language==="en"?product.title:text(product.title));
+}
+
+export function useProductTitle(product: StorefrontProduct) {
+ const {language,text}=useLanguage();
+ return productTitle(product,language,useLiveCatalog(),text);
+}
+
 export function ApprovedProductCard({product,familyId,variant,price,active,onSelect}:{
  product:StorefrontProduct;familyId:string;variant:string;price:number|null;
  active:boolean;onSelect:(element:HTMLButtonElement)=>void;
 }){
  const {language}=useLanguage();
+ const title=useProductTitle(product);
  const menu=useMenu();
  const family=menu.families.find(f=>f.id===familyId);
  const media=selectedProductMedia(product.id,familyId,variant);
@@ -48,8 +59,8 @@ export function ApprovedProductCard({product,familyId,variant,price,active,onSel
    data-selected-product={active} aria-haspopup="dialog" aria-expanded={active}
    disabled={price===null} onClick={event=>onSelect(event.currentTarget)}>
    <span className="ref32-photo">
-     {url&&!failed?<img src={url} alt={product.title} loading="lazy" onError={()=>setFailed(true)}/>:
-       <span className="ref32-photo-pending" role="img" aria-label={product.title+" — photograph pending"}>
+     {url&&!failed?<img src={url} alt={title} loading="lazy" onError={()=>setFailed(true)}/>:
+       <span className="ref32-photo-pending" role="img" aria-label={title}>
          <strong>✧ 3L</strong><small>{language==="es"?"Fotografía pendiente":language==="ar"?"الصورة قيد الإعداد":"Photo pending"}</small>
        </span>}
      <span className={"ref32-card-mark"+(active?" ref32-card-mark-selected":"")} aria-hidden="true">
@@ -58,7 +69,7 @@ export function ApprovedProductCard({product,familyId,variant,price,active,onSel
      </span>
    </span>
    <span className="ref32-product-copy">
-     <strong>{product.title}</strong>
+     <strong>{title}</strong>
      {product.description&&<em>{product.description}</em>}
      <span className="ref32-product-bottom"><span>{price===null?words[language].unavailable:
        (language==="es"?"Desde ":"From ")+formatAed(price)}</span>
@@ -74,11 +85,8 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const menu=useMenu();const family=menuProductFamily(menu,product);
  const {config,loading}=useCheckoutConfig();const now=useCheckoutNow(config);
  const lines=useCart();
- const allowed=family.options.filter(option=>{
-  const record=config?.products.find(p=>p.id===option.id);
-  return availableSku(option.id,now)&&!!record&&record.priceFils===option.priceFils&&
-    (menu.status!=="live"||liveOrderable(option.id)===true);
- });
+ const title=useProductTitle(product);
+ const allowed=purchasableOptions(family,menu.status,config,now);
  const grouped=packChoices(allowed);
  const cakeSizing=family.category==="cakes" && allowed.length>0 &&
    allowed.every(option=>cakeSizeForSku(option.id)!==null);
@@ -101,16 +109,14 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const serving=activeCake?cakeServingCopy(activeCake,language):null;
  const noteTooLong=!!activeCake&&note.trim().length>activeCake.maxCharacters;
  const [presentation,setPresentation]=useState(selected?.presentation??"");
- // Checkout config/live catalog are asynchronous. Initial state can be empty:
- // synchronize the chosen SKU and presentation when authoritative options arrive.
+ // A catalog refresh can withdraw the selected size while the popup is open.
+ // Reset its preparation choices before offering the remaining size.
  const availableKey=allowed.map(option=>option.id).join("|");
  useEffect(()=>{
-  if(!allowed.length)return;
-  const first=sorted[0]!;
-  setSku(current=>allowed.some(option=>option.id===current)?current:first.id);
-  setPresentation(current=>grouped?.presentations.includes(current)?current:toPackChoice(first).presentation);
-  setQty(current=>Math.max(current,minQty(first.id)));
- },[availableKey,product.id]);
+  if(sku===productId || !productId)return;
+  setSku(productId);setQty(minQty(productId));setComposition([]);setColor(null);setNote("");
+  setPresentation(selected?.presentation??"");
+ },[availableKey,sku,productId,selected?.presentation]);
  const spec=packSpec(productId),tricolor=tricolorSpec(productId);
  const configured=config?.products.find(p=>p.id===productId);
  const personalizedRule=config?.personalizedPacks?.rules.find(rule=>rule.packSkuId===productId);
@@ -122,7 +128,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const unit=configured?displayLinePrice({productId,quantity:qty,...(customized?{composition}:{})},configured.priceFils,config?.packPricing):NaN;
  const total=unit*qty;
  const canBuy=!!config?.enabled&&!loading&&!!configured&&
-  packValid&&Number.isFinite(total)&&total>=0&&qty>=minQty(productId)&&
+  sku===productId&&packValid&&Number.isFinite(total)&&total>=0&&qty>=minQty(productId)&&
   inCart+qty<=MAX_QTY&&(!note.trim()||!!activeCake&&validCakeMessage(productId,note.trim()))&&
   (!tricolor||tricolor.kind==="fixed"||!!color);
  const [place,setPlace]=useState<AnchorPlace>({left:12,top:12,width:420,maxHeight:600});
@@ -130,8 +136,10 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const dialog=useRef<HTMLElement>(null);const closeControl=useRef<HTMLButtonElement>(null);
  const amount=Number.isFinite(total)?formatAed(total):"—";
  const chooseSku=(id:string)=>{
+  const option=allowed.find(o=>o.id===id);
+  if(!option)return;
   setSku(id);setQty(minQty(id));setComposition([]);setColor(null);
-  const option=allowed.find(o=>o.id===id);if(option)setPresentation(toPackChoice(option).presentation);
+  setPresentation(toPackChoice(option).presentation);
  };
  const selectedOption=(style:string,pieces:number)=>
   grouped?.choices.find(x=>x.presentation===style&&x.pieces===pieces);
@@ -202,10 +210,10 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  return createPortal(<div className="ref32-overlay">
   <button type="button" className="ref32-backdrop" tabIndex={-1} aria-label="Close purchase dialog" onClick={onClose}/>
   <section className="ref32-dialog" ref={dialog} role="dialog" aria-modal="true"
-    data-anchor-side={side} data-selected-sku={productId} style={place} aria-label={family.name}>
+    data-anchor-side={side} data-selected-sku={productId} style={place} data-product-id={product.id} aria-label={title}>
    <div className="ref32-details">
     <div className="ref32-dialog-heading">
-     <div><h2>{family.name.replace(/\s*[·–—-]\s*Pack\b.*$/i,"")}</h2>
+     <div><h2>{title}</h2>
       {product.description&&<p>{product.description}</p>}
       {serving&&<p className="ref32-servings" data-cake-serves>{serving}</p>}</div>
      <button className="ref32-close" type="button" ref={closeControl} aria-label="Close" onClick={onClose}>×</button>

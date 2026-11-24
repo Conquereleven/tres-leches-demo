@@ -1,0 +1,206 @@
+import { expect, test } from "@playwright/test";
+
+const vanilla = "conchas-traditional--vainilla";
+const individual = "conchas-traditional-vainilla-individual-70-g";
+const chocolate = "conchas-traditional--chocolate";
+const tricolor = "conchas-traditional--tricolor";
+const chocolatePack = "conchas-traditional-pack";
+
+for (const locale of ["en", "es", "ar"] as const) {
+  test(`RT01.1 ${locale}: the card, dialog, SKU and persisted cart agree`, async ({
+    page,
+  }) => {
+    await page.goto(`/bakery?category=conchas&lang=${locale}`);
+    if (locale === "ar")
+      await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+    const dialog = page.getByRole("dialog");
+    const card = (id: string) =>
+      page.locator(`[data-product-id="${id}"].ref32-product`);
+    for (const id of [chocolate, tricolor, chocolatePack, vanilla]) {
+      const current = card(id);
+      const title = await current
+        .locator(".ref32-product-copy strong")
+        .innerText();
+      await current.click();
+      await expect(dialog).toHaveAttribute("data-product-id", id);
+      await expect(dialog).toHaveAccessibleName(title);
+      await expect(dialog.getByRole("heading")).toHaveText(title);
+      if (id !== vanilla) {
+        await page.keyboard.press("Escape");
+        await expect(current).toBeFocused();
+      }
+    }
+    await expect(dialog.locator('[data-sku*="chocolate"]')).toHaveCount(0);
+    await dialog.locator(`[data-sku="${individual}"]`).click();
+    await expect(dialog).toHaveAttribute("data-selected-sku", individual);
+    await dialog.locator(".ref32-buy").click();
+    await expect(dialog).toHaveCount(0);
+    await page.reload();
+    const cart = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem("3l-cart") ?? "[]"),
+    );
+    expect(cart).toEqual([{ productId: individual, quantity: 1 }]);
+    const quote = await page.request.post("/api/checkout/quote", {
+      data: { lines: cart, fulfillmentMethod: "pickup" },
+    });
+    expect(quote.ok()).toBeTruthy();
+    const config = await (
+      await page.request.get("/api/checkout/config")
+    ).json();
+    expect((await quote.json()).subtotalFils).toBe(
+      config.products.find((item: { id: string }) => item.id === individual)
+        .priceFils,
+    );
+  });
+}
+
+test("RT01.1 Pan de Muerto availability, Panettone direct navigation and stale cart", async ({
+  page,
+}) => {
+  await page.route("**/api/checkout/config", async (route) => {
+    const response = await route.fetch();
+    const config = await response.json();
+    config.serverNow = "2026-11-25T08:00:00.000Z";
+    await route.fulfill({ response, json: config });
+  });
+  await page.goto("/bakery?category=pan");
+  await expect(
+    page.locator(".ref32-product[data-category-id=pan]"),
+  ).toHaveCount(2);
+  await expect(
+    page.locator('[data-product-id="pan-de-muerto-filled--pistachio"]'),
+  ).toHaveCount(0);
+  await page.goto("/bakery?category=panettone");
+  await expect(page.getByRole("button", { name: "Panettone" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(page.locator(".ref32-product")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Mexican Bakery", exact: true })
+    .focus();
+  await page.keyboard.press("Enter");
+  await expect(
+    page.getByRole("button", { name: "Mexican Bakery", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.locator('[data-product-id="conchas-filled-pack"]'),
+  ).toHaveCount(0);
+  await page.goto("/bakery?q=pistache");
+  await expect(
+    page.locator('[data-product-id="conchas-traditional--pistache"]'),
+  ).toHaveCount(0);
+  await page.evaluate(() =>
+    localStorage.setItem(
+      "3l-cart",
+      JSON.stringify([
+        { productId: "conchas-filled-pack-6-mini", quantity: 1 },
+        {
+          productId: "conchas-traditional-vainilla-individual-70-g",
+          quantity: 1,
+        },
+      ]),
+    ),
+  );
+  await page.goto("/cart");
+  await expect(page.getByRole("alert")).toContainText("no longer available");
+  await expect(page.locator('a[href="/checkout"]')).toHaveCount(0);
+  await page.goto("/checkout");
+  await expect(page.getByRole("alert")).toContainText("no longer available");
+});
+
+test("RT01.1 cold HTML, portrait completion, reduced motion, contacts and journal", async ({
+  page,
+  browser,
+}, testInfo) => {
+  const route = "**/assets/index-*.js";
+  let releaseScript!: () => void;
+  const delayed = new Promise<void>((resolve) => {
+    releaseScript = resolve;
+  });
+  await page.route(route, async (request) => {
+    await delayed;
+    await request.continue();
+  });
+  await page.goto("/", { waitUntil: "commit" });
+  await expect(page.locator(".v32-home")).toBeVisible();
+  await expect(page.locator(".brand-experience")).toHaveCount(0);
+  await expect(
+    page.getByRole("img", { name: "Alicia Luna Baeza" }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: testInfo.outputPath("home-first-paint.png"),
+    animations: "disabled",
+    fullPage: true,
+  });
+  releaseScript();
+  await page.unroute(route);
+  const sketch = page.locator(".v32-family-portrait .ref-scroll-sketch");
+  await expect
+    .poll(async () => Number(await sketch.getAttribute("data-drawn")))
+    .toBeGreaterThan(0.05);
+  await expect(page.locator(".v32-family-portrait")).toHaveAttribute(
+    "data-entrance",
+    "complete",
+  );
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  await page.screenshot({
+    path: testInfo.outputPath("home-portrait-final.png"),
+    fullPage: true,
+  });
+  const originalViewport = page.viewportSize()!;
+  await page.setViewportSize({ width: 768, height: 900 });
+  await page.screenshot({
+    path: testInfo.outputPath("home-768.png"),
+    fullPage: true,
+  });
+  await page.setViewportSize(originalViewport);
+
+  const noJs = await browser.newContext({ javaScriptEnabled: false });
+  try {
+    const staticPage = await noJs.newPage();
+    const base = new URL(page.url()).origin;
+    for (const path of [
+      "/",
+      "/menu",
+      "/bakery",
+      "/journal",
+      "/contact",
+      "/menu/" + vanilla,
+    ]) {
+      expect((await staticPage.goto(base + path))?.status()).toBe(200);
+      await expect(staticPage.locator(".v32-app h1")).toBeVisible();
+      await expect(staticPage.locator(".brand-experience")).toHaveCount(0);
+    }
+    await expect(staticPage).toHaveTitle(/Concha/i);
+    for (const path of ["/menu/conchas-filled-pack", "/unknown"]) {
+      expect((await staticPage.goto(base + path))?.status()).toBe(404);
+    }
+  } finally {
+    await noJs.close();
+  }
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.reload();
+  await expect(sketch).toHaveAttribute("data-drawn", "1.0000");
+  await expect(page.locator("a[href='/#family-story']").first()).toBeVisible();
+  await page.goto("/journal?lang=es");
+  await expect(page.locator("h1")).toContainText("Una corona dulce");
+  await expect(page.locator(".v32-journal")).toContainText("6 de enero");
+  await page.screenshot({
+    path: testInfo.outputPath("journal.png"),
+    fullPage: true,
+  });
+  for (const pathname of ["/contact", "/terms", "/privacy"]) {
+    await page.goto(pathname);
+    await expect(
+      page.locator('a[href^="https://wa.me/971585943319"]').first(),
+    ).toBeVisible();
+    await expect(
+      page.locator('a[href="tel:+971556406776"]').first(),
+    ).toBeVisible();
+    await expect(
+      page.locator('a[href*="521683319"],a[href*="506757352"]'),
+    ).toHaveCount(0);
+  }
+});

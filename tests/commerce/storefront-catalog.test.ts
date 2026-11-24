@@ -22,7 +22,7 @@ import {
 } from "../../server/catalog/storefront-api";
 import { CommerceService } from "../../server/domain/service";
 import { PaymenntProvider } from "../../server/adapters/paymennt";
-import { DisabledWhatsAppProvider } from "../../server/adapters/blocked";
+import { DisabledWhatsAppProvider, UnconfiguredPaymentProvider } from "../../server/adapters/blocked";
 import { fixtureAddressGeo } from "../fixtures/website-address";
 import {
   addDays,
@@ -31,6 +31,8 @@ import {
   quoteWebCheckout,
 } from "../../server/domain/web-checkout";
 import { reconcileEmbeddedPayment } from "../../server/domain/embedded-checkout";
+import { renderProductPage } from "../../server/catalog/product-page";
+import { hiddenConcha } from "../../shared/storefront-visibility";
 import { RETIRED_SKUS } from "../../shared/commerce-policy";
 
 const sources = loadBootstrapSources(process.cwd());
@@ -717,6 +719,73 @@ test("commercial rollback: publishing the previous price restores the previous r
         .length,
       2,
     );
+  } finally {
+    store.close();
+  }
+});
+
+test("RT01.1 retirement draft keeps prices and does not change quotes until publication", async () => {
+  const { store, view, payload, save, publish } = setup();
+  const service = new CommerceService(store, new DisabledWhatsAppProvider(), new UnconfiguredPaymentProvider());
+  const sku = "conchas-traditional-pistache-mini-40-g";
+  const order = { lines: [{ productId: sku, quantity: 6 }], fulfillmentMethod: "pickup" };
+  const ids = [
+    "conchas-traditional--pistache",
+    "conchas-filled--pistache",
+    "conchas-filled-pack",
+  ];
+  try {
+    const before = storefrontCatalog(store.read());
+    const beforeQuote = quoteWebCheckout(service, order);
+    assert.ok(beforeQuote.subtotalFils > 0);
+
+    for (const id of ids) {
+      const product = view().products.find((p) => p.id === id)!;
+      const draft = payload(product);
+      assert.ok(hiddenConcha(id, draft.variants.map((variant) => variant.skuId)));
+      for (const variant of draft.variants) variant.active = false;
+      save(draft);
+    }
+    assert.deepEqual(storefrontCatalog(store.read()), before);
+    assert.deepEqual(quoteWebCheckout(service, order), beforeQuote);
+    assert.ok(view().issues.every((issue) => issue.level !== "error"));
+    publish();
+
+    const after = storefrontCatalog(store.read());
+    assert.deepEqual(after.products, before.products.filter((p) => !ids.includes(p.id)));
+    const rejected = quoteWebCheckout(service, order);
+    assert.equal(rejected.eligible, false);
+    await assert.rejects(createWebCheckout(service, {
+      ...order,
+      pickup: { pickupDate: addDays(dubaiToday(), 2), preferredTime: "4:00 PM – 9:00 PM" },
+      customer: { name: "Fixture order", phone: "0500000000", email: "fixture@example.invalid" },
+      billing: { sameAsDelivery: false, name: "Fixture order", address1: "Fixture street", city: "Dubai", country: "AE" },
+    }, randomUUID(), "web", "https://fixture.invalid"), { status: 422 });
+    assert.equal(store.read().orders.length, 0);
+    const retained = ["conchas-traditional--chocolate", "conchas-traditional--vainilla",
+      "conchas-tricolor-pack", "croissant--pistacchio", "pan-de-muerto-filled--pistachio"];
+    assert.ok(retained.every((id) => after.products.some((p) => p.id === id)));
+    assert.equal(hiddenConcha("conchas-filled-pack", ["conchas-filled-pack-6-mini", "unrelated-pack"]), false);
+  } finally {
+    store.close();
+  }
+});
+
+test("RT01.1 V3.2 product metadata uses only current public identities and hides seasonal offers", (t) => {
+  t.mock.timers.enable({ apis: ["Date"], now: new Date("2026-11-25T08:00:00Z") });
+  const { store } = setup();
+  const shell = '<html><head><title>3L</title></head><body><main id="main" data-product-slot="true"></main></body></html>';
+  try {
+    const state = store.read();
+    for (const mode of ["on", "off"] as const) {
+      const html = renderProductPage(shell, "/menu/pan-de-muerto-filled-pack", state, mode);
+      assert.match(html, /<title>.*Pack.*<\/title>/i);
+      assert.match(html, /<h1>.+<\/h1>/);
+      assert.doesNotMatch(html, /"offers"|itemprop="price"/);
+      for (const slug of ["pan-de-muerto-filled--chocolate", "conchas-filled-pack", "unknown"])
+        assert.throws(() => renderProductPage(shell, "/menu/" + slug, state, mode), { status: 404 });
+    }
+    assert.throws(() => renderProductPage(shell, "/menu/tres-leches--classic", { ...state, catalogFoundation: undefined }, "on"), { status: 503 });
   } finally {
     store.close();
   }

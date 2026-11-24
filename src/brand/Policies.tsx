@@ -14,6 +14,7 @@ import {
   cancellationFeePercent,
   cancellationRefundPercent,
   contactChannels,
+  contactChannelLabel,
   deliveryBands,
   freeDeliveryAreas,
   legalEntityLabel,
@@ -45,7 +46,7 @@ const cutoff = cancellationCutoffHours;
 const refundPct = cancellationRefundPercent;
 const feePct = cancellationFeePercent;
 
-function ContactDetails({ contactPage = false }: { contactPage?: boolean }) {
+function ContactDetails() {
   const { text: localize, language } = useCustomerLanguage();
   const contactHref = (href: string, kind: string) => {
     if (kind !== "whatsapp" || language === "en") return href;
@@ -54,16 +55,16 @@ function ContactDetails({ contactPage = false }: { contactPage?: boolean }) {
     if (message) url.searchParams.set("text", localize(message));
     return url.toString();
   };
-  const channels = contactChannels({ contactPage });
+  const channels = contactChannels();
   return (
     <>
       {channels.length > 0 && (
         <ul className="b-policy-channels">
           {channels.map((c) => (
-            <li key={c.kind}>
+            <li key={c.href}>
               <span className="b-label">
-                <CustomerCopy>{c.label}</CustomerCopy>
-              </span>
+                {contactChannelLabel(c, language)}
+              </span>{" · "}
               <a
                 href={contactHref(c.href, c.kind)}
                 {...(c.kind === "whatsapp"
@@ -1500,7 +1501,7 @@ export const pages: Record<PolicyPath, Page> = {
       {
         id: "contact-channels",
         title: "Customer care",
-        body: <ContactDetails contactPage />,
+        body: <ContactDetails />,
       },
       {
         id: "order-help",

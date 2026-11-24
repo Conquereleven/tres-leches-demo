@@ -1,4 +1,5 @@
 import data from "./menu-data.json";
+import { hiddenConcha } from "../../shared/storefront-visibility";
 
 export type MenuOption = {
   id: string;
@@ -55,7 +56,7 @@ export function productFamily(product: StorefrontProduct): MenuFamily {
   };
 }
 export const productHref = (product: StorefrontProduct) =>
-  `/menu?product=${encodeURIComponent(product.slug)}`;
+  `/menu/${encodeURIComponent(product.slug)}`;
 
 export const storefrontProductForSku = (sku: string) =>
   currentMenu().products.find((p) => p.optionIds.includes(sku));
@@ -81,7 +82,7 @@ export type Menu = {
 const bundledMenu: Menu = {
   status: "bundled",
   categories: menuCategories,
-  products: storefrontProducts,
+  products: storefrontProducts.filter((product) => !hiddenConcha(product.id, product.optionIds)),
   families: menuFamilies,
 };
 const emptyMenu = (status: "loading" | "unavailable"): Menu => ({
@@ -96,7 +97,7 @@ const pending = {
 };
 function fromLive(catalog: LiveCatalog): Menu {
   const authored = new Map(storefrontProducts.map((p) => [p.id, p]));
-  const products = catalog.products.map((p) => ({
+  const products = catalog.products.filter((p) => !hiddenConcha(p.id, p.options.map((o) => o.id))).map((p) => ({
     id: p.id,
     slug: p.slug,
     familyId: p.familyId,

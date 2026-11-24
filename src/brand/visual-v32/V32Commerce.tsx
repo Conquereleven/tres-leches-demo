@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { cart, cartCount, cartSubtotalFils, displayLinePrice, minQty, useCart, useCheckoutConfig, type CartLine, type CheckoutConfig } from "../cart";
 import { useLanguage } from "../localization";
+import { withdrawnConchaSku } from "../../../shared/storefront-visibility";
 import { formatAed } from "../content";
-import { business, legalEntityLabel, phoneHref, type PolicyPath } from "../business";
+import { business, contactChannelLabel, contactChannels, legalEntityLabel, type PolicyPath } from "../business";
 import { pages } from "../Policies";
+import { HowToOrderSteps } from "../StorePages";
 import { lineKey, componentName, packSpec, type Composition } from "../../../shared/pack-composition";
 import { menuFamilyForSku } from "../menu";
 import { packQtyLabel, toPackChoice } from "./catalog-options";
@@ -27,7 +29,7 @@ function Panel({title,children}:{title:string;children:React.ReactNode}){return 
 function Empty({message}:{message:string}){return <div className="v32-new-empty"><p>{message}</p><a className="v32-new-action" href={suffix("/bakery")}>{copy.en.continue} ↗</a></div>;}
 function Summary({config}:{config:CheckoutConfig}){
  const lines=useCart();const {language,t}=useVisualCopy();
- const good=lines.filter(l=>config.products.some(p=>p.id===l.productId));
+ const good=lines.filter(l=>!withdrawnConchaSku(l.productId)&&config.products.some(p=>p.id===l.productId));
  return <aside className="v32-new-summary"><h2>{t.cart} · {cartCount(lines)}</h2>
  <ul>{good.map(l=>{const p=config.products.find(p=>p.id===l.productId)!;return <li key={lineKey(l)}><span>{p.name}<small> × {l.quantity}</small>
   {(()=>{const option=menuFamilyForSku(l.productId)?.options.find(o=>o.id===l.productId);
@@ -62,28 +64,41 @@ function V32TricolorEditor({line}:{line:CartLine}){
  </label>;
 }
 export function VisualCart(){
- const {t}=useVisualCopy();const lines=useCart();const {config,loading,retry}=useCheckoutConfig();
+ const {text}=useLanguage();
+ const {t}=useVisualCopy();
+ const lines=useCart();const {config,loading,retry}=useCheckoutConfig();
+ const needsReview=lines.some(l=>withdrawnConchaSku(l.productId));
  return <main id="main" className="v32-new-page" data-new-ui="cart">
  <p className="v32-new-eyebrow">THE 3L EXPERIENCE</p><h1>{t.cart}</h1>
  {loading?<p role="status">Loading…</p>:!config?<div role="alert">{t.notReady}<button onClick={retry}>{t.retry}</button></div>:
  !lines.length?<Empty message={t.empty}/>:<div className="v32-new-layout">
- <Panel title={t.cart}><ul className="v32-new-cart-items">{lines.map(l=>{const p=config.products.find(x=>x.id===l.productId);return <li key={lineKey(l)} className="v32-new-cart-row">
-  <div><h3>{p?.name||l.productId}</h3>{tricolorSpec(l.productId)?.kind==="single"?<V32TricolorEditor line={l}/>:l.color&&<p>{tricolorCopy.en[l.color]}</p>}{l.cakeMessage&&<p data-cart-cake-message>{t.selection==="Select a color"?"Cake inscription":"Inscripción"}: {l.cakeMessage}</p>}{l.composition?.map(c=><small key={c.componentSkuId}>{componentName(c.componentSkuId)} × {c.units} </small>)}{config.personalizedPacks?.enabled&&packSpec(l.productId)&&<V32PackEditor line={l} config={config}/>}
-  <p>{p?money(displayLinePrice(l,p.priceFils,config.packPricing))+" each":t.notReady}</p></div>
-  <div className="v32-new-cart-controls"><label>{t.quantity}<input type="number" min={minQty(l.productId)} max="100" value={l.quantity} onChange={e=>cart.set(lineKey(l),Number(e.target.value))}/></label><button type="button" onClick={()=>cart.remove(lineKey(l))}>{t.remove}</button></div></li>})}</ul>
+ <Panel title={t.cart}><ul className="v32-new-cart-items">{lines.map(l=>{const p=withdrawnConchaSku(l.productId)?undefined:config.products.find(x=>x.id===l.productId);return <li key={lineKey(l)} className="v32-new-cart-row">
+  <div><h3>{p?.name||l.productId}</h3>{p&&tricolorSpec(l.productId)?.kind==="single"?<V32TricolorEditor line={l}/>:l.color&&<p>{tricolorCopy.en[l.color]}</p>}{l.cakeMessage&&<p data-cart-cake-message>{t.selection==="Select a color"?"Cake inscription":"Inscripción"}: {l.cakeMessage}</p>}{l.composition?.map(c=><small key={c.componentSkuId}>{componentName(c.componentSkuId)} × {c.units} </small>)}{p&&config.personalizedPacks?.enabled&&packSpec(l.productId)&&<V32PackEditor line={l} config={config}/>}
+  <p>{p?money(displayLinePrice(l,p.priceFils,config.packPricing))+" each":text("This item is no longer available.")}</p></div>
+  <div className="v32-new-cart-controls">{p&&<label>{t.quantity}<input type="number" min={minQty(l.productId)} max="100" value={l.quantity} onChange={e=>cart.set(lineKey(l),Number(e.target.value))}/></label>}<button type="button" onClick={()=>cart.remove(lineKey(l))}>{t.remove}</button></div></li>})}</ul>
  <a className="v32-new-action v32-new-action-secondary" href={suffix("/bakery")}>{t.continue}</a></Panel>
- <div><Summary config={config}/><a className="v32-new-action" href={suffix("/checkout")}>{t.checkout} →</a></div></div>}
+ <div><Summary config={config}/>{needsReview?<p role="alert">{text("This item is no longer available.")}</p>:<a className="v32-new-action" href={suffix("/checkout")}>{t.checkout} →</a>}</div></div>}
  </main>;
 }
 export function VisualContact(){
- const {t}=useVisualCopy();
+ const {language,t}=useVisualCopy();
  return <main className="v32-new-page v32-new-contact" id="main" data-new-ui="contact">
  <p className="v32-new-eyebrow">CUSTOMER CARE</p><h1>{t.contact}</h1><p className="v32-new-lead">{t.contactIntro}</p>
- <div className="v32-new-contact-grid">{business.supportContacts.map(c=><a key={c.name} className="v32-new-panel v32-new-contact-card" href={phoneHref(c.phone)}><small>{c.name}</small><strong>{c.phone}</strong><span>↗</span></a>)}</div>
+ <div className="v32-new-contact-grid">{contactChannels().map(c=><a key={c.href} className="v32-new-panel v32-new-contact-card" href={c.href} {...(c.kind==="whatsapp"?{target:"_blank",rel:"noopener noreferrer"}:{})}><small>{contactChannelLabel(c,language)}</small>{" "}<strong><bdi dir="ltr">{c.value}</bdi></strong><span aria-hidden="true">↗</span></a>)}</div>
  <Panel title={t.location}><p>{business.legalName} · {business.tradingName}</p><address>{business.address}</address></Panel>
  </main>;
 }
-export function VisualHowToOrder(){const {t}=useVisualCopy();return <main className="v32-new-page" id="main" data-new-ui="how"><p className="v32-new-eyebrow">3L PASTELERÍAS</p><h1>{t.help}</h1><div className="v32-new-layout"><Panel title={t.help}><p>{t.helpText}</p><p>{t.verify}</p></Panel><Panel title={t.contact}><p>{t.contactIntro}</p><a href={suffix("/contact")} className="v32-new-action">{t.contact} →</a></Panel></div></main>;}
+export function VisualHowToOrder(){
+ const {t}=useVisualCopy();
+ const {config}=useCheckoutConfig();
+ return <main className="v32-new-page" id="main" data-new-ui="how">
+  <p className="v32-new-eyebrow">3L PASTELERÍAS</p><h1>{t.help}</h1>
+  <div className="v32-new-layout">
+   <Panel title={t.help}><HowToOrderSteps addressVerificationRequired={config?.addressVerificationRequired}/><p>{t.verify}</p></Panel>
+   <Panel title={t.contact}><p>{t.contactIntro}</p><a href={suffix("/contact")} className="v32-new-action">{t.contact} →</a></Panel>
+  </div>
+ </main>;
+}
 export function VisualPolicy({path}:{path:PolicyPath}){
  // The V3.2 shell owns only frame/navigation. Every legal sentence below is
  // the authorized commercial copy from src/brand/Policies.tsx (single source
