@@ -245,20 +245,28 @@ if (!process.env.CONCHAS_BASELINE)
       // degradation when derivatives are unreachable: webp aborts every webp
       // derivative (cards keep their frame via the pending placeholder or a
       // non-webp derivative, never a broken image passed off as a photo);
-      // family aborts the authored conchas photos. naturalWidth is asserted
-      // only for images that actually loaded: a blocked webp must not be
-      // expected to decode.
-      for (const frame of await page.locator(".ref32-photo").all())
-        await expect(frame.locator("img, .ref32-photo-pending")).toHaveCount(1);
-      for (const img of await page.locator(".ref32-photo img").all()) {
-        const loaded = await img.evaluate((i: HTMLImageElement) => i.naturalWidth > 0 && i.complete);
-        if (loaded)
-          await expect
-            .poll(() => img.evaluate((i: HTMLImageElement) => i.naturalWidth))
-            .toBeGreaterThan(0);
-        else
-          await expect(img).toBeAttached();
-      }
+      // family aborts the authored conchas photos. Read all frames in one
+      // browser snapshot because onError replaces images as requests finish.
+      const frames = page.locator(".ref32-photo");
+      await expect
+        .poll(() =>
+          frames.evaluateAll((nodes) =>
+            nodes.flatMap((frame, index) => {
+              const content = frame.querySelectorAll(
+                "img, .ref32-photo-pending",
+              );
+              if (content.length !== 1)
+                return [`frame ${index}: ${content.length} elements`];
+              const [image] = content;
+              return image instanceof HTMLImageElement &&
+                image.complete &&
+                image.naturalWidth === 0
+                ? [`frame ${index}: image failed without a placeholder`]
+                : [];
+            }),
+          ),
+        )
+        .toEqual([]);
       const { dialog } = await openDialog(
         page,
         "conchas-traditional--chocolate",
