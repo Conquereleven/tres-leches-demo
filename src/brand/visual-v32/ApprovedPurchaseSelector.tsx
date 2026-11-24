@@ -38,12 +38,17 @@ export function ApprovedProductCard({product,familyId,variant,price,active,onSel
  const media=selectedProductMedia(product.id,familyId,variant);
  const url=media?.derivatives.find(d=>d.format==="webp")?.src??media?.derivatives[0]?.src
   ??(!publishedMediaAuthority()?family?.image:null);
+ // A published image that fails to load falls back to the same approved
+ // pending placeholder instead of a broken frame (neutral-placeholder
+ // commercial guarantee, same as the no-photo state).
+ const [failed,setFailed]=useState(false);
+ useEffect(()=>{setFailed(false);},[url]);
  return <button className={"ref32-product"+(active?" ref32-product-active":"")} type="button"
    data-product-id={product.id} data-category-id={family?.category??""}
    data-selected-product={active} aria-haspopup="dialog" aria-expanded={active}
    disabled={price===null} onClick={event=>onSelect(event.currentTarget)}>
    <span className="ref32-photo">
-     {url?<img src={url} alt={product.title} loading="lazy"/>:
+     {url&&!failed?<img src={url} alt={product.title} loading="lazy" onError={()=>setFailed(true)}/>:
        <span className="ref32-photo-pending" role="img" aria-label={product.title+" — photograph pending"}>
          <strong>✧ 3L</strong><small>{language==="es"?"Fotografía pendiente":language==="ar"?"الصورة قيد الإعداد":"Photo pending"}</small>
        </span>}

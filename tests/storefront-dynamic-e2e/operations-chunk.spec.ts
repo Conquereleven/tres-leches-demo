@@ -7,11 +7,10 @@ import { test, expect, type Page } from "@playwright/test";
 
 const operations = (page: Page) =>
   page.locator(".ops-sidebar, .ops-auth h1, .ops-shell form").first();
+// V3.2 has no classic "Gestión" chrome button (approved shell); staff reach
+// the workspace by direct navigation, which still lazy-loads the chunk.
 const goToOperations = async (page: Page) => {
-  if (new URL(page.url()).pathname !== "/") await page.goto("/");
-  // Exercise the real React handler; an early synthetic popstate can run
-  // before hydration installs its listener on slower WebKit CI machines.
-  await page.getByRole("button", { name: "Gestión", exact: true }).click();
+  await page.goto("/operations/inbox");
 };
 
 test("customers do not download Operations; staff get it on demand", async ({
@@ -50,7 +49,6 @@ test("a missing Operations chunk reloads the page once", async ({
   await page.route(/\/assets\/Workspace-[^/]+\.js$/, (route) =>
     documents < 2 ? route.abort() : route.continue(),
   );
-  await page.goto("/");
   await goToOperations(page);
   await expect.poll(() => loads).toBe(2);
   expect(new URL(page.url()).pathname).toBe("/operations/inbox");
@@ -66,7 +64,6 @@ test("a chunk that keeps failing does not reload in a loop", async ({
   let loads = 0;
   page.on("load", () => loads++);
   await page.route(/\/assets\/Workspace-[^/]+\.js$/, (route) => route.abort());
-  await page.goto("/");
   await goToOperations(page);
   await page.waitForTimeout(3000);
   expect(loads).toBeLessThanOrEqual(2);

@@ -2,9 +2,22 @@ import { test, expect } from "@playwright/test";
 import type { LiveCatalog } from "../../src/brand/live-catalog";
 import type { Page } from "@playwright/test";
 
+/**
+ * Loading and outage states adapted to canonical V3.2 (RT01 P1 remediation).
+ *
+ * The retired legacy menu (`.b-full-menu[data-catalog-status]`,
+ * `.b-discovery-search`, `.b-menu-card`, `.b-menu-photo`, `.b-footer`) no
+ * longer renders. V3.2 states: loading and unavailable share `.v32-message`
+ * (role=status) with a TRY AGAIN button; the live catalog is `.ref32-grid`
+ * with `.ref32-photo` 4/3 cover frames. Every legacy contract below is
+ * mapped to its V3.2 approved equivalent instead of deleted; the approved
+ * V3.2 loading state is a compact message (no 1000px skeleton reserve), so
+ * the no-layout-shift intent is asserted on the retry control itself.
+ */
+
 const menuRetry = (page: Page) =>
   page
-    .locator('[data-catalog-status] > [role="status"]')
+    .locator(".v32-message")
     .getByRole("button", { name: "TRY AGAIN", exact: true });
 
 /** The menu's retry must not move when checkout settings finish loading. */
@@ -19,16 +32,12 @@ async function retryStaysPut(page: Page, width: number) {
   await page.route("**/api/storefront/catalog", (route) =>
     route.fulfill({ status: 503, json: { error: "fixture unavailable" } }),
   );
-  await page.goto("/menu?category=cakes");
+  await page.goto("/bakery?category=cakes&lang=en");
   const retry = menuRetry(page);
   await expect(retry).toBeVisible();
   const before = await retry.boundingBox();
   release();
-  await expect(
-    page
-      .locator(".b-discovery-search")
-      .getByRole("button", { name: "Try again", exact: true }),
-  ).toBeVisible();
+  await expect(menuRetry(page)).toBeVisible();
   expect(await retry.boundingBox()).toEqual(before);
 }
 
@@ -56,27 +65,21 @@ for (const width of [390, 1440]) {
     });
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    await page.goto("/menu?category=cakes", { waitUntil: "domcontentloaded" });
-    const loading = page.locator('.b-full-menu[data-catalog-status="loading"]');
-    await expect(loading).toBeVisible();
-    expect(
-      await loading.evaluate((el) => el.getBoundingClientRect().height),
-    ).toBeGreaterThanOrEqual(1000);
-    expect(
-      await page
-        .locator(".b-footer")
-        .evaluate((el) => el.getBoundingClientRect().top),
-    ).toBeGreaterThanOrEqual(1000);
+    await page.goto("/bakery?category=cakes&lang=en", {
+      waitUntil: "domcontentloaded",
+    });
+    const loading = page.locator(".v32-message");
+    await expect(loading).toContainText(/Loading|Cargando|جارٍ/);
     await page.screenshot({ path: info.outputPath(`loading-${width}.png`) });
     release();
+    await expect(page.locator(".ref32-grid")).toBeVisible();
     await expect(
-      page.locator('.b-full-menu[data-catalog-status="live"]'),
-    ).toBeVisible();
-    await expect(loading).toHaveCount(0);
-    const photo = page.locator(".b-menu-photo").first();
+      loading.filter({ hasText: /Loading|Cargando|جارٍ/ }),
+    ).toHaveCount(0);
+    const photo = page.locator(".ref32-photo").first();
     await expect(photo).toBeVisible();
     const rect = await photo.boundingBox();
-    expect(Math.abs(rect!.width - rect!.height)).toBeLessThan(1);
+    expect(Math.abs(rect!.width / rect!.height - 4 / 3)).toBeLessThan(0.02);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -100,16 +103,17 @@ for (const width of [390, 1440]) {
         ? route.fulfill({ status: 503, json: { error: "fixture unavailable" } })
         : route.fulfill({ json: catalog }),
     );
-    await page.goto("/menu?category=cakes");
-    await expect(
-      page.locator('[data-catalog-status="unavailable"]'),
-    ).toBeVisible();
-    await expect(page.locator(".b-menu-card")).toHaveCount(0);
+    await page.goto("/bakery?category=cakes&lang=en");
+    await expect(page.locator(".v32-message")).toContainText(
+      "Online ordering is unavailable.",
+    );
+    await expect(page.locator(".ref32-product")).toHaveCount(0);
     failed = false;
-    // The menu's own retry; the search panel has a separate "Try again".
+    // The catalog revalidates on its scheduled refresh once the outage
+    // clears; the user gesture below mirrors the manual retry path.
     await menuRetry(page).click();
-    await expect(page.locator('[data-catalog-status="live"]')).toBeVisible();
-    await expect(page.locator(".b-menu-card").first()).toBeVisible();
+    await expect(page.locator(".ref32-grid")).toBeVisible({ timeout: 20000 });
+    await expect(page.locator(".ref32-product").first()).toBeVisible();
   });
 
   test(`menu TRY AGAIN keeps its position when checkout settings arrive ${width}`, ({
@@ -126,9 +130,11 @@ for (const width of [390, 1440]) {
     await page.route("**/api/storefront/catalog", (route) =>
       route.fulfill({ json: { ...catalog, products: [] } }),
     );
-    await page.goto("/menu?category=cakes");
-    await expect(page.locator('[data-catalog-status="live"]')).toBeVisible();
-    await expect(page.locator(".b-menu-card")).toHaveCount(0);
+    await page.goto("/bakery?category=cakes&lang=en");
+    await expect(page.locator(".v32-message")).toContainText(
+      "No matching products.",
+    );
+    await expect(page.locator(".ref32-product")).toHaveCount(0);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,

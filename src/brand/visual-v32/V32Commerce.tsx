@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { cart, cartCount, cartSubtotalFils, displayLinePrice, minQty, useCart, useCheckoutConfig, type CheckoutConfig } from "../cart";
+import { cart, cartCount, cartSubtotalFils, displayLinePrice, minQty, useCart, useCheckoutConfig, type CartLine, type CheckoutConfig } from "../cart";
 import { useLanguage } from "../localization";
 import { formatAed } from "../content";
 import { business, legalEntityLabel, phoneHref, type PolicyPath } from "../business";
 import { pages } from "../Policies";
-import { lineKey, componentName } from "../../../shared/pack-composition";
+import { lineKey, componentName, packSpec, type Composition } from "../../../shared/pack-composition";
 import { menuFamilyForSku } from "../menu";
 import { packQtyLabel, toPackChoice } from "./catalog-options";
-import { tricolorCopy } from "../../../shared/tricolor";
+import { isTricolorColor, tricolorSpec, tricolorCopy, TRICOLOR_COLORS } from "../../../shared/tricolor";
+import { packCopy } from "../../../shared/pack-copy";
+import { PackBuilder, packComplete } from "../PackBuilder";
 
 // In canonical V3.2, cart actions go to the existing REAL /checkout.
 // The /visual-v32 preview stays isolated and payment-free.
@@ -36,6 +38,29 @@ function Summary({config}:{config:CheckoutConfig}){
   </span><strong>{money(displayLinePrice(l,p.priceFils,config.packPricing)*l.quantity)}</strong></li>})}</ul>
  <div className="v32-new-total"><span>{t.total}</span><strong>{money(cartSubtotalFils(good,config.products,config.packPricing))}</strong></div></aside>;
 }
+// Canonical V3.2 cart pack editing. Reuses the exact commercial primitives of
+// the classic cart (PackBuilder UI, packComplete gating, cart.edit identity):
+// the line key stays stable, quantities/prices/server quotes are untouched.
+function V32PackEditor({line,config}:{line:CartLine;config:CheckoutConfig}){
+ const {language}=useLanguage();const copy=packCopy(language);
+ const [value,setValue]=useState<Composition>(line.composition??[]);
+ return <details className="v32-new-pack-edit">
+  <summary>{copy.edit}</summary>
+  <PackBuilder productId={line.productId} config={config} value={value} onChange={setValue}/>
+  <button type="button" className="v32-new-action-secondary" disabled={!packComplete(line.productId,value,config)} onClick={()=>cart.edit(lineKey(line),value)}>{copy.save}</button>
+ </details>;
+}
+// Tricolor single-piece color editing, same primitive as the classic cart
+// (cart.editColor with line-key identity and merge on identical lines).
+function V32TricolorEditor({line}:{line:CartLine}){
+ const {language}=useLanguage();
+ return <label className="v32-new-tricolor">{tricolorCopy[language].color}
+  <select required value={line.color??""} onChange={e=>{if(isTricolorColor(e.target.value))cart.editColor(lineKey(line),e.target.value);}}>
+   <option value="">{tricolorCopy[language].choose}</option>
+   {TRICOLOR_COLORS.map(c=><option key={c} value={c}>{tricolorCopy[language][c]}</option>)}
+  </select>
+ </label>;
+}
 export function VisualCart(){
  const {t}=useVisualCopy();const lines=useCart();const {config,loading,retry}=useCheckoutConfig();
  return <main id="main" className="v32-new-page" data-new-ui="cart">
@@ -43,7 +68,7 @@ export function VisualCart(){
  {loading?<p role="status">Loading…</p>:!config?<div role="alert">{t.notReady}<button onClick={retry}>{t.retry}</button></div>:
  !lines.length?<Empty message={t.empty}/>:<div className="v32-new-layout">
  <Panel title={t.cart}><ul className="v32-new-cart-items">{lines.map(l=>{const p=config.products.find(x=>x.id===l.productId);return <li key={lineKey(l)} className="v32-new-cart-row">
-  <div><h3>{p?.name||l.productId}</h3>{l.color&&<p>{tricolorCopy.en[l.color]}</p>}{l.cakeMessage&&<p data-cart-cake-message>{t.selection==="Select a color"?"Cake inscription":"Inscripción"}: {l.cakeMessage}</p>}{l.composition?.map(c=><small key={c.componentSkuId}>{componentName(c.componentSkuId)} × {c.units} </small>)}
+  <div><h3>{p?.name||l.productId}</h3>{tricolorSpec(l.productId)?.kind==="single"?<V32TricolorEditor line={l}/>:l.color&&<p>{tricolorCopy.en[l.color]}</p>}{l.cakeMessage&&<p data-cart-cake-message>{t.selection==="Select a color"?"Cake inscription":"Inscripción"}: {l.cakeMessage}</p>}{l.composition?.map(c=><small key={c.componentSkuId}>{componentName(c.componentSkuId)} × {c.units} </small>)}{config.personalizedPacks?.enabled&&packSpec(l.productId)&&<V32PackEditor line={l} config={config}/>}
   <p>{p?money(displayLinePrice(l,p.priceFils,config.packPricing))+" each":t.notReady}</p></div>
   <div className="v32-new-cart-controls"><label>{t.quantity}<input type="number" min={minQty(l.productId)} max="100" value={l.quantity} onChange={e=>cart.set(lineKey(l),Number(e.target.value))}/></label><button type="button" onClick={()=>cart.remove(lineKey(l))}>{t.remove}</button></div></li>})}</ul>
  <a className="v32-new-action v32-new-action-secondary" href={suffix("/bakery")}>{t.continue}</a></Panel>

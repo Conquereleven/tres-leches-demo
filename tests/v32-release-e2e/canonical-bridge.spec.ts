@@ -49,6 +49,42 @@ test("operations route does not inherit customer V3.2", async ({page}) => {
   await expect(page.locator(".v32-app")).toHaveCount(0);
 });
 
+// Canonical V3.2 cart reuses the classic commercial editing primitives
+// (PackBuilder/packComplete/cart.edit, cart.editColor) without changing the
+// approved design, prices or payment policy.
+test("canonical cart edits tricolor color with line identity and persistence", async ({
+  page,
+}) => {
+  await page.goto("/cart");
+  await expect(page.locator('[data-new-ui="cart"]')).toBeVisible();
+  // Seed through the page (addInitScript would re-seed on every reload and
+  // hide persistence regressions).
+  await page.evaluate(() => {
+    localStorage.setItem(
+      "3l-cart",
+      JSON.stringify([
+        {
+          productId: "conchas-traditional-tricolor-individual-70-g",
+          quantity: 1,
+          color: "red",
+        },
+      ]),
+    );
+  });
+  await page.reload();
+  const rows = page.locator(".v32-new-cart-row");
+  await expect(rows).toHaveCount(1);
+  const editor = page.locator(".v32-new-tricolor select");
+  await expect(editor).toBeVisible();
+  await expect(editor).toHaveValue("red");
+  await editor.selectOption("green");
+  await expect(rows).toHaveCount(1);
+  await expect(editor).toHaveValue("green");
+  await page.reload();
+  await expect(page.locator(".v32-new-cart-row")).toHaveCount(1);
+  await expect(page.locator(".v32-new-tricolor select")).toHaveValue("green");
+});
+
 // HTTP and React must agree about every new commercial deep link, while
 // unrecognized routes retain a strict 404 (not a broad SPA catch-all).
 test("canonical public deep links return 200 and unknown paths return 404", async ({ page, request }) => {
