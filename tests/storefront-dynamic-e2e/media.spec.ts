@@ -200,10 +200,20 @@ test("a failed published image shows a neutral placeholder instead of an authore
   await page.route("**/brand/hub/fixture-missing.png", (route) =>
     route.fulfill({ status: 404, body: "" }),
   );
-  await page.goto(`/bakery?category=conchas&lang=en`);
   const card = page.locator(
     `.ref32-product[data-product-id="${target.id}"]`,
   );
+  // Native lazy loading can defer this off-screen card indefinitely in WebKit.
+  const [failedImage] = await Promise.all([
+    page.waitForResponse((response) =>
+      response.url().endsWith("/brand/hub/fixture-missing.png"),
+    ),
+    (async () => {
+      await page.goto(`/bakery?category=conchas&lang=en`);
+      await card.scrollIntoViewIfNeeded();
+    })(),
+  ]);
+  expect(failedImage.status()).toBe(404);
   await expect(card.locator(".ref32-photo-pending")).toBeVisible();
   await expect(card.locator(".ref32-photo img")).toHaveCount(0);
 });
