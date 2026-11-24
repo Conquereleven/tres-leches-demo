@@ -5,6 +5,7 @@ import {
   type APIRequestContext,
 } from "@playwright/test";
 import { setCheckoutProviderStatus } from "../fixtures/checkout-provider-control";
+import { expectCheckoutConfig, gotoStorefront } from "../helpers/storefront";
 import AxeBuilder from "@axe-core/playwright";
 const origin = "http://127.0.0.1:3189";
 async function prepare(page: Page, request: APIRequestContext) {
@@ -34,11 +35,11 @@ async function prepare(page: Page, request: APIRequestContext) {
   });
   expect(r.ok()).toBe(true);
   const previous = await r.json();
-  const ready = page.waitForResponse((r) =>
-    r.url().endsWith("/api/checkout/config"),
-  );
-  await page.goto("/");
-  await (await ready).finished();
+  // Home V3.2 never fetches /api/checkout/config: seed storage after visible
+  // home readiness instead of waiting for an incidental config response.
+  // The config 200 stays as an explicit, navigation-independent API check.
+  await gotoStorefront(page, "/");
+  await expectCheckoutConfig(request);
   await page.evaluate(
     ({ body, key }) => {
       localStorage.setItem("3l-cart", JSON.stringify(body.lines));

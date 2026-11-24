@@ -164,6 +164,19 @@ export type Order = {
   billing?: import("./billing").OrderBilling;
   /** Set exactly once, when the order first becomes paid. */
   paidAt?: string;
+  /** First authoritative acknowledgement only; legacy proposals remain on review hold. */
+  paymentFulfillment?: {
+    paymentId: string;
+    acknowledgedAt: string;
+    actor: string;
+    source: string;
+    checkoutId?: string;
+    receiptId?: string;
+    status: "unchanged" | "auto-rescheduled" | "proposed" | "review-required";
+    reason: string;
+    original: { method?: string; date?: string; slot?: string };
+    effective?: { method: string; date: string; slot: string };
+  };
   audit: Audit[];
 };
 export type DeliveryDetails = {
@@ -276,6 +289,9 @@ export type OperationsEmailNotification = Omit<
   html?: string;
 };
 export type Payment = {
+  /** Immutable intent fingerprint captured before initiating payment. */
+  fulfillmentIntent?: string;
+  fulfillmentRequested?: { method?: string; date?: string; slot?: string };
   supersededAt?: string;
   /** TPL-21: ended locally before any provider call (see local-rejection.ts). */
   localRejection?: { code: "BELOW_MINIMUM"; jobId: string; at: string };

@@ -622,7 +622,7 @@ test("manager can reassign while operator cannot take another operator's convers
   }
 });
 
-test("official-adapter HTTP fixtures: WA2 inbound → GPS → Paymennt link through WA2 → authoritative Paid → Delivered", async () => {
+async function goldenAdapterPath(authoredSchedule: boolean) {
   const store = new Store(":memory:", false);
   const outbound: { url: string; body: { text?: { body: string } } }[] = [];
   const meta = new MetaWhatsAppProvider(metaConfig, async (url, init) => {
@@ -720,6 +720,18 @@ test("official-adapter HTTP fixtures: WA2 inbound → GPS → Paymennt link thro
       version: order.version,
       lines: [{ productId: "tres", quantity: 1 }],
     });
+    if (authoredSchedule)
+      store.write((s) => {
+        const o = s.orders[0]!;
+        o.fulfillmentMethod = "delivery";
+        o.delivery = {
+          zoneId: "jvc",
+          address: "Synthetic Street",
+          building: "Synthetic Tower",
+          date: new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10),
+          slot: "4:00 PM – 9:00 PM",
+        };
+      });
     command({
       type: "requestPayment",
       id: order.id,
@@ -731,6 +743,26 @@ test("official-adapter HTTP fixtures: WA2 inbound → GPS → Paymennt link thro
     assert.match(outbound[0]!.body.text!.body, /pay\.test\.paymennt\.com/);
     checkout.status = "PAID";
     await service.reconcile(store.read().payments[0]!.id, actor);
+    assert.equal(store.read().payments[0]!.status, "paid");
+    const recognized = structuredClone(store.read().orders[0]!);
+    if (!authoredSchedule) {
+      assert.equal(recognized.paymentFulfillment?.status, "review-required");
+      assert.throws(
+        () =>
+          command({
+            type: "transition",
+            id: order.id,
+            version: recognized.version,
+            state: "Production",
+          }),
+        /Fulfillment review required/,
+      );
+      assert.deepEqual(store.read().orders[0], recognized);
+      await service.reconcile(store.read().payments[0]!.id, actor);
+      assert.deepEqual(store.read().orders[0], recognized);
+      return;
+    }
+    assert.equal(recognized.paymentFulfillment?.status, "unchanged");
     for (const state of [
       "Production",
       "Ready",
@@ -748,7 +780,11 @@ test("official-adapter HTTP fixtures: WA2 inbound → GPS → Paymennt link thro
   } finally {
     store.close();
   }
-});
+}
+
+for (const authoredSchedule of [true, false])
+  test(`official-adapter HTTP fixtures: WA2 inbound → GPS → Paymennt link through WA2 → authoritative Paid → Delivered; authored schedule=${authoredSchedule}`, () =>
+    goldenAdapterPath(authoredSchedule));
 
 test("delivery acknowledgment preserves operator version while another operator command remains guarded", async () => {
   const store = new Store(":memory:");

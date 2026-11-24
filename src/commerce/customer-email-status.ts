@@ -25,7 +25,7 @@ export function windowEmailLabel(n: CustomerNotification): string {
     if (e.startsWith("Invalid or missing schedule"))
       return "No programado · horario inválido";
     if (e.startsWith("Expired")) return "No enviado · caducó";
-    if (/^(Order|Payment|Schedule|Customer email)/.test(e))
+    if (/^(Order|Payment|Schedule|Fulfillment|Customer email)/.test(e))
       return "No enviado · pedido no elegible";
     return "Falló · revisar";
   }

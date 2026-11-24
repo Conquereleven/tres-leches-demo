@@ -1,6 +1,7 @@
 /** Isolated SQLite + in-process Paymennt mock. No external payment API or card input. */
 import { test, expect } from "@playwright/test";
 import { clickStableControl } from "../helpers/stable-control";
+import { expectCheckoutConfig, gotoStorefront } from "../helpers/storefront";
 import { setCheckoutProviderStatus } from "../fixtures/checkout-provider-control";
 for (const [sku, initialQty, currentQty, oldAmount, amount] of [
   ["pan-de-muerto", 6, 15, 150, 375],
@@ -36,15 +37,12 @@ for (const [sku, initialQty, currentQty, oldAmount, amount] of [
     expect(initial.ok()).toBe(true);
     const previous = await initial.json();
     expect(previous.amountFils).toBe(oldAmount * 100);
-    // Complete homepage configuration before a fixture storage edit/navigation;
-    // otherwise WebKit may tear down the document during its startup fetch.
-    const configured = page.waitForResponse(
-      (r) => r.url() === "http://127.0.0.1:3189/api/checkout/config",
-    );
-    await page.goto("/");
-    const configResponse = await configured;
-    expect(configResponse.status()).toBe(200);
-    expect(await configResponse.finished()).toBeNull();
+    // Home V3.2 never fetches /api/checkout/config: reach visible home
+    // readiness before the fixture storage edit/navigation instead of
+    // waiting for an incidental config response. The config 200 stays as
+    // an explicit, navigation-independent API check.
+    await gotoStorefront(page, "/");
+    await expectCheckoutConfig(request);
     await page.evaluate(
       ({ key, body }) => {
         sessionStorage.setItem(
@@ -73,14 +71,10 @@ for (const [sku, initialQty, currentQty, oldAmount, amount] of [
     ).toBeVisible();
     // A new hosted attempt is safe only after GET proves the old one terminal.
     setCheckoutProviderStatus(previous.url, "EXPIRED");
-    // Leave checkout and change the real browser cart.
-    const returnedConfig = page.waitForResponse(
-      (r) => r.url() === "http://127.0.0.1:3189/api/checkout/config",
-    );
-    await page.goto("/");
-    const returnedResponse = await returnedConfig;
-    expect(returnedResponse.status()).toBe(200);
-    expect(await returnedResponse.finished()).toBeNull();
+    // Leave checkout and change the real browser cart after visible home
+    // readiness; the config endpoint is consumed by checkout/cart UI, not
+    // by Home, so no incidental response wait belongs here.
+    await gotoStorefront(page, "/");
     await page.evaluate(
       ({ sku, currentQty }) =>
         localStorage.setItem(
@@ -89,9 +83,9 @@ for (const [sku, initialQty, currentQty, oldAmount, amount] of [
         ),
       { sku, currentQty },
     );
-    await page.goto("/cart");
+    await gotoStorefront(page, "/cart", '[data-new-ui="cart"]');
     await expect(page.locator("main")).toContainText(`AED ${amount}`);
-    await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
+    await page.locator('a[href="/checkout"]').click();
     // Valid saved details now recover directly to review instead of step 1.
     await expect(
       page.getByRole("button", { name: "CONTINUE TO DETAILS" }),

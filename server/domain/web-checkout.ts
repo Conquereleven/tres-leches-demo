@@ -1,3 +1,4 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import {
   liveLinePrice,
   packPricingPolicy,
@@ -390,6 +391,7 @@ export function canonicalCartHash(
       return {
         sku: line.productId,
         ...(line.color ? { color: line.color } : {}),
+        ...(line.cakeMessage ? { cakeMessage: line.cakeMessage } : {}),
         ...(line.composition ? { composition: line.composition } : {}),
         quantity: line.quantity,
         unitPriceFils: liveLinePrice(line, catalog),
@@ -399,11 +401,13 @@ export function canonicalCartHash(
       lineKey({
         productId: a.sku,
         color: a.color,
+          cakeMessage: "cakeMessage" in a ? a.cakeMessage : undefined,
         composition: "composition" in a ? a.composition : undefined,
       }).localeCompare(
         lineKey({
           productId: b.sku,
           color: b.color,
+          cakeMessage: "cakeMessage" in b ? b.cakeMessage : undefined,
           composition: "composition" in b ? b.composition : undefined,
         }),
       ),
@@ -460,6 +464,7 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
               .map((i) => ({
                 sku: i.sku,
                 ...(i.color ? { color: i.color } : {}),
+                ...(i.cakeMessage ? { cakeMessage: i.cakeMessage } : {}),
                 ...(i.composition ? { composition: i.composition } : {}),
                 quantity: i.quantity,
                 unitPriceFils: i.unitPriceFils,
@@ -468,11 +473,13 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
                 lineKey({
                   productId: a.sku,
                   color: a.color,
+          cakeMessage: "cakeMessage" in a ? a.cakeMessage : undefined,
                   composition: "composition" in a ? a.composition : undefined,
                 }).localeCompare(
                   lineKey({
                     productId: b.sku,
                     color: b.color,
+          cakeMessage: "cakeMessage" in b ? b.cakeMessage : undefined,
                     composition: "composition" in b ? b.composition : undefined,
                   }),
                 ),
@@ -559,9 +566,7 @@ export function resumeWebCheckout(service: CommerceService, raw: unknown) {
     );
     const unresolved =
       (payment.checkoutFlow === "web" &&
-        !["paid", "failed", "cancelled", "expired"].includes(
-          payment.status,
-        )) ||
+        !["paid", "failed", "cancelled", "expired"].includes(payment.status)) ||
       ["authorized", "pending_confirmation"].includes(payment.status) ||
       payment.directAttempt === "unknown" ||
       payment.directAttempt === "submitted" ||
@@ -842,6 +847,7 @@ export type WebCheckoutSummary = {
     color?: Order["lines"][number]["color"];
     composition?: Order["lines"][number]["composition"];
     packSnapshot?: Order["lines"][number]["packSnapshot"];
+    cakeMessage?: string;
     name: string;
     quantity: number;
     lineFils: number;
@@ -856,6 +862,8 @@ export type WebCheckoutSummary = {
   customerFirstName?: string;
 };
 export type WebCheckoutResult = {
+  fulfillmentPending?: boolean;
+  fulfillmentProposal?: { date: string; slot: string };
   cartHash?: string;
   superseded?: boolean;
   /** Internal reference; kept for support and for clients built before #001. */
@@ -911,6 +919,19 @@ export function readWebCheckoutStatus(
       : null,
     status: order.state,
     paymentStatus: payment.status,
+    ...(fulfillmentPending(order)
+      ? {
+          fulfillmentPending: true,
+          ...(order.paymentFulfillment?.effective
+            ? {
+                fulfillmentProposal: {
+                  date: order.paymentFulfillment?.effective.date,
+                  slot: order.paymentFulfillment?.effective.slot,
+                },
+              }
+            : {}),
+        }
+      : {}),
     ...(payment.checkoutFlow === "web" ? { paymentFlow: "web" as const } : {}),
     ...(verifiedLocalRejection(s, payment)
       ? { rejection: "minimum_quantity" as const }
@@ -949,6 +970,7 @@ export function readWebCheckoutStatus(
           items: frozen.items.map((i) => ({
             productId: i.sku,
             ...(i.color ? { color: i.color } : {}),
+            ...(i.cakeMessage ? { cakeMessage: i.cakeMessage } : {}),
             ...(i.packSnapshot ? { packSnapshot: i.packSnapshot } : {}),
             ...(i.composition
               ? { composition: i.composition, packSnapshot: i.packSnapshot }

@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { chooseArea, fillName } from "../fixtures/storefront-form";
+import { gotoWithCart } from "../helpers/storefront";
 import { mkdirSync } from "node:fs";
 const tomorrow = () =>
   new Date(Date.now() + 172800000).toISOString().slice(0, 10);
@@ -10,19 +11,15 @@ for (const width of [390, 1440]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    // The cart page asks the server for prices. Leaving before that answer
-    // arrives makes WebKit report the cancelled request as a page error, so
-    // wait for it; any real page error still fails the test below.
-    const config = page.waitForResponse((r) =>
-      r.url().endsWith("/api/checkout/config"),
-    );
-    await page.goto("/cart");
-    await config;
-    await page.evaluate(() =>
-      localStorage.setItem(
-        "3l-cart",
-        JSON.stringify([{ productId: "pan-de-muerto", quantity: 1 }]),
-      ),
+    // Seed the cart before navigation so WebKit never tears down a hydrating
+    // document mid-fetch; any real page error still fails the test below.
+    // The canonical cart is V3.2 now: assert its visible shell, not the
+    // incidental config request.
+    await gotoWithCart(
+      page,
+      "/cart",
+      [{ productId: "pan-de-muerto", quantity: 1 }],
+      '[data-new-ui="cart"]',
     );
     await page.goto("/checkout");
     // Focusing the empty field lists every approved area, as the dropdown did.

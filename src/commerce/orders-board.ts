@@ -1,3 +1,5 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
+import { fulfillmentSchedule } from "../../shared/fulfillment-schedule";
 /**
  * Orders board presentation rules. Pure functions over the workspace
  * snapshot: they decide what the kitchen sees, never what state an order is
@@ -32,8 +34,8 @@ export const QUEUE_STATES: readonly OrderState[] = [
   "Out for Delivery",
   "Delivered",
 ];
-export const inQueue = (o: Pick<Order, "state">) =>
-  QUEUE_STATES.includes(o.state);
+export const inQueue = (o: Pick<Order, "state"> & Partial<Order>) =>
+  !fulfillmentPending(o) && QUEUE_STATES.includes(o.state);
 
 export const dubaiDate = (at: Date | string = new Date()) =>
   new Intl.DateTimeFormat("en-CA", {
@@ -43,20 +45,22 @@ export const dubaiDate = (at: Date | string = new Date()) =>
     day: "2-digit",
   }).format(typeof at === "string" ? new Date(at) : at);
 
-type BoardOrder = Pick<Order, "state" | "delivery" | "pickup">;
+type BoardOrder = Pick<Order, "state" | "delivery" | "pickup"> & Partial<Order>;
 
 /**
  * Today is the kitchen's working list: due today, overdue and still open, or
  * open without a delivery date. Upcoming is anything due after today.
  */
 export function matchesView(o: BoardOrder, view: BoardView, today: string) {
-  const date = o.pickup?.pickupDate ?? o.delivery?.date;
+  if (fulfillmentPending(o)) return view === "all";
+  const date = fulfillmentSchedule(o).date;
   if (view === "upcoming") return !!date && date > today;
   if (view === "today")
     return o.state === "Delivered" ? date === today : !date || date <= today;
   return true;
 }
 export function matchesFilter(o: BoardOrder, filter: BoardFilter) {
+  if (fulfillmentPending(o)) return filter === "any";
   switch (filter) {
     case "paid":
       return o.state === "Paid" || o.state === "Confirmed";
@@ -73,10 +77,16 @@ export function matchesFilter(o: BoardOrder, filter: BoardFilter) {
   }
 }
 
+// Retain legacy delivery-only board grouping when no decision was recorded.
+const boardDay = (o: Order) =>
+  o.paymentFulfillment === undefined
+    ? o.delivery?.date
+    : fulfillmentSchedule(o).date;
+
 /** Soonest delivery first; undated after dated; then most recent activity. */
 export function byDue(a: Order, b: Order) {
   return (
-    (a.delivery?.date ?? "9999").localeCompare(b.delivery?.date ?? "9999") ||
+    (boardDay(a) ?? "9999").localeCompare(boardDay(b) ?? "9999") ||
     (b.audit.at(-1)?.at ?? "").localeCompare(a.audit.at(-1)?.at ?? "")
   );
 }
@@ -92,8 +102,10 @@ export function boardMetrics(
 ) {
   const queue = orders.filter(inQueue);
   return {
-    todayOrders: queue.filter((o) => o.delivery?.date === today).length,
-    todayRevenueFils: queue
+    todayOrders: queue.filter((o) => boardDay(o) === today).length,
+    // Paid recognition remains a financial fact even when preparation is held.
+    todayRevenueFils: orders
+      .filter((o) => QUEUE_STATES.includes(o.state))
       .filter((o) => {
         const at = paidAt(o);
         return at && dubaiDate(at) === today;

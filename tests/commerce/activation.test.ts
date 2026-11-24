@@ -122,7 +122,12 @@ for (const status of ["PAID", "FAILED"])
       );
       assert.deepEqual(f.store.read(), before);
       assert.equal(before.paymentNotifications?.length, 1);
-      assert.equal(before.orders[0]!.audit.length, status === "PAID" ? 2 : 1);
+      assert.equal(before.orders[0]!.audit.length, status === "PAID" ? 3 : 1);
+      if (status === "PAID")
+        assert.equal(
+          before.orders[0]!.paymentFulfillment?.status,
+          "review-required",
+        );
       assert.equal(before.jobs.length, 0);
     } finally {
       f.store.close();

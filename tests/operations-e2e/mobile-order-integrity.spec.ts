@@ -5,6 +5,10 @@ import type { Line } from "../../server/domain/model";
 import { mkdirSync, readFileSync } from "node:fs";
 import { validateCatalog } from "../../server/domain/catalog";
 
+const SHOTS =
+  process.env.OPERATIONS_EVIDENCE_DIR ??
+  "docs/operations/mobile-hardening/sprint02";
+
 function frozenOrderFixture() {
   const traditional = PACK_SPECS.find(
     (p) => p.family === "traditional" && p.capacity === 6 && p.size === "mini",
@@ -151,11 +155,11 @@ for (const width of [390, 412])
       ).toBe(true);
       expect(writes).toEqual([]);
       expect(errors).toEqual([]);
-      mkdirSync("docs/operations/mobile-hardening/sprint02", {
+      mkdirSync(SHOTS, {
         recursive: true,
       });
       await page.screenshot({
-        path: `docs/operations/mobile-hardening/sprint02/frozen-order-${info.project.name}-${language}-${width}.png`,
+        path: `${SHOTS}/frozen-order-${info.project.name}-${language}-${width}.png`,
         fullPage: true,
       });
     });

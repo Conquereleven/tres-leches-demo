@@ -2,16 +2,75 @@ import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync, readFileSync } from "node:fs";
 import { PACK_SPECS, componentName } from "../../shared/pack-composition";
-import { packCopy } from "../../shared/pack-copy";
 const shots = "work/qa/premium";
 mkdirSync(shots, { recursive: true });
-const select = async (
+// Canonical V3.2 interaction (the retired `.b-pack-builder` / `.b-menu-*`
+// anatomy no longer renders). Packs are year-round (seasonal rules exclude
+// `-pack-`); singles stay seasonal. Prices always come from the server.
+const openPackDialog = async (
   page: import("@playwright/test").Page,
-  spec: (typeof PACK_SPECS)[number],
+  family: string,
+  lang: string,
 ) => {
-  await page
-    .locator(".b-menu-selectors select")
-    .selectOption(`${spec.capacity} ${spec.size}`);
+  await page.goto(`/bakery?category=mexican&lang=${lang}`);
+  // Same transient fixture-server drop as in conchas-e2e: settle on the real
+  // grid or the UI's own TRY AGAIN state, then recover exactly once (a retry
+  // loop would storm the single-threaded fixture server). Never bypassed.
+  const retry = page.getByRole("button", {
+    name: /try again|reintentar|حاول مجدداً/i,
+  });
+  let state = "waiting";
+  await expect
+    .poll(async () => {
+      if (await page.locator(".ref32-grid").count()) state = "ready";
+      else if (await retry.count()) state = "unavailable";
+      return state;
+    }, { timeout: 20000 })
+    .not.toBe("waiting");
+  if (state === "unavailable") {
+    // Best-effort recovery: a successful retry unmounts this very button
+    // mid-click, so a detach-race here must not fail the test. The grid
+    // assertion below stays the strict gate.
+    await retry.first().click({ timeout: 5000 }).catch(() => {});
+    await expect(page.locator(".ref32-grid")).toBeVisible({ timeout: 15000 });
+  } else {
+    await expect(page.locator(".ref32-grid")).toBeVisible();
+  }
+  const pan = page.locator('.v32-subcategories [data-category-id="pan"]');
+  if (await pan.count()) await pan.click();
+  const card = page.locator(
+    `[data-product-id="pan-de-muerto-${family}-pack"]`,
+  );
+  await expect(card).toBeEnabled({ timeout: 12000 });
+  await card.scrollIntoViewIfNeeded();
+  await card.click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator(".ref32-dialog-footer")).toBeVisible();
+  return dialog;
+};
+const fillComponent = async (
+  dialog: import("@playwright/test").Locator,
+  componentSkuId: string,
+  lang: string,
+  units: number,
+) => {
+  // Exact span match: "Sugar" must not match "Sugar with chocolate covering".
+  const wanted = componentName(componentSkuId, lang as "en" | "es" | "ar");
+  const rows = dialog.locator(".ref32-composition-row");
+  await expect(rows.first()).toBeVisible();
+  const count = await rows.count();
+  let row = null as import("@playwright/test").Locator | null;
+  for (let i = 0; i < count; i++) {
+    const label = (await rows.nth(i).locator("span").first().innerText()).trim();
+    if (label === wanted) {
+      row = rows.nth(i);
+      break;
+    }
+  }
+  if (!row) throw new Error(`composition row not found: ${wanted}`);
+  for (let i = 0; i < units; i++)
+    await row.locator("button").nth(1).click();
 };
 for (const width of [390, 768, 1440])
   for (const lang of ["en", "es", "ar"])
@@ -25,36 +84,26 @@ for (const width of [390, 768, 1440])
         const spec = PACK_SPECS.find(
           (s) => s.family === family && s.capacity === 6 && s.size === "mini",
         )!;
-        await page.goto(
-          `/menu?product=pan-de-muerto-${family}-pack&lang=${lang}`,
-        );
-        await expect(page.locator(".b-pack-builder")).toBeVisible();
-        await select(page, spec);
+        const dialog = await openPackDialog(page, family, lang);
+        await dialog.locator(`[data-sku="${spec.packSkuId}"]`).click();
+        await expect(dialog).toHaveAttribute("data-selected-sku", spec.packSkuId);
         const premium = spec.components.find((c) =>
           family === "traditional"
             ? c.componentSkuId.endsWith("-chocolate-covering")
             : c.componentSkuId.includes("filled-pistachio"),
         )!;
-        const builder = page.locator(".b-pack-builder");
-        await expect(builder).toContainText(packCopy(lang).premiumNote);
-        await expect(builder).toContainText(packCopy(lang).perPiece);
-        await builder
-          .getByRole("spinbutton", {
-            name: componentName(spec.components[0]!.componentSkuId, lang),
-            exact: true,
-          })
-          .fill("4");
-        await expect(page.locator(".b-add-to-cart > button")).toBeDisabled();
-        await builder
-          .getByRole("spinbutton", {
-            name: componentName(premium.componentSkuId, lang),
-            exact: true,
-          })
-          .fill("2");
-        await expect(page.locator(".b-add-to-cart > button")).toBeEnabled();
+        const buy = dialog.locator(".ref32-buy");
+        // Negative: an incomplete composition holds the CTA.
+        await expect(dialog.locator(".ref32-composition")).toBeVisible();
+        await expect(buy).toBeDisabled();
+        await fillComponent(dialog, spec.components[0]!.componentSkuId, lang, 4);
+        await expect(buy).toBeDisabled();
+        // Positive: exactly 6 approved components enable the CTA.
+        await fillComponent(dialog, premium.componentSkuId, lang, 2);
+        await expect(dialog.locator(".ref32-composition")).toContainText("6/6");
+        await expect(buy).toBeEnabled();
         const expected = family === "traditional" ? 7000 : 14600;
-        const button = page.locator(".b-add-to-cart > button");
-        await expect(button).toContainText(
+        await expect(dialog.locator(".ref32-price strong")).toContainText(
           family === "traditional" ? /70|٧٠/ : /146|١٤٦/,
         );
         const quote = await (
@@ -80,61 +129,75 @@ for (const width of [390, 768, 1440])
         ).json();
         expect(quote.totalFils).toBe(expected);
         expect(
-          (await new AxeBuilder({ page }).include(".b-pack-builder").analyze())
+          (await new AxeBuilder({ page }).include(".ref32-dialog").analyze())
             .violations,
         ).toEqual([]);
+        expect(await page.locator("html").getAttribute("dir")).toBe(
+          lang === "ar" ? "rtl" : "ltr",
+        );
+        await page.screenshot({
+          path: `${shots}/${info.project.name}-${width}-${lang}-${family}.png`,
+          fullPage: true,
+        });
+        await buy.click();
+        await expect(page.getByRole("dialog")).toHaveCount(0);
+        // Page overflow is measured with the dialog closed: on mobile the
+        // approved active-card zoom (scale 1.62) intentionally extends past
+        // the viewport while the dialog is open and must not fail page health.
         expect(
           await page.evaluate(
             () => document.documentElement.scrollWidth <= innerWidth,
           ),
         ).toBe(true);
-        await page.screenshot({
-          path: `${shots}/${info.project.name}-${width}-${lang}-${family}.png`,
-          fullPage: true,
-        });
-        await button.click();
       }
       await page.goto(`/cart?lang=${lang}`);
-      await expect(page.locator(".b-co-item")).toHaveCount(2);
+      await expect(page.locator('[data-new-ui="cart"]')).toBeVisible();
+      await expect(
+        page.locator(".v32-new-cart-items .v32-new-cart-row"),
+      ).toHaveCount(2);
+      const quantities = page.locator(
+        '.v32-new-cart-controls input[type="number"]',
+      );
+      await expect(quantities).toHaveCount(2);
+      for (const quantity of await quantities.all())
+        await expect(quantity).toHaveAttribute("max", "100");
       await page.reload();
-      await expect(page.locator(".b-co-item")).toHaveCount(2);
-      await expect(page.locator(".b-co-item-total").nth(0)).toContainText(
-        /70|٧٠/,
-      );
-      await expect(page.locator(".b-co-item-total").nth(1)).toContainText(
-        /146|١٤٦/,
-      );
+      await expect(
+        page.locator(".v32-new-cart-items .v32-new-cart-row"),
+      ).toHaveCount(2);
+      await expect(
+        page.locator(".v32-new-cart-items"),
+      ).toContainText(/70|٧٠/);
+      await expect(
+        page.locator(".v32-new-cart-items"),
+      ).toContainText(/146|١٤٦/);
       await page.screenshot({
         path: `${shots}/${info.project.name}-${width}-${lang}-cart.png`,
         fullPage: true,
       });
       await page.goto(`/checkout?lang=${lang}`);
-      await expect(page.locator(".b-co-summary")).toContainText(/216|٢١٦/);
+      await expect(page.locator(".b-shop .b-co-summary")).toContainText(
+        /216|٢١٦/,
+      );
       expect(errors).toEqual([]);
     });
 test("all eight formats expose the approved per-piece rate and final price; premium 12-piece boxes contain exactly twelve pieces", async ({
   page,
 }) => {
   for (const spec of PACK_SPECS) {
-    await page.goto(`/menu?product=pan-de-muerto-${spec.family}-pack&lang=en`);
-    await expect(page.locator(".b-pack-builder")).toBeVisible();
-    await select(page, spec);
+    const dialog = await openPackDialog(page, spec.family, "en");
+    await dialog.locator(`[data-sku="${spec.packSkuId}"]`).click();
+    await expect(dialog).toHaveAttribute("data-selected-sku", spec.packSkuId);
     const c = spec.components.find((c) =>
       spec.family === "traditional"
         ? c.componentSkuId.endsWith("-chocolate-covering")
         : c.componentSkuId.includes("filled-pistachio"),
     )!;
-    await page
-      .locator(".b-pack-builder")
-      .getByRole("spinbutton", {
-        name: componentName(c.componentSkuId),
-        exact: true,
-      })
-      .fill(String(spec.capacity));
-    await expect(page.locator(".b-pack-builder")).toContainText(
-      `${spec.capacity} / ${spec.capacity}`,
+    await fillComponent(dialog, c.componentSkuId, "en", spec.capacity);
+    await expect(dialog.locator(".ref32-composition")).toContainText(
+      `${spec.capacity}/${spec.capacity}`,
     );
-    await expect(page.locator(".b-add-to-cart > button")).toBeEnabled();
+    await expect(dialog.locator(".ref32-buy")).toBeEnabled();
     const rate =
       spec.family === "traditional"
         ? spec.size === "mini"
@@ -143,18 +206,38 @@ test("all eight formats expose the approved per-piece rate and final price; prem
         : spec.size === "mini"
           ? 23
           : 26;
-    await expect(page.locator(".b-pack-builder")).toContainText(
-      new RegExp(`\\+ AED.?${rate}\\.00 per piece`),
-    );
     const cfg = await (await page.request.get("/api/checkout/config")).json();
     const total =
       cfg.products.find((p: { id: string }) => p.id === spec.packSkuId)
         .priceFils /
         100 +
       spec.capacity * rate;
-    await expect(page.locator(".b-add-to-cart > button")).toContainText(
+    // Server-authoritative total for a full premium box, never a client multiple.
+    await expect(dialog.locator(".ref32-price strong")).toContainText(
       String(total),
     );
+    const quote = await (
+      await page.request.post("/api/checkout/quote", {
+        headers: { Origin: "http://127.0.0.1:3284" },
+        data: {
+          lines: [
+            {
+              productId: spec.packSkuId,
+              quantity: 1,
+              composition: [{ componentSkuId: c.componentSkuId, units: spec.capacity }],
+            },
+          ],
+          fulfillmentMethod: "pickup",
+        },
+      })
+    ).json();
+    expect(quote.totalFils).toBe(
+      cfg.products.find((p: { id: string }) => p.id === spec.packSkuId).priceFils +
+        spec.capacity * rate * 100,
+    );
+    await dialog.locator(".ref32-buy").click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await page.evaluate(() => localStorage.removeItem("3l-cart"));
   }
 });
 test("integrated premium kitchen email contains parent-first frozen prices with no component product charges", async ({

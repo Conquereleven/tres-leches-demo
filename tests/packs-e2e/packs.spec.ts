@@ -1,17 +1,57 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect, type Locator, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync } from "node:fs";
 import { packCopy } from "../../shared/pack-copy";
 import { PACK_SPECS, componentName } from "../../shared/pack-composition";
 const shots = "work/qa/packs";
 mkdirSync(shots, { recursive: true });
-const product = "/menu?product=pan-de-muerto-filled-pack";
-const fill = async (page: Page, lang = "en", n = 12, i = 4) => {
-  const spec = PACK_SPECS.find(
+// Canonical V3.2: the retired legacy /menu product page is gone. Pack
+// customization now happens in the approved V3.2 purchase dialog (ref32) and
+// cart editing in the canonical V3.2 cart (v32-new-*), reusing the same
+// PackBuilder/packComplete/cart.edit commercial primitives.
+const PACK_12 = "pan-de-muerto-filled-pack-12-individuales";
+const spec12 = () =>
+  PACK_SPECS.find(
     (s) =>
       s.family === "filled" && s.capacity === 12 && s.size === "individuales",
   )!;
-  await page
+type Lang = "en" | "es" | "ar";
+test.use({ actionTimeout: 15000, navigationTimeout: 30000 });
+
+const openPackDialog = async (page: Page, lang: Lang = "en") => {
+  await page.goto(`/bakery?category=mexican&lang=${lang}`);
+  // Pack cards are per family; the 12-individuales variant is chosen inside.
+  const card = page.locator(
+    '.ref32-product[data-product-id="pan-de-muerto-filled-pack"]',
+  );
+  await card.scrollIntoViewIfNeeded();
+  await expect(card).toBeEnabled();
+  await card.click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator(".ref32-dialog-footer")).toBeVisible();
+  const variant = dialog.locator(`button[data-sku="${PACK_12}"]`);
+  await expect(variant).toBeEnabled();
+  await variant.click();
+  await expect(dialog).toHaveAttribute("data-selected-sku", PACK_12);
+  return dialog;
+};
+const stepFlavor = async (
+  dialog: Locator,
+  lang: Lang,
+  index: number,
+  times: number,
+) => {
+  const row = dialog.locator(".ref32-composition-row", {
+    hasText: componentName(spec12().components[index]!.componentSkuId, lang),
+  });
+  await expect(row).toBeVisible();
+  for (let i = 0; i < times; i++)
+    await row.getByRole("button", { name: "+", exact: true }).click();
+};
+const fill = async (root: Page | Locator, lang: Lang = "en", n = 12, i = 4) => {
+  const spec = spec12();
+  await root
     .locator(".b-pack-builder")
     .getByRole("spinbutton", {
       name: componentName(spec.components[i]!.componentSkuId, lang),
@@ -19,6 +59,45 @@ const fill = async (page: Page, lang = "en", n = 12, i = 4) => {
     })
     .fill(String(n));
 };
+
+async function readCart(page: Page) {
+  return page.evaluate(() => {
+    const lines = JSON.parse(localStorage.getItem("3l-cart") ?? "[]") as Array<{
+      productId: string;
+      quantity: number;
+      composition: { componentSkuId: string; units: number }[];
+    }>;
+    return lines.map(({ productId, quantity, composition }) => ({
+      productId,
+      quantity,
+      composition: Object.fromEntries(
+        composition.map(({ componentSkuId, units }) => [componentSkuId, units]),
+      ),
+    }));
+  });
+}
+
+async function quoteCart(page: Page) {
+  const lines = (await readCart(page)).map((line) => ({
+    ...line,
+    composition: Object.entries(line.composition).map(
+      ([componentSkuId, units]) => ({
+        componentSkuId,
+        units,
+      }),
+    ),
+  }));
+  const response = await page.request.post("/api/checkout/quote", {
+    headers: {
+      Origin: "http://127.0.0.1:3272",
+      "Idempotency-Key": crypto.randomUUID(),
+    },
+    data: { lines, fulfillmentMethod: "pickup" },
+  });
+  expect(response.status(), await response.text()).toBe(200);
+  return (await response.json()).totalFils;
+}
+
 for (const width of [390, 768, 1440])
   for (const lang of ["en", "es", "ar"] as const)
     test(`${width}px ${lang}: custom choice, cart persistence, editing and fixed checkout price`, async ({
@@ -27,19 +106,33 @@ for (const width of [390, 768, 1440])
       await page.setViewportSize({ width, height: 1000 });
       const errors: string[] = [];
       page.on("pageerror", (e) => errors.push(e.message));
-      await page.goto(`${product}&lang=${lang}`);
-      await expect(page.locator(".b-pack-builder")).toBeVisible();
-      const select = page.locator(".b-menu-selectors select");
-      const individual = await select.locator("option").allTextContents();
-      await select.selectOption({
-        label: individual.find((v) => /12/.test(v) && !/mini|صغير/.test(v))!,
-      });
-      await expect(page.locator(".b-add-to-cart > button")).toBeDisabled();
-      await fill(page, lang);
-      await expect(page.locator(".b-add-to-cart > button")).toBeEnabled();
-      await expect(page.locator(".b-pack-builder")).toContainText("12 / 12");
+      const dialog = await openPackDialog(page, lang);
+      // Negative: an incomplete composition keeps the V3.2 CTA disabled.
+      await expect(dialog.locator(".ref32-buy")).toBeDisabled();
+      await expect(dialog.locator(".ref32-composition-row")).toHaveCount(5);
+      await stepFlavor(dialog, lang, 4, 8);
+      await expect(dialog.locator(".ref32-buy")).toBeDisabled();
+      await stepFlavor(dialog, lang, 1, 4);
+      await expect(dialog.locator(".ref32-buy")).toBeEnabled();
+      await expect(dialog.locator(".ref32-composition p")).toContainText(
+        "12/12",
+      );
+      for (const plus of await dialog
+        .locator(".ref32-composition-row")
+        .getByRole("button", { name: "+", exact: true })
+        .all()) {
+        await expect(plus).toBeDisabled();
+      }
+      await expect(dialog.locator(".ref32-price strong")).toContainText(/235/);
+      const config = await (
+        await page.request.get("/api/checkout/config")
+      ).json();
       expect(
-        (await new AxeBuilder({ page }).include(".b-pack-builder").analyze())
+        config.products.find((p: { id: string }) => p.id === PACK_12)
+          ?.priceFils,
+      ).toBe(23500);
+      expect(
+        (await new AxeBuilder({ page }).include(".ref32-composition").analyze())
           .violations,
       ).toEqual([]);
       await page.evaluate(() => window.scrollTo(0, 0));
@@ -48,48 +141,64 @@ for (const width of [390, 768, 1440])
         path: `${shots}/${info.project.name}-${width}-${lang}-product.png`,
         fullPage: true,
       });
-      await page.locator(".b-add-to-cart > button").click();
+      await dialog.locator(".ref32-buy").click();
+      await expect(dialog).toHaveCount(0);
       await page.goto(`/cart?lang=${lang}`);
-      await expect(page.locator(".b-co-item")).toHaveCount(1);
-      await expect(page.locator(".b-pack-composition")).toContainText("12");
+      await expect(page.locator(".v32-new-cart-row")).toHaveCount(1);
+      const pistachio = spec12().components[4]!.componentSkuId;
+      const chocolate = spec12().components[1]!.componentSkuId;
+      const expected = (first: number, second: number) => [
+        {
+          productId: PACK_12,
+          quantity: 1,
+          composition: { [pistachio]: first, [chocolate]: second },
+        },
+      ];
+      await expect.poll(() => readCart(page)).toEqual(expected(8, 4));
       await page.reload();
-      await expect(page.locator(".b-pack-composition")).toContainText("12");
-      await page.locator(".b-pack-edit summary").click();
-      const spec = PACK_SPECS.find(
-        (s) =>
-          s.family === "filled" &&
-          s.capacity === 12 &&
-          s.size === "individuales",
-      )!;
-      await page
-        .locator(".b-pack-builder")
-        .getByRole("spinbutton", {
-          name: componentName(spec.components[4]!.componentSkuId, lang),
-          exact: true,
-        })
-        .fill("8");
-      await page
-        .locator(".b-pack-builder")
-        .getByRole("spinbutton", {
-          name: componentName(spec.components[1]!.componentSkuId, lang),
-          exact: true,
-        })
-        .fill("4");
-      await page
-        .locator(".b-pack-edit")
-        .getByRole("button", { name: packCopy(lang).save, exact: true })
-        .click();
-      await expect(page.locator(".b-pack-composition")).toContainText("8");
-      await expect(page.locator(".b-pack-composition")).toContainText("4");
-      await page.goto(`${product}&lang=${lang}`);
-      await page.locator(".b-menu-selectors select").selectOption({
-        label: individual.find((v) => /12/.test(v) && !/mini|صغير/.test(v))!,
+      await expect.poll(() => readCart(page)).toEqual(expected(8, 4));
+      await page.locator(".v32-new-pack-edit summary").click();
+      const editor = page.locator(".v32-new-pack-edit");
+      await expect(editor.locator(".b-pack-builder")).toBeVisible();
+      expect(
+        (await new AxeBuilder({ page }).include(".v32-new-pack-edit").analyze())
+          .violations,
+      ).toEqual([]);
+      const save = editor.getByRole("button", {
+        name: packCopy(lang).save,
+        exact: true,
       });
-      await fill(page, lang, 12, 2);
-      await page.locator(".b-add-to-cart > button").click();
+      // Negative: breaking completeness disables save until the mix is whole.
+      await fill(editor, lang, 7, 4);
+      await expect(save).toBeDisabled();
+      await fill(editor, lang, 5, 1);
+      await expect(save).toBeEnabled();
+      await save.click();
+      const rows = page.locator(".v32-new-cart-row");
+      await expect(rows).toContainText(`${componentName(pistachio)} × 7`);
+      await expect(rows).toContainText(`${componentName(chocolate)} × 5`);
+      await expect(rows.first()).toContainText(/235|٢٣٥/);
+      // Server authority: the edited composition quotes the fixed box price.
+      expect(await quoteCart(page)).toBe(23500);
+      await page.reload();
+      await expect.poll(() => readCart(page)).toEqual(expected(7, 5));
+      const dialog2 = await openPackDialog(page, lang);
+      await stepFlavor(dialog2, lang, 2, 12);
+      await dialog2.locator(".ref32-buy").click();
       await page.goto(`/cart?lang=${lang}`);
-      await expect(page.locator(".b-co-item")).toHaveCount(2);
-      await expect(page.locator(".b-co-item-total").first()).toContainText(
+      await expect(page.locator(".v32-new-cart-row")).toHaveCount(2);
+      await expect
+        .poll(() => readCart(page))
+        .toEqual([
+          ...expected(7, 5),
+          {
+            productId: PACK_12,
+            quantity: 1,
+            composition: { [spec12().components[2]!.componentSkuId]: 12 },
+          },
+        ]);
+      expect(await quoteCart(page)).toBe(47000);
+      await expect(page.locator(".v32-new-cart-row").first()).toContainText(
         /235|٢٣٥/,
       );
       await page.evaluate(() => window.scrollTo(0, 0));
@@ -99,9 +208,14 @@ for (const width of [390, 768, 1440])
         fullPage: true,
       });
       await page.goto(`/checkout?lang=${lang}`);
-      await expect(
-        page.locator(".b-co-summary-items .b-pack-composition"),
-      ).toHaveCount(2);
+      const summary = page.locator(".b-co-summary-items .b-pack-composition");
+      await expect(summary).toHaveCount(2);
+      await expect(summary.first()).toContainText(
+        `${componentName(pistachio, lang)} × 7`,
+      );
+      await expect(summary.first()).toContainText(
+        `${componentName(chocolate, lang)} × 5`,
+      );
       await page.evaluate(() => window.scrollTo(0, 0));
       await page.waitForTimeout(300); // Let the existing sticky-header transition settle for evidence.
       await page.screenshot({
@@ -268,18 +382,14 @@ test("customer completes local product → cart → checkout → hosted TEST dou
   context,
 }, info) => {
   await page.setViewportSize({ width: 390, height: 1000 });
-  await page.goto(product + "&lang=en");
-  await expect(page.locator(".b-pack-builder")).toBeVisible();
-  await page
-    .locator(".b-menu-selectors select")
-    .selectOption("12 individuales");
-  await fill(page, "en", 8, 4);
-  await fill(page, "en", 4, 1);
-  await page.locator(".b-add-to-cart > button").click();
+  const dialog = await openPackDialog(page, "en");
+  await stepFlavor(dialog, "en", 4, 8);
+  await stepFlavor(dialog, "en", 1, 4);
+  await expect(dialog.locator(".ref32-buy")).toBeEnabled();
+  await dialog.locator(".ref32-buy").click();
   await page.goto("/cart");
-  await page
-    .getByRole("link", { name: "CONTINUE TO FULFILLMENT", exact: true })
-    .click();
+  await expect(page.locator(".v32-new-cart-row")).toHaveCount(1);
+  await page.locator('a[href="/checkout"]').click();
   const { chooseArea, fillName } = await import("../fixtures/storefront-form");
   await chooseArea(page, "JVC");
   await page
@@ -356,12 +466,10 @@ test("customer completes local product → cart → checkout → hosted TEST dou
 test("published eligibility refreshes an open builder; private manager drafts never affect customers", async ({
   page,
 }, info) => {
-  await page.goto(product + "&lang=en");
-  await page
-    .locator(".b-menu-selectors select")
-    .selectOption("12 individuales");
-  await fill(page, "en", 12, 4);
-  await expect(page.locator(".b-add-to-cart > button")).toBeEnabled();
+  const dialog = await openPackDialog(page, "en");
+  await stepFlavor(dialog, "en", 4, 12);
+  const buy = dialog.locator(".ref32-buy");
+  await expect(buy).toBeEnabled();
   const origin = "http://127.0.0.1:3272";
   const login = async (id: string) => {
     const r = await page.request.post("/api/login", {
@@ -418,7 +526,7 @@ test("published eligibility refreshes an open builder; private manager drafts ne
       await page.request.get("/api/storefront/catalog")
     ).json();
     expect(publicBefore.revision).toBe(initial.published.id);
-    await expect(page.locator(".b-add-to-cart > button")).toBeEnabled();
+    await expect(buy).toBeEnabled();
     const v = await view(admin);
     await command(admin, {
       type: "publish",
@@ -426,13 +534,16 @@ test("published eligibility refreshes an open builder; private manager drafts ne
       expectedPublishedRevision: v.published.id,
     });
     await page.evaluate(() => window.dispatchEvent(new Event("focus")));
-    await expect(page.locator(".b-add-to-cart > button")).toBeDisabled();
-    await expect(page.locator(".b-pack-builder")).toContainText(
-      packCopy("en").disabled,
+    // The open V3.2 dialog drops the unpublished flavor and holds the CTA.
+    await expect(buy).toBeDisabled();
+    await expect(dialog.locator(".ref32-composition")).not.toContainText(
+      componentName(spec.components[4]!.componentSkuId, "en"),
     );
-    await fill(page, "en", 0, 4);
-    await fill(page, "en", 12, 1);
-    await expect(page.locator(".b-add-to-cart > button")).toBeEnabled();
+    // Recovery in the open dialog: re-selecting the variant clears the
+    // now-ineligible flavor, so filling allowed flavors re-enables the CTA.
+    await dialog.locator(`[data-sku="${PACK_12}"]`).click();
+    await stepFlavor(dialog, "en", 1, 12);
+    await expect(buy).toBeEnabled();
     await page.screenshot({
       path: `${shots}/${info.project.name}-changed-eligibility.png`,
       fullPage: true,

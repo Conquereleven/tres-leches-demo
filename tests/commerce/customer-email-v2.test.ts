@@ -333,7 +333,7 @@ for (const [name, mutate, reason] of [
       f.store.write((s) => {
         s.orders[0]!.delivery!.slot = "8:00 AM – 1:00 PM";
       }),
-    /^Schedule changed/,
+    /^Fulfillment pending confirmation/,
   ],
 ] as const)
   test(`after ${name} the window email is not sent and the reason is recorded`, async () => {

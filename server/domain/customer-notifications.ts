@@ -10,6 +10,7 @@
  * nothing and rows stay visibly pending — nothing is reported as sent.
  */
 import { randomUUID } from "node:crypto";
+import { fulfillmentPending, fulfillmentNotice } from "./payment-fulfillment";
 import { ProviderFailure } from "../adapters/failure";
 import { z } from "zod";
 import { renderCustomerEmailHtml } from "./customer-email-html";
@@ -70,6 +71,26 @@ export function renderCustomerEmail(
   } = {},
 ) {
   const reference = orderReference(order);
+  if (fulfillmentPending(order)) {
+    const body = `Order ${reference}\n${fulfillmentNotice(order)}`;
+    const escape = (text: string) =>
+      text.replace(
+        /[&<>"']/g,
+        (char) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[char]!,
+      );
+    return {
+      subject: `3L payment received · ${reference} · fulfillment pending confirmation`,
+      body,
+      html: `<p>Order ${escape(reference)}</p><p>${escape(fulfillmentNotice(order))}</p>`,
+    };
+  }
   const first =
     order.customerDetails?.firstName ||
     customerName(order, context.fallbackName).split(/\s+/)[0] ||
@@ -190,6 +211,7 @@ export function recordCustomerEvent(
   to: OrderState,
 ): CustomerNotification | null {
   const event = customerEventFor(order, from, to);
+  if (fulfillmentPending(order)) return null;
   if (!event) return null;
   // Email flow V2 replaces progress emails with one scheduled window email,
   // for the order's whole life, even if V2 is later turned off. The OMS

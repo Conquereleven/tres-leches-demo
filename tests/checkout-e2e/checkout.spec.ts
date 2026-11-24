@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { chooseArea, fillName } from "../fixtures/storefront-form";
 import { clickStableControl } from "../helpers/stable-control";
+import { expectCheckoutConfig, gotoWithCart } from "../helpers/storefront";
 
 const ORIGIN = "http://127.0.0.1:3189";
 const tomorrow = () =>
@@ -16,25 +17,19 @@ test("cart → delivery → details → review → payment step", async ({
 
   // Preserve the original financial regression using its explicitly retired fixture.
   // Current menu selectors and new SKUs are exercised in menu-e2e separately.
-  // Seed cart only after homepage hydration/config has completed. Navigating
-  // away immediately after `load` can destroy WebKit's document before its
-  // React effect starts fetch(), producing an access-control page error.
-  const homepageConfig = page.waitForResponse(
-    (response) => response.url() === ORIGIN + "/api/checkout/config",
+  // Home V3.2 never fetches /api/checkout/config, so seed the cart with an
+  // init script and assert visible cart readiness instead of waiting for an
+  // incidental config response. The 200 coverage stays as an explicit API
+  // check below, independent of navigation.
+  await gotoWithCart(
+    page,
+    "/cart",
+    [{ productId: "pan-de-muerto", quantity: 2 }],
+    '[data-new-ui="cart"]',
   );
-  await page.goto("/");
-  const configResponse = await homepageConfig;
-  expect(configResponse.status()).toBe(200);
-  expect(await configResponse.finished()).toBeNull();
-  await page.evaluate(() =>
-    localStorage.setItem(
-      "3l-cart",
-      JSON.stringify([{ productId: "pan-de-muerto", quantity: 2 }]),
-    ),
-  );
-  await page.goto("/cart");
+  await expectCheckoutConfig(page.request);
   await expect(page.locator("main")).toContainText("AED 50");
-  await page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }).click();
+  await page.locator('a[href="/checkout"]').click();
 
   await expect(page).toHaveURL(/\/checkout$/);
   // No search match is not evidence of geographic non-coverage.
@@ -286,17 +281,14 @@ test("a paid checkout in this session cannot be paid again", async ({
     },
   });
   // Same cart and fulfillment must keep the paid order protected.
-  // Match the first checkout scenario: don't tear down an initializing WebKit
-  // document while its configuration fetch is still in flight.
-  const homepageConfig = page.waitForResponse(
-    (response) => response.url() === ORIGIN + "/api/checkout/config",
-  );
-  await page.goto("/");
-  const configResponse = await homepageConfig;
-  expect(configResponse.status()).toBe(200);
-  expect(await configResponse.finished()).toBeNull();
-  await page.evaluate(
+  // Home V3.2 never fetches /api/checkout/config: seed storage with an init
+  // script before the first navigation instead of parking on "/".
+  await page.addInitScript(
     ([k, d, c]) => {
+      // One-shot seed (RT01 R3): init scripts run on every new document, so
+      // later full-page loads must keep the customer's state, not reseed it.
+      if (sessionStorage.getItem("3l-checkout-seeded")) return;
+      sessionStorage.setItem("3l-checkout-seeded", "1");
       sessionStorage.setItem(
         "3l-checkout",
         JSON.stringify({ key: k, fingerprint: "earlier" }),
@@ -317,6 +309,7 @@ test("a paid checkout in this session cannot be paid again", async ({
     [key, delivery, customer] as const,
   );
   await page.goto("/checkout");
+  await expect(page.locator(".b-shop .b-co-header")).toBeVisible();
   await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
   await page.getByRole("button", { name: "REVIEW ORDER" }).click();
   await expect(page.getByRole("alert")).toContainText(

@@ -1,5 +1,6 @@
+import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import { lineKey, preparationText } from "../../shared/pack-composition";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   ArrowLeft,
   ChatsCircle,
@@ -7,6 +8,7 @@ import {
   Circle,
   CreditCard,
   EnvelopeSimple,
+  FilePdf,
   MapPin,
   Phone,
   Receipt,
@@ -25,13 +27,19 @@ import { FulfilmentBadge, PaymentBadge } from "./OrderBadges";
 import { aed } from "./OrdersList";
 import { useOps } from "./ops-i18n";
 import {
+  canDownloadDocuments,
+  downloadOrderDocument,
+  type DocumentKind,
+  type DocumentLayout,
+} from "./order-documents";
+import {
   addressCheck,
   conversationOf,
   createdAt,
   customerName,
   dueDate,
   dueSlot,
-  fulfilmentGroup,
+  orderFulfilmentGroup,
   fulfilmentSteps,
   isDraft,
   orderActivity,
@@ -40,6 +48,7 @@ import {
   orderPermissions,
   paymentMethod,
   paymentOf,
+  recognizedPaidAt,
   type OrderPermissions,
 } from "./order-view";
 
@@ -251,6 +260,9 @@ export function OrderDetailsPage({
           <OrderCustomerCard order={o} data={data} conversation={c} />
           <OrderDeliveryCard order={o} data={data} />
           <OrderNotificationsCard order={o} data={data} />
+          {canDownloadDocuments(data.actor.role) && (
+            <OrderDocumentsCard order={o} />
+          )}
         </div>
       </div>
     </article>
@@ -321,7 +333,7 @@ export function OrderFulfillmentCard({
 }: CardProps & { permissions: OrderPermissions }) {
   const { t, formatDate } = useOps();
   const { steps, current } = fulfilmentSteps(o);
-  const group = fulfilmentGroup(o.state);
+  const group = orderFulfilmentGroup(o);
   const pickup = o.fulfillmentMethod === "pickup";
   const due = dueDate(o);
   const slot = dueSlot(o);
@@ -333,6 +345,11 @@ export function OrderFulfillmentCard({
       icon={pickup ? <Storefront aria-hidden /> : <Truck aria-hidden />}
       aside={<FulfilmentBadge order={o} />}
     >
+      {fulfillmentPending(o) && (
+        <p className="oms-notice" role="alert">
+          {t("Fulfillment pending customer and 3L team confirmation.")}
+        </p>
+      )}
       {group === "unpaid" && (
         <p className="oms-notice" role="status">
           <WarningCircle aria-hidden />
@@ -358,32 +375,33 @@ export function OrderFulfillmentCard({
           {t("Draft order. It has not been sent for payment yet.")}
         </p>
       )}
-      {!["unpaid", "cancelled", "draft"].includes(group) && (
-        <ol className="oms-steps" aria-label={t("Fulfillment progress")}>
-          {steps.map((s, i) => (
-            <li
-              key={s.state}
-              data-status={
-                current < 0
-                  ? "todo"
-                  : i < current
-                    ? "done"
-                    : i === current
-                      ? "current"
-                      : "todo"
-              }
-              aria-current={i === current ? "step" : undefined}
-            >
-              {current >= 0 && i <= current ? (
-                <CheckCircle weight="fill" aria-hidden />
-              ) : (
-                <Circle aria-hidden />
-              )}
-              <span>{t(s.label)}</span>
-            </li>
-          ))}
-        </ol>
-      )}
+      {!fulfillmentPending(o) &&
+        !["unpaid", "cancelled", "draft"].includes(group) && (
+          <ol className="oms-steps" aria-label={t("Fulfillment progress")}>
+            {steps.map((s, i) => (
+              <li
+                key={s.state}
+                data-status={
+                  current < 0
+                    ? "todo"
+                    : i < current
+                      ? "done"
+                      : i === current
+                        ? "current"
+                        : "todo"
+                }
+                aria-current={i === current ? "step" : undefined}
+              >
+                {current >= 0 && i <= current ? (
+                  <CheckCircle weight="fill" aria-hidden />
+                ) : (
+                  <Circle aria-hidden />
+                )}
+                <span>{t(s.label)}</span>
+              </li>
+            ))}
+          </ol>
+        )}
       <dl className="oms-facts">
         <Field label={t("Method")}>
           {pickup ? t("Pickup · 3L Pastelerías") : t("Entrega")}
@@ -465,6 +483,7 @@ export function OrderItemsCard({ order: o, data }: CardProps) {
                   </span>
                   <small className="oms-ref">{l.productId}</small>
                   {preparationText(l) && <p lang="en">{preparationText(l)}</p>}
+                  {l.cakeMessage && <p lang="en" data-cake-inscription><strong>Cake inscription:</strong> {l.cakeMessage}</p>}
                   {l.product.reviewRequired && (
                     <small className="oms-item-review">
                       <Translate aria-hidden />
@@ -521,7 +540,7 @@ export function OrderPaymentCard({
   const q = o.quote;
   const pickup = o.fulfillmentMethod === "pickup";
   const method = paymentMethod(p);
-  const paidAt = p?.paidAt ?? o.paidAt;
+  const paidAt = recognizedPaidAt(data, o);
   const jobs = p ? data.jobs.filter((j) => j.entityId === p.id) : [];
   return (
     <Card
@@ -553,7 +572,9 @@ export function OrderPaymentCard({
             {aed(p.amountFils)} {p.status === "paid" ? "" : `· ${t(p.status)}`}
           </Field>
         )}
-        {paidAt && <Field label={t("Paid at")}>{formatDate(paidAt)}</Field>}
+        <Field label={t("Paid at (3L recognition)")}>
+          {paidAt ? formatDate(paidAt) : t("Not stored")}
+        </Field>
       </dl>
       {!p && (
         <p className="oms-muted">
@@ -737,11 +758,9 @@ export function OrderDeliveryCard({ order: o }: CardProps) {
             {t("Pastelerías 3L · Recoger en tienda")}
           </Field>
           <Field label={t("Pickup date")}>
-            {o.pickup?.pickupDate
-              ? formatDate(o.pickup.pickupDate, false)
-              : t("Sin fecha")}
+            {dueDate(o) ? formatDate(dueDate(o)!, false) : t("Sin fecha")}
           </Field>
-          <Field label={t("Hora")}>{stored(o.pickup?.preferredTime)}</Field>
+          <Field label={t("Hora")}>{stored(dueSlot(o))}</Field>
         </dl>
       ) : (
         <dl className="oms-facts oms-stack">
@@ -761,11 +780,9 @@ export function OrderDeliveryCard({ order: o }: CardProps) {
             {stored(o.delivery?.unit)}
           </Field>
           <Field label={t("Delivery date")}>
-            {o.delivery?.date
-              ? formatDate(o.delivery.date, false)
-              : t("Sin fecha")}
+            {dueDate(o) ? formatDate(dueDate(o)!, false) : t("Sin fecha")}
           </Field>
-          <Field label={t("Time slot")}>{stored(o.delivery?.slot)}</Field>
+          <Field label={t("Time slot")}>{stored(dueSlot(o))}</Field>
           {o.location && (
             <Field label={t("GPS")}>
               {o.location.lat}, {o.location.lng}
@@ -854,6 +871,82 @@ export function OrderActivityTimeline({ order: o, data }: CardProps) {
       ) : (
         <p className="oms-muted">{t("No activity recorded.")}</p>
       )}
+    </Card>
+  );
+}
+
+/** Download only; the order, its payment and notifications are untouched. */
+function OrderDocumentsCard({ order: o }: { order: Order }) {
+  const { t, errorText } = useOps();
+  const [state, setState] = useState({ busy: false, error: "" });
+  const get = async (kind: DocumentKind, layout: DocumentLayout = "a4") => {
+    setState({ busy: true, error: "" });
+    try {
+      await downloadOrderDocument(o.id, kind, layout);
+      setState({ busy: false, error: "" });
+    } catch (error) {
+      setState({
+        busy: false,
+        error: errorText(
+          error instanceof Error
+            ? error.message
+            : "Unable to connect. Try again.",
+        ),
+      });
+    }
+  };
+  return (
+    <Card id="documents" title={t("Order documents")}>
+      <div className="oms-head-actions">
+        <button
+          type="button"
+          className="oms-button"
+          disabled={state.busy}
+          onClick={() => get("delivery-note")}
+        >
+          <FilePdf aria-hidden />
+          {t(
+            o.fulfillmentMethod === "pickup"
+              ? "Pickup order sheet (PDF)"
+              : "Delivery note (PDF)",
+          )}
+        </button>
+        <button
+          type="button"
+          className="oms-button"
+          disabled={state.busy}
+          onClick={() => get("packing-slip")}
+        >
+          <FilePdf aria-hidden />
+          {t("Packing slip (PDF)")}
+        </button>
+        {(
+          [
+            ["production-bulk", "a4", "Production & packing · Event / bulk"],
+            ["delivery-note", "a5", "Delivery note · A5 candidate"],
+            [
+              "delivery-note",
+              "a5-two-up",
+              "Delivery notes · A4 two-up candidate",
+            ],
+          ] as const
+        ).map(([kind, layout, label]) => (
+          <button
+            key={layout + kind}
+            type="button"
+            className="oms-button"
+            disabled={state.busy}
+            onClick={() => get(kind, layout)}
+          >
+            <FilePdf aria-hidden />
+            {t(label)} (PDF)
+          </button>
+        ))}
+      </div>
+      {state.error && <p role="alert">{state.error}</p>}
+      <p className="oms-muted">
+        {t("Operational documents, not invoices or receipts.")}
+      </p>
     </Card>
   );
 }

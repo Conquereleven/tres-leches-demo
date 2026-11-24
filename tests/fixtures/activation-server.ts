@@ -1,3 +1,4 @@
+import { validWindow } from "../../shared/commerce-policy";
 import { orderingFixtureProvider } from "./agent-provider";
 // TL25 isolated provider harness. Never bundled or imported by runtime.
 import { createHmac, randomUUID } from "node:crypto";
@@ -136,6 +137,26 @@ app.server.on("request", async (req, res) => {
   let raw = "";
   for await (const part of req) raw += part;
   const input = raw ? JSON.parse(raw) : {};
+  if (req.url === "/__test/schedule") {
+    app.store.write((s) => {
+      const order = s.orders.find((o) => o.id === input.orderId);
+      if (!order || order.paymentId || !validWindow(input.date, input.slot))
+        throw new Error(
+          "Synthetic original schedule must be valid and precede payment initiation",
+        );
+      order.fulfillmentMethod = "delivery";
+      order.delivery = {
+        zoneId: order.quote!.zoneId!,
+        address: "Synthetic Street",
+        building: "Synthetic Tower",
+        date: input.date,
+        slot: input.slot,
+      };
+    });
+    res.setHeader("Content-Type", "application/json");
+    res.end(JSON.stringify({ ok: true }));
+    return;
+  }
   if (req.url === "/__test/settle") {
     const c = checkouts.get(input.id)!;
     c.status = input.status;

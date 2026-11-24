@@ -18,6 +18,7 @@ export type CustomerEmailItem = {
   isBox: boolean;
   /** Do not invent unavailable historical selections. */
   contentsUnavailable: boolean;
+  cakeMessage?: string;
 };
 
 export function customerEmailItems(order: Order): CustomerEmailItem[] {
@@ -61,6 +62,7 @@ export function customerEmailItems(order: Order): CustomerEmailItem[] {
       ...(isBox && accepted ? { boxCapacity: accepted.capacity } : {}),
       isBox,
       contentsUnavailable,
+      ...(line.cakeMessage ? { cakeMessage: line.cakeMessage } : {}),
     };
   });
 }
@@ -73,6 +75,7 @@ export function customerEmailItemsText(items: CustomerEmailItem[]) {
     text.push(
       `- ${item.quantity === null ? "Quantity unavailable ·" : `${item.quantity} ×`} ${item.name}`,
     );
+    if (item.cakeMessage) text.push(`  Cake inscription: ${item.cakeMessage}`);
     if (item.isBox && item.boxCapacity !== undefined) {
       text.push(
         `  Each box (${item.boxCapacity} pieces):`,

@@ -1,0 +1,220 @@
+/*
+ * Source lock: ZIP code/frontend/src/components/ProductCard.jsx,
+ * ProductPopup.jsx and refidelity-v2.css (V3.2). Only .ref32-* selectors.
+ * No cascade overrides of .v32-popup or legacy Shop. Designed anew, one pass.
+ */
+.ref32-grid{
+ display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;
+ position:relative;z-index:1;margin:35px auto 0;max-width:1408px;
+}
+.ref32-product{
+ display:flex;flex-direction:column;position:relative;min-width:0;
+ padding:0;overflow:visible;border:1px solid rgba(255,255,255,.68);border-radius:22px;
+ background:rgba(255,255,255,.57);text-align:left;color:#1c1517;
+ box-shadow:0 20px 45px -20px rgba(120,70,60,.45);
+ backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+ cursor:pointer;transition:box-shadow .3s ease,border-color .3s ease;
+}
+.ref32-product:hover{box-shadow:0 28px 55px -18px rgba(120,70,60,.51)}
+.ref32-product:focus-visible{outline:3px solid #9d6c3b;outline-offset:3px}
+.ref32-product:disabled{cursor:not-allowed;opacity:.7}
+.ref32-product-active{
+ z-index:3;outline:2px solid #fff;outline-offset:2px;
+ border-color:#b98a4e;
+ box-shadow:0 0 0 4px rgba(255,255,255,.72),0 20px 60px rgba(121,66,65,.48)
+}
+.ref32-photo{
+ display:block;position:relative;width:100%;aspect-ratio:4/3;
+ overflow:hidden;border-radius:21px 21px 0 0;
+ background:linear-gradient(145deg,#f0d0cc,#f8e4de);
+}
+.ref32-photo img{width:100%;height:100%;object-fit:cover;display:block;
+ transition:transform .7s cubic-bezier(.22,1,.36,1)}
+.ref32-product:hover .ref32-photo img{transform:scale(1.05)}
+.ref32-photo-pending{display:flex;align-items:center;justify-content:center;flex-direction:column;
+ width:100%;height:100%;gap:9px;color:#936747;text-align:center;
+ background:linear-gradient(145deg,#f0d0cc,#f8e4de)}
+.ref32-photo-pending strong{font:600 32px/1 "Cormorant Garamond",Georgia,serif}
+.ref32-photo-pending small{font:500 10px/1.2 "Jost",Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.ref32-card-mark{display:grid;place-items:center;position:absolute;right:11px;top:11px;
+ width:33px;height:33px;border-radius:50%;color:#8c5a2f;
+ background:rgba(255,255,255,.78);backdrop-filter:blur(12px)}
+.ref32-card-mark svg{width:16px;height:16px}
+.ref32-card-mark-selected{width:43px;height:43px;background:#fff;color:#aa793c;
+ box-shadow:0 5px 20px #845f5480}
+.ref32-card-mark-selected svg{width:26px;height:26px}
+.ref32-product-copy{display:flex;flex:1;flex-direction:column;gap:6px;min-height:126px;padding:16px 18px}
+.ref32-product-copy>strong{font:500 23px/1.04 "Cormorant Garamond",Georgia,serif}
+.ref32-product-copy>em{font:italic 15px/1.2 "Cormorant Garamond",Georgia,serif;color:#8c6a5d}
+.ref32-product-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;
+ margin-top:auto;padding-top:12px;font:500 12px/1.25 "Jost",Arial,sans-serif;color:#8c5a2f}
+.ref32-product-arrow{display:grid;place-items:center;width:33px;height:33px;border:1px solid #b98a4e88;
+ border-radius:50%;font-size:16px;flex:none;transition:background-color .2s}
+.ref32-product:hover .ref32-product-arrow{background:#b98a4e23}
+.ref32-overlay{position:fixed;inset:0;z-index:10000;pointer-events:none}
+.ref32-backdrop{position:fixed;inset:0;width:100%;height:100%;border:0;
+ background:rgba(74,41,43,.08);-webkit-backdrop-filter:none;backdrop-filter:none;
+ pointer-events:auto;animation:ref32-veil .24s both}
+.ref32-dialog{
+ position:fixed;z-index:10001;display:flex;flex-direction:column;min-width:0;
+ overflow:visible;box-sizing:border-box;min-height:0;pointer-events:auto;
+ border:1.5px solid rgba(255,255,255,.83);border-radius:30px;
+ background:linear-gradient(150deg,rgba(251,239,234,.99),rgba(248,227,222,.99));
+ -webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px);
+ box-shadow:0 24px 65px rgba(116,64,69,.40),inset 0 2px 1px #fff;
+ animation:ref32-rise .36s cubic-bezier(.22,1,.36,1) both;
+}
+.ref32-dialog::before{content:"";position:absolute;z-index:2;top:42px;left:-10px;width:19px;height:19px;
+ background:#f9dfdb;transform:rotate(45deg);border-left:2px solid #fff;border-bottom:2px solid #fff;pointer-events:none}
+.ref32-dialog[data-anchor-side="left"]::before{left:auto;right:-10px;transform:rotate(225deg)}
+.ref32-dialog[data-anchor-side="overlap"]::before,.ref32-dialog[data-anchor-side="compact"]::before{display:none}
+.ref32-details{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+ padding:22px 23px 10px;scrollbar-width:thin}
+.ref32-dialog-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px}
+.ref32-dialog-heading h2{margin:0;font:600 37px/.97 "Cormorant Garamond",Georgia,serif;
+ letter-spacing:-.025em;color:#1c1517}
+.ref32-dialog-heading p{margin:6px 0 0;font:italic 17px/1.2 "Cormorant Garamond",Georgia,serif;color:#8c6a5d}
+.ref32-close{display:grid;place-items:center;flex:none;width:38px;height:38px;border:0;
+ border-radius:50%;background:rgba(255,255,255,.75);color:#1c1517;font:27px/1 "Jost",Arial,sans-serif;cursor:pointer}
+.ref32-section-label{margin:0 0 10px;font:600 11px/1.25 "Jost",Arial,sans-serif;
+ text-transform:uppercase;letter-spacing:.20em;color:#8c6a5d}
+.ref32-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ref32-option{display:flex;align-items:center;justify-content:center;flex-direction:column;
+ min-width:0;min-height:58px;padding:9px 7px;
+ border:1px solid #b98a4e66;border-radius:14px;background:rgba(255,255,255,.54);
+ box-shadow:0 4px 15px #b8898131;color:#1c1517;cursor:pointer;
+ transition:background-color .2s ease,border-color .2s ease,box-shadow .2s ease}
+.ref32-option span{display:block;max-width:100%;font:500 12px/1.25 "Jost",Arial,sans-serif;text-align:center}
+.ref32-option small{display:block;margin-top:3px;font:500 11px/1.2 "Jost",Arial,sans-serif;color:#8c5a2f}
+.ref32-option:hover:not(:disabled){border-color:#b98a4e;background:#fff9}
+.ref32-option:disabled{opacity:.35}
+.ref32-option-active,.ref32-option-active:hover{border-color:transparent!important;background:#b12e64!important;
+ color:#fff!important;box-shadow:0 7px 19px #b12e6460!important}
+.ref32-option-active small{color:#fff!important}
+.ref32-presentation{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+.ref32-presentation button{flex:1;padding:7px 12px;border:1px solid #b98a4e77;border-radius:99px;
+ background:#fff9;color:#885b42;font:500 12px/1.2 "Jost",Arial,sans-serif;cursor:pointer}
+.ref32-presentation button[aria-pressed="true"]{background:#b12e64;color:#fff;border-color:#b12e64}
+.ref32-options-three{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.ref32-options-three .ref32-option{min-height:67px;padding:7px 4px}
+.ref32-options-three .ref32-option span{font-size:11px}
+.ref32-options-three .ref32-option small{font-size:10px}
+.ref32-price-quantity{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
+ margin:18px 0 0}
+.ref32-price>span{display:block;font:500 11px/1.25 "Jost",Arial,sans-serif;text-transform:uppercase;
+ letter-spacing:.18em;color:#8c6a5d}
+.ref32-price strong{display:block;margin-top:3px;font:600 32px/1 "Cormorant Garamond",Georgia,serif;color:#1c1517}
+.ref32-quantity{display:flex;align-items:center;justify-content:space-between;
+ border:1px solid #b98a4e77;border-radius:99px;background:#fff9;min-width:108px;padding:5px 8px}
+.ref32-quantity button{width:30px;height:30px;border:0;background:transparent;border-radius:50%;
+ color:#a37238;font:400 21px/1 "Jost",Arial,sans-serif;cursor:pointer}
+.ref32-quantity button:disabled{opacity:.4;cursor:default}
+.ref32-quantity output{min-width:20px;text-align:center;color:#1c1517;font:500 14px "Jost",Arial,sans-serif}
+.ref32-min,.ref32-count{font:italic 13px/1.2 "Cormorant Garamond",Georgia,serif;color:#865f4d;margin:6px 0 0}
+.ref32-count{margin:5px 0 0}
+.ref32-note{display:block;margin-top:17px}
+.ref32-note>span:first-child{display:block;font:600 11px/1.2 "Jost",Arial,sans-serif;
+ letter-spacing:.08em;color:#715144}
+.ref32-note>span:first-child em{font:italic 16px/1.1 "Cormorant Garamond",Georgia,serif;letter-spacing:0;color:#8c6a5d}
+.ref32-note-field{display:flex;align-items:center;gap:9px;min-height:44px;margin-top:8px;padding:8px 13px;
+ border:1px solid #fff9;background:#fff8;border-radius:99px}
+.ref32-note-field>span:first-child{font:22px/1 "Cormorant Garamond",Georgia,serif;color:#8c6a5d}
+.ref32-note-field input{flex:1;min-width:0;border:0;outline:0;background:transparent;
+ font:italic 17px/1 "Cormorant Garamond",Georgia,serif;color:#1c1517}
+.ref32-note-field input::placeholder{color:#8c6a5dbb}
+.ref32-note-field output{font:500 11px/1 "Jost",Arial,sans-serif;color:#8c6a5d}
+.ref32-note-warning{margin:8px 0 0;padding:7px 11px;border-radius:10px;color:#7a3451;
+ background:rgba(255,255,255,.8);font:500 11px/1.3 "Jost",Arial,sans-serif}
+.ref32-extra{display:flex;flex-direction:column;gap:8px;margin-top:12px;
+ font:500 11px "Jost",Arial,sans-serif;color:#8c6a5d}
+.ref32-extra select{border:1px solid #b98a4e77;border-radius:10px;padding:10px;background:#fff9}
+.ref32-composition{margin-top:13px}
+.ref32-composition>p{font:500 11px "Jost",Arial,sans-serif;color:#8c5a2f}
+.ref32-composition-row{display:flex;align-items:center;gap:7px;margin:5px 0;font:12px "Jost",Arial,sans-serif}
+.ref32-composition-row span{flex:1}
+.ref32-composition-row button{width:26px;height:26px;border:1px solid #b98a4e77;border-radius:50%;background:#fff8}
+.ref32-dialog-footer{display:flex;flex:none;align-items:center;gap:12px;
+ padding:10px 20px 17px;background:linear-gradient(0deg,#f8e1dc,rgba(248,225,220,.12));
+ border-radius:0 0 28px 28px}
+.ref32-desktop-quantity{display:flex}
+.ref32-buy{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;min-width:0;
+ min-height:49px;padding:11px 14px;border:0;border-radius:99px;
+ color:#fff;background:#b12e64;box-shadow:0 14px 30px -10px #b12e64a0;
+ text-transform:uppercase;letter-spacing:.13em;font:600 11px/1.2 "Jost",Arial,sans-serif;
+ cursor:pointer;transition:background-color .2s,box-shadow .2s}
+.ref32-buy:hover:not(:disabled){background:#9c2656;box-shadow:0 16px 32px -10px #b12e64c0}
+.ref32-buy:disabled{opacity:.56;cursor:not-allowed}
+.ref32-buy>span:first-of-type{white-space:nowrap}
+.ref32-cta-cost{font-size:10px;letter-spacing:0;white-space:nowrap}
+.ref32-cta-arrow{font-size:20px;line-height:1;margin-left:auto;font-weight:400}
+.ref32-dialog :is(button,input,select):focus-visible{outline:3px solid #915338;outline-offset:2px}
+@keyframes ref32-rise{from{opacity:.25;transform:translateY(36px) scale(.985)}
+ to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes ref32-veil{from{opacity:0}to{opacity:1}}
+@media(max-width:1100px){
+ .ref32-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+}
+@media(max-width:900px){
+ .ref32-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+}
+@media(min-width:641px){
+ .ref32-price-quantity>.ref32-quantity{display:none}
+}
+@media(max-width:640px){
+ .ref32-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:26px}
+ .ref32-product{border-radius:19px}
+ .ref32-product-copy{padding:10px 8px 12px;min-height:82px;gap:4px}
+ .ref32-product-copy>strong{font-size:15px;line-height:1.03}
+ .ref32-product-copy>em{font-size:11px;line-height:1.13}
+ .ref32-product-bottom{padding-top:6px;font-size:9px}
+ .ref32-product-arrow{width:21px;height:21px;font-size:12px}
+ .ref32-card-mark{width:25px;height:25px;top:7px;right:7px}
+ .ref32-card-mark svg{width:13px;height:13px}
+ .ref32-product-active{z-index:15;transform:scale(1.62);transform-origin:center top;
+   box-shadow:0 0 0 3px #fff,0 14px 38px #8b5f5999}
+ .ref32-product-active .ref32-product-copy{visibility:hidden}
+ .ref32-product-active:nth-child(3n+1){transform-origin:left top}
+ .ref32-product-active:nth-child(3n){transform-origin:right top}
+ .ref32-card-mark-selected{width:33px;height:33px}
+ .ref32-card-mark-selected svg{width:21px;height:21px}
+ .ref32-backdrop{background:rgba(74,41,43,.10);backdrop-filter:blur(1px)}
+ .ref32-dialog{border-radius:29px;animation:ref32-rise .3s cubic-bezier(.22,1,.36,1) both}
+ .ref32-dialog::before{top:-10px;left:calc(50% - 10px);transform:rotate(135deg)}
+ .ref32-details{padding:18px 18px 10px}
+ .ref32-dialog-heading{margin-bottom:12px}
+ .ref32-dialog-heading h2{font-size:35px}
+ .ref32-dialog-heading p{font-size:17px}
+ .ref32-section-label{margin-bottom:11px}
+ .ref32-price-quantity{margin-top:18px}
+ .ref32-desktop-quantity{display:none}
+ .ref32-dialog-footer{display:block;padding:8px 17px 16px}
+ .ref32-buy{width:100%;min-height:49px}
+ .ref32-cta-cost{display:none}
+ .ref32-buy>span:first-of-type{letter-spacing:.18em}
+ .ref32-options-four .ref32-option{min-height:55px}
+ .ref32-note{margin-top:16px}
+ .ref32-note-field{min-height:42px}
+}
+@media(max-width:360px){
+ .ref32-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ref32-product-active{transform:scale(1.35)}
+ .ref32-dialog-heading h2{font-size:30px}
+ .ref32-details{padding:14px 15px 6px}
+ .ref32-dialog-footer{padding:7px 13px 12px}
+ .ref32-cta-arrow{font-size:18px}
+}
+@media(max-height:720px) and (max-width:640px){
+ .ref32-dialog[data-anchor-side="compact"]{max-height:calc(100dvh - 20px)}
+ .ref32-dialog-heading h2{font-size:30px}
+ .ref32-details{padding:13px 16px 7px}
+ .ref32-dialog-footer{padding:8px 15px 12px}
+ .ref32-note{margin-top:10px}
+}
+@media(prefers-reduced-motion:reduce){
+ .ref32-dialog,.ref32-backdrop{animation:none!important}
+ .ref32-product,.ref32-photo img{transition:none!important}
+}
+
+/* Founder 8.7/10: cake-only inscription and size/servings, without changing card design. */
+.ref32-dialog .ref32-servings{font:500 13px/1.3 "Jost",Arial,sans-serif;color:#785d48;margin:7px 0 0}
+.ref32-dialog .ref32-note-field output{min-width:35px;text-align:right;font-variant-numeric:tabular-nums}

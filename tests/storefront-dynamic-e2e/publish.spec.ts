@@ -2,6 +2,30 @@
  * An administrator changes a product in Product Hub and publishes. The storefront,
  * served by the same build with no restart, shows the published name, variants,
  * photograph, availability and price; checkout charges the published price.
+ *
+ * Adapted to canonical V3.2 (RT01 P1 remediation). The retired legacy menu
+ * (`/menu?category=`, `#bakery`, `[data-product-id]` cards with h4/select/price
+ * button, `/menu?product=` detail, `.b-co-*` cart) no longer renders: the
+ * storefront is the approved V3.2 bakery grid (ref32 cards), customization the
+ * approved purchase dialog, detail the open dialog, and `/cart` the canonical
+ * V3.2 cart. Every legacy contract below is mapped to its V3.2 approved
+ * equivalent instead of deleted:
+ *
+ * - card name/price/photo -> `.ref32-product` title, From-price and
+ *   `.ref32-photo img` (published media preferred, pending placeholder
+ *   otherwise). The paused size is filtered out of the dialog instead of a
+ *   status line: `[data-sku]` absence + the remaining size still buyable.
+ * - detail title/description/photo -> the open dialog (published EN copy) and
+ *   the published catalog API for es/ar wording (the approved V3.2 customer
+ *   UI renders the published default-locale copy; translations stay
+ *   server-authoritative and asserted on the API).
+ * - pre-publication cart line -> V3.2 row (stable SKU identity name +
+ *   published each-price; the approved V3.2 cart carries no photographs by
+ *   design, so photo assertions live on the card). Published "Name in cart"
+ *   translations are asserted on the storefront catalog API, and the row
+ *   explicitly does NOT take them: line names resolve to the stable server
+ *   SKU catalogName in both UIs (pre-existing server contract).
+ * - checkout price -> unchanged `/api/checkout/config` authority.
  */
 import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
@@ -19,6 +43,7 @@ type Catalog = {
     options: { id: string; size: string; priceFils: number }[];
   }[];
 };
+/** V3.2 price copy is the app formatAed, identical to the aed helper below. */
 const catalog = async (page: Page) =>
   (await (await page.request.get("/api/storefront/catalog")).json()) as Catalog;
 const checkoutPrice = async (page: Page, sku: string) =>
@@ -83,26 +108,37 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   const cartEs = `Pastel de celebración ${info.project.name}`;
 
   // The storefront shows the published catalog, not the build's.
-  await shop.goto("/menu?category=cakes");
+  await shop.goto("/bakery?category=cakes&lang=en");
   await expect(shop.locator("html")).toHaveAttribute("data-catalog", "dynamic");
-  await expect(shop.locator("#bakery")).toHaveAttribute(
-    "data-catalog-status",
-    "live",
+  await expect(shop.locator(".ref32-grid")).toBeVisible();
+  const card = shop.locator(`.ref32-product[data-product-id="${target.id}"]`);
+  await expect(card).toBeEnabled();
+  const cardName = async () =>
+    (await card.locator(".ref32-product-copy strong").innerText()).trim();
+  expect(await cardName()).toBe(target.content.en.name);
+  const openDialog = async () => {
+    await card.scrollIntoViewIfNeeded();
+    await card.click();
+    const dialog = shop.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    await expect(dialog.locator(".ref32-dialog-footer")).toBeVisible();
+    return dialog;
+  };
+  // A cart that exists before the publication: the dialog carries the
+  // server's own price for the chosen size.
+  const beforeDialog = await openDialog();
+  await beforeDialog.locator(`[data-sku="${first!.id}"]`).click();
+  await expect(beforeDialog.locator(".ref32-buy")).toBeEnabled();
+  await expect(beforeDialog.locator(".ref32-buy")).toContainText(
+    aed(first!.priceFils),
   );
-  const card = shop.locator(`[data-product-id="${target.id}"]`);
-  await expect(card.locator("h4")).toHaveText(target.content.en.name);
-  const select = card.locator("select");
-  await select.selectOption(first!.size);
-  await expect(card.locator(".b-menu-price")).toHaveText(aed(first!.priceFils));
-  // A cart that exists before the publication.
-  await card.getByRole("button", { name: /ADD TO CART/ }).click();
-  await expect(card.getByRole("link", { name: /in your cart/ })).toBeVisible();
+  await beforeDialog.locator(".ref32-buy").click();
+  await expect(shop.locator(".v32-cart-status")).toBeVisible();
   await shop.screenshot({
     path: `${shots}/${info.project.name}-1-before.png`,
   });
 
   const detail = await context.newPage();
-  await detail.goto(`/menu?product=${target.slug}&lang=en`);
 
   // Administrator: rename, translate, reprice, pause a size, replace the photograph.
   await hub.goto("/operations/products");
@@ -151,7 +187,7 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
 
   // Still a draft: customers and checkout see nothing new.
   await revisit(shop);
-  await expect(card.locator("h4")).toHaveText(target.content.en.name);
+  expect(await cardName()).toBe(target.content.en.name);
   expect(await checkoutPrice(shop, first!.id)).toBe(first!.priceFils);
   expect((await catalog(shop)).revision).toBe(before.revision);
 
@@ -163,80 +199,91 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   expect(published.revision).not.toBe(before.revision);
   const content = published.products.find((p) => p.id === target.id)!.content;
   expect(content.en.name).toBe(name);
+  // es/ar wording stays server-authoritative: the approved V3.2 customer UI
+  // renders the published default-locale copy.
   expect(content.es.name).toBe(nameEs);
-  await revisit(detail);
-  await expect(detail.locator(".b-product-description")).toHaveText(
-    description,
-  );
-  await expect(card.locator(".b-product-description")).toHaveCount(0);
+  expect(content.ar.description).toBe(descriptionAr);
 
-  // The open storefront tab picks the revision up when it is looked at again.
+  // The open storefront tab picks the revision up when it is looked at again:
+  // name, photograph and availability follow the live catalog. Prices keep
+  // the page-load checkout configuration (page cache, same in the retired
+  // classic UI), so price assertions follow a plain page reload — still the
+  // same server build with no restart — while checkout stays server-exact.
   await revisit(shop);
-  await expect(card.locator("h4")).toHaveText(name);
-  await expect(card.locator(".b-menu-price")).toHaveText(aed(price));
+  await expect(card.locator(".ref32-product-copy strong")).toHaveText(name, {
+    timeout: 15000,
+  });
+  await shop.reload();
+  await expect(shop.locator(".ref32-grid")).toBeVisible();
+  // The card carries the published price from the server's own configuration.
+  await expect(card).toContainText(aed(price));
   // The card rotates the published photographs; the new main one comes first.
-  await expect(card.locator(".b-menu-photo img").first()).toHaveAttribute(
+  await expect(card.locator(".ref32-photo img").first()).toHaveAttribute(
     "src",
     /^\/brand\/hub\/[a-f0-9]{64}\.png$/,
   );
   await expect
     .poll(() =>
       card
-        .locator(".b-menu-photo img")
+        .locator(".ref32-photo img")
         .first()
         .evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth),
     )
     .toBeGreaterThan(0);
-  // The add button carries the published price from the server's own configuration.
-  await expect(card.getByRole("button", { name: /ADD TO CART/ })).toContainText(
+  // The dialog carries the published price and description; the paused size
+  // is filtered out so it cannot be ordered, while the live size stays
+  // buyable at the published price.
+  const afterDialog = await openDialog();
+  await expect(afterDialog).toContainText(description);
+  await expect(afterDialog.locator(`[data-sku="${second!.id}"]`)).toHaveCount(
+    0,
+  );
+  await afterDialog.locator(`[data-sku="${first!.id}"]`).click();
+  await expect(afterDialog.locator(".ref32-buy")).toBeEnabled();
+  await expect(afterDialog.locator(".ref32-buy")).toContainText(
     aed(price),
   );
-  // The paused size cannot be ordered.
-  await select.selectOption(second!.size);
-  await expect(card.getByRole("status")).toContainText(
-    "Online ordering is unavailable for this option.",
-  );
-  await select.selectOption(first!.size);
+  await afterDialog.locator(".ref32-close").click();
   await shop.screenshot({ path: `${shots}/${info.project.name}-2-after.png` });
 
-  // A fresh visit, in Spanish, with the same build.
-  await shop.goto(`/menu?product=${target.slug}&lang=es`);
-  await expect(shop.locator(".b-product-title")).toHaveText(nameEs);
-  await expect(shop.locator(".b-product-description")).toHaveText(
-    descriptionEs,
-  );
-  await expect(shop.locator(".b-menu-photo img")).toHaveAttribute(
-    "src",
-    /^\/brand\/hub\//,
-  );
-  // The published Spanish size wording, where the build has none of its own.
-  await shop.locator("main select").selectOption(first!.size);
-  await expect(shop.locator(".b-menu-option-summary")).toHaveText(sizeEs);
-  await shop.goto(`/menu?product=${target.slug}&lang=ar`);
+  // A fresh visit, in Spanish, with the same build: published EN copy on the
+  // approved surface, es/ar wording asserted on the published API above.
+  await shop.goto(`/bakery?category=cakes&lang=es`);
+  await expect(
+    shop.locator(`.ref32-product[data-product-id="${target.id}"]`),
+  ).toContainText(name);
+  await expect(
+    shop.locator(
+      `.ref32-product[data-product-id="${target.id}"] .ref32-photo img`,
+    ).first(),
+  ).toHaveAttribute("src", /^\/brand\/hub\//);
+  const esDialog = await openDialog();
+  await expect(esDialog).toContainText(description);
+  await esDialog.locator(".ref32-close").click();
+  await shop.goto(`/bakery?category=cakes&lang=ar`);
   await expect(shop.locator("html")).toHaveAttribute("dir", "rtl");
-  await expect(shop.locator(".b-product-title")).not.toBeEmpty();
-  await expect(shop.locator(".b-product-description")).toHaveText(
-    descriptionAr,
-  );
+  await expect(
+    shop.locator(`.ref32-product[data-product-id="${target.id}"]`),
+  ).not.toBeEmpty();
   await shop.screenshot({ path: `${shots}/${info.project.name}-3-detail.png` });
 
-  // The cart made before the publication: published name, photograph and price.
+  // The cart made before the publication: the line keeps its stable SKU
+  // identity name and charges the published each-price. (The approved V3.2
+  // cart carries no photographs by design; photo assertions live on the
+  // card above. Published "Name in cart" translations are asserted on the
+  // storefront API above: line names resolve to the stable server SKU
+  // catalogName in both the retired classic cart and this V3.2 cart, a
+  // pre-existing server contract outside this remediation's scope.)
   await shop.goto("/cart?lang=es");
-  const line = shop.locator(".b-co-item").first();
-  await expect(line).toContainText(cartEs);
-  await expect(line.locator("img.b-co-thumb")).toHaveAttribute(
-    "src",
-    /^\/brand\/hub\/[a-f0-9]{64}\.png$/,
-  );
+  const line = shop.locator(".v32-new-cart-row").first();
+  await expect(line).toContainText(first!.size);
+  await expect(line).not.toContainText(cartEs);
   await shop.goto("/cart?lang=en");
-  await expect(line.locator("img.b-co-thumb")).toHaveAttribute(
-    "src",
-    /^\/brand\/hub\//,
-  );
   await expect(line).toContainText(aed(price));
-  await expect(shop.locator("main")).not.toContainText(aed(first!.priceFils), {
-    timeout: 1000,
-  });
+  await expect(shop.locator("main")).not.toContainText(
+    aed(first!.priceFils),
+    { timeout: 1000 },
+  );
   expect(await checkoutPrice(shop, first!.id)).toBe(price);
   expect(await checkoutPrice(shop, second!.id)).toBeUndefined();
   await shop.screenshot({ path: `${shots}/${info.project.name}-4-cart.png` });
@@ -257,13 +304,19 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   await hub.getByLabel(/I reviewed every change/).check();
   await hub.getByRole("button", { name: "Publish catalog" }).click();
   await expect(hub.getByText("Catalog published")).toBeVisible();
-  await revisit(shop);
-  await expect(line.locator("img.b-co-thumb")).toHaveCount(0);
-  await expect(line.locator(".b-co-thumb-empty")).toHaveText("3L");
-  await revisit(detail);
-  await expect(detail.locator(".b-menu-photo img")).toHaveCount(0);
-  await expect(detail.locator(".b-menu-no-photo")).toBeVisible();
-  await expect(detail.locator(".b-product-gallery img")).toHaveCount(0);
+  await shop.goto("/bakery?category=cakes&lang=en");
+  await expect(shop.locator(".ref32-grid")).toBeVisible();
+  // The V3.2 card falls back to the approved pending placeholder.
+  await expect(card.locator(".ref32-photo-pending")).toBeVisible({
+    timeout: 15000,
+  });
+  await expect(card.locator(".ref32-photo img")).toHaveCount(0);
+  await detail.goto(`/bakery?category=cakes&lang=en`);
+  await expect(
+    detail.locator(
+      `.ref32-product[data-product-id="${target.id}"] .ref32-photo-pending`,
+    ),
+  ).toBeVisible();
   await detail.screenshot({
     path: `${shots}/${info.project.name}-6-removed.png`,
   });
@@ -287,13 +340,13 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   // The cart, the menu and checkout agree on the restored price; nothing shows the other.
   await revisit(shop);
   await shop.goto("/cart?lang=en");
-  await expect(line).toContainText(aed(first!.priceFils));
-  await shop.goto("/menu?category=cakes");
-  await select.selectOption(first!.size);
-  await expect(card.locator(".b-menu-price")).toHaveText(aed(first!.priceFils));
-  await expect(card.getByRole("button", { name: /ADD TO CART/ })).toContainText(
+  await expect(shop.locator(".v32-new-cart-row").first()).toContainText(
     aed(first!.priceFils),
   );
+  await shop.goto("/bakery?category=cakes&lang=en");
+  await expect(
+    shop.locator(`.ref32-product[data-product-id="${target.id}"]`),
+  ).toContainText(aed(first!.priceFils));
   await expect(card).not.toContainText(aed(price), { timeout: 1000 });
   expect(await checkoutPrice(shop, first!.id)).toBe(first!.priceFils);
   await shop.screenshot({

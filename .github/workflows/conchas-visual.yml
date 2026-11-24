@@ -10,6 +10,7 @@ on:
       - "src/brand/media.tsx"
       - "src/brand/media-manifest.json"
       - "tests/conchas-e2e/**"
+      - "src/brand/visual-v32/**"
       - "playwright.conchas.config.ts"
       - ".github/workflows/conchas-visual.yml"
 permissions:
@@ -18,8 +19,17 @@ concurrency:
   group: conchas-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 jobs:
+  # Chromium and WebKit run as independent Playwright processes (fail-fast
+  # off so both always report). Each invocation starts its own disposable
+  # fixture server with its own disposable SQLite database, so the frozen
+  # fixture clock can never starve the second browser of API budget. Either
+  # job failing fails the workflow.
   conchas-browsers:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, webkit]
     # Playwright 1.64.0 image includes compatible browsers and native dependencies.
     # Avoid slow Ubuntu apt mirror downloads consuming the job timeout.
     container:
@@ -37,11 +47,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npx playwright test --config=playwright.conchas.config.ts
+      - run: npx playwright test --config=playwright.conchas.config.ts --project=${{ matrix.project }}
       - if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: conchas-visual-${{ github.run_attempt }}
+          name: conchas-visual-${{ matrix.project }}-${{ github.run_attempt }}
           path: |
             test-results/conchas/
             docs/brand/brand02/conchas/*.png

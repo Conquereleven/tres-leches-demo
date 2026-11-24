@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { mkdirSync, readFileSync } from "node:fs";
+import { ensureSessions } from "./sessions";
 const resources = Object.fromEntries(
   ["en", "tl"].map((l) => [
     l,
@@ -10,19 +11,17 @@ const resources = Object.fromEntries(
 const translateOps = (language: string, key: string) =>
   resources[language][key] ?? key;
 const route = "/operations/analytics?from=2026-10-01&to=2026-10-19";
-const cookies = new Map<string, string>();
+let cookies = new Map<string, string>();
 test.beforeAll(async ({ request }) => {
-  for (const role of ["admin", "manager", "operator", "agent"]) {
-    const response = await request.post("/api/login", {
-      headers: { Origin: "https://127.0.0.1:3339" },
-      data: { id: `fixture-${role}`, password: "fictional-password" },
-    });
-    expect(response.status()).toBe(200);
-    cookies.set(
-      role,
-      response.headers()["set-cookie"]!.split(";")[0]!.split("=")[1]!,
-    );
-  }
+  // One shared login per role per server run: repeating the full multi-role
+  // burst in every file × project exceeds the preserved 10-logins/min/IP
+  // Production limit (HTTP 429). See sessions.ts.
+  cookies = await ensureSessions(request, [
+    "admin",
+    "manager",
+    "operator",
+    "agent",
+  ]);
 });
 async function login(page: import("@playwright/test").Page, role = "admin") {
   await page.context().addCookies([

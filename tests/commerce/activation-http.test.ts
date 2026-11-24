@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import { createHmac, randomUUID } from "node:crypto";
 import type { State } from "../../server/domain/model";
 
-test("TL25 HTTP golden path: real adapters, signed WA2/GPS, signed Paymennt, authoritative settlement and fulfillment once", async () => {
+async function goldenActivationPath(authoredSchedule: boolean) {
   const dir = mkdtempSync(join(tmpdir(), "tl25-http-"));
   const child = spawn(
     process.execPath,
@@ -131,6 +131,19 @@ test("TL25 HTTP golden path: real adapters, signed WA2/GPS, signed Paymennt, aut
     await inbound(true);
     state = await until((s) => s.orders[0]?.quote?.eligible === true);
     assert.equal(state.orders[0]!.quote!.minOrderAed, 30);
+    if (authoredSchedule) {
+      const response = await fetch(base + "/__test/schedule", {
+        method: "POST",
+        body: JSON.stringify({
+          orderId: o.id,
+          date: new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10),
+          slot: "4:00 PM – 9:00 PM",
+        }),
+      });
+      assert.equal(response.status, 200);
+      state = await workspace();
+    }
+
     await command({
       type: "requestPayment",
       id: o.id,
@@ -181,6 +194,39 @@ test("TL25 HTTP golden path: real adapters, signed WA2/GPS, signed Paymennt, aut
     state = await workspace();
     assert.equal(state.payments[0]!.status, "paid");
     assert.equal(state.orders[0]!.state, "Confirmed");
+    if (!authoredSchedule) {
+      assert.equal(
+        state.orders[0]!.paymentFulfillment?.status,
+        "review-required",
+      );
+      const recognized = structuredClone(state.orders[0]);
+      const response = await fetch(base + "/api/commands", {
+        method: "POST",
+        headers: {
+          Origin: base,
+          "Content-Type": "application/json",
+          "Idempotency-Key": randomUUID(),
+        },
+        body: JSON.stringify({
+          type: "transition",
+          id: o.id,
+          version: recognized!.version,
+          state: "Production",
+        }),
+      });
+      assert.equal(response.status, 409);
+      assert.match(
+        (await response.json()).message,
+        /Fulfillment review required/,
+      );
+      assert.equal((await notify()).status, 200);
+      state = await workspace();
+      assert.equal(state.payments[0]!.status, "paid");
+      assert.deepEqual(state.orders[0], recognized);
+      return;
+    }
+    assert.equal(state.orders[0]!.paymentFulfillment?.status, "unchanged");
+
     for (const target of [
       "Production",
       "Ready",
@@ -202,9 +248,16 @@ test("TL25 HTTP golden path: real adapters, signed WA2/GPS, signed Paymennt, aut
     assert.deepEqual(after.conversations, before.conversations);
     assert.equal(after.orders[0]!.state, "Delivered");
   } finally {
-    const exited = new Promise((r) => child.once("exit", r));
+    const exited =
+      child.exitCode !== null || child.signalCode !== null
+        ? Promise.resolve()
+        : new Promise((r) => child.once("exit", r));
     child.kill("SIGTERM");
     await exited;
     rmSync(dir, { recursive: true, force: true });
   }
-});
+}
+
+for (const authoredSchedule of [true, false])
+  test(`TL25 HTTP golden path: real adapters, signed WA2/GPS, signed Paymennt, authoritative settlement and fulfillment once; authored schedule=${authoredSchedule}`, () =>
+    goldenActivationPath(authoredSchedule));

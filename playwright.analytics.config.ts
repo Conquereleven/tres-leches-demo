@@ -3,11 +3,14 @@ import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 const dir = mkdtempSync(join(tmpdir(), "3l-analytics-browser-"));
+// RT01 R1: the session-cookie cache is scoped to this single server run.
+process.env.ANALYTICS_SESSIONS_FILE ??= join(dir, ".sessions.json");
 export default defineConfig({
   testDir: "tests/analytics-e2e",
   outputDir: "test-results/analytics",
   workers: 1,
   timeout: 45000,
+  globalTeardown: "./tests/analytics-e2e/global-teardown.ts",
   projects: [
     { name: "chromium", use: { browserName: "chromium" } },
     { name: "webkit", use: { browserName: "webkit" } },

@@ -16,7 +16,7 @@ import type { Order, Payment } from "../../server/domain/model";
 import { useOps } from "./ops-i18n";
 import { paymentBadge, type PaymentTone } from "./orders-board";
 import {
-  fulfilmentGroup,
+  orderFulfilmentGroup,
   fulfilmentLabel,
   type FulfilmentGroup,
 } from "./order-view";
@@ -30,6 +30,7 @@ const PAYMENT_ICON: Record<PaymentTone, typeof CheckCircle> = {
   none: MinusCircle,
 };
 const FULFILMENT_ICON: Record<FulfilmentGroup, typeof CheckCircle> = {
+  review: Warning,
   draft: PencilSimple,
   unpaid: HandCoins,
   "to-confirm": Clock,
@@ -60,10 +61,10 @@ export function PaymentBadge({
 export function FulfilmentBadge({
   order,
 }: {
-  order: Pick<Order, "state" | "fulfillmentMethod">;
+  order: Pick<Order, "state" | "fulfillmentMethod"> & Partial<Order>;
 }) {
   const { t } = useOps();
-  const group = fulfilmentGroup(order.state);
+  const group = orderFulfilmentGroup(order);
   const Icon = FULFILMENT_ICON[group];
   return (
     <span className="oms-badge" data-kind="fulfilment" data-tone={group}>

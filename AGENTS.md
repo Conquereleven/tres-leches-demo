@@ -191,3 +191,21 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Exactly two automatic customer emails per newly paid order: Order Confirmed at the authoritative payment confirmation, and a scheduled email at the start of the accepted slot (08:00/13:00/16:00 Asia/Dubai). No dependency on Take Order or OMS transitions; Enrolment is permanent: OMS progress emails never resume for an enrolled order, even if V2 is disabled or its epoch changes. Internal team emails unchanged.
 - Delivery copy never claims courier dispatch. A window email later than 30 minutes is not sent; it is recorded as an operational exception.
 - Off by default: `CUSTOMER_EMAIL_V2_ENABLED` plus a fresh `CUSTOMER_EMAIL_V2_SINCE` epoch. No backfill or replay. Paymennt's own payment receipt stays enabled and unchanged (founder decision): customers get one Paymennt receipt plus exactly two 3L emails. Never suppress or alter Paymennt emails. Details: `docs/order-experience/email-v2/README.md`.
+
+## Founder-approved 3L Visual Lab V3.2 (22 November 2026, isolated preview only)
+- The standalone V3.2 ZIP is the visual reference source; REF_A Menu, REF_B Home/Story,
+  REF_C desktop popup and REF_D mobile popup are authoritative visual references.
+  The *integrated* V3.2 in Draft PR #83 is NOT visually approved.
+- A customer preview is one connected experience: Home, Menu, Mexican Bakery,
+  Contact, Cart, Checkout, order return and purchasing policies must never
+  silently switch back to the earlier storefront UI.
+- The desktop catalog retains exactly four columns; mobile responsive acceptance
+  covers 390×844, 375×667 and 320×568, including anchored product dialog,
+  scrollable variant content and continuously visible Add to Cart.
+- Use original founder-approved imagery and source typography when accessible.
+  Until verified reference-derived files are available, do not claim pixel fidelity
+  or fabricate photos/fonts. Use live catalog authority, published media mapping
+  and existing Shop/Policy components, never parallel commerce data.
+- Work in the existing isolated V3.2 Draft PR branch with synthetic preview data,
+  browser checks and independent visual review. No merge/deploy/Production/payment
+  provider activation/real customer data absent separate Founder approval.

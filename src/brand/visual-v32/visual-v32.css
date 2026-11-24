@@ -1,0 +1,489 @@
+/* Approved 3L Visual Lab V3.2 composition: isolated preview path only. */
+.v32-app,.v32-overlay{--ink:#1c1517;--gold:#a28d5b;--rose:#a93c68;font-family:3L Montserrat,Arial,sans-serif;color:var(--ink)}
+.v32-app{min-height:100vh;isolation:isolate;padding:1px 0;background:radial-gradient(ellipse at 50% 9%,#fff9f7 0%,transparent 44%),linear-gradient(130deg,#f5ccc7,#f9e7e2 45%,#f1c4c3);position:relative;overflow-x:clip}
+/* RTL page health: the decorative .v32-blossom intentionally bleeds 14px past
+   the left edge. In RTL that bleed expands document scrollWidth and allows
+   horizontal panning. Clipping it here changes no pixel: the bleed stays
+   visually identical, it just stops creating scrollable overflow. */
+.v32-app::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(112deg,transparent 15%,#fff6 28%,transparent 40%,#fff3 52%,transparent 66%)}
+.v32-app *,.v32-overlay *{box-sizing:border-box}.v32-app a{text-decoration:none;color:inherit}
+.v32-app h1,.v32-app h2,.v32-app strong,.v32-overlay h1,.v32-overlay h2{font-family:"3L Abril",Georgia,serif}
+.v32-app button,.v32-overlay button{font-family:inherit;cursor:pointer}
+.v32-app button:focus-visible,.v32-app a:focus-visible,.v32-overlay button:focus-visible,.v32-overlay select:focus-visible{outline:3px solid #884535;outline-offset:3px}
+.v32-sr,.v32-skip:not(:focus){position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.v32-skip:focus{position:absolute;z-index:200;top:0;background:white;padding:10px}
+.v32-header{position:relative;z-index:10}
+.v32-mobile-toggle,.v32-mobile-drawer{display:none}
+.v32-mobile-toggle{border:0;border-radius:50%;background:#ffffffa8;min-width:38px;min-height:38px;font-size:25px;color:#543928}
+.v32-mobile-drawer{position:absolute;left:13px;right:13px;top:calc(100% + 8px);flex-direction:column;gap:4px;padding:12px;border:1px solid white;border-radius:22px;background:#f6dfe0f0;box-shadow:0 12px 30px #a8747440}
+.v32-mobile-drawer a{display:block;padding:14px;border-radius:12px;font-size:13px;font-weight:600;letter-spacing:.12em}
+.v32-mobile-drawer a:focus-visible{outline:3px solid #543928;outline-offset:2px}
+.v32-nav{max-width:1408px;margin:25px auto 0;min-height:68px;padding:10px 35px;display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;border:1px solid #fffe;border-radius:99px;background:#ffffff75;box-shadow:0 14px 30px #a8747440;backdrop-filter:blur(18px)}
+.v32-nav-left,.v32-nav-right{display:flex;align-items:center;gap:25px;font:500 11px 3L Montserrat;letter-spacing:.20em}
+.v32-nav-right{justify-content:flex-end;gap:17px}
+.v32-logo{white-space:nowrap;display:flex;flex-direction:column;align-items:center;color:#b57939!important}
+.v32-logo strong{font-size:29px;line-height:1}.v32-logo small{margin-top:5px;font:500 9px 3L Montserrat;letter-spacing:.24em}
+.v32-nav select{border:0;border-radius:99px;background:#fffa;padding:8px;color:#7f5731}
+.v32-home,.v32-landing,.v32-catalog{max-width:1440px;margin:auto;padding:48px 35px 70px}
+.v32-home h1,.v32-landing h1,.v32-catalog h1{text-align:center;font-size:clamp(48px,5.5vw,83px);font-weight:500;letter-spacing:-.03em;line-height:.95;margin:15px 0 26px}
+.v32-journey{display:grid;grid-template-columns:1fr 1.2fr 1fr;align-items:end;gap:20px}
+.v32-city{display:flex;flex-direction:column;align-items:center;text-align:center}
+.v32-city img{width:100%;height:235px;object-fit:contain;mix-blend-mode:multiply;mask-image:radial-gradient(ellipse,#000 48%,transparent 85%)}
+.v32-city b{font:500 23px Georgia;letter-spacing:.18em;color:#87551d}.v32-city span{font:500 21px Georgia;letter-spacing:.18em;color:#87551d}
+.v32-route{width:100%;align-self:center}
+.v32-story{margin-top:24px;padding:35px 0;border-top:2px solid #fffb;display:grid;grid-template-columns:1fr 1.12fr;gap:5%;align-items:center}
+.v32-family{display:flex;position:relative;align-items:flex-end;justify-content:center;min-height:400px}
+.v32-family img:first-child{width:60%;height:360px;object-fit:contain;border:7px solid #fff9;border-radius:25px;transform:rotate(-3deg);box-shadow:0 12px 25px #a9878777}
+.v32-family img:nth-child(2){width:38%;height:265px;object-fit:cover;margin-left:-9%;border:7px solid #fff9;border-radius:25px;transform:rotate(6deg);box-shadow:0 12px 25px #a9878777}
+.v32-family i{position:absolute;top:4px;right:0;max-width:130px;color:#8d5c32;font:italic 21px "3L Abril"}
+.v32-legacy{padding:10px 0 10px 35px;border-left:1px solid var(--gold)}
+.v32-legacy h2{font-size:clamp(38px,4vw,59px);line-height:.94;font-weight:600;margin:0 0 20px}
+.v32-legacy p{font-size:14px;line-height:1.6;margin:0 0 15px}
+.v32-legacy a{display:block;border:1px solid white;border-radius:99px;background:#fff8;padding:17px 24px;font-size:12px;font-weight:600;color:#935a24}
+.v32-eyebrow{display:block;text-align:center;letter-spacing:.3em;font-size:12px;color:#a37139}
+.v32-landing h1,.v32-catalog h1{margin:25px 0 11px}.v32-tagline{text-align:center;font-size:12px;letter-spacing:.30em;color:#a37139}
+.v32-search{display:flex;align-items:center;gap:15px;max-width:670px;margin:39px auto 45px;padding:13px 20px;border:1px solid #fff9;border-radius:99px;background:#fff9;backdrop-filter:blur(10px);box-shadow:0 13px 35px #c18a8a66}
+.v32-search span{font-size:25px;color:#825835}
+.v32-search input{border:0;min-width:0;flex:1;background:transparent;outline:none;font:italic 19px "3L Abril"}
+.v32-search button{border:0;border-left:1px solid #b98a4e55;padding-left:18px;background:transparent;color:#925c27;font-size:11px;letter-spacing:.18em}
+.v32-tiles{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.v32-tile{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:13px;min-height:510px;padding:60px;border-radius:28px;color:white!important;background-position:center;background-size:cover;box-shadow:0 24px 40px #b78c8c77}
+.v32-cakes{background-image:linear-gradient(90deg,#654035ee,transparent 88%),url("/brand/approved/tres-leches-classic-960.webp")}
+.v32-breads{background-image:linear-gradient(90deg,#654035ee,transparent 88%),url("/brand/approved/3l-media-002/bakery-0-m002-002-1440.webp")}
+.v32-tile small{font-size:14px;letter-spacing:.25em;color:#ecc689}
+.v32-tile strong{font-size:clamp(65px,5.8vw,94px);font-style:italic;font-weight:400;line-height:.92}
+.v32-tile em{font:italic 23px/1.35 "3L Abril",Georgia}
+.v32-tile b{border-radius:99px;background:#ffebe4;color:#875221;padding:15px 24px;font:600 11px 3L Montserrat;letter-spacing:.15em}
+.v32-filters{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:12px;margin:-12px auto 35px}
+.v32-filters button{border:1px solid #fffa;border-radius:99px;background:#fff8;color:#895522;padding:10px 20px;font-size:12px}
+.v32-filters .v32-selected{background:var(--rose);border-color:transparent;color:white;box-shadow:0 5px 12px #b66a7e77}
+.v32-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.v32-message{text-align:center;margin:35px auto;padding:25px;background:#fff9;border-radius:22px}
+.v32-close{position:sticky;top:0;z-index:4;float:right;width:38px;height:38px;border:0;border-radius:50%;background:#fffd;color:#5c3f35;font-size:26px}
+@media(max-width:1000px){.v32-nav{margin:12px}.v32-nav-left,.v32-nav-right{gap:10px}.v32-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.v32-journey{grid-template-columns:1fr 1fr}.v32-route{grid-column:1/-1;grid-row:2;max-width:350px;margin:auto}.v32-story{grid-template-columns:1fr}.v32-legacy{border-left:0;border-top:1px solid #b98a4e;padding:25px 0}.v32-tile{min-height:440px;padding:35px}}
+@media(max-width:640px){.v32-nav{grid-template-columns:auto 1fr auto;gap:6px;padding:8px 13px}.v32-mobile-toggle{display:inline-flex;align-items:center;justify-content:center}.v32-mobile-drawer{display:flex}.v32-nav-left{display:none}.v32-nav-right>a:not(:last-child){display:none}.v32-logo strong{font-size:22px}.v32-logo small{font-size:7px}.v32-home,.v32-landing,.v32-catalog{padding:35px 14px}.v32-home h1{font-size:44px}.v32-city img{height:125px}.v32-city b,.v32-city span{font-size:12px}.v32-family{min-height:270px}.v32-family img:first-child{height:230px}.v32-family img:nth-child(2){height:190px}.v32-landing h1,.v32-catalog h1{font-size:49px}.v32-tagline{font-size:10px}.v32-search{margin:30px auto}.v32-tiles{grid-template-columns:1fr}.v32-tile{min-height:390px}.v32-filters{gap:6px}.v32-filters button{padding:8px 10px;font-size:10px}.v32-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}
+@media(max-width:360px){.v32-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.v32-app *,.v32-overlay *{animation:none!important;transition:none!important}}
+
+
+
+/* V3.2 SOURCE FIDELITY PORT.
+ * Match approved REF_A/B/C/D geometry rather than decorating old selectors.
+ * Brand fonts are local/self-hosted (CSP compliant); no remote fonts. */
+.v32-app::after{content:"";position:absolute;z-index:0;pointer-events:none;left:-22px;top:87px;width:275px;height:210px;background:url("/brand/reference/flower.png") center / contain no-repeat;mask-image:radial-gradient(circle at 30% 30%,#000 28%,transparent 77%);opacity:.52}
+.v32-app .v32-header,.v32-app main{position:relative;z-index:1}
+.v32-app h1,.v32-app h2,.v32-app .v32-product-copy strong,.v32-popup h2,
+.v32-popup .v32-popup-unit strong{font-family:Georgia,"Times New Roman",serif!important;font-weight:400!important;letter-spacing:-.038em}
+.v32-app .v32-home h1{font-size:clamp(44px,5.3vw,74px);line-height:.96;margin:8px auto 24px}
+.v32-app .v32-home-fidelity{padding-top:45px}
+.v32-home-fidelity .v32-journey{margin-top:-95px;grid-template-columns:minmax(0,1fr) minmax(230px,1.23fr) minmax(0,1fr);gap:24px}
+.v32-city-crop{position:relative;width:100%;height:225px;overflow:hidden;mask-image:radial-gradient(ellipse 74% 70% at 50% 54%,#000 48%,transparent 98%)}
+.v32-city-crop img{position:absolute;display:block;height:100%!important;max-width:none;width:200%!important;object-fit:contain!important;mix-blend-mode:multiply}
+.v32-city-right .v32-city-crop img{transform:translateX(-50%)}
+.v32-home-fidelity .v32-story{margin-top:22px;padding-top:28px;grid-template-columns:1.06fr 1.12fr}
+.v32-home-fidelity .v32-legacy h2{font-size:clamp(33px,3.8vw,54px);line-height:.99;font-weight:400}
+.v32-legacy p{font-size:clamp(12px,1.03vw,15px);line-height:1.52}
+.v32-family img:first-child{width:60%;height:360px;transform:rotate(-3deg)}
+.v32-family img:nth-child(2){width:38%;height:270px;transform:rotate(6deg)}
+.v32-landing-fidelity{padding-top:45px}
+.v32-landing-fidelity .v32-tiles{gap:28px}
+.v32-landing-fidelity .v32-tile{min-height:565px;border-radius:27px;gap:11px;
+  box-shadow:0 25px 52px -20px rgba(120,70,60,.45)}
+.v32-landing-fidelity .v32-tile strong{font-family:Georgia,serif!important;font-weight:400;font-style:italic;font-size:clamp(62px,5.5vw,85px);letter-spacing:-.045em}
+.v32-landing-fidelity .v32-tile em{font:italic 21px/1.3 Georgia,serif}
+.v32-landing-fidelity .v32-cakes{background-image:linear-gradient(90deg,#3e2423df 0%,#53332ba2 39%,#4e2e2b29 77%,transparent),url("/brand/approved/tres-leches-classic-960.webp")}
+.v32-landing-fidelity .v32-breads{background-image:linear-gradient(90deg,#3e2423df 0%,#53332ba2 39%,#4e2e2b29 77%,transparent),url("/brand/approved/3l-media-002/bakery-1-m002-041-1440.webp")}
+.v32-landing-fidelity .v32-tile b{font-size:11px;border-radius:99px;padding:13px 24px;letter-spacing:.2em}
+.v32-catalog-fidelity .v32-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+.v32-section-caption{margin:0 0 10px;font-size:11px;letter-spacing:.22em;color:#846353}
+@media(max-width:900px){
+  .v32-home-fidelity .v32-journey{margin-top:10px;grid-template-columns:1fr 1fr;gap:16px}
+  .v32-home-fidelity .v32-route{grid-row:2;grid-column:1/-1;justify-self:center}
+  .v32-home-fidelity .v32-story{grid-template-columns:1fr}
+  .v32-city-crop{height:175px}
+}
+@media(max-width:640px){
+  .v32-app::after{top:72px;width:166px;height:165px}
+  .v32-home-fidelity .v32-journey{margin-top:8px}
+  .v32-city-crop{height:116px}
+  .v32-home-fidelity .v32-story{padding-top:20px}
+  .v32-landing-fidelity .v32-tiles{grid-template-columns:1fr}
+  .v32-landing-fidelity .v32-tile{min-height:420px;padding:30px}
+  .v32-landing-fidelity .v32-tile strong{font-size:65px}
+  .v32-catalog-fidelity .v32-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:360px){.v32-catalog-fidelity .v32-grid{grid-template-columns:1fr}}
+
+
+/* V3.2 fidelity correction, founder feedback 22-Nov-2026.
+ * Native selects previously sat on a different text baseline; fixed-height
+ * control and centralized flex alignment share one true nav centreline.
+ */
+.v32-nav-left,.v32-nav-right{
+  min-height:40px;align-items:center;
+  line-height:1.25;
+  text-transform:none;
+}
+.v32-nav-left>a,.v32-nav-right>a{
+  display:inline-flex;align-items:center;min-height:40px;line-height:1.25;
+  text-transform:none;
+}
+.v32-nav-right .v32-language-control{
+  display:inline-flex;align-items:center;justify-content:center;
+  position:relative;height:40px;min-width:61px;margin:0;padding:0;
+  flex:none;vertical-align:middle;
+}
+.v32-nav-right .v32-language-control select{
+  -webkit-appearance:none;appearance:none;display:block;
+  margin:0;min-width:61px;height:38px;padding:0 23px 0 12px;
+  border:1px solid rgba(255,255,255,.85);border-radius:999px;
+  background:rgba(255,255,255,.75);
+  font:600 11px/38px "3L Montserrat",Arial,sans-serif;
+  color:#7f5731;letter-spacing:0;cursor:pointer;
+}
+.v32-nav-right .v32-language-control::after{
+  content:"⌄";position:absolute;right:9px;top:50%;transform:translateY(-56%);
+  font:14px/1 Arial,sans-serif;color:#7f5731;pointer-events:none;
+}
+.v32-nav-right .v32-language-control select:focus-visible{
+  outline:2px solid #27242D;outline-offset:2px;box-shadow:0 0 0 4px #A28D5B;
+}
+.v32-cart-status:empty{
+  position:absolute;height:1px;width:1px;overflow:hidden;clip-path:inset(50%);
+}
+.v32-cart-status:not(:empty){
+  max-width:max-content;margin:24px auto 0;padding:10px 17px;
+  border-radius:99px;border:1px solid #fff9;background:#fff9;
+  color:#27242D;font-size:12px;text-align:center;
+}
+@media(max-width:640px){
+  .v32-nav-right{gap:8px}
+}
+
+/* Source-fidelity pass 22-Nov-2026: original ZIP inspected.
+ * Reuse original visual hierarchy; keep original live catalog and payment
+ * rules, no demo values. Assets are NOT approved for production.
+ */
+.v32-app,.v32-overlay{font-family:"Jost","3L Montserrat",Arial,sans-serif}
+.v32-app h1,.v32-app h2,.v32-app strong,
+.v32-overlay h1,.v32-overlay h2,
+.v32-app .v32-product-copy strong,
+.v32-popup .v32-popup-unit strong{
+  font-family:"Cormorant Garamond",Georgia,serif!important
+}
+.v32-app .v32-home h1,.v32-app .v32-landing h1,.v32-app .v32-catalog h1{
+  font-family:"Cormorant Garamond",Georgia,serif!important;font-weight:500!important;
+  letter-spacing:-.038em;line-height:.96;
+}
+.v32-app .v32-nav-left,.v32-app .v32-nav-right,
+.v32-app .v32-nav-left>a,.v32-app .v32-nav-right>a{
+  font-family:"Jost","3L Montserrat",Arial,sans-serif;
+  font-size:12px;line-height:1.25;
+  letter-spacing:.17em;text-transform:none;
+}
+.v32-app .v32-nav-right .v32-language-control select{font-family:"Jost",Arial,sans-serif}
+.v32-app .v32-logo strong{font-family:"Cormorant Garamond",Georgia,serif!important;font-size:30px;font-weight:600!important}
+.v32-app .v32-legacy h2{font-family:"Cormorant Garamond",Georgia,serif!important;font-weight:500!important;line-height:.99}
+.v32-app .v32-legacy p,.v32-app .v32-legacy a{font-family:"Jost",Arial,sans-serif}
+.v32-app .v32-landing-fidelity .v32-tile strong{
+  font:italic 400 clamp(64px,5.7vw,91px)/.96 "Cormorant Garamond",Georgia,serif!important
+}
+.v32-app .v32-landing-fidelity .v32-tile em{font:italic 21px/1.3 "Cormorant Garamond",Georgia,serif!important}
+.v32-app .v32-search input{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic}
+.v32-app .v32-commerce-shell .b-shop-main>h1,
+.v32-app .v32-commerce-shell .b-policy-hero h1,
+.v32-app .v32-commerce-shell .b-co-status h1,
+.v32-app .v32-commerce-shell .b-co-confirm-hero h1,
+.v32-app .v32-commerce-shell .b-policy-body article>section h2{
+  font-family:"Cormorant Garamond",Georgia,serif!important;font-weight:500!important
+}
+@media(max-width:640px){
+  .v32-nav{min-width:0}
+  .v32-nav>.v32-logo{min-width:0;white-space:normal}
+  .v32-logo strong{font-size:22px!important;white-space:nowrap}
+  .v32-nav-right{gap:6px}
+  .v32-nav-right>a[href$="/cart"]{
+    display:inline-flex!important;align-items:center;justify-content:center;
+    width:39px;height:39px;min-width:39px;overflow:visible;
+    font-size:0!important;letter-spacing:0
+  }
+  .v32-nav-right>a[href$="/cart"]::before{
+    content:"🛍";font-size:17px;line-height:1
+  }
+  .v32-nav-right>a[href$="/cart"] span{
+    font:500 10px/1 "Jost",Arial,sans-serif;position:absolute;
+    align-self:flex-end;margin:0 0 -1px 27px;min-width:14px;text-align:center
+  }
+}
+@media(max-width:360px){
+  .v32-nav{padding:7px 9px;gap:4px}
+  .v32-logo strong{font-size:19px!important}
+  .v32-logo small{font-size:6px}
+  .v32-nav-right .v32-language-control,
+  .v32-nav-right .v32-language-control select{min-width:52px}
+}
+
+/* Exact original V3.2 ZIP visual crops only inside the isolated synthetic
+ * preview. Never merge/deploy these as authentic 3L product photography.
+ * Local preview script can stage them into dist after test-only build.
+ */
+.v32-city-reference img{
+  width:100%!important;height:100%!important;max-width:100%;
+  transform:none!important;object-fit:contain!important;mix-blend-mode:multiply;
+}
+.v32-city-reference[data-fallback="true"] img{width:200%!important;max-width:none}
+.v32-city-right .v32-city-reference[data-fallback="true"] img{transform:translateX(-50%)!important}
+.v32-family>.v32-family-reference{
+  display:block;width:100%!important;max-width:100%;height:auto!important;
+  max-height:455px;object-fit:contain!important;transform:none!important;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+  mix-blend-mode:multiply;mask-image:radial-gradient(ellipse at 50% 50%,#000 52%,transparent 82%);
+}
+.v32-family-fallback{
+  display:flex;position:relative;align-items:flex-end;justify-content:center;
+  width:100%;min-height:360px
+}
+.v32-family-fallback img:first-child{width:60%;height:360px;object-fit:contain;transform:rotate(-3deg)}
+.v32-family-fallback img:nth-child(2){width:38%;height:270px;object-fit:cover;transform:rotate(6deg)}
+.v32-family-fallback i{position:absolute;top:4px;right:0;color:#8d5c32}
+.v32-landing-fidelity .v32-cakes{
+  background-image:
+    linear-gradient(90deg,#3e2423df 0%,#53332ba2 39%,#4e2e2b29 77%,transparent),
+    url("/visual-v32-reference/cake-photographic-detail.jpg"),
+    url("/brand/approved/tres-leches-classic-960.webp");
+}
+.v32-landing-fidelity .v32-breads{
+  background-image:
+    linear-gradient(90deg,#3e2423df 0%,#53332ba2 39%,#4e2e2b29 77%,transparent),
+    url("/visual-v32-reference/bakery-atelier-concept.webp"),
+    url("/brand/approved/3l-media-002/bakery-1-m002-041-1440.webp");
+}
+.v32-landing-fidelity .v32-tile{
+  background-size:cover,cover,cover;background-position:center,center,center
+}
+@media(max-width:640px){
+  .v32-family>.v32-family-reference{max-height:345px}
+  .v32-family-fallback{min-height:270px}
+  .v32-family-fallback img:first-child{height:230px}
+  .v32-family-fallback img:nth-child(2){height:190px}
+}
+
+/* Original source's base glass-pink background (isolated preview only).
+ * Follow `bg-gradient-to-br from-[#F8E3DE] via-[#FBEFEA] to-[#F8E3DE]`
+ * from src/components/Layout.jsx in the uploaded ZIP, without changing
+ * the live public brand/operations palette. */
+.v32-app{
+  background:
+    radial-gradient(ellipse at 50% 26%,rgba(255,255,255,.72),transparent 40%),
+    linear-gradient(135deg,#F8E3DE 0%,#FBEFEA 52%,#F8E3DE 100%)!important
+}
+.v32-nav{
+  border-color:rgba(255,255,255,.88);
+  background:rgba(255,255,255,.42);
+  box-shadow:0 12px 30px rgba(147,81,82,.17),inset 0 1px 0 #fff;
+}
+
+
+
+/* V3.2 standalone customer storefront, source-faithful from Founder's ZIP.
+   No Shop/StorePages/Policies selectors. Commerce data comes from cart.ts, menu.ts. */
+.v32-app .v32-new-page{max-width:1260px;margin:0 auto;padding:68px 30px 110px;color:#22181d;position:relative;z-index:2;min-height:70vh;animation:v32-enter .65s both}
+.v32-app .v32-new-page>h1{font:500 clamp(48px,6vw,85px)/.94 "Cormorant Garamond",Georgia,serif!important;letter-spacing:-.04em;text-align:center;margin:18px auto 26px}
+.v32-app .v32-new-eyebrow{color:#976b46;font:500 11px/1.4 Jost,Arial,sans-serif;letter-spacing:.32em;text-align:center;text-transform:uppercase}
+.v32-app .v32-new-lead{max-width:680px;text-align:center;margin:0 auto 80px;font:400 19px/1.55 Jost,Arial,sans-serif;color:#514046}
+.v32-app .v32-new-layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.85fr);gap:32px;margin-top:48px;align-items:start}
+.v32-app .v32-new-panel,.v32-app .v32-new-summary,.v32-app .v32-new-empty,.v32-app .v32-new-quote{
+  border:1px solid rgba(255,255,255,.85);border-radius:26px;padding:clamp(22px,3vw,42px);
+  background:rgba(255,255,255,.60);box-shadow:0 20px 45px rgba(139,89,90,.14);backdrop-filter:blur(17px)
+}
+.v32-app .v32-new-panel h2,.v32-app .v32-new-summary h2{font:500 clamp(29px,3vw,39px)/1.1 "Cormorant Garamond",Georgia,serif!important;margin:0 0 24px}
+.v32-app .v32-new-panel h3{font:500 23px/1.1 "Cormorant Garamond",Georgia,serif!important;margin:0 0 8px}
+.v32-app .v32-new-panel p,.v32-app .v32-new-summary p{font:400 14px/1.65 Jost,Arial,sans-serif}
+.v32-app .v32-new-action{display:flex;align-items:center;justify-content:center;width:100%;min-height:51px;margin-top:16px;padding:12px 23px;background:#ac3168;color:#fff!important;border:1px solid #ac3168;border-radius:99px;text-align:center;text-decoration:none!important;font:600 13px Jost,Arial,sans-serif;letter-spacing:.035em;cursor:pointer;box-shadow:0 8px 24px #9d416b30}
+.v32-app .v32-new-action:disabled{opacity:.45;cursor:not-allowed}
+.v32-app .v32-new-action-secondary{display:inline-flex;width:auto;color:#814e32!important;background:#fff9;border:1px solid #d9a99b;border-radius:99px;padding:12px 22px;cursor:pointer;font:500 13px Jost,Arial,sans-serif}
+.v32-app .v32-new-empty{max-width:700px;margin:80px auto;text-align:center;font:italic 28px "Cormorant Garamond",Georgia,serif}
+.v32-app .v32-new-contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 auto 55px}
+.v32-app .v32-new-contact-card{display:flex;flex-direction:column;gap:10px;min-height:142px;color:#27242d!important;transition:transform .25s;text-decoration:none}
+.v32-app .v32-new-contact-card:hover{transform:translateY(-4px)}
+.v32-app .v32-new-contact-card small{font:600 11px Jost,Arial,sans-serif;text-transform:uppercase;letter-spacing:.14em}
+.v32-app .v32-new-contact-card strong{font:500 25px/1.15 "Cormorant Garamond",Georgia,serif!important;overflow-wrap:anywhere}
+.v32-app .v32-new-contact-card span{align-self:end;color:#b47b48}
+.v32-app .v32-new-contact address{font-style:normal;line-height:1.7}
+.v32-app .v32-new-policy{max-width:940px;margin:55px auto}
+.v32-app .v32-new-cart-items,.v32-app .v32-new-summary ul{padding:0;margin:0;list-style:none}
+.v32-app .v32-new-cart-row{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:22px 0;border-bottom:1px solid #dbc3ba}
+.v32-app .v32-new-cart-row:first-child{padding-top:0}
+.v32-app .v32-new-cart-row small{display:block;color:#875d4a;margin-top:6px}
+.v32-app .v32-new-cart-row p{margin:8px 0}
+.v32-app .v32-new-cart-controls{display:flex;flex-direction:column;align-items:end;gap:13px;min-width:120px}
+.v32-app .v32-new-cart-controls input{display:block;margin-top:5px;width:79px;padding:9px;background:#fff9;border:1px solid #d2a69a;border-radius:10px}
+.v32-app .v32-new-cart-controls button{border:0;background:none;text-decoration:underline;color:#975b48}
+.v32-app .v32-new-pack-edit{margin:10px 0}
+.v32-app .v32-new-pack-edit summary{cursor:pointer;text-decoration:underline;color:#975b48;font:500 13px Jost,Arial,sans-serif}
+.v32-app .v32-new-pack-edit .b-pack-builder{margin:10px 0}
+.v32-app .v32-new-pack-edit .v32-new-action-secondary{border:1px solid #d2a69a;background:#fff9;border-radius:10px;padding:9px 16px;color:#975b48;cursor:pointer}
+.v32-app .v32-new-pack-edit .v32-new-action-secondary:disabled{opacity:.45;cursor:not-allowed}
+.v32-app .v32-new-tricolor{display:block;margin:8px 0;font:400 13px Jost,Arial,sans-serif;color:#875d4a}
+.v32-app .v32-new-tricolor select{display:block;margin-top:5px;padding:9px;background:#fff9;border:1px solid #d2a69a;border-radius:10px;color:inherit}
+.v32-app .v32-new-summary li,.v32-app .v32-new-total{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #dbc3ba}
+.v32-app .v32-new-summary li span{font:400 13px Jost,Arial,sans-serif}
+.v32-app .v32-new-summary li strong,.v32-app .v32-new-total strong{white-space:nowrap;font:600 16px Jost,Arial,sans-serif!important}
+.v32-app .v32-new-total{padding:18px 0 0;border:0;font-weight:600}
+.v32-app .v32-new-progress{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin:40px 0 0}
+.v32-app .v32-new-progress span{padding:10px 15px;border-top:2px solid #d9b9ad;font:500 11px Jost,Arial,sans-serif;color:#79676a}
+.v32-app .v32-new-progress .active{border-top-color:#aa3369;color:#22181d}
+.v32-app .v32-new-form label{display:flex;flex-direction:column;gap:8px;margin-bottom:21px;font:500 12px Jost,Arial,sans-serif;color:#503b40}
+.v32-app .v32-new-form :is(input,select),.v32-app .v32-buy-form select{width:100%;min-height:47px;border:1px solid #d3aaa0;border-radius:12px;background:#fffc;padding:10px 13px;color:#27242d;font:400 14px Jost,Arial,sans-serif}
+.v32-app .v32-new-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.v32-app .v32-new-switch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0 26px}
+.v32-app .v32-new-switch button{padding:12px;border:1px solid #d9a99b;border-radius:99px;background:#fff9}
+.v32-app .v32-new-switch button.active{background:#aa3369;color:#fff;border-color:#aa3369}
+.v32-app .v32-new-steps{display:flex;align-items:center;justify-content:end;gap:14px}
+.v32-app .v32-new-footnote{color:#79686a;font:400 12px/1.5 Jost,Arial,sans-serif}
+.v32-app .v32-new-quote{padding:16px 22px;font-size:13px;margin-top:20px}
+.v32-app .v32-new-payment-block{padding:20px;border:1px dashed #ad7a5c;border-radius:13px;background:#fbe9e5}
+.v32-app .v32-tile,.v32-app .v32-product{transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s}
+.v32-app .v32-product:hover,.v32-app .v32-tile:hover{transform:translateY(-4px)}
+.v32-app .v32-home h1,.v32-app .v32-landing h1,.v32-app .v32-catalog h1{animation:v32-enter .7s both}
+.v32-app .v32-route path{stroke-dasharray:720;stroke-dashoffset:720;animation:v32-route-draw 3.4s .3s ease forwards}
+@keyframes v32-enter{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+@keyframes v32-route-draw{to{stroke-dashoffset:0}}
+@media(max-width:800px){.v32-app .v32-new-layout{grid-template-columns:1fr}.v32-app .v32-new-contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.v32-app .v32-new-page{padding:44px 15px 70px}.v32-app .v32-new-contact-grid{grid-template-columns:1fr;gap:14px;margin-bottom:32px}.v32-app .v32-new-lead{margin-bottom:35px}.v32-app .v32-new-fields{grid-template-columns:1fr}.v32-app .v32-new-cart-row{gap:10px}.v32-app .v32-new-progress{gap:6px}.v32-app .v32-new-progress span{padding:7px;font-size:10px}}
+@media(prefers-reduced-motion:reduce){.v32-app .v32-route path{animation:none;stroke-dashoffset:0}.v32-app .v32-new-page,.v32-app .v32-home h1,.v32-app .v32-landing h1,.v32-app .v32-catalog h1{animation:none}.v32-app .v32-product,.v32-app .v32-tile{transition:none}}
+
+
+/* Source-fidelity correction from REF_A/B/C/D ZIP + Founder prior approvals.
+   The mobile sheet is rendered through document.body Portal: main/H1 can no
+   longer intercept its links, regardless of stacking contexts in Home. */
+.v32-mobile-portal{position:fixed;inset:0;z-index:2147480000}
+.v32-mobile-backdrop{position:absolute;inset:0;width:100%;height:100%;border:0;
+  background:rgba(28,21,23,.4);backdrop-filter:blur(2px);animation:v32-veil .25s both}
+.v32-mobile-portal .v32-mobile-sheet{display:flex!important;position:fixed!important;
+  inset:0 auto 0 0!important;top:0!important;left:0!important;right:auto!important;
+  height:100dvh!important;max-height:100dvh;min-width:0;width:min(310px,84vw);
+  flex-direction:column;gap:25px;overflow-y:auto;pointer-events:auto;
+  padding:28px 22px!important;border-radius:0 26px 26px 0!important;
+  background:linear-gradient(165deg,rgba(255,255,255,.94),rgba(248,227,222,.94))!important;
+  border-right:1px solid #fff9!important;box-shadow:18px 0 55px #67434355;
+  backdrop-filter:blur(24px);animation:v32-sheet-in .43s cubic-bezier(.2,1,.28,1) both}
+.v32-mobile-sheet-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.v32-mobile-sheet-top strong{font:600 26px/1 "Cormorant Garamond",Georgia,serif;color:#ac793f}
+.v32-mobile-sheet-top button{border:0;border-radius:50%;background:#fff9;
+  height:42px;width:42px;color:#482f37;font-size:27px}
+.v32-mobile-sheet nav{display:flex;flex-direction:column;gap:9px}
+.v32-mobile-sheet nav a{display:block;color:#1c1517!important;padding:14px 18px;border-radius:13px;
+  font:500 15px/1.4 "Jost",Arial,sans-serif;letter-spacing:.08em}
+.v32-mobile-sheet nav a:hover,.v32-mobile-sheet nav a:focus-visible{background:#fff9}
+.v32-logo-micro{display:flex;align-items:center;gap:8px}
+.v32-logo-micro i{height:1px;width:24px;background:#b98a4eaa}
+.v32-logo-micro small{white-space:nowrap}
+.v32-cart-glyph{font:400 17px/1 Georgia,serif;color:#a97741;margin-right:6px}
+.v32-eyebrow:before,.v32-eyebrow:after{content:"";display:inline-block;
+  width:40px;height:1px;background:#b98a4eaa;vertical-align:middle;margin:0 13px 4px}
+.v32-search-results{display:flex;gap:8px;justify-content:center;align-items:center;
+  min-height:31px;margin:-25px auto 21px;max-width:670px;flex-wrap:wrap}
+.v32-result-pill{padding:6px 15px;border:1px solid #b98a4e77;background:#ebd9d0b3;
+  border-radius:99px;color:#865b37;font:500 11px/1.1 Jost,Arial,sans-serif;letter-spacing:.12em}
+.v32-search-empty{font:italic 19px/1 "Cormorant Garamond",Georgia,serif;color:#8c6a5d;margin:0}
+.v32-tile-highlight{outline:4px solid #b98a4e!important;outline-offset:5px}
+.v32-gold-rule{display:block;width:41px;height:1px;background:#b98a4e}
+.v32-app .v32-tile{overflow:hidden;background-size:cover;
+  transition:transform .5s cubic-bezier(.22,1,.36,1),box-shadow .4s,background-size .8s}
+.v32-app .v32-tile:hover{box-shadow:0 27px 55px #86565770}
+.v32-app .v32-tile b{transition:transform .3s,background-color .3s}
+.v32-app .v32-tile:hover b{transform:translateY(-2px);background:#fbe6d9}
+.v32-app:before{animation:v32-window-light 22s ease-in-out infinite alternate}
+.v32-blossom{position:absolute;top:110px;left:-14px;z-index:3;pointer-events:none;
+  width:230px;height:225px;opacity:.86;
+  background-image:url("/visual-v32-reference/ref-home.png");
+  background-size:1100px auto;background-position:0 -80px;background-repeat:no-repeat;
+  mask-image:radial-gradient(ellipse at 42% 42%,#000 38%,transparent 73%);
+  animation:v32-blossom 8s ease-in-out infinite;transform-origin:15% 0}
+@keyframes v32-blossom{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+@keyframes v32-window-light{from{transform:translateX(-18px)}to{transform:translateX(28px)}}
+@keyframes v32-modal-arrive{from{opacity:.5;transform:translateY(54px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes v32-sheet-in{from{transform:translateX(-103%)}to{transform:translateX(0)}}
+@keyframes v32-veil{from{opacity:0}to{opacity:1}}
+@media(max-width:640px){
+  .v32-blossom{width:140px;height:155px;top:94px;background-size:770px auto;background-position:0 -56px;opacity:.64}
+  .v32-logo-micro i{display:none}
+  .v32-eyebrow:before,.v32-eyebrow:after{width:17px;margin-inline:8px}
+}
+@media(prefers-reduced-motion:reduce){
+  .v32-app:before,.v32-blossom,.v32-overlay .v32-popup,.v32-overlay .v32-scrim,
+  .v32-mobile-backdrop,.v32-mobile-portal .v32-mobile-sheet{animation:none!important;transition:none!important}
+}
+
+/* ZIP header exact lightweight shopping-bag line art, no legacy icon. */
+.v32-cart-glyph{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
+.v32-cart-glyph svg{width:16px;height:16px;display:block}
+@media(max-width:640px){
+}
+@media(max-height:600px) and (max-width:640px){
+}
+@media(min-width:641px){
+ .v32-popup .v32-variants .v32-variant-current :is(span,small){color:#1c1517!important}
+}
+@media(max-width:640px){
+}
+
+/* Founder-approved REF_C vs REF_D backdrop behavior. Desktop keeps the
+   surrounding catalog sharp; handset applies soft blur to the catalog. */
+@media(min-width:641px){
+}
+@media(max-width:640px){
+}
+
+/* Published collection and package size selectors; no duplicated commercial catalog. */
+.v32-subcategories{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;max-width:1050px;margin:3px auto 30px}
+.v32-subcategories button{font:500 11px/1.4 "Jost",Arial,sans-serif;padding:8px 15px;border:1px solid #b98a4e70;border-radius:999px;color:#865b37;background:#ffffff9e;cursor:pointer}
+.v32-subcategories button:hover{border-color:#b98a4e;background:#fff}
+.v32-subcategories button.v32-subcategory-active{border-color:#b12e64;color:#fff;background:#b12e64}
+.v32-app [data-cart-pack-count]{display:block;font-size:12px;color:#875b39;margin-top:4px}
+@media(max-width:640px){
+ .v32-subcategories{gap:6px;margin:0 auto 18px;padding:0 10px}
+ .v32-subcategories button{font-size:10px;padding:7px 11px}
+}
+.v32-app .v32-subcategories{position:relative;z-index:5;will-change:auto;transform:none;animation:none}
+.v32-app .v32-subcategories button{position:relative;transform:none;animation:none}
+@media(max-width:640px){
+}
+@media(min-width:641px){
+}
+.v32-app .v32-subcategories button,.v32-app .v32-subcategories button:hover{
+ transform:none!important;animation:none!important;
+ transition:background-color .18s,border-color .18s!important
+}
+@media(prefers-reduced-motion:reduce){
+}
+
+/* Founder REF_D photo-to-popup composition, kept isolated to V3.2.
+   Cards are stable click targets; background stays sharp just like source.
+   Real catalog media authority is unchanged. */
+@media(max-width:640px){
+  .v32-app .v32-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:9px!important;
+    align-items:start;
+  }
+}
+@media(max-width:360px){
+  .v32-app .v32-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+
+
+/* Source V3.2 has no footer on Bakery. Remaining commercial/legal routes
+   retain a clean 3L navigation rather than unstyled raw anchor links. */
+.v32-site-footer{max-width:1340px;margin:55px auto 15px;padding:25px 30px;
+ display:flex;justify-content:space-between;align-items:center;gap:25px;flex-wrap:wrap;
+ border-top:1px solid #b98a4e55;color:#7c5541}
+.v32-site-footer-brand{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.v32-site-footer-brand strong{font:600 24px/1 "Cormorant Garamond",Georgia,serif!important;color:#b57939}
+.v32-site-footer-brand small{font:500 9px/1.3 "Jost",Arial,sans-serif;letter-spacing:.2em}
+.v32-site-footer nav{display:flex;align-items:center;flex-wrap:wrap;gap:12px 24px}
+.v32-site-footer nav a{font:500 11px/1.5 "Jost",Arial,sans-serif;letter-spacing:.06em;text-decoration:none}
+.v32-site-footer nav a:hover{text-decoration:underline}
+@media(max-width:640px){.v32-site-footer{margin:28px 12px 12px;padding:20px 12px;gap:15px}
+ .v32-site-footer nav{gap:8px 16px}}
