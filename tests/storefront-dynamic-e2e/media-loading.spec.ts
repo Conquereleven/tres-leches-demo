@@ -23,6 +23,11 @@ const menuRetry = (page: Page) =>
 /** The menu's retry must not move when checkout settings finish loading. */
 async function retryStaysPut(page: Page, width: number) {
   await page.setViewportSize({ width, height: 1000 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  // Isolate the checkout transition from the external font swap.
+  await page.route("https://fonts.googleapis.com/**", (route) =>
+    route.fulfill({ contentType: "text/css", body: "" }),
+  );
   let release!: () => void;
   const held = new Promise<void>((resolve) => (release = resolve));
   await page.route("**/api/checkout/config", async (route) => {
@@ -34,10 +39,18 @@ async function retryStaysPut(page: Page, width: number) {
   );
   await page.goto("/bakery?category=cakes&lang=en");
   const retry = menuRetry(page);
+  const status = page.locator(".v32-message");
+  await expect(status).toContainText("Online ordering is unavailable.");
   await expect(retry).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
   const before = await retry.boundingBox();
+  const response = page.waitForResponse("**/api/checkout/config");
   release();
-  await expect(menuRetry(page)).toBeVisible();
+  const settings = await response;
+  expect(settings.ok()).toBe(true);
+  await settings.finished();
+  await expect(status).toContainText("Online ordering is unavailable.");
+  await expect(retry).toBeVisible();
   expect(await retry.boundingBox()).toEqual(before);
 }
 

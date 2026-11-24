@@ -264,6 +264,7 @@ function Bakery(){
   const close=useCallback(()=>{setSelected(null);trigger.current?.focus();},[]);
   const afterAdd=useCallback(()=>{setAddedMessage(visualCopy[language].added);close();},[language,close]);
   const available=menu.status!=="unavailable"&&menu.status!=="loading"&&!loading&&!!config;
+  const waiting=menu.status!=="unavailable"&&(loading||menu.status==="loading");
   const collections=filter==="all"?[]:menu.categories.filter(c=>categoryFor(c.id)===filter);
   const items=available?menu.products.filter(p=>{
     const family=menuProductFamily(menu,p),q=query.trim().toLowerCase();
@@ -294,7 +295,7 @@ function Bakery(){
         onClick={()=>{setSubcategory(cat.id);setSelected(null);}}>{cat.name}</button>)}
     </div>}
     {!available?<div className="v32-message" role="status">
-      <p>{loading||menu.status==="loading"?t.loading:t.orderingUnavailable}</p>
+      <p>{waiting?t.loading:t.orderingUnavailable}</p>
       <button type="button" onClick={retry}>{t.retry}</button></div>:
       !items.length?<p className="v32-message" role="status">{t.notFound}</p>:
       <div className="ref32-grid" data-grid-columns="4">
