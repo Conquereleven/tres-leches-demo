@@ -371,8 +371,12 @@ for (const [slug, single] of [
       const row = page.locator(".v32-new-cart-items .v32-new-cart-row").first();
       await expect(row).toContainText("AED");
       await expect(row).toContainText(amount.replace("AED ", ""));
-      // The cart row always records the color in English (kitchen contract).
-      if (slug === "tricolor") await expect(row).toContainText("Green");
+      // The customer cart localizes the editor and keeps the selected color ID.
+      if (slug === "tricolor") {
+        const color = row.locator(".v32-new-tricolor select");
+        await expect(color).toHaveValue("green");
+        await expect(color.locator("option:checked")).toHaveText("Verde");
+      }
       await page.goto("/checkout?lang=es");
       await expect(page.locator(".b-shop .b-co-header")).toBeVisible();
       await expect(page.locator("main")).toContainText(/concha/i);

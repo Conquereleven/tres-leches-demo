@@ -12,7 +12,7 @@ mkdirSync(shots, { recursive: true });
  * the canonical Shop checkout intentionally retains `.b-shop` with valid
  * order/payment continuity. The legacy `/menu?product=…` selectors
  * (`.b-add-to-cart > button`, `.b-menu-selectors select`, `.b-menu-price`,
- * `.b-pack-composition`, `.b-co-item`, cart color control) are therefore not
+ * `.b-pack-composition`, `.b-co-item`) are therefore not
  * mounted on the customer path anymore; asserting them tested a UI that no
  * longer ships. This spec exercises the mounted V3.2 instead:
  *
@@ -21,8 +21,8 @@ mkdirSync(shots, { recursive: true });
  * - purchase: portal dialog `.ref32-dialog` with `[data-selected-sku]`,
  *   SKU buttons `button[data-sku]`, CTA `.ref32-buy` and — for single-piece
  *   tricolor only — a labelled color select under `.ref32-extra`
- * - cart: `/cart` rows `.v32-new-cart-row` (V3.2 fixes the color at purchase;
- *   the cart has no inline color editor by design)
+ * - cart: `/cart` rows `.v32-new-cart-row` with a localized color editor on
+ *   individual pieces
  * - review: canonical `/checkout` Shop summary
  *   `.b-co-summary-items .b-pack-composition` plus a server quote
  *
@@ -176,17 +176,20 @@ for (const width of [390, 768, 1440])
 
       // V3.2 cart: five rows with the exact identities above.
       await page.goto(`/cart?lang=${lang}`);
-      await expect(page.locator(".v32-new-cart-row")).toHaveCount(5);
+      const rows = page.locator(".v32-new-cart-row");
+      const colors = rows.locator(".v32-new-tricolor select");
+      await expect(rows).toHaveCount(5);
       expect(await readCart(page)).toEqual(expected);
-      // V3.2 renders the chosen preparation colors in the cart rows.
-      for (const name of [
-        tricolorCopy.en.red,
-        tricolorCopy.en.white,
-        tricolorCopy.en.green,
-      ] as const)
+      await expect(colors).toHaveCount(3);
+      for (const [index, color] of (["red", "white", "green"] as const).entries()) {
+        const editor = rows.nth(index).locator(".v32-new-tricolor select");
+        await expect(editor).toHaveValue(color);
         await expect(
-          page.locator(".v32-new-cart-row", { hasText: name }).first(),
-        ).toBeVisible();
+          editor.locator("option:checked"),
+        ).toHaveText(tricolorCopy[lang][color]);
+      }
+      await expect(rows.nth(3).locator("select")).toHaveCount(0);
+      await expect(rows.nth(4).locator("select")).toHaveCount(0);
       await page.screenshot({
         path: `${shots}/${info.project.name}-${width}-${lang}-cart.png`,
         fullPage: true,
@@ -209,30 +212,20 @@ for (const width of [390, 768, 1440])
       await page.reload();
       expect(await readCart(page)).toEqual(expected);
 
-      // V3.2 fixes the color at purchase: the cart carries no inline color
-      // editor. Color changes after navigation go through the same cart
-      // persistence authority (validated localStorage), not around it.
-      await expect(page.locator(".v32-new-cart-row select")).toHaveCount(0);
-      await page.evaluate(() => {
-        const raw = JSON.parse(localStorage.getItem("3l-cart") ?? "[]");
-        raw[0].color = "white";
-        localStorage.setItem("3l-cart", JSON.stringify(raw));
-      });
-      await page.reload();
-      await expect(page.locator(".v32-new-cart-row")).toHaveCount(5);
+      // Editing Mini to white keeps it distinct from the white Individual.
       const edited: CartLine[] = expected.map((line, i) =>
         i === 0 ? { ...line, color: "white" as const } : line,
       );
-      expect(await readCart(page)).toEqual(edited);
-      await expect(
-        page.locator(".v32-new-cart-row", { hasText: "Mini" }).first(),
-      ).toBeVisible();
-      await page.evaluate(() => {
-        const raw = JSON.parse(localStorage.getItem("3l-cart") ?? "[]");
-        raw[0].color = "red";
-        localStorage.setItem("3l-cart", JSON.stringify(raw));
-      });
+      await colors.first().selectOption("white");
+      await expect.poll(() => readCart(page)).toEqual(edited);
       await page.reload();
+      await expect(rows).toHaveCount(5);
+      await expect(colors.first()).toHaveValue("white");
+      expect(await readCart(page)).toEqual(edited);
+      await colors.first().selectOption("red");
+      await expect.poll(() => readCart(page)).toEqual(expected);
+      await page.reload();
+      await expect(colors.first()).toHaveValue("red");
       expect(await readCart(page)).toEqual(expected);
 
       // Server quote for the exact five lines, then the real Shop review.
