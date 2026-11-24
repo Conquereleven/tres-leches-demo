@@ -21,11 +21,16 @@ concurrency:
   cancel-in-progress: true
 jobs:
   analytics-browsers:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    # Preinstalled browser dependencies prevent apt mirror stalls and runner OS drift.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      options: --user 1001
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
@@ -33,8 +38,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npx playwright install --with-deps chromium webkit
-      - run: npx playwright test --config=playwright.analytics.config.ts
+      - run: node scripts/verify-webkit-runtime.mjs
+      - run: openssl version
+      - run: npx playwright test --config=playwright.analytics.config.ts --reporter=list
       # Disposable synthetic SQLite; no secrets, provider requests or deployment.
       - if: failure()
         name: Synthetic failure context
