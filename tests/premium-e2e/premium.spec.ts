@@ -155,9 +155,12 @@ for (const width of [390, 768, 1440])
       await expect(
         page.locator(".v32-new-cart-items .v32-new-cart-row"),
       ).toHaveCount(2);
-      await expect(
-        page.locator('.v32-new-cart-row input[type="number"]').first(),
-      ).toHaveAttribute("max", "100");
+      const quantities = page.locator(
+        '.v32-new-cart-controls input[type="number"]',
+      );
+      await expect(quantities).toHaveCount(2);
+      for (const quantity of await quantities.all())
+        await expect(quantity).toHaveAttribute("max", "100");
       await page.reload();
       await expect(
         page.locator(".v32-new-cart-items .v32-new-cart-row"),
