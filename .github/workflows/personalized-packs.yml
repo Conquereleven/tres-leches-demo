@@ -17,6 +17,10 @@ concurrency:
 jobs:
   packed-v32:
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, webkit]
     container:
       image: mcr.microsoft.com/playwright:v1.64.0-noble
       options: --user 1001
@@ -34,11 +38,11 @@ jobs:
       - run: npm run build
       - run: node scripts/verify-webkit-runtime.mjs
       - name: Real V3.2 personalized packs, settled order, kitchen, authorization
-        run: npx playwright test --config=playwright.packs.config.ts
-      - if: failure()
+        run: npx playwright test --config=playwright.packs.config.ts --project=${{ matrix.project }} --reporter=list
+      - if: failure() || cancelled()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: v32-packs-failure-${{ github.run_attempt }}
+          name: v32-packs-failure-${{ matrix.project }}-${{ github.run_attempt }}
           path: test-results/packs/
           retention-days: 7
           if-no-files-found: ignore

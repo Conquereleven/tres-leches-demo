@@ -10,6 +10,8 @@ const spec = PACK_SPECS.find((s) =>
   s.family === "filled" && s.capacity === 12 && s.size === "individuales"
 )!;
 const cardId = "pan-de-muerto-filled-pack";
+// Missing selectors must fail with useful diagnostics, not consume the entire job.
+test.use({ actionTimeout: 15000, navigationTimeout: 30000 });
 
 async function openBuilder(page: Page, language: "en" | "es" | "ar") {
   await page.goto("/bakery?category=mexican&lang=" + language);
@@ -18,8 +20,11 @@ async function openBuilder(page: Page, language: "en" | "es" | "ar") {
   await card.click();
   const dialog = page.locator(".ref32-dialog");
   await expect(dialog).toBeVisible();
-  await dialog.locator('[data-pack-presentation="individual"]').click();
-  await dialog.locator('[data-pack-pieces="12"]').click();
+  // Four direct V3.2 variant buttons replace the legacy two-stage selector.
+  const variant = dialog.locator(`button[data-sku="${spec.packSkuId}"]`);
+  await expect(variant).toBeVisible();
+  await expect(variant).toBeEnabled();
+  await variant.click();
   await expect(dialog).toHaveAttribute("data-selected-sku", spec.packSkuId);
   await expect(dialog.locator(".ref32-composition-row")).toHaveCount(5);
   return dialog;
@@ -59,6 +64,9 @@ for(const width of [390,768,1440]) for(const language of ["en","es","ar"] as con
     await expect(buy).toBeDisabled();
     await chooseFlavor(dialog,spec.components[1]!.componentSkuId,4,language);
     await expect(dialog.locator(".ref32-composition p")).toContainText("12/12");
+    for (const plus of await dialog.locator(".ref32-composition-row").getByRole("button", {name: "+", exact: true}).all()) {
+      await expect(plus).toBeDisabled();
+    }
     await expect(dialog.locator(".ref32-price strong")).toContainText(/235/);
     await expect(buy).toBeEnabled();
     const config=await(await page.request.get("/api/checkout/config")).json();
@@ -77,7 +85,9 @@ for(const width of [390,768,1440]) for(const language of ["en","es","ar"] as con
       },
     }];
     await expect.poll(()=>readCart(page)).toEqual(expected);
-    await expect(page.locator(".v32-new-cart-row")).toContainText("Pistachio");
+    const cartRow = page.locator(".v32-new-cart-row");
+    await expect(cartRow).toContainText(`${componentName(spec.components[4]!.componentSkuId)} × 8`);
+    await expect(cartRow).toContainText(`${componentName(spec.components[1]!.componentSkuId)} × 4`);
     await page.reload();
     await expect.poll(()=>readCart(page)).toEqual(expected);
     const quoted=await page.request.post("/api/checkout/quote",{
@@ -93,7 +103,10 @@ for(const width of [390,768,1440]) for(const language of ["en","es","ar"] as con
     expect(quoted.status(),await quoted.text()).toBe(200);
     expect((await quoted.json()).totalFils).toBe(23500);
     await page.goto("/checkout?lang="+language);
-    await expect(page.locator(".b-co-summary-items .b-pack-composition")).toContainText("Pistachio");
+    const summary = page.locator(".b-co-summary-items .b-pack-composition");
+    await expect(summary).toHaveCount(1);
+    await expect(summary).toContainText(`${componentName(spec.components[4]!.componentSkuId, language)} × 8`);
+    await expect(summary).toContainText(`${componentName(spec.components[1]!.componentSkuId, language)} × 4`);
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
     expect(errors).toEqual([]);
   });
