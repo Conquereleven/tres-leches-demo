@@ -5,6 +5,10 @@ on:
     paths:
       - "src/brand/visual-v32/**"
       - "tests/conchas-e2e/visual-v32.spec.ts"
+      - "tests/v32-release-e2e/rt011-storefront.spec.ts"
+      - "playwright.v32-release.config.ts"
+      - "server/catalog/**"
+      - "shared/commerce-policy.ts"
       - ".github/workflows/v32-preview-evidence.yml"
 permissions:
   contents: read
@@ -31,6 +35,8 @@ jobs:
       - run: npm run build
       - name: Verify actual 3L categories and package choices
         run: npx playwright test --config=playwright.conchas.config.ts tests/conchas-e2e/visual-v32-source.spec.ts --workers=1
+      - name: Verify RT01.1 storefront on Chromium and WebKit
+        run: npx playwright test --config=playwright.v32-release.config.ts tests/v32-release-e2e/rt011-storefront.spec.ts
       - name: Record exact SHA and scope
         if: always()
         run: |
@@ -47,5 +53,6 @@ jobs:
             docs/brand/brand02/conchas/v32-source-*.png
             docs/brand/brand02/conchas/v32-proof-head.txt
             test-results/conchas/
+            test-results/v32-release/
           retention-days: 7
           if-no-files-found: error

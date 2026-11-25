@@ -532,3 +532,54 @@
   .v32-journal-sections, .v32-app .v32-new-contact-grid { grid-template-columns: 1fr; }
 }
 .v32-product-page-card { max-width: 390px; margin: 24px auto; }
+
+/* The route is geographic. Isolate art positioning from the page direction. */
+.v32-journey { direction: ltr; }
+.v32-city-reference[data-fallback="true"] {
+  height: auto;
+  width: min(100%, 245px);
+  aspect-ratio: 784 / 780;
+}
+.v32-city-reference img { inset: 0 auto auto 0; }
+.v32-city-reference[data-fallback="true"] img {
+  height: auto !important;
+  object-fit: fill !important;
+}
+.v32-city { min-width: 0; }
+@media (max-width: 900px) {
+  .v32-city-reference[data-fallback="true"] { width: min(100%, 176px); }
+  .v32-home-fidelity .v32-route { grid-row: auto; grid-column: auto; }
+  .v32-home-fidelity .v32-journey {
+    grid-template-columns: minmax(0, 1fr) minmax(48px, 0.65fr) minmax(0, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .v32-home-fidelity .v32-journey { gap: 6px; }
+  .v32-city b { letter-spacing: 0.02em; }
+}
+[lang="ar"] :is(.v32-app, .v32-mobile-portal) {
+  font-family: "Noto Sans Arabic", Tahoma, sans-serif;
+}
+[lang="ar"] :is(.v32-app, .v32-mobile-portal) :is(h1, h2, h3, p, a:not(.v32-logo), label, select, button, strong, small, em, .v32-city b, .v32-city span, .v32-tagline, .v32-eyebrow):not(.v32-logo *) {
+  font-family: "Noto Sans Arabic", Tahoma, sans-serif !important;
+  letter-spacing: normal;
+  line-height: 1.55;
+}
+[lang="ar"] .v32-app .v32-home h1 { margin-bottom: 22px; }
+[lang="ar"] .v32-home-fidelity .v32-journey { margin-top: 0; }
+[lang="ar"] .v32-app .v32-legacy {
+  border-left: 0;
+  border-inline-start: 1px solid #b98a4e;
+  padding-inline: 25px 0;
+  text-align: start;
+}
+[lang="ar"] .v32-search button {
+  border-left: 0;
+  border-inline-start: 1px solid #b98a4e55;
+  padding-inline: 18px 0;
+}
+[lang="ar"] .v32-mobile-sheet {
+  inset: 0 0 0 auto !important;
+  border-radius: 26px 0 0 26px !important;
+}
+[lang="ar"] .v32-journal-sections { text-align: start; }

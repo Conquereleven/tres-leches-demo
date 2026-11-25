@@ -35,7 +35,7 @@ test("source REF_C: four-column desktop cards with anchored original popup",asyn
 test("source REF_C: four direct real-SKU purchase choices have no technical two-step matrix",async ({page})=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto("/visual-v32/bakery?category=mexican&lang=es");
- const product=page.locator('[data-product-id="conchas-traditional-pack"]');
+ const product=page.locator('.ref32-product[data-product-id="conchas-traditional-pack"]');
  await expect(product).toBeEnabled();
  await product.click();
  const dialog=page.getByRole("dialog");
@@ -52,7 +52,7 @@ test("source REF_C: four direct real-SKU purchase choices have no technical two-
 test("source REF_D: selected card image stays visibly linked above popup",async ({page},info)=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto("/visual-v32/bakery?category=bakery&lang=es");
- const card=page.locator('[data-product-id="orejas"]');
+ const card=page.locator('.ref32-product[data-product-id="orejas"]');
  await expect(card).toBeEnabled();
  await card.click();
  const box=await card.locator(".ref32-photo").boundingBox();
@@ -95,7 +95,7 @@ test("short REF_D: footer stays in viewport while only details scroll",async ({p
 test("real purchase: Orejas selected box SKU and amount reach canonical cart",async ({page})=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto("/visual-v32/bakery?category=bakery&lang=es");
- await page.locator('[data-product-id="orejas"]').click();
+ await page.locator('.ref32-product[data-product-id="orejas"]').click();
  const dialog=page.getByRole("dialog");
  await expect(dialog.locator('.ref32-presentation button[aria-pressed="true"]')).toHaveCount(1);
  await expect(dialog.locator('[data-pack-pieces="6"]')).toBeEnabled();
@@ -117,7 +117,7 @@ test("real purchase: Orejas selected box SKU and amount reach canonical cart",as
 test("Founder 8.7: cakes use Mini/Small/Medium with 15/20/30 characters and servings in description",async ({page},info)=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto("/visual-v32/bakery?category=cakes&lang=es");
- const card=page.locator('[data-product-id="tres-leches--classic"]');
+ const card=page.locator('.ref32-product[data-product-id="tres-leches--classic"]');
  await card.click();
  const popup=page.getByRole("dialog");
  const options=popup.locator(".ref32-options .ref32-option");
@@ -163,7 +163,7 @@ test("Founder 8.7: cakes use Mini/Small/Medium with 15/20/30 characters and serv
 test("Founder 8.7 mobile: three cake sizes, 15/20/30 limits and visible CTA",async ({page},info)=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto("/visual-v32/bakery?category=cakes&lang=en");
- await page.locator('[data-product-id="tres-leches--classic"]').click();
+ await page.locator('.ref32-product[data-product-id="tres-leches--classic"]').click();
  const popup=page.getByRole("dialog");
  const sizes=popup.locator('[data-cake-sizes="Mini-Small-Medium"]');
  await expect(sizes).toBeVisible();
@@ -186,16 +186,16 @@ test("Founder 8.7 mobile: three cake sizes, 15/20/30 limits and visible CTA",asy
 });
 test("Founder 8.7: no inscription field for Bakery, Conchas or Orejas",async ({page})=>{
  await page.goto("/visual-v32/bakery?category=bakery&lang=es");
- await page.locator('[data-product-id="orejas"]').click();
+ await page.locator('.ref32-product[data-product-id="orejas"]').click();
  await expect(page.getByRole("dialog").locator(".ref32-note")).toHaveCount(0);
  await page.keyboard.press("Escape");
  await page.goto("/visual-v32/bakery?category=mexican&lang=es");
- await page.locator('[data-product-id="conchas-traditional-pack"]').click();
+ await page.locator('.ref32-product[data-product-id="conchas-traditional-pack"]').click();
  await expect(page.getByRole("dialog").locator(".ref32-note")).toHaveCount(0);
 });
 test("Founder 8.7: Special Flavours Big displays Medium, with no invented serving range",async ({page})=>{
  await page.goto("/visual-v32/bakery?category=cakes&lang=en");
- const card=page.locator('[data-product-id="special-flavours-cake--berries"]');
+ const card=page.locator('.ref32-product[data-product-id="special-flavours-cake--berries"]');
  await expect(card).toBeEnabled();
  await card.click();
  const popup=page.getByRole("dialog"),buttons=popup.locator(".ref32-option");

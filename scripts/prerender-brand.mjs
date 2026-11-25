@@ -43,7 +43,7 @@ const shell = readFileSync(path, "utf8");
 if (!shell.includes('<div id="root"></div>'))
   throw new Error("Static storefront root is missing");
 const fontSheet =
-  '<link data-v32-font-sheet="true" rel="stylesheet" referrerpolicy="no-referrer" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=Jost:wght@400;500;600&amp;display=swap">';
+  '<link data-v32-font-sheet="true" rel="stylesheet" referrerpolicy="no-referrer" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;family=Jost:wght@400;500;600&amp;family=Noto+Sans+Arabic:wght@400;500;600;700&amp;display=swap">';
 const withFonts = shell.replace("</head>", () => fontSheet + "</head>");
 const withBody = (html, body) =>
   html.replace('<div id="root"></div>', () => `<div id="root">${body}</div>`);

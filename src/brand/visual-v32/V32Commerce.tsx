@@ -2,12 +2,13 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { cart, cartCount, cartSubtotalFils, displayLinePrice, minQty, useCart, useCheckoutConfig, type CartLine, type CheckoutConfig } from "../cart";
 import { useLanguage } from "../localization";
 import { withdrawnConchaSku } from "../../../shared/storefront-visibility";
-import { formatAed } from "../content";
+import { productTitle, storefrontMoney } from "./ApprovedPurchaseSelector";
+import { useLiveCatalog } from "../live-catalog";
 import { business, contactChannelLabel, contactChannels, legalEntityLabel, type PolicyPath } from "../business";
 import { pages } from "../Policies";
 import { HowToOrderSteps } from "../StorePages";
 import { lineKey, componentName, packSpec, type Composition } from "../../../shared/pack-composition";
-import { menuFamilyForSku } from "../menu";
+import { storefrontProductForSku, menuFamilyForSku } from "../menu";
 import { packQtyLabel, toPackChoice } from "./catalog-options";
 import { isTricolorColor, tricolorSpec, tricolorCopy, TRICOLOR_COLORS } from "../../../shared/tricolor";
 import { packCopy } from "../../../shared/pack-copy";
@@ -23,15 +24,28 @@ const copy={
  ar:{empty:"سلتك تنتظر شيئاً لذيذاً.",cart:"سلتك",continue:"استكشف قائمتنا",checkout:"إتمام الطلب",remove:"إزالة",total:"المجموع الفرعي",quantity:"الكمية",delivery:"توصيل",pickup:"استلام",fulfillment:"توصيل أو استلام",details:"بياناتك",review:"مراجعة طلبك",next:"متابعة",back:"رجوع",date:"اختر التاريخ",slot:"الفترة",zone:"منطقة التوصيل",address:"الشارع والمبنى",unit:"الوحدة",first:"الاسم الكامل",phone:"رقم الهاتف",email:"البريد الإلكتروني",notice:"هذه معاينة تجريبية لا تنفّذ الدفع أو الطلبات.",notReady:"الطلب غير متاح مؤقتاً.",minimum:"يجب استيفاء الحد الأدنى قبل متابعة الطلب.",contact:"نحن هنا للمساعدة",contactIntro:"هل لديك أسئلة حول طلبك أو التوصيل أو كعكة خاصة؟ تواصل مع فريق 3L.",company:"الشركة",location:"زورونا",help:"كيفية الطلب",helpText:"اختر المنتجات والتوصيل أو الاستلام وراجع التفاصيل قبل الدفع.",price:"السعر",add:"أضف إلى السلة",choose:"اختر",selection:"اختر اللون",boxes:"اختر محتويات كل علبة",pieces:"عدد القطع",invalid:"أكمل الاختيار للمتابعة.",saved:"تمت الإضافة",start:"متابعة التسوق",policy:"معلومات العملاء",verify:"يتم التحقق من الرسوم والحد الأدنى بواسطة الخادم.",retry:"حاول مجدداً"}
 } as const;
 const suffix=(p:string)=>root+p;
-const money=(n:number)=>formatAed(n);
-function useVisualCopy(){const {language}=useLanguage();return {language,t:copy[language]};}
+
+function useVisualCopy(){const {language}=useLanguage();return {language,t:copy[language],money:(amount:number)=>storefrontMoney(amount,language)};}
 function Panel({title,children}:{title:string;children:React.ReactNode}){return <section className="v32-new-panel"><h2>{title}</h2>{children}</section>;}
-function Empty({message}:{message:string}){return <div className="v32-new-empty"><p>{message}</p><a className="v32-new-action" href={suffix("/bakery")}>{copy.en.continue} ↗</a></div>;}
+function Empty({message}:{message:string}){const {t}=useVisualCopy();return <div className="v32-new-empty"><p>{message}</p><a className="v32-new-action" href={suffix("/bakery")}>{t.continue} ↗</a></div>;}
+function useCartName(){
+ const {language,text}=useLanguage();
+ const catalog=useLiveCatalog();
+ return (sku:string,name:string)=>{
+  const product=storefrontProductForSku(sku);
+  const option=catalog.status==="live"?catalog.catalog.products.find(item=>item.id===product?.id)?.options.find(item=>item.id===sku)?.content[language]:undefined;
+  if(language==="en")return name;
+  if(option?.name)return option.name;
+  if(!product)return text(name);
+  const size=menuFamilyForSku(sku)?.options.find(item=>item.id===sku)?.size;
+  return [productTitle(product,language,catalog,text), option?.sizeLabel??(size?text(size):null)].filter(Boolean).join(" · ");
+ };
+}
 function Summary({config}:{config:CheckoutConfig}){
- const lines=useCart();const {language,t}=useVisualCopy();
+ const lines=useCart();const {language,t,money}=useVisualCopy();const name=useCartName();
  const good=lines.filter(l=>!withdrawnConchaSku(l.productId)&&config.products.some(p=>p.id===l.productId));
  return <aside className="v32-new-summary"><h2>{t.cart} · {cartCount(lines)}</h2>
- <ul>{good.map(l=>{const p=config.products.find(p=>p.id===l.productId)!;return <li key={lineKey(l)}><span>{p.name}<small> × {l.quantity}</small>
+ <ul>{good.map(l=>{const p=config.products.find(p=>p.id===l.productId)!;return <li key={lineKey(l)}><span>{name(p.id,p.name)}<small> × {l.quantity}</small>
   {(()=>{const option=menuFamilyForSku(l.productId)?.options.find(o=>o.id===l.productId);
     const choice=option?toPackChoice(option):null;
     return choice&&choice.pieces>1?<small data-cart-pack-count>
@@ -65,16 +79,16 @@ function V32TricolorEditor({line}:{line:CartLine}){
 }
 export function VisualCart(){
  const {text}=useLanguage();
- const {t}=useVisualCopy();
+ const {language,t,money}=useVisualCopy();const name=useCartName();
  const lines=useCart();const {config,loading,retry}=useCheckoutConfig();
- const needsReview=lines.some(l=>withdrawnConchaSku(l.productId));
+ const needsReview=lines.some(l=>withdrawnConchaSku(l.productId)||!config?.products.some(p=>p.id===l.productId));
  return <main id="main" className="v32-new-page" data-new-ui="cart">
- <p className="v32-new-eyebrow">THE 3L EXPERIENCE</p><h1>{t.cart}</h1>
- {loading?<p role="status">Loading…</p>:!config?<div role="alert">{t.notReady}<button onClick={retry}>{t.retry}</button></div>:
+ <p className="v32-new-eyebrow">{{en:"THE 3L EXPERIENCE",es:"LA EXPERIENCIA 3L",ar:"تجربة 3L"}[language]}</p><h1>{t.cart}</h1>
+ {loading?<p role="status">{text("Loading…")}</p>:!config?<div role="alert">{t.notReady}<button onClick={retry}>{t.retry}</button></div>:
  !lines.length?<Empty message={t.empty}/>:<div className="v32-new-layout">
  <Panel title={t.cart}><ul className="v32-new-cart-items">{lines.map(l=>{const p=withdrawnConchaSku(l.productId)?undefined:config.products.find(x=>x.id===l.productId);return <li key={lineKey(l)} className="v32-new-cart-row">
-  <div><h3>{p?.name||l.productId}</h3>{p&&tricolorSpec(l.productId)?.kind==="single"?<V32TricolorEditor line={l}/>:l.color&&<p>{tricolorCopy.en[l.color]}</p>}{l.cakeMessage&&<p data-cart-cake-message>{t.selection==="Select a color"?"Cake inscription":"Inscripción"}: {l.cakeMessage}</p>}{l.composition?.map(c=><small key={c.componentSkuId}>{componentName(c.componentSkuId)} × {c.units} </small>)}{p&&config.personalizedPacks?.enabled&&packSpec(l.productId)&&<V32PackEditor line={l} config={config}/>}
-  <p>{p?money(displayLinePrice(l,p.priceFils,config.packPricing))+" each":text("This item is no longer available.")}</p></div>
+  <div><h3>{p?name(p.id,p.name):l.productId}</h3>{p&&tricolorSpec(l.productId)?.kind==="single"?<V32TricolorEditor line={l}/>:l.color&&<p>{tricolorCopy[language][l.color]}</p>}{l.cakeMessage&&<p data-cart-cake-message>{{en:"Cake inscription",es:"Inscripción",ar:"الكتابة على الكعكة"}[language]}: {l.cakeMessage}</p>}{l.composition?.map(c=><small key={c.componentSkuId}>{componentName(c.componentSkuId,language)} × {c.units} </small>)}{p&&config.personalizedPacks?.enabled&&packSpec(l.productId)&&<V32PackEditor line={l} config={config}/>}
+  <p>{p?money(displayLinePrice(l,p.priceFils,config.packPricing))+{en:" each",es:" por unidad",ar:" للقطعة"}[language]:text("This item is no longer available.")}</p></div>
   <div className="v32-new-cart-controls">{p&&<label>{t.quantity}<input type="number" min={minQty(l.productId)} max="100" value={l.quantity} onChange={e=>cart.set(lineKey(l),Number(e.target.value))}/></label>}<button type="button" onClick={()=>cart.remove(lineKey(l))}>{t.remove}</button></div></li>})}</ul>
  <a className="v32-new-action v32-new-action-secondary" href={suffix("/bakery")}>{t.continue}</a></Panel>
  <div><Summary config={config}/>{needsReview?<p role="alert">{text("This item is no longer available.")}</p>:<a className="v32-new-action" href={suffix("/checkout")}>{t.checkout} →</a>}</div></div>}
@@ -116,7 +130,7 @@ export function VisualPolicy({path}:{path:PolicyPath}){
 }
 type Quote={eligible?:boolean;totalFils?:number;subtotalFils?:number;feeFils?:number;minOrderAed?:number;reason?:string};
 export function VisualCheckout(){
- const {t}=useVisualCopy();const lines=useCart();const {config,loading,retry}=useCheckoutConfig();
+ const {language,t,money}=useVisualCopy();const lines=useCart();const {config,loading,retry}=useCheckoutConfig();
  const [step,setStep]=useState(1),[mode,setMode]=useState<"pickup"|"delivery">("pickup");
  const [zone,setZone]=useState(""),[date,setDate]=useState(""),[slot,setSlot]=useState("");
  const [name,setName]=useState(""),[phone,setPhone]=useState(""),[email,setEmail]=useState("");
@@ -135,7 +149,7 @@ export function VisualCheckout(){
  },[config,validLines,mode,zone,t.notReady]);
  const proceed=(e:FormEvent)=>{e.preventDefault();if(step===1&&(!date||!slot||(mode==="delivery"&&(!zone||!address))))return;
   if(step===2&&(!name.trim()||!phone.trim()||!email.includes("@")))return;setStep(s=>Math.min(3,s+1));window.scrollTo({top:0,behavior:"smooth"})};
- return <main id="main" className="v32-new-page" data-new-ui="checkout"><p className="v32-new-eyebrow">THE 3L EXPERIENCE</p><h1>{step===1?t.fulfillment:step===2?t.details:t.review}</h1>
+ return <main id="main" className="v32-new-page" data-new-ui="checkout"><p className="v32-new-eyebrow">{{en:"THE 3L EXPERIENCE",es:"LA EXPERIENCIA 3L",ar:"تجربة 3L"}[language]}</p><h1>{step===1?t.fulfillment:step===2?t.details:t.review}</h1>
  <div className="v32-new-progress"><span className={step>=1?"active":""}>01 {t.fulfillment}</span><span className={step>=2?"active":""}>02 {t.details}</span><span className={step>=3?"active":""}>03 {t.review}</span></div>
  {loading?<p role="status">Loading…</p>:!config?.enabled?<div role="alert">{t.notReady}<button type="button" onClick={retry}>{t.retry}</button></div>:
  !validLines.length?<Empty message={t.empty}/>:below?<div role="alert" className="v32-new-panel">{t.minimum}<a className="v32-new-action" href={suffix("/cart")}>{t.cart}</a></div>:

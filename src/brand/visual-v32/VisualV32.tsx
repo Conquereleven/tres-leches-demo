@@ -8,7 +8,8 @@ import { purchasableOptions } from "./catalog-availability";
 import { EntranceSketch } from "../ScrollSketch";
 import { Journal } from "./Journal";
 import { VisualCart, VisualCheckout, VisualReturn, VisualContact, VisualPolicy, VisualHowToOrder } from "./V32Commerce";
-import { ApprovedProductCard, ApprovedPurchasePopup, productTitle, useProductTitle } from "./ApprovedPurchaseSelector";
+import { ApprovedProductCard, ApprovedPurchasePopup, productTitle, productDescription, useProductTitle } from "./ApprovedPurchaseSelector";
+import { localizedSource } from "../locales/engine";
 import { isPolicyPath } from "../business";
 import "./visual-v32.css";
 
@@ -114,9 +115,16 @@ const categoryFor=(category:string):Filter=>
   category==="panettone"?"panettone":
   category==="pan"||category==="conchas"?"mexican":"special";
 
+const navigationLabels = {
+ en: { language: "Language", open: "Open navigation", close: "Close navigation", menu: "Mobile navigation", skip: "Skip to content", categories: "Categories", collections: "Published 3L categories", searchBakery: "Search the bakery", searchMenu: "Search the menu", footer: "V3.2 footer navigation" },
+ es: { language: "Idioma", open: "Abrir navegación", close: "Cerrar navegación", menu: "Navegación móvil", skip: "Saltar al contenido", categories: "Categorías", collections: "Categorías publicadas de 3L", searchBakery: "Buscar en la panadería", searchMenu: "Buscar en el menú", footer: "Navegación al pie de página" },
+ ar: { language: "اللغة", open: "فتح قائمة التنقل", close: "إغلاق قائمة التنقل", menu: "قائمة التنقل", skip: "انتقل إلى المحتوى", categories: "الفئات", collections: "فئات 3L المنشورة", searchBakery: "ابحث في المخبز", searchMenu: "ابحث في القائمة", footer: "روابط تذييل الصفحة" },
+} as const;
+
 function Header(){
   const {language,setLanguage}=useLanguage();
   const labels=visualNav[language];
+  const ui=navigationLabels[language];
   const [mobileOpen,setMobileOpen]=useState(false);
   const count=cartCount(useCart());
   useEffect(()=>{
@@ -129,8 +137,8 @@ function Header(){
   },[mobileOpen]);
   return <>
     <header className="v32-header">
-      <nav className="v32-nav" aria-label="3L Visual Lab">
-        <button className="v32-mobile-toggle" type="button" aria-label={mobileOpen?"Close navigation":"Open navigation"}
+      <nav className="v32-nav" aria-label="3L">
+        <button className="v32-mobile-toggle" type="button" aria-label={mobileOpen?ui.close:ui.open}
           aria-controls="v32-mobile-links" aria-expanded={mobileOpen}
           onClick={()=>setMobileOpen(value=>!value)}>{mobileOpen?"×":"☰"}</button>
         <span className="v32-nav-left"><a href={origin || "/"}>{labels.home}</a><a href={origin+"/menu"}>{labels.menu}</a></span>
@@ -140,8 +148,8 @@ function Header(){
         </a>
         <span className="v32-nav-right">
           <a href={origin+"/journal"}>{labels.journal}</a><a href={origin+"/contact"}>{labels.contact}</a>
-          <label className="v32-language-control"><span className="v32-sr">Language</span>
-            <select aria-label="Language" value={language}
+          <label className="v32-language-control"><span className="v32-sr">{ui.language}</span>
+            <select aria-label={ui.language} value={language}
               onChange={e=>setLanguage(e.target.value as typeof language)}>
               <option value="en">🇬🇧 EN</option><option value="es">🇲🇽 ES</option><option value="ar">🇦🇪 AR</option>
             </select>
@@ -152,11 +160,11 @@ function Header(){
     </header>
     {mobileOpen&&createPortal(<div className="v32-mobile-portal" data-v32-mobile-menu="true">
       <button type="button" className="v32-mobile-backdrop"
-        onClick={()=>setMobileOpen(false)} aria-label="Close navigation backdrop"/>
-      <aside className="v32-mobile-drawer v32-mobile-sheet" id="v32-mobile-links" aria-label="Mobile navigation">
+        onClick={()=>setMobileOpen(false)} aria-hidden="true" tabIndex={-1}/>
+      <aside className="v32-mobile-drawer v32-mobile-sheet" id="v32-mobile-links" aria-label={ui.menu}>
         <div className="v32-mobile-sheet-top">
           <strong>✧ 3L pastelerías</strong>
-          <button type="button" aria-label="Close menu" onClick={()=>setMobileOpen(false)}>×</button>
+          <button type="button" aria-label={ui.menu+" · "+ui.close} onClick={()=>setMobileOpen(false)}>×</button>
         </div>
         <nav>
           <a href={origin || "/"} onClick={()=>setMobileOpen(false)}>{labels.home}</a>
@@ -172,22 +180,27 @@ function Header(){
 function Home({staticPage}:{staticPage:boolean}){
   const {language}=useLanguage();const t=visualCopy[language];
   const combinedCityArt="/brand/reference/mexico-dubai.png";
+  const cities = {
+    en: { mexico: "MEXICO CITY", dubai: "DUBAI", since: "1982", journey: "Mexico City 1982 to Dubai Today" },
+    es: { mexico: "CIUDAD DE MÉXICO", dubai: "DUBÁI", since: "1982", journey: "De Ciudad de México en 1982 a Dubái hoy" },
+    ar: { mexico: "مدينة مكسيكو", dubai: "دبي", since: "١٩٨٢", journey: "من مدينة مكسيكو عام ١٩٨٢ إلى دبي اليوم" },
+  }[language];
   return <main className="v32-home v32-home-fidelity" id="main">
     <h1>{t.hero1}<br/>{t.hero2}</h1>
-    <section className="v32-journey" aria-label="Mexico City 1982 to Dubai Today">
-      <div className="v32-city v32-city-left"><div className="v32-city-crop v32-city-reference" data-fallback={!origin || undefined}><img
+    <section className="v32-journey" dir="ltr" aria-label={cities.journey}>
+      <div className="v32-city v32-city-left" data-city="mexico"><div className="v32-city-crop v32-city-reference" data-fallback={!origin || undefined}><img
         src={origin?previewAssets+"/mexico-city-illustration.jpg":combinedCityArt} onError={e=>fallbackPreviewAsset(e,combinedCityArt)}
-        alt="Mexico City 1982 illustration"/></div>
-        <b>MEXICO CITY</b><span>1982</span></div>
+        alt=""/></div>
+        <b dir="auto">{cities.mexico}</b><span><bdi>{cities.since}</bdi></span></div>
       <svg viewBox="0 0 540 100" className="v32-route" aria-hidden="true">
         <path d="M8 39 C90 -24 150 138 267 55 S417 56 529 38" fill="none" stroke="#b98a4e" strokeWidth="2"/>
         <circle cx="98" cy="37" r="17" fill="none" stroke="#b98a4e" strokeWidth="2"/>
         <circle cx="529" cy="38" r="9" fill="#f8ebe4" stroke="#b98a4e" strokeWidth="3"/>
       </svg>
-      <div className="v32-city v32-city-right"><div className="v32-city-crop v32-city-reference" data-fallback={!origin || undefined}><img
+      <div className="v32-city v32-city-right" data-city="dubai"><div className="v32-city-crop v32-city-reference" data-fallback={!origin || undefined}><img
         src={origin?previewAssets+"/dubai-illustration.jpg":combinedCityArt} onError={e=>fallbackPreviewAsset(e,combinedCityArt)}
-        alt="Dubai Today illustration"/></div>
-        <b>DUBAI</b><span>{t.today}</span></div>
+        alt=""/></div>
+        <b dir="auto">{cities.dubai}</b><span><bdi>{t.today}</bdi></span></div>
     </section>
     <section className="v32-story" id="family-story">
       <div className="v32-family">
@@ -209,8 +222,8 @@ function Landing(){
   const {language}=useLanguage();const t=visualCopy[language];
   const [query,setQuery]=useState("");
   const keywords={
-    cakes:["cake","pastel","berry","slice","pastries","seasonal","tres leches"],
-    bakery:["bread","concha","croissant","pan","bakery","palmier","orejas"]
+    cakes:["cake","pastel","berry","slice","pastries","seasonal","tres leches","كعكة","كعكات","تريس ليتشيس"],
+    bakery:["bread","concha","croissant","pan","bakery","palmier","orejas","مخبوزات","خبز","كونشا","كرواسون"]
   };
   const normalized=query.trim().toLocaleLowerCase();
   const matches=normalized?Object.entries(keywords).filter(([,words])=>
@@ -219,9 +232,10 @@ function Landing(){
     <span className="v32-eyebrow">{t.menuEyebrow}</span><h1>{t.menuTitle}</h1>
     <p className="v32-tagline">{t.menuTag}</p>
     <form action={origin+"/bakery"} className="v32-search" role="search">
+      <input type="hidden" name="lang" value={language}/>
       <span aria-hidden="true">⌕</span><input value={query}
         onChange={event=>setQuery(event.target.value)}
-        name="q" type="search" aria-label="Search the bakery" placeholder={t.searchBakery}/>
+        name="q" type="search" aria-label={navigationLabels[language].searchBakery} placeholder={t.searchBakery}/>
       <button type="submit">{t.find}</button>
     </form>
     <div className="v32-search-results" aria-live="polite">
@@ -249,16 +263,36 @@ function Bakery({search,staticPage=false}:{search:string;staticPage?:boolean}){
   const menu=useMenu();
   const {config,loading,retry}=useCheckoutConfig();
   const now=useCheckoutNow(config);
-  const params=new URLSearchParams(search);
+  const [urlSearch,setUrlSearch]=useState(search);
+  const params=new URLSearchParams(urlSearch);
   const raw=params.get("category")??"all";
-  const initial:Filter=groups.some(g=>g.id===raw)?raw as Filter:
+  const filter:Filter=groups.some(g=>g.id===raw)?raw as Filter:
     raw==="pan"||raw==="conchas"?"mexican":"all";
-  const [filter,setFilter]=useState<Filter>(initial);
-  const [subcategory,setSubcategory]=useState<string|null>(params.get("subcategory")??(raw==="pan"||raw==="conchas"?raw:null));
+  const subcategory=params.get("subcategory")??(raw==="pan"||raw==="conchas"?raw:null);
   const [query,setQuery]=useState(params.get("q")??"");
   const [selected,setSelected]=useState<string|null>(null);
   const [addedMessage,setAddedMessage]=useState("");
   const trigger=useRef<HTMLButtonElement|null>(null);
+  useEffect(()=>{
+    const restore=()=>{
+      setUrlSearch(location.search);
+      setQuery(new URLSearchParams(location.search).get("q")??"");
+      setSelected(null);
+      setAddedMessage("");
+    };
+    window.addEventListener("popstate",restore);
+    return ()=>window.removeEventListener("popstate",restore);
+  },[]);
+  const navigateFilters=(next:Filter,collection:string|null)=>{
+    const url=new URL(location.href);
+    if(next==="all")url.searchParams.delete("category");else url.searchParams.set("category",next);
+    if(collection)url.searchParams.set("subcategory",collection);else url.searchParams.delete("subcategory");
+    if(query.trim())url.searchParams.set("q",query.trim());else url.searchParams.delete("q");
+    if(url.search!==location.search)history.pushState(history.state,"",url);
+    setUrlSearch(url.search);
+    setSelected(null);
+    setAddedMessage("");
+  };
   const close=useCallback(()=>{setSelected(null);trigger.current?.focus();},[]);
   const afterAdd=useCallback(()=>{setAddedMessage(visualCopy[language].added);close();},[language,close]);
   const available=menu.status!=="unavailable"&&menu.status!=="loading"&&!loading&&!!config;
@@ -266,46 +300,56 @@ function Bakery({search,staticPage=false}:{search:string;staticPage?:boolean}){
   const catalog = available ? menu.products.flatMap(product => {
     const family = menuProductFamily(menu,product);
     const options = purchasableOptions(family,menu.status,config,now);
-    if (family.category === "pan" && !options.length) return [];
+    if (family.category === "panettone" || ((family.category === "pan" || query.trim()) && !options.length)) return [];
     return [{product, family, price: options.length ? Math.min(...options.map(o=>o.priceFils)) : null}];
   }) : [];
   const categoriesWithProducts = new Set(catalog.map(item=>item.family.category));
   const collections = filter==="all" ? [] : menu.categories.filter(c=>
     categoryFor(c.id)===filter && categoriesWithProducts.has(c.id));
+  const categoryName=(id:string,name:string)=>{
+    const item=published.status==="live"?published.catalog.categories.find(c=>c.id===id):undefined;
+    const knownArabic:Record<string,string>={
+      cakes:"الكعكات", jars:"كعكات في أكواب", bakery:"المخبوزات",
+      pan:"بان دي مويرتو", conchas:"كونشا", special:"نكهات خاصة",
+    };
+    const translation=item?.content?.[language]?.name;
+    return language==="ar"&&(!translation||translation===name)&&knownArabic[id]
+      ? knownArabic[id] : translation??localizedSource(name,language);
+  };
   const q=query.trim().toLocaleLowerCase(language);
   const items=catalog.filter(({product,family})=>
     (filter==="all"||categoryFor(family.category)===filter)&&
     (!subcategory||family.category===subcategory)&&
-    (!q||[product.title, productTitle(product,language,published,text), product.description??"", product.variant,
-      menu.categories.find(c=>c.id===family.category)?.name??"",
+    (!q||[product.title, productTitle(product,language,published,text), product.description??"", productDescription(product,language,published)??"", product.variant,
+      ...menu.categories.filter(c=>c.id===family.category).flatMap(c=>[c.name,categoryName(c.id,c.name)]),
       ...groups.filter(g=>g.id===categoryFor(family.category)).flatMap(g=>[g.en,g.es,g.ar]),
     ].some(value=>value.toLocaleLowerCase(language).includes(q))));
   const active=items.find(({product,price})=>product.id===selected&&price!==null)?.product;
   return <main className="v32-catalog v32-catalog-fidelity" id="main">
     <span className="v32-eyebrow">{t.catalogEyebrow}</span><h1>{t.catalogTitle}</h1>
     <p className="v32-tagline">{t.catalogTag}</p>
-    <form className="v32-search" onSubmit={e=>e.preventDefault()}>
+    <form className="v32-search" role="search" onSubmit={e=>{e.preventDefault();navigateFilters(filter,subcategory);}}>
       <span aria-hidden>⌕</span><input value={query} onChange={e=>setQuery(e.target.value)}
-      type="search" aria-label="Search the menu" placeholder={t.searchMenu}/>
+      type="search" aria-label={navigationLabels[language].searchMenu} placeholder={t.searchMenu}/>
       <button type="submit">{t.find}</button>
     </form>
-    <div className="v32-filters" role="group" aria-label="Categories">
-      {groups.map(g=><button key={g.id} type="button" className={filter===g.id?"v32-selected":""}
-        aria-pressed={filter===g.id} onClick={()=>{setFilter(g.id);setSubcategory(null);setSelected(null);}}>
+    <div className="v32-filters" role="group" aria-label={navigationLabels[language].categories}>
+      {groups.filter(g=>g.id!=="panettone").map(g=><button key={g.id} type="button" className={filter===g.id?"v32-selected":""}
+        aria-pressed={filter===g.id} onClick={()=>navigateFilters(g.id,null)}>
         {g[language]}
       </button>)}
     </div>
-    {collections.length>1&&<div className="v32-subcategories" role="group" aria-label="Published 3L categories" data-category-source="published">
+    {collections.length>1&&<div className="v32-subcategories" role="group" aria-label={navigationLabels[language].collections} data-category-source="published">
       <button type="button" className={!subcategory?"v32-subcategory-active":""} aria-pressed={!subcategory}
-        onClick={()=>{setSubcategory(null);setSelected(null);}}>{language==="es"?"Todos":language==="ar"?"الكل":"All"}</button>
+        onClick={()=>navigateFilters(filter,null)}>{language==="es"?"Todos":language==="ar"?"الكل":"All"}</button>
       {collections.map(cat=><button key={cat.id} type="button" data-category-id={cat.id}
         className={subcategory===cat.id?"v32-subcategory-active":""} aria-pressed={subcategory===cat.id}
-        onClick={()=>{setSubcategory(cat.id);setSelected(null);}}>{cat.name}</button>)}
+        onClick={()=>navigateFilters(filter,cat.id)}>{categoryName(cat.id,cat.name)}</button>)}
     </div>}
     {staticPage?<noscript><p className="v32-message">Enable JavaScript to view current products and order online. <a href="/contact">Contact 3L</a></p></noscript>:!available?<div className="v32-message" role="status">
       <p>{waiting?t.loading:t.orderingUnavailable}</p>
       <button type="button" onClick={retry}>{t.retry}</button></div>:
-      !items.length?<p className="v32-message" role="status">{t.notFound}</p>:
+      !items.length?<p className="v32-message v32-search-empty" role="status">{t.notFound}</p>:
       <div className="ref32-grid" data-grid-columns="4">
         {items.map(({product,family,price})=>{
           return <ApprovedProductCard key={product.id} product={product}
@@ -350,7 +394,7 @@ function ProductRoute({slug}:{slug:string}){
   if(!product)return <MissingPage/>;
   const family=menuProductFamily(menu,product);
   const options=purchasableOptions(family,menu.status,config,now);
-  if(family.category==="pan"&&!options.length)return <MissingPage/>;
+  if(family.category==="panettone"||(family.category==="pan"&&!options.length))return <MissingPage/>;
   return <ProductDetail key={product.id} product={product} family={family}
     price={options.length?Math.min(...options.map(option=>option.priceFils)):null}/>;
 }
@@ -393,7 +437,7 @@ function VisualFooter(){
   const labels=visualNav[language];const t=visualCopy[language];
   return <footer className="v32-site-footer">
     <div className="v32-site-footer-brand"><strong>✧ 3L pastelerías</strong><small>MEXICO CITY SINCE 1982</small></div>
-    <nav aria-label="V3.2 footer navigation">
+    <nav aria-label={navigationLabels[language].footer}>
       <a href={origin+"/menu"}>{labels.menu}</a>
       <a href={origin+"/journal"}>{labels.journal}</a>
       <a href={origin+"/#family-story"}>{labels.story}</a>
@@ -412,16 +456,17 @@ export function VisualV32({pathname,search="",staticPage=false}:{pathname:string
     if(document.querySelector("[data-v32-font-sheet]"))return;
     const link=document.createElement("link");
     link.rel="stylesheet";
-    link.href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@400;500;600&display=swap";
+    link.href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@400;500;600&family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap";
     link.referrerPolicy="no-referrer";
     link.dataset.v32FontSheet="true";
     document.head.appendChild(link);
     return ()=>{link.remove();};
   },[]);
+  const {language}=useLanguage();
   const path=pathname.replace(/\/+$/,"").slice(origin.length) || "/";
-  const commerce = ["/cart","/checkout","/checkout/return","/how-to-order"].includes(path) || isPolicyPath(path);
+  const commerce = ["/cart","/checkout","/checkout/return","/how-to-order","/contact"].includes(path) || isPolicyPath(path);
   return <div className="v32-app" data-visual-preview="v32" data-frontend="standalone-v32">
-    <a className="v32-skip" href="#main">Skip to content</a>
+    <a className="v32-skip" href="#main">{navigationLabels[language].skip}</a>
     <Header/>
     <div className="v32-blossom" aria-hidden="true"/>
     {path==="/"?<Home staticPage={staticPage}/>:path==="/menu"?<Landing/>:path==="/bakery"?<Bakery search={search} staticPage={staticPage}/>:path==="/journal"?<Journal/>:

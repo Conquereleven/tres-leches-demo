@@ -25,13 +25,13 @@ for (const width of [390, 768, 1440])
         await page.request.get("/api/storefront/catalog")
       ).json();
       const ids = [
-        "conchas-traditional--tricolor",
-        "conchas-filled--pistache",
-        "conchas-filled-pack",
+        "conchas-traditional--chocolate",
+        "conchas-traditional--vainilla",
+        "conchas-traditional-pack",
       ];
       const targets = catalog.products.filter((p) => ids.includes(p.id));
       const original = structuredClone(catalog);
-      const target = targets.find((p) => p.id === "conchas-filled--pistache")!;
+      const target = targets.find((p) => p.id === "conchas-traditional--vainilla")!;
       const image = catalog.assets.find(
         (a) => a.id === target.media[0]!.assetId,
       )!;
@@ -85,7 +85,7 @@ for (const width of [390, 768, 1440])
       if (lang === "en")
         await page
           .locator(
-            '.ref32-product[data-product-id="conchas-filled--pistache"]',
+            '.ref32-product[data-product-id="conchas-traditional--vainilla"]',
           )
           .screenshot({
             path: `${shots}/${info.project.name}-${width}-removed.png`,
@@ -179,7 +179,7 @@ test("a failed published image shows a neutral placeholder instead of an authore
     await page.request.get("/api/storefront/catalog")
   ).json();
   const target = catalog.products.find(
-    (p) => p.id === "conchas-filled--pistache",
+    (p) => p.id === "conchas-traditional--vainilla",
   )!;
   const asset = structuredClone(catalog.assets[0]!);
   asset.id = "fixture-missing-image";
@@ -234,7 +234,7 @@ test("homepage named products follow publication while category/editorial previe
   )!;
   const homeBefore = await (await request.get("/")).text();
   const editorialBefore = homeBefore.match(
-    /\/brand\/approved\/editorial-mexico-dubai\.webp/g,
+    /\/brand\/reference\/mexico-dubai\.png/g,
   );
   expect(editorialBefore?.length).toBeGreaterThan(0);
   expect(homeBefore).not.toContain("/brand/hub/");
@@ -250,7 +250,7 @@ test("homepage named products follow publication while category/editorial previe
   await expect(card.locator(".ref32-photo img")).toHaveCount(0);
   const homeAfter = await (await request.get("/")).text();
   expect(
-    homeAfter.match(/\/brand\/approved\/editorial-mexico-dubai\.webp/g),
+    homeAfter.match(/\/brand\/reference\/mexico-dubai\.png/g),
   ).toEqual(editorialBefore);
   expect(homeAfter).not.toContain("/brand/hub/");
 });
@@ -266,7 +266,7 @@ test("product cards keep one approved primary, with no gallery and no editorial 
     await page.request.get("/api/storefront/catalog")
   ).json();
   const target = catalog.products.find(
-    (p) => p.id === "conchas-filled--pistache",
+    (p) => p.id === "conchas-traditional--vainilla",
   )!;
   const missing = structuredClone(catalog.assets[0]!);
   missing.id = "fixture-broken-gallery";
@@ -343,6 +343,6 @@ test("dynamic homepage HTML cannot show stale bundled product photos before Java
   const html = await response.text();
   expect(html).toContain('data-catalog="dynamic"');
   expect(html).not.toContain('data-product-media="bundled"');
-  expect(html).toContain("editorial-mexico-dubai.webp");
+  expect(html).toContain("/brand/reference/mexico-dubai.png");
   expect(html).not.toContain("/brand/hub/");
 });

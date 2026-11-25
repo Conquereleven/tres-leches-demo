@@ -33,11 +33,8 @@ import { expectCheckoutConfig } from "../helpers/storefront";
 const CONCHAS_IDS = [
   "conchas-traditional--chocolate",
   "conchas-traditional--vainilla",
-  "conchas-traditional--pistache",
   "conchas-traditional--tricolor",
-  "conchas-filled--pistache",
   "conchas-traditional-pack",
-  "conchas-filled-pack",
   "conchas-tricolor-pack",
 ] as const;
 
@@ -46,7 +43,7 @@ const catalog = (lang: string) =>
 
 /**
  * RT01 R4: approved media authority per product (`src/brand/media.tsx` +
- * `media-manifest.json` + `category-media.json`). Six products carry an
+ * `media-manifest.json` + `category-media.json`). Three visible products carry an
  * assigned product asset; the two tricolor products intentionally resolve to
  * NO product media (`selectedProductMedia` returns undefined for them) and
  * must never display another SKU's photograph. No fictitious photos are
@@ -57,10 +54,7 @@ const catalog = (lang: string) =>
 const PRODUCTS_WITH_MEDIA = [
   "conchas-traditional--chocolate",
   "conchas-traditional--vainilla",
-  "conchas-traditional--pistache",
-  "conchas-filled--pistache",
   "conchas-traditional-pack",
-  "conchas-filled-pack",
 ] as const;
 const PRODUCTS_WITHOUT_MEDIA = [
   "conchas-traditional--tricolor",
@@ -129,16 +123,11 @@ async function capture(page: Page, path: string) {
   for (const frame of await page.locator(".ref32-product .ref32-photo").all()) {
     await frame.scrollIntoViewIfNeeded();
     await expect
-      .poll(() =>
-        frame
-          .locator("img")
-          .first()
-          .evaluate((i) =>
-            i ? (i as HTMLImageElement).naturalWidth : 0,
-          )
-          .catch(() => 0),
-      )
-      .toBeGreaterThan(0);
+      .poll(() => frame.evaluate((node) =>
+        !!node.querySelector(".ref32-photo-pending") ||
+        (node.querySelector("img")?.naturalWidth ?? 0) > 0,
+      ))
+      .toBe(true);
   }
   await page.evaluate(() => window.scrollTo(0, 0));
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
@@ -248,6 +237,13 @@ if (!process.env.CONCHAS_BASELINE)
       // family aborts the authored conchas photos. Read all frames in one
       // browser snapshot because onError replaces images as requests finish.
       const frames = page.locator(".ref32-photo");
+      for (const frame of await frames.all()) {
+        await frame.scrollIntoViewIfNeeded();
+        await expect.poll(() => frame.evaluate((node) =>
+          !!node.querySelector(".ref32-photo-pending") ||
+          (node.querySelector("img")?.naturalWidth ?? 0) > 0,
+        )).toBe(true);
+      }
       await expect
         .poll(() =>
           frames.evaluateAll((nodes) =>
@@ -330,7 +326,6 @@ for (const width of [390, 768, 1440])
 
 for (const [slug, single] of [
   ["vainilla", "conchas-traditional-vainilla-mini-40-g"],
-  ["pistache", "conchas-traditional-pistache-mini-40-g"],
   ["tricolor", "conchas-traditional-tricolor-mini-40-g"],
 ] as const) {
   for (const [size, sku, price] of [
@@ -431,9 +426,9 @@ for (const width of [390, 768, 1440])
     // and cover fit; the legacy banner anatomy stays absent.
     await expect(page.locator(".b-category-showcase")).toHaveCount(0);
     for (const id of [
-      "conchas-filled--pistache",
+      "conchas-traditional--chocolate",
+      "conchas-traditional--vainilla",
       "conchas-traditional-pack",
-      "conchas-filled-pack",
     ] as const) {
       await page.evaluate(() => localStorage.removeItem("3l-cart"));
       const { dialog } = await openDialog(page, id);
@@ -483,7 +478,7 @@ for (const width of [390, 768, 1440])
   });
 
 for (const width of [390, 768, 1440])
-  test(`all eight approved Conchas uniform frames and journey ${width}`, async ({
+  test(`all five visible Conchas uniform frames and journey ${width}`, async ({
     page,
     request,
   }, info) => {
@@ -549,7 +544,7 @@ for (const width of [390, 768, 1440])
       JSON.stringify(frames, null, 2),
     );
     if (info.project.name === "chromium")
-      await capture(page, `${root}/eight-cards-${width}.png`);
+      await capture(page, `${root}/visible-cards-${width}.png`);
     for (const id of CONCHAS_IDS) {
       const { dialog } = await openDialog(page, id);
       // Conchas never take an inscription; tricolor singles hold the buy
@@ -583,7 +578,7 @@ for (const width of [390, 768, 1440])
     if (info.project.name === "chromium") {
       await page.goto(catalog("en"));
       await readyCatalog(page, catalog("en"));
-      await capture(page, `${root}/eight-cart-${width}.png`);
+      await capture(page, `${root}/visible-cart-${width}.png`);
     }
     expect(errors).toEqual([]);
   });

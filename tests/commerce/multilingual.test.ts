@@ -36,6 +36,8 @@ test("presentation localizes money and dates without changing canonical financia
     assert.equal(localizedSource("Pan de Muerto", locale), "Pan de Muerto");
   }
   assert.match(localizedMoney(10800, "es"), /108/);
+  assert.match(localizedMoney(10800, "ar"), /١٠٨/);
+  assert.match(localizedMoney(10800, "ar"), /د\.إ/);
 });
 test("translation resource keys are presentation-only and shared across locales", () => {
   for (const namespace of Object.keys(

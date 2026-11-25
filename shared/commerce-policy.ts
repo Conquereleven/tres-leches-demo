@@ -37,8 +37,12 @@ export const RETIRED_SKUS: ReadonlySet<string> = new Set(
     ]),
   ].map((sku) => `pan-de-muerto-${sku}-chocolate-covering`),
 );
+/** Reserved SKU namespace until the founder confirms a commercial Panettone release. */
+export const heldPanettoneSku = (id: string) =>
+  id === "panettone" || id.startsWith("panettone-");
+
 export function availableSku(id: string, now = new Date()) {
-  if (RETIRED_SKUS.has(id)) return false;
+  if (RETIRED_SKUS.has(id) || heldPanettoneSku(id)) return false;
   const date = businessDate(now).slice(5);
   return SEASONAL_RULES.every(
     (r) =>

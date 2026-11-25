@@ -7,13 +7,14 @@
  */
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
-import { useMenu, menuProductFamily, type StorefrontProduct } from "../menu";
+import { useMenu, menuProductFamily, type MenuOption, type StorefrontProduct } from "../menu";
 import { useCheckoutConfig, useCheckoutNow, useCart, cart, displayLinePrice, minQty, MAX_QTY } from "../cart";
 import { useLanguage, type Locale } from "../localization";
 import { useLiveCatalog, type LiveState } from "../live-catalog";
 import { purchasableOptions } from "./catalog-availability";
 import { selectedProductMedia, publishedMediaAuthority } from "../media";
 import { formatAed } from "../content";
+import { localizedMoney, localizedSource } from "../locales/engine";
 import { cakeSizeForSku, cakeSizeName, cakeServingCopy, validCakeMessage } from "../../../shared/cake-personalization";
 import { packChoices, packQtyLabel, presentationLabel, toPackChoice } from "./catalog-options";
 import { packSpec, componentName, type Composition } from "../../../shared/pack-composition";
@@ -28,9 +29,19 @@ const words={
 type AnchorSide="left"|"right"|"overlap"|"mobile"|"compact";
 type AnchorPlace=CSSProperties&{left:number;top:number;width:number;maxHeight:number};
 
+export const storefrontMoney = (amount: number, language: Locale) =>
+ language === "ar" ? localizedMoney(amount, language) : formatAed(amount);
+
+function publishedProduct(product: StorefrontProduct, catalog: LiveState) {
+ return catalog.status === "live" ? catalog.catalog.products.find(entry => entry.id === product.id) : undefined;
+}
+
 export function productTitle(product: StorefrontProduct, language: Locale, catalog: LiveState, text: (source: string) => string) {
- const published=catalog.status==="live"?catalog.catalog.products.find(entry=>entry.id===product.id):null;
- return published?.content[language]?.name ?? (language==="en"?product.title:text(product.title));
+ return publishedProduct(product,catalog)?.content[language]?.name ?? (language==="en"?product.title:text(product.title));
+}
+export function productDescription(product: StorefrontProduct, language: Locale, catalog: LiveState) {
+ return publishedProduct(product,catalog)?.content[language]?.description ??
+   (product.description ? localizedSource(product.description, language) : null);
 }
 
 export function useProductTitle(product: StorefrontProduct) {
@@ -44,6 +55,8 @@ export function ApprovedProductCard({product,familyId,variant,price,active,onSel
 }){
  const {language}=useLanguage();
  const title=useProductTitle(product);
+ const published=useLiveCatalog();
+ const description=productDescription(product,language,published);
  const menu=useMenu();
  const family=menu.families.find(f=>f.id===familyId);
  const media=selectedProductMedia(product.id,familyId,variant);
@@ -52,14 +65,13 @@ export function ApprovedProductCard({product,familyId,variant,price,active,onSel
  // A published image that fails to load falls back to the same approved
  // pending placeholder instead of a broken frame (neutral-placeholder
  // commercial guarantee, same as the no-photo state).
- const [failed,setFailed]=useState(false);
- useEffect(()=>{setFailed(false);},[url]);
+ const [failedUrl,setFailedUrl]=useState<string|null>(null);
  return <button className={"ref32-product"+(active?" ref32-product-active":"")} type="button"
    data-product-id={product.id} data-category-id={family?.category??""}
    data-selected-product={active} aria-haspopup="dialog" aria-expanded={active}
    disabled={price===null} onClick={event=>onSelect(event.currentTarget)}>
    <span className="ref32-photo">
-     {url&&!failed?<img src={url} alt={title} loading="lazy" onError={()=>setFailed(true)}/>:
+     {url&&url!==failedUrl?<img src={url} alt={title} loading="lazy" onError={()=>setFailedUrl(url)}/>:
        <span className="ref32-photo-pending" role="img" aria-label={title}>
          <strong>✧ 3L</strong><small>{language==="es"?"Fotografía pendiente":language==="ar"?"الصورة قيد الإعداد":"Photo pending"}</small>
        </span>}
@@ -70,9 +82,9 @@ export function ApprovedProductCard({product,familyId,variant,price,active,onSel
    </span>
    <span className="ref32-product-copy">
      <strong>{title}</strong>
-     {product.description&&<em>{product.description}</em>}
+     {description&&<em>{description}</em>}
      <span className="ref32-product-bottom"><span>{price===null?words[language].unavailable:
-       (language==="es"?"Desde ":"From ")+formatAed(price)}</span>
+       (language==="es"?"Desde ":language==="ar"?"ابتداءً من ":"From ")+storefrontMoney(price,language)}</span>
        <span className="ref32-product-arrow" aria-hidden="true">→</span>
      </span>
    </span>
@@ -86,8 +98,20 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const {config,loading}=useCheckoutConfig();const now=useCheckoutNow(config);
  const lines=useCart();
  const title=useProductTitle(product);
+ const published=useLiveCatalog();
+ const description=productDescription(product,language,published);
  const allowed=purchasableOptions(family,menu.status,config,now);
  const grouped=packChoices(allowed);
+ const liveOptions=publishedProduct(product,published)?.options;
+ const hasMultipleFlavors=new Set(allowed.map(item=>item.variant)).size>1;
+ const localizedOption=(option:MenuOption,source:string)=>{
+  const content=liveOptions?.find(item=>item.id===option.id)?.content[language];
+  const cakeLabels={Mini:{es:"Mini",ar:"صغير جداً"},Small:{es:"Pequeño",ar:"صغير"},Medium:{es:"Mediano",ar:"متوسط"}};
+  const size=cakeLabels[source as keyof typeof cakeLabels];
+  const label=content?.sizeLabel??(language==="en"?source:size?size[language]:localizedSource(source,language));
+  const flavor=hasMultipleFlavors&&option.variant?(content?.variantLabel??localizedSource(option.variant,language)):null;
+  return flavor&&flavor!==label?`${flavor} · ${label}`:label;
+ };
  const cakeSizing=family.category==="cakes" && allowed.length>0 &&
    allowed.every(option=>cakeSizeForSku(option.id)!==null);
  const rank={mini:0,small:1,medium:2};
@@ -134,7 +158,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const [place,setPlace]=useState<AnchorPlace>({left:12,top:12,width:420,maxHeight:600});
  const [side,setSide]=useState<AnchorSide>("right");
  const dialog=useRef<HTMLElement>(null);const closeControl=useRef<HTMLButtonElement>(null);
- const amount=Number.isFinite(total)?formatAed(total):"—";
+ const amount=Number.isFinite(total)?storefrontMoney(total,language):"—";
  const chooseSku=(id:string)=>{
   const option=allowed.find(o=>o.id===id);
   if(!option)return;
@@ -208,15 +232,15 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
   return ()=>{cancelAnimationFrame(raf);document.body.style.overflow=before;window.removeEventListener("keydown",onKey);};
  },[onClose]);
  return createPortal(<div className="ref32-overlay">
-  <button type="button" className="ref32-backdrop" tabIndex={-1} aria-label="Close purchase dialog" onClick={onClose}/>
-  <section className="ref32-dialog" ref={dialog} role="dialog" aria-modal="true"
+  <button type="button" className="ref32-backdrop" tabIndex={-1} aria-label={t.close} onClick={onClose}/>
+  <section className="ref32-dialog" ref={dialog} role="dialog" lang={language} dir={language==="ar"?"rtl":"ltr"} aria-modal="true"
     data-anchor-side={side} data-selected-sku={productId} style={place} data-product-id={product.id} aria-label={title}>
    <div className="ref32-details">
     <div className="ref32-dialog-heading">
      <div><h2>{title}</h2>
-      {product.description&&<p>{product.description}</p>}
+      {description&&<p>{description}</p>}
       {serving&&<p className="ref32-servings" data-cake-serves>{serving}</p>}</div>
-     <button className="ref32-close" type="button" ref={closeControl} aria-label="Close" onClick={onClose}>×</button>
+     <button className="ref32-close" type="button" ref={closeControl} aria-label={t.close} onClick={onClose}>×</button>
     </div>
     <p className="ref32-section-label">{cakeSizing?t.size:t.variant}</p>
     {grouped?.choices.length===4?
@@ -228,8 +252,8 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
          className={productId===choice.option.id?"ref32-option ref32-option-active":"ref32-option"}
          onClick={()=>chooseSku(choice.option.id)}>
          <span>{packQtyLabel(choice.pieces,language)}
-           {choice.presentation==="mini"?" (Mini)":choice.presentation==="individual"?" (Individual)":""}</span>
-         <small>{formatAed(choice.option.priceFils)}</small>
+           {["mini","individual"].includes(choice.presentation)?` (${presentationLabel(choice.presentation,language)})`:""}</span>
+         <small>{storefrontMoney(choice.option.priceFils,language)}</small>
         </button>)}
       </div>:
     grouped?.choices.length&&grouped.choices.length>4?
@@ -248,7 +272,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
           aria-pressed={option?.option.id===productId}
           className={option?.option.id===productId?"ref32-option ref32-option-active":"ref32-option"}
           disabled={!option} onClick={()=>option&&chooseSku(option.option.id)}>
-          <span>{packQtyLabel(pieces,language)}</span><small>{option?formatAed(option.option.priceFils):"—"}</small>
+          <span>{packQtyLabel(pieces,language)}</span><small>{option?storefrontMoney(option.option.priceFils,language):"—"}</small>
          </button>;
         })}
        </div>
@@ -258,8 +282,8 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
          aria-pressed={option.id===productId}
          className={option.id===productId?"ref32-option ref32-option-active":"ref32-option"}
          onClick={()=>chooseSku(option.id)}>
-         <span>{cakeSizing?cakeSizeName(cakeSizeForSku(option.id)!):option.size}</span>
-         <small>{formatAed(option.priceFils)}</small>
+         <span>{localizedOption(option,cakeSizing?cakeSizeName(cakeSizeForSku(option.id)!):option.size)}</span>
+         <small>{storefrontMoney(option.priceFils,language)}</small>
        </button>)}
       </div>}
     {tricolor?.kind==="single"&&<label className="ref32-extra">{t.select}

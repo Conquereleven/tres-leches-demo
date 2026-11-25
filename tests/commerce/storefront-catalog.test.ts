@@ -790,3 +790,11 @@ test("RT01.1 V3.2 product metadata uses only current public identities and hides
     store.close();
   }
 });
+
+
+test("the reserved Panettone SKU namespace cannot be quoted or listed as available", async () => {
+  const { availableSku } = await import("../../shared/commerce-policy");
+  for (const id of ["panettone", "panettone-fixture-single"])
+    assert.equal(availableSku(id), false);
+  assert.equal(availableSku("conchas-traditional-vainilla-individual-70-g"), true);
+});

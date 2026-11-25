@@ -47,7 +47,7 @@ export function renderProductPage(
   const name = published?.content.en.name ?? bundled?.title;
   const description = published?.content.en.description ?? "";
 
-  if (!productId || !name || hiddenConcha(productId, skuIds))
+  if (!productId || !name || category === "panettone" || hiddenConcha(productId, skuIds))
     throw new DomainError(404, "Product not found");
   if (category === "pan") {
     const current = state.catalog ?? [];

@@ -209,3 +209,9 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Work in the existing isolated V3.2 Draft PR branch with synthetic preview data,
   browser checks and independent visual review. No merge/deploy/Production/payment
   provider activation/real customer data absent separate Founder approval.
+
+## RT01.1 storefront follow-up
+
+- The Mexico City → Dubai journey keeps its geographic order when the storefront switches direction. Each illustration stays with its localized label and date.
+- Bakery filters and submitted search terms use the URL and browser history; published product names, descriptions, and option labels take precedence by locale.
+- Panettone is reserved and hidden until the Founder confirms commercial data. No purchasing through the storefront or the reserved SKU namespace.

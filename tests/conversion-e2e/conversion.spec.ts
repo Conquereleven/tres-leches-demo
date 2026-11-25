@@ -67,9 +67,7 @@ for (const width of [390, 1440])
       // 1. V3.2 landing keyword search across languages.
       await page.goto(`/menu?lang=${lang}`);
       await expect(page.locator(".v32-landing")).toBeVisible();
-      const landingSearch = page.getByRole("searchbox", {
-        name: "Search the bakery",
-      });
+      const landingSearch = page.locator(".v32-landing input[type=search]");
       await landingSearch.fill("concha");
       await expect(page.locator(".v32-result-pill").first()).toBeVisible();
       await expect(page.locator(".v32-tile-highlight").first()).toBeVisible();
@@ -92,9 +90,7 @@ for (const width of [390, 1440])
       await expect(page.locator(".ref32-product").first()).toBeVisible();
       const total = await page.locator(".ref32-product").count();
       expect(total).toBeGreaterThan(1);
-      const bakerySearch = page.getByRole("searchbox", {
-        name: "Search the menu",
-      });
+      const bakerySearch = page.locator(".v32-catalog input[type=search]");
       await bakerySearch.fill("relleno");
       const filtered = await page.locator(".ref32-product").count();
       expect(filtered).toBeGreaterThan(0);
@@ -252,10 +248,13 @@ test("search no-results, URL, keyboard and offline recovery", async ({
     page.getByRole("button", { name: "FIND \u2192", exact: true }),
   ).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(page.locator(".v32-result-pill").first()).toBeVisible();
+  await expect(page).toHaveURL(/\/bakery\?.*q=concha/);
+  await expect(page.locator(".ref32-product").first()).toBeVisible();
+  await page.goBack();
   await input.fill("zzzzzzzz");
   await input.press("Enter");
   await expect(page.locator(".v32-search-empty")).toBeVisible();
+  await page.goBack();
   await input.fill("concha");
   await expect(page.locator(".v32-result-pill").first()).toBeVisible();
   // V3.2 bakery live search filters the grid; no-match stays explicit.

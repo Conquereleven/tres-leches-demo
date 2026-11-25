@@ -25,6 +25,12 @@ for (const locale of ["en", "es", "ar"] as const) {
       await expect(dialog).toHaveAttribute("data-product-id", id);
       await expect(dialog).toHaveAccessibleName(title);
       await expect(dialog.getByRole("heading")).toHaveText(title);
+      if (locale === "ar") {
+        await expect(dialog).toHaveAttribute("dir", "rtl");
+        await expect(dialog.locator(".ref32-price strong")).toContainText(
+          /د\.إ/,
+        );
+      }
       if (id !== vanilla) {
         await page.keyboard.press("Escape");
         await expect(current).toBeFocused();
@@ -51,6 +57,13 @@ for (const locale of ["en", "es", "ar"] as const) {
       config.products.find((item: { id: string }) => item.id === individual)
         .priceFils,
     );
+    if (locale === "ar") {
+      await page.goto("/cart?lang=ar");
+      await expect(page.locator(".v32-new-cart-row")).toContainText(
+        /كونشا|كونتشا/,
+      );
+      await expect(page.locator(".v32-new-total")).toContainText(/د\.إ/);
+    }
   });
 }
 
@@ -71,10 +84,9 @@ test("RT01.1 Pan de Muerto availability, Panettone direct navigation and stale c
     page.locator('[data-product-id="pan-de-muerto-filled--pistachio"]'),
   ).toHaveCount(0);
   await page.goto("/bakery?category=panettone");
-  await expect(page.getByRole("button", { name: "Panettone" })).toHaveAttribute(
-    "aria-pressed",
-    "true",
-  );
+  await expect(page.getByRole("button", { name: "Panettone" })).toHaveCount(0);
+  await expect(page.locator(".v32-search-empty")).toBeVisible();
+  expect((await page.request.get("/menu/panettone")).status()).toBe(404);
   await expect(page.locator(".ref32-product")).toHaveCount(0);
   await page
     .getByRole("button", { name: "Mexican Bakery", exact: true })
@@ -83,6 +95,7 @@ test("RT01.1 Pan de Muerto availability, Panettone direct navigation and stale c
   await expect(
     page.getByRole("button", { name: "Mexican Bakery", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
+  await expect(page).toHaveURL(/category=mexican/);
   await expect(
     page.locator('[data-product-id="conchas-filled-pack"]'),
   ).toHaveCount(0);
@@ -203,4 +216,71 @@ test("RT01.1 cold HTML, portrait completion, reduced motion, contacts and journa
       page.locator('a[href*="521683319"],a[href*="506757352"]'),
     ).toHaveCount(0);
   }
+});
+
+test("Arabic geography and category history stay stable at 390, 768 and 1440", async ({
+  page,
+}, info) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const width of [390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/?lang=ar");
+    await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+    const journey = page.locator(".v32-journey");
+    await expect(journey).toHaveAttribute("dir", "ltr");
+    const mexico = journey.locator('[data-city="mexico"]');
+    const dubai = journey.locator('[data-city="dubai"]');
+    await expect(mexico).toHaveText(/مدينة مكسيكو.*١٩٨٢/);
+    await expect(dubai).toHaveText(/دبي.*اليوم/);
+    const [first, path, last] = await Promise.all([
+      mexico.boundingBox(),
+      journey.locator(".v32-route").boundingBox(),
+      dubai.boundingBox(),
+    ]);
+    expect(first!.x).toBeLessThan(path!.x);
+    expect(path!.x).toBeLessThan(last!.x);
+    for (const city of [mexico, dubai])
+      await expect
+        .poll(() => city.locator("img").evaluate((image) => image.naturalWidth))
+        .toBeGreaterThan(0);
+    await expect(mexico.locator("img")).toHaveCSS("transform", "none");
+    await expect(dubai.locator("img")).not.toHaveCSS("transform", "none");
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+    await page.screenshot({
+      path: info.outputPath(`home-ar-${width}.png`),
+      fullPage: true,
+    });
+  }
+  await page.goto("/bakery?category=mexican&lang=ar");
+  const conchas = page.locator(
+    ".v32-subcategories button[data-category-id=conchas]",
+  );
+  await expect(conchas).toHaveText("كونشا");
+  await conchas.click();
+  await expect(page).toHaveURL(/subcategory=conchas/);
+  await expect(conchas).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.locator(".ref32-product[data-category-id=pan]"),
+  ).toHaveCount(0);
+  await page.goBack();
+  await expect(conchas).toHaveAttribute("aria-pressed", "false");
+  await page.goForward();
+  await expect(conchas).toHaveAttribute("aria-pressed", "true");
+  await page.reload();
+  await expect(conchas).toHaveAttribute("aria-pressed", "true");
+  await page
+    .getByRole("searchbox", { name: "ابحث في القائمة" })
+    .fill("fictional-no-results");
+  await page.getByRole("searchbox", { name: "ابحث في القائمة" }).press("Enter");
+  await expect(page).toHaveURL(/q=fictional-no-results/);
+  await expect(page.locator(".v32-search-empty")).toHaveText(
+    "لا توجد منتجات مطابقة.",
+  );
+  await page.goBack();
+  await expect(page.locator(".ref32-product").first()).toBeVisible();
+  await page.getByRole("link", { name: "المجلة", exact: true }).click();
+  await expect(page).toHaveURL(/journal/);
+  await expect(page.locator(".v32-journal h1")).toContainText("تاج من الحلوى");
 });

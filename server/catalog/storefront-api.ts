@@ -3,7 +3,7 @@ import { packPricingPolicy } from "../domain/pack-pricing";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { State } from "../domain/model";
 import { DomainError } from "../domain/model";
-import { RETIRED_SKUS, availableSku } from "../../shared/commerce-policy";
+import { RETIRED_SKUS, availableSku, heldPanettoneSku } from "../../shared/commerce-policy";
 import { catalogDigest, validateFoundation } from "./contract";
 
 /**
@@ -76,6 +76,7 @@ export function storefrontCatalog(state: State, now = new Date()) {
             v.productId === p.id &&
             v.commercialState === "published" &&
             !RETIRED_SKUS.has(v.skuId) &&
+            !heldPanettoneSku(v.skuId) &&
             commercial.get(v.skuId)?.active === true,
         )
         .map((v) => {
@@ -97,7 +98,7 @@ export function storefrontCatalog(state: State, now = new Date()) {
         }),
     }))
     // A product whose every variant was deactivated is not shown at all.
-    .filter((p) => p.options.length > 0);
+    .filter((p) => p.categoryId !== "panettone" && p.options.length > 0);
   const usedFamilies = new Set(products.map((p) => p.familyId));
   const usedCategories = new Set(products.map((p) => p.categoryId));
   const assetIds = new Set([

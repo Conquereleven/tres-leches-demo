@@ -95,6 +95,11 @@ const Context = createContext({
 });
 export function LocalizationProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Locale>(initialLocale);
+  useEffect(() => {
+    const restore = () => setLanguage(initialLocale());
+    window.addEventListener("popstate", restore);
+    return () => window.removeEventListener("popstate", restore);
+  }, []);
   // Re-render translated copy when a new published revision arrives.
   useLiveCatalog();
   useEffect(() => {

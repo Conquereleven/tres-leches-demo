@@ -246,38 +246,23 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   await afterDialog.locator(".ref32-close").click();
   await shop.screenshot({ path: `${shots}/${info.project.name}-2-after.png` });
 
-  // A fresh visit, in Spanish, with the same build: published EN copy on the
-  // approved surface, es/ar wording asserted on the published API above.
-  await shop.goto(`/bakery?category=cakes&lang=es`);
-  await expect(
-    shop.locator(`.ref32-product[data-product-id="${target.id}"]`),
-  ).toContainText(name);
-  await expect(
-    shop.locator(
-      `.ref32-product[data-product-id="${target.id}"] .ref32-photo img`,
-    ).first(),
-  ).toHaveAttribute("src", /^\/brand\/hub\//);
+  // A fresh visit uses the published wording for each selected language.
+  await shop.goto("/bakery?category=cakes&lang=es");
+  await expect(card).toContainText(nameEs);
+  await expect(card.locator(".ref32-photo img")).toHaveAttribute("src", /^\/brand\/hub\//);
   const esDialog = await openDialog();
-  await expect(esDialog).toContainText(description);
+  await expect(esDialog).toContainText(descriptionEs);
+  await expect(esDialog.locator(`[data-sku="${first!.id}"]`)).toContainText(sizeEs);
   await esDialog.locator(".ref32-close").click();
-  await shop.goto(`/bakery?category=cakes&lang=ar`);
+  await shop.goto("/bakery?category=cakes&lang=ar");
   await expect(shop.locator("html")).toHaveAttribute("dir", "rtl");
-  await expect(
-    shop.locator(`.ref32-product[data-product-id="${target.id}"]`),
-  ).not.toBeEmpty();
+  await expect(card).toContainText(descriptionAr);
   await shop.screenshot({ path: `${shots}/${info.project.name}-3-detail.png` });
 
-  // The cart made before the publication: the line keeps its stable SKU
-  // identity name and charges the published each-price. (The approved V3.2
-  // cart carries no photographs by design; photo assertions live on the
-  // card above. Published "Name in cart" translations are asserted on the
-  // storefront API above: line names resolve to the stable server SKU
-  // catalogName in both the retired classic cart and this V3.2 cart, a
-  // pre-existing server contract outside this remediation's scope.)
+  // The already-added line uses the newly published localized SKU label.
   await shop.goto("/cart?lang=es");
   const line = shop.locator(".v32-new-cart-row").first();
-  await expect(line).toContainText(first!.size);
-  await expect(line).not.toContainText(cartEs);
+  await expect(line).toContainText(cartEs);
   await shop.goto("/cart?lang=en");
   await expect(line).toContainText(aed(price));
   await expect(shop.locator("main")).not.toContainText(
