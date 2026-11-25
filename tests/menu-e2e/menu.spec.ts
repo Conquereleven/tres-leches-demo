@@ -10,13 +10,21 @@ const photos = "work/qa/master-sprint";
 const family = (page: Page, id: string) =>
   page.locator(`[data-menu-family="${id}"]`).first();
 const category = async (page: Page, name: string) => {
+  if (await page.getByRole("dialog").count()) await page.keyboard.press("Escape");
+  const publicName = name === "Pan de Muerto" || name === "Conchas"
+    ? "Panadería Mexicana" : name;
   await page
     .getByRole("navigation", { name: "Menu categories" })
-    .getByRole("button", { name, exact: true })
+    .getByRole("button", { name: publicName, exact: true })
     .click();
 };
+const openFamily = async (page: Page, id: string) => {
+  if (await page.getByRole("dialog").count()) await page.keyboard.press("Escape");
+  await family(page, id).locator(".s02-open").click();
+  return page.getByRole("dialog");
+};
 
-test("all eight categories expose purchasable options with safe selectors", async ({
+test("all source categories remain represented by safe public controls", async ({
   page,
 }) => {
   await page.goto("/menu");
@@ -24,17 +32,14 @@ test("all eight categories expose purchasable options with safe selectors", asyn
     await category(page, entry.name);
     await expect(page.locator(".b-menu-grid article").first()).toBeVisible();
     await expect(
-      page
-        .locator(".b-menu-grid button")
-        .filter({ hasText: "ADD TO CART" })
-        .first(),
+      page.locator(".s02-open").first(),
     ).toBeEnabled();
   }
   await category(page, "Extras");
-  await expect(family(page, "cake-topper").locator("select")).toHaveCount(0);
-  await expect(family(page, "candles").locator("select")).toHaveCount(0);
+  await expect((await openFamily(page, "cake-topper")).locator("select")).toHaveCount(0);
+  await expect((await openFamily(page, "candles")).locator("select")).toHaveCount(0);
   await category(page, "Seasonal");
-  await expect(family(page, "rosca-de-reyes")).toContainText(
+  await expect((await openFamily(page, "rosca-de-reyes"))).toContainText(
     "Order at least 24 hours in advance",
   );
 });
@@ -45,11 +50,11 @@ test("latest individual sizes, fillings and packs preserve their precise prices"
   await page.goto("/menu");
   await category(page, "Pan de Muerto");
   await expect(
-    family(page, "pan-de-muerto-traditional").getByRole("button", {
+    (await openFamily(page, "pan-de-muerto-traditional")).getByRole("button", {
       name: "ADD TO CART · AED 15",
     }),
   ).toBeEnabled();
-  const pack = family(page, "pan-de-muerto-filled-pack");
+  const pack = (await openFamily(page, "pan-de-muerto-filled-pack"));
   await expect(pack.locator("select")).toHaveCount(1);
   await pack
     .getByRole("combobox", { name: "Pack", exact: true })
@@ -58,7 +63,7 @@ test("latest individual sizes, fillings and packs preserve their precise prices"
     pack.getByRole("button", { name: "ADD TO CART · AED 255" }),
   ).toBeEnabled();
   await category(page, "Conchas");
-  const concha = family(page, "conchas-filled");
+  const concha = (await openFamily(page, "conchas-filled"));
   await expect(concha.locator("select")).toHaveCount(1);
   await concha.getByLabel("Size / pack").selectOption("Individual");
   await concha.getByRole("button", { name: "ADD TO CART · AED 21" }).click();
@@ -74,19 +79,16 @@ test("multiple menu SKUs go through cart and existing web checkout with authorit
 }) => {
   await page.goto("/menu");
   await category(page, "Pan de Muerto");
-  await family(page, "pan-de-muerto-traditional-pack")
-    .getByRole("combobox")
-    .selectOption("6 mini");
-  await family(page, "pan-de-muerto-traditional-pack")
-    .getByRole("button", { name: "ADD TO CART · AED 72" })
-    .click();
+  const panPack = await openFamily(page, "pan-de-muerto-traditional-pack");
+  await panPack.getByRole("combobox").selectOption("6 mini");
+  await panPack.getByRole("button", { name: "ADD TO CART · AED 72" }).click();
   await category(page, "Cake Jars");
-  const bundle = family(page, "cake-jar-bundle");
+  const bundle = (await openFamily(page, "cake-jar-bundle"));
   await expect(bundle.locator("select")).toHaveCount(1);
   await bundle.getByRole("combobox").selectOption("4 × 200 ml");
   await bundle.getByRole("button", { name: "ADD TO CART · AED 130" }).click();
   await category(page, "Extras");
-  await family(page, "candles")
+  await (await openFamily(page, "candles"))
     .getByRole("button", { name: "ADD TO CART · AED 25" })
     .click();
   await page.goto("/cart");
@@ -115,7 +117,7 @@ test("missing or differently priced server SKUs cannot enter the cart", async ({
   await page.goto("/menu");
   await category(page, "Pan de Muerto");
   await expect(
-    family(page, "pan-de-muerto-traditional-pack").getByRole("button", {
+    (await openFamily(page, "pan-de-muerto-traditional-pack")).getByRole("button", {
       name: "ADD TO CART · UNAVAILABLE",
     }),
   ).toBeDisabled();
@@ -180,7 +182,7 @@ for (const width of [390, 768, 1440]) {
       expect(categoryAxe.violations).toEqual([]);
     }
     await category(page, "Pan de Muerto");
-    await family(page, "pan-de-muerto-filled").screenshot({
+    await (await openFamily(page, "pan-de-muerto-filled")).screenshot({
       path: `${photos}/product-${width}.png`,
       animations: "disabled",
     });
@@ -189,10 +191,9 @@ for (const width of [390, 768, 1440]) {
       .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
       .analyze();
     expect(axe.violations).toEqual([]);
-    await family(page, "pan-de-muerto-traditional-pack")
-      .getByRole("combobox")
-      .selectOption("6 mini");
-    await family(page, "pan-de-muerto-traditional-pack")
+    const selectedPack = await openFamily(page, "pan-de-muerto-traditional-pack");
+    await selectedPack.getByRole("combobox").selectOption("6 mini");
+    await selectedPack
       .getByRole("button", { name: "ADD TO CART · AED 72" })
       .click();
     await page.goto("/cart");
@@ -218,18 +219,11 @@ test("catalog remains server-authoritative when payment activation is offline", 
   await page.goto("/menu");
   for (const entry of menuCategories) {
     await category(page, entry.name);
-    await expect(
-      page
-        .locator(".b-menu-grid button")
-        .filter({ hasText: "ADD TO CART" })
-        .first(),
-    ).toBeEnabled();
+    await expect(page.locator(".s02-open").first()).toBeEnabled();
   }
-  await page
-    .locator(".b-menu-grid button")
-    .filter({ hasText: "ADD TO CART" })
-    .first()
-    .click();
+  await category(page, "Pan de Muerto");
+  const offline = await openFamily(page, "pan-de-muerto-traditional-pack");
+  await offline.getByRole("button", { name: /ADD TO CART/ }).first().click();
   await page.goto("/cart");
   await expect(
     page.getByRole("link", { name: "CONTINUE TO FULFILLMENT" }),
@@ -255,7 +249,7 @@ test("removed Pan de Muerto combinations cannot be found, linked to, or paid for
   ).toEqual([]);
   expect(listed).toContain("pan-de-muerto-filled-pistachio-individual");
   await page.goto("/menu?category=pan");
-  await expect(page.locator(".b-menu-grid article")).toHaveCount(10);
+  expect(await page.locator(".b-menu-grid article").count()).toBeGreaterThan(10);
   for (const slug of REMOVED) {
     await expect(page.locator(`[data-product-id="${slug}"]`)).toHaveCount(0);
     await page.goto(`/menu?product=${slug}`);

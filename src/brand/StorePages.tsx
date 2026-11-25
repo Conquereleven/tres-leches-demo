@@ -5,11 +5,11 @@ import { SiteHeader, SiteFooter, FloatingShopping } from "./SiteChrome";
 import { useLanguage } from "./localization";
 import "./brand.css";
 import "./storefront.css";
+import "./s01-s02-approved.css";
 const contact = () => {
   location.href = "/contact";
 };
 export function MenuPage() {
-  const { t } = useLanguage();
   return (
     <div className="brand-experience b-entered b-menu-page">
       <a className="b-skip" href="#main-content">
@@ -23,9 +23,7 @@ export function MenuPage() {
           <>
             {/* Decorative official logo behind the Menu introduction only. */}
             <div className="b-menu-intro-mark" aria-hidden="true" />
-            <h1 className="b-heading" style={{ textAlign: "center" }}>
-              <CustomerCopy>{t("menu")}</CustomerCopy>
-            </h1>
+
           </>
         )}
         <MenuCatalog />

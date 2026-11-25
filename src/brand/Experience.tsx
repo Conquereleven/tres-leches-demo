@@ -6,15 +6,15 @@ import {
   paintJourney,
 } from "./ScrollSketch";
 import { useEditorialMotion } from "./useEditorialMotion";
-import { MenuPreview, HowToOrderGuide } from "./StorefrontGuide";
-import { ResponsiveMedia } from "./media";
+import { HowToOrderGuide } from "./StorefrontGuide";
 import { CustomerCopy } from "./localization";
 import { useEffect, useRef, useState } from "react";
-import { Pause, Play, ArrowRight, Star } from "@phosphor-icons/react";
+import { Pause, Play, ArrowRight } from "@phosphor-icons/react";
 import { SiteHeader, SiteFooter, FloatingShopping } from "./SiteChrome";
 import { approved } from "./content";
 import "./brand.css";
 import "./storefront.css";
+import "./s01-s02-approved.css";
 const media = (name: string) => `/brand/reference/${name}`;
 /** Approved reference composition; no unfinished reference scaffolds or catalog duplication. */
 export function BrandExperience({ onManage }: { onManage: () => void }) {
@@ -165,7 +165,9 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             </span>
           </div>
         </section>
-        <MenuPreview />
+
+
+        <div className="s01-history-unified">
         <section id="story" className="ref-bridge">
           <h2>
             <CustomerCopy>More than a cake.</CustomerCopy> <br />
@@ -210,117 +212,6 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             </CustomerCopy>
           </p>
         </section>
-        <section id="collection" className="ref-featured">
-          <Star className="ref-star" weight="fill" aria-hidden />
-          <p className="b-label">
-            <CustomerCopy>OUR SIGNATURE FLAVORS</CustomerCopy>
-          </p>
-          <h2>
-            <CustomerCopy>A little taste</CustomerCopy> <br />{" "}
-            <CustomerCopy>of what we do.</CustomerCopy>
-          </h2>
-          <p>
-            <CustomerCopy>
-              Three iconic cakes, the same beloved tradition.
-            </CustomerCopy>
-          </p>
-          <div className="ref-cakes">
-            {[
-              ["dulce", "DULCE DE LECHE"],
-              ["mango", "MANGO"],
-              ["saffron", "SAFFRON"],
-            ].map(([id, label]) => (
-              <a key={id} href="/menu?category=cakes">
-                <ResponsiveMedia
-                  productId={
-                    id === "dulce"
-                      ? "tres-leches-premium--dulce-de-leche"
-                      : id === "mango"
-                        ? "tres-leches-mango--mango"
-                        : "special-flavours-cake--saffron"
-                  }
-                  family={
-                    id === "dulce"
-                      ? "tres-leches-premium"
-                      : id === "mango"
-                        ? "tres-leches-mango"
-                        : "special-flavours-cake"
-                  }
-                  variant={
-                    id === "dulce"
-                      ? "Dulce de Leche"
-                      : id === "mango"
-                        ? "Mango"
-                        : "Saffron"
-                  }
-                  alt={`${label!} product photograph`}
-                />
-                <span>{label}</span>
-              </a>
-            ))}
-          </div>
-          <a className="b-button" href="/menu?category=cakes">
-            <CustomerCopy>VIEW ALL CAKES</CustomerCopy>{" "}
-            <ArrowRight className="b-directional" aria-hidden />
-          </a>
-        </section>
-        <section
-          ref={editorial}
-          className="ref-tradition"
-          aria-label={localize("Tradition in every slice")}
-        >
-          <div className="ref-panel">
-            <h2>
-              <CustomerCopy>TRADITION</CustomerCopy> <br />{" "}
-              <CustomerCopy>IN EVERY</CustomerCopy> <br />{" "}
-              <CustomerCopy>SLICE.</CustomerCopy>
-            </h2>
-            <span className="ref-rule" aria-hidden />
-            <p>
-              <CustomerCopy>
-                Tres Leches cakes made with time-honored recipes and a lot of
-                love.
-              </CustomerCopy>
-            </p>
-            <a className="b-link" href="/menu?category=cakes">
-              <ArrowRight
-                className="ref-cta-circle b-directional"
-                aria-hidden
-              />
-              <span>
-                <CustomerCopy>VIEW THE</CustomerCopy> <br />{" "}
-                <CustomerCopy>COLLECTION</CustomerCopy>
-              </span>
-            </a>
-          </div>
-          <div className="ref-slices">
-            <img
-              className="ref-particles"
-              src={"/brand/approved/editorial-cake-particles.webp"}
-              alt=""
-              loading="lazy"
-            />
-            <img
-              className="ref-slice ref-slice-one"
-              src={media("nutella.webp")}
-              alt={localize("Nutella Tres Leches slice")}
-              loading="lazy"
-            />
-            <img
-              className="ref-slice ref-slice-two"
-              src={media("coffee.webp")}
-              alt={localize("Coffee Latte Tres Leches slice")}
-              loading="lazy"
-            />
-            <img
-              className="ref-slice ref-slice-three"
-              src={media("original.webp")}
-              alt={localize("Original Tres Leches slice")}
-              loading="lazy"
-            />
-          </div>
-        </section>
-        <HowToOrderGuide />
         <section id="family-story" className="ref-family" ref={journal}>
           <div className="ref-collage">
             <img
@@ -401,6 +292,65 @@ export function BrandExperience({ onManage }: { onManage: () => void }) {
             </a>
           </div>
         </section>
+        </div>
+        <section
+          ref={editorial}
+          className="ref-tradition"
+          aria-label={localize("Tradition in every slice")}
+        >
+          <div className="ref-panel">
+            <h2>
+              <CustomerCopy>TRADITION</CustomerCopy> <br />{" "}
+              <CustomerCopy>IN EVERY</CustomerCopy> <br />{" "}
+              <CustomerCopy>SLICE.</CustomerCopy>
+            </h2>
+            <span className="ref-rule" aria-hidden />
+            <p>
+              <CustomerCopy>
+                Tres Leches cakes made with time-honored recipes and a lot of
+                love.
+              </CustomerCopy>
+            </p>
+            <a className="b-link" href="/menu?category=cakes">
+              <ArrowRight
+                className="ref-cta-circle b-directional"
+                aria-hidden
+              />
+              <span>
+                <CustomerCopy>VIEW THE</CustomerCopy> <br />{" "}
+                <CustomerCopy>COLLECTION</CustomerCopy>
+              </span>
+            </a>
+          </div>
+          <div className="ref-slices">
+            <img
+              className="ref-particles"
+              src={"/brand/approved/editorial-cake-particles.webp"}
+              alt=""
+              loading="lazy"
+            />
+            <img
+              className="ref-slice ref-slice-one"
+              src={media("nutella.webp")}
+              alt={localize("Nutella Tres Leches slice")}
+              loading="lazy"
+            />
+            <img
+              className="ref-slice ref-slice-two"
+              src={media("coffee.webp")}
+              alt={localize("Coffee Latte Tres Leches slice")}
+              loading="lazy"
+            />
+            <img
+              className="ref-slice ref-slice-three"
+              src={media("original.webp")}
+              alt={localize("Original Tres Leches slice")}
+              loading="lazy"
+            />
+          </div>
+        </section>
+        <HowToOrderGuide />
+
         <div className="ref-order-link">
           <a className="b-link" href="/how-to-order">
             <CustomerCopy>HOW TO ORDER</CustomerCopy>
