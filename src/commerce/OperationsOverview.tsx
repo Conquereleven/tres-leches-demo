@@ -69,20 +69,10 @@ export function OperationsOverview({
       .join(" · ");
   return (
     <div className="ops-overview ops-v2">
-      <section className="ops-v2-intro">
-        <div>
-          <p className="ops-kicker">{t("DAILY OPERATIONS")}</p>
-          <h2>{t("A clear view of the day")}</h2>
-          <p>{t("Current workspace snapshot · no SLA estimates")}</p>
-        </div>
-        <div className="ops-v2-date">
-          <span>{t("Asia/Dubai")}</span>
-          <strong>{formatDate(today, false)}</strong>
-          <button className="primary" onClick={() => onNavigate("orders")}>
-            {t("View orders")}
-          </button>
-        </div>
-      </section>
+      <div className="tatbiq-overview-date">
+        <time dateTime={today}>{formatDate(today, false)}</time>
+        <span>{t("Asia/Dubai")}</span>
+      </div>
       <section
         className="ops-summary-grid ops-v2-summary"
         aria-label={t("Overview metrics")}
@@ -117,52 +107,54 @@ export function OperationsOverview({
         />
       </ReportPanel>
       <div className="ops-v2-columns">
-        <ReportPanel
-          title={t("Today's priorities")}
-          subtitle={t(
-            "Scheduled work and recorded exceptions · no invented deadlines",
-          )}
-          action={
-            <a href={`/operations/orders?dueFrom=${today}&dueTo=${today}`}>
-              {t("View today's schedule")}
-            </a>
-          }
-        >
-          {agenda.priorities.length ? (
-            <ol className="ops-v2-priorities">
-              {agenda.priorities.slice(0, 8).map(({ order, reasons }) => (
-                <li key={order.id}>
-                  <div className="ops-v2-priority-title">
-                    <a href={orderPath(order.id)}>{orderReference(order)}</a>
-                    <span>{t(fulfilmentLabel(order))}</span>
-                  </div>
-                  <p>
-                    {t(
-                      order.fulfillmentMethod === "pickup"
-                        ? "Pickup"
-                        : "Delivery",
-                    )}{" "}
-                    · {schedule(order) || t("Sin fecha")}
-                  </p>
-                  <ul>
-                    {reasons.map((reason) => (
-                      <li key={reason}>{t(reason)}</li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <p className="co-empty">
-              {t("No scheduled work or exceptions to review")}
-            </p>
-          )}
-          {agenda.priorities.length > 8 && (
-            <p className="ops-v2-note">
-              {t("More orders to review")}: {agenda.priorities.length - 8}
-            </p>
-          )}
-        </ReportPanel>
+        <div className="tatbiq-priorities">
+          <ReportPanel
+            title={t("Today's priorities")}
+            subtitle={t(
+              "Scheduled work and recorded exceptions · no invented deadlines",
+            )}
+            action={
+              <a href={`/operations/orders?dueFrom=${today}&dueTo=${today}`}>
+                {t("View today's schedule")}
+              </a>
+            }
+          >
+            {agenda.priorities.length ? (
+              <ol className="ops-v2-priorities">
+                {agenda.priorities.slice(0, 8).map(({ order, reasons }) => (
+                  <li key={order.id}>
+                    <div className="ops-v2-priority-title">
+                      <a href={orderPath(order.id)}>{orderReference(order)}</a>
+                      <span>{t(fulfilmentLabel(order))}</span>
+                    </div>
+                    <p>
+                      {t(
+                        order.fulfillmentMethod === "pickup"
+                          ? "Pickup"
+                          : "Delivery",
+                      )}{" "}
+                      · {schedule(order) || t("Sin fecha")}
+                    </p>
+                    <ul>
+                      {reasons.map((reason) => (
+                        <li key={reason}>{t(reason)}</li>
+                      ))}
+                    </ul>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="co-empty">
+                {t("No scheduled work or exceptions to review")}
+              </p>
+            )}
+            {agenda.priorities.length > 8 && (
+              <p className="ops-v2-note">
+                {t("More orders to review")}: {agenda.priorities.length - 8}
+              </p>
+            )}
+          </ReportPanel>
+        </div>
         <ReportPanel
           title={t("Operational attention")}
           subtitle={t("Review evidence before taking action")}
