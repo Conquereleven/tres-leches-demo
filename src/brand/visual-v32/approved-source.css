@@ -228,3 +228,26 @@
 [lang="ar"] .ref32-product { text-align: start; }
 [lang="ar"] :is(.ref32-cta-arrow, .ref32-product-arrow) { transform: scaleX(-1); }
 .ref32-dialog[lang="ar"] .ref32-cta-arrow { margin-inline-start: auto; margin-left: 0; }
+
+.ref32-photo[data-fit="whole"] { background: #f7f0ec; }
+.ref32-photo[data-fit="whole"] img,
+.ref32-product:hover .ref32-photo[data-fit="whole"] img {
+ object-fit: contain;
+ object-position: center;
+ transform: none;
+}
+.ref32-panettone-intro {
+ display: grid;
+ grid-template-columns: minmax(0, 1fr) minmax(68px, 25%);
+ align-items: start;
+ gap: 10px;
+}
+.ref32-panettone-preview {
+ display: block;
+ width: 100%;
+ height: clamp(74px, 10vh, 104px);
+ object-fit: contain;
+ object-position: center;
+ background: #f7f0ec;
+ border-radius: 12px;
+}

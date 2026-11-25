@@ -58,6 +58,7 @@ export function loadBootstrapSources(root: string): BootstrapSources {
     JSON.parse(readFileSync(resolve(root, path), "utf8"));
   const menu = read("src/brand/menu-data.json");
   const manifests = [
+    "rt013-media",
     "official-pan-media",
     "media-manifest",
     "category-media",

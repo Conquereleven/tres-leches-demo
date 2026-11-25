@@ -1,39 +1,103 @@
 {
-  "category": { "en": "Panettone", "es": "Panettone", "ar": "بانيتوني" },
+  "category": {
+    "en": "Panettone",
+    "es": "Panettone",
+    "ar": "بانيتوني"
+  },
   "sizes": [
-    { "id": "mini", "priceFils": 2700, "en": "Mini", "es": "Mini", "ar": "ميني" },
-    { "id": "normal", "priceFils": 17000, "en": "Normal", "es": "Normal", "ar": "عادي" }
+    {
+      "id": "mini",
+      "priceFils": 2700,
+      "en": "Mini",
+      "es": "Mini",
+      "ar": "ميني"
+    },
+    {
+      "id": "normal",
+      "priceFils": 17000,
+      "en": "Normal",
+      "es": "Normal",
+      "ar": "عادي"
+    }
   ],
   "products": [
     {
       "id": "panettone-normal",
-      "name": { "en": "Panettone Normal", "es": "Panettone Normal", "ar": "بانيتوني عادي" },
+      "name": {
+        "en": "Panettone Normal",
+        "es": "Panettone Normal",
+        "ar": "بانيتوني عادي"
+      },
       "description": {
         "en": "Contains gluten. Full allergen information is pending confirmation.",
         "es": "Contiene gluten. La declaración completa de alérgenos está pendiente de confirmación.",
         "ar": "يحتوي على الغلوتين. القائمة الكاملة لمسببات الحساسية بانتظار التأكيد."
       },
-      "previewPhoto": { "source": "photos/panettone/09.webp", "file": "normal.webp", "sha256": "9461041764870d56b1fbdacb31a6aa80ba305d909cf7b2629510e6d88f153608", "size": "normal" }
+      "previewPhoto": {
+        "source": "photos/panettone/09.webp",
+        "file": "normal.webp",
+        "sha256": "77fac0a97469093a60a45b3d70a3626338637f2ab0be597cd2d3e96a8610c3a6",
+        "size": "normal",
+        "sourceDerivativeSha256": "9461041764870d56b1fbdacb31a6aa80ba305d909cf7b2629510e6d88f153608",
+        "crop": {
+          "x": 0,
+          "y": 496,
+          "width": 1067,
+          "height": 1104
+        }
+      }
     },
     {
       "id": "panettone-chocolate",
-      "name": { "en": "Panettone Chocolate", "es": "Panettone de chocolate", "ar": "بانيتوني بالشوكولاتة" },
+      "name": {
+        "en": "Panettone Chocolate",
+        "es": "Panettone de chocolate",
+        "ar": "بانيتوني بالشوكولاتة"
+      },
       "description": {
         "en": "Contains gluten. Full allergen information is pending confirmation.",
         "es": "Contiene gluten. La declaración completa de alérgenos está pendiente de confirmación.",
         "ar": "يحتوي على الغلوتين. القائمة الكاملة لمسببات الحساسية بانتظار التأكيد."
       },
-      "previewPhoto": { "source": "photos/panettone/14.webp", "file": "chocolate.webp", "sha256": "8b1f1d253b46d306d9a66fb7026aaf86cd85bd9bf223466c7a28305828308385", "size": "normal" }
+      "previewPhoto": {
+        "source": "photos/panettone/14.webp",
+        "file": "chocolate.webp",
+        "sha256": "979fe632de3598e898fd099b3d05f5ed83bdd72e6c8f68833806b8c8a247aaf9",
+        "size": "normal",
+        "sourceDerivativeSha256": "8b1f1d253b46d306d9a66fb7026aaf86cd85bd9bf223466c7a28305828308385",
+        "crop": {
+          "x": 0,
+          "y": 432,
+          "width": 1067,
+          "height": 1168
+        }
+      }
     },
     {
       "id": "panettone-pistacchio",
-      "name": { "en": "Panettone Pistacchio", "es": "Panettone de pistacho", "ar": "بانيتوني بالفستق" },
+      "name": {
+        "en": "Panettone Pistacchio",
+        "es": "Panettone de pistacho",
+        "ar": "بانيتوني بالفستق"
+      },
       "description": {
         "en": "Contains gluten and pistachio. Full allergen information is pending confirmation.",
         "es": "Contiene gluten y pistacho. La declaración completa de alérgenos está pendiente de confirmación.",
         "ar": "يحتوي على الغلوتين والفستق. القائمة الكاملة لمسببات الحساسية بانتظار التأكيد."
       },
-      "previewPhoto": { "source": "photos/panettone/11.webp", "file": "pistacchio.webp", "sha256": "c4e2013b5c11d92727281bbc82f3a6b6ea889990ffe09bc8a7550ec2f9ff76a7", "size": "normal" }
+      "previewPhoto": {
+        "source": "photos/panettone/11.webp",
+        "file": "pistacchio.webp",
+        "sha256": "d38c6746273823b3ce463459a5dfce7081eef595fb53ce6fd8716c4b7869fc0a",
+        "size": "normal",
+        "sourceDerivativeSha256": "c4e2013b5c11d92727281bbc82f3a6b6ea889990ffe09bc8a7550ec2f9ff76a7",
+        "crop": {
+          "x": 0,
+          "y": 416,
+          "width": 1067,
+          "height": 1184
+        }
+      }
     }
   ]
 }

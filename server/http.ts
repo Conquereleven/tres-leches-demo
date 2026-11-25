@@ -1157,7 +1157,7 @@ export async function startServer(
         candidate = resolve(root, "." + decodeURIComponent(path));
       if (candidate !== root && !candidate.startsWith(root + "/"))
         throw new DomainError(404, "No encontrado");
-      if (path === "/app-shell.html" || path === "/product-shell.html")
+      if (path === "/app-shell.html" || path === "/product-shell.html" || /^\/\.localized(?:\/|$)/.test(path))
         throw new DomainError(404, "Ruta no encontrada");
       const linkedProduct = path === "/menu" && url.searchParams.get("product");
       if (linkedProduct && isProductPagePath(`/menu/${linkedProduct}`)) {
@@ -1169,7 +1169,11 @@ export async function startServer(
       const productPage = isProductPagePath(path);
       if (path === "/" || prerenderedPages.some((page) => page === path) || productPage) {
         const page = productPage ? "product-shell" : path === "/" ? "index" : path.slice(1);
-        const file = resolve(root, page + ".html");
+        const language = url.searchParams.get("lang");
+        const localeDirectory = !productPage && (language === "ar" || language === "es")
+          ? `.localized/${language}`
+          : ".";
+        const file = resolve(root, localeDirectory, page + ".html");
         if (!existsSync(file))
           throw new DomainError(404, "Ejecuta el build para servir la aplicación");
         const html = markDynamicCatalog(file);

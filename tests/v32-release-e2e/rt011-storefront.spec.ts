@@ -47,6 +47,7 @@ for (const locale of ["en", "es", "ar"] as const) {
     );
     expect(cart).toEqual([{ productId: individual, quantity: 1 }]);
     const quote = await page.request.post("/api/checkout/quote", {
+      headers: { Origin: new URL(page.url()).origin },
       data: { lines: cart, fulfillmentMethod: "pickup" },
     });
     expect(quote.ok()).toBeTruthy();
@@ -79,10 +80,10 @@ test("RT01.1 Pan de Muerto availability, Panettone direct navigation and stale c
   await page.goto("/bakery?category=pan");
   await expect(
     page.locator(".ref32-product[data-category-id=pan]"),
-  ).toHaveCount(2);
+  ).toHaveCount(10);
   await expect(
     page.locator('[data-product-id="pan-de-muerto-filled--pistachio"]'),
-  ).toHaveCount(0);
+  ).toBeEnabled();
   await page.goto("/bakery?category=panettone");
   await expect(page.getByRole("button", { name: "Panettone" })).toHaveCount(0);
   await expect(page.locator(".v32-search-empty")).toBeVisible();
@@ -147,6 +148,7 @@ test("RT01.1 cold HTML, portrait completion, reduced motion, contacts and journa
     fullPage: true,
   });
   releaseScript();
+  await expect(page.locator(".ref-scroll-sketch")).toBeVisible();
   await page.unroute(route);
   const sketch = page.locator(".v32-family-portrait .ref-scroll-sketch");
   await expect

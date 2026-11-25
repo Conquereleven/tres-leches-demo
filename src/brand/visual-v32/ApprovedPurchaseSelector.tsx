@@ -22,9 +22,9 @@ import { tricolorSpec, TRICOLOR_COLORS, tricolorCopy, type TricolorColor } from 
 import "./approved-source.css";
 
 const words={
- es:{size:"Tamaño",variant:"Variante",presentation:"Presentación",price:"Precio",quantity:"Cantidad",boxes:"Cantidad de cajas",note:"Personalización",optional:"(opcional)",placeholder:'Ej. "Feliz cumpleaños"',add:"Agregar al carrito",unavailable:"No disponible",notReady:"Selecciona todos los sabores antes de continuar",noteHold:"La inscripción supera el límite del tamaño seleccionado.",pieces:"piezas por caja",unit:"pieza",close:"Cerrar",min:"Pedido mínimo",select:"Seleccionar color",contains:"Contenido de la caja"},
- en:{size:"Size",variant:"Choose a variant",presentation:"Presentation",price:"Price",quantity:"Quantity",boxes:"Number of boxes",note:"Personalization",optional:"(optional)",placeholder:"e.g. Happy birthday",add:"Add to cart",unavailable:"Unavailable",notReady:"Select every flavor before continuing",noteHold:"The inscription exceeds the character limit for this size.",pieces:"pieces per box",unit:"piece",close:"Close",min:"Minimum order",select:"Select color",contains:"Pieces in box"},
- ar:{size:"الحجم",variant:"اختر النوع",presentation:"الحجم",price:"السعر",quantity:"الكمية",boxes:"عدد العلب",note:"التخصيص",optional:"(اختياري)",placeholder:"مثلاً عيد ميلاد سعيد",add:"أضف إلى السلة",unavailable:"غير متاح",notReady:"اختر الأصناف للمتابعة",noteHold:"الكتابة تتجاوز الحد المسموح لهذا الحجم.",pieces:"قطع في العلبة",unit:"قطعة",close:"إغلاق",min:"الحد الأدنى للطلب",select:"اختر اللون",contains:"القطع في العلبة"}
+ es:{size:"Tamaño",variant:"Variante",presentation:"Presentación",price:"Precio",quantity:"Cantidad",boxes:"Cantidad de cajas",note:"Personalización",optional:"(opcional)",placeholder:'Ej. "Feliz cumpleaños"',add:"Agregar al carrito",unavailable:"No disponible",notReady:"Selecciona todos los sabores antes de continuar",noteHold:"La inscripción supera el límite del tamaño seleccionado.",pieces:"piezas por caja",unit:"pieza",close:"Cerrar",min:"Pedido mínimo",select:"Seleccionar color",contains:"Contenido de la caja",decrease:"Reducir cantidad",increase:"Aumentar cantidad"},
+ en:{size:"Size",variant:"Choose a variant",presentation:"Presentation",price:"Price",quantity:"Quantity",boxes:"Number of boxes",note:"Personalization",optional:"(optional)",placeholder:"e.g. Happy birthday",add:"Add to cart",unavailable:"Unavailable",notReady:"Select every flavor before continuing",noteHold:"The inscription exceeds the character limit for this size.",pieces:"pieces per box",unit:"piece",close:"Close",min:"Minimum order",select:"Select color",contains:"Pieces in box",decrease:"Decrease quantity",increase:"Increase quantity"},
+ ar:{size:"الحجم",variant:"اختر النوع",presentation:"الحجم",price:"السعر",quantity:"الكمية",boxes:"عدد العلب",note:"التخصيص",optional:"(اختياري)",placeholder:"مثلاً عيد ميلاد سعيد",add:"أضف إلى السلة",unavailable:"غير متاح",notReady:"اختر الأصناف للمتابعة",noteHold:"الكتابة تتجاوز الحد المسموح لهذا الحجم.",pieces:"قطع في العلبة",unit:"قطعة",close:"إغلاق",min:"الحد الأدنى للطلب",select:"اختر اللون",contains:"محتويات العلبة",decrease:"تقليل الكمية",increase:"زيادة الكمية"}
 } as const;
 type AnchorSide="left"|"right"|"overlap"|"mobile"|"compact";
 type AnchorPlace=CSSProperties&{left:number;top:number;width:number;maxHeight:number};
@@ -70,7 +70,7 @@ export function ApprovedProductCard({product,familyId,variant,price,active,onSel
    data-product-id={product.id} data-category-id={family?.category??""}
    data-selected-product={active} aria-haspopup="dialog" aria-expanded={active}
    disabled={price===null} onClick={event=>onSelect(event.currentTarget)}>
-   <span className="ref32-photo">
+   <span className="ref32-photo" data-fit={family?.category==="panettone"?"whole":undefined}>
      {url&&url!==failedUrl?<img src={url} alt={title} loading="lazy" onError={()=>setFailedUrl(url)}/>:
        <span className="ref32-photo-pending" role="img" aria-label={title}>
          <strong>✧ 3L</strong><small>{language==="es"?"Fotografía pendiente":language==="ar"?"الصورة قيد الإعداد":"Photo pending"}</small>
@@ -100,6 +100,9 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const title=useProductTitle(product);
  const published=useLiveCatalog();
  const description=productDescription(product,language,published);
+ const panettonePhoto=family.category==="panettone"
+   ? selectedProductMedia(product.id,family.id,product.variant)?.derivatives[0]?.src
+   : undefined;
  const allowed=purchasableOptions(family,menu.status,config,now);
  const grouped=packChoices(allowed);
  const liveOptions=publishedProduct(product,published)?.options;
@@ -175,10 +178,10 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  });
  const quantityControls=<div className="ref32-quantity" role="group"
    aria-label={selected&&selected.pieces>1?t.boxes:t.quantity}>
-   <button type="button" aria-label="Decrease quantity" disabled={qty<=minQty(productId)}
+   <button type="button" aria-label={t.decrease} disabled={qty<=minQty(productId)}
      onClick={()=>setQty(q=>Math.max(minQty(productId),q-1))}>−</button>
    <output aria-live="polite">{qty}</output>
-   <button type="button" aria-label="Increase quantity" disabled={inCart+qty>=MAX_QTY}
+   <button type="button" aria-label={t.increase} disabled={inCart+qty>=MAX_QTY}
      onClick={()=>setQty(q=>q+1)}>+</button>
  </div>;
  const buy=()=>{if(!canBuy)return;cart.add(productId,qty,customized?composition:undefined,color??undefined,note.trim()||undefined);onAdded();};
@@ -238,9 +241,14 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
     data-anchor-side={side} data-selected-sku={productId} style={place} data-product-id={product.id} aria-label={title}>
    <div className="ref32-details">
     <div className="ref32-dialog-heading">
-     <div><h2>{title}</h2>
-      {description&&<p>{description}</p>}
-      {serving&&<p className="ref32-servings" data-cake-serves>{serving}</p>}</div>
+     <div className={panettonePhoto?"ref32-panettone-intro":undefined}>
+      <div>
+       <h2>{title}</h2>
+       {description&&<p>{description}</p>}
+       {serving&&<p className="ref32-servings" data-cake-serves>{serving}</p>}
+      </div>
+      {panettonePhoto&&<img className="ref32-panettone-preview" src={panettonePhoto} alt={title}/>}
+     </div>
      <button className="ref32-close" type="button" ref={closeControl} aria-label={t.close} onClick={onClose}>×</button>
     </div>
     <p className="ref32-section-label">{showSize?t.size:t.variant}</p>
@@ -305,7 +313,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
      <div className="ref32-price"><span>{t.price}</span><strong>{amount}</strong></div>
      {quantityControls}
     </div>
-    {minQty(productId)>1&&<p className="ref32-min" data-minimum-notice>{t.min}: {minQty(productId)} {t.unit}</p>}
+    {minQty(productId)>1&&<p className="ref32-min" data-minimum-notice>{t.min}: <bdi>{new Intl.NumberFormat(language==="ar"?"ar-AE-u-nu-arab":language).format(minQty(productId))}</bdi> {language==="ar"?"قطع":language==="es"?"piezas":"pieces"}</p>}
     {selected&&selected.pieces>1&&<p className="ref32-count" data-pack-piece-count>{selected.pieces} {t.pieces}</p>}
     {activeCake&&<label className="ref32-note"><span>{t.note} <em>{t.optional}</em></span>
       <span className="ref32-note-field"><span aria-hidden="true">✎</span>
@@ -321,7 +329,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
      <div className="ref32-desktop-quantity">{quantityControls}</div>
      <button type="button" className="ref32-buy" disabled={!canBuy} onClick={buy}>
       <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M5 8h14l-1 12H6z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
-      <span>{t.add}</span><span className="ref32-cta-cost">{amount}</span><span className="ref32-cta-arrow" aria-hidden="true">→</span>
+      <span>{t.add}</span><span className="ref32-cta-cost">{amount}</span><span className="ref32-cta-arrow" aria-hidden="true">{language==="ar"?"←":"→"}</span>
      </button>
    </footer>
   </section>

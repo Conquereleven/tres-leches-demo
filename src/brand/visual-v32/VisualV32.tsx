@@ -82,16 +82,16 @@ const visualCopy = {
  ar: {
   hero1:"أكثر من مجرد كعكة.",hero2:"تقليد عائلي.",today:"اليوم",
   legacy:"صنع بحب: إرث عائلة 3L",
-  story1:"مرحباً، أنا ليزا، مؤسسة 3L في دبي. أهلاً بكم في عالمنا، حيث تمثل كل كعكة تريس ليتشيس تراث عائلتنا، وتُحضّر بحب وبمكونات طبيعية.",
-  story2:"بدأت قصتنا عام 1982 في مكسيكو سيتي، عندما أعدّت أليسيا لونا بايثا كعكات تريس ليتشيس لأحبتها. واليوم يستمر هذا التقليد العائلي في دبي.",
-  storyQuote:"قصتنا تفوح أيضاً برائحة الحب ♡",explore:"اكتشفوا كعكات تريس ليتشيس ←",
+  story1:"أهلاً بكم، أنا ليزا، مؤسسة مخبز 3L في دبي. تحمل كل كعكة تريس ليتشيس شيئاً من تراث عائلتنا، ونحضّرها بحب وبمكونات طبيعية مختارة.",
+  story2:"بدأت قصتنا في مدينة مكسيكو عام ١٩٨٢، عندما كانت أليسيا لونا بايثا تعدّ كعكة تريس ليتشيس لعائلتها وأحبّائها. واليوم نواصل هذا التقليد العائلي في دبي.",
+  storyQuote:"وصفةٌ نتوارثها بحب",explore:"اكتشفوا كعكات تريس ليتشيس ←",
   menuEyebrow:"قائمة 3L",menuTitle:"استكشفوا قائمتنا",menuTag:"كعكات ومخبوزات وإبداعاتنا المميزة",
-  searchBakery:"ابحث في المخبز...",searchMenu:"ابحث في القائمة...",find:"بحث ←",
+  searchBakery:"ابحث في المخبز",searchMenu:"ابحث في القائمة",find:"بحث",
   cakes:"الكعكات",bakery:"المخبوزات",cakesTag:"الحلويات",bakeryTag:"المخبوزات",
   cakesDesc:"كعكاتنا المميزة وحلوياتنا وإبداعاتنا الموسمية.",
-  bakeryDesc:"خبز حرفي ومفضلات كلاسيكية ومخبوزات طازجة.",
+  bakeryDesc:"معجّنات مكسيكية تقليدية ومخبوزات طازجة.",
   exploreCakes:"استكشف الكعكات ←",exploreBakery:"استكشف المخبوزات ←",
-  catalogEyebrow:"قائمتنا",catalogTitle:"المخبوزات المكسيكية التقليدية",catalogTag:"كعكات وخبز وإبداعات مميزة",
+  catalogEyebrow:"قائمتنا",catalogTitle:"المخبوزات المكسيكية التقليدية",catalogTag:"كعكات ومعجّنات من وصفاتنا المميّزة",
   variants:"اختر النوع",price:"السعر",from:"ابتداءً من ",unavailable:"غير متاح",
   loading:"جارٍ تحميل المنتجات المتاحة...",orderingUnavailable:"الطلبات عبر الإنترنت غير متاحة.",
   notFound:"لا توجد منتجات مطابقة.",retry:"حاول مجدداً",variantUnavailable:"هذا الخيار غير متاح للطلب عبر الإنترنت.",
@@ -103,7 +103,7 @@ const visualCopy = {
 
 const groups: {id: Filter; en: string; es: string; ar: string}[] = [
   {id:"all",en:"All Products",es:"Todos",ar:"الكل"},
-  {id:"cakes",en:"Cakes",es:"Pasteles",ar:"كيك"},
+  {id:"cakes",en:"Cakes",es:"Pasteles",ar:"كعكات"},
   {id:"bakery",en:"Bakery",es:"Panadería",ar:"مخبوزات"},
   {id:"mexican",en:"Mexican Bakery",es:"Panadería Mexicana",ar:"مخبوزات مكسيكية"},
   {id:"panettone",en:"Panettone",es:"Panettone",ar:"بانيتوني"},
@@ -142,8 +142,8 @@ function Header(){
           aria-controls="v32-mobile-links" aria-expanded={mobileOpen}
           onClick={()=>setMobileOpen(value=>!value)}>{mobileOpen?"×":"☰"}</button>
         <span className="v32-nav-left"><a href={origin || "/"}>{labels.home}</a><a href={origin+"/menu"}>{labels.menu}</a></span>
-        <a className="v32-logo" href={origin || "/"}>
-          <strong>✧ 3L pastelerías</strong>
+        <a className="v32-logo" dir="ltr" href={origin || "/"}>
+          <strong dir="ltr">✧ 3L pastelerías</strong>
           <span className="v32-logo-micro"><i/><small>MEXICO CITY SINCE 1982</small><i/></span>
         </a>
         <span className="v32-nav-right">
@@ -154,7 +154,7 @@ function Header(){
               <option value="en">🇬🇧 EN</option><option value="es">🇲🇽 ES</option><option value="ar">🇦🇪 AR</option>
             </select>
           </label>
-          <a href={origin+"/cart"}><span className="v32-cart-glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 8.5h15l-1 12h-13z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg></span>{labels.cart} (<span aria-live="polite">{count}</span>)</a>
+          <a href={origin+"/cart"}><span className="v32-cart-glyph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 8.5h15l-1 12h-13z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg></span>{labels.cart} <bdi aria-live="polite">({new Intl.NumberFormat(language==="ar"?"ar-AE-u-nu-arab":language).format(count)})</bdi></a>
         </span>
       </nav>
     </header>
@@ -163,7 +163,7 @@ function Header(){
         onClick={()=>setMobileOpen(false)} aria-hidden="true" tabIndex={-1}/>
       <aside className="v32-mobile-drawer v32-mobile-sheet" id="v32-mobile-links" aria-label={ui.menu}>
         <div className="v32-mobile-sheet-top">
-          <strong>✧ 3L pastelerías</strong>
+          <strong dir="ltr">✧ 3L pastelerías</strong>
           <button type="button" aria-label={ui.menu+" · "+ui.close} onClick={()=>setMobileOpen(false)}>×</button>
         </div>
         <nav>
@@ -191,7 +191,7 @@ function Home({staticPage}:{staticPage:boolean}){
       <div className="v32-city v32-city-left" data-city="mexico"><div className="v32-city-crop v32-city-reference" data-fallback={!origin || undefined}><img
         src={origin?previewAssets+"/mexico-city-illustration.jpg":combinedCityArt} onError={e=>fallbackPreviewAsset(e,combinedCityArt)}
         alt=""/></div>
-        <b dir="auto">{cities.mexico}</b><span><bdi>{cities.since}</bdi></span></div>
+        <div className="v32-city-caption" dir={language==="ar"?"rtl":"ltr"}><b>{cities.mexico}</b><span><bdi>{cities.since}</bdi></span></div></div>
       <svg viewBox="0 0 540 100" className="v32-route" aria-hidden="true">
         <path d="M8 39 C90 -24 150 138 267 55 S417 56 529 38" fill="none" stroke="#b98a4e" strokeWidth="2"/>
         <circle cx="98" cy="37" r="17" fill="none" stroke="#b98a4e" strokeWidth="2"/>
@@ -200,7 +200,7 @@ function Home({staticPage}:{staticPage:boolean}){
       <div className="v32-city v32-city-right" data-city="dubai"><div className="v32-city-crop v32-city-reference" data-fallback={!origin || undefined}><img
         src={origin?previewAssets+"/dubai-illustration.jpg":combinedCityArt} onError={e=>fallbackPreviewAsset(e,combinedCityArt)}
         alt=""/></div>
-        <b dir="auto">{cities.dubai}</b><span><bdi>{t.today}</bdi></span></div>
+        <div className="v32-city-caption" dir={language==="ar"?"rtl":"ltr"}><b>{cities.dubai}</b><span>{t.today}</span></div></div>
     </section>
     <section className="v32-story" id="family-story">
       <div className="v32-family">
@@ -235,7 +235,7 @@ function Landing(){
       <input type="hidden" name="lang" value={language}/>
       <span aria-hidden="true">⌕</span><input value={query}
         onChange={event=>setQuery(event.target.value)}
-        name="q" type="search" aria-label={navigationLabels[language].searchBakery} placeholder={t.searchBakery}/>
+        name="q" type="search" dir="auto" aria-label={navigationLabels[language].searchBakery} placeholder={t.searchBakery}/>
       <button type="submit">{t.find}</button>
     </form>
     <div className="v32-search-results" aria-live="polite">
@@ -310,7 +310,7 @@ function Bakery({search,staticPage=false}:{search:string;staticPage?:boolean}){
     const item=published.status==="live"?published.catalog.categories.find(c=>c.id===id):undefined;
     const knownArabic:Record<string,string>={
       cakes:"الكعكات", jars:"كعكات في أكواب", bakery:"المخبوزات",
-      pan:"بان دي مويرتو", conchas:"كونشا", special:"نكهات خاصة",
+      pan:"بان دي مويرتو", conchas:"خبز الكونشا", panettone:"بانيتوني", special:"نكهات خاصة",
     };
     const translation=item?.content?.[language]?.name;
     return language==="ar"&&(!translation||translation===name)&&knownArabic[id]
@@ -330,7 +330,7 @@ function Bakery({search,staticPage=false}:{search:string;staticPage?:boolean}){
     <p className="v32-tagline">{t.catalogTag}</p>
     <form className="v32-search" role="search" onSubmit={e=>{e.preventDefault();navigateFilters(filter,subcategory);}}>
       <span aria-hidden>⌕</span><input value={query} onChange={e=>setQuery(e.target.value)}
-      type="search" aria-label={navigationLabels[language].searchMenu} placeholder={t.searchMenu}/>
+      type="search" dir="auto" aria-label={navigationLabels[language].searchMenu} placeholder={t.searchMenu}/>
       <button type="submit">{t.find}</button>
     </form>
     <div className="v32-filters" role="group" aria-label={navigationLabels[language].categories}>
@@ -436,7 +436,7 @@ function VisualFooter(){
   const {language}=useLanguage();
   const labels=visualNav[language];const t=visualCopy[language];
   return <footer className="v32-site-footer">
-    <div className="v32-site-footer-brand"><strong>✧ 3L pastelerías</strong><small>MEXICO CITY SINCE 1982</small></div>
+    <div className="v32-site-footer-brand"><strong dir="ltr">✧ 3L pastelerías</strong><small>MEXICO CITY SINCE 1982</small></div>
     <nav aria-label={navigationLabels[language].footer}>
       <a href={origin+"/menu"}>{labels.menu}</a>
       <a href={origin+"/journal"}>{labels.journal}</a>
@@ -465,7 +465,7 @@ export function VisualV32({pathname,search="",staticPage=false}:{pathname:string
   const {language}=useLanguage();
   const path=pathname.replace(/\/+$/,"").slice(origin.length) || "/";
   const commerce = ["/cart","/checkout","/checkout/return","/how-to-order","/contact"].includes(path) || isPolicyPath(path);
-  return <div className="v32-app" data-visual-preview="v32" data-frontend="standalone-v32">
+  return <div className="v32-app" lang={language} dir={language==="ar"?"rtl":"ltr"} data-visual-preview="v32" data-frontend="standalone-v32">
     <a className="v32-skip" href="#main">{navigationLabels[language].skip}</a>
     <Header/>
     <div className="v32-blossom" aria-hidden="true"/>

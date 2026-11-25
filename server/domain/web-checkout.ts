@@ -799,7 +799,7 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
   );
   requireThat(
     input.lines.every((l) => availableSku(l.productId)),
-    "This product is outside its ordering season",
+    "This product is not available for online ordering",
     422,
   );
   requireThat(

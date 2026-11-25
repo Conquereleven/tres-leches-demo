@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from "react";
+import { useLayoutEffect, useId, useRef } from "react";
 import drawing from "./journal-drawing.json";
 const WIDTH = 640,
   HEIGHT = 768;
@@ -228,7 +228,7 @@ let entrancePlayed = false;
 /** The first home mount in a document plays the portrait once. */
 export function EntranceSketch({ label }: { label: string }) {
   const portrait = useRef<HTMLDivElement>(null);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = portrait.current;
     if (!element || element.dataset.entrance === "complete") return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -247,7 +247,6 @@ export function EntranceSketch({ label }: { label: string }) {
     paintSketch(element, 0);
     const animate = (time: number) => {
       start ??= time;
-      entrancePlayed = true;
       const progress = Math.min((time - start) / 4400, 1);
       if (progress === 1) return finish();
       paintSketch(element, progress);

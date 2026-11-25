@@ -71,16 +71,16 @@ test("longer product lead time preserved; mango jars are not mango cakes", () =>
   assert.equal(leadHours(["rosca-de-reyes-6-personas"]), 24);
   assert.equal(leadHours(["cake-jar-premium-mango-110-ml"]), 12);
 });
-for (const [date, expected] of [
-  ["2026-10-02T19:59:59Z", false],
-  ["2026-10-02T20:00:00Z", true],
-  ["2026-11-15T19:59:59Z", true],
-  ["2026-11-15T20:00:00Z", false],
+for (const [date] of [
+  ["2026-10-02T19:59:59Z"],
+  ["2026-10-02T20:00:00Z"],
+  ["2026-11-15T19:59:59Z"],
+  ["2026-11-15T20:00:00Z"],
 ] as const)
-  test(`season uses Dubai clock ${date}`, () => {
+  test(`Pan de Muerto availability stays year-round ${date}`, () => {
     assert.equal(
       availableSku("pan-de-muerto-filled-pistachio-individual", new Date(date)),
-      expected,
+      true,
     );
     assert.equal(
       availableSku("pan-de-muerto-filled-pack-12-individuales", new Date(date)),

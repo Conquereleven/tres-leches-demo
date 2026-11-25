@@ -3,13 +3,16 @@ import { useLanguage as useCustomerLanguage } from "./localization";
 import manifest from "./media-manifest.json";
 import categories from "./category-media.json";
 import official from "./official-pan-media.json";
+import rt013 from "./rt013-media.json";
 import { useEffect, useRef, useState } from "react";
 import { liveState, useLiveCatalog, type LiveAsset } from "./live-catalog";
 export const productMediaAssignments = [
+  ...rt013.products,
   ...official.products,
   ...manifest.products,
 ];
 export const approvedMedia = [
+  ...rt013.assets,
   ...official.assets,
   ...manifest.assets,
   ...categories.assets,
@@ -139,7 +142,7 @@ export const usesMenuReferencePresentation = (asset: MediaAsset | undefined) =>
  * category-media frames (3L-MEDIA-002 photographs first) open the gallery;
  * official frames for the same category follow. */
 export const categoryEditorialMedia = (category: string) =>
-  [...categories.editorial, ...official.editorial]
+  [...rt013.editorial, ...categories.editorial, ...official.editorial]
     .filter((e) => e.category === category)
     .flatMap((e) => e.sourceIds)
     .map((id) => approvedMedia.find((a) => a.sourceId === id))

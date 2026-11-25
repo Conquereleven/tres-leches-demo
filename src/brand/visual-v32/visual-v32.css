@@ -583,3 +583,11 @@
   border-radius: 26px 0 0 26px !important;
 }
 [lang="ar"] .v32-journal-sections { text-align: start; }
+
+.v32-city-caption { display: grid; gap: 3px; justify-items: center; }
+.v32-app[dir="rtl"] :is(.v32-story, .v32-journal-sections, .v32-new-cart-row) { text-align: start; }
+.v32-search input { text-align: start; }
+
+.v32-app[dir="rtl"] .v32-search input:placeholder-shown { direction: rtl; text-align: right; }
+.v32-app[dir="rtl"] .v32-search input::placeholder { font-style: normal; }
+.v32-nav-right > a { white-space: nowrap; }

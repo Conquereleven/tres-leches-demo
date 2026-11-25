@@ -10,8 +10,8 @@ await build({
     contents: `import React from 'react'; import {renderToStaticMarkup} from 'react-dom/server'; import {VisualV32} from './src/brand/visual-v32/VisualV32'; import {LocalizationProvider} from './src/brand/localization'; import {pages} from './src/brand/Policies'; import {pendingBusinessFacts} from './src/brand/business'; import {seoPages, siteName, socialImage} from './src/seo/pages';
 export * from './shared/seo';
 export {seoPages, siteName, socialImage, pages as policyMeta};
-export const renderPage = (pathname) => renderToStaticMarkup(
-  <LocalizationProvider><VisualV32 pathname={pathname} staticPage /></LocalizationProvider>);
+export const renderPage = (pathname, language) => renderToStaticMarkup(
+  <LocalizationProvider prerenderLocale={language}><VisualV32 pathname={pathname} staticPage /></LocalizationProvider>);
 export const pending = pendingBusinessFacts();`,
     resolveDir: process.cwd(),
     loader: "tsx",
@@ -58,11 +58,21 @@ const site = { origin: SITE_ORIGIN, name: siteName, image: socialImage };
 const pages = seoPages(SITE_ORIGIN, shellMeta(shell), policyMeta);
 // Every public page: same shell and bundle, own head and own content.
 for (const page of pages) {
-  const body = renderPage(page.path);
+  const body = renderPage(page.path, "en");
   writeFileSync(
     page.path === "/" ? path : `dist/client${page.path}.html`,
     withBody(applyHead(withFonts, headTags(page, site)), body),
   );
+  const name = page.path === "/" ? "index" : page.path.slice(1);
+  for (const language of ["ar", "es"]) {
+    const direction = language === "ar" ? "rtl" : "ltr";
+    const localizedShell = withFonts.replace('<html lang="en">', `<html lang="${language}" dir="${direction}">`);
+    mkdirSync(`dist/client/.localized/${language}`, { recursive: true });
+    writeFileSync(
+      `dist/client/.localized/${language}/${name}.html`,
+      withBody(applyHead(localizedShell, headTags(page, site)), renderPage(page.path, language)),
+    );
+  }
 }
 writeFileSync("dist/client/robots.txt", robotsTxt(SITE_ORIGIN));
 writeFileSync("dist/client/sitemap.xml", sitemapXml(pages, SITE_ORIGIN));

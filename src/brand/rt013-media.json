@@ -1,0 +1,535 @@
+{
+  "assets": [
+    {
+      "sourceId": "rt013-bisquets",
+      "sourceFilename": "BISQUETS/BISQUET FRONTAL 02.jpg",
+      "sourceSha256": "65c7de6a2cf7839e891524fefa8ba4941522dc2c82f03fafccc4ffa268943523",
+      "originalBytes": 2203220,
+      "family": "bisquets",
+      "variant": "",
+      "size": null,
+      "alt": "Bisquet",
+      "status": "assigned",
+      "width": 540,
+      "height": 960,
+      "derivatives": [
+        {
+          "src": "/brand/rt013/rt013-bisquets-480.webp",
+          "width": 270,
+          "height": 480,
+          "format": "webp",
+          "bytes": 14474,
+          "sha256": "f08552d1cacde58bca75b8228041a336448b8c6ecd7eb1d8c29f0973e18414f0"
+        },
+        {
+          "src": "/brand/rt013/rt013-bisquets-960.webp",
+          "width": 540,
+          "height": 960,
+          "format": "webp",
+          "bytes": 48962,
+          "sha256": "0cc62125d9aa5d3be47277ab1f2d4ec4386c2c694a433f721a613090a2bdd68b"
+        }
+      ],
+      "presentation": "menu-reference-photo"
+    },
+    {
+      "sourceId": "rt013-conchas-traditional-chocolate",
+      "sourceFilename": "CONCHA CHOCOLATE/CONCHA CH 02.jpg",
+      "sourceSha256": "26060ae4ef5a92d1b385d78541ff81c222b1dcc0cf6480473954dc31c72c914b",
+      "originalBytes": 1973262,
+      "family": "conchas-traditional",
+      "variant": "Chocolate",
+      "size": null,
+      "alt": "Traditional chocolate concha",
+      "status": "assigned",
+      "width": 960,
+      "height": 960,
+      "derivatives": [
+        {
+          "src": "/brand/rt013/rt013-conchas-traditional-chocolate-480.webp",
+          "width": 480,
+          "height": 480,
+          "format": "webp",
+          "bytes": 28068,
+          "sha256": "f6d8e710b77b449da1148c8adad12090544906f25083f32a84117126db743982"
+        },
+        {
+          "src": "/brand/rt013/rt013-conchas-traditional-chocolate-960.webp",
+          "width": 960,
+          "height": 960,
+          "format": "webp",
+          "bytes": 91582,
+          "sha256": "d33aa6608bc8dd071930abd725043d78fdc4dc4ea4ab4d9f6f41ab5af5d6e768"
+        }
+      ],
+      "presentation": "menu-reference-photo"
+    },
+    {
+      "sourceId": "rt013-conchas-traditional-vainilla",
+      "sourceFilename": "CONCHA VAINILLA/CONCHA VAINILLA 02.jpg",
+      "sourceSha256": "edca050dba9ba1852c2de21e31dd5d532a20e6e486d20a5dcc0e8577dfde6755",
+      "originalBytes": 2313810,
+      "family": "conchas-traditional",
+      "variant": "Vainilla",
+      "size": null,
+      "alt": "Traditional vanilla concha",
+      "status": "assigned",
+      "width": 685,
+      "height": 960,
+      "derivatives": [
+        {
+          "src": "/brand/rt013/rt013-conchas-traditional-vainilla-480.webp",
+          "width": 343,
+          "height": 480,
+          "format": "webp",
+          "bytes": 18296,
+          "sha256": "322a9f62dcfc6650c235f9c8513b62358362d18cc5091c5294b30597b5cc426e"
+        },
+        {
+          "src": "/brand/rt013/rt013-conchas-traditional-vainilla-960.webp",
+          "width": 685,
+          "height": 960,
+          "format": "webp",
+          "bytes": 55654,
+          "sha256": "4058f07ed4a6d875d8ea90bfedef64b4b49723b4683f6cc707f673f80e409308"
+        }
+      ],
+      "presentation": "menu-reference-photo"
+    },
+    {
+      "sourceId": "rt013-orejas",
+      "sourceFilename": "OREJITAS/OREJA 02.jpg",
+      "sourceSha256": "fa3dacb841918d2e4ae3296ded68cac4ba2e34ff1ffe38bf8ea11677e4cfd8f3",
+      "originalBytes": 2755579,
+      "family": "orejas",
+      "variant": "",
+      "size": null,
+      "alt": "Oreja",
+      "status": "assigned",
+      "width": 768,
+      "height": 960,
+      "derivatives": [
+        {
+          "src": "/brand/rt013/rt013-orejas-480.webp",
+          "width": 384,
+          "height": 480,
+          "format": "webp",
+          "bytes": 30334,
+          "sha256": "098cccf921829ed9ea8b2c5ea2ccc30eb1e243886cdd974e0e0587e9fe14e599"
+        },
+        {
+          "src": "/brand/rt013/rt013-orejas-960.webp",
+          "width": 768,
+          "height": 960,
+          "format": "webp",
+          "bytes": 106032,
+          "sha256": "ca436bcdeea3bb7cf9f1888a06cf8cfa09f52edcdfd6f8f6e68c9f3cac63ea9a"
+        }
+      ],
+      "presentation": "menu-reference-photo"
+    },
+    {
+      "sourceId": "rt013-pan-de-muerto-traditional-ajonjoli",
+      "sourceFilename": "PAN DE MUERTO AJONJOLI/PAN DE MUERTO AJONJOLI 06.jpg",
+      "sourceSha256": "213f1cfac10ba946b2e8046f898d444761e915e3b4c3d077b778ed7abd40410a",
+      "originalBytes": 1901608,
+      "family": "pan-de-muerto-traditional",
+      "variant": "Ajonjolí",
+      "size": null,
+      "alt": "Sesame Pan de Muerto",
+      "status": "assigned",
+      "width": 960,
+      "height": 960,
+      "derivatives": [
+        {
+          "src": "/brand/rt013/rt013-pan-de-muerto-traditional-ajonjoli-480.webp",
+          "width": 480,
+          "height": 480,
+          "format": "webp",
+          "bytes": 37934,
+          "sha256": "d82987970c2a47ceb8f42325662eaf776571f868a473faf17c2f5303b586d32a"
+        },
+        {
+          "src": "/brand/rt013/rt013-pan-de-muerto-traditional-ajonjoli-960.webp",
+          "width": 960,
+          "height": 960,
+          "format": "webp",
+          "bytes": 105524,
+          "sha256": "9085e55c76034a6140c5503e9a084ad0b6273f795baf7e4e57175d89a05f3a56"
+        }
+      ],
+      "presentation": "menu-reference-photo"
+    },
+    {
+      "sourceId": "rt013-pan-de-muerto-traditional-azucar",
+      "sourceFilename": "PAN DE MUERTO AZUCAR/PAN DE MUERTO AZUCAR 04.jpg",
+      "sourceSha256": "7c4ed77f43973d647c072ebf3f65595bc53319e7d79348a455ad2096f93637f1",
+      "originalBytes": 2067372,
+      "family": "pan-de-muerto-traditional",
+      "variant": "Azúcar",
+      "size": null,
+      "alt": "Sugar Pan de Muerto",
+      "status": "assigned",
+      "width": 960,
+      "height": 960,
+      "derivatives": [
+        {
+          "src": "/brand/rt013/rt013-pan-de-muerto-traditional-azucar-480.webp",
+          "width": 480,
+          "height": 480,
+          "format": "webp",
+          "bytes": 41754,
+          "sha256": "1b9cc57c2bbb9d5c4351f49fa1d2e41bfe5001f64fd3a77372cfea986ad9e05a"
+        },
+        {
+          "src": "/brand/rt013/rt013-pan-de-muerto-traditional-azucar-960.webp",
+          "width": 960,
+          "height": 960,
+          "format": "webp",
+          "bytes": 138586,
+          "sha256": "de8d7d7dd19bb8301644574e257fd39a11d965f6c51369e47f873bd8cd13a7d9"
+        }
+      ],
+      "presentation": "menu-reference-photo"
+    },
+    {
+      "sourceId": "rt013-pan-de-muerto-traditional-azucar-chocolate-covering",
+      "sourceFilename": "PAN DE MUERTO CUBIERTO DE CHOCOLATE/PAN CUBIERTO CHOCOLATE 02.jpg",
+      "sourceSha256": "7d1f8a43f430feadc9d1a5ed771782068d5e145bb7ade4b4716d5530164f47cd",
+      "originalBytes": 1842169,
+      "family": "pan-de-muerto-traditional",
+      "variant": "Azúcar · Chocolate covering",
+      "size": null,
+      "alt": "Chocolate-covered Pan de Muerto",
+      "status": "assigned",
+      "width": 960,
+      "height": 960,
+      "derivatives": [
+        {
+          "src": "/brand/rt013/rt013-pan-de-muerto-traditional-azucar-chocolate-covering-480.webp",
+          "width": 480,
+          "height": 480,
+          "format": "webp",
+          "bytes": 27648,
+          "sha256": "4a21962873d0885ff32b601b15533379d8b2024014fb70d2cec160931719c8df"
+        },
+        {
+          "src": "/brand/rt013/rt013-pan-de-muerto-traditional-azucar-chocolate-covering-960.webp",
+          "width": 960,
+          "height": 960,
+          "format": "webp",
+          "bytes": 99402,
+          "sha256": "700b696b3fb7eb4c7e40e83442de67a640fdfeeca4b7323d0a5298f9d613913a"
+        }
+      ],
+      "presentation": "menu-reference-photo"
+    },
+    {
+      "sourceId": "rt013-pan-de-muerto-filled-pistachio",
+      "sourceFilename": "PAN DE MUERTO PISTACHO/PISTACHO 02.jpg",
+      "sourceSha256": "ad83ee2dea74be5802405ee95b2bb5208a096b3d7215fb7e6ab9cf337eab5509",
+      "originalBytes": 2241077,
+      "family": "pan-de-muerto-filled",
+      "variant": "Pistachio",
+      "size": null,
+      "alt": "Pistachio Pan de Muerto",
+      "status": "assigned",
+      "width": 768,
+      "height": 960,
+      "derivatives": [
+        {
+          "src": "/brand/rt013/rt013-pan-de-muerto-filled-pistachio-480.webp",
+          "width": 384,
+          "height": 480,
+          "format": "webp",
+          "bytes": 17924,
+          "sha256": "dd1316b868fbe202c39840ad40c2bab117e25ab54d69cd29608f897707daff0a"
+        },
+        {
+          "src": "/brand/rt013/rt013-pan-de-muerto-filled-pistachio-960.webp",
+          "width": 768,
+          "height": 960,
+          "format": "webp",
+          "bytes": 54572,
+          "sha256": "95b5ac89faad99296a5596285607d0d40ed122043bd7aafe4e71cd5c1081e146"
+        }
+      ],
+      "presentation": "menu-reference-photo"
+    },
+    {
+      "sourceId": "rt013-pan-de-muerto-filled-chocolate",
+      "sourceFilename": "PAN DE MUERTO RELLENO/CHOCOLATE 01.jpg",
+      "sourceSha256": "5e563d88fabfb6ad904384d813be4a7a15ea1b591c11bf75d4b0df63868f7275",
+      "originalBytes": 3341459,
+      "family": "pan-de-muerto-filled",
+      "variant": "Chocolate",
+      "size": null,
+      "alt": "Chocolate-filled Pan de Muerto",
+      "status": "assigned",
+      "width": 540,
+      "height": 960,
+      "derivatives": [
+        {
+          "src": "/brand/rt013/rt013-pan-de-muerto-filled-chocolate-480.webp",
+          "width": 270,
+          "height": 480,
+          "format": "webp",
+          "bytes": 16402,
+          "sha256": "4c698c010c6646f858b477a41fc59010ffa3ca40b3a357e847554c49a0f4b4ce"
+        },
+        {
+          "src": "/brand/rt013/rt013-pan-de-muerto-filled-chocolate-960.webp",
+          "width": 540,
+          "height": 960,
+          "format": "webp",
+          "bytes": 52772,
+          "sha256": "fb13a7f7d79c22c1027ace8dfe0b9795297bb85b704a0027036be8ff5da310b4"
+        }
+      ],
+      "presentation": "menu-reference-photo"
+    },
+    {
+      "sourceId": "rt013-pan-de-muerto-filled-mascarpone-y-fresas",
+      "sourceFilename": "PAN DE MUERTO RELLENO/FRESA 01.jpg",
+      "sourceSha256": "f7b45e326a9e7b6cb25da634d60144bdb585b20cd93768e10db924de8d36433d",
+      "originalBytes": 3404671,
+      "family": "pan-de-muerto-filled",
+      "variant": "Mascarpone y fresas",
+      "size": null,
+      "alt": "Strawberry and mascarpone Pan de Muerto",
+      "status": "assigned",
+      "width": 540,
+      "height": 960,
+      "derivatives": [
+        {
+          "src": "/brand/rt013/rt013-pan-de-muerto-filled-mascarpone-y-fresas-480.webp",
+          "width": 270,
+          "height": 480,
+          "format": "webp",
+          "bytes": 15770,
+          "sha256": "599f2af2bf88349f6896aa7ac2f828cf278c2bf01a1fd9f213ce69222f0369d8"
+        },
+        {
+          "src": "/brand/rt013/rt013-pan-de-muerto-filled-mascarpone-y-fresas-960.webp",
+          "width": 540,
+          "height": 960,
+          "format": "webp",
+          "bytes": 51572,
+          "sha256": "cb8ee3ab35525f411be4ed489498c0403e131f9adf27ca43ea0c3e9235361682"
+        }
+      ],
+      "presentation": "menu-reference-photo"
+    },
+    {
+      "sourceId": "rt013-conchas-editorial-26",
+      "sourceFilename": "CONCHAS COLORES/CONCHAS COLORES 02.jpg",
+      "sourceSha256": "8d8e6f8410088a4825669e5fff5ccd2bea13834ef12ba5772dcd41a15b874038",
+      "originalBytes": 4473956,
+      "family": "conchas",
+      "variant": "Editorial",
+      "size": null,
+      "alt": "Assorted conchas",
+      "status": "assigned",
+      "width": 540,
+      "height": 960,
+      "derivatives": [
+        {
+          "src": "/brand/rt013/rt013-conchas-editorial-26-480.webp",
+          "width": 270,
+          "height": 480,
+          "format": "webp",
+          "bytes": 34842,
+          "sha256": "01a49ca252bd25f35f82136b0dc9d0c2bac0acf6a11f83f096fb0dac927aed2f"
+        },
+        {
+          "src": "/brand/rt013/rt013-conchas-editorial-26-960.webp",
+          "width": 540,
+          "height": 960,
+          "format": "webp",
+          "bytes": 131344,
+          "sha256": "ee113ca4aa98cdb9b85f1ac1de8c0daa4553f721c0b8445de92ad58a20e2442d"
+        }
+      ],
+      "presentation": "menu-reference-photo"
+    },
+    {
+      "sourceId": "rt013-pan-editorial-82",
+      "sourceFilename": "PAN DE MUERTO PACKS/PACK 6 MINI AZUCAR.jpg",
+      "sourceSha256": "466d35150303e5c37584a27f21935e5bea99e89a0f0750203a24fe515a8ec51b",
+      "originalBytes": 3946398,
+      "family": "pan",
+      "variant": "Editorial",
+      "size": null,
+      "alt": "Six mini sugar Pan de Muerto",
+      "status": "assigned",
+      "width": 540,
+      "height": 960,
+      "derivatives": [
+        {
+          "src": "/brand/rt013/rt013-pan-editorial-82-480.webp",
+          "width": 270,
+          "height": 480,
+          "format": "webp",
+          "bytes": 39402,
+          "sha256": "05a599c2cc325fa6311065cd81beeeb6de9651b75be3048afb069f5e53af45d3"
+        },
+        {
+          "src": "/brand/rt013/rt013-pan-editorial-82-960.webp",
+          "width": 540,
+          "height": 960,
+          "format": "webp",
+          "bytes": 166262,
+          "sha256": "443ad54c11fb72449d81568f9aa6fa2e8975855bdeb2f57b0ef26c2e19f51d34"
+        }
+      ],
+      "presentation": "menu-reference-photo"
+    },
+    {
+      "sourceId": "rt013-pan-editorial-93",
+      "sourceFilename": "PAN DE MUERTO RELLENO/MIX 02.jpg",
+      "sourceSha256": "7342b0390df82b99c6f44578403a9843cd84588a90a980c0c69f32477bae59b8",
+      "originalBytes": 2693599,
+      "family": "pan",
+      "variant": "Editorial",
+      "size": null,
+      "alt": "Assorted filled Pan de Muerto",
+      "status": "assigned",
+      "width": 768,
+      "height": 960,
+      "derivatives": [
+        {
+          "src": "/brand/rt013/rt013-pan-editorial-93-480.webp",
+          "width": 384,
+          "height": 480,
+          "format": "webp",
+          "bytes": 29020,
+          "sha256": "2375c0f92e7ea76ef3edf296518edab81e61c13d3dd1c045866f849565d129a5"
+        },
+        {
+          "src": "/brand/rt013/rt013-pan-editorial-93-960.webp",
+          "width": 768,
+          "height": 960,
+          "format": "webp",
+          "bytes": 101098,
+          "sha256": "e1dc14c8c289f7423d2221339e0987bab23a092302c9a67a6579ea352e9e96bb"
+        }
+      ],
+      "presentation": "menu-reference-photo"
+    }
+  ],
+  "products": [
+    {
+      "productId": "bisquets",
+      "skuIds": [
+        "bisquets-mini-60-g",
+        "bisquets-individual-100-g",
+        "bisquets-6-mini-60-g-cada-uno",
+        "bisquets-12-mini-60-g-cada-uno",
+        "bisquets-6-individuales-100-g-cada-uno",
+        "bisquets-12-individuales-100-g-cada-uno"
+      ],
+      "primarySourceId": "rt013-bisquets",
+      "gallerySourceIds": []
+    },
+    {
+      "productId": "conchas-traditional--chocolate",
+      "skuIds": [
+        "conchas-traditional-chocolate-mini-40-g",
+        "conchas-traditional-chocolate-individual-70-g"
+      ],
+      "primarySourceId": "rt013-conchas-traditional-chocolate",
+      "gallerySourceIds": []
+    },
+    {
+      "productId": "conchas-traditional--vainilla",
+      "skuIds": [
+        "conchas-traditional-vainilla-mini-40-g",
+        "conchas-traditional-vainilla-individual-70-g"
+      ],
+      "primarySourceId": "rt013-conchas-traditional-vainilla",
+      "gallerySourceIds": []
+    },
+    {
+      "productId": "orejas",
+      "skuIds": [
+        "orejas-mini-60-g",
+        "orejas-individual-100-g",
+        "orejas-6-mini-60-g-cada-uno",
+        "orejas-12-mini-60-g-cada-uno",
+        "orejas-6-individuales-100-g-cada-uno",
+        "orejas-12-individuales-100-g-cada-uno"
+      ],
+      "primarySourceId": "rt013-orejas",
+      "gallerySourceIds": []
+    },
+    {
+      "productId": "pan-de-muerto-traditional--ajonjoli",
+      "skuIds": [
+        "pan-de-muerto-traditional-ajonjoli-mini-40-g",
+        "pan-de-muerto-traditional-ajonjoli-individual-70-g"
+      ],
+      "primarySourceId": "rt013-pan-de-muerto-traditional-ajonjoli",
+      "gallerySourceIds": []
+    },
+    {
+      "productId": "pan-de-muerto-traditional--azucar",
+      "skuIds": [
+        "pan-de-muerto-traditional-azucar-mini-40-g",
+        "pan-de-muerto-traditional-azucar-individual-70-g"
+      ],
+      "primarySourceId": "rt013-pan-de-muerto-traditional-azucar",
+      "gallerySourceIds": []
+    },
+    {
+      "productId": "pan-de-muerto-traditional--azucar-chocolate-covering",
+      "skuIds": [
+        "pan-de-muerto-traditional-azucar-mini-40-g-chocolate-covering",
+        "pan-de-muerto-traditional-azucar-individual-70-g-chocolate-covering"
+      ],
+      "primarySourceId": "rt013-pan-de-muerto-traditional-azucar-chocolate-covering",
+      "gallerySourceIds": []
+    },
+    {
+      "productId": "pan-de-muerto-filled--pistachio",
+      "skuIds": [
+        "pan-de-muerto-filled-pistachio-mini",
+        "pan-de-muerto-filled-pistachio-individual"
+      ],
+      "primarySourceId": "rt013-pan-de-muerto-filled-pistachio",
+      "gallerySourceIds": []
+    },
+    {
+      "productId": "pan-de-muerto-filled--chocolate",
+      "skuIds": [
+        "pan-de-muerto-filled-chocolate-mini",
+        "pan-de-muerto-filled-chocolate-individual"
+      ],
+      "primarySourceId": "rt013-pan-de-muerto-filled-chocolate",
+      "gallerySourceIds": []
+    },
+    {
+      "productId": "pan-de-muerto-filled--mascarpone-y-fresas",
+      "skuIds": [
+        "pan-de-muerto-filled-mascarpone-y-fresas-mini",
+        "pan-de-muerto-filled-mascarpone-y-fresas-individual"
+      ],
+      "primarySourceId": "rt013-pan-de-muerto-filled-mascarpone-y-fresas",
+      "gallerySourceIds": []
+    }
+  ],
+  "editorial": [
+    {
+      "category": "conchas",
+      "sourceIds": [
+        "rt013-conchas-editorial-26"
+      ]
+    },
+    {
+      "category": "pan",
+      "sourceIds": [
+        "rt013-pan-editorial-82",
+        "rt013-pan-editorial-93"
+      ]
+    }
+  ]
+}
