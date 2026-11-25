@@ -209,3 +209,8 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Work in the existing isolated V3.2 Draft PR branch with synthetic preview data,
   browser checks and independent visual review. No merge/deploy/Production/payment
   provider activation/real customer data absent separate Founder approval.
+
+## RT02.1 Tatbiq merchant workspace
+
+- Founder-approved merchant shell and Overview use Tatbiq's white navigation, Sora / DM Sans, and mint design tokens. Scope them to `.commerce.ops-shell.tatbiq-workspace`; existing OMS status styling and public storefront styling retain their own contracts.
+- Operations navigation uses the existing module list, routes and role/environment guards. Metric cards, activity and warnings use existing workspace and reporting contracts.

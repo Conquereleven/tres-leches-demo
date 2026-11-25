@@ -41,6 +41,7 @@ import { orderReference } from "../../shared/order-number";
 import "./commerce.css";
 import "./operations-shell.css";
 import "./oms.css";
+import "./tatbiq-workspace.css";
 type Run = (body: Record<string, unknown>, path?: string) => Promise<boolean>;
 const LIST_SCROLL = "3l-oms-list-scroll";
 /** Current view and order from the address bar; old `?order=` links are upgraded in place. */
