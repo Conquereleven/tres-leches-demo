@@ -300,7 +300,7 @@ function Bakery({search,staticPage=false}:{search:string;staticPage?:boolean}){
   const catalog = available ? menu.products.flatMap(product => {
     const family = menuProductFamily(menu,product);
     const options = purchasableOptions(family,menu.status,config,now);
-    if (family.category === "panettone" || ((family.category === "pan" || query.trim()) && !options.length)) return [];
+    if (["pan", "panettone"].includes(family.category) && !options.length) return [];
     return [{product, family, price: options.length ? Math.min(...options.map(o=>o.priceFils)) : null}];
   }) : [];
   const categoriesWithProducts = new Set(catalog.map(item=>item.family.category));
@@ -317,13 +317,13 @@ function Bakery({search,staticPage=false}:{search:string;staticPage?:boolean}){
       ? knownArabic[id] : translation??localizedSource(name,language);
   };
   const q=query.trim().toLocaleLowerCase(language);
-  const items=catalog.filter(({product,family})=>
+  const items=catalog.filter(({product,family,price})=>
     (filter==="all"||categoryFor(family.category)===filter)&&
     (!subcategory||family.category===subcategory)&&
-    (!q||[product.title, productTitle(product,language,published,text), product.description??"", productDescription(product,language,published)??"", product.variant,
+    (!q||(price!==null&&[product.title, productTitle(product,language,published,text), product.description??"", productDescription(product,language,published)??"", product.variant,
       ...menu.categories.filter(c=>c.id===family.category).flatMap(c=>[c.name,categoryName(c.id,c.name)]),
       ...groups.filter(g=>g.id===categoryFor(family.category)).flatMap(g=>[g.en,g.es,g.ar]),
-    ].some(value=>value.toLocaleLowerCase(language).includes(q))));
+    ].some(value=>value.toLocaleLowerCase(language).includes(q)))));
   const active=items.find(({product,price})=>product.id===selected&&price!==null)?.product;
   return <main className="v32-catalog v32-catalog-fidelity" id="main">
     <span className="v32-eyebrow">{t.catalogEyebrow}</span><h1>{t.catalogTitle}</h1>
@@ -334,7 +334,7 @@ function Bakery({search,staticPage=false}:{search:string;staticPage?:boolean}){
       <button type="submit">{t.find}</button>
     </form>
     <div className="v32-filters" role="group" aria-label={navigationLabels[language].categories}>
-      {groups.filter(g=>g.id!=="panettone").map(g=><button key={g.id} type="button" className={filter===g.id?"v32-selected":""}
+      {groups.filter(g=>g.id!=="panettone"||categoriesWithProducts.has("panettone")).map(g=><button key={g.id} type="button" className={filter===g.id?"v32-selected":""}
         aria-pressed={filter===g.id} onClick={()=>navigateFilters(g.id,null)}>
         {g[language]}
       </button>)}
@@ -394,7 +394,7 @@ function ProductRoute({slug}:{slug:string}){
   if(!product)return <MissingPage/>;
   const family=menuProductFamily(menu,product);
   const options=purchasableOptions(family,menu.status,config,now);
-  if(family.category==="panettone"||(family.category==="pan"&&!options.length))return <MissingPage/>;
+  if(["pan","panettone"].includes(family.category)&&!options.length)return <MissingPage/>;
   return <ProductDetail key={product.id} product={product} family={family}
     price={options.length?Math.min(...options.map(option=>option.priceFils)):null}/>;
 }

@@ -214,4 +214,5 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 
 - The Mexico City → Dubai journey keeps its geographic order when the storefront switches direction. Each illustration stays with its localized label and date.
 - Bakery filters and submitted search terms use the URL and browser history; published product names, descriptions, and option labels take precedence by locale.
-- Panettone is reserved and hidden until the Founder confirms commercial data. No purchasing through the storefront or the reserved SKU namespace.
+- RT01.2 prepares the Founder-confirmed Panettone Normal, Chocolate and Pistacchio. Each has Mini (2700 fils) and Normal (17000 fils), available year-round once published. Product Hub is the commercial authority. Keep the six SKUs in the isolated test fixture until separately authorized for LIVE. All other Panettone SKUs remain reserved.
+- Declare confirmed gluten and, for Pistacchio, pistachio, with an explicit incomplete-declaration notice. Weights, ingredients, full allergens and pack details remain pending. Founder confirmed the PH product cover photos for size Normal: 09 Normal, 14 Chocolate, 11 Pistacchio. The group shots of Mini are not individual variant photos.

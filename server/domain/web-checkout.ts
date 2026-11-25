@@ -1,3 +1,4 @@
+import { storefrontSkuPublished } from "../catalog/storefront-api";
 import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import {
   liveLinePrice,
@@ -790,7 +791,9 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
   const s = service.store.read();
   validatePackLines(s, input.lines);
   requireThat(
-    !input.lines.some((l) => RETIRED_SKUS.has(l.productId)),
+    input.lines.every((l) =>
+      !RETIRED_SKUS.has(l.productId) && storefrontSkuPublished(s, l.productId),
+    ),
     "Product unavailable",
     422,
   );

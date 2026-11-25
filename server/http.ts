@@ -13,6 +13,7 @@ import { serveHubMedia, serveProductHub } from "./catalog/product-hub-api";
 import { approvedOperationsNames } from "./catalog/product-hub";
 import {
   publishedRevision,
+  storefrontSkuPublished,
   serveStorefrontCatalog,
   storefrontCatalogMode,
 } from "./catalog/storefront-api";
@@ -489,7 +490,8 @@ export async function startServer(
                 (p) =>
                   p.active !== false &&
                   p.availability !== "unavailable" &&
-                  availableSku(p.id),
+                  availableSku(p.id) &&
+                  storefrontSkuPublished(s, p.id),
               )
               .map((p) => ({
                 id: p.id,

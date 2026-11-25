@@ -47,6 +47,7 @@ export type HubHistoryEntry = {
   action:
     | "draft.product"
     | "draft.packEligibility"
+    | "draft.category"
     | "draft.family"
     | "draft.asset"
     | "draft.media"
@@ -173,6 +174,17 @@ export const hubCommandSchema = z.discriminatedUnion("type", [
     .strict(),
   z
     .object({
+      type: z.literal("addCategory"),
+      expectedVersion,
+      category: z.object({
+        id,
+        name: text.max(300),
+        translations: translationsSchema,
+      }).strict(),
+    })
+    .strict(),
+  z
+    .object({
       type: z.literal("saveFamily"),
       expectedVersion,
       family: z
@@ -254,7 +266,7 @@ export type HubIssue = {
   message: string;
 };
 export type HubChange = {
-  kind: "product" | "variant" | "price" | "availability" | "family" | "asset";
+  kind: "product" | "variant" | "price" | "availability" | "category" | "family" | "asset";
   target: string;
   field: string;
   before: string | null;
@@ -336,6 +348,10 @@ export function hubChanges(
         (r) => r.packSkuId === spec.packSkuId,
       )?.componentSkuIds ?? [],
     );
+  const oldCategories = byId(live.foundation.categories);
+  for (const category of next.foundation.categories)
+    if (!oldCategories.has(category.id))
+      add("category", category.id, "created", null, category.name);
   const oldProducts = byId(live.foundation.products);
   for (const p of next.foundation.products) {
     const o = oldProducts.get(p.id);
@@ -961,6 +977,18 @@ export function hubCommand(
           .sort((a, b) => a.packSkuId.localeCompare(b.packSkuId));
         action = "draft.packEligibility";
         summary = "Edited pack flavor eligibility";
+      } else if (cmd.type === "addCategory") {
+        const categories = draft.foundation.categories;
+        if (categories.some((category) => category.id.toLowerCase() === cmd.category.id.toLowerCase()))
+          throw new DomainError(422, "That category identifier is already in use");
+        categories.push({
+          ...cmd.category,
+          image: null,
+          media: [],
+          displayOrder: Math.max(-1, ...categories.map((category) => category.displayOrder)) + 1,
+        });
+        action = "draft.category";
+        summary = `Created category ${cmd.category.id}`;
       } else if (cmd.type === "saveFamily") {
         if (
           !draft.foundation.categories.some(

@@ -114,6 +114,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  };
  const cakeSizing=family.category==="cakes" && allowed.length>0 &&
    allowed.every(option=>cakeSizeForSku(option.id)!==null);
+ const showSize=cakeSizing||family.category==="panettone";
  const rank={mini:0,small:1,medium:2};
  const sorted=[...allowed].sort((a,b)=>{
   if(cakeSizing) return rank[cakeSizeForSku(a.id)!.key]-rank[cakeSizeForSku(b.id)!.key];
@@ -242,7 +243,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
       {serving&&<p className="ref32-servings" data-cake-serves>{serving}</p>}</div>
      <button className="ref32-close" type="button" ref={closeControl} aria-label={t.close} onClick={onClose}>×</button>
     </div>
-    <p className="ref32-section-label">{cakeSizing?t.size:t.variant}</p>
+    <p className="ref32-section-label">{showSize?t.size:t.variant}</p>
     {grouped?.choices.length===4?
       <div className="ref32-options ref32-options-four" role="group" aria-label={t.variant}>
        {[...grouped.choices].sort((a,b)=>a.pieces-b.pieces||
@@ -277,7 +278,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
         })}
        </div>
       </div>:
-      <div className={"ref32-options "+(cakeSizing&&sorted.length===3?"ref32-options-three":"ref32-options-four")} role="group" aria-label={cakeSizing?t.size:t.variant} data-cake-sizes={cakeSizing?"Mini-Small-Medium":undefined}>
+      <div className={"ref32-options "+(cakeSizing&&sorted.length===3?"ref32-options-three":"ref32-options-four")} role="group" aria-label={showSize?t.size:t.variant} data-cake-sizes={cakeSizing?"Mini-Small-Medium":undefined}>
        {sorted.map(option=><button type="button" key={option.id} data-sku={option.id}
          aria-pressed={option.id===productId}
          className={option.id===productId?"ref32-option ref32-option-active":"ref32-option"}
