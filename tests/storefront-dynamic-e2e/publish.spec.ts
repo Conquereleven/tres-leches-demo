@@ -110,7 +110,7 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   // The storefront shows the published catalog, not the build's.
   await shop.goto("/bakery?category=cakes&lang=en");
   await expect(shop.locator("html")).toHaveAttribute("data-catalog", "dynamic");
-  await expect(shop.locator(".ref32-grid")).toBeVisible();
+  await expect(shop.locator(".structural-grid")).toBeVisible();
   const card = shop.locator(`.ref32-product[data-product-id="${target.id}"]`);
   await expect(card).toBeEnabled();
   const cardName = async () =>
@@ -129,7 +129,7 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   const beforeDialog = await openDialog();
   await beforeDialog.locator(`[data-sku="${first!.id}"]`).click();
   await expect(beforeDialog.locator(".ref32-buy")).toBeEnabled();
-  await expect(beforeDialog.locator(".ref32-buy")).toContainText(
+  await expect(beforeDialog.locator(".ref32-price strong")).toContainText(
     aed(first!.priceFils),
   );
   await beforeDialog.locator(".ref32-buy").click();
@@ -214,7 +214,7 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
     timeout: 15000,
   });
   await shop.reload();
-  await expect(shop.locator(".ref32-grid")).toBeVisible();
+  await expect(shop.locator(".structural-grid")).toBeVisible();
   // The card carries the published price from the server's own configuration.
   await expect(card).toContainText(aed(price));
   // The card rotates the published photographs; the new main one comes first.
@@ -240,44 +240,29 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   );
   await afterDialog.locator(`[data-sku="${first!.id}"]`).click();
   await expect(afterDialog.locator(".ref32-buy")).toBeEnabled();
-  await expect(afterDialog.locator(".ref32-buy")).toContainText(
+  await expect(afterDialog.locator(".ref32-price strong")).toContainText(
     aed(price),
   );
   await afterDialog.locator(".ref32-close").click();
   await shop.screenshot({ path: `${shots}/${info.project.name}-2-after.png` });
 
-  // A fresh visit, in Spanish, with the same build: published EN copy on the
-  // approved surface, es/ar wording asserted on the published API above.
-  await shop.goto(`/bakery?category=cakes&lang=es`);
-  await expect(
-    shop.locator(`.ref32-product[data-product-id="${target.id}"]`),
-  ).toContainText(name);
-  await expect(
-    shop.locator(
-      `.ref32-product[data-product-id="${target.id}"] .ref32-photo img`,
-    ).first(),
-  ).toHaveAttribute("src", /^\/brand\/hub\//);
+  // A fresh visit uses the published wording for each selected language.
+  await shop.goto("/bakery?category=cakes&lang=es");
+  await expect(card).toContainText(nameEs);
+  await expect(card.locator(".ref32-photo img")).toHaveAttribute("src", /^\/brand\/hub\//);
   const esDialog = await openDialog();
-  await expect(esDialog).toContainText(description);
+  await expect(esDialog).toContainText(descriptionEs);
+  await expect(esDialog.locator(`[data-sku="${first!.id}"]`)).toContainText(sizeEs);
   await esDialog.locator(".ref32-close").click();
-  await shop.goto(`/bakery?category=cakes&lang=ar`);
+  await shop.goto("/bakery?category=cakes&lang=ar");
   await expect(shop.locator("html")).toHaveAttribute("dir", "rtl");
-  await expect(
-    shop.locator(`.ref32-product[data-product-id="${target.id}"]`),
-  ).not.toBeEmpty();
+  await expect(card).toContainText(descriptionAr);
   await shop.screenshot({ path: `${shots}/${info.project.name}-3-detail.png` });
 
-  // The cart made before the publication: the line keeps its stable SKU
-  // identity name and charges the published each-price. (The approved V3.2
-  // cart carries no photographs by design; photo assertions live on the
-  // card above. Published "Name in cart" translations are asserted on the
-  // storefront API above: line names resolve to the stable server SKU
-  // catalogName in both the retired classic cart and this V3.2 cart, a
-  // pre-existing server contract outside this remediation's scope.)
+  // The already-added line uses the newly published localized SKU label.
   await shop.goto("/cart?lang=es");
   const line = shop.locator(".v32-new-cart-row").first();
-  await expect(line).toContainText(first!.size);
-  await expect(line).not.toContainText(cartEs);
+  await expect(line).toContainText(cartEs);
   await shop.goto("/cart?lang=en");
   await expect(line).toContainText(aed(price));
   await expect(shop.locator("main")).not.toContainText(
@@ -305,7 +290,7 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   await hub.getByRole("button", { name: "Publish catalog" }).click();
   await expect(hub.getByText("Catalog published")).toBeVisible();
   await shop.goto("/bakery?category=cakes&lang=en");
-  await expect(shop.locator(".ref32-grid")).toBeVisible();
+  await expect(shop.locator(".structural-grid")).toBeVisible();
   // The V3.2 card falls back to the approved pending placeholder.
   await expect(card.locator(".ref32-photo-pending")).toBeVisible({
     timeout: 15000,

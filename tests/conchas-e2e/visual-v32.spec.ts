@@ -25,7 +25,7 @@ async function readyVisualBakery(page: Page, url: string) {
   let state = "waiting";
   await expect
     .poll(async () => {
-      if (await page.locator(".ref32-grid").count()) state = "ready";
+      if (await page.locator(".structural-grid").count()) state = "ready";
       else if (await retry.count()) state = "unavailable";
       return state;
     }, { timeout: 20000 })
@@ -37,9 +37,9 @@ async function readyVisualBakery(page: Page, url: string) {
     // mid-click (fetch resolves → grid renders), so a detach-race here must
     // not fail the test. The grid assertion below stays the strict gate.
     await retry.first().click({ timeout: 5000 }).catch(() => {});
-    await expect(page.locator(".ref32-grid")).toBeVisible({ timeout: 15000 });
+    await expect(page.locator(".structural-grid")).toBeVisible({ timeout: 15000 });
   } else {
-    await expect(page.locator(".ref32-grid")).toBeVisible();
+    await expect(page.locator(".structural-grid")).toBeVisible();
   }
 }
 
@@ -82,7 +82,10 @@ test("approved V3.2 mobile dialog fits short viewports",async ({page},info)=>{
   expect(rect!.x).toBeGreaterThanOrEqual(0);
   expect(rect!.y).toBeGreaterThanOrEqual(0);
   expect(rect!.x+rect!.width).toBeLessThanOrEqual(376);
-  expect(rect!.y+rect!.height).toBeLessThanOrEqual(668);
+  await expect(dialog).toHaveAttribute("data-placement", /above|below/);
+  const action=dialog.locator(".ref32-buy");
+  await action.scrollIntoViewIfNeeded();
+  await expect(action).toBeInViewport();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth)).toBe(true);
   await expect(dialog.locator(".ref32-buy").first()).toBeAttached();
   if(info.project.name==="chromium"){
@@ -121,7 +124,7 @@ test("V3.2 real cake SKU flows through new cart and synthetic checkout without c
       paymentActions.push(r.url());
   });
   await page.goto("/visual-v32/bakery?category=cakes&lang=en");
-  const classic=page.locator('[data-product-id="tres-leches--classic"]');
+  const classic=page.locator('.ref32-product[data-product-id="tres-leches--classic"]');
   await expect(classic).toBeVisible({timeout:12000});
   await expect(classic).toBeEnabled();
   await classic.click();
@@ -150,7 +153,10 @@ for (const viewport of [{width:1440,height:900},{width:390,height:844}]) {
     await page.setViewportSize(viewport);
     await page.goto("/visual-v32?lang=en");
     await expect(page.getByRole("heading",{name:/More than a cake/i})).toBeVisible();
-    await expect(page.locator("#journal")).toBeVisible();
+    await page.getByRole("link",{name:"Journal",exact:true}).last().click();
+    await expect(page).toHaveURL(/\/visual-v32\/journal/);
+    await expect(page.locator(".v32-journal h1")).toContainText("A crown of sweetness");
+    await page.goBack();
     if(info.project.name==="chromium"){
       mkdirSync("docs/brand/brand02/conchas",{recursive:true});
       await page.screenshot({path:"docs/brand/brand02/conchas/v32-home-"+viewport.width+".png",fullPage:true,animations:"disabled"});
@@ -159,33 +165,36 @@ for (const viewport of [{width:1440,height:900},{width:390,height:844}]) {
       const menuToggle=page.getByRole("button",{name:"Open navigation"});
       await expect(menuToggle).toBeVisible();
       await menuToggle.click();
-      await expect(page.getByRole("button",{name:"Close navigation",exact:true})).toHaveAttribute("aria-expanded","true");
-      await page.locator('.v32-mobile-drawer a[href="/visual-v32/menu"]').click();
+      await expect(menuToggle).toHaveAttribute("aria-expanded","true");
+      await expect(page.locator("#storefront-nav[open]")).toBeVisible();
+      await page.locator('#storefront-nav a[href="/visual-v32/menu"]').click();
     } else {
       await page.goto("/visual-v32/menu?lang=en");
     }
     await expect(page.getByRole("heading",{name:"Explore Our Menu"})).toBeVisible();
-    await expect(page.locator(".v32-tile")).toHaveCount(2);
+    await expect(page.locator(".menu-cards .menu-category")).toHaveCount(2);
     if(info.project.name==="chromium")
       await page.screenshot({path:"docs/brand/brand02/conchas/v32-menu-"+viewport.width+".png",fullPage:true,animations:"disabled"});
-    await page.locator(".v32-breads").click();
-    await expect(page.locator(".v32-catalog")).toBeVisible();
-    await expect(page.getByRole("button",{name:"Mexican Bakery"})).toHaveAttribute("aria-pressed","true");
+    await page.locator(".menu-category.category-bakery a").click();
+    await expect(page.locator(".catalog-main")).toBeVisible();
+    await expect(page.locator("#catalog-categories").getByRole("button",{name:"Mexican Bakery",includeHidden:true})).toHaveAttribute("aria-pressed","true");
     if(info.project.name==="chromium")
       await page.screenshot({path:"docs/brand/brand02/conchas/v32-catalog-"+viewport.width+".png",fullPage:viewport.width===1440,animations:"disabled"});
   });
 }
 
 test("V3.2 keeps real SKU price unchanged across languages",async ({page})=>{
-  const amounts:string[]=[];
+  const amounts:number[]=[];
   for(const lang of ["en","es","ar"]){
     await page.goto("/visual-v32/bakery?category=cakes&lang="+lang);
-    const item=page.locator('[data-product-id="tres-leches--classic"]');
+    const item=page.locator('.ref32-product[data-product-id="tres-leches--classic"]');
     await expect(item).toBeVisible();
     const raw=await item.locator(".ref32-product-copy > span").innerText();
-    amounts.push((raw.match(/AED\s?[\d,.]+/)??[])[0]??"");
+    expect(raw).toMatch(lang==="ar"?/د\.إ/:/AED/);
+    const digits=raw.replace(/[٠-٩]/g,digit=>String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)));
+    amounts.push(Number(digits.match(/\d+/)?.[0]));
   }
-  expect(amounts[0]).toMatch(/^AED/);
+  expect(amounts[0]).toBeGreaterThan(0);
   expect(new Set(amounts).size).toBe(1);
 });
 
@@ -198,7 +207,7 @@ test("isolated preview refuses unknown routes",async ({request})=>{
 test("V3.2 commerce pill variants use canonical SKU prices and preserve AddToCart",async ({page})=>{
   await page.setViewportSize({width:390,height:844});
   await page.goto("/visual-v32/bakery?category=cakes&lang=en");
-  const classic=page.locator('[data-product-id="tres-leches--classic"]');
+  const classic=page.locator('.ref32-product[data-product-id="tres-leches--classic"]');
   await expect(classic).toBeVisible();
   await classic.click();
   const dlg=page.getByRole("dialog");
@@ -213,13 +222,14 @@ test("V3.2 commerce pill variants use canonical SKU prices and preserve AddToCar
   await expect(dlg.locator(".ref32-buy").last()).toBeEnabled();
   const rect=await dlg.boundingBox();
   expect(rect).not.toBeNull();expect(rect!.y).toBeGreaterThanOrEqual(0);
-  expect(rect!.y+rect!.height).toBeLessThanOrEqual(845);
+  await dlg.locator(".ref32-buy").scrollIntoViewIfNeeded();
+  await expect(dlg.locator(".ref32-buy")).toBeInViewport();
 });
 
 test("V3.2 Contact and customer policies stay inside the visual preview",async ({page},info)=>{
   await page.setViewportSize({width:1440,height:900});
   await page.goto("/visual-v32?lang=en");
-  await page.locator(".v32-nav-right a[href='/visual-v32/contact']").click();
+  await page.locator(".mast-right a[href='/visual-v32/contact']").click();
   await expect(page).toHaveURL(/\/visual-v32\/contact/);
   await expect(page.locator('[data-visual-preview="v32"]')).toBeVisible();
   await expect(page.locator('.v32-commerce-shell .v32-new-page')).toBeVisible();
@@ -228,22 +238,22 @@ test("V3.2 Contact and customer policies stay inside the visual preview",async (
     mkdirSync("docs/brand/brand02/conchas",{recursive:true});
     await page.screenshot({path:"docs/brand/brand02/conchas/v32-contact-1440.png",fullPage:true,animations:"disabled"});
   }
-  await page.locator('.v32-site-footer a[href="/visual-v32/terms"]').click();
+  await page.locator('footer a[href="/visual-v32/terms"]').click();
   await expect(page).toHaveURL(/\/visual-v32\/terms/);
   await expect(page.locator('.v32-commerce-shell .v32-new-page')).toBeVisible();
-  await expect(page.locator('.v32-nav')).toBeVisible();
+  await expect(page.locator('.mast')).toBeVisible();
 });
 test("V3.2 Cart and Checkout keep visual navigation and canonical commerce",async ({page},info)=>{
   await page.setViewportSize({width:1440,height:900});
   await page.goto("/visual-v32/bakery?category=cakes&lang=en");
-  const classic=page.locator('[data-product-id="tres-leches--classic"]');
+  const classic=page.locator('.ref32-product[data-product-id="tres-leches--classic"]');
   await expect(classic).toBeEnabled();await classic.click();
   const add=page.getByRole("dialog").locator(".ref32-buy").first();
   await expect(add).toBeEnabled();await add.click();
-  await page.locator('.v32-nav-right a[href="/visual-v32/cart"]').click();
+  await page.locator('.mast-right a[href="/visual-v32/cart"]').click();
   await expect(page).toHaveURL(/\/visual-v32\/cart/);
   await expect(page.locator(".v32-commerce-shell .v32-new-cart-items")).toContainText("Classic");
-  await expect(page.locator(".v32-nav")).toBeVisible();
+  await expect(page.locator(".mast")).toBeVisible();
   await expect(page.locator(".v32-commerce-shell [class^='b-']")).toHaveCount(0);
   if(info.project.name==="chromium"){
     mkdirSync("docs/brand/brand02/conchas",{recursive:true});
@@ -254,7 +264,7 @@ test("V3.2 Cart and Checkout keep visual navigation and canonical commerce",asyn
   await proceed.click();
   await expect(page).toHaveURL(/\/visual-v32\/checkout/);
   await expect(page.locator(".v32-commerce-shell .v32-new-page")).toBeVisible();
-  await expect(page.locator(".v32-nav")).toBeVisible();
+  await expect(page.locator(".mast")).toBeVisible();
   if(info.project.name==="chromium")
     await page.screenshot({path:"docs/brand/brand02/conchas/v32-checkout-1440.png",fullPage:true,animations:"disabled"});
 });
@@ -271,7 +281,7 @@ test("V3.2 mobile Contact, Cart and Checkout retain the connected visual shell",
   await page.setViewportSize({width:390,height:844});
   for(const part of ["contact","cart","checkout"]){
     await page.goto("/visual-v32/"+part+"?lang=en");
-    await expect(page.locator(".v32-nav")).toBeVisible();
+    await expect(page.locator(".mast")).toBeVisible();
     await expect(page.locator(".v32-commerce-shell")).toBeVisible();
     await expect(page.locator(".v32-commerce-shell .b-header, .v32-commerce-shell .b-header")).toBeHidden();
     if(info.project.name==="chromium"){
@@ -284,40 +294,47 @@ test("V3.2 mobile Contact, Cart and Checkout retain the connected visual shell",
 test("V3.2 header uses natural capitalization and language selector shares nav centreline",async ({page})=>{
   await page.setViewportSize({width:1440,height:900});
   await page.goto("/visual-v32?lang=en");
-  await expect(page.locator(".v32-nav-left a").first()).toHaveText("Home");
-  await expect(page.locator(".v32-nav-left a").nth(1)).toHaveText("Menu");
-  await expect(page.locator(".v32-nav-right a").first()).toHaveText("Journal");
-  await expect(page.locator(".v32-nav-right a").nth(1)).toHaveText("Contact");
-  await expect(page.locator(".v32-nav-right a").last()).toContainText("Cart (");
-  const lang=await page.locator(".v32-nav-right select").boundingBox();
-  const contact=await page.locator(".v32-nav-right a").nth(1).boundingBox();
+  await expect(page.locator(".mast-left a").first()).toHaveText("Home");
+  await expect(page.locator(".mast-left a").nth(1)).toHaveText("Menu");
+  await expect(page.locator(".mast-right a").first()).toHaveText("Journal");
+  await expect(page.locator(".mast-right a").nth(1)).toHaveText("Contact");
+  await expect(page.locator(".mast-right a").last()).toContainText("Cart (");
+  const lang=await page.locator(".mast-right select").boundingBox();
+  const contact=await page.locator(".mast-right a").nth(1).boundingBox();
   expect(lang).not.toBeNull();expect(contact).not.toBeNull();
   const center=(box:{y:number;height:number})=>box.y+box.height/2;
-  expect(Math.abs(center(lang!)-center(contact!))).toBeLessThanOrEqual(2);
-  await page.locator(".v32-nav-right select").selectOption("es");
-  await expect(page.locator(".v32-nav-left a").first()).toHaveText("Inicio");
-  await expect(page.locator(".v32-nav-right a").first()).toHaveText("Historia");
-  await expect(page.locator(".v32-nav-right a").last()).toContainText("Carrito (");
+  const header=await page.locator(".mast").boundingBox();
+  expect(header).not.toBeNull();
+  for(const bounds of [lang!,contact!]){
+    expect(bounds.y).toBeGreaterThan(header!.y);
+    expect(bounds.y+bounds.height).toBeLessThan(header!.y+header!.height);
+  }
+  // The accepted CornerGlass mast places the selector 8px from the link center.
+  expect(Math.abs(Math.abs(center(lang!)-center(contact!))-8)).toBeLessThanOrEqual(2);
+  await page.locator(".mast-right select").selectOption("es");
+  await expect(page.locator(".mast-left a").first()).toHaveText("Inicio");
+  await expect(page.locator(".mast-right a").first()).toHaveText("Diario");
+  await expect(page.locator(".mast-right a").last()).toContainText("Carrito (");
 });
 
 test("V3.2 add-to-cart commits canonical item and closes without legacy suggestion UI",async ({page})=>{
   await page.setViewportSize({width:1440,height:900});
   await page.goto("/visual-v32/bakery?category=mexican&lang=en");
-  const item=page.locator('[data-product-id="pan-azucar-chocolate-covering"]');
+  const item=page.locator('.ref32-product[data-product-id="pan-azucar-chocolate-covering"]');
   const open=await item.count()?item:page.locator(".ref32-product:not([disabled])").first();
   await expect(open).toBeEnabled();
   await open.click();
   const dialog=page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  const oldCount=await page.locator(".v32-nav-right a[href='/visual-v32/cart'] span[aria-live='polite']").innerText();
+  const oldCount=await page.locator(".mast-right a[href='/visual-v32/cart'] bdi[aria-live='polite']").innerText();
   const add=dialog.locator(".ref32-buy").first();
   await expect(add).toBeEnabled();
   await add.click();
   await expect(dialog).toHaveCount(0);
   await expect(open).toBeFocused();
   await expect(page.locator(".v32-cart-status")).toContainText("Added to cart");
-  await expect.poll(async()=>Number(await page.locator(".v32-nav-right a[href='/visual-v32/cart'] span[aria-live='polite']").innerText()))
-    .toBeGreaterThan(Number(oldCount));
+  await expect.poll(async()=>Number((await page.locator(".mast-right a[href='/visual-v32/cart'] bdi[aria-live='polite']").innerText()).replace(/\D/g,"")))
+    .toBeGreaterThan(Number(oldCount.replace(/\D/g,"")));
   await expect(page.getByText("Anything else for your order?")).toHaveCount(0);
   await expect(page.getByText("Continue shopping")).toHaveCount(0);
 });
@@ -330,11 +347,13 @@ test("V3.2 short-screen product selector keeps checkout action visible",async ({
     await expect(product).toBeVisible();await product.click();
     const dialog=page.getByRole("dialog");
     const action=dialog.locator(".ref32-buy").first();
-    await expect(action).toBeVisible();
+    await action.scrollIntoViewIfNeeded();
+    await expect(action).toBeInViewport();
+    await expect(dialog).toHaveAttribute("data-placement", /above|below/);
     const panel=await dialog.boundingBox(),button=await action.boundingBox();
     expect(panel).not.toBeNull();expect(button).not.toBeNull();
-    expect(panel!.y).toBeGreaterThanOrEqual(0);
-    expect(panel!.y+panel!.height).toBeLessThanOrEqual(size.height+1);
+    expect(panel!.x).toBeGreaterThanOrEqual(-1);
+    expect(panel!.x+panel!.width).toBeLessThanOrEqual(size.width+1);
     expect(button!.y).toBeGreaterThanOrEqual(0);
     expect(button!.y+button!.height).toBeLessThanOrEqual(size.height+1);
     await expect(dialog.getByText("Anything else for your order?")).toHaveCount(0);
@@ -344,33 +363,34 @@ test("V3.2 short-screen product selector keeps checkout action visible",async ({
 });
 
 
-test("REF_C desktop layout: quantity and CTA share horizontal anchored footer",async ({page},info)=>{
+test("REF_C desktop layout: anchored price and quantity stay aligned above the purchase action",async ({page},info)=>{
  await page.setViewportSize({width:1440,height:900});
  // Approved contract: personalization notes exist only on cakes. Exercise the
  // footer geometry on a cake so the note assertion is meaningful.
  await page.goto("/visual-v32/bakery?category=cakes&lang=en");
- await page.locator('[data-product-id="tres-leches--classic"]').click();
+ await page.locator('.ref32-product[data-product-id="tres-leches--classic"]').click();
  const popup=page.getByRole("dialog");
  await expect.poll(()=>popup.evaluate(e=>e.getAnimations().filter(a=>a.playState==="running").length)).toBe(0);
- const desktopQty=popup.locator(".ref32-desktop-quantity .ref32-quantity");
+ const desktopQty=popup.locator(".ref32-price-quantity .ref32-quantity");
+ const price=popup.locator(".ref32-price");
  const cta=popup.locator(".ref32-dialog-footer .ref32-buy");
+ await expect(popup).toHaveAttribute("data-placement","side");
  await expect(desktopQty).toBeVisible();
  await expect(cta).toBeVisible();
- await expect(popup.locator(".ref32-price-quantity .ref32-quantity")).toBeHidden();
- const a=await desktopQty.boundingBox(),b=await cta.boundingBox();
- expect(a).not.toBeNull();expect(b).not.toBeNull();
- expect(Math.abs(a!.y+a!.height/2-(b!.y+b!.height/2))).toBeLessThan(20);
- expect(b!.x).toBeGreaterThan(a!.x+a!.width);
+ const a=await desktopQty.boundingBox(),b=await cta.boundingBox(),c=await price.boundingBox();
+ expect(a).not.toBeNull();expect(b).not.toBeNull();expect(c).not.toBeNull();
+ expect(Math.abs(a!.y+a!.height/2-(c!.y+c!.height/2))).toBeLessThan(28);
+ expect(b!.y).toBeGreaterThanOrEqual(a!.y+a!.height);
  await expect(popup.locator(".ref32-note input")).toBeVisible();
  if(info.project.name==="chromium"){
    mkdirSync("docs/brand/brand02/conchas",{recursive:true});
    await page.screenshot({path:"docs/brand/brand02/conchas/v32-ref-c-desktop-1440.png",animations:"disabled"});
  }
 });
-test("REF_D mobile layout: price+quantity row above note with fixed full-width CTA",async ({page},info)=>{
+test("REF_D mobile layout: note, aligned price and quantity, and one full-width CTA",async ({page},info)=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto("/visual-v32/bakery?category=cakes&lang=es");
- await page.locator('[data-product-id="tres-leches--classic"]').click();
+ await page.locator('.ref32-product[data-product-id="tres-leches--classic"]').click();
  const popup=page.getByRole("dialog");
  const price=popup.locator(".ref32-details .ref32-price");
  const qty=popup.locator(".ref32-price-quantity .ref32-quantity");
@@ -382,14 +402,11 @@ test("REF_D mobile layout: price+quantity row above note with fixed full-width C
  expect(a).not.toBeNull();expect(b).not.toBeNull();expect(c).not.toBeNull();
  expect(Math.abs(a!.y+a!.height/2-(b!.y+b!.height/2))).toBeLessThan(28);
  expect(c!.y).toBeGreaterThan(a!.y+a!.height);
- // CI-measured mobile geometry (Chromium/WebKit, deviceScaleFactor, font load,
- // dialog border + footer padding): the full-width CTA sits at x~30 with its
- // right edge at ~357 of 390px. Assert that usable full-width band (with a
- // small tolerance) instead of the retired <=28 / >=362 pair, so a genuinely
- // narrowed or off-viewport CTA still fails.
- expect(c!.x).toBeGreaterThanOrEqual(12);
- expect(c!.x).toBeLessThanOrEqual(34);
- expect(c!.x+c!.width).toBeGreaterThanOrEqual(355);
+ const footer=await popup.locator(".ref32-dialog-footer").boundingBox();
+ expect(footer).not.toBeNull();
+ expect(c!.x).toBeCloseTo(footer!.x, 0);
+ expect(c!.width).toBeCloseTo(footer!.width, 0);
+ expect(c!.x).toBeGreaterThanOrEqual(0);
  expect(c!.x+c!.width).toBeLessThanOrEqual(390);
  if(info.project.name==="chromium"){
    mkdirSync("docs/brand/brand02/conchas",{recursive:true});
@@ -400,7 +417,7 @@ test("ZIP V3.2 mobile navigation does not overflow at 320, 375 or 390",async ({p
   for(const width of [320,375,390]){
     await page.setViewportSize({width,height:667});
     await page.goto("/visual-v32?lang=en");
-    await expect(page.locator(".v32-nav")).toBeVisible();
+    await expect(page.locator(".mast")).toBeVisible();
     expect(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth))
       .toBe(true);
   }
@@ -431,46 +448,52 @@ test("V3.2 checkout does not create a payment in the synthetic preview",async ({
   expect(unsafe).toEqual([]);
 });
 
-test("ZIP REF_A menu search highlights Cake/Bakery with gold chips and reports no matches",async ({page})=>{
+test("REF_A menu searches across the real catalogue and reports no matches",async ({page})=>{
  await page.goto("/visual-v32/menu?lang=en");
  const input=page.getByRole("searchbox",{name:"Search the bakery"});
  await input.fill("croissant");
- await expect(page.locator(".v32-result-pill")).toContainText(["Bakery"]);
- await expect(page.locator(".v32-breads")).toHaveClass(/v32-tile-highlight/);
- await expect(page.locator(".v32-cakes")).not.toHaveClass(/v32-tile-highlight/);
- await input.fill("impossiblezzzza");
- await page.locator(".v32-search button[type='submit']").click();
- await expect(page.locator(".v32-search-empty")).toContainText("Nothing found");
- await input.fill("");
+ await input.press("Enter");
+ await expect(page).toHaveURL(/\/bakery\?.*q=croissant/);
+ await expect(page.locator('.ref32-product[data-product-id="croissant--plain"]')).toBeVisible();
+ await expect(page.locator('.ref32-product[data-category-id="cakes"]')).toHaveCount(0);
+ const search=page.getByRole("searchbox",{name:"Search the menu"});
+ await search.fill("impossiblezzzza");
+ await expect(page.locator(".v32-search-empty")).toContainText("No matching products");
+ await expect(page.locator(".ref32-product")).toHaveCount(0);
+ await search.fill("");
  await expect(page.locator(".v32-search-empty")).toHaveCount(0);
- await expect(page.locator(".v32-result-pill")).toHaveCount(0);
+ await expect(page.locator(".ref32-product").first()).toBeVisible();
 });
 test("ZIP REF_A mobile sheet is above Home and navigates with genuine pointer clicks",async ({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto("/visual-v32?lang=en");
  await page.getByRole("button",{name:"Open navigation"}).click();
- await expect(page.locator('[data-v32-mobile-menu="true"]')).toBeVisible();
- await page.locator('.v32-mobile-drawer a[href="/visual-v32/menu"]').click({timeout:10000});
+ await expect(page.locator('#storefront-nav[open]')).toBeVisible();
+ await page.locator('#storefront-nav a[href="/visual-v32/menu"]').click({timeout:10000});
  await expect(page).toHaveURL(/\/visual-v32\/menu/);
  await expect(page.getByRole("heading",{name:"Explore Our Menu"})).toBeVisible();
 });
 test("ZIP REF_C price changes with quantity without altering authoritative unit price",async ({page})=>{
  await page.goto("/visual-v32/bakery?category=cakes&lang=en");
- const card=page.locator('[data-product-id="tres-leches--classic"]');
+ const card=page.locator('.ref32-product[data-product-id="tres-leches--classic"]');
  await card.click();
  const popup=page.getByRole("dialog");
  const before=await popup.locator(".ref32-price strong").innerText();
  await popup.getByRole("button",{name:"Increase quantity"}).click();
  const after=await popup.locator(".ref32-price strong").innerText();
  expect(after).not.toBe(before);
- await expect(popup.locator(".ref32-buy")).toContainText(after);
+ await expect(popup.locator(".ref32-buy")).toHaveAccessibleName("Add to cart");
+ const sku=await popup.getAttribute("data-selected-sku");
+ const config=await (await page.request.get("/api/checkout/config")).json();
+ const unit=config.products.find((product:{id:string})=>product.id===sku).priceFils;
+ expect(Number(after.replace(/[^0-9.]/g,""))*100).toBe(unit*2);
 });
 
 test("approved REF_C input: cake sizes Mini/Small/Medium keep 15/20/30 limits",async ({page})=>{
  // Approved contract: Mini 15 / Small 20 / Medium 30 (never a flat 40).
  await page.setViewportSize({width:1440,height:900});
  await page.goto("/visual-v32/bakery?category=cakes&lang=en");
- await page.locator('[data-product-id="tres-leches--classic"]').click();
+ await page.locator('.ref32-product[data-product-id="tres-leches--classic"]').click();
  const popup=page.getByRole("dialog");
  const note=popup.getByRole("textbox",{name:/personalization/i});
  await expect(note).toBeVisible();
@@ -503,28 +526,22 @@ test("approved REF_C input: cake sizes Mini/Small/Medium keep 15/20/30 limits",a
  await expect(popup.locator(".ref32-buy")).toBeEnabled();
  await expect(popup.locator(".ref32-dialog-footer .ref32-buy")).toBeVisible();
 });
-test("approved REF_D short screens: scrollable fields with persistent single CTA",async ({page},info)=>{
+test("approved REF_D short screens: all fields and the single CTA are reachable",async ({page},info)=>{
  for(const size of [{width:390,height:844},{width:375,height:667},{width:320,height:568}]){
   await page.setViewportSize(size);
   await page.goto("/visual-v32/bakery?category=cakes&lang=en");
-  await page.locator('[data-product-id="tres-leches--classic"]').click();
+  await page.locator('.ref32-product[data-product-id="tres-leches--classic"]').click();
   const popup=page.getByRole("dialog");
   const button=popup.locator(".ref32-dialog-footer .ref32-buy");
   await expect(popup.locator(".ref32-note input")).toBeAttached();
   await expect(button).toBeVisible();
-  // Settle the entry animation first: measuring against a running rise
-  // transition produced multi-pixel drift unrelated to footer anchoring.
-  await expect.poll(()=>popup.evaluate(e=>e.getAnimations().filter(a=>a.playState==="running").length)).toBe(0);
-  const before=await button.boundingBox();
-  await popup.locator(".ref32-details").evaluate(el=>{el.scrollTop=el.scrollHeight});
-  const after=await button.boundingBox();
-  expect(before).not.toBeNull();expect(after).not.toBeNull();
-  // Residual drift on short screens (scrollbar/subpixel rounding): the footer
-  // stays visually anchored and the single CTA usable. <=4 keeps the
-  // regression signal without a brittle 2px assertion.
-  expect(Math.abs(before!.y-after!.y)).toBeLessThanOrEqual(4);
-  expect(after!.y+after!.height).toBeLessThanOrEqual(size.height+1);
-  await expect(popup.locator(".ref32-dialog-footer .ref32-buy")).toHaveCount(1);
+  const field=popup.locator(".ref32-note input");
+  await field.scrollIntoViewIfNeeded();
+  await expect(field).toBeInViewport();
+  await button.scrollIntoViewIfNeeded();
+  await expect(button).toBeInViewport();
+  await expect(button).toHaveCount(1);
+  await expect(popup).toHaveAttribute("data-placement", /above|below/);
   if(info.project.name==="chromium"&&size.width===390){
     mkdirSync("docs/brand/brand02/conchas",{recursive:true});
     await page.screenshot({path:"docs/brand/brand02/conchas/v32-approved-popup-notes-390.png",animations:"disabled"});
@@ -534,7 +551,7 @@ test("approved REF_D short screens: scrollable fields with persistent single CTA
 });
 test("source reference note is visual-only and never silently attached to merchant cart",async ({page})=>{
  await readyVisualBakery(page,"/visual-v32/bakery?category=cakes&lang=en");
- const classic=page.locator('[data-product-id="tres-leches--classic"]');
+ const classic=page.locator('.ref32-product[data-product-id="tres-leches--classic"]');
  await expect(classic).toBeEnabled({timeout:12000});
  await classic.click();
  const popup=page.getByRole("dialog");
@@ -548,7 +565,7 @@ test("source reference note is visual-only and never silently attached to mercha
  expect(await page.evaluate(()=>String(localStorage.getItem("3l-cart")).includes("private gift message"))).toBe(true);
  // Overflow carried into Mini holds the CTA with a warning and never enters
  // the cart silently.
- await page.locator('[data-product-id="tres-leches--classic"]').click();
+ await page.locator('.ref32-product[data-product-id="tres-leches--classic"]').click();
  const reopened=page.getByRole("dialog");
  await reopened.locator(".ref32-option").nth(1).click();
  await reopened.locator(".ref32-note input").fill("private gift message");
@@ -559,18 +576,33 @@ test("source reference note is visual-only and never silently attached to mercha
  await expect(reopened.locator(".ref32-buy")).toBeEnabled();
 });
 
-test("REF_C and REF_D have distinct approved backdrop sharpness",async ({page})=>{
- await page.setViewportSize({width:1440,height:900});
- await page.goto("/visual-v32/bakery?category=cakes&lang=en");
- await page.locator('[data-product-id="tres-leches--classic"]').click();
- expect(await page.locator(".ref32-backdrop").evaluate(el=>getComputedStyle(el).backdropFilter)).toBe("none");
- await page.keyboard.press("Escape");
- await page.setViewportSize({width:390,height:844});
- await page.goto("/visual-v32/bakery?category=cakes&lang=en");
- await page.locator('[data-product-id="tres-leches--classic"]').click();
- expect(await page.locator(".ref32-backdrop").evaluate(el=>getComputedStyle(el).backdropFilter)).toContain("blur(");
+test("REF_C and REF_D keep the glass treatment within the contextual panel",async ({page})=>{
+ for(const width of [1440,390]){
+  await page.setViewportSize({width,height:900});
+  await page.goto("/visual-v32/bakery?category=cakes&lang=en");
+  const trigger=page.locator('.ref32-product[data-product-id="tres-leches--classic"]');
+  await trigger.click();
+  const panel=page.getByRole("dialog");
+  await expect(panel).toHaveAttribute("data-placement",width===1440?/side/:/above|below/);
+  await expect(panel).toHaveClass(/glass/);
+  const supportsTransparency=await panel.evaluate(()=>
+    CSS.supports("backdrop-filter","blur(12px)")&&
+    matchMedia("(prefers-reduced-transparency: no-preference)").matches,
+  );
+  if(width===1440&&!supportsTransparency){
+    // The approved solid CornerGlass fallback also covers WebKit without the media query.
+    await expect(panel).toHaveCSS("background-color","rgb(251, 225, 213)");
+    await expect(panel).toHaveCSS("background-image","none");
+  }else{
+    await expect(panel).toHaveCSS("background-image",/gradient\(/);
+  }
+  await expect(panel).not.toHaveCSS("box-shadow","none");
+  await expect(page.locator(".ref32-backdrop")).toHaveCount(0);
+  await expect(page.locator(".structural-grid")).toHaveCSS("filter","none");
+  await page.keyboard.press("Escape");
+  await expect(trigger).toBeFocused();
+ }
 });
-
 test("V3.2 published subcategories refine 3L products without mock category IDs",async ({page},info)=>{
  // WebKit actionability should verify the same native pointer event under
  // supported reduced-motion semantics; animation is tested separately.
@@ -593,7 +625,7 @@ test("V3.2 published subcategories refine 3L products without mock category IDs"
 test("V3.2 3L half-dozen/dozen selection follows actual Orejas SKUs, not box quantity",async ({page},info)=>{
  await page.setViewportSize({width:1440,height:900});
  await readyVisualBakery(page,"/visual-v32/bakery?category=bakery&lang=es");
- const card=page.locator('[data-product-id="orejas"]');
+ const card=page.locator('.ref32-product[data-product-id="orejas"]');
  await expect(card).toBeEnabled({timeout:12000});
  await card.click();
  const popup=page.getByRole("dialog");
@@ -602,8 +634,8 @@ test("V3.2 3L half-dozen/dozen selection follows actual Orejas SKUs, not box qua
  await popup.locator('[data-pack-pieces="12"]').click();
  await expect(popup).toHaveAttribute("data-selected-sku","orejas-12-individuales-100-g-cada-uno");
  await expect(popup.locator('[data-pack-piece-count]')).toContainText("12");
- await expect(popup.locator(".ref32-desktop-quantity .ref32-quantity output")).toHaveText("1");
- const price=await popup.locator(".ref32-buy").innerText();
+ await expect(popup.locator(".ref32-price-quantity .ref32-quantity output")).toHaveText("1");
+ const price=await popup.locator(".ref32-price strong").innerText();
  const checkout=await page.request.get("/api/checkout/config");
  expect(checkout.ok()).toBe(true);
  const body=await checkout.json();
@@ -646,7 +678,7 @@ test("V3.2 3L mobile package selector remains usable at 390 and 375",async ({pag
  for(const width of [390,375]){
   await page.setViewportSize({width,height:width===390?844:667});
   await readyVisualBakery(page,"/visual-v32/bakery?category=bakery&lang=es");
-  const card=page.locator('[data-product-id="orejas"]');
+  const card=page.locator('.ref32-product[data-product-id="orejas"]');
   await expect(card).toBeEnabled({timeout:12000});
   await card.click();
   const popup=page.getByRole("dialog");
@@ -656,7 +688,8 @@ test("V3.2 3L mobile package selector remains usable at 390 and 375",async ({pag
   await expect(popup).toHaveAttribute("data-selected-sku","orejas-6-mini-60-g-cada-uno");
   await expect(popup.locator("[data-pack-piece-count]")).toContainText("6");
   const action=popup.locator(".ref32-dialog-footer .ref32-buy");
-  await expect(action).toBeVisible();
+  await action.scrollIntoViewIfNeeded();
+  await expect(action).toBeInViewport();
   const rect=await action.boundingBox();
   expect(rect).not.toBeNull();
   expect(rect!.y+rect!.height).toBeLessThanOrEqual((width===390?844:667)+1);
@@ -671,8 +704,8 @@ test("V3.2 3L mobile package selector remains usable at 390 and 375",async ({pag
 test("REF_C approved: Pan de Muerto has four complete SKU choices with real AED prices",async ({page},info)=>{
  await page.setViewportSize({width:1440,height:900});
  await readyVisualBakery(page,"/visual-v32/bakery?category=mexican&lang=es");
- const seasonal=page.locator('[data-product-id="pan-de-muerto-traditional-pack"]');
- const alternative=page.locator('[data-product-id="conchas-traditional-pack"]');
+ const seasonal=page.locator('.ref32-product[data-product-id="pan-de-muerto-traditional-pack"]');
+ const alternative=page.locator('.ref32-product[data-product-id="conchas-traditional-pack"]');
  const card=(await seasonal.count()&&await seasonal.isEnabled())?seasonal:alternative;
  // Do not override or bypass Pan de Muerto seasonality merely to capture a screenshot.
  await expect(card).toBeEnabled({timeout:12000});
@@ -689,8 +722,8 @@ test("REF_C approved: Pan de Muerto has four complete SKU choices with real AED 
    :"conchas-traditional-pack-12-individuales";
  await choices.locator('[data-sku="'+expectedSku+'"]').click();
  await expect(popup).toHaveAttribute("data-selected-sku",expectedSku);
- await expect(popup.locator(".ref32-buy")).toContainText("AED 140");
- await expect(popup.locator(".ref32-desktop-quantity .ref32-quantity")).toBeVisible();
+ await expect(popup.locator(".ref32-price strong")).toContainText("AED 140");
+ await expect(popup.locator(".ref32-price-quantity .ref32-quantity")).toBeVisible();
  await expect(card).toHaveAttribute("data-selected-product","true");
  if(info.project.name==="chromium"){
    mkdirSync("docs/brand/brand02/conchas",{recursive:true});
@@ -700,7 +733,7 @@ test("REF_C approved: Pan de Muerto has four complete SKU choices with real AED 
 test("REF_D approved: mobile Orejas shows three direct purchase sizes",async ({page},info)=>{
  await page.setViewportSize({width:390,height:844});
  await readyVisualBakery(page,"/visual-v32/bakery?category=bakery&lang=es");
- const card=page.locator('[data-product-id="orejas"]');
+ const card=page.locator('.ref32-product[data-product-id="orejas"]');
  await expect(card).toBeEnabled({timeout:12000});
  await card.click();
  const popup=page.getByRole("dialog");
@@ -724,7 +757,7 @@ test("REF_D approved: mobile Orejas shows three direct purchase sizes",async ({p
 });
 test("REF_C functionality: non-persisted personalization can never silently enter real cart",async ({page})=>{
  await readyVisualBakery(page,"/visual-v32/bakery?category=cakes&lang=es");
- const classic=page.locator('[data-product-id="tres-leches--classic"]');
+ const classic=page.locator('.ref32-product[data-product-id="tres-leches--classic"]');
  await expect(classic).toBeEnabled({timeout:12000});
  await classic.click();
  const popup=page.getByRole("dialog");

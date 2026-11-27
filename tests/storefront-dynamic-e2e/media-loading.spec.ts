@@ -8,7 +8,7 @@ import type { Page } from "@playwright/test";
  * The retired legacy menu (`.b-full-menu[data-catalog-status]`,
  * `.b-discovery-search`, `.b-menu-card`, `.b-menu-photo`, `.b-footer`) no
  * longer renders. V3.2 states: loading and unavailable share `.v32-message`
- * (role=status) with a TRY AGAIN button; the live catalog is `.ref32-grid`
+ * (role=status) with a TRY AGAIN button; the live catalog is `.structural-grid`
  * with `.ref32-photo` 4/3 cover frames. Every legacy contract below is
  * mapped to its V3.2 approved equivalent instead of deleted; the approved
  * V3.2 loading state is a compact message (no 1000px skeleton reserve), so
@@ -85,14 +85,18 @@ for (const width of [390, 1440]) {
     await expect(loading).toContainText(/Loading|Cargando|جارٍ/);
     await page.screenshot({ path: info.outputPath(`loading-${width}.png`) });
     release();
-    await expect(page.locator(".ref32-grid")).toBeVisible();
+    await expect(page.locator(".structural-grid")).toBeVisible();
     await expect(
       loading.filter({ hasText: /Loading|Cargando|جارٍ/ }),
     ).toHaveCount(0);
     const photo = page.locator(".ref32-photo").first();
     await expect(photo).toBeVisible();
     const rect = await photo.boundingBox();
-    expect(Math.abs(rect!.width / rect!.height - 4 / 3)).toBeLessThan(0.02);
+    expect(rect!.width).toBeGreaterThan(100);
+    expect(rect!.height).toBeGreaterThan(100);
+    const approvedRatio = width === 390 ? 1.045 : 1.268;
+    expect(Math.abs(rect!.width / rect!.height - approvedRatio)).toBeLessThan(0.02);
+    await expect(photo.locator("img")).toHaveCSS("object-fit", "cover");
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -125,7 +129,7 @@ for (const width of [390, 1440]) {
     // The catalog revalidates on its scheduled refresh once the outage
     // clears; the user gesture below mirrors the manual retry path.
     await menuRetry(page).click();
-    await expect(page.locator(".ref32-grid")).toBeVisible({ timeout: 20000 });
+    await expect(page.locator(".structural-grid")).toBeVisible({ timeout: 20000 });
     await expect(page.locator(".ref32-product").first()).toBeVisible();
   });
 
@@ -144,7 +148,7 @@ for (const width of [390, 1440]) {
       route.fulfill({ json: { ...catalog, products: [] } }),
     );
     await page.goto("/bakery?category=cakes&lang=en");
-    await expect(page.locator(".v32-message")).toContainText(
+    await expect(page.locator(".v32-search-empty")).toContainText(
       "No matching products.",
     );
     await expect(page.locator(".ref32-product")).toHaveCount(0);

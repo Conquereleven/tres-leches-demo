@@ -115,7 +115,9 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
     ).toBe(503);
     const page = await context.newPage();
     await page.goto(origin);
-    await page.getByRole("button", { name: "Gestión", exact: true }).click();
+    await expect(page.locator(".mast")).toBeVisible();
+    await expect(page.locator('a[href^="/operations"]')).toHaveCount(0);
+    await page.goto(origin + "/operations/inbox");
     await page.getByLabel("Agent", { exact: true }).fill("test-admin");
     await page
       .getByLabel("Password", { exact: true })
@@ -200,7 +202,8 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
           .getByRole("navigation", { name: "Operations" })
           .screenshot({ path: "work/qa/tl24-mobile-nav.png" });
       }
-      await page.getByRole("button", { name: "Orders", exact: true }).click();
+      await (width === 390 ? page.getByRole("dialog") : page.getByRole("navigation", { name: "Operations" }))
+        .getByRole("button", { name: "Orders", exact: true }).click();
       await expect(page.getByText(/No orders yet/)).toBeVisible();
       await page.screenshot({
         path: `work/qa/tl24-orders-${width}.png`,
@@ -214,7 +217,8 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
       await expect(page.getByText(/No production items yet/)).toBeVisible();
       if (width === 390)
         await page.getByRole("button", { name: "Open menu" }).click();
-      await page.getByRole("button", { name: "Inbox", exact: true }).click();
+      await (width === 390 ? page.getByRole("dialog") : page.getByRole("navigation", { name: "Operations" }))
+        .getByRole("button", { name: "Inbox", exact: true }).click();
     }
     await page
       .getByRole("button", { name: "Diagnostics / UAT", exact: true })

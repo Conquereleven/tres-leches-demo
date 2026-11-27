@@ -4,11 +4,11 @@ import {
   CaretLeft,
   CaretRight,
   DownloadSimple,
-  FileArchive,
-  FilePdf,
   Funnel,
   MagnifyingGlass,
   Receipt,
+  Checks,
+  CaretDown,
   Storefront,
   Truck,
   X,
@@ -64,6 +64,97 @@ function useDubaiToday() {
   return today;
 }
 
+const exportGroups: ReadonlyArray<{
+  label: string;
+  formats: ReadonlyArray<{ label: string; request: DocumentRequest }>;
+}> = [
+  { label: "CSV", formats: [{ label: "Export orders CSV", request: { format: "csv" } }] },
+  {
+    label: "Delivery",
+    formats: [
+      { label: "Delivery notes (PDF)", request: { format: "pdf", kind: "delivery-note" } },
+      { label: "Delivery notes (ZIP)", request: { format: "zip", kind: "delivery-note" } },
+      ...(["a5", "a5-two-up"] as const).flatMap((layout) =>
+        (["pdf", "zip"] as const).map((format) => ({
+          label: layout === "a5" ? "Delivery note · A5 candidate" : "Delivery notes · A4 two-up candidate",
+          request: { format, kind: "delivery-note" as const, layout },
+        })),
+      ),
+    ],
+  },
+  {
+    label: "Packing",
+    formats: [
+      { label: "Packing slips (PDF)", request: { format: "pdf", kind: "packing-slip" } },
+      { label: "Packing slips (ZIP)", request: { format: "zip", kind: "packing-slip" } },
+    ],
+  },
+  {
+    label: "Production documents",
+    formats: (["pdf", "zip"] as const).map((format) => ({
+      label: "Production & packing · Event / bulk",
+      request: { format, kind: "production-bulk", layout: "a4" },
+    })),
+  },
+];
+
+function OrderExports({ busy, limitExceeded, onExport }: {
+  busy: boolean;
+  limitExceeded: boolean;
+  onExport: (request: DocumentRequest) => void;
+}) {
+  const { t } = useOps();
+  const disclosure = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    function onOutside(event: PointerEvent) {
+      if (event.target instanceof Node && !disclosure.current?.contains(event.target)) setOpen(false);
+    }
+    disclosure.current?.querySelector<HTMLButtonElement>(".oms-export-group button:not(:disabled)")?.focus();
+    document.addEventListener("pointerdown", onOutside);
+    return () => document.removeEventListener("pointerdown", onOutside);
+  }, [open]);
+  function close() {
+    setOpen(false);
+    trigger.current?.focus();
+  }
+  return (
+    <div className="oms-export" ref={disclosure} onKeyDown={(e) => {
+      if (open && e.key === "Escape") {
+        e.stopPropagation();
+        close();
+      } else if (e.key === "ArrowDown" && e.target === trigger.current) {
+        e.preventDefault();
+        if (!limitExceeded) setOpen(true);
+      }
+    }}>
+      <button className="oms-button oms-export-trigger" ref={trigger} type="button"
+        aria-controls="oms-export-options" aria-expanded={open} aria-busy={busy}
+        disabled={limitExceeded} onClick={() => setOpen(!open)}>
+        <DownloadSimple aria-hidden /> {t("Export")} <CaretDown aria-hidden />
+      </button>
+      <div id="oms-export-options" className="oms-export-options" role="group"
+        aria-label={t("Export")} hidden={!open || limitExceeded}>
+        {exportGroups.map((group) => (
+          <div className="oms-export-group" key={group.label}>
+            <span className="oms-export-label">{t(group.label)}</span>
+            {group.formats.map(({ label, request }) => (
+              <button key={label + request.format} type="button" disabled={busy} onClick={() => {
+                close();
+                onExport(request);
+              }}>
+                {t(label)}{"layout" in request && request.layout && ` (${request.format.toUpperCase()})`}
+              </button>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /**
  * Every order in the workspace, searchable and filterable. Unpaid orders are
  * listed and marked, but only the Kitchen queue decides what is produced.
@@ -81,6 +172,7 @@ export function OrdersList({
 }) {
   const { t, errorText } = useOps();
   const today = useDubaiToday();
+  const searchInput = useRef<HTMLInputElement>(null);
   const filters = activeFilterCount(query);
   const canSelect = canDownloadDocuments(data.actor.role);
   const [open, setOpen] = useState(
@@ -154,74 +246,62 @@ export function OrdersList({
   }
   return (
     <div className="oms oms-list">
-      <div className="oms-card oms-toolbar">
-        <FulfilmentTabs
-          query={query}
-          counts={counts}
-          total={data.orders.length}
-          onSelect={(fulfilment) => set({ fulfilment })}
-        />
+      <FulfilmentTabs query={query} counts={counts} total={data.orders.length}
+        onSelect={(fulfilment) => set({ fulfilment })} />
+      <div className="oms-toolbar">
         <div className="oms-search-row">
           <label className="oms-search">
             <span className="oms-sr">{t("Search orders")}</span>
             <MagnifyingGlass aria-hidden />
-            <input
-              type="search"
-              value={query.q}
-              onChange={(e) => set({ q: e.target.value })}
-              placeholder={t("Order number, customer, phone or email")}
-            />
+            <input ref={searchInput} type="search" value={query.q} onChange={(e) => set({ q: e.target.value })}
+              placeholder={t("Order number, customer, phone or email")} />
           </label>
-          <button
-            type="button"
-            className="oms-button"
-            aria-expanded={open}
-            aria-controls="oms-filters"
-            onClick={() => setOpen(!open)}
-          >
-            <Funnel aria-hidden />
-            {t("Filters")}
+          <label className="oms-view-select">
+            <span className="oms-sr">{t("Daily order views")}</span>
+            <select value={query.view} onChange={(e) => set({ view: e.target.value as ListQuery["view"] })}>
+              {ORDER_VIEWS.map(([id, label]) => (
+                <option key={id} value={id}>{t(label)} · {viewCounts.get(id) ?? 0}</option>
+              ))}
+            </select>
+          </label>
+          <button type="button" className="oms-button" aria-expanded={open} aria-controls="oms-filters"
+            onClick={() => setOpen(!open)}>
+            <Funnel aria-hidden /> {t("Filters")}
             {filters > 0 && <span className="oms-count">{filters}</span>}
           </button>
-        </div>
-        <div
-          className="oms-views"
-          role="group"
-          aria-label={t("Daily order views")}
-        >
-          {ORDER_VIEWS.map(([id, label]) => (
-            <button
-              type="button"
-              key={id}
-              aria-pressed={query.view === id}
-              onClick={() => set({ view: id })}
-            >
-              {t(label)}
-              <span>{viewCounts.get(id) ?? 0}</span>
+          {(filters > 0 || query.q) && (
+            <button type="button" className="oms-button oms-toolbar-icon" onClick={() => onQuery(EMPTY_QUERY)}
+              aria-label={t("Clear search and filters")} title={t("Clear search and filters")}>
+              <X aria-hidden />
             </button>
-          ))}
+          )}
+          {canSelect && selected.length < matching.length && (
+            <button type="button" className="oms-button oms-toolbar-icon"
+              aria-label={t("Select all {{count}} matching orders", { count: matching.length })}
+              title={t("Select all {{count}} matching orders", { count: matching.length })}
+              onClick={() => select(new Set(matching.map((o) => o.id)))}>
+              <Checks aria-hidden />
+            </button>
+          )}
+          <p className="oms-result oms-muted" aria-live="polite">
+            {result.total === data.orders.length ? t("{{count}} orders", { count: result.total }) :
+              t("{{shown}} of {{count}} orders", { shown: result.total, count: data.orders.length })}
+          </p>
+          {canSelect && selected.length > 0 && (
+            <div className="oms-bulk" role="region" aria-label={t("Selected orders")}>
+              <strong aria-live="polite">{t("{{count}} selected", { count: selected.length })}</strong>
+              <OrderExports key={scopeKey} busy={download.busy} limitExceeded={selected.length > MAX_DOCUMENT_ORDERS}
+                onExport={(request) => void run(request)} />
+              <button type="button" className="oms-button oms-toolbar-icon" aria-label={t("Clear selection")}
+                title={t("Clear selection")} onClick={() => {
+                  select(new Set());
+                  searchInput.current?.focus();
+                }}>
+                <X aria-hidden />
+              </button>
+            </div>
+          )}
         </div>
-        {query.view === "delivered-today" && (
-          <p className="oms-muted">
-            {t(
-              "Orders whose delivery or collection was recorded today (Dubai).",
-            )}
-            {deliveredWithoutEvidence(data.orders) > 0 &&
-              " " +
-                t(
-                  "{{count}} delivered orders have no recorded completion time and are not counted.",
-                  { count: deliveredWithoutEvidence(data.orders) },
-                )}
-          </p>
-        )}
-        {query.view === "tomorrow" && (
-          <p className="oms-muted">
-            {t(
-              "Due tomorrow (Dubai), excluding delivered and cancelled orders: {{ready}} paid or confirmed · {{waiting}} unpaid or draft, not ready to prepare.",
-              { ready: actionable, waiting: matching.length - actionable },
-            )}
-          </p>
-        )}
         {open && (
           <div className="oms-filters" id="oms-filters">
             <label>
@@ -298,181 +378,35 @@ export function OrdersList({
             </fieldset>
           </div>
         )}
-        <div className="oms-toolbar-foot">
-          <p className="oms-muted" aria-live="polite">
-            {result.total === data.orders.length
-              ? t("{{count}} orders", { count: result.total })
-              : t("{{shown}} of {{count}} orders", {
-                  shown: result.total,
-                  count: data.orders.length,
-                })}
-          </p>
-          {(filters > 0 || query.q) && (
-            <button
-              type="button"
-              className="oms-link"
-              onClick={() => onQuery(EMPTY_QUERY)}
-            >
-              <X aria-hidden />
-              {t("Clear search and filters")}
-            </button>
-          )}
-        </div>
       </div>
-
-      {canSelect && result.total > 0 && (
-        <div
-          className="oms-card oms-bulk"
-          role="region"
-          aria-label={t("Selected orders")}
-        >
-          <p aria-live="polite">
-            <strong>
-              {t("{{count}} selected", { count: selected.length })}
-            </strong>{" "}
-            <span className="oms-muted">
-              {t("of {{count}} matching orders", { count: matching.length })}
-            </span>
-          </p>
-          {selected.length < matching.length && (
-            <button
-              type="button"
-              className="oms-link"
-              onClick={() => select(new Set(matching.map((o) => o.id)))}
-            >
-              {t("Select all {{count}} matching orders", {
-                count: matching.length,
-              })}
-            </button>
-          )}
-          {selected.length > 0 && (
-            <button
-              type="button"
-              className="oms-link"
-              onClick={() => select(new Set())}
-            >
-              {t("Clear selection")}
-            </button>
-          )}
-          <div className="oms-bulk-actions">
-            <button
-              type="button"
-              className="oms-button"
-              disabled={
-                !selected.length ||
-                selected.length > MAX_DOCUMENT_ORDERS ||
-                download.busy
-              }
-              onClick={() => run({ format: "csv" })}
-            >
-              <DownloadSimple aria-hidden />
-              {t("Export orders CSV")}
-            </button>
-            <button
-              type="button"
-              className="oms-button"
-              disabled={
-                !selected.length ||
-                selected.length > MAX_DOCUMENT_ORDERS ||
-                download.busy
-              }
-              onClick={() => run({ format: "pdf", kind: "delivery-note" })}
-            >
-              <FilePdf aria-hidden />
-              {t("Delivery notes (PDF)")}
-            </button>
-            <button
-              type="button"
-              className="oms-button"
-              disabled={
-                !selected.length ||
-                selected.length > MAX_DOCUMENT_ORDERS ||
-                download.busy
-              }
-              onClick={() => run({ format: "pdf", kind: "packing-slip" })}
-            >
-              <FilePdf aria-hidden />
-              {t("Packing slips (PDF)")}
-            </button>
-            <button
-              type="button"
-              className="oms-button"
-              disabled={
-                !selected.length ||
-                selected.length > MAX_DOCUMENT_ORDERS ||
-                download.busy
-              }
-              onClick={() => run({ format: "zip", kind: "delivery-note" })}
-            >
-              <FileArchive aria-hidden />
-              {t("Delivery notes (ZIP)")}
-            </button>
-            <button
-              type="button"
-              className="oms-button"
-              disabled={
-                !selected.length ||
-                selected.length > MAX_DOCUMENT_ORDERS ||
-                download.busy
-              }
-              onClick={() => run({ format: "zip", kind: "packing-slip" })}
-            >
-              <FileArchive aria-hidden />
-              {t("Packing slips (ZIP)")}
-            </button>
-            {(
-              [
-                [
-                  "production-bulk",
-                  "a4",
-                  "Production & packing · Event / bulk",
-                ],
-                ["delivery-note", "a5", "Delivery note · A5 candidate"],
-                [
-                  "delivery-note",
-                  "a5-two-up",
-                  "Delivery notes · A4 two-up candidate",
-                ],
-              ] as const
-            ).flatMap(([kind, layout, label]) =>
-              (["pdf", "zip"] as const).map((format) => (
-                <button
-                  key={`${kind}-${layout}-${format}`}
-                  type="button"
-                  className="oms-button"
-                  disabled={
-                    !selected.length ||
-                    selected.length > MAX_DOCUMENT_ORDERS ||
-                    download.busy
-                  }
-                  onClick={() => run({ format, kind, layout })}
-                >
-                  <FilePdf aria-hidden />
-                  {t(label)} ({format.toUpperCase()})
-                </button>
-              )),
-            )}
-          </div>
-          {selected.length > MAX_DOCUMENT_ORDERS && (
-            <p role="alert">
-              {t("Select at most {{max}} orders per download.", {
-                max: MAX_DOCUMENT_ORDERS,
-              })}
-            </p>
-          )}
-          {download.busy && (
-            <p className="oms-muted" role="status">
-              {t("Preparing download…")}
-            </p>
-          )}
-          {download.error && <p role="alert">{download.error}</p>}
-          <p className="oms-muted">
+        {query.view === "delivered-today" && (
+          <p className="oms-view-note oms-muted">
             {t(
-              "Download only: operational documents, not invoices. Nothing is sent, printed or changed.",
+              "Orders whose delivery or collection was recorded today (Dubai).",
+            )}
+            {deliveredWithoutEvidence(data.orders) > 0 &&
+              " " +
+                t(
+                  "{{count}} delivered orders have no recorded completion time and are not counted.",
+                  { count: deliveredWithoutEvidence(data.orders) },
+                )}
+          </p>
+        )}
+        {query.view === "tomorrow" && (
+          <p className="oms-view-note oms-muted">
+            {t(
+              "Due tomorrow (Dubai), excluding delivered and cancelled orders: {{ready}} paid or confirmed · {{waiting}} unpaid or draft, not ready to prepare.",
+              { ready: actionable, waiting: matching.length - actionable },
             )}
           </p>
-        </div>
+        )}
+      {selected.length > MAX_DOCUMENT_ORDERS && (
+        <p className="oms-view-note" role="alert">
+          {t("Select at most {{max}} orders per download.", { max: MAX_DOCUMENT_ORDERS })}
+        </p>
       )}
+      {download.busy && <p className="oms-view-note" role="status">{t("Preparing download…")}</p>}
+      {download.error && <p className="oms-view-note" role="alert">{download.error}</p>}
 
       {result.rows.length ? (
         <div className="oms-card oms-table-card">

@@ -1,0 +1,229 @@
+{
+  "category": {
+    "en": "Panettone",
+    "es": "Panettone",
+    "ar": "بانيتوني"
+  },
+  "sizes": [
+    {
+      "id": "mini",
+      "priceFils": 2700,
+      "en": "Mini",
+      "es": "Mini",
+      "ar": "ميني"
+    },
+    {
+      "id": "normal",
+      "priceFils": 17000,
+      "en": "Normal",
+      "es": "Normal",
+      "ar": "عادي"
+    }
+  ],
+  "products": [
+    {
+      "id": "panettone-normal",
+      "name": {
+        "en": "Panettone Normal",
+        "es": "Panettone Normal",
+        "ar": "بانيتوني عادي"
+      },
+      "description": {
+        "en": "Contains gluten. Full allergen information is pending confirmation.",
+        "es": "Contiene gluten. La declaración completa de alérgenos está pendiente de confirmación.",
+        "ar": "يحتوي على الغلوتين. القائمة الكاملة لمسببات الحساسية بانتظار التأكيد."
+      },
+      "previewPhoto": {
+        "source": "photos/panettone/09.webp",
+        "file": "normal.webp",
+        "sha256": "77fac0a97469093a60a45b3d70a3626338637f2ab0be597cd2d3e96a8610c3a6",
+        "size": "normal",
+        "sourceDerivativeSha256": "9461041764870d56b1fbdacb31a6aa80ba305d909cf7b2629510e6d88f153608",
+        "crop": {
+          "x": 0,
+          "y": 496,
+          "width": 1067,
+          "height": 1104
+        },
+        "sourceOriginalSha256": "7e01bed2a62906220b1aa926c2ededd5fdcd8f235b290a8cdca40a3d9b2bc271",
+        "sourceOriginalFile": "PANETONE/09.jpg"
+      },
+      "galleryPhotos": [
+        {
+          "source": "photos/panettone/01.webp",
+          "file": "gallery/panettone-normal-01.webp",
+          "sha256": "a390db6420bf5048009cd9149ead7efe95a4222b2c011ab1f31540f5a3969f0e",
+          "sourceDerivativeSha256": "2e7b1af35fe1bcca92da847acc95b5db5b9b9166519c8921fa2ba65d23e132f5",
+          "size": "normal",
+          "width": 640,
+          "height": 960,
+          "sourceOriginalSha256": "8994034449e884e5d749b482c3df4f389c51073a01b0d6390a1774caf1f2a90a",
+          "sourceOriginalFile": "PANETONE/01.jpg"
+        },
+        {
+          "source": "photos/panettone/10.webp",
+          "file": "gallery/panettone-normal-10.webp",
+          "sha256": "bbbf404ee50937191ef7f57a9bdd683645122a30c429036ce89d6fd310d5d7af",
+          "sourceDerivativeSha256": "8afe11c561108c9189dd3dd6a461089b1fc39fb598d441a7772bc6e1490bd37a",
+          "size": "normal",
+          "width": 540,
+          "height": 960,
+          "sourceOriginalSha256": "84923ffda2e3dd1e00c6dd99d3a35703f119bfadbb2ba2245e6b8318aa8dfd12",
+          "sourceOriginalFile": "PANETONE/10.jpg"
+        }
+      ],
+      "releaseAvailability": "unavailable"
+    },
+    {
+      "id": "panettone-chocolate",
+      "name": {
+        "en": "Panettone Chocolate",
+        "es": "Panettone de chocolate",
+        "ar": "بانيتوني بالشوكولاتة"
+      },
+      "description": {
+        "en": "Contains gluten. Full allergen information is pending confirmation.",
+        "es": "Contiene gluten. La declaración completa de alérgenos está pendiente de confirmación.",
+        "ar": "يحتوي على الغلوتين. القائمة الكاملة لمسببات الحساسية بانتظار التأكيد."
+      },
+      "previewPhoto": {
+        "source": "photos/panettone/14.webp",
+        "file": "chocolate.webp",
+        "sha256": "979fe632de3598e898fd099b3d05f5ed83bdd72e6c8f68833806b8c8a247aaf9",
+        "size": "normal",
+        "sourceDerivativeSha256": "8b1f1d253b46d306d9a66fb7026aaf86cd85bd9bf223466c7a28305828308385",
+        "crop": {
+          "x": 0,
+          "y": 432,
+          "width": 1067,
+          "height": 1168
+        },
+        "sourceOriginalSha256": "b6fd5da4f6e30c675458655f8a3c729d86f61e5e1e0b72454230bc0f5e3abcc4",
+        "sourceOriginalFile": "PANETONE/14.jpg"
+      },
+      "galleryPhotos": [
+        {
+          "source": "photos/panettone/02.webp",
+          "file": "gallery/panettone-chocolate-02.webp",
+          "sha256": "734fdb450655f9db6fd76c364c33e5b62d0b634f0a14cd1f23fc0a5fcae0856b",
+          "sourceDerivativeSha256": "18f1d54972fd192bc3230e678a0e7b1346a5b69d45167da50ddc0f5c5d7e0688",
+          "size": "normal",
+          "width": 640,
+          "height": 960,
+          "sourceOriginalSha256": "b33cd4035ac27a4295b95e84e8f3ec474a3139bd234fdb4b098f841c969c5c20",
+          "sourceOriginalFile": "PANETONE/02.jpg"
+        },
+        {
+          "source": "photos/panettone/03.webp",
+          "file": "gallery/panettone-chocolate-03.webp",
+          "sha256": "302c89a57d915d2f810808f6641206e7d9b23cf3ccac89ae26a0c92a07b6c467",
+          "sourceDerivativeSha256": "e5bb1335cd1ab318e8c2200caf9fd2337d3d6ecb4f26f1398e154ddf732f9798",
+          "size": "normal",
+          "width": 640,
+          "height": 960,
+          "sourceOriginalSha256": "03173ac4514d7418ce215cf46b3b3102fdde581f2680ffe8166ea61d66c115ff",
+          "sourceOriginalFile": "PANETONE/03.jpg"
+        },
+        {
+          "source": "photos/panettone/12.webp",
+          "file": "gallery/panettone-chocolate-12.webp",
+          "sha256": "8d2dcc71b32de555be56bf1cda16c079d7ed44c74a3aedd6446c608c2883fff6",
+          "sourceDerivativeSha256": "3bad7561189daa39dad66c19e551846b44af1993e83c3a99fcc2ca60b43c9497",
+          "size": "normal",
+          "width": 640,
+          "height": 960,
+          "sourceOriginalSha256": "c3bdc6c84cf1e2921e3df8253afd559eee48d97f5c18b9ce694e92ecf2458269",
+          "sourceOriginalFile": "PANETONE/12.jpg"
+        },
+        {
+          "source": "photos/panettone/13.webp",
+          "file": "gallery/panettone-chocolate-13.webp",
+          "sha256": "0f150fb5e67b0d4bf7dfc9ae4579de96a2d1b4c1ed19dcd49602f4b6ad8a7f43",
+          "sourceDerivativeSha256": "998956a740701d39eb1bce70eed5de529cb6d6b0cc716b132c785279ab6b4ce0",
+          "size": "normal",
+          "width": 540,
+          "height": 960,
+          "sourceOriginalSha256": "55823f636e7ad8a893773e3e4fe6a07f5ff876525a44a8e1a137907565658c9f",
+          "sourceOriginalFile": "PANETONE/13.jpg"
+        },
+        {
+          "source": "photos/panettone/15.webp",
+          "file": "gallery/panettone-chocolate-15.webp",
+          "sha256": "f250458b6b454d478f6f17293bfca78e865c6d83638b2119379028dc057c88ba",
+          "sourceDerivativeSha256": "ce8af221a4d4ce0f38890d18590b794edea75411bf1a63f5c0d3abb7dea8997b",
+          "size": "normal",
+          "width": 640,
+          "height": 960,
+          "sourceOriginalSha256": "6a48ef8530acd10e03fa699e2dd10ec1f3ed7bed0bd4978eda2b7173900e25ab",
+          "sourceOriginalFile": "PANETONE/15.jpg"
+        }
+      ],
+      "releaseAvailability": "unavailable"
+    },
+    {
+      "id": "panettone-pistacchio",
+      "name": {
+        "en": "Panettone Pistacchio",
+        "es": "Panettone de pistacho",
+        "ar": "بانيتوني بالفستق"
+      },
+      "description": {
+        "en": "Contains gluten and pistachio. Full allergen information is pending confirmation.",
+        "es": "Contiene gluten y pistacho. La declaración completa de alérgenos está pendiente de confirmación.",
+        "ar": "يحتوي على الغلوتين والفستق. القائمة الكاملة لمسببات الحساسية بانتظار التأكيد."
+      },
+      "previewPhoto": {
+        "source": "photos/panettone/11.webp",
+        "file": "pistacchio.webp",
+        "sha256": "d38c6746273823b3ce463459a5dfce7081eef595fb53ce6fd8716c4b7869fc0a",
+        "size": "normal",
+        "sourceDerivativeSha256": "c4e2013b5c11d92727281bbc82f3a6b6ea889990ffe09bc8a7550ec2f9ff76a7",
+        "crop": {
+          "x": 0,
+          "y": 416,
+          "width": 1067,
+          "height": 1184
+        },
+        "sourceOriginalSha256": "0d658b71b09b13b14e7b2543bb9523bf685328fa27c9aaa7eb90d32dd5feee01",
+        "sourceOriginalFile": "PANETONE/11.jpg"
+      },
+      "galleryPhotos": [
+        {
+          "source": "photos/panettone/04.webp",
+          "file": "gallery/panettone-pistacchio-04.webp",
+          "sha256": "0ea6e2d54c4421da5cbad236bfbf682dc3879bbd6b3e7485a0caab79467c1905",
+          "sourceDerivativeSha256": "3b7f9869b987bad7042d26b3b81746959cd527f3f7fb6102d31bfe10a098972d",
+          "size": "normal",
+          "width": 640,
+          "height": 960,
+          "sourceOriginalSha256": "da1331b126ff9340ad3c68fd68256682800c243984104f1085337a12d7716aab",
+          "sourceOriginalFile": "PANETONE/04.jpg"
+        },
+        {
+          "source": "photos/panettone/05.webp",
+          "file": "gallery/panettone-pistacchio-05.webp",
+          "sha256": "13963c7cbd582effe5030f2383c40b9f3fbf0153f3c34e2bd384ede4f93b545f",
+          "sourceDerivativeSha256": "d321f1f25bf51c6c3c6704dbf759e622ecad7aca15458220bf3a47a7d15d3aa2",
+          "size": "normal",
+          "width": 640,
+          "height": 960,
+          "sourceOriginalSha256": "61e605774138eac1ffa3611ca9197cf914e92aa59c56757a055d993c8b0e0f5c",
+          "sourceOriginalFile": "PANETONE/05.jpg"
+        },
+        {
+          "source": "photos/panettone/06.webp",
+          "file": "gallery/panettone-pistacchio-06.webp",
+          "sha256": "3f50b661c8be1ecf0e3d063391f4ff3af5434d6e9b81eb30d79c4da2dd3ff1f5",
+          "sourceDerivativeSha256": "394a0b7b5cd1e0e69dec7eeff2c3c69106f8e2b0cec0c64e3b1dcb47694fb821",
+          "size": "normal",
+          "width": 640,
+          "height": 960,
+          "sourceOriginalSha256": "1bb88bee5170a6dc3b88c6170a6637f5ea45147eb08be2bc352898d270c48272",
+          "sourceOriginalFile": "PANETONE/06.jpg"
+        }
+      ],
+      "releaseAvailability": "unavailable"
+    }
+  ],
+  "releaseAvailabilityReason": "Confirmed disclosures remain in product copy. Purchase is held for Mini and Normal pending verification of mandatory allergen information for each SKU."
+}

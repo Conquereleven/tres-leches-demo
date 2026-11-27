@@ -2322,11 +2322,31 @@
         "/menu?category=extras"
       ],
       "usage": "alternate family photograph; no customization options inferred",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 4908,
+          "sha256": "2b094dfac6d2321fa5587075df7bac1c0abd621239eaa21c9b9d140808245257",
+          "src": "/brand/approved/legacy-gallery/gallery-1kPaZKFo69Y0odxVRz5eIEkBjNNYrWLik-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 14072,
+          "sha256": "7ab9b862e208837056038fd47355560c67ebad67646eac1a5503b5997df1ba68",
+          "src": "/brand/approved/legacy-gallery/gallery-1kPaZKFo69Y0odxVRz5eIEkBjNNYrWLik-960.webp"
+        }
+      ],
       "alt": "Approved cake topper photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": ""
+      "variant": "",
+      "sourceSha256": "1a95bc124d3f370adc3ca31f28164015d66986700e3fb2332730a3649c2d6202",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1GH3vta4GzmdxrVyAhSsC21EuuEX8WQG0",
@@ -2336,11 +2356,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 3756,
+          "sha256": "40cd9866e16d8818f3447da3d2329f3a4d80ce814050b2df4a3565d606c1948b",
+          "src": "/brand/approved/legacy-gallery/gallery-1GH3vta4GzmdxrVyAhSsC21EuuEX8WQG0-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 10272,
+          "sha256": "60d2e7d76515aad3b79dd68f5bb96ea4d88c98d003c12c227bbc437ca7208df8",
+          "src": "/brand/approved/legacy-gallery/gallery-1GH3vta4GzmdxrVyAhSsC21EuuEX8WQG0-960.webp"
+        }
+      ],
       "alt": "Alternate approved cake-topper photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": ""
+      "variant": "",
+      "sourceSha256": "70839df023172e77552450689dc4dee317917a155eed2bb26dbfaee7307e389f",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1jDwqeq30bTCFEPn_1BbYEpu9R8w32Ucv",
@@ -2350,11 +2390,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 6606,
+          "sha256": "e2dd582eff5d69d80cdab64d1cdd43cb8cc79650e6ea7a94da079aee06770a1e",
+          "src": "/brand/approved/legacy-gallery/gallery-1jDwqeq30bTCFEPn_1BbYEpu9R8w32Ucv-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 18248,
+          "sha256": "a7ea298522e91cad45780bcd68f733035b1ddbd6ed5b82b1667a65c3989204fc",
+          "src": "/brand/approved/legacy-gallery/gallery-1jDwqeq30bTCFEPn_1BbYEpu9R8w32Ucv-960.webp"
+        }
+      ],
       "alt": "Alternate approved cake-topper photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": ""
+      "variant": "",
+      "sourceSha256": "c6a37dae3c66a497a190e0ead3bc9f4dade46ebd728c41f8544bc8ab4776485a",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1oT9rAwdPgMJPHK9BbQg0Qwv_GtPoBHXx",
@@ -2364,11 +2424,31 @@
         "/menu?category=extras"
       ],
       "usage": "alternate family photograph; no customization options inferred",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 3948,
+          "sha256": "ab306719b272b2a8e4898088c4f77c2f2d31681bacb6e816db81af6a5f73ad57",
+          "src": "/brand/approved/legacy-gallery/gallery-1oT9rAwdPgMJPHK9BbQg0Qwv_GtPoBHXx-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 10646,
+          "sha256": "30fa4624f88b35f918f458ddc88a83e1e3830cbc9e4459c092350eb3fd0879ec",
+          "src": "/brand/approved/legacy-gallery/gallery-1oT9rAwdPgMJPHK9BbQg0Qwv_GtPoBHXx-960.webp"
+        }
+      ],
       "alt": "Approved cake topper photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": ""
+      "variant": "",
+      "sourceSha256": "a6da253227a98a70f671ff68898ada5c4b514655d86e468939c8da8754ba67b9",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1OolFUtbCjnDi11uhoFbHceCfCyOLP8AG",
@@ -2378,11 +2458,31 @@
         "/menu?category=extras"
       ],
       "usage": "alternate family photograph; no customization options inferred",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 4598,
+          "sha256": "695e6040a233724af8fc961fee9a91bb3ea69b813ffa5841572e9fd5193a870c",
+          "src": "/brand/approved/legacy-gallery/gallery-1OolFUtbCjnDi11uhoFbHceCfCyOLP8AG-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 12606,
+          "sha256": "6e462c29dac4aaac55128e64e8ad70cfda984a89caa3c2e893758fa0300f6de3",
+          "src": "/brand/approved/legacy-gallery/gallery-1OolFUtbCjnDi11uhoFbHceCfCyOLP8AG-960.webp"
+        }
+      ],
       "alt": "Approved cake topper photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": ""
+      "variant": "",
+      "sourceSha256": "6b76382f441438e8512fd6754666a79c6ae53e6d1640029e70cb9c7194c2c4ff",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "10QUSo0ZTcIsa-Cn5M16m6HU8BnsmxFx8",
@@ -2392,11 +2492,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 25438,
+          "sha256": "e7bdf8b085cf56f3fd23383f51414d2e3dd086aceec17fbe0cfe96f8b7f41724",
+          "src": "/brand/approved/legacy-gallery/gallery-10QUSo0ZTcIsa-Cn5M16m6HU8BnsmxFx8-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 92812,
+          "sha256": "badb5db874b47a7e6690a8908f53c478a1fecdb43cd82cc520c0491197673031",
+          "src": "/brand/approved/legacy-gallery/gallery-10QUSo0ZTcIsa-Cn5M16m6HU8BnsmxFx8-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Caffe Latte"
+      "variant": "Caffe Latte",
+      "sourceSha256": "76449d1b6e97154360f0c9d3b789aa58c1da1c859c571db20e321b49b77290a5",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1OCUl8T28sX_TQO2nsfdumiBqCpttvZ16",
@@ -2406,11 +2526,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 26746,
+          "sha256": "8c9cecdce6b274e175dec8d71cc00da5f08a590e9659f945ccfd27947917fb14",
+          "src": "/brand/approved/legacy-gallery/gallery-1OCUl8T28sX_TQO2nsfdumiBqCpttvZ16-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 80826,
+          "sha256": "1fb786fcdcab267ea8d9755ab2bf295f5cf311fa7dea3f78e648f3f2d521f7e9",
+          "src": "/brand/approved/legacy-gallery/gallery-1OCUl8T28sX_TQO2nsfdumiBqCpttvZ16-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Caffe Latte"
+      "variant": "Caffe Latte",
+      "sourceSha256": "a57b93b506e086ae4798fad2465debd779ee9d9cacca906a1d866eaba38479ec",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1h41aO8B2UU6vrO80jiy1VSK5fwlbJ-88",
@@ -2444,11 +2584,31 @@
         "/menu?category=jars"
       ],
       "usage": "alternate family photograph; no assortment promised",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 35822,
+          "sha256": "9432873424b0efae63236cce7ee74eb3864ef83e8892755b668ce656b2039b1b",
+          "src": "/brand/approved/legacy-gallery/gallery-1K0D3bWFYXJX2fPr71Fqhf-nxdmPAWDYB-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 134276,
+          "sha256": "27a2234954311c4c6716c4adcc8236e23edf7ddad700a4e7e1aae1fd64edad35",
+          "src": "/brand/approved/legacy-gallery/gallery-1K0D3bWFYXJX2fPr71Fqhf-nxdmPAWDYB-960.webp"
+        }
+      ],
       "alt": "3L cake jar family photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": ""
+      "variant": "",
+      "sourceSha256": "b29d255c30c9ed112a17a951a08543c5da630e18f9277ac8cb4ed0d2573bd6f6",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1MtH1x7-v1vtWHSMGkmbQF0d2bxD71n2w",
@@ -2458,11 +2618,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 8406,
+          "sha256": "345672b002bb293d08c26881c6e5dde40b5458e5f6daf57db988c7613bd52f6a",
+          "src": "/brand/approved/legacy-gallery/gallery-1MtH1x7-v1vtWHSMGkmbQF0d2bxD71n2w-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 23554,
+          "sha256": "a3d5e8b780b6ab5965cb5c6d6f7c0cd648c3a1e64a2649a5342ba7e8be92c4e7",
+          "src": "/brand/approved/legacy-gallery/gallery-1MtH1x7-v1vtWHSMGkmbQF0d2bxD71n2w-960.webp"
+        }
+      ],
       "alt": "Alternate approved candles photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": ""
+      "variant": "",
+      "sourceSha256": "a2b8540833bdef08ecd21706afcbb9daf539ef9035e6253beb9014ca6cad6cd7",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1xiNbch518T7N2unCqgl4Q0yKm6uHr8iM",
@@ -2472,11 +2652,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 17192,
+          "sha256": "cba3b55328d9b17a6999160d8956d34e5f4c372df3c789ae085ac5e229105595",
+          "src": "/brand/approved/legacy-gallery/gallery-1xiNbch518T7N2unCqgl4Q0yKm6uHr8iM-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 59438,
+          "sha256": "c837b701e2aa615e78044df612c0cd2d3b348ded357ea32b23a21b0d7f41c382",
+          "src": "/brand/approved/legacy-gallery/gallery-1xiNbch518T7N2unCqgl4Q0yKm6uHr8iM-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Classic"
+      "variant": "Classic",
+      "sourceSha256": "d7f9c9ae94bd12a58239db3ee10af52867f90814f5c2803b74f3b7ba623e7b0d",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1Rlks5Qh3CAy6AahTkE_JdZHmRunGh7VG",
@@ -2486,11 +2686,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 15542,
+          "sha256": "705bccea34e8bd80fbd29e2d572177c36b6b41b9a15a3e4146329418393079f0",
+          "src": "/brand/approved/legacy-gallery/gallery-1Rlks5Qh3CAy6AahTkE_JdZHmRunGh7VG-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 63460,
+          "sha256": "b23e2f8ecd5e137d4b07280b7b4310028e35d4158b318211df016e63acd0995d",
+          "src": "/brand/approved/legacy-gallery/gallery-1Rlks5Qh3CAy6AahTkE_JdZHmRunGh7VG-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Classic"
+      "variant": "Classic",
+      "sourceSha256": "5613f5748832ce053c62048e71709e1d120f1994c3f0df6e425c46026e57c758",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1WGsbj1r6SUw-ukBwz9XoDjVndS1iTwmF",
@@ -2500,11 +2720,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 20292,
+          "sha256": "fe36898105ded2f6aa32d3ceb287efcd6ce765238cb4c40967515814c3fa6473",
+          "src": "/brand/approved/legacy-gallery/gallery-1WGsbj1r6SUw-ukBwz9XoDjVndS1iTwmF-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 59206,
+          "sha256": "9f565b51c3e7070d2f8371fe3ad4730bda46a7fec9044b9510d568e8dbc8f61c",
+          "src": "/brand/approved/legacy-gallery/gallery-1WGsbj1r6SUw-ukBwz9XoDjVndS1iTwmF-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Coconut"
+      "variant": "Coconut",
+      "sourceSha256": "12aabccd114f661cedb3cb04047b336d2a1222dc43710166fa723e12b6775f59",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "10y0hOJfLOVECo3q0WkjuYe102M_doy9Q",
@@ -2514,11 +2754,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 17956,
+          "sha256": "8448bea5b12d3003e19b81e42a4e9dd6f69a1b7a0c845911b4c00dfa69d47c61",
+          "src": "/brand/approved/legacy-gallery/gallery-10y0hOJfLOVECo3q0WkjuYe102M_doy9Q-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 49216,
+          "sha256": "04a5cf1818ef07176da71fe6ccd381e0b1efa6239035c52978eece244375ea52",
+          "src": "/brand/approved/legacy-gallery/gallery-10y0hOJfLOVECo3q0WkjuYe102M_doy9Q-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Confetti"
+      "variant": "Confetti",
+      "sourceSha256": "88e4a374780acf4c44483f7e590fda8134fdd43f7e2a72995392e648a61bca61",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1dg9Vns0PbcK9engCIFStu3UdG8cLeFyF",
@@ -2528,11 +2788,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 20402,
+          "sha256": "4d53e72097c05ac4c3292d8853abe6ebb9e2c45a372b72f2f60d24079ddbe88a",
+          "src": "/brand/approved/legacy-gallery/gallery-1dg9Vns0PbcK9engCIFStu3UdG8cLeFyF-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 60626,
+          "sha256": "f3b13c40ddb8fdc2a023a1e7ccdd674b4fa07995778b2a175f469f98990b16a9",
+          "src": "/brand/approved/legacy-gallery/gallery-1dg9Vns0PbcK9engCIFStu3UdG8cLeFyF-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Confetti"
+      "variant": "Confetti",
+      "sourceSha256": "bacfd81531d59f6baba36e4c631b436be5fe7ac0aa0560a5400952f29c75a3aa",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1wZKbgpW7J1ZTlz3h4e3FwDAspD79eHqG",
@@ -2564,11 +2844,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 17574,
+          "sha256": "6482d286a9b2981591d46a0639d7221e28b01aa0cb20e7b13b6fdc708a80dda0",
+          "src": "/brand/approved/legacy-gallery/gallery-1l1CXVunDeEnfxUmIEKdHm_hh_a67iOsv-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 46226,
+          "sha256": "4b4598f842f32b7518b3b7d2220dda2b38c5317a3c562aac43d8444a504f74fb",
+          "src": "/brand/approved/legacy-gallery/gallery-1l1CXVunDeEnfxUmIEKdHm_hh_a67iOsv-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches-premium photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Dulce de Leche"
+      "variant": "Dulce de Leche",
+      "sourceSha256": "7e8fc9514eb2add346345252470e708fc0a302c529ed193bf51953387d5b5935",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "114pW6AeVXqBVA7D23OV8EKJbPBEa6j5s",
@@ -2578,11 +2878,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 22468,
+          "sha256": "fee58256468ca0297cee583c94b9338263cb298970441f803ea6f586097d113c",
+          "src": "/brand/approved/legacy-gallery/gallery-114pW6AeVXqBVA7D23OV8EKJbPBEa6j5s-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 65114,
+          "sha256": "3e0f7e90ff62ff363abfc055b58a8e979599c686030b22c0a448098ed9c65787",
+          "src": "/brand/approved/legacy-gallery/gallery-114pW6AeVXqBVA7D23OV8EKJbPBEa6j5s-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches-premium photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Dulce de Leche"
+      "variant": "Dulce de Leche",
+      "sourceSha256": "2424570d4268d1510d14fd1f856f9a7bef6d76321fbeccf49c62535a486189e2",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1HOBKguX9i9_oKY9rzT47A_tSwFbmLsPo",
@@ -2614,11 +2934,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 14660,
+          "sha256": "2b4790871074613698fe426de628c0efd60f3da1dccfe3a05c371ca7af9c6ed1",
+          "src": "/brand/approved/legacy-gallery/gallery-1vmFqj39W--kVhw8Y7b3ZtWXg3xeuZ5ne-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 45314,
+          "sha256": "c6d680364d25dff1f2c1a8520797d598f5178ec1e715d548cf353cfb1a229297",
+          "src": "/brand/approved/legacy-gallery/gallery-1vmFqj39W--kVhw8Y7b3ZtWXg3xeuZ5ne-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Lotus"
+      "variant": "Lotus",
+      "sourceSha256": "6edcace8519e751d518a982bca5d0934372200a4ef2278754ec986d448d24bf8",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1EldYZ3-qAk5TkUVgNUueuNaf7l69sE22",
@@ -2628,11 +2968,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 26138,
+          "sha256": "cbb52864b13f66ffb56e2a8a11ffa5c9416cc4a96e7de5caf716b639b8a202fd",
+          "src": "/brand/approved/legacy-gallery/gallery-1EldYZ3-qAk5TkUVgNUueuNaf7l69sE22-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 77888,
+          "sha256": "51c13dd3e284a7e94edd269852e31e9ac5f65b903d1383f69005ae2dcc23d4f4",
+          "src": "/brand/approved/legacy-gallery/gallery-1EldYZ3-qAk5TkUVgNUueuNaf7l69sE22-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Lotus"
+      "variant": "Lotus",
+      "sourceSha256": "1b1d82acc115b066b4ca529a619350601f8270f659a240a4dd23ec6994ff8d6a",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1GC4XqiyR-3EIClYyO2NJdVgZzsK6bmFk",
@@ -2666,11 +3026,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 19662,
+          "sha256": "3ce25df7eaa8e8e3873cd150b250234c3525f201fa1ec8326fc274aafdd9ae0e",
+          "src": "/brand/approved/legacy-gallery/gallery-10nVZ0SCXQgrQEpF8UiOX9t52bbHmT-t2-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 53646,
+          "sha256": "bcc4036699aac1eba1d45027d5dac8cd6c7b5317ac5cdb02df420c4c4b9e8d65",
+          "src": "/brand/approved/legacy-gallery/gallery-10nVZ0SCXQgrQEpF8UiOX9t52bbHmT-t2-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "M&Ms"
+      "variant": "M&Ms",
+      "sourceSha256": "14fd473da98ca06c977d79545e7e30cbf8751d9502e39cecce624624b2a69b72",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1SA1FMsYgvhUg09SQ7qEIaqGmHTV9QwAa",
@@ -2680,11 +3060,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 24772,
+          "sha256": "e52d9eec30255d9e3936297d299855f6349a16812761b4d2b5ae5731b3dd7bcb",
+          "src": "/brand/approved/legacy-gallery/gallery-1SA1FMsYgvhUg09SQ7qEIaqGmHTV9QwAa-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 71974,
+          "sha256": "b3a3121f4123495f1de28b6c999dbcf7b946ae59d400e79897d0763919d24b97",
+          "src": "/brand/approved/legacy-gallery/gallery-1SA1FMsYgvhUg09SQ7qEIaqGmHTV9QwAa-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "M&Ms"
+      "variant": "M&Ms",
+      "sourceSha256": "64b5041b62b5403b64ef55fd2ee677e2dd194932b0070c5abec5b7d9e94fb595",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1r7yRUr-0ewurtOPuggUBoocBY_XqICjb",
@@ -2694,11 +3094,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 12168,
+          "sha256": "dc78e9abaa3eee21a9a3b02d612a71c454d30a5cb79f7faf371b38d895d1d32b",
+          "src": "/brand/approved/legacy-gallery/gallery-1r7yRUr-0ewurtOPuggUBoocBY_XqICjb-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 35174,
+          "sha256": "775dc0940e06a6f01c1f304823c9b73e663792fe180cd08aaa6c1c35a52f83c7",
+          "src": "/brand/approved/legacy-gallery/gallery-1r7yRUr-0ewurtOPuggUBoocBY_XqICjb-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches-mango photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Mango"
+      "variant": "Mango",
+      "sourceSha256": "e8dee6b212fcefb5908e1b79d1713f1fce6d5f18f4e75a8cdc550320d7a33ea5",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1K8V3mdQQcq51-5LHr8iIML3kHIwqnq3t",
@@ -2708,11 +3128,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 20878,
+          "sha256": "7eca27dd3eb121430fbd0e36160fbb2d00b602b11eb736cab4f50ca1e8c9b04d",
+          "src": "/brand/approved/legacy-gallery/gallery-1K8V3mdQQcq51-5LHr8iIML3kHIwqnq3t-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 59170,
+          "sha256": "dcc4929100958237dcd8fa9d3d25fbb06b3b41cb83bf26de440403b24f1ee24d",
+          "src": "/brand/approved/legacy-gallery/gallery-1K8V3mdQQcq51-5LHr8iIML3kHIwqnq3t-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches-mango photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Mango"
+      "variant": "Mango",
+      "sourceSha256": "a5eb499c9cbb85f9e4038f8584cbb1d00af5ed23e975191bc093e95bdd32cb34",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1UNayOgEccgx-XIcSzAGc5Aug5EBXoHqg",
@@ -2722,11 +3162,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 23140,
+          "sha256": "1001896abdcf0abe015e8e9610e75d03e6877c9f9a40514fe2d5d1f20993a193",
+          "src": "/brand/approved/legacy-gallery/gallery-1UNayOgEccgx-XIcSzAGc5Aug5EBXoHqg-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 66786,
+          "sha256": "3fed47bfd69832158ab2db0463e8a30ec2c1718c5f03094cc6f0645d1e15f454",
+          "src": "/brand/approved/legacy-gallery/gallery-1UNayOgEccgx-XIcSzAGc5Aug5EBXoHqg-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Nutella"
+      "variant": "Nutella",
+      "sourceSha256": "ad5477b559731b547e4a56e848a002ab707103865d78a4e3a533156250a2ea30",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1NITcQTTTk7c6l2jCRSDgCN_Rl5TcLEtB",
@@ -2736,11 +3196,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 26948,
+          "sha256": "20692a23765ebb9808e549d39a5900c2cb2793e56fc0982b1e7af4db542c5bba",
+          "src": "/brand/approved/legacy-gallery/gallery-1NITcQTTTk7c6l2jCRSDgCN_Rl5TcLEtB-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 77294,
+          "sha256": "d5c824359698e9c1f0f51a92abf5f4551bf706b214b35d0a0bbe0728d9ed95d3",
+          "src": "/brand/approved/legacy-gallery/gallery-1NITcQTTTk7c6l2jCRSDgCN_Rl5TcLEtB-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Nutella"
+      "variant": "Nutella",
+      "sourceSha256": "2c20332b66c07640183bb61737171f5666dab07c69ef760941b9e65048985acc",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1uS4R7HGAvjKGWutzUknCF7Ay_zHv-GYn",
@@ -2750,11 +3230,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 20542,
+          "sha256": "5f11b3c1bdd86d5d104ebe907e38a3e7338a1c88ef4db9e3a598fa217b0036d5",
+          "src": "/brand/approved/legacy-gallery/gallery-1uS4R7HGAvjKGWutzUknCF7Ay_zHv-GYn-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 68514,
+          "sha256": "5d904861a4279ddb52b3f995ad9c2c0efd27ee09155756f70d21dcc444753bf8",
+          "src": "/brand/approved/legacy-gallery/gallery-1uS4R7HGAvjKGWutzUknCF7Ay_zHv-GYn-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Oreo"
+      "variant": "Oreo",
+      "sourceSha256": "3924bf10438c8f18564e0cb8490dc53c8308dfc8b7ae41d675d1d6ac06046bf6",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1YsjXfUgPwjN0_n08VwqXslRreVv37dbt",
@@ -2764,11 +3264,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 15668,
+          "sha256": "cb2daa5d1ee3c3fe0ee69a2878270c24fd58eddcbb43eb803c8da090d7d8be48",
+          "src": "/brand/approved/legacy-gallery/gallery-1YsjXfUgPwjN0_n08VwqXslRreVv37dbt-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 45572,
+          "sha256": "6af880287c265d5b4e89bce19876d8f1e0f6ca03e1ccdeff72ebc05069055cc3",
+          "src": "/brand/approved/legacy-gallery/gallery-1YsjXfUgPwjN0_n08VwqXslRreVv37dbt-960.webp"
+        }
+      ],
       "alt": "Alternate approved special-flavours-cake photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Pistacchio"
+      "variant": "Pistacchio",
+      "sourceSha256": "3c6a891cd865d4a0699fb7149e526eace70d23b77b469b299707fd543edb0d13",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1DGmVdtFJAPrYBguQjjFM_LPHnM-WGR4m",
@@ -2778,11 +3298,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 20168,
+          "sha256": "ef8ee48305b98119212b7cce7f5fd8df472c6510032fe7f9e951aa2fed15e869",
+          "src": "/brand/approved/legacy-gallery/gallery-1DGmVdtFJAPrYBguQjjFM_LPHnM-WGR4m-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 66748,
+          "sha256": "bf5948a250b2294449d96ef8e761b2322c20d9369697da2c7a4d9ff1bd20a019",
+          "src": "/brand/approved/legacy-gallery/gallery-1DGmVdtFJAPrYBguQjjFM_LPHnM-WGR4m-960.webp"
+        }
+      ],
       "alt": "Alternate approved special-flavours-cake photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Pistacchio"
+      "variant": "Pistacchio",
+      "sourceSha256": "069bddccff71e608752385e5f20dbd7f552e1a394c50d800b3380f8d0e349278",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1D1UnOXDuf8CqTKgpLgc0o69fuULFGG99",
@@ -2814,11 +3354,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 21950,
+          "sha256": "b9591ee55ee513c2bac66192308ba52dd2a48fafe3a188bdb1a58c7b5e483319",
+          "src": "/brand/approved/legacy-gallery/gallery-1IvJuul7sz_lvDO1QQJhEspCfZe5C2BT6-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 62250,
+          "sha256": "3977d74e1425e78782496125f9d06d702f53cbcc3661fb5e99ed5e24c5fd35dd",
+          "src": "/brand/approved/legacy-gallery/gallery-1IvJuul7sz_lvDO1QQJhEspCfZe5C2BT6-960.webp"
+        }
+      ],
       "alt": "Alternate approved special-flavours-cake photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Rosettas"
+      "variant": "Rosettas",
+      "sourceSha256": "fdcaa48a8ed6263f13f84dd98be492080b21c42cf87775d232d7d19efe3b1747",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1E7WSR6YjW1Wtv4M-yhMBt3MiqY4prOrY",
@@ -2828,11 +3388,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 24030,
+          "sha256": "e20b2cac2257bad70f42fb78b98d3d3e1b80b141c3ed756e42ba57e3bd3c0cf0",
+          "src": "/brand/approved/legacy-gallery/gallery-1E7WSR6YjW1Wtv4M-yhMBt3MiqY4prOrY-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 74724,
+          "sha256": "46b990bf59856dec06cb20bbdd0260be9e34238d64bc2f8820d485a5bdd3217e",
+          "src": "/brand/approved/legacy-gallery/gallery-1E7WSR6YjW1Wtv4M-yhMBt3MiqY4prOrY-960.webp"
+        }
+      ],
       "alt": "Alternate approved special-flavours-cake photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Saffron"
+      "variant": "Saffron",
+      "sourceSha256": "0f783a01314a7b0f400570d9b23c89b0dce8ed5e5de991a8f8933a54a65ace0d",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1Nz-_8JJkyLEmhcj5uwZNUD02EN3Psapi",
@@ -2842,11 +3422,31 @@
         "/menu"
       ],
       "usage": "alternate gallery candidate; existing UI has no gallery",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 25090,
+          "sha256": "aeaed71e932e4c388af8447ecbbcc2b7ef8b4875828466e0ce05f6b402ed1da3",
+          "src": "/brand/approved/legacy-gallery/gallery-1Nz-_8JJkyLEmhcj5uwZNUD02EN3Psapi-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 74686,
+          "sha256": "e8268997bc8ddbcdbc361163a342a771fd9ad2c7a4679a11b3adcbb9211e630c",
+          "src": "/brand/approved/legacy-gallery/gallery-1Nz-_8JJkyLEmhcj5uwZNUD02EN3Psapi-960.webp"
+        }
+      ],
       "alt": "Alternate approved tres-leches photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Vanilla Strawberry"
+      "variant": "Vanilla Strawberry",
+      "sourceSha256": "bfd87861cf2424e5e5c3411c2787f7e73f320b407a8729f9dabda90d935da302",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "1_DaQHMhtDSFYqhATw-3Ub3RAPfigeSSE",
@@ -2856,11 +3456,31 @@
         "/menu"
       ],
       "usage": "alternate angle",
-      "derivatives": [],
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 320,
+          "format": "webp",
+          "bytes": 26586,
+          "sha256": "beb56809cc7f720cd79783cf414133f63ffc8dcffe89a9030137469f74c22cfc",
+          "src": "/brand/approved/legacy-gallery/gallery-1_DaQHMhtDSFYqhATw-3Ub3RAPfigeSSE-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 641,
+          "format": "webp",
+          "bytes": 74624,
+          "sha256": "73ac541f33c074495ed5237cd705c7c63c2882366a93fd289e0baeca43297118",
+          "src": "/brand/approved/legacy-gallery/gallery-1_DaQHMhtDSFYqhATw-3Ub3RAPfigeSSE-960.webp"
+        }
+      ],
       "alt": "Alternate Saffron cake photograph",
-      "status": "available but unused",
+      "status": "assigned",
       "reason": "Alternate approved angle retained for future gallery",
-      "variant": "Saffron"
+      "variant": "Saffron",
+      "sourceSha256": "108357f69e30d16b03d826f2b433a5da43dc75fa5a5d1707d168167500caa23c",
+      "width": 960,
+      "height": 641
     },
     {
       "sourceId": "3l-ai-concha-traditional-chocolate-20261010",
@@ -2928,6 +3548,186 @@
       "mediaKind": "digital-illustration",
       "presentation": "menu-reference",
       "replacementStatus": "AWAITING FOUNDER-APPROVED IMAGES"
+    },
+    {
+      "sourceId": "ph-tarta-02",
+      "sourceFilename": "TARTA/02.jpg",
+      "family": "cheesecake",
+      "variant": "",
+      "size": null,
+      "status": "assigned",
+      "alt": "Cheesecake",
+      "width": 685,
+      "height": 960,
+      "sourceSha256": "cd0d7fe3b4aac765b1c75b18da19cfdd96f3956cc12abf5b5b59beb2cccc9aa0",
+      "derivatives": [
+        {
+          "width": 343,
+          "height": 480,
+          "format": "webp",
+          "bytes": 16480,
+          "sha256": "d9be258ddbb8911984cd134920084769b02b244442b05d28ed0b793421e40851",
+          "src": "/brand/approved/ph/ph-tarta-02-480.webp"
+        },
+        {
+          "width": 685,
+          "height": 960,
+          "format": "webp",
+          "bytes": 43974,
+          "sha256": "22fb463b05829e60c1fc26a3a4ee5d08c7a8ce35164123de26c7a511ad326fe1",
+          "src": "/brand/approved/ph/ph-tarta-02-960.webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "ph-tarta-01",
+      "sourceFilename": "TARTA/01.jpg",
+      "family": "cheesecake",
+      "variant": "",
+      "size": null,
+      "status": "assigned",
+      "alt": "Cheesecake",
+      "width": 540,
+      "height": 960,
+      "sourceSha256": "3930ae843ae3b5e36827a87f3701dd3dad2f9bd8f469965834a1cde57d6fe9e3",
+      "derivatives": [
+        {
+          "width": 270,
+          "height": 480,
+          "format": "webp",
+          "bytes": 14178,
+          "sha256": "21cc6cf27ed51e7c2df364e812ed4d2120367b4c6cb8f7ff53db8f55149b544e",
+          "src": "/brand/approved/ph/ph-tarta-01-480.webp"
+        },
+        {
+          "width": 540,
+          "height": 960,
+          "format": "webp",
+          "bytes": 36402,
+          "sha256": "48e5091e3f47842ab3088b904368b4104c3aaafeb46ebfdb3097e6dedf24421a",
+          "src": "/brand/approved/ph/ph-tarta-01-960.webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "ph-tarta-03",
+      "sourceFilename": "TARTA/03.jpg",
+      "family": "cheesecake",
+      "variant": "",
+      "size": null,
+      "status": "assigned",
+      "alt": "Cheesecake",
+      "width": 960,
+      "height": 540,
+      "sourceSha256": "77ac1e3ce95966857837e3c8e70287866a1a9a45405235736e642a273126d8c0",
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 270,
+          "format": "webp",
+          "bytes": 19104,
+          "sha256": "9204e8588edb68feeb01c1ca9b34f4e4d851a1810c40d027bd31a58c7034baf8",
+          "src": "/brand/approved/ph/ph-tarta-03-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "format": "webp",
+          "bytes": 49618,
+          "sha256": "4dcf47324f7a1ab332a01ac6b47b60f338a2ee8764a0e97c045157cf88875898",
+          "src": "/brand/approved/ph/ph-tarta-03-960.webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "ph-tarta-04",
+      "sourceFilename": "TARTA/04.jpg",
+      "family": "carrot-cake",
+      "variant": "",
+      "size": null,
+      "status": "assigned",
+      "alt": "Carrot cake",
+      "width": 960,
+      "height": 540,
+      "sourceSha256": "ff27001352f7934be4187179d6e5cda7b4ac02d28861f1c8c89410903ecb0914",
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 270,
+          "format": "webp",
+          "bytes": 23376,
+          "sha256": "ffd8d849e972989860563655ff0a9c2f3e84daa9edbee3ea5aeb3adc560b193b",
+          "src": "/brand/approved/ph/ph-tarta-04-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "format": "webp",
+          "bytes": 59978,
+          "sha256": "41f7182089aa6c9d25d6ddad751e49a04308c0caccbb5f202441ad251fad7b73",
+          "src": "/brand/approved/ph/ph-tarta-04-960.webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "ph-tarta-05",
+      "sourceFilename": "TARTA/05.jpg",
+      "family": "carrot-cake",
+      "variant": "",
+      "size": null,
+      "status": "assigned",
+      "alt": "Carrot cake",
+      "width": 960,
+      "height": 540,
+      "sourceSha256": "9143a8d414d1b39dbdf71bdc5b6999b06a18b5995a0be188d6deed54f590f1eb",
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 270,
+          "format": "webp",
+          "bytes": 22264,
+          "sha256": "d8f263dc7590a395c3beecdc5f2e58ae6bd191a2819087f6a8ef28adf0bbe767",
+          "src": "/brand/approved/ph/ph-tarta-05-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "format": "webp",
+          "bytes": 56934,
+          "sha256": "3544ece4e710945b600be7495f8fc8aef47fcffec7b08dde40a66844f4aa141e",
+          "src": "/brand/approved/ph/ph-tarta-05-960.webp"
+        }
+      ]
+    },
+    {
+      "sourceId": "ph-tarta-06",
+      "sourceFilename": "TARTA/06.jpg",
+      "family": "carrot-cake",
+      "variant": "",
+      "size": null,
+      "status": "assigned",
+      "alt": "Carrot cake",
+      "width": 960,
+      "height": 540,
+      "sourceSha256": "07d246db1061f2e5338d5ddb4fd5a88126794baa32ca1a4d8af79443cadbdcff",
+      "derivatives": [
+        {
+          "width": 480,
+          "height": 270,
+          "format": "webp",
+          "bytes": 24106,
+          "sha256": "8ff260229960332b250abbf3d6330c585ba87d6bf262a4b59f43e30773fe617f",
+          "src": "/brand/approved/ph/ph-tarta-06-480.webp"
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "format": "webp",
+          "bytes": 60578,
+          "sha256": "3b7a655210f80903864c0478e950ffa0353c852c86fbbf072d3745c5d9f77bd0",
+          "src": "/brand/approved/ph/ph-tarta-06-960.webp"
+        }
+      ]
     }
   ],
   "editorial": [
@@ -3223,7 +4023,9 @@
       "slug": "tres-leches--vanilla-strawberry",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1SAFjwElHzkXtQfxLRSSxNpie7FTSO8YD",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1Nz-_8JJkyLEmhcj5uwZNUD02EN3Psapi"
+      ],
       "familyId": "tres-leches",
       "variant": "Vanilla Strawberry"
     },
@@ -3232,7 +4034,10 @@
       "slug": "tres-leches--classic",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1AQVsRpJ6v13GhTGJEICFDPK-vyq13DJO",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1xiNbch518T7N2unCqgl4Q0yKm6uHr8iM",
+        "1Rlks5Qh3CAy6AahTkE_JdZHmRunGh7VG"
+      ],
       "familyId": "tres-leches",
       "variant": "Classic"
     },
@@ -3241,7 +4046,10 @@
       "slug": "tres-leches--nutella",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1xZMi2wjmbPuK9-KQthnfv_K8AvRlLBXb",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1UNayOgEccgx-XIcSzAGc5Aug5EBXoHqg",
+        "1NITcQTTTk7c6l2jCRSDgCN_Rl5TcLEtB"
+      ],
       "familyId": "tres-leches",
       "variant": "Nutella"
     },
@@ -3250,7 +4058,10 @@
       "slug": "tres-leches--caffe-latte",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1UOxCTO1a2wbHKtWGe7pB1Y9tvfDeU0sI",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "10QUSo0ZTcIsa-Cn5M16m6HU8BnsmxFx8",
+        "1OCUl8T28sX_TQO2nsfdumiBqCpttvZ16"
+      ],
       "familyId": "tres-leches",
       "variant": "Caffe Latte"
     },
@@ -3259,7 +4070,9 @@
       "slug": "tres-leches--coconut",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1OCd7HYnPsl_ZbjF4m1SvRDMWKDN7OftN",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1WGsbj1r6SUw-ukBwz9XoDjVndS1iTwmF"
+      ],
       "familyId": "tres-leches",
       "variant": "Coconut"
     },
@@ -3268,7 +4081,10 @@
       "slug": "tres-leches--confetti",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1eJaF3IF79qvg_P-Jh0fFhb9mPsgqasv7",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "10y0hOJfLOVECo3q0WkjuYe102M_doy9Q",
+        "1dg9Vns0PbcK9engCIFStu3UdG8cLeFyF"
+      ],
       "familyId": "tres-leches",
       "variant": "Confetti"
     },
@@ -3277,7 +4093,10 @@
       "slug": "tres-leches--lotus",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1U_I7bIHh5eR1FELk61uKe4wTkLvZ6oPP",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1vmFqj39W--kVhw8Y7b3ZtWXg3xeuZ5ne",
+        "1EldYZ3-qAk5TkUVgNUueuNaf7l69sE22"
+      ],
       "familyId": "tres-leches",
       "variant": "Lotus"
     },
@@ -3286,7 +4105,10 @@
       "slug": "tres-leches--m-ms",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1LIEZjzeslI-ZMpGYCfk8zqeGB5tqP7Xq",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "10nVZ0SCXQgrQEpF8UiOX9t52bbHmT-t2",
+        "1SA1FMsYgvhUg09SQ7qEIaqGmHTV9QwAa"
+      ],
       "familyId": "tres-leches",
       "variant": "M&Ms"
     },
@@ -3295,7 +4117,9 @@
       "slug": "tres-leches--oreo",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1jI6gdcjCpMYgwG5mc-0J_om6s2j2RVDr",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1uS4R7HGAvjKGWutzUknCF7Ay_zHv-GYn"
+      ],
       "familyId": "tres-leches",
       "variant": "Oreo"
     },
@@ -3304,7 +4128,10 @@
       "slug": "tres-leches-premium--dulce-de-leche",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1ZfXU_Gaeg4Rd3dPVmMZS6dsucnwVWraF",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1l1CXVunDeEnfxUmIEKdHm_hh_a67iOsv",
+        "114pW6AeVXqBVA7D23OV8EKJbPBEa6j5s"
+      ],
       "familyId": "tres-leches-premium",
       "variant": "Dulce de Leche"
     },
@@ -3322,7 +4149,10 @@
       "slug": "tres-leches-mango--mango",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "17PHX1fgmJXdAsdA2HQKWkVW6kyg8rt_G",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1r7yRUr-0ewurtOPuggUBoocBY_XqICjb",
+        "1K8V3mdQQcq51-5LHr8iIML3kHIwqnq3t"
+      ],
       "familyId": "tres-leches-mango",
       "variant": "Mango"
     },
@@ -3367,7 +4197,10 @@
       "slug": "special-flavours-cake--pistacchio",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1Z4vZNR3PPsndURye2AfcD9CjoBfeeOF0",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1YsjXfUgPwjN0_n08VwqXslRreVv37dbt",
+        "1DGmVdtFJAPrYBguQjjFM_LPHnM-WGR4m"
+      ],
       "familyId": "special-flavours-cake",
       "variant": "Pistacchio"
     },
@@ -3385,7 +4218,9 @@
       "slug": "special-flavours-cake--rosettas",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1pJ9RvHUzcor5MlJcuAFh_-cnXC2MovUS",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1IvJuul7sz_lvDO1QQJhEspCfZe5C2BT6"
+      ],
       "familyId": "special-flavours-cake",
       "variant": "Rosettas"
     },
@@ -3394,7 +4229,10 @@
       "slug": "special-flavours-cake--saffron",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1uF3N2VrJvySMHYoYxaOVgUmVdcb4OPCG",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1E7WSR6YjW1Wtv4M-yhMBt3MiqY4prOrY",
+        "1_DaQHMhtDSFYqhATw-3Ub3RAPfigeSSE"
+      ],
       "familyId": "special-flavours-cake",
       "variant": "Saffron"
     },
@@ -3511,7 +4349,9 @@
       "slug": "cake-jar-bundle",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1rTHqazck_5X9O-4bRbv48qCpS0QpnHiT",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1K0D3bWFYXJX2fPr71Fqhf-nxdmPAWDYB"
+      ],
       "familyId": "cake-jar-bundle",
       "variant": ""
     },
@@ -3573,8 +4413,11 @@
       "productId": "carrot-cake",
       "slug": "carrot-cake",
       "status": "PHOTO PENDING FROM LISA",
-      "primarySourceId": null,
-      "gallerySourceIds": [],
+      "primarySourceId": "ph-tarta-04",
+      "gallerySourceIds": [
+        "ph-tarta-05",
+        "ph-tarta-06"
+      ],
       "familyId": "carrot-cake",
       "variant": ""
     },
@@ -3582,8 +4425,11 @@
       "productId": "cheesecake",
       "slug": "cheesecake",
       "status": "PHOTO PENDING FROM LISA",
-      "primarySourceId": null,
-      "gallerySourceIds": [],
+      "primarySourceId": "ph-tarta-02",
+      "gallerySourceIds": [
+        "ph-tarta-01",
+        "ph-tarta-03"
+      ],
       "familyId": "cheesecake",
       "variant": ""
     },
@@ -3718,7 +4564,13 @@
       "slug": "cake-topper",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1PPfBb0zDzygPb4o5oklRJZAy843rH75s",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1kPaZKFo69Y0odxVRz5eIEkBjNNYrWLik",
+        "1GH3vta4GzmdxrVyAhSsC21EuuEX8WQG0",
+        "1jDwqeq30bTCFEPn_1BbYEpu9R8w32Ucv",
+        "1oT9rAwdPgMJPHK9BbQg0Qwv_GtPoBHXx",
+        "1OolFUtbCjnDi11uhoFbHceCfCyOLP8AG"
+      ],
       "familyId": "cake-topper",
       "variant": ""
     },
@@ -3727,7 +4579,9 @@
       "slug": "candles",
       "status": "FINAL PHOTO AVAILABLE",
       "primarySourceId": "1-yxiwJ39gk3YJNHW8h6ALuZisG2NZ_qm",
-      "gallerySourceIds": [],
+      "gallerySourceIds": [
+        "1MtH1x7-v1vtWHSMGkmbQF0d2bxD71n2w"
+      ],
       "familyId": "candles",
       "variant": ""
     }

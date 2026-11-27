@@ -1,3 +1,4 @@
+import { storefrontSkuPublished } from "../catalog/storefront-api";
 import { fulfillmentPending } from "../../shared/payment-fulfillment";
 import {
   liveLinePrice,
@@ -7,6 +8,7 @@ import {
 import {
   commerceLineSchema,
   distinctLines,
+  itemQuantitySchema,
   lineKey,
 } from "../../shared/pack-composition";
 import {
@@ -19,7 +21,6 @@ import { frozenCheckout } from "./frozen-checkout";
 import {
   availableSku,
   RETIRED_SKUS,
-  MAX_ITEM_QUANTITY,
   validWindow,
   leadHours,
   DELIVERY_WINDOWS,
@@ -114,7 +115,7 @@ const lines = z
 export const webQuoteSchema = z
   .object({
     productId: z.string().min(1).max(100),
-    quantity: z.number().int().min(1).max(MAX_ITEM_QUANTITY),
+    quantity: itemQuantitySchema,
     zoneId: z.string().min(1).max(100),
   })
   .strict();
@@ -790,13 +791,15 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
   const s = service.store.read();
   validatePackLines(s, input.lines);
   requireThat(
-    !input.lines.some((l) => RETIRED_SKUS.has(l.productId)),
+    input.lines.every((l) =>
+      !RETIRED_SKUS.has(l.productId) && storefrontSkuPublished(s, l.productId),
+    ),
     "Product unavailable",
     422,
   );
   requireThat(
     input.lines.every((l) => availableSku(l.productId)),
-    "This product is outside its ordering season",
+    "This product is not available for online ordering",
     422,
   );
   requireThat(

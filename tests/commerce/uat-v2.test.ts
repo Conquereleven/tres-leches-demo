@@ -79,10 +79,10 @@ test("UAT V2: international WhatsApp requires an explicit country prefix and nor
   ])
     assert.equal(normalizeWhatsAppNumber(value), null);
 });
-test("UAT V2: Pan singles available today while packs remain year-round", () => {
+test("UAT V2: Pan singles and packs remain year-round", () => {
   const sku = "pan-de-muerto-traditional-azucar-mini-40-g";
   assert.equal(availableSku(sku, new Date("2026-10-03T00:00:00+04:00")), true);
-  assert.equal(availableSku(sku, new Date("2026-11-16T00:00:00+04:00")), false);
+  assert.equal(availableSku(sku, new Date("2026-11-16T00:00:00+04:00")), true);
   assert.equal(
     availableSku(
       "pan-de-muerto-traditional-pack-6-mini",

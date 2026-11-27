@@ -1,19 +1,13 @@
-/**
- * SOURCE-LOCKED VisualLab V3.2 purchase component.
- * DOM hierarchy and colors rebuilt from ZIP:
- * src/components/ProductPopup.jsx + ProductCard.jsx and REF_C/REF_D.
- * Only SKU/pricing/availability/cart adapters originate from 3L Commerce.
- * No old storefront view or legacy v32 modal styling is mounted.
- */
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { createPortal } from "react-dom";
-import { useMenu, menuProductFamily, type StorefrontProduct } from "../menu";
+/* Commercial purchase state with the approved VR008 contextual presentation. */
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useMenu, menuProductFamily, type MenuOption, type StorefrontProduct } from "../menu";
 import { useCheckoutConfig, useCheckoutNow, useCart, cart, displayLinePrice, minQty, MAX_QTY } from "../cart";
-import { useLanguage } from "../localization";
-import { availableSku } from "../../../shared/commerce-policy";
-import { liveOrderable } from "../live-catalog";
-import { selectedProductMedia, publishedMediaAuthority } from "../media";
+import { useLanguage, type Locale } from "../localization";
+import { useLiveCatalog, type LiveState } from "../live-catalog";
+import { purchasableOptions } from "./catalog-availability";
+import { MediaPicture, MediaRotation, productGalleryMedia, selectedProductMedia, publishedMediaAuthority } from "../media";
 import { formatAed } from "../content";
+import { localizedMoney, localizedSource } from "../locales/engine";
 import { cakeSizeForSku, cakeSizeName, cakeServingCopy, validCakeMessage } from "../../../shared/cake-personalization";
 import { packChoices, packQtyLabel, presentationLabel, toPackChoice } from "./catalog-options";
 import { packSpec, componentName, type Composition } from "../../../shared/pack-composition";
@@ -21,67 +15,111 @@ import { tricolorSpec, TRICOLOR_COLORS, tricolorCopy, type TricolorColor } from 
 import "./approved-source.css";
 
 const words={
- es:{size:"Tamaño",variant:"Variante",presentation:"Presentación",price:"Precio",quantity:"Cantidad",boxes:"Cantidad de cajas",note:"Personalización",optional:"(opcional)",placeholder:'Ej. "Feliz cumpleaños"',add:"Agregar al carrito",unavailable:"No disponible",notReady:"Selecciona todos los sabores antes de continuar",noteHold:"La inscripción supera el límite del tamaño seleccionado.",pieces:"piezas por caja",unit:"pieza",close:"Cerrar",min:"Pedido mínimo",select:"Seleccionar color",contains:"Contenido de la caja"},
- en:{size:"Size",variant:"Choose a variant",presentation:"Presentation",price:"Price",quantity:"Quantity",boxes:"Number of boxes",note:"Personalization",optional:"(optional)",placeholder:"e.g. Happy birthday",add:"Add to cart",unavailable:"Unavailable",notReady:"Select every flavor before continuing",noteHold:"The inscription exceeds the character limit for this size.",pieces:"pieces per box",unit:"piece",close:"Close",min:"Minimum order",select:"Select color",contains:"Pieces in box"},
- ar:{size:"الحجم",variant:"اختر النوع",presentation:"الحجم",price:"السعر",quantity:"الكمية",boxes:"عدد العلب",note:"التخصيص",optional:"(اختياري)",placeholder:"مثلاً عيد ميلاد سعيد",add:"أضف إلى السلة",unavailable:"غير متاح",notReady:"اختر الأصناف للمتابعة",noteHold:"الكتابة تتجاوز الحد المسموح لهذا الحجم.",pieces:"قطع في العلبة",unit:"قطعة",close:"إغلاق",min:"الحد الأدنى للطلب",select:"اختر اللون",contains:"القطع في العلبة"}
+ es:{size:"Tamaño",variant:"Variante",presentation:"Presentación",price:"Precio",quantity:"Cantidad",boxes:"Cantidad de cajas",note:"Personalización",optional:"(opcional)",placeholder:'Ej. "Feliz cumpleaños"',add:"Agregar al carrito",unavailable:"No disponible",notReady:"Selecciona todos los sabores antes de continuar",noteHold:"La inscripción supera el límite del tamaño seleccionado.",pieces:"piezas por caja",unit:"pieza",close:"Cerrar",min:"Pedido mínimo",select:"Seleccionar color",contains:"Contenido de la caja",decrease:"Reducir cantidad",increase:"Aumentar cantidad"},
+ en:{size:"Size",variant:"Choose a variant",presentation:"Presentation",price:"Price",quantity:"Quantity",boxes:"Number of boxes",note:"Personalization",optional:"(optional)",placeholder:"e.g. Happy birthday",add:"Add to cart",unavailable:"Unavailable",notReady:"Select every flavor before continuing",noteHold:"The inscription exceeds the character limit for this size.",pieces:"pieces per box",unit:"piece",close:"Close",min:"Minimum order",select:"Select color",contains:"Pieces in box",decrease:"Decrease quantity",increase:"Increase quantity"},
+ ar:{size:"الحجم",variant:"اختر النوع",presentation:"الحجم",price:"السعر",quantity:"الكمية",boxes:"عدد العلب",note:"التخصيص",optional:"(اختياري)",placeholder:"مثلاً عيد ميلاد سعيد",add:"أضف إلى السلة",unavailable:"غير متاح",notReady:"اختر الأصناف للمتابعة",noteHold:"الكتابة تتجاوز الحد المسموح لهذا الحجم.",pieces:"قطع في العلبة",unit:"قطعة",close:"إغلاق",min:"الحد الأدنى للطلب",select:"اختر اللون",contains:"محتويات العلبة",decrease:"تقليل الكمية",increase:"زيادة الكمية"}
 } as const;
-type AnchorSide="left"|"right"|"overlap"|"mobile"|"compact";
-type AnchorPlace=CSSProperties&{left:number;top:number;width:number;maxHeight:number};
 
-export function ApprovedProductCard({product,familyId,variant,price,active,onSelect}:{
+export const storefrontMoney = (amount: number, language: Locale) =>
+ language === "ar" ? localizedMoney(amount, language) : formatAed(amount);
+
+function publishedProduct(product: StorefrontProduct, catalog: LiveState) {
+ return catalog.status === "live" ? catalog.catalog.products.find(entry => entry.id === product.id) : undefined;
+}
+
+export function productTitle(product: StorefrontProduct, language: Locale, catalog: LiveState, text: (source: string) => string) {
+ return publishedProduct(product,catalog)?.content[language]?.name ?? (language==="en"?product.title:text(product.title));
+}
+export function productDescription(product: StorefrontProduct, language: Locale, catalog: LiveState) {
+ return publishedProduct(product,catalog)?.content[language]?.description ??
+   (product.description ? localizedSource(product.description, language) : null);
+}
+
+export function useProductTitle(product: StorefrontProduct) {
+ const {language,text}=useLanguage();
+ return productTitle(product,language,useLiveCatalog(),text);
+}
+
+export function ApprovedProductCard({product,familyId,variant,price,active,onSelect,children,gallery=false,detailsHref}:{
  product:StorefrontProduct;familyId:string;variant:string;price:number|null;
- active:boolean;onSelect:(element:HTMLButtonElement)=>void;
+ active:boolean;onSelect:(element:HTMLButtonElement)=>void;children?:ReactNode;gallery?:boolean;detailsHref?:string;
 }){
  const {language}=useLanguage();
+ const title=useProductTitle(product);
+ const published=useLiveCatalog();
+ const description=productDescription(product,language,published);
  const menu=useMenu();
  const family=menu.families.find(f=>f.id===familyId);
  const media=selectedProductMedia(product.id,familyId,variant);
- const url=media?.derivatives.find(d=>d.format==="webp")?.src??media?.derivatives[0]?.src
-  ??(!publishedMediaAuthority()?family?.image:null);
- // A published image that fails to load falls back to the same approved
- // pending placeholder instead of a broken frame (neutral-placeholder
- // commercial guarantee, same as the no-photo state).
- const [failed,setFailed]=useState(false);
- useEffect(()=>{setFailed(false);},[url]);
- return <button className={"ref32-product"+(active?" ref32-product-active":"")} type="button"
-   data-product-id={product.id} data-category-id={family?.category??""}
-   data-selected-product={active} aria-haspopup="dialog" aria-expanded={active}
-   disabled={price===null} onClick={event=>onSelect(event.currentTarget)}>
-   <span className="ref32-photo">
-     {url&&!failed?<img src={url} alt={product.title} loading="lazy" onError={()=>setFailed(true)}/>:
-       <span className="ref32-photo-pending" role="img" aria-label={product.title+" — photograph pending"}>
+ const additional=gallery&&media?productGalleryMedia(product.id,familyId,variant):[];
+ const [photoHeld,setPhotoHeld]=useState(false);
+ const [failedFallback,setFailedFallback]=useState<string|null>(null);
+ const sizes="(max-width:599px) 46vw, (max-width:1099px) 30vw, 22vw";
+ const fallback=publishedMediaAuthority()?null:family?.image;
+ const category=family?.category;
+ const feature=category==="pan"?" tile-pan":category==="conchas"?" tile-conchas":category==="panettone"?" tile-panettone":category==="cakes"?" tile-cake":/oreja/i.test(product.slug)?" tile-orejas":"";
+ const body=<>
+   <span className="ref32-photo tile-photo" data-fit={family?.category==="panettone"?"whole":undefined}>
+     {media&&additional.length?<MediaRotation key={media.sourceId} frames={[media,...additional]} alt=""
+       className="product-media" sizes={sizes} focusable={false} paused={active||photoHeld}/>:
+       media?<MediaPicture key={media.sourceId} asset={media} alt="" className="product-media" sizes={sizes} placeholderOnError/>:
+       fallback&&fallback!==failedFallback?<img className="product-media" src={fallback} alt="" loading="lazy" decoding="async"
+         onError={()=>setFailedFallback(fallback)}/>:
+       <span className="ref32-photo-pending" role="img" aria-label={title}>
          <strong>✧ 3L</strong><small>{language==="es"?"Fotografía pendiente":language==="ar"?"الصورة قيد الإعداد":"Photo pending"}</small>
        </span>}
-     <span className={"ref32-card-mark"+(active?" ref32-card-mark-selected":"")} aria-hidden="true">
-       {active?<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="m4 12 5 5L20 6"/></svg>:
-       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M20.8 8.1c0 4-5 7.4-8.8 10.9C8.2 15.5 3.2 12.1 3.2 8.1c0-4 5.2-5.8 8.8-2.2 3.6-3.6 8.8-1.8 8.8 2.2Z"/></svg>}
-     </span>
+     {active&&<span className="picked" aria-hidden="true"><svg className="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="m4 12 5 5L20 6"/></svg></span>}
    </span>
-   <span className="ref32-product-copy">
-     <strong>{product.title}</strong>
-     {product.description&&<em>{product.description}</em>}
-     <span className="ref32-product-bottom"><span>{price===null?words[language].unavailable:
-       (language==="es"?"Desde ":"From ")+formatAed(price)}</span>
-       <span className="ref32-product-arrow" aria-hidden="true">→</span>
-     </span>
+   <span className="tile-copy ref32-product-copy">
+     <strong>{title}</strong>
+     {description&&<em>{description}</em>}
+     <span>{price===null?words[language].unavailable:
+       (language==="es"?"Desde ":language==="ar"?"ابتداءً من ":"From ")+storefrontMoney(price,language)}</span>
+     <i aria-hidden="true">→</i>
    </span>
- </button>;
+ </>;
+ const attributes={className:"ref32-product tile-button","data-product-id":product.id,"data-category-id":family?.category??""};
+ return <><article className={"tile"+feature+(active?" is-selected":"")}>
+   {detailsHref?<a {...attributes} href={detailsHref}>{body}</a>:
+    <button {...attributes} type="button" data-selected-product={active} aria-haspopup="dialog" aria-expanded={active}
+      aria-controls={active?"product-panel":undefined} disabled={price===null} onClick={event=>onSelect(event.currentTarget)}
+      onFocus={gallery?()=>setPhotoHeld(true):undefined} onBlur={gallery?()=>setPhotoHeld(false):undefined}>{body}</button>}
+ </article>{children}</>;
 }
+
 export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  product:StorefrontProduct;anchor:HTMLElement|null;onClose:()=>void;onAdded:()=>void;
 }){
  const {language}=useLanguage();const t=words[language];
- const menu=useMenu();const family=menuProductFamily(menu,product);
+ const menu=useMenu();
  const {config,loading}=useCheckoutConfig();const now=useCheckoutNow(config);
+ const [variantId,setVariantId]=useState(product.id);
+ const category=menuProductFamily(menu,product).category;
+ const optionsFor=(item:StorefrontProduct)=>purchasableOptions(menuProductFamily(menu,item),menu.status,config,now);
+ const variants=category==="pan"||category==="panettone"
+  ? menu.products.filter(item=>item.familyId===product.familyId&&optionsFor(item).length>0)
+  : [];
+ const current=variants.find(item=>item.id===variantId)??product;
+ const family=menuProductFamily(menu,current);
  const lines=useCart();
- const allowed=family.options.filter(option=>{
-  const record=config?.products.find(p=>p.id===option.id);
-  return availableSku(option.id,now)&&!!record&&record.priceFils===option.priceFils&&
-    (menu.status!=="live"||liveOrderable(option.id)===true);
- });
+ const title=useProductTitle(current);
+ const published=useLiveCatalog();
+ const description=productDescription(current,language,published);
+ const allowed=optionsFor(current);
  const grouped=packChoices(allowed);
+ const liveOptions=publishedProduct(current,published)?.options;
+ const hasMultipleFlavors=new Set(allowed.map(item=>item.variant)).size>1;
+ const localizedOption=(option:MenuOption,source:string)=>{
+  const content=liveOptions?.find(item=>item.id===option.id)?.content[language];
+  const cakeLabels={Mini:{es:"Mini",ar:"صغير جداً"},Small:{es:"Pequeño",ar:"صغير"},Medium:{es:"Mediano",ar:"متوسط"}};
+  const size=cakeLabels[source as keyof typeof cakeLabels];
+  const label=content?.sizeLabel??(language==="en"?source:size?size[language]:localizedSource(source,language));
+  const flavor=hasMultipleFlavors&&option.variant?(content?.variantLabel??localizedSource(option.variant,language)):null;
+  return flavor&&flavor!==label?`${flavor} · ${label}`:label;
+ };
  const cakeSizing=family.category==="cakes" && allowed.length>0 &&
    allowed.every(option=>cakeSizeForSku(option.id)!==null);
+ const showSize=cakeSizing||family.category==="panettone";
  const rank={mini:0,small:1,medium:2};
  const sorted=[...allowed].sort((a,b)=>{
   if(cakeSizing) return rank[cakeSizeForSku(a.id)!.key]-rank[cakeSizeForSku(b.id)!.key];
@@ -101,16 +139,14 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const serving=activeCake?cakeServingCopy(activeCake,language):null;
  const noteTooLong=!!activeCake&&note.trim().length>activeCake.maxCharacters;
  const [presentation,setPresentation]=useState(selected?.presentation??"");
- // Checkout config/live catalog are asynchronous. Initial state can be empty:
- // synchronize the chosen SKU and presentation when authoritative options arrive.
+ // A catalog refresh can withdraw the selected size while the popup is open.
+ // Reset its preparation choices before offering the remaining size.
  const availableKey=allowed.map(option=>option.id).join("|");
  useEffect(()=>{
-  if(!allowed.length)return;
-  const first=sorted[0]!;
-  setSku(current=>allowed.some(option=>option.id===current)?current:first.id);
-  setPresentation(current=>grouped?.presentations.includes(current)?current:toPackChoice(first).presentation);
-  setQty(current=>Math.max(current,minQty(first.id)));
- },[availableKey,product.id]);
+  if(sku===productId || !productId)return;
+  setSku(productId);setQty(minQty(productId));setComposition([]);setColor(null);setNote("");
+  setPresentation(selected?.presentation??"");
+ },[availableKey,sku,productId,selected?.presentation]);
  const spec=packSpec(productId),tricolor=tricolorSpec(productId);
  const configured=config?.products.find(p=>p.id===productId);
  const personalizedRule=config?.personalizedPacks?.rules.find(rule=>rule.packSkuId===productId);
@@ -122,16 +158,16 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const unit=configured?displayLinePrice({productId,quantity:qty,...(customized?{composition}:{})},configured.priceFils,config?.packPricing):NaN;
  const total=unit*qty;
  const canBuy=!!config?.enabled&&!loading&&!!configured&&
-  packValid&&Number.isFinite(total)&&total>=0&&qty>=minQty(productId)&&
+  sku===productId&&packValid&&Number.isFinite(total)&&total>=0&&qty>=minQty(productId)&&
   inCart+qty<=MAX_QTY&&(!note.trim()||!!activeCake&&validCakeMessage(productId,note.trim()))&&
   (!tricolor||tricolor.kind==="fixed"||!!color);
- const [place,setPlace]=useState<AnchorPlace>({left:12,top:12,width:420,maxHeight:600});
- const [side,setSide]=useState<AnchorSide>("right");
  const dialog=useRef<HTMLElement>(null);const closeControl=useRef<HTMLButtonElement>(null);
- const amount=Number.isFinite(total)?formatAed(total):"—";
+ const amount=Number.isFinite(total)?storefrontMoney(total,language):"—";
  const chooseSku=(id:string)=>{
+  const option=allowed.find(o=>o.id===id);
+  if(!option)return;
   setSku(id);setQty(minQty(id));setComposition([]);setColor(null);
-  const option=allowed.find(o=>o.id===id);if(option)setPresentation(toPackChoice(option).presentation);
+  setPresentation(toPackChoice(option).presentation);
  };
  const selectedOption=(style:string,pieces:number)=>
   grouped?.choices.find(x=>x.presentation===style&&x.pieces===pieces);
@@ -140,77 +176,111 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
   const rest=old.filter(x=>x.componentSkuId!==id);
   return value?[...rest,{componentSkuId:id,units:value}]:rest;
  });
- const quantityControls=<div className="ref32-quantity" role="group"
+ const quantityControls=<div className="ref32-quantity quantity" role="group"
    aria-label={selected&&selected.pieces>1?t.boxes:t.quantity}>
-   <button type="button" aria-label="Decrease quantity" disabled={qty<=minQty(productId)}
+   <button type="button" aria-label={t.decrease} disabled={qty<=minQty(productId)}
      onClick={()=>setQty(q=>Math.max(minQty(productId),q-1))}>−</button>
    <output aria-live="polite">{qty}</output>
-   <button type="button" aria-label="Increase quantity" disabled={inCart+qty>=MAX_QTY}
+   <button type="button" aria-label={t.increase} disabled={inCart+qty>=MAX_QTY}
      onClick={()=>setQty(q=>q+1)}>+</button>
  </div>;
  const buy=()=>{if(!canBuy)return;cart.add(productId,qty,customized?composition:undefined,color??undefined,note.trim()||undefined);onAdded();};
  useLayoutEffect(()=>{
-  const measure=()=>{
-   const viewportWidth=window.innerWidth;
-   const height=Math.round(window.visualViewport?.height??window.innerHeight);
-   const bounds=anchor?.getBoundingClientRect();
-   if(viewportWidth<=640){
-    const compact=height<=720;
-    const width=Math.min(viewportWidth-24,410);
-    const imageBottom=anchor?.querySelector(".ref32-photo")?.getBoundingClientRect().bottom;
-    const wanted=compact?Math.max(12,Math.min(54,Math.round((height-540)/2))):
-       (imageBottom??bounds?.top??20)-5;
-    const top=compact?wanted:Math.max(12,Math.min(wanted,height-430));
-    setPlace({left:Math.round((viewportWidth-width)/2),top,width,maxHeight:height-top-12});
-    setSide(compact?"compact":"mobile");return;
+  const element=dialog.current;
+  const grid=element?.parentElement;
+  if(!element||!grid||!anchor)return;
+  const scrollArea=grid.closest<HTMLElement>(".catalog-products")??grid;
+  let verticalSide: "above" | "below" | undefined;
+  let widthMeasured=0, heightMeasured=0;
+  const place=()=>{
+   const bounds=grid.getBoundingClientRect(),card=anchor.getBoundingClientRect();
+   const panel=element.getBoundingClientRect();
+   const viewport=window.visualViewport;
+   const top=viewport?.offsetTop??0, height=viewport?.height??window.innerHeight;
+   const compact=window.matchMedia("(max-width: 1023px)").matches;
+   const gap=12;
+   const clamp=(value:number,min:number,max:number)=>Math.max(min,Math.min(max,value));
+   const cardCenter=card.left+card.width/2-bounds.left;
+   let x:number,y:number;
+   if(compact){
+    const above=card.top-top,below=top+height-card.bottom;
+    const fitsAbove=card.top-bounds.top>=panel.height+gap;
+    if(!verticalSide||widthMeasured!==bounds.width||heightMeasured!==height)
+     verticalSide=fitsAbove&&below<panel.height+gap&&above>below?"above":"below";
+    else if(verticalSide==="above"&&!fitsAbove)verticalSide="below";
+    x=clamp(cardCenter-panel.width/2,0,bounds.width-panel.width);
+    y=(verticalSide==="above"?card.top-panel.height-gap:card.bottom+gap)-bounds.top;
+    element.dataset.placement=verticalSide;
+    element.dataset.anchorSide=verticalSide;
+    element.style.setProperty("--pointer-x",`${clamp(cardCenter-x,14,panel.width-14)}px`);
+   }else{
+    const leftSpace=card.left-bounds.left,rightSpace=bounds.right-card.right;
+    const right=rightSpace>=leftSpace;
+    x=clamp((right?card.right-gap/2:card.left-panel.width+gap/2)-bounds.left,0,bounds.width-panel.width);
+    y=Math.max(0,card.top-bounds.top-10);
+    element.dataset.placement="side";
+    element.dataset.side=right?"right":"left";
+    element.dataset.anchorSide=right?"right":"left";
    }
-   const width=Math.min(448,viewportWidth-24);
-   const br=bounds??{left:12,right:260,top:100};
-   const right=br.right+width+8<=viewportWidth;
-   const left=!right&&br.left-width-8>=12;
-   const position=right?"right":left?"left":"overlap";
-   const x=right?br.right+6:left?br.left-width-6:Math.max(12,Math.min(viewportWidth-width-12,br.right-width*.35));
-   // Reserve enough room for the actual source fields even if CheckoutConfig
-   // arrives AFTER the dialog opened. Never allow the purchase footer below
-   // the viewport; the details pane owns any necessary scrolling.
-   const preferredHeight=Math.min(height-24,grouped?.choices.length===4?460:
-      grouped?.choices.length&&grouped.choices.length>4?500:440);
-   const top=Math.max(12,Math.min(br.top-12,height-preferredHeight-12));
-   setPlace({left:x,top,width,maxHeight:height-top-12});
-   setSide(position);
+   widthMeasured=bounds.width;heightMeasured=height;
+   element.style.setProperty("--panel-x",`${x}px`);
+   element.style.setProperty("--panel-y",`${y}px`);
+   scrollArea.style.setProperty("--panel-overhang",`${Math.max(0,y+panel.height-bounds.height)}px`);
   };
-  measure();window.addEventListener("resize",measure);window.addEventListener("scroll",measure,true);
-  window.visualViewport?.addEventListener("resize",measure);
-  return ()=>{window.removeEventListener("resize",measure);window.removeEventListener("scroll",measure,true);
-   window.visualViewport?.removeEventListener("resize",measure);};
- },[anchor,product.id,availableKey]);
+  place();
+  const observer=new ResizeObserver(place);
+  for(const node of [grid,anchor,element])observer.observe(node);
+  window.addEventListener("resize",place);
+  window.visualViewport?.addEventListener("resize",place);
+  const frame=requestAnimationFrame(()=>{
+   closeControl.current?.focus({preventScroll:true});
+   closeControl.current?.scrollIntoView({block:"nearest"});
+  });
+  return ()=>{
+   cancelAnimationFrame(frame);observer.disconnect();
+   window.removeEventListener("resize",place);
+   window.visualViewport?.removeEventListener("resize",place);
+   scrollArea.style.removeProperty("--panel-overhang");
+  };
+ },[anchor,product.id]);
  useEffect(()=>{
-  const before=document.body.style.overflow;document.body.style.overflow="hidden";
-  const raf=requestAnimationFrame(()=>closeControl.current?.focus());
-  const onKey=(event:KeyboardEvent)=>{
+  const key=(event:KeyboardEvent)=>{
    if(event.key==="Escape"){event.preventDefault();onClose();}
-   if(event.key!=="Tab"||!dialog.current)return;
-   const tabbables=Array.from(dialog.current.querySelectorAll<HTMLElement>(
-    'button:not([disabled]),input:not([disabled]),select:not([disabled])'));
-   const first=tabbables[0],last=tabbables.at(-1);
-   if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
-   else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
   };
-  window.addEventListener("keydown",onKey);
-  return ()=>{cancelAnimationFrame(raf);document.body.style.overflow=before;window.removeEventListener("keydown",onKey);};
+  const dismiss=(event:PointerEvent)=>{
+   if(event.target instanceof Element&&!dialog.current?.contains(event.target)&&!event.target.closest(".ref32-product"))onClose();
+  };
+  window.addEventListener("keydown",key);
+  window.addEventListener("pointerdown",dismiss);
+  return ()=>{window.removeEventListener("keydown",key);window.removeEventListener("pointerdown",dismiss);};
  },[onClose]);
- return createPortal(<div className="ref32-overlay">
-  <button type="button" className="ref32-backdrop" tabIndex={-1} aria-label="Close purchase dialog" onClick={onClose}/>
-  <section className="ref32-dialog" ref={dialog} role="dialog" aria-modal="true"
-    data-anchor-side={side} data-selected-sku={productId} style={place} aria-label={family.name}>
+ return <section className="ref32-dialog config glass" id="product-panel" ref={dialog} role="dialog" lang={language} dir={language==="ar"?"rtl":"ltr"}
+    data-selected-sku={productId} data-product-id={product.id} data-variant-product-id={current.id} aria-label={title}>
    <div className="ref32-details">
     <div className="ref32-dialog-heading">
-     <div><h2>{family.name.replace(/\s*[·–—-]\s*Pack\b.*$/i,"")}</h2>
-      {product.description&&<p>{product.description}</p>}
-      {serving&&<p className="ref32-servings" data-cake-serves>{serving}</p>}</div>
-     <button className="ref32-close" type="button" ref={closeControl} aria-label="Close" onClick={onClose}>×</button>
+     <div>
+      <h2>{title}</h2>
+      {description&&<p className="config-description">{description}</p>}
+      {serving&&<p className="ref32-servings" data-cake-serves>{serving}</p>}
+     </div>
+     <button className="ref32-close close-config" type="button" ref={closeControl} aria-label={t.close} onClick={onClose}>×</button>
     </div>
-    <p className="ref32-section-label">{cakeSizing?t.size:t.variant}</p>
+    {variants.length>1&&<>
+      <p className="ref32-section-label">{t.variant}</p>
+      <div className="ref32-options ref32-options-three" role="group" aria-label={t.variant}>
+        {variants.map(item=>{
+          const content=publishedProduct(item,published)?.options[0]?.content[language];
+          const label=content?.variantLabel??localizedSource(item.variant,language);
+          const active=item.id===current.id;
+          return <button type="button" key={item.id} data-variant-id={item.id} aria-pressed={active}
+            className={active?"ref32-option ref32-option-active":"ref32-option"}
+            onClick={()=>{setVariantId(item.id);setNote("");}}>
+            <span>{label}</span>
+          </button>;
+        })}
+      </div>
+    </>}
+    <p className="ref32-section-label">{showSize||variants.length>1?t.size:t.variant}</p>
     {grouped?.choices.length===4?
       <div className="ref32-options ref32-options-four" role="group" aria-label={t.variant}>
        {[...grouped.choices].sort((a,b)=>a.pieces-b.pieces||
@@ -220,8 +290,8 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
          className={productId===choice.option.id?"ref32-option ref32-option-active":"ref32-option"}
          onClick={()=>chooseSku(choice.option.id)}>
          <span>{packQtyLabel(choice.pieces,language)}
-           {choice.presentation==="mini"?" (Mini)":choice.presentation==="individual"?" (Individual)":""}</span>
-         <small>{formatAed(choice.option.priceFils)}</small>
+           {["mini","individual"].includes(choice.presentation)?` (${presentationLabel(choice.presentation,language)})`:""}</span>
+         <small>{storefrontMoney(choice.option.priceFils,language)}</small>
         </button>)}
       </div>:
     grouped?.choices.length&&grouped.choices.length>4?
@@ -240,18 +310,18 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
           aria-pressed={option?.option.id===productId}
           className={option?.option.id===productId?"ref32-option ref32-option-active":"ref32-option"}
           disabled={!option} onClick={()=>option&&chooseSku(option.option.id)}>
-          <span>{packQtyLabel(pieces,language)}</span><small>{option?formatAed(option.option.priceFils):"—"}</small>
+          <span>{packQtyLabel(pieces,language)}</span><small>{option?storefrontMoney(option.option.priceFils,language):"—"}</small>
          </button>;
         })}
        </div>
       </div>:
-      <div className={"ref32-options "+(cakeSizing&&sorted.length===3?"ref32-options-three":"ref32-options-four")} role="group" aria-label={cakeSizing?t.size:t.variant} data-cake-sizes={cakeSizing?"Mini-Small-Medium":undefined}>
+      <div className={"ref32-options "+(cakeSizing&&sorted.length===3?"ref32-options-three":"ref32-options-four")} role="group" aria-label={showSize||variants.length>1?t.size:t.variant} data-cake-sizes={cakeSizing?"Mini-Small-Medium":undefined}>
        {sorted.map(option=><button type="button" key={option.id} data-sku={option.id}
          aria-pressed={option.id===productId}
          className={option.id===productId?"ref32-option ref32-option-active":"ref32-option"}
          onClick={()=>chooseSku(option.id)}>
-         <span>{cakeSizing?cakeSizeName(cakeSizeForSku(option.id)!):option.size}</span>
-         <small>{formatAed(option.priceFils)}</small>
+         <span>{localizedOption(option,cakeSizing?cakeSizeName(cakeSizeForSku(option.id)!):option.size)}</span>
+         <small>{storefrontMoney(option.priceFils,language)}</small>
        </button>)}
       </div>}
     {tricolor?.kind==="single"&&<label className="ref32-extra">{t.select}
@@ -268,11 +338,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
         <button type="button" disabled={picked>=count} onClick={()=>chooseFlavor(x.componentSkuId,1)}>+</button>
        </div>)}
     </div>}
-    <div className="ref32-price-quantity">
-     <div className="ref32-price"><span>{t.price}</span><strong>{amount}</strong></div>
-     {quantityControls}
-    </div>
-    {minQty(productId)>1&&<p className="ref32-min" data-minimum-notice>{t.min}: {minQty(productId)} {t.unit}</p>}
+    {minQty(productId)>1&&<p className="ref32-min minimum" data-minimum-notice>{t.min}: <bdi>{new Intl.NumberFormat(language==="ar"?"ar-AE-u-nu-arab":language).format(minQty(productId))}</bdi> {language==="ar"?"قطع":language==="es"?"piezas":"pieces"}</p>}
     {selected&&selected.pieces>1&&<p className="ref32-count" data-pack-piece-count>{selected.pieces} {t.pieces}</p>}
     {activeCake&&<label className="ref32-note"><span>{t.note} <em>{t.optional}</em></span>
       <span className="ref32-note-field"><span aria-hidden="true">✎</span>
@@ -283,14 +349,16 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
     </label>}
     {noteTooLong&&<p role="alert" className="ref32-note-warning">{t.noteHold}</p>}
     {!packValid&&<p role="alert" className="ref32-note-warning">{t.notReady}</p>}
+    <div className="ref32-price-quantity config-bottom">
+     <div className="ref32-price config-price"><span>{t.price}</span><strong><bdi>{amount}</bdi></strong></div>
+     <div className="qty-block"><span>{selected&&selected.pieces>1?t.boxes:t.quantity}</span>{quantityControls}</div>
+    </div>
    </div>
    <footer className="ref32-dialog-footer">
-     <div className="ref32-desktop-quantity">{quantityControls}</div>
-     <button type="button" className="ref32-buy" disabled={!canBuy} onClick={buy}>
+     <button type="button" className="ref32-buy add" disabled={!canBuy} onClick={buy}>
       <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M5 8h14l-1 12H6z"/><path d="M9 9V6a3 3 0 0 1 6 0v3"/></svg>
-      <span>{t.add}</span><span className="ref32-cta-cost">{amount}</span><span className="ref32-cta-arrow" aria-hidden="true">→</span>
+      <span>{t.add}</span><span className="ref32-cta-arrow" aria-hidden="true">{language==="ar"?"←":"→"}</span>
      </button>
    </footer>
-  </section>
- </div>,document.body);
+  </section>;
 }

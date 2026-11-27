@@ -115,11 +115,11 @@ function reviewedEnglish(source: string): string {
 }
 export function localizedMoney(priceFils: number, locale: Locale): string {
   return new Intl.NumberFormat(
-    locale === "ar" ? "ar-AE" : locale === "es" ? "es-AE" : "en-AE",
+    locale === "ar" ? "ar-AE-u-nu-arab" : locale === "es" ? "es-AE" : "en-AE",
     {
       style: "currency",
       currency: "AED",
-      currencyDisplay: "code",
+      currencyDisplay: locale === "ar" ? "symbol" : "code",
       minimumFractionDigits: priceFils % 100 === 0 ? 0 : 2,
       maximumFractionDigits: 2,
     },

@@ -372,7 +372,7 @@ test("reject malformed, duplicate, retired, disabled, wrong size, cross family a
     f.store.close();
   }
 });
-test("off flag preserves legacy packs and rejects composition; packs remain year-round independently of singles", () => {
+test("off flag preserves legacy packs and rejects composition; packs and eligible singles remain year-round", () => {
   const f = fixture(),
     spec = PACK_SPECS[0]!;
   try {
@@ -393,7 +393,7 @@ test("off flag preserves legacy packs and rejects composition; packs remain year
         spec.components[0]!.componentSkuId,
         new Date("2027-03-01T10:00:00Z"),
       ),
-      false,
+      true,
     );
     assert.equal(
       availableSku(spec.packSkuId, new Date("2027-03-01T10:00:00Z")),

@@ -480,12 +480,23 @@ for (const width of [390, 768, 1440])
       if (name === "orders-list")
         for (const text of ["#012", "Layla Fixture", "AED 100.00", "Paid"])
           await expect(row(page, "TL-FIX00001")).toContainText(text);
-      // Approved palette only: no purple or green anywhere in Operations.
+      // Tatbiq mint belongs to the shell. OMS keeps its own palette.
       const offBrand = await page.evaluate(() => {
         const bad: string[] = [];
         for (const el of document.querySelectorAll(".ops-shell *")) {
           const cs = getComputedStyle(el);
           for (const value of [cs.color, cs.backgroundColor]) {
+            if (
+              el.closest(
+                ".tatbiq-brand-mark, .ops-navigation, .tatbiq-bottom-nav",
+              ) &&
+              [
+                "rgb(77, 227, 194)",
+                "rgb(9, 121, 97)",
+                "rgb(232, 250, 245)",
+              ].includes(value)
+            )
+              continue;
             const m = value.match(/[\d.]+/g)?.map(Number);
             if (!m || m[3] === 0) continue;
             const [r, g, b] = [m[0]! / 255, m[1]! / 255, m[2]! / 255];
@@ -518,5 +529,55 @@ for (const width of [390, 768, 1440])
     if (await sidebar.isVisible())
       expect(
         await sidebar.evaluate((el) => getComputedStyle(el).backgroundColor),
-      ).toBe("rgb(246, 223, 224)");
+      ).toBe("rgb(255, 255, 255)");
   });
+
+test("Orders desk keeps the table first and reveals exports only for a selection", async ({ page }, info) => {
+  await serve(page);
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto("/operations/orders");
+    const table = page.locator(".oms-table");
+    await expect(table.locator("tbody tr").first()).toBeInViewport();
+    await expect(page.locator(".oms-bulk")).toHaveCount(0);
+    await expect(page.locator(".oms-toolbar.oms-card")).toHaveCount(0);
+    const row = table.locator('tr[data-order="TL-FIX00001"]');
+    await row.getByRole("checkbox").focus();
+    await page.keyboard.press("Space");
+    const selection = page.getByRole("region", { name: "Selected orders", exact: true });
+    await expect(selection).toContainText("1 selected");
+    const exportTrigger = selection.getByRole("button", { name: "Export", exact: true });
+    await expect(exportTrigger).toHaveAttribute("aria-expanded", "false");
+    await exportTrigger.focus();
+    await page.keyboard.press("Enter");
+    await expect(selection.getByRole("button", { name: "Export orders CSV" })).toBeVisible();
+    const options = page.locator("#oms-export-options");
+    await expect(options.getByRole("button")).toHaveCount(11);
+    const box = await options.boundingBox();
+    expect(box!.x).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+    await page.screenshot({ path: info.outputPath(`orders-exports-${width}.png`) });
+    await expect(options.getByRole("button").first()).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(options).toBeHidden();
+    await expect(exportTrigger).toBeFocused();
+    await page.getByRole("combobox", { name: "Daily order views" }).selectOption("tomorrow");
+    await expect(page).toHaveURL(/view=tomorrow/);
+    await expect(selection).toHaveCount(0);
+    await page.getByRole("combobox", { name: "Daily order views" }).selectOption("all");
+    await expect(row).toBeVisible();
+    await row.getByRole("link").click();
+    await expect(page).toHaveURL(/\/orders\/TL-FIX00001$/);
+    await expect(page.locator(".oms-details")).toBeVisible();
+  }
+});
+
+test("empty Orders shows the empty state without an export region", async ({ page }) => {
+  const data = omsWorkspace();
+  data.orders = [];
+  await serve(page, data);
+  await page.goto("/operations/orders");
+  await expect(page.getByRole("heading", { name: "No orders yet" })).toBeVisible();
+  await expect(page.locator(".oms-bulk")).toHaveCount(0);
+  await expect(page.getByRole("searchbox", { name: "Search orders" })).toBeVisible();
+});

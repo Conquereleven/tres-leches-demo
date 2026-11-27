@@ -544,11 +544,11 @@ test("HTTP manager draft/media access stays private; publish and privilege injec
   }
 });
 
-for (const [now, inSeason, port] of [
-  ["2026-11-15T19:59:59.999Z", true, 3177],
-  ["2026-11-15T20:00:00.000Z", false, 3178],
+for (const [now, port] of [
+  ["2026-11-15T19:59:59.999Z", 3177],
+  ["2026-11-15T20:00:00.000Z", 3178],
 ] as const)
-  test(`real public API preserves the Dubai Nov15/16 boundary at ${now}`, async () => {
+  test(`real public API keeps Pan de Muerto available across Dubai midnight at ${now}`, async () => {
     const s = await server(
       port,
       {
@@ -566,7 +566,7 @@ for (const [now, inSeason, port] of [
         hub.products.some((p: { variants: { skuId: string }[] }) =>
           p.variants.some((v) => v.skuId === sku),
         ),
-        "published authority retains the deliberately initialized seasonal SKU",
+        "published authority retains the published Pan de Muerto SKU",
       );
       const response = await fetch(s.base + "/api/checkout/config");
       assert.equal(response.status, 200);
@@ -574,8 +574,8 @@ for (const [now, inSeason, port] of [
       const row = config.products.find((p: { id: string }) => p.id === sku);
       assert.equal(
         !!row,
-        inSeason,
-        "only public orderability changes at Dubai midnight",
+        true,
+        "public orderability persists across Dubai midnight",
       );
       assert.ok(
         config.products.some(
@@ -608,9 +608,9 @@ for (const [now, inSeason, port] of [
         .find((v: { id: string }) => v.id === sku);
       assert.ok(
         visible,
-        "published identity is retained across seasonal closure",
+        "published identity is retained year-round",
       );
-      assert.equal(visible.available, inSeason);
+      assert.equal(visible.available, true);
     } finally {
       await s.close();
     }

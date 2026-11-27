@@ -775,7 +775,7 @@
   },
   "Bisquets": {
     "english": "Bisquets",
-    "arabic": null,
+    "arabic": "بيسكيتس مكسيكي",
     "review": "Arabic approval required",
     "sources": ["menu-data.json:catalog.families.22.name"]
   },
@@ -2269,7 +2269,7 @@
   },
   "Orejas": {
     "english": "Orejas",
-    "arabic": null,
+    "arabic": "أوريخاس",
     "review": "Arabic approval required",
     "sources": ["menu-data.json:catalog.families.21.name"]
   },

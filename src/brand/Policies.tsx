@@ -14,6 +14,7 @@ import {
   cancellationFeePercent,
   cancellationRefundPercent,
   contactChannels,
+  contactChannelLabel,
   deliveryBands,
   freeDeliveryAreas,
   legalEntityLabel,
@@ -36,16 +37,17 @@ type Page = {
   sections: Section[];
 };
 
-const L = ({ to, children }: { to: PolicyPath; children: ReactNode }) => (
-  <a href={to}>{children}</a>
-);
+function L({ to, children }: { to: PolicyPath; children: ReactNode }) {
+  const { language } = useCustomerLanguage();
+  return <a href={language === "en" ? to : `${to}?lang=${language}`}>{children}</a>;
+}
 const who = () => business.legalName ?? business.tradingName;
 // Short aliases for the confirmed cancellation rule, used across several pages.
 const cutoff = cancellationCutoffHours;
 const refundPct = cancellationRefundPercent;
 const feePct = cancellationFeePercent;
 
-function ContactDetails({ contactPage = false }: { contactPage?: boolean }) {
+function ContactDetails() {
   const { text: localize, language } = useCustomerLanguage();
   const contactHref = (href: string, kind: string) => {
     if (kind !== "whatsapp" || language === "en") return href;
@@ -54,16 +56,16 @@ function ContactDetails({ contactPage = false }: { contactPage?: boolean }) {
     if (message) url.searchParams.set("text", localize(message));
     return url.toString();
   };
-  const channels = contactChannels({ contactPage });
+  const channels = contactChannels();
   return (
     <>
       {channels.length > 0 && (
         <ul className="b-policy-channels">
           {channels.map((c) => (
-            <li key={c.kind}>
+            <li key={c.href}>
               <span className="b-label">
-                <CustomerCopy>{c.label}</CustomerCopy>
-              </span>
+                {contactChannelLabel(c, language)}
+              </span>{" · "}
               <a
                 href={contactHref(c.href, c.kind)}
                 {...(c.kind === "whatsapp"
@@ -1500,7 +1502,7 @@ export const pages: Record<PolicyPath, Page> = {
       {
         id: "contact-channels",
         title: "Customer care",
-        body: <ContactDetails contactPage />,
+        body: <ContactDetails />,
       },
       {
         id: "order-help",

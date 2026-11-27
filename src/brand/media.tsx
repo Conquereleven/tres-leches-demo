@@ -3,13 +3,16 @@ import { useLanguage as useCustomerLanguage } from "./localization";
 import manifest from "./media-manifest.json";
 import categories from "./category-media.json";
 import official from "./official-pan-media.json";
+import rt013 from "./rt013-media.json";
 import { useEffect, useRef, useState } from "react";
 import { liveState, useLiveCatalog, type LiveAsset } from "./live-catalog";
 export const productMediaAssignments = [
+  ...rt013.products,
   ...official.products,
   ...manifest.products,
 ];
 export const approvedMedia = [
+  ...rt013.assets,
   ...official.assets,
   ...manifest.assets,
   ...categories.assets,
@@ -139,7 +142,7 @@ export const usesMenuReferencePresentation = (asset: MediaAsset | undefined) =>
  * category-media frames (3L-MEDIA-002 photographs first) open the gallery;
  * official frames for the same category follow. */
 export const categoryEditorialMedia = (category: string) =>
-  [...categories.editorial, ...official.editorial]
+  [...rt013.editorial, ...categories.editorial, ...official.editorial]
     .filter((e) => e.category === category)
     .flatMap((e) => e.sourceIds)
     .map((id) => approvedMedia.find((a) => a.sourceId === id))
@@ -157,6 +160,7 @@ export function MediaPicture({
   active,
   fallback,
   bundledProduct = false,
+  placeholderOnError = false,
 }: {
   asset: MediaAsset;
   alt: string;
@@ -165,12 +169,13 @@ export function MediaPicture({
   active?: boolean;
   fallback?: string | null;
   bundledProduct?: boolean;
+  placeholderOnError?: boolean;
 }) {
   const [failed, setFailed] = useState(0);
   const published = asset.sourceId.startsWith("published-");
   const digital =
     "mediaKind" in asset && asset.mediaKind === "digital-illustration";
-  if (published && failed >= 2)
+  if ((published || placeholderOnError) && failed >= 2)
     return (
       <picture
         className={active ? "is-active" : undefined}
@@ -190,6 +195,7 @@ export function MediaPicture({
       </picture>
     );
   const webp = asset.derivatives.filter((d) => d.format === "webp");
+  const canRetryWebp = webp.length > 0 && asset.derivatives.some((d) => d.format === "avif");
   return (
     <picture
       className={active ? "is-active" : undefined}
@@ -224,8 +230,10 @@ export function MediaPicture({
         decoding="async"
         style={digital ? { objectFit: "contain" } : undefined}
         onError={
-          (digital || published) && failed < 2
-            ? () => setFailed((value) => (published ? 2 : value + 1))
+          (digital || published || placeholderOnError) && failed < 2
+            ? () => setFailed((value) => (
+                published || (placeholderOnError && !canRetryWebp) ? 2 : value + 1
+              ))
             : undefined
         }
       />
@@ -245,12 +253,16 @@ export function MediaRotation({
   sizes,
   className,
   bundledProduct = false,
+  focusable = true,
+  paused = false,
 }: {
   frames: MediaAsset[];
   alt: string;
   sizes: string;
   className?: string;
   bundledProduct?: boolean;
+  focusable?: boolean;
+  paused?: boolean;
 }) {
   const root = useRef<HTMLSpanElement>(null);
   const [turn, setTurn] = useState(0);
@@ -269,7 +281,7 @@ export function MediaRotation({
     return () => observer.disconnect();
   }, []);
   useEffect(() => {
-    if (held || !visible || frames.length < 2) return;
+    if (held || paused || !visible || frames.length < 2) return;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let timer: ReturnType<typeof setInterval> | undefined;
     const update = () => {
@@ -295,7 +307,7 @@ export function MediaRotation({
       if (timer) clearInterval(timer);
       motion.removeEventListener("change", update);
     };
-  }, [held, visible, frames.length]);
+  }, [held, paused, visible, frames.length]);
   const current = turn % frames.length;
   return (
     <span
@@ -309,9 +321,10 @@ export function MediaRotation({
       onPointerLeave={() => setHeld(false)}
       onFocus={() => setHeld(true)}
       onBlur={() => setHeld(false)}
-      tabIndex={0}
+      tabIndex={focusable ? 0 : undefined}
       role="group"
-      aria-label={alt}
+      aria-label={alt || undefined}
+      aria-hidden={alt ? undefined : true}
     >
       {frames
         .slice(0, Math.min(frames.length, turn + 2))

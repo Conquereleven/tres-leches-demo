@@ -1,7 +1,9 @@
 import { build } from "esbuild";
 import { execFileSync } from "node:child_process";
 import { copyFileSync, cpSync, mkdirSync } from "node:fs";
-let revision = process.env.BUILD_SOURCE_SHA;
+// The Git-connected Railway build supplies its source commit at build time.
+// A persistent BUILD_SOURCE_SHA service override can outlive that commit.
+let revision = process.env.RAILWAY_GIT_COMMIT_SHA || process.env.BUILD_SOURCE_SHA;
 if (!revision) {
   try {
     revision = execFileSync("git", ["rev-parse", "HEAD"], {

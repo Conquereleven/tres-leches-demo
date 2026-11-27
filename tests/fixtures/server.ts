@@ -1,6 +1,8 @@
 import { orderingFixtureProvider } from "./agent-provider";
+import { paidFixture } from "./customer-paid";
 import { scryptSync } from "node:crypto";
 import { startServer } from "../../server/http";
+import { assignPublicOrderNumber } from "../../server/domain/order-number";
 import { seed } from "./runtime";
 import { MockWhatsAppProvider, MockPaymentProvider } from "./providers";
 import { MockGeoService } from "./geo";
@@ -41,7 +43,31 @@ app.server.on("request", async (req, res) => {
       let raw = "";
       for await (const part of req) raw += part;
       const body = JSON.parse(raw);
-      if (req.url === "/api/demo/location") {
+      if (req.url === "/api/demo/paid-fulfillment") {
+        const fixture = paidFixture();
+        try {
+          const key = await fixture.place();
+          fixture.providerState.status = "PAID";
+          await fixture.reconcile(key);
+          const order = fixture.order(key);
+          const snapshot = fixture.store.read();
+          const payment = snapshot.payments.find(p => p.id === order.paymentId);
+          const conversation = snapshot.conversations.find(c => c.id === order.conversationId);
+          if (order.state !== "Confirmed" || payment?.status !== "paid" || !conversation)
+            throw new Error("A confirmed synthetic checkout is required");
+          app.store.write(state => {
+            delete order.publicOrderNumber;
+            assignPublicOrderNumber(state, order);
+            state.conversations.push(conversation);
+            state.orders.push(order);
+            state.payments.push(payment);
+          });
+          res.setHeader("Content-Type", "application/json");
+          return res.end(JSON.stringify({ orderId: order.id }));
+        } finally {
+          fixture.store.close();
+        }
+      } else if (req.url === "/api/demo/location") {
         const c = app.store
           .read()
           .conversations.find((c) => c.id === body.conversationId)!;

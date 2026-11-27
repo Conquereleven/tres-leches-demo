@@ -9,7 +9,7 @@ export function Login({ onLogin }: { onLogin: () => Promise<void> }) {
     [signingIn, setSigningIn] = useState(false);
   const submitting = useRef(false);
   return (
-    <main className="commerce ops-shell ops-auth">
+    <main className="commerce ops-shell tatbiq-workspace ops-auth">
       <form
         className="co-zone-editor"
         onSubmit={(e) => {
@@ -31,6 +31,14 @@ export function Login({ onLogin }: { onLogin: () => Promise<void> }) {
             });
         }}
       >
+        <div className="tatbiq-login-brand">
+          <span className="tatbiq-brand-mark">
+            <img src="/brand/icon.png" alt="" />
+          </span>
+          <p>
+            {t("Pastelerías 3L")} · {t("Operations")}
+          </p>
+        </div>
         <h1>{t("Inicia sesión")}</h1>
         <label>
           {t("Agente")}

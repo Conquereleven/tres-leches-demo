@@ -54,12 +54,17 @@ for (const width of [390, 1440])
           await expect(page.locator(".ops-v2-summary button")).toHaveCount(6);
           await expect(page.locator(".ops-v2-finance")).toBeVisible();
           if (width === 1440) {
-            const tops = await page
-              .locator(".ops-v2-summary button")
-              .evaluateAll((nodes) =>
-                nodes.map((n) => Math.round(n.getBoundingClientRect().top)),
-              );
-            expect(new Set(tops).size).toBe(1);
+            const boxes = await page.locator(".ops-v2-summary button").evaluateAll((nodes) =>
+              nodes.map((node) => {
+                const { top, left } = node.getBoundingClientRect();
+                return { top: Math.round(top), left: Math.round(left) };
+              }),
+            );
+            const rows = [...new Set(boxes.map(({ top }) => top))];
+            expect(rows).toHaveLength(2);
+            const columns = rows.map((top) => boxes.filter((box) => box.top === top).map(({ left }) => left));
+            expect(new Set(columns[0]).size).toBe(3);
+            expect(columns[1]).toEqual(columns[0]);
           }
           await expect(
             page.getByRole("heading", {

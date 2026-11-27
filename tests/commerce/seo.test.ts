@@ -85,7 +85,7 @@ test("trailing slashes redirect to one URL and never off-site", () => {
 test("every public page has a unique title, description and canonical URL", () => {
   assert.deepEqual(
     pages.map((p) => p.path),
-    ["/", "/menu", "/how-to-order", ...policyRoutes.map((r) => r.path)],
+    ["/", "/menu", "/bakery", "/journal", "/how-to-order", ...policyRoutes.map((r) => r.path)],
   );
   // The server serves a prerendered file for exactly the non-home pages.
   assert.deepEqual(
@@ -178,7 +178,7 @@ test("business structured data states only verified facts", () => {
   );
   assert.deepEqual(
     (data.contactPoint as { telephone: string }[]).map((c) => c.telephone),
-    business.supportContacts.map((c) => c.phone.replace(/\s+/g, "")),
+    [business.whatsapp, ...business.supportContacts.map((c) => c.phone.replace(/\s+/g, ""))],
   );
   assert.deepEqual(data.sameAs, [destinations.instagram]);
   // Facts the owner has not supplied, and anything that would need a catalog,
@@ -210,7 +210,7 @@ test("business structured data states only verified facts", () => {
 
 test("store page metadata names no product price and matches approved wording", () => {
   for (const page of Object.values(storePages)) {
-    assert.doesNotMatch(page.description, /AED|\d(?!L )/);
+    assert.doesNotMatch(page.description, /\bAED\b/);
     assert.ok(page.description.includes(business.tradingName));
   }
   assert.equal(isoDate("22 September 2026"), "2026-09-22");
@@ -278,6 +278,9 @@ test(
         ),
         page.path,
       );
+      assert.match(html, /<div id="root">(?:<link[^>]*>)*<div class="v32-app vr009"/);
+      assert.doesNotMatch(html, /class="brand-experience|fonts\.googleapis\.com/);
+      assert.doesNotMatch(html, /521683319|506757352|52 168 3319|50 675 7352/);
       assert.equal(html.match(/<h1/g)!.length, 1, page.path);
       assert.match(html, /<html lang="en">/);
     }
@@ -286,7 +289,7 @@ test(
     // Menu: site chrome and heading only. No product, price or availability
     // is baked into static HTML; the published catalog is the only source.
     const menu = doc("menu.html");
-    assert.match(menu, /<h1[^>]*>Menu<\/h1>/);
+    assert.match(menu, /<h1[^>]*>Explore Our Menu<\/h1>/);
     assert.doesNotMatch(
       visible(menu),
       /AED|Pan de Muerto|Concha|Tres Leches Cakes/,

@@ -165,17 +165,18 @@ test("unavailable/unpublished/retired/price-mismatched options are never offered
   catalog.products = [];
   assert.equal(searchProducts(catalog, config, "milk", now).length, 0);
 });
-test("retired and out-of-season SKUs are excluded even if both endpoints list them", () => {
+test("retired choices stay excluded and published Pan de Muerto sells year-round", () => {
   const { catalog, config } = fixture();
-  for (const id of [
-    "pan-de-muerto-filled-chocolate-mini-chocolate-covering",
-    "pan-de-muerto-traditional-azucar-mini-40-g",
-  ]) {
+  for (const [id, expected] of [
+    ["pan-de-muerto-filled-chocolate-mini-chocolate-covering", 0],
+    ["conchas-traditional-pistache-mini-40-g", 0],
+    ["pan-de-muerto-traditional-azucar-mini-40-g", 1],
+  ] as const) {
     catalog.products[0]!.options[0]!.id = id;
     config.products[0]!.id = id;
     assert.equal(
       searchProducts(catalog, config, "milk", new Date("2026-07-01")).length,
-      0,
+      expected,
     );
   }
 });

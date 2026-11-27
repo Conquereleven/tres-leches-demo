@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 const fixtureDbPath = join(mkdtempSync(join(tmpdir(), "3l-v32-uat-")), "synthetic.sqlite");
 import { defineConfig } from "@playwright/test";
+const integrationPreview = process.env.VR009_SYNTHETIC_PREVIEW;
 export default defineConfig({
   testDir: "tests/v32-release-e2e",
   outputDir: "test-results/v32-release",
@@ -16,12 +17,12 @@ export default defineConfig({
     { name: "webkit-mobile", use: { browserName: "webkit", viewport: { width: 390, height: 844 } } },
   ],
   use: {
-    baseURL: "http://127.0.0.1:5175",
+    baseURL: integrationPreview ?? "http://127.0.0.1:5175",
     headless: true,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
-  webServer: {
+  webServer: integrationPreview ? undefined : {
     command: `APP_ENV=test NODE_ENV=test PROVIDER_MODE=offline META_OUTBOUND_ENABLED=false COVERAGE_FIXTURE=approved DELIVERY_ADDRESS_MODE=legacy FIXTURE_DATE=2026-10-08T08:00:00+04:00 DB_PATH=${fixtureDbPath} PORT=5175 HOST=127.0.0.1 APP_ORIGIN=http://127.0.0.1:5175 node --import tsx tests/fixtures/web-checkout-server.ts`,
     url: "http://127.0.0.1:5175/api/health",
     reuseExistingServer: false,

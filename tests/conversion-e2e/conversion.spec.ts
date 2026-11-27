@@ -3,36 +3,8 @@ import AxeBuilder from "@axe-core/playwright";
 import { PACK_SPECS, componentName } from "../../shared/pack-composition";
 import type { LiveCatalog } from "../../src/brand/live-catalog";
 
-/**
- * Conversion journeys adapted to canonical V3.2 (RT01 P1 remediation).
- *
- * The retired legacy menu (`/menu?product=`, `.b-menu-*` selectors,
- * `.b-pack-builder` page builder, `.b-complementary` suggestions,
- * `.b-search-results` discovery links, `.b-co-*` cart) no longer renders:
- * canonical `/menu` is the approved V3.2 landing (keyword tile search),
- * `/bakery` the approved catalog with live search, customization the
- * approved purchase dialog (ref32), and `/cart` the canonical V3.2 cart.
- * Every legacy contract below is mapped to its V3.2 approved equivalent
- * instead of deleted:
- *
- * - pack customization (12-count CTA gating, per-flavor steppers, fixed
- *   box price) -> ref32 dialog `[data-sku]` variant + `.ref32-composition`
- *   steppers + `.ref32-buy` (positive + negative assertions).
- * - two distinct mixes keep line identity -> localStorage composition
- *   inequality + two `.v32-new-cart-row` rows (same as packs E2E).
- * - discovery search across languages -> V3.2 landing keyword pills
- *   (`.v32-result-pill`/`.v32-tile-highlight`/`.v32-search-empty`) and the
- *   bakery live search (grid filtering + `.v32-message` no-match state).
- * - cart -> checkout handoff without provider posts -> V3.2 cart link to
- *   the existing real `/checkout` + `providerPosts` 0.
- *
- * Not mapped (no V3.2 counterpart in the approved design): the classic
- * product-page complementary-suggestions panel and the recommendation
- * combobox (`[data-recommendation]`). The commercial behaviors they
- * exercised — distinct pack line identity and purchase gating — remain
- * asserted through the dialog/cart path above.
- */
-
+// Exercise the approved menu search handoff, live catalog filtering, and full
+// pack-to-cart conversion on the public storefront in all three languages.
 const PACK_12 = "pan-de-muerto-filled-pack-12-individuales";
 const spec12 = () =>
   PACK_SPECS.find(
@@ -66,41 +38,39 @@ for (const width of [390, 1440])
       await page.emulateMedia({ reducedMotion: "reduce" });
       // 1. V3.2 landing keyword search across languages.
       await page.goto(`/menu?lang=${lang}`);
-      await expect(page.locator(".v32-landing")).toBeVisible();
-      const landingSearch = page.getByRole("searchbox", {
-        name: "Search the bakery",
-      });
+      const landingForm = page.locator(".menu-main").getByRole("search");
+      const landingSearch = landingForm.getByRole("searchbox");
+      await expect(landingSearch).toBeVisible();
       await landingSearch.fill("concha");
-      await expect(page.locator(".v32-result-pill").first()).toBeVisible();
-      await expect(page.locator(".v32-tile-highlight").first()).toBeVisible();
-      await page
-        .locator(".v32-search")
-        .screenshot({ path: info.outputPath(`search-${width}-${lang}.png`) });
+      await landingForm.screenshot({ path: info.outputPath(`search-${width}-${lang}.png`) });
       expect(
         (
           await new AxeBuilder({ page })
-            .include(".v32-search")
+            .include(".menu-main form[role=search]")
             .analyze()
         ).violations,
       ).toEqual([]);
+      await landingSearch.press("Enter");
+      await expect(page).toHaveURL(/\/bakery\?.*q=concha/);
+      expect(new URL(page.url()).searchParams.get("lang")).toBe(lang);
+      await expect(page.locator('.ref32-product[data-category-id="conchas"]').first()).toBeVisible();
+      await page.goBack();
       await landingSearch.fill("zzzzzzzz");
       await landingSearch.press("Enter");
       await expect(page.locator(".v32-search-empty")).toBeVisible();
       // 2. Bakery live search filters the grid; no-match stays explicit.
       await page.goto(`/bakery?category=pan&subcategory=pan&lang=${lang}`);
-      await expect(page.locator(".ref32-grid")).toBeVisible();
+      await expect(page.locator(".structural-grid")).toBeVisible();
       await expect(page.locator(".ref32-product").first()).toBeVisible();
       const total = await page.locator(".ref32-product").count();
       expect(total).toBeGreaterThan(1);
-      const bakerySearch = page.getByRole("searchbox", {
-        name: "Search the menu",
-      });
+      const bakerySearch = page.locator(".catalog-main input[type=search]");
       await bakerySearch.fill("relleno");
       const filtered = await page.locator(".ref32-product").count();
       expect(filtered).toBeGreaterThan(0);
       expect(filtered).toBeLessThan(total);
       await bakerySearch.fill("zzzzzzzz");
-      await expect(page.locator(".v32-message")).toBeVisible();
+      await expect(page.locator(".v32-search-empty")).toBeVisible();
       await expect(page.locator(".ref32-product")).toHaveCount(0);
       await bakerySearch.fill("");
       await expect(page.locator(".ref32-product").first()).toBeVisible();
@@ -234,30 +204,27 @@ test("search no-results, URL, keyboard and offline recovery", async ({
   page,
   browserName,
 }) => {
-  // V3.2 landing keyword search stays keyboard operable (?q= is honored
-  // by the bakery live search below).
   await page.goto("/menu?lang=en");
-  const input = page.getByRole("searchbox", { name: "Search the bakery" });
+  const form = page.locator(".menu-main").getByRole("search");
+  const input = form.getByRole("searchbox", { name: "Search the bakery" });
+  const submit = form.getByRole("button", { name: "FIND", exact: true });
   await input.fill("concha");
-  await expect(page.locator(".v32-result-pill").first()).toBeVisible();
   await input.focus();
   if (browserName === "webkit") {
-    // Safari's system Full Keyboard Access setting controls whether Tab
-    // visits buttons. Verify the control itself accepts focus and activation.
-    await page.getByRole("button", { name: "FIND \u2192", exact: true }).focus();
+    await submit.focus();
   } else {
     await page.keyboard.press("Tab");
   }
-  await expect(
-    page.getByRole("button", { name: "FIND \u2192", exact: true }),
-  ).toBeFocused();
+  await expect(submit).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(page.locator(".v32-result-pill").first()).toBeVisible();
+  await expect(page).toHaveURL(/\/bakery\?.*q=concha/);
+  await expect(page.locator('.ref32-product[data-category-id="conchas"]').first()).toBeVisible();
+  await page.goBack();
   await input.fill("zzzzzzzz");
   await input.press("Enter");
   await expect(page.locator(".v32-search-empty")).toBeVisible();
-  await input.fill("concha");
-  await expect(page.locator(".v32-result-pill").first()).toBeVisible();
+  await page.goBack();
+  await expect(input).toBeVisible();
   // V3.2 bakery live search filters the grid; no-match stays explicit.
   // (?q= is honored on load; the grid below waits for the live catalog.)
   await page.goto("/bakery?category=pan&subcategory=pan&q=relleno&lang=en");
@@ -265,12 +232,12 @@ test("search no-results, URL, keyboard and offline recovery", async ({
     name: "Search the menu",
   });
   await expect(bakerySearch).toHaveValue("relleno");
-  await expect(page.locator(".ref32-grid")).toBeVisible();
+  await expect(page.locator(".structural-grid")).toBeVisible();
   await expect(page.locator(".ref32-product").first()).toBeVisible();
   const cards = page.locator(".ref32-product");
   expect(await cards.count()).toBeGreaterThan(0);
   await bakerySearch.fill("zzzzzzzz");
-  await expect(page.locator(".v32-message")).toBeVisible();
+  await expect(page.locator(".v32-search-empty")).toBeVisible();
   await expect(cards).toHaveCount(0);
   await bakerySearch.fill("");
   await expect(cards.first()).toBeVisible();
@@ -283,7 +250,7 @@ test("current published availability gates purchase, not listing", async ({
   // listed but hold purchase (disabled card, no price). There is no
   // recommendation combobox in the approved V3.2 design.
   await page.goto("/bakery?lang=en");
-  await expect(page.locator(".ref32-grid")).toBeVisible();
+  await expect(page.locator(".structural-grid")).toBeVisible();
   const pack = page.locator(
     '.ref32-product[data-product-id="pan-de-muerto-filled-pack"]',
   );
@@ -302,7 +269,7 @@ test("current published availability gates purchase, not listing", async ({
     r.fulfill({ json: unavailable }),
   );
   await page.goto("/bakery?lang=en");
-  await expect(page.locator(".ref32-grid")).toBeVisible();
+  await expect(page.locator(".structural-grid")).toBeVisible();
   // Listing is intact (searchable catalog), purchase is held.
   await expect(
     page.locator('.ref32-product[data-product-id="milk"]'),

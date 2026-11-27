@@ -114,6 +114,7 @@ export type SocialImage = {
 export function headTags(
   page: SeoPage,
   site: { origin: string; name: string; image: SocialImage },
+  language: "en" | "es" | "ar" = "en",
 ): string {
   const url = absoluteUrl(site.origin, page.path);
   const image = absoluteUrl(site.origin, site.image.path);
@@ -123,7 +124,7 @@ export function headTags(
     `<link rel="canonical" href="${attr(url)}" />`,
     `<meta property="og:type" content="website" />`,
     `<meta property="og:site_name" content="${attr(site.name)}" />`,
-    `<meta property="og:locale" content="en_AE" />`,
+    `<meta property="og:locale" content="${language}_AE" />`,
     `<meta property="og:url" content="${attr(url)}" />`,
     `<meta property="og:title" content="${attr(page.title)}" />`,
     `<meta property="og:description" content="${attr(page.description)}" />`,

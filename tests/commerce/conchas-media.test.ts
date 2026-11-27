@@ -28,7 +28,7 @@ test("approved original bytes and responsive derivatives retain source hashes", 
     }
   }
 });
-test("each traditional Concha retains exact approved artwork alongside the final batch", () => {
+test("traditional chocolate and vanilla use their verified originals; unconfirmed Tricolor stays neutral", () => {
   const chocolate = selectedProductMedia(
     "conchas-traditional--chocolate",
     "conchas-traditional",
@@ -36,12 +36,10 @@ test("each traditional Concha retains exact approved artwork alongside the final
   );
   assert.equal(
     chocolate?.sourceId,
-    "3l-ai-concha-traditional-chocolate-20261010",
+    "rt013-conchas-traditional-chocolate",
   );
   assert.ok(
-    chocolate &&
-      "mediaKind" in chocolate &&
-      chocolate.mediaKind === "digital-illustration",
+    chocolate?.sourceFilename === "CONCHA CHOCOLATE/CONCHA CH 02.jpg",
   );
   for (const [id, family, variant] of [
     ["conchas-filled--pistache", "conchas-filled", "Pistache"],
@@ -58,7 +56,7 @@ test("each traditional Concha retains exact approved artwork alongside the final
     [
       "vainilla",
       "Vainilla",
-      "3l-conchas-editorial-concha-tradicional-vainilla",
+      "rt013-conchas-traditional-vainilla",
     ],
     [
       "pistache",
@@ -84,7 +82,7 @@ test("each traditional Concha retains exact approved artwork alongside the final
       (p) =>
         p.productId.startsWith("conchas-traditional--") && p.primarySourceId,
     ).length,
-    3,
+    5,
   );
   for (const a of index.filter((x) => !x.productId)) {
     assert.ok(!existsSync("public/brand/approved/" + a.source));
@@ -98,13 +96,12 @@ test("Conchas keeps the two retained approved final batch frames after the new p
       (a) => !a.sourceId.includes("conchas_de_pistache_sobre_tabla_de_madera"),
     ),
   );
-  // 3L-MEDIA-002 photographs open; the retained frames follow.
   assert.deepEqual(
-    gallery.slice(0, 3).map((a) => a.sourceId),
-    ["026", "027", "024"].map((n) => `3l-media-002-conchas-m002-${n}`),
+    gallery.slice(0, 4).map((a) => a.sourceId),
+    ["rt013-conchas-editorial-26", ...["026", "027", "024"].map((n) => `3l-media-002-conchas-m002-${n}`)],
   );
-  assert.equal(gallery.length, 5);
-  const frames = gallery.slice(3);
+  assert.equal(gallery.length, 6);
+  const frames = gallery.slice(4);
   assert.ok(
     frames.every(
       (a) => !a.sourceId.includes("conchas_de_pistache_sobre_tabla_de_madera"),
@@ -124,7 +121,7 @@ test("Conchas keeps the two retained approved final batch frames after the new p
       ),
     );
   }
-  assert.equal(categoryEditorialMedia("pan").length, 7);
+  assert.equal(categoryEditorialMedia("pan").length, 9);
   assert.equal(categoryEditorialMedia("cakes").length, 0);
 });
 

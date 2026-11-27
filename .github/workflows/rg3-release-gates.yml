@@ -11,7 +11,8 @@ jobs:
   browsers:
     if: startsWith(github.head_ref, 'integration/3l-rg3-')
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # This job runs both Operations projects serially before checkout and restore.
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:

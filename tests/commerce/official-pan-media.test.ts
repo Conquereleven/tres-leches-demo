@@ -1,3 +1,4 @@
+import reviewedRT013 from "../../src/brand/rt013-media.json";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, statSync } from "node:fs";
@@ -65,19 +66,19 @@ test("all 50 official photos are accounted for and only reviewed ones are public
     "official-pan-04",
   ]);
   assert.deepEqual(pack("pan-de-muerto-filled-pack"), ["official-pan-02"]);
-  // 3L-MEDIA-002 photographs open the gallery; the four restored banner boards
-  // follow, whole, in their original 3:2 frame.
+  // RT01.3 fronts the approved MEDIA-002 photographs and preserved banner boards.
   const boards = categoryEditorialMedia("pan");
   assert.deepEqual(
-    boards.slice(0, 3).map((b) => b.sourceId),
-    ["080", "059", "049"].map((n) => `3l-media-002-pan-m002-${n}`),
+    boards.slice(0, 5).map((b) => b.sourceId),
+    ["rt013-pan-editorial-82", "rt013-pan-editorial-93", ...["080", "059", "049"].map((n) => `3l-media-002-pan-m002-${n}`)],
   );
   assert.deepEqual(
-    boards.slice(3).map((b) => b.sourceId),
+    boards.slice(5).map((b) => b.sourceId),
     ["01", "02", "03", "04"].map((n) => `official-pan-banner-${n}`),
   );
-  assert.equal(boards.length, 7);
-  for (const board of boards)
+  assert.equal(boards.length, 9);
+  assert.deepEqual(boards.slice(0, 2).map(({ width, height }) => [width, height]), [[540, 960], [768, 960]]);
+  for (const board of boards.slice(2))
     assert.ok(Math.abs(board.width! / board.height! - 1.5) < 0.005);
   for (const other of ["cakes", "jars"])
     assert.deepEqual(categoryEditorialMedia(other), []);
@@ -97,7 +98,8 @@ test("all 50 official photos are accounted for and only reviewed ones are public
         product.variant,
         option.size,
       )!;
-      assert.equal(asset.sourceId, mapping.primarySourceId);
+      const replacement = reviewedRT013.products.find((item) => item.productId === mapping.productId);
+      assert.equal(asset.sourceId, replacement?.primarySourceId ?? mapping.primarySourceId);
       if (!product.familyId.endsWith("-pack"))
         assert.equal(asset.variant, product.variant);
     }

@@ -2,17 +2,17 @@ import { test, expect } from "@playwright/test";
 
 test("canonical homepage/menu/bakery render approved V3.2", async ({page}) => {
   await page.goto("/");
-  await expect(page.locator(".v32-app .v32-header")).toBeVisible();
-  await expect(page.locator('a.v32-logo[href="/"]')).toBeVisible();
+  await expect(page.locator(".vr009 .mast")).toBeVisible();
+  await expect(page.locator('a.brand[href="/"]')).toBeVisible();
   await page.goto("/menu");
-  await expect(page.locator(".v32-landing")).toBeVisible();
-  await page.locator('a.v32-logo[href="/"]').click();
-  await expect(page.locator(".v32-home")).toBeVisible();
+  await expect(page.locator(".menu-main")).toBeVisible();
+  await page.locator('a.brand[href="/"]').click();
+  await expect(page.locator(".home-main")).toBeVisible();
   const bakeryResponse = await page.goto("/bakery");
   expect(bakeryResponse?.status(), "canonical /bakery must return HTTP 200").toBe(200);
-  await expect(page.locator(".v32-catalog")).toBeVisible();
-  await page.locator('a.v32-logo[href="/"]').click();
-  await expect(page.locator(".v32-home")).toBeVisible();
+  await expect(page.locator(".catalog-main")).toBeVisible();
+  await page.locator('a.brand[href="/"]').click();
+  await expect(page.locator(".home-main")).toBeVisible();
 });
 
 test("canonical cart enters existing real checkout, NOT preview checkout", async ({page}) => {
@@ -89,9 +89,9 @@ test("canonical cart edits tricolor color with line identity and persistence", a
 // unrecognized routes retain a strict 404 (not a broad SPA catch-all).
 test("canonical public deep links return 200 and unknown paths return 404", async ({ page, request }) => {
   const routes: [string,string][] = [
-    ["/bakery", ".v32-catalog"],
+    ["/bakery", ".catalog-main"],
     ["/contact", '[data-new-ui="contact"]'],
-    ["/journal", ".v32-home"],
+    ["/journal", ".v32-journal"],
     ["/how-to-order", '[data-new-ui="how"]'],
     ["/terms", '[data-new-ui="policy"]'],
     ["/privacy", '[data-new-ui="policy"]'],

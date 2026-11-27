@@ -111,10 +111,11 @@ export function lineKey(
     (l.cakeMessage ? `~cake:${encodeURIComponent(l.cakeMessage)}` : "")
   );
 }
+export const itemQuantitySchema = z.number().int().min(1).max(MAX_ITEM_QUANTITY);
 export const commerceLineSchema = z
   .object({
     productId: z.string().min(1).max(100),
-    quantity: z.number().int().min(1).max(MAX_ITEM_QUANTITY),
+    quantity: itemQuantitySchema,
     composition: compositionSchema.optional(),
     color: z.enum(["red", "white", "green"]).optional(),
     cakeMessage: z.string().trim().min(1).max(30).optional(),

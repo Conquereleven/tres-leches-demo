@@ -201,7 +201,8 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
   silently switch back to the earlier storefront UI.
 - The desktop catalog retains exactly four columns; mobile responsive acceptance
   covers 390×844, 375×667 and 320×568, including anchored product dialog,
-  scrollable variant content and continuously visible Add to Cart.
+  and all fields and Add to Cart reachable by scrolling when needed, as
+  specified in VR007 and preserved in the Founder-approved VR009 storefront.
 - Use original founder-approved imagery and source typography when accessible.
   Until verified reference-derived files are available, do not claim pixel fidelity
   or fabricate photos/fonts. Use live catalog authority, published media mapping
@@ -209,3 +210,17 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 - Work in the existing isolated V3.2 Draft PR branch with synthetic preview data,
   browser checks and independent visual review. No merge/deploy/Production/payment
   provider activation/real customer data absent separate Founder approval.
+
+## RT01.1 storefront follow-up
+
+- The Mexico City → Dubai journey keeps its geographic order when the storefront switches direction. Each illustration stays with its localized label and date.
+- Bakery filters and submitted search terms use the URL and browser history; published product names, descriptions, and option labels take precedence by locale.
+- RT01.2 prepares the Founder-confirmed Panettone Normal, Chocolate and Pistacchio. Each has Mini (2700 fils) and Normal (17000 fils), available year-round once published. Product Hub is the commercial authority. Keep the six SKUs in the isolated test fixture until separately authorized for LIVE. All other Panettone SKUs remain reserved.
+- Declare confirmed gluten and, for Pistacchio, pistachio, with an explicit incomplete-declaration notice. Weights, ingredients, full allergens and pack details remain pending. Founder confirmed the PH product cover photos for size Normal: 09 Normal, 14 Chocolate, 11 Pistacchio. The group shots of Mini are not individual variant photos.
+
+## RT01.3 and RT02.2 founder follow-up (25 November 2026)
+
+- Loose Pan de Muerto and its packs remain available year-round once published and active. This supersedes the old seasonal window for loose pieces. Preserve the shared minimum of six for the existing loose SKUs, independent pack rules, and withdrawn SKU protections.
+- New photographs come from the reviewed originals in `~/Downloads/NUEVAS`. The inventory is `docs/handoffs/3L_RT013_FOTOGRAFIAS.csv`. Use only verified product identities and keep mixed images with uncertain composition at category level or pending. Preserve the approved Normal/Chocolate/Pistacchio Panettone source identities and provisional declarations.
+- The Founder rejected the mixed RT02.1 visual treatment. The administrative Tatbiq ZIP is the design authority for the workspace shell, navigation, information hierarchy and cards. Keep 3L command handlers, role checks and data sources.
+- Local-only GO. The previous draft publication authorization does not apply to new candidates. The master handoff records the exact SHAs, evidence and remaining gates.

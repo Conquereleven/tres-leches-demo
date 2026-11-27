@@ -141,6 +141,7 @@ for (const width of [390, 1440])
           ["Delivery notes (PDF)", "pdf"],
           ["Delivery notes (ZIP)", "zip"],
         ]) {
+          await page.locator(".oms-export-trigger").click();
           const waiting = page.waitForEvent("download");
           await page
             .getByRole("button", { name: t(label), exact: true })

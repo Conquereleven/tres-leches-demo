@@ -5,9 +5,12 @@ import manifest from "../../src/brand/media-manifest.json";
 import { menuFamilies } from "../../src/brand/menu";
 import { selectedMedia } from "../../src/brand/media";
 test("all curated media match actual catalog variants and ship responsive derivatives, never originals", () => {
-  assert.equal(manifest.assets.length, 81);
+  assert.equal(manifest.assets.length, 87);
   const assigned = manifest.assets.filter((a) => a.status === "assigned");
-  assert.equal(assigned.length, 36);
+  const galleries = assigned.filter((asset) => asset.derivatives.some(({src}) =>
+    src.startsWith("/brand/approved/legacy-gallery/") || src.startsWith("/brand/approved/ph/")));
+  assert.equal(assigned.length - galleries.length, 36);
+  assert.equal(galleries.length, 37);
   for (const a of assigned) {
     const family = menuFamilies.find((f) => f.id === a.family);
     assert.ok(family);
@@ -16,7 +19,12 @@ test("all curated media match actual catalog variants and ship responsive deriva
         (o) => o.variant === a.variant && (!a.size || o.size === a.size),
       ),
     );
-    assert.equal(a.derivatives.length, 6);
+    if (galleries.includes(a)) {
+      assert.deepEqual(a.derivatives.map(({width,height}) => Math.max(width,height)), [480, 960]);
+      assert.ok(a.derivatives.every((derivative) => derivative.src.endsWith(".webp")));
+    } else {
+      assert.equal(a.derivatives.length, 6);
+    }
     for (const d of a.derivatives) {
       assert.ok(existsSync("public" + d.src));
       assert.equal(statSync("public" + d.src).size, d.bytes);

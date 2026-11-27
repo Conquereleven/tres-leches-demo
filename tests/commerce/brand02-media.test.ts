@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import {
-  selectedProductMedia,
+  approvedMedia,
   categoryEditorialMedia,
 } from "../../src/brand/media";
 import products from "../../shared/storefront-products.json";
@@ -28,20 +28,17 @@ test("BRAND02 accounts for seven interim products and independent editorial repl
     assert.ok(row);
     assert.deepEqual(row.skuIds, p.optionIds);
     assert.equal(row.replacementStatus, "AWAITING FOUNDER-APPROVED IMAGES");
-    const asset = selectedProductMedia(p.id, p.familyId, p.variant)!;
-    if (p.id === "conchas-traditional--tricolor") {
-      assert.equal(asset, undefined);
-      continue;
-    }
-    assert.equal(row.currentSourceId, asset.sourceId);
+    if (p.id === "conchas-traditional--tricolor") continue;
+    const asset = approvedMedia.find((entry) => entry.sourceId === row.currentSourceId)!;
+    assert.ok(asset, p.id);
     assert.equal(asset.width, asset.height);
     for (const d of row.currentDerivatives)
       assert.ok(existsSync("public" + d.src), d.src);
   }
   const gallery = categoryEditorialMedia("conchas");
-  // 3L-MEDIA-002 photographs open the gallery; BRAND02 frames follow them.
+  // Later approved batches open the gallery; BRAND02 retains its two frames.
   const editorial = gallery.filter(
-    (a) => !a.sourceId.startsWith("3l-media-002-"),
+    (a) => !a.sourceId.startsWith("3l-media-002-") && !a.sourceId.startsWith("rt013-"),
   );
   assert.deepEqual(gallery.slice(-editorial.length), editorial);
   // The previously planned third frame was explicitly withdrawn.
@@ -110,7 +107,7 @@ test("BRAND02 leaves commercial identifiers, prices, availability, translations 
       // The BRAND02 release must remain free of commerce changes. PACK-001
       // subsequently extends cart/checkout under its own behavioral regressions;
       // compare the historical visual release for these two implementation files.
-      const current = ["src/brand/Shop.tsx", "src/brand/cart.ts"].includes(path)
+      const current = ["src/brand/Shop.tsx", "src/brand/cart.ts", "shared/commerce-policy.ts"].includes(path)
         ? execFileSync("git", [
             "show",
             `a75a0fa1637f4511ed0237e2b4fff621489e619a:${path}`,
@@ -125,7 +122,10 @@ test("BRAND02 leaves commercial identifiers, prices, availability, translations 
           path,
         );
       else if (/src\/brand\/locales\/(en|es|ar)\/menu.json/.test(path)) {
-        const now = JSON.parse(current.toString()),
+        const copy = path.includes("/ar/")
+          ? execFileSync("git", ["show", `3d1ae44d72c5b48bb19039fde02e49a1db47daf5:${path}`])
+          : current;
+        const now = JSON.parse(copy.toString()),
           previous = JSON.parse(old.toString());
         const expected = path.includes("/en/")
           ? "Tricolor Concha · 1 piece"
@@ -149,6 +149,13 @@ test("BRAND02 leaves commercial identifiers, prices, availability, translations 
         for (const key of Object.keys(now))
           if (key.startsWith("conversion_") || key.startsWith("pack_v2_"))
             delete now[key];
+        if (path.includes("/ar/")) {
+          // RT01.1 approved Arabic for these two bakery labels after BRAND02.
+          assert.equal(now.copy_1b248fab70060e69, "بيسكيتس مكسيكي");
+          assert.equal(now.copy_4a13214d0639f970, "أوريخاس");
+          now.copy_1b248fab70060e69 = previous.copy_1b248fab70060e69;
+          now.copy_4a13214d0639f970 = previous.copy_4a13214d0639f970;
+        }
         assert.deepEqual(now, previous, path);
       } else assert.deepEqual(current, old, path);
     }

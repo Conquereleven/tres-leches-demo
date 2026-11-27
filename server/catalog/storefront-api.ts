@@ -3,7 +3,8 @@ import { packPricingPolicy } from "../domain/pack-pricing";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { State } from "../domain/model";
 import { DomainError } from "../domain/model";
-import { RETIRED_SKUS, availableSku } from "../../shared/commerce-policy";
+import { RETIRED_SKUS, availableSku, heldPanettoneSku, isPanettoneSku } from "../../shared/commerce-policy";
+import { withdrawnConchaSku } from "../../shared/storefront-visibility";
 import { catalogDigest, validateFoundation } from "./contract";
 
 /**
@@ -45,6 +46,23 @@ export function publishedRevision(state: State, mode: StorefrontMode) {
     return { dynamic: true, sellable: false, revision: null };
   }
 }
+/** An approved SKU in a private draft or a legacy catalog row cannot be quoted. */
+export function storefrontSkuPublished(state: State, sku: string) {
+  if (!isPanettoneSku(sku)) return true;
+  if (heldPanettoneSku(sku)) return false;
+  const productId = sku.slice(0, sku.lastIndexOf("-"));
+  return (
+    state.catalogFoundation?.products.some(
+      (product) => product.id === productId &&
+        product.categoryId === "panettone" && product.commercialState === "published",
+    ) === true &&
+    state.catalogFoundation.variants.some(
+      (variant) => variant.skuId === sku && variant.productId === productId &&
+        variant.commercialState === "published",
+    )
+  );
+}
+
 export function storefrontCatalog(state: State, now = new Date()) {
   if (!state.catalogFoundation)
     throw new DomainError(503, "Catalog revision unavailable");
@@ -76,6 +94,8 @@ export function storefrontCatalog(state: State, now = new Date()) {
             v.productId === p.id &&
             v.commercialState === "published" &&
             !RETIRED_SKUS.has(v.skuId) &&
+            !withdrawnConchaSku(v.skuId) &&
+            storefrontSkuPublished(state, v.skuId) &&
             commercial.get(v.skuId)?.active === true,
         )
         .map((v) => {

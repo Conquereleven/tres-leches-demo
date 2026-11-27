@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { randomUUID } from "node:crypto";
 test("WA2 operational golden path, responsive and console", async ({
   page,
 }) => {
@@ -58,14 +59,43 @@ test("WA2 operational golden path, responsive and console", async ({
   });
   await page.getByRole("button", { name: "Refresh", exact: true }).click();
   await expect(page.locator(".co-state")).toContainText("Confirmed");
-  for (const state of ["Preparing", "Ready", "Out for delivery", "Delivered"]) {
-    await page
-      .getByRole("button", { name: `Move to ${state}`, exact: true })
-      .click();
-    await expect(page.locator(".co-state")).toContainText(state);
+  // The unscheduled WA order is paid, but must not enter fulfillment.
+  await expect(page.getByRole("alert")).toContainText("Fulfillment review required");
+  await expect(page.getByRole("button", { name: "Move to Preparing" })).toHaveCount(0);
+  const held = (await (await page.request.get("/api/workspace")).json()).orders
+    .find((order: { paymentId: string }) => order.paymentId === snapshot.payments[0].id);
+  const origin = new URL(page.url()).origin;
+  const invalid = await page.request.post("/api/commands", {
+    headers: { Origin: origin, "Idempotency-Key": randomUUID() },
+    data: { type: "transition", id: held.id, version: held.version, state: "Production" },
+  });
+  expect(invalid.status()).toBe(409);
+  expect((await invalid.json()).message).toBe(
+    "Fulfillment review required; preparation and dispatch are on hold",
+  );
+
+  // A separate scheduled synthetic checkout retains every positive transition.
+  const checkout = await page.request.post("/api/demo/paid-fulfillment", { data: {} });
+  expect(checkout.ok(), await checkout.text()).toBe(true);
+  const { orderId } = await checkout.json();
+  await page.goto("/operations/orders/" + orderId);
+  await page.getByRole("button", { name: "Take order", exact: true }).click();
+  for (const [name, state] of [
+    ["Start preparation", "Production"], ["Mark ready", "Ready"],
+    ["Send for delivery", "Out for Delivery"], ["Mark delivered", "Delivered"],
+  ]) {
+    await page.getByRole("button", { name, exact: true }).click();
+    await expect.poll(async () => {
+      const view = await (await page.request.get("/api/workspace")).json();
+      return view.orders.find((order: { id: string }) => order.id === orderId)?.state;
+    }).toBe(state);
   }
   await page.getByRole("button", { name: "Deliveries", exact: true }).click();
-  await expect(page.locator(".co-state")).toContainText("Delivered");
+  const delivered = page.getByRole("article").filter({
+    has: page.getByRole("heading", { name: "Alex Private", exact: true }),
+  });
+  await expect(delivered).toBeVisible();
+  await expect(delivered).toContainText("Delivered");
   for (const width of [390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await expect

@@ -32,14 +32,6 @@ export const operationsNavigation = [
     icon: House,
   },
   {
-    id: "analytics",
-    label: "Analytics & Reports",
-    title: "Analytics & Reports",
-    description: "Recorded payment captures and historical product performance",
-    group: "Workspace",
-    icon: ChartLine,
-  },
-  {
     id: "orders",
     label: "Orders",
     title: "Orders",
@@ -60,7 +52,7 @@ export const operationsNavigation = [
     label: "Products",
     title: "Products",
     description: "Product Hub integration",
-    group: "Workspace",
+    group: "Administration",
     icon: Package,
   },
   {
@@ -86,6 +78,14 @@ export const operationsNavigation = [
     description: "Ticket previews and future printer connections",
     group: "Administration",
     icon: Printer,
+  },
+  {
+    id: "analytics",
+    label: "Analytics & Reports",
+    title: "Analytics & Reports",
+    description: "Recorded payment captures and historical product performance",
+    group: "Administration",
+    icon: ChartLine,
   },
   {
     id: "zones",
@@ -143,9 +143,12 @@ export function OperationsShell({
       return false;
     }
   });
+  const identity =
+    data.agents.find((agent) => agent.id === data.actor.id)?.name ??
+    data.actor.id;
   const [hint, setHint] = useState<{ label: string; top: number } | null>(null);
   const drawer = useRef<HTMLDialogElement>(null);
-  const menuButton = useRef<HTMLButtonElement>(null);
+  const drawerTrigger = useRef<HTMLButtonElement>(null);
   const current = navigation.find((item) => item.id === view) ?? navigation[0]!;
   const visible = navigation.filter(
     (item) =>
@@ -172,10 +175,12 @@ export function OperationsShell({
       <>
         <a
           className="ops-brand"
-          href="/"
-          aria-label={t("Pastelerías 3L · Ir a la tienda")}
+          href="/operations/overview"
+          aria-label={t("Overview")}
         >
-          <img src="/brand/icon.png" alt="" />
+          <span className="tatbiq-brand-mark">
+            <img src="/brand/icon.png" alt="" />
+          </span>
           <span>
             {t("Pastelerías 3L")}
             <small>{t("OPERATIONS")}</small>
@@ -231,13 +236,10 @@ export function OperationsShell({
           </a>
           <div className="ops-user">
             <span className="ops-avatar" aria-hidden="true">
-              {data.actor.id.slice(0, 2).toUpperCase()}
+              {identity.slice(0, 2).toUpperCase()}
             </span>
             <div>
-              <strong>
-                {data.agents.find((a) => a.id === data.actor.id)?.name ??
-                  data.actor.id}
-              </strong>
+              <strong>{identity}</strong>
               <small>{t(data.actor.role)}</small>
             </div>
           </div>
@@ -289,7 +291,7 @@ export function OperationsShell({
   }
   return (
     <div
-      className={`commerce ops-shell${collapsed ? " ops-collapsed" : ""}${view === "analytics" ? " ops-analytics" : ""}`}
+      className={`commerce ops-shell tatbiq-workspace${collapsed ? " ops-collapsed" : ""}${view === "analytics" ? " ops-analytics" : ""}`}
       aria-busy={busy}
       lang={language}
     >
@@ -327,7 +329,7 @@ export function OperationsShell({
             first?.focus();
           }
         }}
-        onClose={() => menuButton.current?.focus()}
+        onClose={() => drawerTrigger.current?.focus()}
         onClick={(event) => {
           if (event.target === drawer.current) drawer.current.close();
         }}
@@ -346,17 +348,20 @@ export function OperationsShell({
       <div className="ops-workspace">
         <header className="ops-topbar">
           <button
-            ref={menuButton}
             className="ops-menu"
             aria-label={t("Abrir menú")}
             aria-haspopup="dialog"
-            onClick={() => drawer.current?.showModal()}
+            onClick={(event) => {
+              drawerTrigger.current = event.currentTarget;
+              drawer.current?.showModal();
+            }}
           >
             <List size={22} />
           </button>
           <span className="ops-breadcrumb">
             {t("Operaciones")}
-            <span>{t("/")}</span> <strong>{t(current.title)}</strong>
+            <CaretRight size={13} aria-hidden="true" />{" "}
+            <strong>{t(current.title)}</strong>
           </span>
           <label className="ops-language">
             {t("Dashboard language")}
@@ -371,14 +376,21 @@ export function OperationsShell({
               <option value="tl">Filipino / Tagalog</option>
             </select>
           </label>
+          <span className="ops-avatar tatbiq-topbar-avatar" aria-hidden="true">
+            {identity.slice(0, 2).toUpperCase()}
+          </span>
+        </header>
+        <section className="tatbiq-context" aria-label={t("Entorno")}>
           <span className="ops-environment">
+            <ShieldCheck size={15} aria-hidden="true" />
             {data.environment === "staging"
               ? t("Staging")
               : data.environment === "test"
                 ? t("Test")
                 : t("Operations")}
           </span>
-        </header>
+          <span>Dubai · AED</span>
+        </section>
         <main
           id="operations-content"
           tabIndex={-1}
@@ -387,9 +399,6 @@ export function OperationsShell({
           <header className="ops-page-header">
             {heading ?? (
               <div>
-                <p className="ops-kicker">
-                  {t("PASTELERÍAS 3L /")} {t(current.group)}
-                </p>
                 <h1>{t(current.title)}</h1>
                 <p>{t(current.description)}</p>
               </div>
@@ -402,6 +411,35 @@ export function OperationsShell({
           {children}
         </main>
       </div>
+      <nav className="tatbiq-bottom-nav" aria-label={t("Navegación rápida")}>
+        {visible
+          .filter(({ id }) =>
+            ["overview", "orders", "products", "settings"].includes(id),
+          )
+          .map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              type="button"
+              aria-current={view === id ? "page" : undefined}
+              onClick={() => navigate(id)}
+            >
+              <Icon size={20} aria-hidden="true" />
+              <span>{t(label)}</span>
+            </button>
+          ))}
+        <button
+          type="button"
+          aria-label={t("Menú de operaciones")}
+          aria-haspopup="dialog"
+          onClick={(event) => {
+            drawerTrigger.current = event.currentTarget;
+            drawer.current?.showModal();
+          }}
+        >
+          <List size={20} aria-hidden="true" />
+          <span>{t("Operaciones")}</span>
+        </button>
+      </nav>
     </div>
   );
 }

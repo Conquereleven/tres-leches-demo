@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useLayoutEffect, useId, useRef } from "react";
 import drawing from "./journal-drawing.json";
 const WIDTH = 640,
   HEIGHT = 768;
@@ -221,4 +221,46 @@ export function JourneyRoute() {
       </g>
     </svg>
   );
+}
+
+let entrancePlayed = false;
+
+/** The first home mount in a document plays the portrait once. */
+export function EntranceSketch({ label }: { label: string }) {
+  const portrait = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const element = portrait.current;
+    if (!element || element.dataset.entrance === "complete") return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let frame = 0;
+    let start: number | undefined;
+    const finish = () => {
+      cancelAnimationFrame(frame);
+      entrancePlayed = true;
+      paintSketch(element, 1);
+      element.dataset.entrance = "complete";
+    };
+    if (entrancePlayed || reduced.matches) {
+      finish();
+      return;
+    }
+    paintSketch(element, 0);
+    const animate = (time: number) => {
+      start ??= time;
+      const progress = Math.min((time - start) / 4400, 1);
+      if (progress === 1) return finish();
+      paintSketch(element, progress);
+      frame = requestAnimationFrame(animate);
+    };
+    const onPreferenceChange = () => {
+      if (reduced.matches) finish();
+    };
+    frame = requestAnimationFrame(animate);
+    reduced.addEventListener("change", onPreferenceChange);
+    return () => {
+      cancelAnimationFrame(frame);
+      reduced.removeEventListener("change", onPreferenceChange);
+    };
+  }, []);
+  return <div ref={portrait} className="v32-family-portrait"><ScrollSketch label={label} /></div>;
 }

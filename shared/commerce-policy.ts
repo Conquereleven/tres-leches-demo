@@ -1,3 +1,5 @@
+import { withdrawnConchaSku } from "./storefront-visibility";
+
 /** Approved Dubai business policy, shared by browser and authoritative server. */
 export const MAX_ITEM_QUANTITY = 100;
 export const BUSINESS_TIMEZONE = "Asia/Dubai";
@@ -6,9 +8,6 @@ export const DELIVERY_WINDOWS = [
   { label: "1:00 PM – 4:00 PM", startHour: 13 },
   { label: "4:00 PM – 9:00 PM", startHour: 16 },
 ] as const;
-export const SEASONAL_RULES = [
-  { prefix: "pan-de-muerto-", exclude: "-pack-", start: "10-03", end: "11-15" },
-];
 export function businessDate(now = new Date()) {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: BUSINESS_TIMEZONE,
@@ -37,15 +36,22 @@ export const RETIRED_SKUS: ReadonlySet<string> = new Set(
     ]),
   ].map((sku) => `pan-de-muerto-${sku}-chocolate-covering`),
 );
-export function availableSku(id: string, now = new Date()) {
-  if (RETIRED_SKUS.has(id)) return false;
-  const date = businessDate(now).slice(5);
-  return SEASONAL_RULES.every(
-    (r) =>
-      !id.startsWith(r.prefix) ||
-      id.includes(r.exclude) ||
-      (date >= r.start && date <= r.end),
-  );
+/** Other SKUs in the reserved namespace remain unavailable, including packs. */
+const panettoneSkus: ReadonlySet<string> = new Set(
+  ["normal", "chocolate", "pistacchio"].flatMap((flavor) =>
+    ["mini", "normal"].map((size) => `panettone-${flavor}-${size}`),
+  ),
+);
+export const isPanettoneSku = (id: string) =>
+  id === "panettone" || id.startsWith("panettone-");
+export const heldPanettoneSku = (id: string) =>
+  isPanettoneSku(id) && !panettoneSkus.has(id);
+
+/** Approved Pan de Muerto singles and packs now sell year-round.
+ * Publication, stock state and retired SKUs are still enforced independently.
+ */
+export function availableSku(id: string, _now?: Date) {
+  return !RETIRED_SKUS.has(id) && !withdrawnConchaSku(id) && !heldPanettoneSku(id);
 }
 export function leadHours(ids: string[]) {
   return ids.some((id) => /gelatina|^rosca|^tres-leches-mango-/i.test(id))

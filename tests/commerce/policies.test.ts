@@ -136,7 +136,7 @@ test("confirmed merchant identity and contacts render on the customer pages", ()
     /Golositalia FZCO, trading as Pastelerías 3L/,
   );
   assert.ok(business.address?.includes("Cluster C"));
-  assert.equal(business.supportContacts.length, 3);
+  assert.deepEqual(business.supportContacts.map(c => c.phone), ["+971 55 640 6776"]);
   for (const c of business.supportContacts)
     assert.match(
       c.phone,
@@ -155,6 +155,8 @@ test("confirmed merchant identity and contacts render on the customer pages", ()
   );
 
   const contact = render("/contact");
+  for (const html of [contact, terms, render("/privacy")])
+    assert.doesNotMatch(html, /521683319|506757352|52 168 3319|50 675 7352/);
   assert.ok(
     contact.includes(business.address!),
     "address missing from Contact",

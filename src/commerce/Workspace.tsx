@@ -41,6 +41,8 @@ import { orderReference } from "../../shared/order-number";
 import "./commerce.css";
 import "./operations-shell.css";
 import "./oms.css";
+import "./operations-fonts.css";
+import "./tatbiq-workspace.css";
 type Run = (body: Record<string, unknown>, path?: string) => Promise<boolean>;
 const LIST_SCROLL = "3l-oms-list-scroll";
 /** Current view and order from the address bar; old `?order=` links are upgraded in place. */
@@ -240,7 +242,7 @@ function WorkspaceInner() {
   if (!data && sessionExpired) return <Login onLogin={resumeAfterLogin} />;
   if (!data)
     return (
-      <main className="commerce ops-shell ops-auth" lang={language}>
+      <main className="commerce ops-shell tatbiq-workspace ops-auth" lang={language}>
         <h1>{t("Workspace de operaciones")}</h1>
         {error || offline ? (
           <div role="alert">
@@ -839,11 +841,11 @@ function OrderPanel({
     [manualZone, setManualZone] = useState(""),
     [manualReason, setManualReason] = useState("");
   const p = data.payments.find((p) => p.id === o.paymentId),
-    c = data.conversations.find((c) => c.id === o.conversationId)!,
+    c = data.conversations.find((c) => c.id === o.conversationId),
     editable = ["Building", "Awaiting Location", "Minimum Check"].includes(
       o.state,
     ),
-    owned = c.assignedAgent === data.actor.id && c.status === "open";
+    owned = c?.assignedAgent === data.actor.id && c.status === "open";
   const next: Partial<Record<OrderState, OrderState>> = {
     Confirmed: "Production",
     Production: "Ready",
@@ -1110,9 +1112,13 @@ function OrderPanel({
             </p>
             {p.url && (
               <p className="co-payment-url">
-                {t("Enlace generado y encolado por")}{" "}
-                {c.sourceNumberId.toUpperCase()}.
-                <br />
+                {c && (
+                  <>
+                    {t("Enlace generado y encolado por")}{" "}
+                    {c.sourceNumberId.toUpperCase()}.
+                    <br />
+                  </>
+                )}
                 <code>{p.url}</code>
               </p>
             )}

@@ -112,8 +112,8 @@ for (const width of [390, 768, 1440])
       // Two single SKUs (Mini 40 g AED 11, Individual 70 g AED 13): the CTA
       // stays disabled until a color is chosen, for each SKU in turn.
       const singles = [
-        { sku: SINGLE_MINI, color: "red", price: /11/ },
-        { sku: SINGLE_IND, color: "white", price: /13/ },
+        { sku: SINGLE_MINI, color: "red", price: lang === "ar" ? /١١/ : /11/ },
+        { sku: SINGLE_IND, color: "white", price: lang === "ar" ? /١٣/ : /13/ },
       ] as const;
       for (const [i, single] of singles.entries()) {
         const dialog = await openDialog(page, SINGLES_CARD);
@@ -156,8 +156,8 @@ for (const width of [390, 768, 1440])
 
       // Fixed 3-piece packs (AED 33/39): no editable color by design.
       const packs = [
-        { sku: PACK_MINI, price: /33/ },
-        { sku: PACK_IND, price: /39/ },
+        { sku: PACK_MINI, price: lang === "ar" ? /٣٣/ : /33/ },
+        { sku: PACK_IND, price: lang === "ar" ? /٣٩/ : /39/ },
       ] as const;
       for (const [i, pack] of packs.entries()) {
         const dialog = await openDialog(page, PACKS_CARD);
@@ -196,17 +196,17 @@ for (const width of [390, 768, 1440])
       });
 
       // Quantity via the real V3.2 number controls, persisted across reload.
-      const quantities = page.locator(
-        ".v32-new-cart-row input[type='number']",
-      );
+      const quantities = rows.getByRole("spinbutton");
       await expect(quantities).toHaveCount(5);
       await quantities.first().fill("2");
+      await quantities.first().blur();
       expected[0]!.quantity = 2;
       await expect.poll(() => readCart(page)).toEqual(expected);
       await page.reload();
       await expect(page.locator(".v32-new-cart-row")).toHaveCount(5);
       expect(await readCart(page)).toEqual(expected);
       await quantities.first().fill("1");
+      await quantities.first().blur();
       expected[0]!.quantity = 1;
       await expect.poll(() => readCart(page)).toEqual(expected);
       await page.reload();

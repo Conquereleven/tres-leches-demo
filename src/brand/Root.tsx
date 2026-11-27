@@ -1,12 +1,16 @@
-import { VisualV32 } from "./visual-v32/VisualV32";
+import { StorefrontCheckoutFrame, VisualV32 } from "./visual-v32/VisualV32";
 import { LocalizationProvider, useLanguage } from "./localization";
 import { CheckoutPage, CheckoutReturn } from "./Shop";
+import { useMenu } from "./menu";
+import { useLiveCatalog } from "./live-catalog";
+import { pages } from "./Policies";
+import { productDescription, productTitle } from "./visual-v32/ApprovedPurchaseSelector";
+import { productMetadata, socialImage, storefrontLabels, storefrontMetadata } from "../seo/pages";
 import { Suspense, lazy, useEffect, useState } from "react";
-import { BrandExperience } from "./Experience";
-import { isPolicyPath } from "./business";
 // Staff-only code (Operations, Product Hub) loads only on /operations, so
 // customers never download it. A tab opened before a deploy may ask for a chunk
 // that no longer exists: reload once to get the current build instead of failing.
+const operationsLoadingLabel = "Loading 3L Operations…";
 const RELOADED = "3l-operations-chunk-reload";
 const CommerceWorkspace = lazy(() =>
   import("../commerce/Workspace").then(
@@ -34,6 +38,28 @@ const CommerceWorkspace = lazy(() =>
     },
   ),
 );
+function StorefrontMetadata({ path }: { path: string }) {
+  const { language, text } = useLanguage();
+  const catalog = useLiveCatalog();
+  const menu = useMenu();
+  const product = path.startsWith("/menu/") ? menu.products.find(item => item.slug === path.slice(6)) : undefined;
+  const metadata = product
+    ? productMetadata(productTitle(product, language, catalog, text), productDescription(product, language, catalog))
+    : storefrontMetadata(path, language, pages);
+  const title = metadata?.title;
+  const description = metadata?.description;
+  useEffect(() => {
+    if (!title || !description) return;
+    document.title = title;
+    for (const [selector, value] of [
+      ['meta[name="description"]', description], ['meta[property="og:description"]', description],
+      ['meta[name="twitter:description"]', description], ['meta[property="og:title"]', title],
+      ['meta[name="twitter:title"]', title], ['meta[property="og:locale"]', `${language}_AE`],
+      ['meta[property="og:image:alt"]', language === "en" ? socialImage.alt : storefrontLabels[language].wordmark],
+    ] as const) document.querySelector(selector)?.setAttribute("content", value);
+  }, [language, title, description]);
+  return null;
+}
 function RoutedApp() {
   const { language } = useLanguage();
   const [path, setPath] = useState(location.pathname);
@@ -51,31 +77,22 @@ function RoutedApp() {
   if (path.startsWith("/operations"))
     return (
       <Suspense
-        fallback={<main className="commerce ops-shell" aria-busy="true" />}
+        fallback={
+          <main className="operations-entry" aria-busy="true">
+            <span role="status">{operationsLoadingLabel}</span>
+          </main>
+        }
       >
         <CommerceWorkspace />
       </Suspense>
     );
-  const page = path.replace(/\/+$/, "");
-  // Canonical V3.2 customer storefront. Keep the authorized legacy checkout
-  // and server-authoritative payment/3DS recovery unchanged.
-  if (page === "/visual-v32" || page.startsWith("/visual-v32/")) return <VisualV32 />;
-  if (["", "/", "/menu", "/bakery", "/cart", "/contact", "/how-to-order", "/journal"].includes(page))
-    return <VisualV32 />;
-  if (page === "/checkout/return") return <CheckoutReturn />;
-  if (page === "/checkout") return <CheckoutPage />;
-  // Canonical public policies render inside the approved V3.2 shell.
-  // VisualV32 owns their frame; the authorized legal copy still comes from
-  // src/brand/Policies.tsx (see VisualPolicy), never from preview text.
-  if (isPolicyPath(page)) return <VisualV32 />;
-  return (
-    <BrandExperience
-      onManage={() => {
-        history.pushState({}, "", "/operations/inbox");
-        setPath("/operations/inbox");
-      }}
-    />
-  );
+  const page = path.replace(/\/+$/, "") || "/";
+  if (page === "/checkout/return" || page === "/checkout") {
+    return <><StorefrontMetadata path={page} /><StorefrontCheckoutFrame>
+      {page === "/checkout/return" ? <CheckoutReturn /> : <CheckoutPage />}
+    </StorefrontCheckoutFrame></>;
+  }
+  return <><StorefrontMetadata path={page} /><VisualV32 key={path} pathname={path} search={location.search} /></>;
 }
 
 export function Root() {
