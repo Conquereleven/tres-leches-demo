@@ -14,6 +14,7 @@ export function QuantityInput({
   value,
   min = 1,
   max,
+  showMaximum = true,
   label,
   onChange,
   onDraftValidityChange,
@@ -22,10 +23,11 @@ export function QuantityInput({
   value: number;
   min?: number;
   max: number;
+  showMaximum?: boolean;
   label: string;
   onChange: (value: number) => void;
   /** Cart mode defers persistence until the edit is finished. */
-  onDraftValidityChange?: (valid: boolean) => void;
+  onDraftValidityChange?: (valid: boolean, belowMinimum?: boolean) => void;
   className?: string;
 }) {
   const { language } = useLanguage();
@@ -36,19 +38,31 @@ export function QuantityInput({
   const cartEdit = onDraftValidityChange !== undefined;
   const valid =
     Number.isSafeInteger(quantity) && quantity >= min && quantity <= max;
-  const describeRange = localizedKey("checkout:quantity_range", language, {
-    0: min,
-    1: max,
-  });
+  const describeRange = localizedKey(
+    showMaximum ? "checkout:quantity_range" : "checkout:quantity_minimum_hint",
+    language,
+    {
+      0: min,
+      1: max,
+    },
+  );
   const error =
     cartEdit && showError && !valid
       ? Number.isNaN(quantity)
         ? localizedKey("checkout:quantity_whole_number", language)
-        : describeRange
+        : quantity > max && !showMaximum
+          ? localizedKey("checkout:quantity_smaller", language)
+          : describeRange
       : null;
   useEffect(() => {
-    onDraftValidityChange?.(draft === null || valid);
-  }, [draft, valid, onDraftValidityChange]);
+    onDraftValidityChange?.(
+      draft === null || valid,
+      showError &&
+        draft !== null &&
+        Number.isSafeInteger(quantity) &&
+        quantity < min,
+    );
+  }, [draft, valid, quantity, min, showError, onDraftValidityChange]);
   useEffect(() => () => onDraftValidityChange?.(true), [onDraftValidityChange]);
 
   return (
@@ -58,7 +72,7 @@ export function QuantityInput({
         aria-label={label}
         role={cartEdit ? "spinbutton" : undefined}
         aria-valuemin={cartEdit ? min : undefined}
-        aria-valuemax={cartEdit ? max : undefined}
+        aria-valuemax={cartEdit && showMaximum ? max : undefined}
         aria-valuenow={cartEdit ? (valid ? quantity : value) : undefined}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
@@ -66,7 +80,7 @@ export function QuantityInput({
         type="text"
         inputMode="numeric"
         pattern={cartEdit ? undefined : "[0-9]*"}
-        maxLength={cartEdit ? undefined : 3}
+        maxLength={!cartEdit && showMaximum ? String(max).length : undefined}
         autoComplete="off"
         value={draft ?? String(value)}
         onChange={(event) => {

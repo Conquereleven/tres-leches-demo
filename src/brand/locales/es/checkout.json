@@ -201,5 +201,10 @@
   "copy_tpl2_previous_open": "El pedido {0} todavía tiene un pago abierto, por lo que estos cambios no se pueden aplicar.",
   "copy_tpl2_previous_open_detail": "Completa ese pago, o espera a que termine, antes de pagar un pedido modificado.",
   "quantity_whole_number": "Ingresa un número entero para la cantidad.",
-  "quantity_range": "Ingresa una cantidad entre {0} y {1}."
+  "quantity_range": "Ingresa una cantidad entre {0} y {1}.",
+  "quantity_minimum_hint": "Ingresa un número entero de al menos {0}.",
+  "quantity_smaller": "Ingresa un número entero menor para la cantidad.",
+  "quantity_minimum_product": "Pedido mínimo: {0} piezas de este producto.",
+  "quantity_apply_minimum": "Actualizar a {0} piezas · {1}",
+  "order_amount_range": "El importe del pedido supera el límite de pago en línea."
 }

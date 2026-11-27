@@ -238,7 +238,7 @@ export class CommerceService {
     c.version++;
     this.enqueue(s, "message", id);
   }
-  command(raw: unknown, key: string, actor: Actor): unknown {
+  command(raw: unknown, key: string, actor: Actor, channel: "operations" | "storefront" = "operations"): unknown {
     const cmd = commandSchema.parse(raw);
     requireThat(
       /^[a-zA-Z0-9_-]{8,120}$/.test(key),
@@ -256,7 +256,7 @@ export class CommerceService {
         );
         return previous.result;
       }
-      const entity = this.apply(s, cmd, actor) as {
+      const entity = this.apply(s, cmd, actor, channel) as {
         id: string;
         version?: number;
         state?: string;
@@ -271,7 +271,7 @@ export class CommerceService {
       return result;
     });
   }
-  private apply(s: State, cmd: Command, actor: Actor): unknown {
+  private apply(s: State, cmd: Command, actor: Actor, channel: "operations" | "storefront"): unknown {
     if (cmd.type === "createZone") {
       requireThat(
         actor.role === "admin",
@@ -514,6 +514,10 @@ export class CommerceService {
       if (o.state !== "Building") transition(o, "Building", actor.id);
       if (cmd.type === "editOrder") {
         requireThat(distinctLines(cmd.lines), "Productos duplicados", 400);
+        // The online checkout validates large order amounts before using these
+        // commands. Operations and WhatsApp retain their existing edit boundary.
+        requireThat(channel === "storefront" || distinctLines(cmd.lines, 100),
+          "La cantidad de este SKU supera el límite de Operaciones", 400);
         requireThat(
           cmd.lines.every((l) =>
             (s.catalog ?? []).some(

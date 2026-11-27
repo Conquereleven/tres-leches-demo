@@ -64,7 +64,7 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
 
 ## Approved UAT patch V2 (3 October 2026)
 - Flavours are separate authored storefront products with stable slugs; sizes/packs retain authoritative SKU IDs. Retired concha SKUs remain historical, not purchasable. Traditional conchas: Chocolate only. Filled conchas: Pistache only, existing prices confirmed.
-- Customer approved maximum100 units per SKU; quantity supports direct integer entry. Pan singles season begins October3 through November15.
+- The October UAT used a 100-unit per-SKU ceiling. The V3.2 customer hotfix supersedes that general ceiling. Direct editing supports larger orders while availability, the documented 100-box limit for personalized Pan de Muerto packs, and safe authoritative payment amounts remain enforced. Pan singles availability follows the newer year-round decision below.
 - Full text header wordmark, linked homepage menu preview, accessible visual ordering guide, scroll-driven assembly of separate cake layers; no looping motion and reduced motion shows final composition.
 - Optional international WhatsApp contact is separate from required UAE operations mobile. Production remains legacy address mode; Google prepared but off.
 

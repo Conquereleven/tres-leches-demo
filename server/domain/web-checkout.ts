@@ -10,6 +10,7 @@ import {
   distinctLines,
   itemQuantitySchema,
   lineKey,
+  skuQuantityLimit,
 } from "../../shared/pack-composition";
 import {
   validatePackLines,
@@ -109,7 +110,7 @@ const lines = z
   .array(commerceLineSchema)
   .min(1)
   .max(20)
-  .refine(distinctLines, "Duplicate composition or maximum quantity exceeded");
+  .refine((value) => distinctLines(value), "Duplicate composition or maximum quantity exceeded");
 
 /** Legacy single-product quote shape, kept for existing clients. */
 export const webQuoteSchema = z
@@ -117,6 +118,10 @@ export const webQuoteSchema = z
     productId: z.string().min(1).max(100),
     quantity: itemQuantitySchema,
     zoneId: z.string().min(1).max(100),
+  })
+  .refine(({ productId, quantity }) => quantity <= (skuQuantityLimit(productId) ?? Number.MAX_SAFE_INTEGER), {
+    path: ["quantity"],
+    message: "Pack quantity exceeds its box limit",
   })
   .strict();
 export const cartQuoteSchema = z
@@ -133,7 +138,7 @@ export const cartQuoteSchema = z
 
 /** Legacy single-product checkout shape, kept for existing clients. */
 export const webCheckoutSchema = webQuoteSchema
-  .extend({
+  .safeExtend({
     customer: z.string().trim().min(2).max(100),
     phone: z
       .string()
@@ -775,6 +780,19 @@ export async function recoverWebCheckout(
   return { ...resumed, quote };
 }
 
+/** Validate the decimal AED number that the provider will receive as JSON. */
+function exactOnlineAmount(fils: number | null) {
+  if (fils === null || !Number.isSafeInteger(fils) || fils < 0) return false;
+  const amount = fils / 100;
+  // Preserve both the outgoing decimal and the amount the adapter reconciles.
+  if (Math.round(amount * 100) !== fils) return false;
+  const decimal = /^(\d+)(?:\.(\d{1,2}))?$/.exec(JSON.stringify(amount));
+  if (!decimal) return false;
+  const aed = BigInt(decimal[1]!);
+  const cents = BigInt((decimal[2] ?? "").padEnd(2, "0"));
+  return aed * 100n + cents === BigInt(fils);
+}
+
 /** Server-side quote for a cart. The browser never supplies a price. */
 export function quoteWebCheckout(service: CommerceService, raw: unknown) {
   const cart = cartQuoteSchema.safeParse(raw);
@@ -824,6 +842,11 @@ export function quoteWebCheckout(service: CommerceService, raw: unknown) {
     zone?.id,
     s.catalog ?? [],
     method,
+  );
+  requireThat(
+    [quote.subtotalFils, quote.totalFils].every(exactOnlineAmount),
+    "The order amount exceeds the supported online payment range.",
+    422,
   );
   // Opaque comparison token only: catalog/quote remain the sole price authority.
   const quoteRevision = digest(
@@ -1135,6 +1158,7 @@ export async function createWebCheckout(
         { type, ...current, ...extra },
         `${key}-${type}`,
         WEB_ACTOR,
+        "storefront",
       ) as Step;
     let order = command("createOrder", { id: conversationId, version: 0 });
     order = command("editOrder", order, { lines: input.lines });

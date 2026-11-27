@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { validCakeMessage } from "./cake-personalization";
-import { MAX_ITEM_QUANTITY } from "./commerce-policy";
+import { MAX_PERSONALIZED_PACK_BOXES } from "./commerce-policy";
 import {
   tricolorSpec,
   tricolorPreparation,
@@ -111,7 +111,10 @@ export function lineKey(
     (l.cakeMessage ? `~cake:${encodeURIComponent(l.cakeMessage)}` : "")
   );
 }
-export const itemQuantitySchema = z.number().int().min(1).max(MAX_ITEM_QUANTITY);
+export const itemQuantitySchema = z.number().int().min(1);
+export function skuQuantityLimit(sku: string) {
+  return packSpec(sku) ? MAX_PERSONALIZED_PACK_BOXES : undefined;
+}
 export const commerceLineSchema = z
   .object({
     productId: z.string().min(1).max(100),
@@ -122,6 +125,9 @@ export const commerceLineSchema = z
   })
   .strict()
   .superRefine((line, ctx) => {
+    const maximum = skuQuantityLimit(line.productId);
+    if (maximum !== undefined && line.quantity > maximum)
+      ctx.addIssue({ code: "custom", path: ["quantity"], message: "Pack quantity exceeds its box limit" });
     if (line.cakeMessage !== undefined && !validCakeMessage(line.productId, line.cakeMessage)) {
       ctx.addIssue({ code: "custom", path: ["cakeMessage"],
         message: "Cake inscription is only allowed for supported cake SKUs, up to 15/20/30 characters by size" });
@@ -156,15 +162,14 @@ export const commerceLineSchema = z
       ? { composition: normalizeComposition(line.composition) }
       : {}),
   }));
-export function distinctLines(ls: CommerceLine[]) {
-  return (
-    new Set(ls.map(lineKey)).size === ls.length &&
-    ls.every(
-      (l) =>
-        ls
-          .filter((x) => x.productId === l.productId)
-          .reduce((n, x) => n + x.quantity, 0) <= MAX_ITEM_QUANTITY,
-    )
+export function distinctLines(ls: CommerceLine[], channelMaximum = Number.MAX_SAFE_INTEGER) {
+  if (new Set(ls.map(lineKey)).size !== ls.length) return false;
+  if (!Number.isSafeInteger(ls.reduce((sum, line) => sum + line.quantity, 0))) return false;
+  const quantities = new Map<string, number>();
+  for (const { productId, quantity } of ls)
+    quantities.set(productId, (quantities.get(productId) ?? 0) + quantity);
+  return [...quantities].every(([sku, quantity]) =>
+    quantity <= Math.min(skuQuantityLimit(sku) ?? Number.MAX_SAFE_INTEGER, channelMaximum)
   );
 }
 export const packEligibilitySchema = z

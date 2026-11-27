@@ -1118,5 +1118,10 @@
   "Order {0} still has an open payment, so these changes can't be applied to it.": "checkout:copy_tpl2_previous_open",
   "Complete that payment, or wait until it ends, before paying for a changed order.": "checkout:copy_tpl2_previous_open_detail",
   "Enter a whole number for the quantity.": "checkout:quantity_whole_number",
-  "Enter a quantity between {0} and {1}.": "checkout:quantity_range"
+  "Enter a quantity between {0} and {1}.": "checkout:quantity_range",
+  "Enter a whole number of at least {0}.": "checkout:quantity_minimum_hint",
+  "Enter a smaller whole number for the quantity.": "checkout:quantity_smaller",
+  "Minimum order: {0} pieces for this product.": "checkout:quantity_minimum_product",
+  "Update to {0} pieces · {1}": "checkout:quantity_apply_minimum",
+  "The order amount exceeds the supported online payment range.": "checkout:order_amount_range"
 }

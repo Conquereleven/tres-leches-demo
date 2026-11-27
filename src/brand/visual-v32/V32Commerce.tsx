@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react
 import { belowMinimumLines, cart, cartCount, cartQuantityBounds, cartSubtotalFils, displayLinePrice, minQty, useCart, useCheckoutConfig, type CartLine, type CheckoutConfig } from "../cart";
 import { QuantityInput } from "../QuantityInput";
 import { useLanguage } from "../localization";
+import { localizedKey } from "../locales/engine";
 import { withdrawnConchaSku } from "../../../shared/storefront-visibility";
 import { productTitle, storefrontMoney } from "./ApprovedPurchaseSelector";
 import { useLiveCatalog } from "../live-catalog";
@@ -79,28 +80,54 @@ function V32TricolorEditor({line}:{line:CartLine}){
  </label>;
 }
 
-function V32CartQuantity({line, lines, label, onValidityChange}: {
+function V32CartQuantity({line, lines, label, minimumTotal, onValidityChange}: {
   line: CartLine;
   lines: CartLine[];
   label: string;
+  minimumTotal: (minimum: number) => string;
   onValidityChange: (key: string, valid: boolean) => void;
 }) {
+  const { language } = useLanguage();
   const key = lineKey(line);
+  const bounds = cartQuantityBounds(lines, line);
+  const [belowDraft, setBelowDraft] = useState(false);
+  const [repairCount, setRepairCount] = useState(0);
   const report = useCallback(
-    (valid: boolean) => onValidityChange(key, valid),
+    (valid: boolean, belowMinimum = false) => {
+      setBelowDraft(belowMinimum);
+      onValidityChange(key, valid);
+    },
     [key, onValidityChange],
   );
+  const needsRepair = minQty(line.productId) > 1 &&
+    (line.quantity < bounds.min || belowDraft);
   return (
-    <label>{label}
-      <QuantityInput
-        {...cartQuantityBounds(lines, line)}
-        className=""
-        label={label}
-        value={line.quantity}
-        onChange={(quantity) => cart.set(key, quantity)}
-        onDraftValidityChange={report}
-      />
-    </label>
+    <>
+      <label>{label}
+        <QuantityInput
+          key={repairCount}
+          {...bounds}
+          className=""
+          label={label}
+          value={line.quantity}
+          onChange={(quantity) => cart.set(key, quantity)}
+          onDraftValidityChange={report}
+        />
+      </label>
+      {needsRepair && (
+        <div className="v32-cart-minimum" data-quantity-minimum>
+          <p role="status">{localizedKey("checkout:quantity_minimum_product", language, {0:minQty(line.productId)})}</p>
+          <button type="button" onClick={(event) => {
+            const controls = event.currentTarget.closest(".v32-new-cart-controls");
+            cart.set(key, bounds.min);
+            setRepairCount(count => count + 1);
+            requestAnimationFrame(() => controls?.querySelector("input")?.focus());
+          }}>
+            {localizedKey("checkout:quantity_apply_minimum", language, {0:bounds.min,1:minimumTotal(bounds.min)})}
+          </button>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -127,9 +154,9 @@ export function VisualCart(){
  <Panel title={t.cart}><ul className="v32-new-cart-items">{lines.map(l=>{const p=withdrawnConchaSku(l.productId)?undefined:config.products.find(x=>x.id===l.productId);return <li key={lineKey(l)} className="v32-new-cart-row">
   <div><h3>{p?name(p.id,p.name):l.productId}</h3>{p&&tricolorSpec(l.productId)?.kind==="single"?<V32TricolorEditor line={l}/>:l.color&&<p>{tricolorCopy[language][l.color]}</p>}{l.cakeMessage&&<p data-cart-cake-message>{{en:"Cake inscription",es:"Inscripción",ar:"الكتابة على الكعكة"}[language]}: {l.cakeMessage}</p>}{l.composition?.map(c=><small key={c.componentSkuId}>{componentName(c.componentSkuId,language)} × {c.units} </small>)}{p&&config.personalizedPacks?.enabled&&packSpec(l.productId)&&<V32PackEditor line={l} config={config}/>}
   <p>{p?money(displayLinePrice(l,p.priceFils,config.packPricing))+{en:" each",es:" por unidad",ar:" للقطعة"}[language]:text("This item is no longer available.")}</p></div>
-  <div className="v32-new-cart-controls">{p&&<V32CartQuantity line={l} lines={lines} label={t.quantity} onValidityChange={reportQuantity}/>}<button type="button" onClick={()=>cart.remove(lineKey(l))}>{t.remove}</button></div></li>})}</ul>
+  <div className="v32-new-cart-controls">{p&&<V32CartQuantity line={l} lines={lines} label={t.quantity} minimumTotal={minimum=>money(displayLinePrice(l,p.priceFils,config.packPricing)*minimum)} onValidityChange={reportQuantity}/>}<button type="button" onClick={()=>cart.remove(lineKey(l))}>{t.remove}</button></div></li>})}</ul>
  <a className="v32-new-action v32-new-action-secondary" href={suffix("/bakery")}>{t.continue}</a></Panel>
- <div><Summary config={config}/>{needsReview?<p role="alert">{text("This item is no longer available.")}</p>:belowMinimum?<p role="alert">{t.minimum}</p>:<a className="v32-new-action" aria-disabled={invalidEdits.size > 0 ? true : undefined} href={invalidEdits.size ? undefined : suffix("/checkout")}>{t.checkout} <span aria-hidden>{language==="ar"?"←":"→"}</span></a>}</div></div>}
+ <div><Summary config={config}/>{needsReview&&<p role="alert">{text("This item is no longer available.")}</p>}<a className="v32-new-action" aria-disabled={needsReview||belowMinimum||invalidEdits.size>0 ? true : undefined} href={needsReview||belowMinimum||invalidEdits.size ? undefined : suffix("/checkout")}>{t.checkout} <span aria-hidden>{language==="ar"?"←":"→"}</span></a></div></div>}
  </main>;
 }
 export function VisualContact(){

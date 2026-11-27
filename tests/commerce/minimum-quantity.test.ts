@@ -195,7 +195,7 @@ const rejectsMinimumAsync = (fn: () => Promise<unknown>) =>
       e instanceof DomainError && e.status === 422 && e.message === MESSAGE,
   );
 
-test("server quote rejects 1 and 5, accepts 6, 7, 90, 99 and 100, and refuses 101 for loose Pan and Bolillo", () => {
+test("server quote rejects counts below six, prices loose Pan and Bolillo above 100, and rejects unsafe payment amounts", () => {
   mock.timers.enable({ apis: ["Date"], now: new Date(NOW) });
   const f = fixture();
   try {
@@ -205,7 +205,7 @@ test("server quote rejects 1 and 5, accepts 6, 7, 90, 99 and 100, and refuses 10
           quoteWebCheckout(f.service, pickup([{ productId: id, quantity }])),
         );
       const price = f.store.read().catalog!.find((p) => p.id === id)!.priceFils;
-      for (const quantity of [6, 7, 90, 99, 100]) {
+      for (const quantity of [6, 7, 90, 99, 100, 120]) {
         const q = quoteWebCheckout(
           f.service,
           pickup([{ productId: id, quantity }]),
@@ -214,7 +214,7 @@ test("server quote rejects 1 and 5, accepts 6, 7, 90, 99 and 100, and refuses 10
         assert.equal(q.subtotalFils, price * quantity, `${id} × ${quantity}`);
       }
       assert.throws(() =>
-        quoteWebCheckout(f.service, pickup([{ productId: id, quantity: 101 }])),
+        quoteWebCheckout(f.service, pickup([{ productId: id, quantity: Number.MAX_SAFE_INTEGER }])),
       );
     }
     // Legacy single-product shape cannot bypass the rule.
@@ -246,7 +246,7 @@ test("hosted checkout freezes the current large-order price and rejects stale qu
       createWebCheckout(f.service, checkout, randomUUID(), true, undefined, quoteRevision);
     await assert.rejects(create(body, quote(99).quoteRevision), { status: 409 });
     await assert.rejects(create(
-      checkoutBody([{ productId: PAN_2, quantity: 101 }]),
+      checkoutBody([{ productId: PAN_2, quantity: Number.MAX_SAFE_INTEGER }]),
       quote(100).quoteRevision,
     ));
     assert.equal(f.store.read().orders.length, 0);
@@ -262,6 +262,25 @@ test("hosted checkout freezes the current large-order price and rejects stale qu
   } finally {
     f.store.close();
     mock.timers.reset();
+  }
+});
+
+test("website quotes require exact AED decimals on the wire and in provider reconciliation", () => {
+  const f = fixture();
+  try {
+    f.store.write(state => {
+      state.catalog!.find(product=>product.id===PAN_2)!.priceFils=1;
+    });
+    const quantity=Number.MAX_SAFE_INTEGER;
+    const quote=(count:number)=>quoteWebCheckout(f.service,pickup([{productId:PAN_2,quantity:count}]));
+    assert.equal(quote(quantity-2).totalFils,quantity-2);
+    for (const lossy of [quantity, quantity-1])
+      assert.throws(()=>quote(lossy),{
+        status:422,message:"The order amount exceeds the supported online payment range.",
+      });
+    assert.equal(f.calls(),0);
+  } finally {
+    f.store.close();
   }
 });
 
