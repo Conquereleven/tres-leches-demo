@@ -96,7 +96,7 @@ for (const width of [390, 768, 1440])
     await page
       .getByRole("button", { name: "Decrease quantity", exact: true })
       .click();
-    for (const invalid of ["0", "101", "-2", "1.5", "abc"]) {
+    for (const invalid of ["0", "9007199254740992", "-2", "1.5", "abc"]) {
       await qty.fill(invalid);
       await qty.press("Tab");
       await expect(qty).toHaveValue("40");

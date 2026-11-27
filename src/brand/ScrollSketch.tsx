@@ -182,15 +182,8 @@ export function paintJourney(section: HTMLElement, progress: number) {
   // Screen pixels per drawing unit, independent of the stacked mobile rotation.
   const unit = 1 / (Math.hypot(matrix.a, matrix.b) || 1);
   const length = route.getTotalLength();
-  const place = (selector: string, at: number) => {
-    const point = route.getPointAtLength(length * at);
-    section
-      .querySelector(selector)
-      ?.setAttribute(
-        "transform",
-        `translate(${point.x.toFixed(1)} ${point.y.toFixed(1)}) scale(${unit.toFixed(3)})`,
-      );
-  };
+  const place = (selector: string, at: number) =>
+    placeRoutePoint(route, section.querySelector(selector), length * at, unit);
   place(".ref-route-origin", 0);
   place(".ref-route-arrival", 1);
   place(".ref-route-tracer", travelled);
@@ -202,6 +195,85 @@ export function paintJourney(section: HTMLElement, progress: number) {
   const bridge = section.closest<HTMLElement>(".ref-bridge") ?? section;
   bridge.dataset.journey =
     progress < 0.2 ? "mexico" : travelled < 1 ? "travel" : "dubai";
+}
+
+function placeRoutePoint(route: SVGPathElement, marker: Element | null, distance: number, scale: number) {
+  if (!marker) return;
+  const point = route.getPointAtLength(distance);
+  marker.setAttribute("transform",
+    `translate(${point.x.toFixed(1)} ${point.y.toFixed(1)}) scale(${scale.toFixed(3)})`);
+}
+
+/** Tie the existing mobile artwork and traveller to the path actually drawn by the browser. */
+export function useMobileJourneyEntrance(section: { readonly current: HTMLElement | null }) {
+  useLayoutEffect(() => {
+    const bridge = section.current;
+    const route = bridge?.querySelector<SVGPathElement>(".journey-line");
+    const marker = bridge?.querySelector(".journey-traveller") ?? null;
+    if (!bridge || !route || !marker) return;
+    const mobile = matchMedia("(max-width: 900px)");
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    let frame = 0;
+    let deadline = 0;
+    const position = (distance: number) => {
+      const matrix = route.getScreenCTM();
+      const scale = matrix ? 1 / (Math.hypot(matrix.a, matrix.b) || 1) : 1;
+      placeRoutePoint(route, marker, distance, scale);
+    };
+    const clear = () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(deadline);
+      delete bridge.dataset.routeEntrance;
+      bridge.style.removeProperty("--mobile-route-length");
+    };
+    const finish = () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(deadline);
+      if (mobile.matches) bridge.dataset.routeEntrance = "complete";
+    };
+    const onAnimationEnd = (event: AnimationEvent) => {
+      if (event.animationName === "route-draw") finish();
+    };
+    const play = () => {
+      clear();
+      if (!mobile.matches) return;
+      const length = route.getTotalLength();
+      bridge.style.setProperty("--mobile-route-length", String(length));
+      if (reduced.matches) {
+        finish();
+        return;
+      }
+      // Hydration can finish after the prerendered CSS timeline has started.
+      // Restart that same timeline for the mobile path and sample it for the marker.
+      route.style.animationName = "none";
+      void getComputedStyle(route).animationName;
+      bridge.dataset.routeEntrance = "running";
+      route.style.removeProperty("animation-name");
+      position(0);
+      const tick = () => {
+        const offset = Number.parseFloat(getComputedStyle(route).strokeDashoffset);
+        if (!Number.isFinite(offset) || offset <= 0.01) {
+          finish();
+          return;
+        }
+        position(Math.max(0, length - offset));
+        frame = requestAnimationFrame(tick);
+      };
+      frame = requestAnimationFrame(tick);
+      // Safari may suspend frames during a tab orientation change or capture.
+      deadline = window.setTimeout(finish, 4500);
+    };
+    route.addEventListener("animationend", onAnimationEnd);
+    play();
+    mobile.addEventListener("change", play);
+    reduced.addEventListener("change", play);
+    return () => {
+      clear();
+      route.removeEventListener("animationend", onAnimationEnd);
+      mobile.removeEventListener("change", play);
+      reduced.removeEventListener("change", play);
+    };
+  }, [section]);
 }
 export function JourneyRoute() {
   return (
@@ -232,10 +304,13 @@ export function EntranceSketch({ label }: { label: string }) {
     const element = portrait.current;
     if (!element || element.dataset.entrance === "complete") return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const waitForMobileVisibility = window.matchMedia("(max-width: 900px)").matches;
     let frame = 0;
     let start: number | undefined;
+    let observer: IntersectionObserver | undefined;
     const finish = () => {
       cancelAnimationFrame(frame);
+      observer?.disconnect();
       entrancePlayed = true;
       paintSketch(element, 1);
       element.dataset.entrance = "complete";
@@ -252,13 +327,26 @@ export function EntranceSketch({ label }: { label: string }) {
       paintSketch(element, progress);
       frame = requestAnimationFrame(animate);
     };
+    const begin = () => {
+      observer?.disconnect();
+      if (reduced.matches) return finish();
+      element.dataset.entrance = "drawing";
+      frame = requestAnimationFrame(animate);
+    };
     const onPreferenceChange = () => {
       if (reduced.matches) finish();
     };
-    frame = requestAnimationFrame(animate);
+    if (waitForMobileVisibility && typeof IntersectionObserver !== "undefined") {
+      element.dataset.entrance = "waiting";
+      observer = new IntersectionObserver(([entry]) => {
+        if (entry?.isIntersecting) begin();
+      });
+      observer.observe(element);
+    } else begin();
     reduced.addEventListener("change", onPreferenceChange);
     return () => {
       cancelAnimationFrame(frame);
+      observer?.disconnect();
       reduced.removeEventListener("change", onPreferenceChange);
     };
   }, []);

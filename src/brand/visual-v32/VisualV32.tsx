@@ -4,7 +4,7 @@ import { useCheckoutConfig, useCheckoutNow, useCart, cartCount } from "../cart";
 import { useLanguage } from "../localization";
 import { useLiveCatalog } from "../live-catalog";
 import { purchasableOptions } from "./catalog-availability";
-import { EntranceSketch } from "../ScrollSketch";
+import { EntranceSketch, useMobileJourneyEntrance } from "../ScrollSketch";
 import { Journal, RoscaStory } from "./Journal";
 import { VisualCart, VisualCheckout, VisualReturn, VisualContact, VisualPolicy, VisualHowToOrder } from "./V32Commerce";
 import { ApprovedProductCard, ApprovedPurchasePopup, productTitle, productDescription, storefrontMoney, useProductTitle } from "./ApprovedPurchaseSelector";
@@ -119,9 +119,12 @@ const navigationLabels = {
  ar: { language: "اللغة", open: "فتح قائمة التنقل", close: "إغلاق قائمة التنقل", menu: "قائمة التنقل", skip: "انتقل إلى المحتوى", categories: "الفئات", collections: "فئات 3L المنشورة", searchBakery: "ابحث في المخبز", searchMenu: "ابحث في القائمة", footer: "روابط تذييل الصفحة" },
 } as const;
 
-function Icon({name}:{name:"menu"|"bag"|"search"|"arrow"|"chat"}){
+function Icon({name}:{name:"menu"|"bag"|"search"|"arrow"|"chat"|"home"|"catalogue"|"journal"}){
   const shape={
     menu:<path d="M3 5h18M3 12h18M3 19h18"/>,
+    home:<path d="m3 11 9-8 9 8M5 9v12h14V9M10 21v-7h4v7"/>,
+    catalogue:<path d="M4 5h16v14H4zM4 11h16M12 11v8"/>,
+    journal:<path d="M4 5h6l2 2 2-2h6v13h-6l-2 2-2-2H4zM12 7v13"/>,
     bag:<><path d="M5 8h14l2 13H3L5 8Z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></>,
     search:<><circle cx="10.5" cy="10.5" r="6.7"/><path d="m16 16 5 5"/></>,
     arrow:<path d="M2 12h19m-6-5 6 5-6 5"/>,
@@ -136,8 +139,68 @@ export function StorefrontHeader(){
   const href = (path: string) => (origin + path || "/") + (language === "en" ? "" : `?lang=${language}`);
 
   const count=cartCount(useCart());
-  const menu=useRef<HTMLDialogElement>(null);
+  const menu=useRef<HTMLDivElement>(null);
+  const navigationTrigger=useRef<HTMLButtonElement>(null);
+  const restoreNavigationFocus=useRef(false);
   const [open,setOpen]=useState(false);
+  const closeNavigation=useCallback((restoreFocus: boolean)=>{
+    if(restoreFocus)restoreNavigationFocus.current=true;
+    setOpen(false);
+  },[]);
+  useEffect(()=>{
+    if(!open){
+      if(!restoreNavigationFocus.current)return;
+      restoreNavigationFocus.current=false;
+      const frame=requestAnimationFrame(()=>navigationTrigger.current?.focus({preventScroll:true}));
+      return ()=>cancelAnimationFrame(frame);
+    }
+    menu.current?.querySelector<HTMLAnchorElement>("nav a")?.focus();
+    let tabTarget: EventTarget|null=null;
+    const onKey=(event:KeyboardEvent)=>{
+      tabTarget=event.key==="Tab"?event.target:null;
+      if(event.key==="Escape"){event.preventDefault();closeNavigation(true);}
+    };
+    const containsControl=(target:EventTarget|null)=>target instanceof Node &&
+      (menu.current?.contains(target)||navigationTrigger.current?.contains(target));
+    const closeOutside=(event:Event)=>{
+      if(event.target instanceof Node&&!containsControl(event.target))closeNavigation(false);
+    };
+    const onPointer=(event:PointerEvent)=>{
+      tabTarget=null;
+      closeOutside(event);
+    };
+    let focusTimer=0;
+    const onFocusOut=(event:FocusEvent)=>{
+      if(!containsControl(event.target)||containsControl(event.relatedTarget))return;
+      if(event.relatedTarget)closeNavigation(false);
+      else if(event.target===tabTarget){
+        // Safari can move focus to the browser UI without emitting focusin.
+        tabTarget=null;
+        window.clearTimeout(focusTimer);
+        focusTimer=window.setTimeout(()=>{
+          if(!containsControl(document.activeElement))closeNavigation(false);
+        });
+      }
+    };
+    const viewport=window.matchMedia("(max-width: 900px)");
+    const onResize=()=>{if(!viewport.matches)closeNavigation(false)};
+    const onLeave=()=>closeNavigation(false);
+    document.addEventListener("keydown",onKey);
+    document.addEventListener("pointerdown",onPointer);
+    document.addEventListener("focusin",closeOutside);
+    document.addEventListener("focusout",onFocusOut);
+    viewport.addEventListener("change",onResize);
+    window.addEventListener("pagehide",onLeave);
+    return ()=>{
+      document.removeEventListener("keydown",onKey);
+      document.removeEventListener("pointerdown",onPointer);
+      document.removeEventListener("focusin",closeOutside);
+      document.removeEventListener("focusout",onFocusOut);
+      window.clearTimeout(focusTimer);
+      viewport.removeEventListener("change",onResize);
+      window.removeEventListener("pagehide",onLeave);
+    };
+  },[open,closeNavigation]);
   const displayCount=new Intl.NumberFormat(language==="ar"?"ar-AE-u-nu-arab":language).format(count);
   const languagePicker = (mobile=false)=><label className="vr009-language">
     <span className="v32-sr">{ui.language}</span>
@@ -145,10 +208,18 @@ export function StorefrontHeader(){
       <option value="en">{mobile?"English":"🇬🇧"}</option><option value="es">{mobile?"Español":"ES"}</option><option value="ar">{mobile?"العربية":"AR"}</option>
     </select>
   </label>;
+  const route=open?location.pathname.slice(origin.length).replace(/\/$/,""):"";
+  const mobileLinks=[
+    {path:"",label:labels.home,icon:"home",current:route===""},
+    {path:"/menu",label:labels.menu,icon:"catalogue",current:/^\/(menu|bakery)(\/|$)/.test(route)},
+    {path:"/journal",label:labels.journal,icon:"journal",current:route==="/journal"},
+    {path:"/contact",label:labels.contact,icon:"chat",current:route==="/contact"},
+    {path:"/cart",label:labels.cart,icon:"bag",current:route==="/cart"},
+  ] as const;
   return <>
     <header className="mast">
-      <button className="mobile-nav" type="button" aria-label={ui.open} aria-controls="storefront-nav"
-        aria-expanded={open} onClick={()=>{menu.current?.showModal();setOpen(true);}}><Icon name="menu"/></button>
+      <button ref={navigationTrigger} className="mobile-nav" type="button" aria-label={ui.open} aria-controls="storefront-nav"
+        aria-expanded={open} onClick={()=>open?closeNavigation(true):setOpen(true)}><Icon name="menu"/></button>
       <nav className="mast-left" aria-label={labels.menu}><a href={href("")}>{labels.home}</a><a href={href("/menu")}>{labels.menu}</a></nav>
       <a className="brand" href={href("")} dir="ltr"><img src={art+"wordmark-tight.png"} alt={storefrontLabels[language].wordmark}/></a>
       <nav className="mast-right" aria-label={labels.support}>
@@ -157,16 +228,22 @@ export function StorefrontHeader(){
         <a className="cart-text" href={href("/cart")}><Icon name="bag"/>{labels.cart} <bdi aria-live="polite">({displayCount})</bdi></a>
       </nav>
       <a className="mobile-bag" href={href("/cart")} aria-label={labels.cart}><Icon name="bag"/><output>{displayCount}</output></a>
+      <div className="mobile-corner-nav glass" id="storefront-nav" ref={menu} role="dialog" aria-label={ui.menu}
+        data-open={open} aria-hidden={open?undefined:true} inert={!open}>
+        <button type="button" className="mobile-corner-close" aria-label={ui.close} onClick={()=>closeNavigation(true)}>×</button>
+        <nav aria-label={ui.menu}>
+          {mobileLinks.map(link=><a key={link.path} href={href(link.path)}
+            aria-current={open&&link.current?"page":undefined} onClick={()=>closeNavigation(false)}>
+            <Icon name={link.icon}/><span>{link.label}</span>
+            {link.path==="/cart"&&<bdi className="mobile-corner-count">{displayCount}</bdi>}
+          </a>)}
+        </nav>
+        <div className="mobile-corner-language">
+          <span aria-hidden="true">{ui.language}</span>
+          {languagePicker(true)}
+        </div>
+      </div>
     </header>
-    <dialog className="local-dialog glass" id="storefront-nav" ref={menu} aria-label={ui.menu} onClose={()=>setOpen(false)}>
-      <form method="dialog"><button aria-label={ui.close}>×</button></form>
-      <h2>{labels.menu}</h2>
-      <nav>
-        <a href={href("")}>{labels.home}</a><a href={href("/menu")}>{labels.menu}</a>
-        <a href={href("/journal")}>{labels.journal}</a><a href={href("/contact")}>{labels.contact}</a>
-        <a href={href("/cart")}>{labels.cart} ({displayCount})</a>{languagePicker(true)}
-      </nav>
-    </dialog>
   </>;
 }
 function Blossoms(){
@@ -174,6 +251,8 @@ function Blossoms(){
 }
 function Home({staticPage}:{staticPage:boolean}){
   const {language}=useLanguage();const t=visualCopy[language];
+  const journey=useRef<HTMLElement>(null);
+  useMobileJourneyEntrance(journey);
   const cities = {
     en:{mexico:"Mexico City",dubai:"Dubai",since:"1982",journey:"Mexico City 1982 to Dubai today",help:"Need help?",liza:"Liza preparing a tres leches cake"},
     es:{mexico:"Ciudad de México",dubai:"Dubái",since:"1982",journey:"De Ciudad de México en 1982 a Dubái hoy",help:"¿Necesitas ayuda?",liza:"Liza preparando un pastel de tres leches"},
@@ -182,13 +261,17 @@ function Home({staticPage}:{staticPage:boolean}){
   return <main className="home-main" id="main">
     <div className="journey-composition">
       <h1 className="entrance">{t.hero1}<br/>{t.hero2}</h1>
-      <section className="journey" dir="ltr" aria-label={cities.journey}>
+      <section ref={journey} className="journey" dir="ltr" aria-label={cities.journey}>
         <figure className="city mexico" data-city="mexico"><img src={art+"mexico.png"} alt=""/><figcaption dir={language === "ar" ? "rtl" : undefined}>{cities.mexico}<span>{cities.since}</span></figcaption></figure>
         <svg viewBox="0 0 540 100" className="journey-svg" aria-hidden="true">
           <path className="journey-halo" d="M8 39 C90 -24 150 138 267 55 S417 56 529 38"/>
           <path className="journey-line" d="M8 39 C90 -24 150 138 267 55 S417 56 529 38"/>
           <circle cx="8" cy="39" r="6" fill="#c58327"/><circle cx="105" cy="39" r="21" fill="#f9ded3" stroke="#b97720" strokeWidth="2"/>
           <circle cx="105" cy="39" r="9" fill="#8b4d1c"/><circle cx="529" cy="38" r="9" fill="#f9e6df" stroke="#bd7923" strokeWidth="3"/>
+          <g className="journey-traveller" aria-hidden="true">
+            <circle r="7" fill="#f8e1aa" opacity=".8"/>
+            <circle r="3.8" fill="#b47b30" stroke="#fff6df" strokeWidth="1.2"/>
+          </g>
         </svg>
         <figure className="city dubai" data-city="dubai"><img src={art+"dubai.jpg"} alt=""/><figcaption dir={language === "ar" ? "rtl" : undefined}>{cities.dubai}<span>{t.today}</span></figcaption></figure>
       </section>

@@ -50,7 +50,7 @@ for (const width of [390, 1440]) {
     const input = quantityField(page);
     await expect(input).toHaveValue("7");
     await expect(input).toHaveAttribute("aria-valuemin", "6");
-    await expect(input).toHaveAttribute("aria-valuemax", "100");
+    await expect(input).not.toHaveAttribute("aria-valuemax");
 
     // Clearing and typing the first digit must never delete or reset the row.
     await input.fill("");
@@ -97,14 +97,14 @@ for (const [lang, whole, range] of [
   [
     "en",
     "Enter a whole number for the quantity.",
-    "Enter a quantity between 6 and 100.",
+    "Enter a whole number of at least 6.",
   ],
   [
     "es",
     "Ingresa un número entero para la cantidad.",
-    "Ingresa una cantidad entre 6 y 100.",
+    "Ingresa un número entero de al menos 6.",
   ],
-  ["ar", "أدخل عدداً صحيحاً للكمية.", "أدخل كمية بين 6 و100."],
+  ["ar", "أدخل عدداً صحيحاً للكمية.", "أدخل عدداً صحيحاً لا يقل عن 6."],
 ] as const) {
   test(`invalid quantities are editable, explained and never persisted in ${lang}`, async ({
     page,
@@ -124,7 +124,7 @@ for (const [lang, whole, range] of [
       ["6.5", whole],
       ["0", range],
       ["5", range],
-      ["101", range],
+      ["4", range],
     ]) {
       await input.fill(invalid);
       await input.press("Tab");
@@ -158,11 +158,15 @@ test("quote requests enforce capacity, published availability and numeric quanti
       headers: { origin: baseURL! },
       data: { lines: [{ productId, quantity }], fulfillmentMethod: "pickup" },
     });
-  for (const quantity of [0, -1, 6.5, "90", "", 101]) {
+  for (const quantity of [0, -1, 6.5, "90", "", Number.MAX_SAFE_INTEGER + 1]) {
     expect((await post(quantity)).status()).toBe(400);
   }
   expect((await post(5)).status()).toBe(422);
-  for (const quantity of [6, 90, 99, 100]) {
+  expect(
+    (await post(101, "pan-de-muerto-traditional-pack-6-mini")).status(),
+  ).toBe(400);
+  expect((await post(Number.MAX_SAFE_INTEGER)).status()).toBe(422);
+  for (const quantity of [6, 90, 99, 100, 120]) {
     const response = await post(quantity);
     expect(response.status()).toBe(200);
     expect(await response.json()).toMatchObject({
@@ -278,4 +282,101 @@ test("checkout requires a fresh review when a cart edit changes the amount to pa
   await expect(review).not.toBeChecked();
   await review.check();
   await expect(next).toBeEnabled();
+});
+
+test("a 19-piece mixed basket identifies the four-piece Pan line and confirms both minimum repair and a 120-piece hosted checkout", async ({
+  page,
+}, info) => {
+  const mixed = [
+    { productId: pan, quantity: 4 },
+    { productId: "pan-de-muerto", quantity: 7 },
+    { productId: "fixture-36", quantity: 8 },
+  ];
+  const forbidden: string[] = [];
+  await page.route("https://pay.test.paymennt.com/**", (route) =>
+    route.fulfill({ body: "Hosted synthetic handoff" }),
+  );
+  page.on("request", (request) => {
+    if (
+      request.method() === "POST" &&
+      !request.url().startsWith("http://127.0.0.1:3189/")
+    )
+      forbidden.push(new URL(request.url()).origin);
+  });
+  await gotoWithCart(page, "/cart", mixed, '[data-new-ui="cart"]');
+  const rows = page.locator(".v32-new-cart-row");
+  const invalid = rows.first();
+  const field = invalid.getByRole("spinbutton");
+  const repair = invalid.locator("[data-quantity-minimum]");
+  await expect(rows).toHaveCount(3);
+  await expect(page.locator(".mast .mobile-bag output")).toHaveText("19");
+  await expect(field).toHaveValue("4");
+  await expect(repair).toContainText(
+    "Minimum order: 6 pieces for this product.",
+  );
+  await expect(rows.nth(1).locator("[data-quantity-minimum]")).toHaveCount(0);
+  await expect(rows.nth(2).locator("[data-quantity-minimum]")).toHaveCount(0);
+  await expect(page.locator(".v32-new-action[aria-disabled=true]")).toHaveCount(
+    1,
+  );
+  await expect(page.locator(".v32-new-total")).toContainText("AED 515");
+  await page.screenshot({ path: info.outputPath("exact-invalid-line.png") });
+  await repair
+    .getByRole("button", { name: "Update to 6 pieces · AED 78" })
+    .click();
+  await expect(field).toHaveValue("6");
+  await expect(page.locator(".v32-new-total")).toContainText("AED 541");
+  await expect(page.getByRole("link", { name: /^Checkout/ })).toBeVisible();
+
+  await field.fill("120");
+  await field.press("Enter");
+  await expect(field).toHaveValue("120");
+  await page.reload();
+  await expect(field).toHaveValue("120");
+  await expect(page.locator(".v32-new-total")).toContainText("AED 2023");
+  await page.getByRole("link", { name: /^Checkout/ }).click();
+  const response = page.waitForResponse((r) =>
+    r.url().endsWith("/api/checkout/quote"),
+  );
+  await page.getByRole("radio", { name: "PICKUP", exact: true }).check();
+  expect(await (await response).json()).toMatchObject({
+    eligible: true,
+    subtotalFils: 202300,
+    totalFils: 202300,
+  });
+  const date = page.getByLabel("Pickup date");
+  await date.fill((await date.getAttribute("min"))!);
+  await page
+    .getByRole("combobox", { name: "Pickup time", exact: true })
+    .selectOption("4:00 PM – 9:00 PM");
+  await page.getByRole("button", { name: "CONTINUE TO DETAILS" }).click();
+  await fillName(page, "Quantity", "Fixture");
+  await page
+    .getByLabel("Email for payment receipt")
+    .fill("quantity@example.invalid");
+  await page.getByLabel("Mobile number").fill("0500000000");
+  await page
+    .getByLabel("Street address", { exact: true })
+    .fill("Synthetic fixture street");
+  await page.getByLabel("City", { exact: true }).fill("Dubai");
+  await page.getByRole("button", { name: "REVIEW ORDER" }).click();
+  await page.getByLabel(/I've reviewed my order/).check();
+  const checkout = page.waitForResponse(
+    (r) =>
+      r.url().endsWith("/api/checkout/web") && r.request().method() === "POST",
+  );
+  await page.getByRole("button", { name: "PAY AED 2023" }).click();
+  const accepted = await checkout;
+  expect(accepted.status()).toBe(200);
+  expect(
+    accepted
+      .request()
+      .postDataJSON()
+      .lines.find((item: { productId: string }) => item.productId === pan)
+      .quantity,
+  ).toBe(120);
+  await expect(page).toHaveURL(
+    /^https:\/\/pay\.test\.paymennt\.com\/checkout\//,
+  );
+  expect(forbidden).toEqual([]);
 });

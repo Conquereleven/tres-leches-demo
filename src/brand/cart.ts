@@ -7,6 +7,7 @@ import { useLiveCatalog } from "./live-catalog";
 import {
   commerceLineSchema,
   packSpec,
+  skuQuantityLimit,
   lineKey,
   normalizeComposition,
   type CommerceLine,
@@ -21,7 +22,6 @@ import {
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 export type CartLine = CommerceLine;
-import { MAX_ITEM_QUANTITY } from "../../shared/commerce-policy";
 import {
   belowMinimumSkus,
   minimumOrderQuantity,
@@ -31,7 +31,7 @@ import {
   tricolorSpec,
   type TricolorColor,
 } from "../../shared/tricolor";
-export const MAX_QTY = MAX_ITEM_QUANTITY;
+export { skuQuantityLimit };
 export const minQty = minimumOrderQuantity;
 /** Lines whose SKU total is under its minimum; checkout stays closed until corrected. */
 export const belowMinimumLines = (ls: CartLine[]) => {
@@ -48,9 +48,18 @@ export function cartQuantityBounds(ls: readonly CartLine[], line: CartLine) {
         : total,
     0,
   );
+  const limit = skuQuantityLimit(line.productId);
   return {
     min: Math.max(1, minQty(line.productId) - otherUnits),
-    max: MAX_QTY - otherUnits,
+    max: Math.min(
+      (limit ?? Number.MAX_SAFE_INTEGER) - otherUnits,
+      Number.MAX_SAFE_INTEGER -
+        ls.reduce(
+          (sum, entry) => (lineKey(entry) === key ? sum : sum + entry.quantity),
+          0,
+        ),
+    ),
+    showMaximum: limit !== undefined,
   };
 }
 const KEY = "3l-cart";
@@ -96,7 +105,7 @@ export const cart = {
     color?: TricolorColor,
     cakeMessage?: string,
   ) {
-    if (!productId || !Number.isInteger(quantity) || quantity < 1) return;
+    if (!productId || !Number.isSafeInteger(quantity) || quantity < 1) return;
     const entry = {
       productId,
       quantity,
@@ -113,7 +122,9 @@ export const cart = {
       .filter((l) => l.productId === productId)
       .reduce((n, l) => n + l.quantity, 0);
     if (
-      total + quantity > MAX_QTY ||
+      !Number.isSafeInteger(cartCount(lines) + quantity) ||
+      total + quantity >
+        (skuQuantityLimit(productId) ?? Number.MAX_SAFE_INTEGER) ||
       total + quantity < minimumOrderQuantity(productId)
     )
       return;

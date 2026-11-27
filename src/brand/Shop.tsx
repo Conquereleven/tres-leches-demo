@@ -103,7 +103,7 @@ import {
   cart,
   cartSubtotalFils,
   displayLinePrice,
-  MAX_QTY,
+  skuQuantityLimit,
   cartQuantityBounds,
   minQty,
   useCart,
@@ -301,6 +301,8 @@ function friendly(message?: string) {
     return "Online delivery isn't available for this area yet.";
   if (/catálogo|product unavailable/i.test(message))
     return "An item in your cart is no longer available.";
+  if (message === "The order amount exceeds the supported online payment range.")
+    return message;
   if (/[áéíóúñ¿]/i.test(message))
     return "Something went wrong. Please try again.";
   return "Something went wrong. Please try again.";
@@ -736,6 +738,8 @@ export function AddToCart({
   const { config, loading } = useCheckoutConfig();
   const lines = useCart();
   const min = minQty(productId);
+  const quantityLimit = skuQuantityLimit(productId);
+  const maximum = quantityLimit ?? Number.MAX_SAFE_INTEGER;
   const [quantity, setQuantity] = useState(min);
   const [added, setAdded] = useState(false);
   const [composition, setComposition] = useState<Composition>([]);
@@ -811,15 +815,16 @@ export function AddToCart({
         <QuantityInput
           value={quantity}
           min={min}
-          max={Math.max(min, MAX_QTY - inCart)}
+          max={Math.max(min, maximum - inCart)}
+          showMaximum={quantityLimit !== undefined}
           label={custom ? packCopy(language).numberBoxes : localize("Quantity")}
           onChange={setQuantity}
         />
         <button
           type="button"
           aria-label={localize("Increase quantity")}
-          disabled={quantity + inCart >= MAX_QTY}
-          onClick={() => setQuantity((q) => Math.min(MAX_QTY - inCart, q + 1))}
+          disabled={quantity + inCart >= maximum}
+          onClick={() => setQuantity((q) => Math.min(maximum - inCart, q + 1))}
         >
           <Plus aria-hidden />
         </button>
@@ -827,14 +832,14 @@ export function AddToCart({
       <Button
         type="button"
         disabled={
-          inCart >= MAX_QTY ||
+          inCart >= maximum ||
           (tricolor?.kind === "single" && !color) ||
           (custom && !packComplete(productId, composition, config!))
         }
         onClick={() => {
           if (
             quantity < min ||
-            quantity + inCart > MAX_QTY ||
+            quantity + inCart > maximum ||
             (custom && !packComplete(productId, composition, config!))
           )
             return;

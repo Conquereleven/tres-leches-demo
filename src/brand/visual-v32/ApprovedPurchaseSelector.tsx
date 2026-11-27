@@ -1,7 +1,7 @@
 /* Commercial purchase state with the approved VR008 contextual presentation. */
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useMenu, menuProductFamily, type MenuOption, type StorefrontProduct } from "../menu";
-import { useCheckoutConfig, useCheckoutNow, useCart, cart, displayLinePrice, minQty, MAX_QTY } from "../cart";
+import { useCheckoutConfig, useCheckoutNow, useCart, cart, displayLinePrice, minQty, skuQuantityLimit } from "../cart";
 import { useLanguage, type Locale } from "../localization";
 import { useLiveCatalog, type LiveState } from "../live-catalog";
 import { purchasableOptions } from "./catalog-availability";
@@ -155,11 +155,12 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const packValid=!customized||!!personalizedRule&&picked===count&&
   composition.every(p=>personalizedRule.componentSkuIds.includes(p.componentSkuId));
  const inCart=lines.filter(l=>l.productId===productId).reduce((sum,l)=>sum+l.quantity,0);
+ const quantityLimit=skuQuantityLimit(productId)??Number.MAX_SAFE_INTEGER;
  const unit=configured?displayLinePrice({productId,quantity:qty,...(customized?{composition}:{})},configured.priceFils,config?.packPricing):NaN;
  const total=unit*qty;
  const canBuy=!!config?.enabled&&!loading&&!!configured&&
   sku===productId&&packValid&&Number.isFinite(total)&&total>=0&&qty>=minQty(productId)&&
-  inCart+qty<=MAX_QTY&&(!note.trim()||!!activeCake&&validCakeMessage(productId,note.trim()))&&
+  inCart+qty<=quantityLimit&&(!note.trim()||!!activeCake&&validCakeMessage(productId,note.trim()))&&
   (!tricolor||tricolor.kind==="fixed"||!!color);
  const dialog=useRef<HTMLElement>(null);const closeControl=useRef<HTMLButtonElement>(null);
  const amount=Number.isFinite(total)?storefrontMoney(total,language):"—";
@@ -181,7 +182,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
    <button type="button" aria-label={t.decrease} disabled={qty<=minQty(productId)}
      onClick={()=>setQty(q=>Math.max(minQty(productId),q-1))}>−</button>
    <output aria-live="polite">{qty}</output>
-   <button type="button" aria-label={t.increase} disabled={inCart+qty>=MAX_QTY}
+   <button type="button" aria-label={t.increase} disabled={inCart+qty>=quantityLimit}
      onClick={()=>setQty(q=>q+1)}>+</button>
  </div>;
  const buy=()=>{if(!canBuy)return;cart.add(productId,qty,customized?composition:undefined,color??undefined,note.trim()||undefined);onAdded();};

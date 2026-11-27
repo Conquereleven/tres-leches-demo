@@ -81,6 +81,24 @@ function ready(f: ReturnType<typeof fixture>) {
 }
 const current = (f: ReturnType<typeof fixture>, id: string) =>
   f.store.read().orders.find((o) => o.id === id)!;
+test("Operations and WhatsApp retain their quantity threshold after storefront bulk orders", () => {
+  const f = fixture();
+  try {
+    const id = setup(f);
+    const before = f.store.read();
+    for (const quantity of [101, Number.MAX_SAFE_INTEGER])
+      assert.throws(() => f.cmd({
+        type: "editOrder", id, version: current(f,id).version,
+        channel:"storefront", lines:[{productId:"tres", quantity}],
+      }), {status:400});
+    const actual = f.store.read();
+    assert.deepEqual(actual.orders, before.orders);
+    assert.deepEqual(actual.payments, before.payments);
+    assert.deepEqual(actual.jobs, before.jobs);
+  } finally {
+    f.store.close();
+  }
+});
 test("seed preserves every source band, explicit free delivery and unknown fees", () => {
   assert.deepEqual(
     [...new Set(zoneSeed.map((z) => z.minOrderAed))],

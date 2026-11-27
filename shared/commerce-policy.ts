@@ -1,7 +1,8 @@
 import { withdrawnConchaSku } from "./storefront-visibility";
 
 /** Approved Dubai business policy, shared by browser and authoritative server. */
-export const MAX_ITEM_QUANTITY = 100;
+/** Merchant-approved box limit for configurable Pan de Muerto packs. */
+export const MAX_PERSONALIZED_PACK_BOXES = 100;
 export const BUSINESS_TIMEZONE = "Asia/Dubai";
 export const DELIVERY_WINDOWS = [
   { label: "8:00 AM – 1:00 PM", startHour: 8 },

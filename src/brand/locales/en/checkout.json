@@ -201,5 +201,10 @@
   "copy_tpl2_previous_open": "Order {0} still has an open payment, so these changes can't be applied to it.",
   "copy_tpl2_previous_open_detail": "Complete that payment, or wait until it ends, before paying for a changed order.",
   "quantity_whole_number": "Enter a whole number for the quantity.",
-  "quantity_range": "Enter a quantity between {0} and {1}."
+  "quantity_range": "Enter a quantity between {0} and {1}.",
+  "quantity_minimum_hint": "Enter a whole number of at least {0}.",
+  "quantity_smaller": "Enter a smaller whole number for the quantity.",
+  "quantity_minimum_product": "Minimum order: {0} pieces for this product.",
+  "quantity_apply_minimum": "Update to {0} pieces · {1}",
+  "order_amount_range": "The order amount exceeds the supported online payment range."
 }

@@ -49,15 +49,15 @@ test("UAT V2: four traditional Concha flavours and filled Pistache retain approv
   assert.deepEqual([...new Set(filled.map(o => o.variant))], ["Pistache"]);
   assert.deepEqual(filled.map(o => o.priceFils), [2100, 1800]);
 });
-test("UAT V2: direct quantity 40 and maximum 100 accepted, malformed quantities rejected on server", () => {
-  for (const quantity of [1, 40, 100])
+test("direct loose quantities above 100 are accepted and malformed quantities or oversized packs are rejected", () => {
+  for (const quantity of [1, 40, 100, 120])
     assert.ok(
       cartQuoteSchema.safeParse({
         lines: [{ productId: "sku", quantity }],
         fulfillmentMethod: "pickup",
       }).success,
     );
-  for (const quantity of [0, -1, 1.5, 101, "40", "4x", NaN])
+  for (const quantity of [0, -1, 1.5, Number.MAX_SAFE_INTEGER + 1, "40", "4x", NaN])
     assert.equal(
       cartQuoteSchema.safeParse({
         lines: [{ productId: "sku", quantity }],
@@ -65,6 +65,10 @@ test("UAT V2: direct quantity 40 and maximum 100 accepted, malformed quantities 
       }).success,
       false,
     );
+  assert.equal(cartQuoteSchema.safeParse({
+    lines:[{productId:"pan-de-muerto-traditional-pack-6-mini",quantity:101}],
+    fulfillmentMethod:"pickup",
+  }).success,false);
 });
 test("UAT V2: international WhatsApp requires an explicit country prefix and normalizes safely", () => {
   assert.equal(normalizeWhatsAppNumber("+52 (55) 1234-5678"), "+525512345678");
