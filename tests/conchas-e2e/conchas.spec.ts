@@ -194,8 +194,8 @@ for (const width of [390, 768, 1440])
       await expect(page.locator('[data-new-ui="cart"]')).toBeVisible();
       const row = page.locator(".v32-new-cart-items .v32-new-cart-row").first();
       await expect(row).toContainText(locale === "ar" ? /د\.إ/ : /AED/);
-      await expect(row.locator('input[type="number"]')).toHaveAttribute(
-        "max",
+      await expect(row.getByRole("spinbutton")).toHaveAttribute(
+        "aria-valuemax",
         "100",
       );
       await shot("cart");

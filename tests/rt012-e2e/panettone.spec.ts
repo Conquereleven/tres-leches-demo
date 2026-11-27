@@ -57,6 +57,7 @@ test("three flavors, six sizes and prices, correct photo identity, persistent ca
   await expect(rows).toHaveCount(6);
   const firstRow = rows.filter({ has: page.getByRole("heading", { name: "Panettone Normal · Mini", exact: true }) });
   await firstRow.getByRole("spinbutton").fill("2");
+  await firstRow.getByRole("spinbutton").blur();
   cart[0]!.quantity = 2;
   await page.reload();
   await expect(firstRow.getByRole("spinbutton")).toHaveValue("2");

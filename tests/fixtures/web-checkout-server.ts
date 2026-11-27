@@ -82,7 +82,7 @@ if (process.env.BOLILLO_FIXTURE === "true")
     active: true,
     availability: "available",
   });
-if (process.env.CATALOG_FIXTURE === "legacy")
+if (process.env.CATALOG_FIXTURE === "legacy") {
   initial.catalog.push({
     id: "fixture-36",
     name: "Fixture Bakery",
@@ -90,6 +90,18 @@ if (process.env.CATALOG_FIXTURE === "legacy")
     active: true,
     availability: "available",
   });
+  // Use two real variants and prices to exercise the production quantity rules.
+  const approved = validateCatalog(JSON.parse(
+    readFileSync("data-imports/liza-current-menu.json", "utf8"),
+  ));
+  initial.catalog.push(
+    approved.find((item) => item.id === "pan-de-muerto-traditional-azucar-mini-40-g")!,
+    {
+      ...approved.find((item) => item.id === "pan-de-muerto-traditional-azucar-individual-70-g")!,
+      availability: "unavailable",
+    },
+  );
+}
 const provider = new PaymenntProvider(
   { apiKey: "fixture-key", apiSecret: "fixture-secret", environment: "test" },
   async (url, init) => {

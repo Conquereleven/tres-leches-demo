@@ -196,17 +196,17 @@ for (const width of [390, 768, 1440])
       });
 
       // Quantity via the real V3.2 number controls, persisted across reload.
-      const quantities = page.locator(
-        ".v32-new-cart-row input[type='number']",
-      );
+      const quantities = rows.getByRole("spinbutton");
       await expect(quantities).toHaveCount(5);
       await quantities.first().fill("2");
+      await quantities.first().blur();
       expected[0]!.quantity = 2;
       await expect.poll(() => readCart(page)).toEqual(expected);
       await page.reload();
       await expect(page.locator(".v32-new-cart-row")).toHaveCount(5);
       expect(await readCart(page)).toEqual(expected);
       await quantities.first().fill("1");
+      await quantities.first().blur();
       expected[0]!.quantity = 1;
       await expect.poll(() => readCart(page)).toEqual(expected);
       await page.reload();

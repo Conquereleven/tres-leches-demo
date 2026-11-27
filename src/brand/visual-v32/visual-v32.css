@@ -299,6 +299,7 @@
 .v32-app .v32-new-cart-row p{margin:8px 0}
 .v32-app .v32-new-cart-controls{display:flex;flex-direction:column;align-items:end;gap:13px;min-width:120px}
 .v32-app .v32-new-cart-controls input{display:block;margin-top:5px;width:79px;padding:9px;background:#fff9;border:1px solid #d2a69a;border-radius:10px}
+.v32-app .v32-new-cart-controls small[role=alert]{max-width:min(12rem,32vw)}
 .v32-app .v32-new-cart-controls button{border:0;background:none;text-decoration:underline;color:#975b48}
 .v32-app .v32-new-pack-edit{margin:10px 0}
 .v32-app .v32-new-pack-edit summary{cursor:pointer;text-decoration:underline;color:#975b48;font:500 13px Jost,Arial,sans-serif}

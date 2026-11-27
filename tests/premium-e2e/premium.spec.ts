@@ -155,12 +155,10 @@ for (const width of [390, 768, 1440])
       await expect(
         page.locator(".v32-new-cart-items .v32-new-cart-row"),
       ).toHaveCount(2);
-      const quantities = page.locator(
-        '.v32-new-cart-controls input[type="number"]',
-      );
+      const quantities = page.locator(".v32-new-cart-controls").getByRole("spinbutton");
       await expect(quantities).toHaveCount(2);
       for (const quantity of await quantities.all())
-        await expect(quantity).toHaveAttribute("max", "100");
+        await expect(quantity).toHaveAttribute("aria-valuemax", "100");
       await page.reload();
       await expect(
         page.locator(".v32-new-cart-items .v32-new-cart-row"),

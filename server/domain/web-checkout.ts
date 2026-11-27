@@ -8,6 +8,7 @@ import {
 import {
   commerceLineSchema,
   distinctLines,
+  itemQuantitySchema,
   lineKey,
 } from "../../shared/pack-composition";
 import {
@@ -20,7 +21,6 @@ import { frozenCheckout } from "./frozen-checkout";
 import {
   availableSku,
   RETIRED_SKUS,
-  MAX_ITEM_QUANTITY,
   validWindow,
   leadHours,
   DELIVERY_WINDOWS,
@@ -115,7 +115,7 @@ const lines = z
 export const webQuoteSchema = z
   .object({
     productId: z.string().min(1).max(100),
-    quantity: z.number().int().min(1).max(MAX_ITEM_QUANTITY),
+    quantity: itemQuantitySchema,
     zoneId: z.string().min(1).max(100),
   })
   .strict();

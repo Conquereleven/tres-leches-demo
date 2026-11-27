@@ -195,7 +195,7 @@ const rejectsMinimumAsync = (fn: () => Promise<unknown>) =>
       e instanceof DomainError && e.status === 422 && e.message === MESSAGE,
   );
 
-test("server quote rejects 1 and 5, accepts 6, 7 and 100, and refuses 101 for loose Pan and Bolillo", () => {
+test("server quote rejects 1 and 5, accepts 6, 7, 90, 99 and 100, and refuses 101 for loose Pan and Bolillo", () => {
   mock.timers.enable({ apis: ["Date"], now: new Date(NOW) });
   const f = fixture();
   try {
@@ -205,7 +205,7 @@ test("server quote rejects 1 and 5, accepts 6, 7 and 100, and refuses 101 for lo
           quoteWebCheckout(f.service, pickup([{ productId: id, quantity }])),
         );
       const price = f.store.read().catalog!.find((p) => p.id === id)!.priceFils;
-      for (const quantity of [6, 7, 100]) {
+      for (const quantity of [6, 7, 90, 99, 100]) {
         const q = quoteWebCheckout(
           f.service,
           pickup([{ productId: id, quantity }]),
@@ -226,6 +226,39 @@ test("server quote rejects 1 and 5, accepts 6, 7 and 100, and refuses 101 for lo
       }),
     );
     assert.equal(f.calls(), 0);
+  } finally {
+    f.store.close();
+    mock.timers.reset();
+  }
+});
+
+test("hosted checkout freezes the current large-order price and rejects stale quotes and excess quantities", async () => {
+  mock.timers.enable({ apis: ["Date"], now: new Date(NOW) });
+  const f = fixture();
+  try {
+    const lines = [{ productId: PAN_2, quantity: 100 }];
+    const body = checkoutBody(lines);
+    const quote = (quantity: number) => quoteWebCheckout(f.service, {
+      lines: [{ productId: PAN_2, quantity }],
+      zoneId: body.delivery.zoneId,
+    });
+    const create = (checkout: unknown, quoteRevision: string) =>
+      createWebCheckout(f.service, checkout, randomUUID(), true, undefined, quoteRevision);
+    await assert.rejects(create(body, quote(99).quoteRevision), { status: 409 });
+    await assert.rejects(create(
+      checkoutBody([{ productId: PAN_2, quantity: 101 }]),
+      quote(100).quoteRevision,
+    ));
+    assert.equal(f.store.read().orders.length, 0);
+    assert.equal(f.calls(), 0);
+    const final = quote(100);
+    const created = await create(body, final.quoteRevision);
+    const state = f.store.read();
+    const order = state.orders.find((order) => order.id === created.orderId)!;
+    assert.deepEqual(order.lines.map(({ productId, quantity }) => ({ productId, quantity })), lines);
+    assert.equal(order.quote?.subtotalFils, 130_000);
+    assert.equal(order.quote?.totalFils, 130_000);
+    assert.equal(state.payments.find((payment) => payment.id === order.paymentId)?.amountFils, 130_000);
   } finally {
     f.store.close();
     mock.timers.reset();

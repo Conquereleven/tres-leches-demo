@@ -58,6 +58,7 @@ import { menuFamilyForSku, storefrontProductForSku } from "./menu";
 import {
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -103,6 +104,7 @@ import {
   cartSubtotalFils,
   displayLinePrice,
   MAX_QTY,
+  cartQuantityBounds,
   minQty,
   useCart,
   useCheckoutConfig,
@@ -297,7 +299,7 @@ function friendly(message?: string) {
     return "Your order is below the minimum for this delivery area.";
   if (/pendiente de revisión|Regla pendiente/i.test(message))
     return "Online delivery isn't available for this area yet.";
-  if (/catálogo/i.test(message))
+  if (/catálogo|product unavailable/i.test(message))
     return "An item in your cart is no longer available.";
   if (/[áéíóúñ¿]/i.test(message))
     return "Something went wrong. Please try again.";
@@ -810,7 +812,7 @@ export function AddToCart({
           value={quantity}
           min={min}
           max={Math.max(min, MAX_QTY - inCart)}
-          label={custom ? packCopy(language).numberBoxes : "Quantity"}
+          label={custom ? packCopy(language).numberBoxes : localize("Quantity")}
           onChange={setQuantity}
         />
         <button
@@ -969,6 +971,7 @@ function CartItems({
               </button>
             </li>
           );
+        const bounds = cartQuantityBounds(lines, l);
         return (
           <li key={lineKey(l)} className="b-co-item">
             <Thumb productId={p.id} name={p.name} />
@@ -1019,28 +1022,29 @@ function CartItems({
               <button
                 type="button"
                 aria-label={localize(`Decrease ${p.name}`)}
-                disabled={
-                  minQty(l.productId) > 1 && l.quantity <= minQty(l.productId)
+                disabled={minQty(l.productId) > 1 && l.quantity <= bounds.min}
+                onClick={() =>
+                  l.quantity === 1
+                    ? cart.remove(lineKey(l))
+                    : cart.set(lineKey(l), l.quantity - 1)
                 }
-                onClick={() => cart.set(lineKey(l), l.quantity - 1)}
               >
                 <Minus aria-hidden />
               </button>
               <QuantityInput
                 value={l.quantity}
-                min={minQty(l.productId)}
-                max={MAX_QTY}
-                label={`${p.name} quantity`}
+                {...bounds}
+                label={localize(`${p.name} quantity`)}
                 onChange={(n) => cart.set(lineKey(l), n)}
               />
               <button
                 type="button"
                 aria-label={localize(`Increase ${p.name}`)}
-                disabled={l.quantity >= MAX_QTY}
+                disabled={l.quantity >= bounds.max}
                 onClick={() =>
                   cart.set(
                     lineKey(l),
-                    Math.max(minQty(l.productId), l.quantity + 1),
+                    Math.max(bounds.min, l.quantity + 1),
                   )
                 }
               >
@@ -1190,10 +1194,12 @@ export function CheckoutPage() {
   const [cutoffDialog, setCutoffDialog] = useState(false);
   const [addressBusy, setAddressBusy] = useState(false);
   const [addressNotice, setAddressNotice] = useState("");
-  const [quote, setQuote] = useState<Quote | null>(null);
   const [error, setError] = useState("");
   const heading = useRef<HTMLHeadingElement>(null);
-  const needsCartReview = lines.some((line) => withdrawnConchaSku(line.productId));
+  const needsCartReview = lines.some(
+    (line) => withdrawnConchaSku(line.productId) ||
+      (config?.enabled && !config.products.some((p) => p.id === line.productId)),
+  );
   const cartLines = useMemo(
     () =>
       config
@@ -1201,6 +1207,22 @@ export function CheckoutPage() {
         : [],
     [lines, config],
   );
+  const quoteRequest = useMemo(() => {
+    if (needsCartReview || !config?.enabled || (!pickup && !delivery.zoneId) || !cartLines.length)
+      return null;
+    return {
+      lines: cartLines,
+      ...(pickup ? { fulfillmentMethod: "pickup" } : { zoneId: delivery.zoneId }),
+    };
+  }, [cartLines, config?.enabled, delivery.zoneId, needsCartReview, pickup]);
+  const [quoted, setQuoted] = useState<{
+    request: NonNullable<typeof quoteRequest>;
+    quote?: Quote;
+    error?: string;
+  } | null>(null);
+  const currentQuote = quoted?.request === quoteRequest ? quoted : null;
+  const quote = currentQuote?.quote ?? null;
+  const quoteError = currentQuote?.error;
 
   useEffect(
     () => saveDraft({ step, fulfillmentMethod, delivery, customer, billing }),
@@ -1210,24 +1232,21 @@ export function CheckoutPage() {
     heading.current?.focus();
     window.scrollTo({ top: 0 });
   }, [step]);
-  // Live server quote for the chosen area. Display only; re-checked on payment.
+  // Keep a response valid only for the exact lines and fulfillment just quoted.
   useEffect(() => {
+    if (!quoteRequest) return;
     let active = true;
-    setQuote(null);
-    if (needsCartReview || !config?.enabled || (!pickup && !delivery.zoneId) || !cartLines.length)
-      return;
-    post<Quote>("/api/checkout/quote", {
-      lines: cartLines,
-      ...(pickup
-        ? { fulfillmentMethod: "pickup" }
-        : { zoneId: delivery.zoneId }),
-    })
-      .then((q) => active && setQuote(q))
-      .catch((e: Error) => active && setError(e.message));
+    post<Quote>("/api/checkout/quote", quoteRequest)
+      .then((quote) => {
+        if (active) setQuoted({ request: quoteRequest, quote });
+      })
+      .catch((error: Error) => {
+        if (active) setQuoted({ request: quoteRequest, error: error.message });
+      });
     return () => {
       active = false;
     };
-  }, [delivery.zoneId, cartLines, config, pickup, needsCartReview]);
+  }, [quoteRequest]);
 
   useEffect(() => {
     if (needsCartReview || !resumeSaved.current || !config?.enabled || !quote?.eligible) return;
@@ -1447,7 +1466,6 @@ export function CheckoutPage() {
                         setFulfillmentMethod(method);
                         setAreaMissing(false);
                         setError("");
-                        setQuote(null);
                         // Pickup has no delivery address to reuse. Returning to
                         // delivery restores the default only if nothing was typed.
                         setBilling((b) =>
@@ -1720,9 +1738,9 @@ export function CheckoutPage() {
                 )}
               </fieldset>
             </Card>
-            {error && (
+            {(error || quoteError) && (
               <p role="alert">
-                <CustomerCopy>{error}</CustomerCopy>
+                <CustomerCopy>{error || quoteError || ""}</CustomerCopy>
               </p>
             )}
             {cutoffDialog && (
@@ -1787,6 +1805,7 @@ export function CheckoutPage() {
             className="b-shop-form b-co-main"
             onSubmit={(e) => {
               e.preventDefault();
+              if (!quote?.eligible) return;
               if (!phoneOk) {
                 setError("Please enter a valid UAE mobile number.");
                 return;
@@ -2058,13 +2077,13 @@ export function CheckoutPage() {
                 </fieldset>
               )}
             </Card>
-            {error && (
+            {(error || quoteError) && (
               <p role="alert">
-                <CustomerCopy>{error}</CustomerCopy>
+                <CustomerCopy>{error || quoteError || ""}</CustomerCopy>
               </p>
             )}
             <div className="b-shop-actions">
-              <Button type="submit" className="b-co-cta">
+              <Button type="submit" className="b-co-cta" disabled={!quote?.eligible}>
                 <CustomerCopy>REVIEW ORDER</CustomerCopy>
               </Button>
               <button
@@ -2091,6 +2110,7 @@ export function CheckoutPage() {
       customer={customer as Customer}
       billing={billing}
       quote={quote}
+      quoteError={quoteError}
       subtotal={subtotal}
       back={() => setStep(2)}
       backToDelivery={() => setStep(1)}
@@ -2339,6 +2359,8 @@ function PaymentStep({
   customer,
   billing,
   quote,
+  quoteError,
+  subtotal,
   back,
   backToDelivery,
 }: {
@@ -2349,13 +2371,14 @@ function PaymentStep({
   customer: Customer;
   billing: Billing;
   quote: Quote | null;
+  quoteError?: string;
   subtotal: number;
   back: () => void;
   backToDelivery: () => void;
 }) {
   const { text: localize } = useCustomerLanguage();
 
-  const [reviewed, setReviewed] = useState(false);
+  const [reviewedContext, setReviewedContext] = useState<string | null>(null);
   const [held, setHeld] = useState<Status | null>(null);
   const [checkingPrevious, setCheckingPrevious] = useState(true);
   const [recoveryRevision, setRecoveryRevision] = useState(0);
@@ -2379,6 +2402,18 @@ function PaymentStep({
   });
 
   const cartContext = JSON.stringify(body);
+  const reviewContext = quote?.eligible
+    ? JSON.stringify([cartContext, quote.quoteRevision, quote.totalFils])
+    : null;
+  const reviewed = reviewContext !== null && reviewedContext === reviewContext;
+  const currentReview = useRef<string | null>(null);
+  useLayoutEffect(() => {
+    currentReview.current = reviewContext;
+    return () => {
+      currentReview.current = null;
+    };
+  }, [reviewContext]);
+
   useEffect(() => {
     let active = true;
     setCheckingPrevious(true);
@@ -2408,7 +2443,7 @@ function PaymentStep({
 
   async function pay(e: React.FormEvent) {
     e.preventDefault();
-    if (!reviewed || inFlight.current || checkingPrevious) return;
+    if (!quote?.eligible || !reviewed || inFlight.current || checkingPrevious) return;
     inFlight.current = true;
     setBusy(true);
     setError("");
@@ -2416,6 +2451,11 @@ function PaymentStep({
       // Same details → same idempotency key → the same order and payment.
       const fingerprint = JSON.stringify(body);
       const previous = await heldCheckout(body);
+      if (currentReview.current !== reviewContext) {
+        inFlight.current = false;
+        setBusy(false);
+        return;
+      }
       if (previous) {
         setHeld(previous);
         inFlight.current = false;
@@ -2473,11 +2513,13 @@ function PaymentStep({
           lines={lines}
           config={config}
           fulfillmentMethod={fulfillmentMethod}
-          subtotal={quote?.subtotalFils ?? 0}
+          subtotal={quote?.subtotalFils ?? subtotal}
           fee={quote?.feeFils ?? null}
           total={total}
+          feePending={!quote}
         />
         <div className="b-co-main">
+          {quoteError && <p role="alert"><CustomerCopy>{quoteError}</CustomerCopy></p>}
           <section
             className="b-co-card b-co-review"
             aria-label={localize("Order review")}
@@ -2611,6 +2653,12 @@ function PaymentStep({
                 </CustomerCopy>
               </a>
             </div>
+          ) : !quote ? (
+            !quoteError && (
+              <p className="b-shop-notice" role="status">
+                <CustomerCopy>Preparing checkout…</CustomerCopy>
+              </p>
+            )
           ) : total == null ? (
             <p className="b-shop-notice" role="alert">
               <CustomerCopy>
@@ -2650,7 +2698,7 @@ function PaymentStep({
                   type="checkbox"
                   checked={reviewed}
                   disabled={locked}
-                  onChange={(e) => setReviewed(e.target.checked)}
+                  onChange={(e) => setReviewedContext(e.target.checked ? reviewContext : null)}
                 />
                 <span>
                   <CustomerCopy>

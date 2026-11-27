@@ -38,6 +38,21 @@ export const belowMinimumLines = (ls: CartLine[]) => {
   const ids = new Set(belowMinimumSkus(ls));
   return ls.filter((l) => ids.has(l.productId));
 };
+/** Both limits apply to the SKU total, including lines with other preparations. */
+export function cartQuantityBounds(ls: readonly CartLine[], line: CartLine) {
+  const key = lineKey(line);
+  const otherUnits = ls.reduce(
+    (total, entry) =>
+      entry.productId === line.productId && lineKey(entry) !== key
+        ? total + entry.quantity
+        : total,
+    0,
+  );
+  return {
+    min: Math.max(1, minQty(line.productId) - otherUnits),
+    max: MAX_QTY - otherUnits,
+  };
+}
 const KEY = "3l-cart";
 
 let lines: CartLine[] = read();
@@ -106,41 +121,23 @@ export const cart = {
     commit(
       current
         ? lines.map((l) =>
-            lineKey(l) === key
-              ? { ...l, quantity: Math.min(MAX_QTY, l.quantity + quantity) }
-              : l,
+            lineKey(l) === key ? { ...l, quantity: l.quantity + quantity } : l,
           )
         : [...lines, parsed.data],
     );
   },
   set(key: string, quantity: number) {
-    if (!Number.isInteger(quantity) || quantity < 0) return;
+    if (!Number.isSafeInteger(quantity) || quantity < 0) return;
     const target = lines.find((l) => lineKey(l) === key);
-    if (
-      !target ||
-      (quantity > 0 &&
-        quantity +
-          lines
-            .filter(
-              (l) => l.productId === target.productId && lineKey(l) !== key,
-            )
-            .reduce((n, l) => n + l.quantity, 0) <
-          minimumOrderQuantity(target.productId)) ||
-      lines
-        .filter((l) => l.productId === target.productId && lineKey(l) !== key)
-        .reduce((n, l) => n + l.quantity, 0) +
-        quantity >
-        MAX_QTY
-    )
+    if (!target || target.quantity === quantity) return;
+    if (quantity === 0) {
+      commit(lines.filter((line) => line !== target));
       return;
+    }
+    const { min, max } = cartQuantityBounds(lines, target);
+    if (quantity < min || quantity > max) return;
     commit(
-      quantity < 1
-        ? lines.filter((l) => lineKey(l) !== key)
-        : lines.map((l) =>
-            lineKey(l) === key
-              ? { ...l, quantity: Math.min(MAX_QTY, quantity) }
-              : l,
-          ),
+      lines.map((line) => (line === target ? { ...line, quantity } : line)),
     );
   },
   edit(key: string, composition: Composition) {
