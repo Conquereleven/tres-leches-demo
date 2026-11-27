@@ -585,7 +585,18 @@ test("REF_C and REF_D keep the glass treatment within the contextual panel",asyn
   const panel=page.getByRole("dialog");
   await expect(panel).toHaveAttribute("data-placement",width===1440?/side/:/above|below/);
   await expect(panel).toHaveClass(/glass/);
-  await expect(panel).not.toHaveCSS("background-image","none");
+  const supportsTransparency=await panel.evaluate(()=>
+    CSS.supports("backdrop-filter","blur(12px)")&&
+    matchMedia("(prefers-reduced-transparency: no-preference)").matches,
+  );
+  if(width===1440&&!supportsTransparency){
+    // The approved solid CornerGlass fallback also covers WebKit without the media query.
+    await expect(panel).toHaveCSS("background-color","rgb(251, 225, 213)");
+    await expect(panel).toHaveCSS("background-image","none");
+  }else{
+    await expect(panel).toHaveCSS("background-image",/gradient\(/);
+  }
+  await expect(panel).not.toHaveCSS("box-shadow","none");
   await expect(page.locator(".ref32-backdrop")).toHaveCount(0);
   await expect(page.locator(".structural-grid")).toHaveCSS("filter","none");
   await page.keyboard.press("Escape");
