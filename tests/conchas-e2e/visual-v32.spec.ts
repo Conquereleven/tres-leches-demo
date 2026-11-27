@@ -166,8 +166,9 @@ for (const viewport of [{width:1440,height:900},{width:390,height:844}]) {
       await expect(menuToggle).toBeVisible();
       await menuToggle.click();
       await expect(menuToggle).toHaveAttribute("aria-expanded","true");
-      await expect(page.locator("#storefront-nav[open]")).toBeVisible();
-      await page.locator('#storefront-nav a[href="/visual-v32/menu"]').click();
+      const mobileNav = page.getByRole("dialog", { name:"Mobile navigation" });
+      await expect(mobileNav).toBeVisible();
+      await mobileNav.locator('a[href="/visual-v32/menu"]').click();
     } else {
       await page.goto("/visual-v32/menu?lang=en");
     }
@@ -464,12 +465,13 @@ test("REF_A menu searches across the real catalogue and reports no matches",asyn
  await expect(page.locator(".v32-search-empty")).toHaveCount(0);
  await expect(page.locator(".ref32-product").first()).toBeVisible();
 });
-test("ZIP REF_A mobile sheet is above Home and navigates with genuine pointer clicks",async ({page})=>{
+test("ZIP REF_A mobile CornerGlass panel is above Home and navigates with genuine pointer clicks",async ({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto("/visual-v32?lang=en");
  await page.getByRole("button",{name:"Open navigation"}).click();
- await expect(page.locator('#storefront-nav[open]')).toBeVisible();
- await page.locator('#storefront-nav a[href="/visual-v32/menu"]').click({timeout:10000});
+ const mobileNav=page.getByRole("dialog",{name:"Mobile navigation"});
+ await expect(mobileNav).toBeVisible();
+ await mobileNav.locator('a[href="/visual-v32/menu"]').click({timeout:10000});
  await expect(page).toHaveURL(/\/visual-v32\/menu/);
  await expect(page.getByRole("heading",{name:"Explore Our Menu"})).toBeVisible();
 });

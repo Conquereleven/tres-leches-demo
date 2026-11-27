@@ -141,33 +141,62 @@ export function StorefrontHeader(){
   const count=cartCount(useCart());
   const menu=useRef<HTMLDivElement>(null);
   const navigationTrigger=useRef<HTMLButtonElement>(null);
+  const restoreNavigationFocus=useRef(false);
   const [open,setOpen]=useState(false);
   const closeNavigation=useCallback((restoreFocus: boolean)=>{
+    if(restoreFocus)restoreNavigationFocus.current=true;
     setOpen(false);
-    if(restoreFocus) navigationTrigger.current?.focus();
   },[]);
   useEffect(()=>{
-    if(!open)return;
+    if(!open){
+      if(!restoreNavigationFocus.current)return;
+      restoreNavigationFocus.current=false;
+      const frame=requestAnimationFrame(()=>navigationTrigger.current?.focus({preventScroll:true}));
+      return ()=>cancelAnimationFrame(frame);
+    }
     menu.current?.querySelector<HTMLAnchorElement>("nav a")?.focus();
+    let tabTarget: EventTarget|null=null;
     const onKey=(event:KeyboardEvent)=>{
+      tabTarget=event.key==="Tab"?event.target:null;
       if(event.key==="Escape"){event.preventDefault();closeNavigation(true);}
     };
+    const containsControl=(target:EventTarget|null)=>target instanceof Node &&
+      (menu.current?.contains(target)||navigationTrigger.current?.contains(target));
     const closeOutside=(event:Event)=>{
-      if(event.target instanceof Node && !menu.current?.contains(event.target) &&
-        !navigationTrigger.current?.contains(event.target)) closeNavigation(false);
+      if(event.target instanceof Node&&!containsControl(event.target))closeNavigation(false);
+    };
+    const onPointer=(event:PointerEvent)=>{
+      tabTarget=null;
+      closeOutside(event);
+    };
+    let focusTimer=0;
+    const onFocusOut=(event:FocusEvent)=>{
+      if(!containsControl(event.target)||containsControl(event.relatedTarget))return;
+      if(event.relatedTarget)closeNavigation(false);
+      else if(event.target===tabTarget){
+        // Safari can move focus to the browser UI without emitting focusin.
+        tabTarget=null;
+        window.clearTimeout(focusTimer);
+        focusTimer=window.setTimeout(()=>{
+          if(!containsControl(document.activeElement))closeNavigation(false);
+        });
+      }
     };
     const viewport=window.matchMedia("(max-width: 900px)");
     const onResize=()=>{if(!viewport.matches)closeNavigation(false)};
     const onLeave=()=>closeNavigation(false);
     document.addEventListener("keydown",onKey);
-    document.addEventListener("pointerdown",closeOutside);
+    document.addEventListener("pointerdown",onPointer);
     document.addEventListener("focusin",closeOutside);
+    document.addEventListener("focusout",onFocusOut);
     viewport.addEventListener("change",onResize);
     window.addEventListener("pagehide",onLeave);
     return ()=>{
       document.removeEventListener("keydown",onKey);
-      document.removeEventListener("pointerdown",closeOutside);
+      document.removeEventListener("pointerdown",onPointer);
       document.removeEventListener("focusin",closeOutside);
+      document.removeEventListener("focusout",onFocusOut);
+      window.clearTimeout(focusTimer);
       viewport.removeEventListener("change",onResize);
       window.removeEventListener("pagehide",onLeave);
     };
