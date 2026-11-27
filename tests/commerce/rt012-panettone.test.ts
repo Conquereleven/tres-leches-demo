@@ -4,7 +4,7 @@ import { availableSku } from "../../shared/commerce-policy";
 import { hubMediaAccess } from "../../server/catalog/product-hub";
 import { storefrontCatalog } from "../../server/catalog/storefront-api";
 import { renderProductPage } from "../../server/catalog/product-page";
-import { quoteWebCheckout } from "../../server/domain/web-checkout";
+import { canonicalCartHash, quoteWebCheckout } from "../../server/domain/web-checkout";
 import { paidFixture } from "../fixtures/customer-paid";
 import { integratedFixture } from "../fixtures/rt01-integrated-server";
 import { draftPanettoneFixture } from "../fixtures/rt012-panettone";
@@ -72,5 +72,37 @@ test("Panettone stays private until Product Hub publishes the three products and
   assert.throws(() => quote([{ ...cart[0], priceFils: 1 }]));
   assert.throws(() => quote([{ productId: "panettone-chocolate-missing", quantity: 1 }]), { status: 422 });
   assert.throws(() => quote([{ productId: "panettone-pack", quantity: 1 }]), { status: 422 });
+  assert.equal(f.providerState.creates, 0);
+});
+
+test("release hold keeps Panettone details and photos visible and blocks checkout for all six SKUs", (t) => {
+  const f = paidFixture();
+  t.after(() => f.store.close());
+  const { initial } = integratedFixture();
+  f.store.write((state) => { state.catalogFoundation = initial.catalogFoundation; });
+  draftPanettoneFixture(f.store, { release: true }).publish();
+  const state = f.store.read();
+  const catalog = storefrontCatalog(state, new Date("2026-11-27T08:00:00Z"));
+  const panettone = catalog.products.filter((row) => row.categoryId === "panettone");
+  assert.equal(panettone.length, 3);
+  const shell = '<head></head><main id="main" data-product-slot="true"></main>';
+  for (const p of panettone) {
+    assert.equal(p.options.length, 2);
+    assert.ok(p.media.some(link => link.role==="primary"));
+    assert.match(renderProductPage(shell, `/menu/${p.slug}`, state, "on", "ar"), /الغلوتين/);
+    for (const option of p.options) {
+      assert.equal(option.orderable, false);
+      assert.equal(option.available, false);
+      const cart = {
+        lines: [{ productId: option.id, quantity: 1 }], fulfillmentMethod: "pickup",
+      };
+      assert.equal(quoteWebCheckout(f.service, cart).eligible, false);
+      assert.throws(() => canonicalCartHash(f.service, cart), { status: 422 });
+    }
+  }
+  const eligible = quoteWebCheckout(f.service, {
+    lines: [{ productId: "pan-de-muerto-traditional-azucar-individual-70-g", quantity: 6 }], fulfillmentMethod: "pickup",
+  });
+  assert.equal(eligible.eligible, true);
   assert.equal(f.providerState.creates, 0);
 });

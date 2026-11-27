@@ -34,7 +34,7 @@ import {
   publishedMediaAuthority,
 } from "./media";
 import { AddressAutocomplete } from "./AddressAutocomplete";
-import { CustomerCopy, LanguageSwitcher } from "./localization";
+import { CustomerCopy } from "./localization";
 import { useCheckoutNow } from "./cart";
 import {
   validWindow,
@@ -81,7 +81,6 @@ import "./checkout.css";
 import {
   Button,
   Input,
-  Logo,
   Select,
   Textarea,
   WhatsAppCTA,
@@ -475,25 +474,14 @@ function Progress({ step }: { step: number }) {
     </nav>
   );
 }
-/** Checkout keeps its own compact header: logo, a secure-checkout cue, no menu. */
-function CheckoutHeader() {
-  const { text: localize } = useCustomerLanguage();
-
+function CheckoutSecurity() {
   return (
-    <header className="b-co-header">
-      <a
-        href="/"
-        className="b-co-logo"
-        aria-label={localize("Pastelerías 3L · Home")}
-      >
-        <Logo />
-      </a>
-      <LanguageSwitcher />
+    <div className="b-co-header b-co-security">
       <p className="b-co-secure">
         <LockSimple aria-hidden weight="bold" />{" "}
         <CustomerCopy>Secure checkout</CustomerCopy>
       </p>
-    </header>
+    </div>
   );
 }
 function ShopShell({
@@ -513,11 +501,8 @@ function ShopShell({
   };
   return (
     <div className="brand-experience b-entered b-shop">
-      <a className="b-skip" href="#main-content">
-        <CustomerCopy>Skip to content</CustomerCopy>
-      </a>
-      <CheckoutHeader />
       <main id="main-content" className="b-shop-main">
+        <CheckoutSecurity />
         <Progress step={step} />
         {!bare && (
           <h1>

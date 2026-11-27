@@ -118,16 +118,15 @@ export function VisualPolicy({path}:{path:PolicyPath}){
  // The V3.2 shell owns only frame/navigation. Every legal sentence below is
  // the authorized commercial copy from src/brand/Policies.tsx (single source
  // of truth with business.ts): never preview-simplified text.
- const {t}=useVisualCopy();const {language}=useLanguage();
+ const {t}=useVisualCopy();const {language,text}=useLanguage();
  if(path==="/contact")return <VisualContact/>;
  const page=pages[path];
- useEffect(()=>{document.title=`${page.metaTitle} — ${business.tradingName} Dubai`;},[page]);
- return <main id="main" className="v32-new-page" data-new-ui="policy"><p className="v32-new-eyebrow">{t.policy}</p><h1>{page.title}</h1>
+ return <main id="main" className="v32-new-page" data-new-ui="policy"><p className="v32-new-eyebrow">{t.policy}</p><h1>{text(page.title)}</h1>
  <div className="v32-new-policy b-policy-body">{page.intro}
- {page.summary&&<ul className="b-policy-summary" aria-label="Summary">{page.summary.map(s=><li key={s.title}><p className="b-label">{s.title}</p><p>{s.text}</p></li>)}</ul>}
- {page.sections.map(s=><section key={s.id} aria-label={s.title}><h2>{s.title}</h2>{s.body}</section>)}
- <p className="b-caption">Last updated {new Date(`${business.policiesUpdated} 12:00:00 UTC`).toLocaleDateString(language==="en"?"en-GB":language,{day:"numeric",month:"long",year:"numeric",timeZone:"UTC"})} · {legalEntityLabel()}</p></div>
- <a href={suffix("/contact")} className="v32-new-action">{t.contact} →</a></main>;
+ {page.summary&&<ul className="b-policy-summary" aria-label={text("Summary")}>{page.summary.map(s=><li key={s.title}><p className="b-label">{text(s.title)}</p><p>{typeof s.text === "string" ? text(s.text) : s.text}</p></li>)}</ul>}
+ {page.sections.map(s=><section key={s.id} aria-label={text(s.title)}><h2>{text(s.title)}</h2>{s.body}</section>)}
+ <p className="b-caption">{text("Last updated")} {new Date(`${business.policiesUpdated} 12:00:00 UTC`).toLocaleDateString(language==="en"?"en-GB":language,{day:"numeric",month:"long",year:"numeric",timeZone:"UTC"})} · {text(legalEntityLabel())}</p></div>
+ <a href={suffix("/contact") + (language === "en" ? "" : `?lang=${language}`)} className="v32-new-action">{t.contact} →</a></main>;
 }
 type Quote={eligible?:boolean;totalFils?:number;subtotalFils?:number;feeFils?:number;minOrderAed?:number;reason?:string};
 export function VisualCheckout(){

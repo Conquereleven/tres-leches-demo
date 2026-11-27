@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import selection from "../../docs/media/3l-media-002/selection.json";
+import rt013Media from "../../src/brand/rt013-media.json";
 import uploads from "../../docs/media/3l-media-002/hub-uploads.json";
 import plan from "../../docs/media/3l-media-002/publication-plan.json";
 import {
@@ -21,31 +22,42 @@ const metadataFree = (bytes: Buffer) =>
 
 test("new photographs open each category gallery in the reviewed order; approved frames follow", () => {
   const ids = (c: string) => categoryEditorialMedia(c).map((a) => a.sourceId);
-  for (const [category, opening, retained] of [
-    ["pan", ["080", "059", "049"], 4],
-    ["conchas", ["026", "027", "024"], 2],
-    ["bakery", ["002", "041"], 0],
+  for (const [category, rt013, opening, retained] of [
+    ["pan", ["rt013-pan-editorial-82", "rt013-pan-editorial-93"], ["080", "059", "049"], 4],
+    ["conchas", ["rt013-conchas-editorial-26"], ["026", "027", "024"], 2],
+    ["bakery", [], ["002", "041"], 0],
   ] as const) {
     const gallery = categoryEditorialMedia(category);
-    assert.equal(gallery.length, opening.length + retained, category);
+    const legacyStart = rt013.length;
+    const legacyEnd = legacyStart + opening.length;
+    assert.equal(gallery.length, legacyEnd + retained, category);
+    assert.deepEqual(ids(category).slice(0, legacyStart), rt013);
+    for (const asset of gallery.slice(0, legacyStart)) {
+      assert.equal(asset.family, category);
+      assert.ok(rt013Media.products.every((mapping) =>
+        mapping.primarySourceId !== asset.sourceId && !mapping.gallerySourceIds.some((id) => id === asset.sourceId),
+      ));
+      for (const derivative of asset.derivatives)
+        assert.ok(metadataFree(readFileSync("public" + derivative.src)), derivative.src);
+    }
     assert.deepEqual(
-      ids(category).slice(0, opening.length),
+      ids(category).slice(legacyStart, legacyEnd),
       opening.map((n) => `3l-media-002-${category}-m002-${n}`),
     );
     assert.ok(
       ids(category)
-        .slice(opening.length)
+        .slice(legacyEnd)
         .every((id) => !id.startsWith("3l-media-002-")),
     );
     // Exactly the reviewed editorial selection, no more.
     assert.deepEqual(
-      [...ids(category).slice(0, opening.length)].sort(),
+      [...ids(category).slice(legacyStart, legacyEnd)].sort(),
       selection
         .filter((s) => s.kind === "editorial" && s.target === category)
         .map((s) => `3l-media-002-${category}-${s.assetId.toLowerCase()}`)
         .sort(),
     );
-    for (const asset of gallery.slice(0, opening.length)) {
+    for (const asset of gallery.slice(legacyStart, legacyEnd)) {
       // A category frame is never resolvable as a product, flavour or pack image.
       assert.equal(asset.family, null);
       assert.ok(usesMenuReferencePresentation(asset));

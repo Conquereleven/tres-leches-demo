@@ -4,6 +4,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import type { State } from "../domain/model";
 import { DomainError } from "../domain/model";
 import { RETIRED_SKUS, availableSku, heldPanettoneSku, isPanettoneSku } from "../../shared/commerce-policy";
+import { withdrawnConchaSku } from "../../shared/storefront-visibility";
 import { catalogDigest, validateFoundation } from "./contract";
 
 /**
@@ -93,6 +94,7 @@ export function storefrontCatalog(state: State, now = new Date()) {
             v.productId === p.id &&
             v.commercialState === "published" &&
             !RETIRED_SKUS.has(v.skuId) &&
+            !withdrawnConchaSku(v.skuId) &&
             storefrontSkuPublished(state, v.skuId) &&
             commercial.get(v.skuId)?.active === true,
         )

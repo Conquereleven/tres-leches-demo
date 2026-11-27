@@ -1,0 +1,351 @@
+.commerce.ops-shell.tatbiq-workspace {
+  --tatbiq-ink: #101828;
+  --tatbiq-primary: #0b1220;
+  --tatbiq-mint: #4de3c2;
+  --tatbiq-mint-soft: #e8faf5;
+  --tatbiq-mint-ink: #097961;
+  --tatbiq-muted: #667085;
+  --tatbiq-canvas: #f6f8fb;
+  --tatbiq-line: #e7ebf0;
+  --tatbiq-heading: "Sora", system-ui, sans-serif;
+  --rail: 226px;
+  --line: var(--tatbiq-line);
+  background: var(--tatbiq-canvas);
+  color: var(--tatbiq-ink);
+  font-family: "DM Sans", system-ui, sans-serif;
+}
+
+.tatbiq-workspace :is(h1, h2, h3, .ops-brand, .ops-summary-card strong) {
+  font-family: var(--tatbiq-heading);
+}
+.commerce.ops-shell.tatbiq-workspace .ops-sidebar {
+  padding: 24px 14px 14px;
+  border-inline-end: 1px solid var(--tatbiq-line);
+  background: #fff;
+}
+.tatbiq-workspace .ops-brand {
+  gap: 10px;
+  margin-block-end: 18px;
+}
+.commerce.ops-shell.tatbiq-workspace .tatbiq-brand-mark {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  flex: none;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--tatbiq-primary);
+}
+.tatbiq-workspace .tatbiq-brand-mark img {
+  width: 27px;
+  height: 27px;
+  object-fit: contain;
+}
+.tatbiq-workspace .ops-brand > span:last-child {
+  color: var(--tatbiq-ink);
+}
+.tatbiq-workspace .ops-nav-section > p {
+  color: var(--tatbiq-muted);
+}
+.tatbiq-workspace .ops-navigation button {
+  gap: 10px;
+  min-height: 44px;
+  border-radius: 12px;
+  color: var(--tatbiq-muted);
+  font-size: 0.875rem;
+}
+.commerce.ops-shell.tatbiq-workspace
+  :is(.ops-navigation, .tatbiq-bottom-nav)
+  button[aria-current="page"] {
+  color: var(--tatbiq-primary);
+  background: var(--tatbiq-mint-soft);
+}
+.commerce.ops-shell.tatbiq-workspace
+  .ops-navigation
+  button[aria-current="page"]::before {
+  display: none;
+}
+.tatbiq-workspace
+  :is(.ops-navigation, .tatbiq-bottom-nav)
+  button[aria-current="page"]
+  svg {
+  color: var(--tatbiq-mint-ink);
+}
+.tatbiq-workspace .ops-sidebar-bottom {
+  border-top: 1px solid var(--tatbiq-line);
+}
+.commerce.ops-shell.tatbiq-workspace .ops-topbar {
+  min-height: 72px;
+  padding-inline: 30px;
+  border-bottom: 1px solid var(--tatbiq-line);
+}
+.tatbiq-workspace .ops-breadcrumb {
+  margin-inline-end: auto;
+}
+.tatbiq-workspace .ops-avatar {
+  color: var(--tatbiq-primary);
+  background: var(--tatbiq-mint-soft);
+}
+.tatbiq-workspace .tatbiq-context {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 30px;
+  border-bottom: 1px solid var(--tatbiq-line);
+  background: #fff;
+  color: var(--tatbiq-muted);
+  font-size: 0.8rem;
+}
+.commerce.ops-shell.tatbiq-workspace .ops-environment {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--tatbiq-primary);
+  background: var(--tatbiq-mint-soft);
+}
+.tatbiq-workspace .ops-content {
+  max-width: 1420px;
+  padding-inline: 30px;
+}
+.tatbiq-workspace .ops-page-header h1 {
+  color: var(--tatbiq-ink);
+  letter-spacing: -0.045em;
+}
+.tatbiq-workspace .ops-drawer {
+  background: #fff;
+}
+.tatbiq-workspace .ops-drawer::backdrop {
+  background: rgb(11 18 32 / 50%);
+}
+.tatbiq-workspace .ops-drawer-inner {
+  padding: 12px 16px;
+}
+.tatbiq-workspace .ops-drawer-close {
+  color: var(--tatbiq-ink);
+}
+.commerce.ops-shell.tatbiq-workspace
+  :is(
+    .ops-panel,
+    .ops-v2-panel,
+    .ops-summary-card,
+    .oms-card,
+    .ph-panel,
+    .co-zone-editor
+  ) {
+  color: var(--tatbiq-ink);
+  background: #fff;
+  border-color: var(--tatbiq-line);
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgb(16 24 40 / 4%);
+}
+.commerce.ops-shell.tatbiq-workspace
+  :is(
+    .ops-summary-card,
+    .ops-navigation button,
+    .tatbiq-bottom-nav button
+  ):hover:not(:disabled) {
+  background: var(--tatbiq-mint-soft);
+  border-color: var(--tatbiq-line);
+}
+.tatbiq-workspace :is(.ops-table-scroll, .ops-v2-panel) thead {
+  background: var(--tatbiq-canvas);
+}
+.tatbiq-workspace :is(.ops-table-scroll, .ops-v2-panel) th {
+  color: var(--tatbiq-muted);
+}
+.tatbiq-workspace :is(.ops-table-scroll, .ops-v2-panel) td {
+  border-color: var(--tatbiq-line);
+}
+.commerce.ops-shell.tatbiq-workspace :is(button.primary, .co-action.primary) {
+  color: #fff;
+  background: var(--tatbiq-primary);
+  border-color: var(--tatbiq-primary);
+}
+.commerce.ops-shell.tatbiq-workspace :focus-visible {
+  outline-color: var(--tatbiq-mint-ink);
+}
+.tatbiq-workspace .tatbiq-overview-date {
+  display: flex;
+  gap: 10px;
+  color: var(--tatbiq-muted);
+}
+.tatbiq-workspace .tatbiq-overview-date time {
+  color: var(--tatbiq-ink);
+  font-weight: 700;
+}
+.commerce.ops-shell.tatbiq-workspace .ops-overview .ops-v2-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.commerce.ops-shell.tatbiq-workspace .ops-summary-card {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  text-align: start;
+}
+.tatbiq-workspace .tatbiq-metric-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+.tatbiq-workspace .tatbiq-metric-heading svg {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  padding: 7px;
+  border-radius: 10px;
+  background: var(--tatbiq-mint-soft);
+  color: var(--tatbiq-mint-ink);
+}
+.tatbiq-workspace :is(.tatbiq-overview-primary, .tatbiq-overview-secondary) {
+  display: grid;
+  grid-template-columns: minmax(0, 1.13fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+}
+.tatbiq-workspace .tatbiq-overview-secondary {
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+}
+.commerce.ops-shell.tatbiq-workspace .ops-v2-track {
+  background: var(--tatbiq-mint-soft);
+}
+.commerce.ops-shell.tatbiq-workspace .ops-v2-track > span {
+  background: var(--tatbiq-mint-ink);
+}
+.commerce.ops-shell.tatbiq-workspace .tatbiq-priorities .ops-v2-panel {
+  background: var(--tatbiq-primary);
+  color: #fff;
+  border-color: var(--tatbiq-primary);
+}
+.commerce.ops-shell.tatbiq-workspace .tatbiq-priorities :is(a, h2) {
+  color: var(--tatbiq-mint);
+}
+.commerce.ops-shell.tatbiq-workspace
+  .tatbiq-priorities
+  :is(.ops-v2-priorities p, .ops-v2-note, .co-empty) {
+  color: var(--tatbiq-line);
+}
+.commerce.ops-shell.tatbiq-workspace
+  .tatbiq-priorities
+  .ops-v2-priorities
+  ul
+  li {
+  background: var(--tatbiq-mint-soft);
+  color: var(--tatbiq-primary);
+}
+.commerce.ops-shell.tatbiq-workspace .tatbiq-priorities :focus-visible {
+  outline-color: var(--tatbiq-mint);
+}
+.commerce.ops-shell.tatbiq-workspace .ph-tabs button[aria-selected="true"] {
+  border-color: var(--tatbiq-mint-ink);
+  background: var(--tatbiq-mint-soft);
+  color: var(--tatbiq-ink);
+}
+.commerce.ops-shell.tatbiq-workspace
+  :is(.ops-drawer, .ops-order-card, .co-panel) {
+  background: #fff;
+  border-color: var(--tatbiq-line);
+}
+.tatbiq-workspace .tatbiq-login-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-block-end: 20px;
+}
+.tatbiq-workspace .tatbiq-bottom-nav {
+  display: none;
+}
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  .commerce.ops-shell.tatbiq-workspace {
+    --rail: 80px;
+  }
+  .commerce.ops-shell.tatbiq-workspace .ops-sidebar {
+    padding-inline: 12px;
+  }
+  .tatbiq-workspace .ops-sidebar .ops-brand {
+    padding-inline: 8px;
+  }
+  .tatbiq-workspace .ops-sidebar .ops-brand > span:last-child {
+    display: none;
+  }
+}
+@media (max-width: 1023px) {
+  .tatbiq-workspace :is(.tatbiq-overview-primary, .tatbiq-overview-secondary) {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 767px) {
+  .tatbiq-workspace :is(.ops-content, .ops-topbar, .tatbiq-context) {
+    padding-inline: 16px;
+  }
+  .commerce.ops-shell.tatbiq-workspace .ops-topbar {
+    min-height: 60px;
+    padding-block: 8px;
+  }
+  .tatbiq-workspace .ops-language {
+    font-size: 0;
+    gap: 0;
+  }
+  .commerce.ops-shell.tatbiq-workspace .ops-language select {
+    font-size: 0.875rem;
+    max-width: 112px;
+    min-height: 42px;
+  }
+  .tatbiq-workspace .tatbiq-metric-heading svg {
+    width: 26px;
+    height: 26px;
+    padding: 5px;
+  }
+  .commerce.ops-shell.tatbiq-workspace
+    .ops-v2-summary
+    .ops-summary-card
+    strong {
+    font-size: 27px;
+  }
+  .tatbiq-workspace .ops-content {
+    padding-bottom: calc(83px + env(safe-area-inset-bottom, 0px));
+  }
+  .tatbiq-workspace .ops-breadcrumb {
+    min-width: 0;
+  }
+  .tatbiq-workspace .tatbiq-topbar-avatar {
+    display: none;
+  }
+  .commerce.ops-shell.tatbiq-workspace .ops-overview .ops-v2-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .commerce.ops-shell.tatbiq-workspace .ops-summary-card {
+    padding: 12px;
+  }
+  .tatbiq-workspace .tatbiq-bottom-nav {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 19;
+    display: flex;
+    gap: 3px;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--tatbiq-line);
+    background: #fff;
+  }
+  .tatbiq-workspace .tatbiq-bottom-nav button {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+    min-height: 46px;
+    overflow-wrap: anywhere;
+    place-items: center;
+    gap: 3px;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    background: transparent;
+    color: var(--tatbiq-muted);
+    padding: 4px 2px;
+    font-size: 0.68rem;
+    line-height: 1.2;
+  }
+}

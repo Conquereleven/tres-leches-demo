@@ -278,8 +278,8 @@ test(
         ),
         page.path,
       );
-      assert.match(html, /<div id="root">(?:<link[^>]*>)*<div class="v32-app"/);
-      assert.doesNotMatch(html, /class="brand-experience/);
+      assert.match(html, /<div id="root">(?:<link[^>]*>)*<div class="v32-app vr009"/);
+      assert.doesNotMatch(html, /class="brand-experience|fonts\.googleapis\.com/);
       assert.doesNotMatch(html, /521683319|506757352|52 168 3319|50 675 7352/);
       assert.equal(html.match(/<h1/g)!.length, 1, page.path);
       assert.match(html, /<html lang="en">/);

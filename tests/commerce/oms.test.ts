@@ -404,6 +404,31 @@ test("OMS styles use only the approved palette and stay scoped to Operations", (
     );
 });
 
+test("Tatbiq uses its approved palette within the Operations workspace", () => {
+  const css = readFileSync("src/commerce/tatbiq-workspace.css", "utf8");
+  const colours = new Set(
+    [...css.matchAll(/#[0-9a-f]{3,8}\b/gi)].map((match) => match[0]),
+  );
+  assert.deepEqual([...colours].sort(), [
+    "#097961",
+    "#0b1220",
+    "#101828",
+    "#4de3c2",
+    "#667085",
+    "#e7ebf0",
+    "#e8faf5",
+    "#f6f8fb",
+    "#fff",
+  ]);
+  const selectors = css.replace(/@import[^;]*;/g, "").matchAll(/([^{}]+)\{/g);
+  for (const [, selector] of selectors)
+    if (!selector!.trim().startsWith("@media"))
+      assert.match(
+        selector!.trim(),
+        /^(?:\.commerce\.ops-shell)?\.tatbiq-workspace\b/,
+      );
+});
+
 test("server serves the app shell for one order path and nothing wider", async () => {
   const PORT = 3173;
   const call = (path: string) =>

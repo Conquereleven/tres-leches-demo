@@ -7,6 +7,8 @@ if (!out)
     "PRINT_EVIDENCE_DIR required for synthetic download evidence",
   );
 async function download(page: Page, label: string, name: string) {
+  const exportMenu = page.locator(".oms-export-trigger");
+  if (await exportMenu.isVisible()) await exportMenu.click();
   const waiting = page.waitForEvent("download");
   await page.getByRole("button", { name: label, exact: true }).click();
   const d = await waiting;
@@ -60,6 +62,18 @@ test("real authenticated downloads: single, >25 matching, all variants, CSV, ZIP
     "Delivery notes · A4 two-up candidate (PDF)",
     `${prefix}-bulk-two-up.pdf`,
   );
+  for (const [label, filename] of [
+    ["Delivery notes (PDF)", "delivery-a4.pdf"],
+    ["Packing slips (ZIP)", "packing.zip"],
+    ["Production & packing · Event / bulk (ZIP)", "production.zip"],
+    ["Delivery note · A5 candidate (ZIP)", "delivery-a5.zip"],
+    ["Delivery notes · A4 two-up candidate (ZIP)", "delivery-two-up.zip"],
+  ]) {
+    const bytes = await download(page, label!, `${prefix}-bulk-${filename}`);
+    expect(bytes.subarray(0, filename!.endsWith(".zip") ? 2 : 4).toString()).toBe(
+      filename!.endsWith(".zip") ? "PK" : "%PDF",
+    );
+  }
   const zip = await download(
     page,
     "Delivery notes (ZIP)",
@@ -67,6 +81,7 @@ test("real authenticated downloads: single, >25 matching, all variants, CSV, ZIP
   );
   const end = zip.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
   expect(zip.readUInt16LE(end + 10)).toBe(count);
+  await page.locator(".oms-export-trigger").click();
   await page.screenshot({
     path: join(out!, `${prefix}-selection.png`),
     fullPage: true,

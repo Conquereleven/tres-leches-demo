@@ -32,7 +32,7 @@ import {
 } from "../../server/domain/web-checkout";
 import { reconcileEmbeddedPayment } from "../../server/domain/embedded-checkout";
 import { renderProductPage } from "../../server/catalog/product-page";
-import { hiddenConcha } from "../../shared/storefront-visibility";
+import { hiddenConcha, withdrawnConchaSku } from "../../shared/storefront-visibility";
 import { RETIRED_SKUS } from "../../shared/commerce-policy";
 
 const sources = loadBootstrapSources(process.cwd());
@@ -189,7 +189,7 @@ test("public contract: published revision only, three languages, server prices, 
   const { store, view, payload, save, cake } = setup();
   try {
     const before = storefrontCatalog(store.read());
-    assert.equal(before.products.length, 75);
+    assert.equal(before.products.length, 72);
     assert.equal(before.revision, view().published.id);
     const ids = new Set(sources.approved.map((c) => c.id));
     for (const p of before.products) {
@@ -199,6 +199,7 @@ test("public contract: published revision only, three languages, server prices, 
       for (const o of p.options) {
         assert.ok(ids.has(o.id));
         assert.ok(!RETIRED_SKUS.has(o.id));
+        assert.ok(!withdrawnConchaSku(o.id));
         assert.equal(
           o.priceFils,
           sources.approved.find((c) => c.id === o.id)!.priceFils,
@@ -724,37 +725,44 @@ test("commercial rollback: publishing the previous price restores the previous r
   }
 });
 
-test("RT01.1 retirement draft keeps prices and does not change quotes until publication", async () => {
+test("a new retirement draft preserves quotes until publication and cannot revive withdrawn pistachio", async () => {
   const { store, view, payload, save, publish } = setup();
   const service = new CommerceService(store, new DisabledWhatsAppProvider(), new UnconfiguredPaymentProvider());
-  const sku = "conchas-traditional-pistache-mini-40-g";
+  const sku = "conchas-traditional-chocolate-mini-40-g";
   const order = { lines: [{ productId: sku, quantity: 6 }], fulfillmentMethod: "pickup" };
-  const ids = [
+  const retiring = "conchas-traditional--chocolate";
+  const withdrawn = [
     "conchas-traditional--pistache",
     "conchas-filled--pistache",
     "conchas-filled-pack",
   ];
   try {
     const before = storefrontCatalog(store.read());
+    assert.ok(withdrawn.every((id) => !before.products.some((product) => product.id === id)));
     const beforeQuote = quoteWebCheckout(service, order);
     assert.ok(beforeQuote.subtotalFils > 0);
 
-    for (const id of ids) {
+    const retiredCart = { ...order, lines: [{ productId: "conchas-traditional-pistache-mini-40-g", quantity: 6 }] };
+    assert.throws(() => quoteWebCheckout(service, retiredCart), { status: 422 });
+    for (const id of withdrawn) {
       const product = view().products.find((p) => p.id === id)!;
       const draft = payload(product);
       assert.ok(hiddenConcha(id, draft.variants.map((variant) => variant.skuId)));
       for (const variant of draft.variants) variant.active = false;
       save(draft);
     }
+    const draft = payload(view().products.find((p) => p.id === retiring)!);
+    for (const variant of draft.variants) variant.active = false;
+    save(draft);
     assert.deepEqual(storefrontCatalog(store.read()), before);
     assert.deepEqual(quoteWebCheckout(service, order), beforeQuote);
     assert.ok(view().issues.every((issue) => issue.level !== "error"));
     publish();
 
     const after = storefrontCatalog(store.read());
-    assert.deepEqual(after.products, before.products.filter((p) => !ids.includes(p.id)));
-    const rejected = quoteWebCheckout(service, order);
-    assert.equal(rejected.eligible, false);
+    assert.deepEqual(after.products, before.products.filter((p) => p.id !== retiring));
+    assert.equal(quoteWebCheckout(service, order).eligible, false);
+    assert.throws(() => quoteWebCheckout(service, retiredCart), { status: 422 });
     await assert.rejects(createWebCheckout(service, {
       ...order,
       pickup: { pickupDate: addDays(dubaiToday(), 2), preferredTime: "4:00 PM – 9:00 PM" },
@@ -762,7 +770,7 @@ test("RT01.1 retirement draft keeps prices and does not change quotes until publ
       billing: { sameAsDelivery: false, name: "Fixture order", address1: "Fixture street", city: "Dubai", country: "AE" },
     }, randomUUID(), "web", "https://fixture.invalid"), { status: 422 });
     assert.equal(store.read().orders.length, 0);
-    const retained = ["conchas-traditional--chocolate", "conchas-traditional--vainilla",
+    const retained = ["conchas-traditional--tricolor", "conchas-traditional--vainilla",
       "conchas-tricolor-pack", "croissant--pistacchio", "pan-de-muerto-filled--pistachio"];
     assert.ok(retained.every((id) => after.products.some((p) => p.id === id)));
     assert.equal(hiddenConcha("conchas-filled-pack", ["conchas-filled-pack-6-mini", "unrelated-pack"]), false);
@@ -771,18 +779,23 @@ test("RT01.1 retirement draft keeps prices and does not change quotes until publ
   }
 });
 
-test("RT01.1 V3.2 product metadata uses only current public identities and hides seasonal offers", (t) => {
+test("V3.2 metadata includes available annual Pan de Muerto and excludes retired products and embedded prices", (t) => {
   t.mock.timers.enable({ apis: ["Date"], now: new Date("2026-11-25T08:00:00Z") });
   const { store } = setup();
   const shell = '<html><head><title>3L</title></head><body><main id="main" data-product-slot="true"></main></body></html>';
   try {
     const state = store.read();
     for (const mode of ["on", "off"] as const) {
-      const html = renderProductPage(shell, "/menu/pan-de-muerto-filled-pack", state, mode);
-      assert.match(html, /<title>.*Pack.*<\/title>/i);
-      assert.match(html, /<h1>.+<\/h1>/);
-      assert.doesNotMatch(html, /"offers"|itemprop="price"/);
-      for (const slug of ["pan-de-muerto-filled--chocolate", "conchas-filled-pack", "unknown"])
+      for (const [slug, title] of [
+        ["pan-de-muerto-filled-pack", /<title>.*Pack.*<\/title>/i],
+        ["pan-de-muerto-filled--chocolate", /<title>.*Chocolate.*<\/title>/i],
+      ] as const) {
+        const html = renderProductPage(shell, "/menu/" + slug, state, mode);
+        assert.match(html, title);
+        assert.match(html, /<h1>.+<\/h1>/);
+        assert.doesNotMatch(html, /"offers"|itemprop="price"/);
+      }
+      for (const slug of ["conchas-filled-pack", "unknown"])
         assert.throws(() => renderProductPage(shell, "/menu/" + slug, state, mode), { status: 404 });
     }
     assert.throws(() => renderProductPage(shell, "/menu/tres-leches--classic", { ...state, catalogFoundation: undefined }, "on"), { status: 503 });

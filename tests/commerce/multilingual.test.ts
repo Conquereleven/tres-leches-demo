@@ -33,7 +33,7 @@ test("presentation localizes money and dates without changing canonical financia
   for (const locale of ["en", "es", "ar"] as const) {
     assert.equal(typeof localizedMoney(10800, locale), "string");
     assert.equal(localizedDate("2026-10-20", locale).length > 0, true);
-    assert.equal(localizedSource("Pan de Muerto", locale), "Pan de Muerto");
+    assert.equal(localizedSource("Pan de Muerto", locale), locale === "ar" ? "بان دي مويرتو" : "Pan de Muerto");
   }
   assert.match(localizedMoney(10800, "es"), /108/);
   assert.match(localizedMoney(10800, "ar"), /١٠٨/);

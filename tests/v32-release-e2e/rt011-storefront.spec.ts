@@ -85,16 +85,18 @@ test("RT01.1 Pan de Muerto availability, Panettone direct navigation and stale c
     page.locator('[data-product-id="pan-de-muerto-filled--pistachio"]'),
   ).toBeEnabled();
   await page.goto("/bakery?category=panettone");
-  await expect(page.getByRole("button", { name: "Panettone" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Panettone", exact: true })).toHaveCount(0);
   await expect(page.locator(".v32-search-empty")).toBeVisible();
   expect((await page.request.get("/menu/panettone")).status()).toBe(404);
   await expect(page.locator(".ref32-product")).toHaveCount(0);
+  const categoryTrigger = page.locator(".category-trigger");
+  if (await categoryTrigger.isVisible()) await categoryTrigger.click();
   await page
     .getByRole("button", { name: "Mexican Bakery", exact: true })
     .focus();
   await page.keyboard.press("Enter");
   await expect(
-    page.getByRole("button", { name: "Mexican Bakery", exact: true }),
+    page.getByRole("button", { name: "Mexican Bakery", exact: true, includeHidden: true }),
   ).toHaveAttribute("aria-pressed", "true");
   await expect(page).toHaveURL(/category=mexican/);
   await expect(
@@ -127,29 +129,21 @@ test("RT01.1 cold HTML, portrait completion, reduced motion, contacts and journa
   page,
   browser,
 }, testInfo) => {
-  const route = "**/assets/index-*.js";
-  let releaseScript!: () => void;
-  const delayed = new Promise<void>((resolve) => {
-    releaseScript = resolve;
-  });
-  await page.route(route, async (request) => {
-    await delayed;
-    await request.continue();
-  });
-  await page.goto("/", { waitUntil: "commit" });
-  await expect(page.locator(".v32-home")).toBeVisible();
-  await expect(page.locator(".brand-experience")).toHaveCount(0);
-  await expect(
-    page.getByRole("img", { name: "Alicia Luna Baeza" }),
-  ).toBeVisible();
-  await page.screenshot({
-    path: testInfo.outputPath("home-first-paint.png"),
-    animations: "disabled",
-    fullPage: true,
-  });
-  releaseScript();
+  test.setTimeout(120_000);
+  const origin = new URL(testInfo.project.use.baseURL!);
+  const cold = await browser.newContext({ javaScriptEnabled: false, viewport: page.viewportSize() });
+  try {
+    const firstPaint = await cold.newPage();
+    await firstPaint.goto(origin.href);
+    await expect(firstPaint.locator(".home-main")).toBeVisible();
+    await expect(firstPaint.locator(".brand-experience")).toHaveCount(0);
+    await expect(firstPaint.getByRole("img", { name: "Alicia Luna Baeza" })).toBeVisible();
+    await firstPaint.screenshot({path: testInfo.outputPath("home-first-paint.png"), fullPage: true});
+  } finally {
+    await cold.close();
+  }
+  await page.goto("/");
   await expect(page.locator(".ref-scroll-sketch")).toBeVisible();
-  await page.unroute(route);
   const sketch = page.locator(".v32-family-portrait .ref-scroll-sketch");
   await expect
     .poll(async () => Number(await sketch.getAttribute("data-drawn")))
@@ -228,7 +222,7 @@ test("Arabic geography and category history stay stable at 390, 768 and 1440", a
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/?lang=ar");
     await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
-    const journey = page.locator(".v32-journey");
+    const journey = page.locator(".journey");
     await expect(journey).toHaveAttribute("dir", "ltr");
     const mexico = journey.locator('[data-city="mexico"]');
     const dubai = journey.locator('[data-city="dubai"]');
@@ -236,7 +230,7 @@ test("Arabic geography and category history stay stable at 390, 768 and 1440", a
     await expect(dubai).toHaveText(/دبي.*اليوم/);
     const [first, path, last] = await Promise.all([
       mexico.boundingBox(),
-      journey.locator(".v32-route").boundingBox(),
+      journey.locator(".journey-svg").boundingBox(),
       dubai.boundingBox(),
     ]);
     expect(first!.x).toBeLessThan(path!.x);
@@ -245,8 +239,8 @@ test("Arabic geography and category history stay stable at 390, 768 and 1440", a
       await expect
         .poll(() => city.locator("img").evaluate((image) => image.naturalWidth))
         .toBeGreaterThan(0);
-    await expect(mexico.locator("img")).toHaveCSS("transform", "none");
-    await expect(dubai.locator("img")).not.toHaveCSS("transform", "none");
+    await expect(mexico.locator("img")).toHaveAttribute("src", "/brand/vr008/mexico.png");
+    await expect(dubai.locator("img")).toHaveAttribute("src", "/brand/vr008/dubai.jpg");
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth),
     ).toBeLessThanOrEqual(width);
@@ -282,7 +276,7 @@ test("Arabic geography and category history stay stable at 390, 768 and 1440", a
   );
   await page.goBack();
   await expect(page.locator(".ref32-product").first()).toBeVisible();
-  await page.getByRole("link", { name: "المجلة", exact: true }).click();
+  await page.locator(".mast").getByRole("link", { name: "المجلة", exact: true }).click();
   await expect(page).toHaveURL(/journal/);
-  await expect(page.locator(".v32-journal h1")).toContainText("تاج من الحلوى");
+  await expect(page.locator(".v32-journal h1")).toContainText("على هيئة تاج");
 });

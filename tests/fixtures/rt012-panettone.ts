@@ -18,20 +18,20 @@ type Localized = Record<(typeof locales)[number], string>;
 type ProductCommand = Extract<HubCommand, { type: "saveProduct" }>;
 type Content = ProductCommand["product"]["translations"];
 
-function content(name: Localized, description?: Localized, size?: Localized): Content {
+function content(name: Localized, description?: Localized, size?: Localized, flavour?: Localized): Content {
   const entries = locales.map((locale) => [
     locale,
     {
       name: name[locale],
       description: description?.[locale] ?? null,
-      variantLabel: null,
+      variantLabel: flavour?.[locale] ?? null,
       ...(size ? { sizeLabel: size[locale] } : {}),
     },
   ]);
   return Object.fromEntries(entries) as Content;
 }
 
-export function draftPanettoneFixture(store: Store) {
+export function draftPanettoneFixture(store: Store, { release = false } = {}) {
   const before = store.read();
   const revision = before.catalogFoundation?.revision.id;
   assert.ok(revision);
@@ -61,16 +61,16 @@ export function draftPanettoneFixture(store: Store) {
     },
   });
   for (const product of manifest.products) {
-    const bytes = readFileSync(new URL(
-      `../../data-imports/rt012-panettone/${product.previewPhoto.file}`,
-      import.meta.url,
-    ));
-    const sha = createHash("sha256").update(bytes).digest("hex");
-    assert.equal(sha, product.previewPhoto.sha256);
-    const output = hubUpload(
-      store, admin, randomUUID(), bytes, "image/webp",
-      { expectedVersion: version++, alt: content(product.name) }, flags,
-    ) as { assetId: string };
+    const releaseAvailability = product.releaseAvailability;
+    assert.equal(releaseAvailability, "unavailable");
+    const availability = release ? releaseAvailability : "available";
+    const media = [product.previewPhoto, ...product.galleryPhotos].map((photo, index) => {
+      const bytes = readFileSync(new URL(`../../data-imports/rt012-panettone/${photo.file}`, import.meta.url));
+      assert.equal(createHash("sha256").update(bytes).digest("hex"), photo.sha256);
+      const output = hubUpload(store, admin, randomUUID(), bytes, "image/webp",
+        { expectedVersion: version++, alt: content(product.name) }, flags) as { assetId: string };
+      return { assetId: output.assetId, role: index === 0 ? "primary" as const : "gallery" as const, order: Math.max(0, index - 1) };
+    });
     command({
       type: "saveProduct",
       expectedVersion: version++,
@@ -83,7 +83,7 @@ export function draftPanettoneFixture(store: Store) {
         description: product.description.en,
         commercialState: "published",
         translations: content(product.name, product.description),
-        media: [{ assetId: output.assetId, role: "primary", order: 0 }],
+        media,
       },
       variants: manifest.sizes.map((size) => {
         const name = {
@@ -97,13 +97,13 @@ export function draftPanettoneFixture(store: Store) {
           size: size.en,
           packQuantity: null,
           commercialState: "published",
-          translations: content(name, undefined, size),
+          translations: content(name, undefined, size, product.name),
           media: [],
           catalogName: name.en,
           operationsName: name.en,
           priceFils: size.priceFils,
           active: true,
-          availability: "available",
+          availability,
         };
       }),
     });

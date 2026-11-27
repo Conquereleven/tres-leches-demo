@@ -1,6 +1,8 @@
 import { serveAnalytics } from "./analytics/api";
 import { serveOrderDocuments } from "./orders/documents";
 import { isProductPagePath, renderProductPage } from "./catalog/product-page";
+import { storefrontLabels } from "../src/seo/pages";
+import { isLocale, type Locale } from "../src/brand/locales/engine";
 import { withoutBundledProductMedia } from "./catalog/product-media-html";
 import { packPricingPolicy } from "./domain/pack-pricing";
 import { packBuilderEnabled, publishedPackRules } from "./domain/packs";
@@ -403,6 +405,7 @@ export async function startServer(
     res.end(JSON.stringify(value));
   }
   const server = http.createServer(async (req, res) => {
+    let publicDocumentLocale: Locale | undefined;
     const correlationId = randomBytes(12).toString("hex");
     trace.enterWith(correlationId);
     res.setHeader("X-Request-Id", correlationId);
@@ -428,6 +431,11 @@ export async function startServer(
       }
       const url = new URL(req.url ?? "/", origin),
         path = url.pathname;
+      const language = url.searchParams.get("lang");
+      const locale = isLocale(language) ? language : "en";
+      if ((req.method === "GET" || req.method === "HEAD") &&
+          !/^\/(?:api|operations|brand|fonts|payments)(?:\/|$)/.test(path) &&
+          /^\/(?:[\w-]+(?:\/[\w-]+)*\/?)?$/.test(path)) publicDocumentLocale = locale;
       if (path.startsWith("/api/")) {
         // API answers are data for the site's own pages, never search results.
         res.setHeader("X-Robots-Tag", "noindex");
@@ -1157,7 +1165,11 @@ export async function startServer(
         candidate = resolve(root, "." + decodeURIComponent(path));
       if (candidate !== root && !candidate.startsWith(root + "/"))
         throw new DomainError(404, "No encontrado");
-      if (path === "/app-shell.html" || path === "/product-shell.html" || /^\/\.localized(?:\/|$)/.test(path))
+      const assetPath = candidate.slice(root.length);
+      if (
+        ["/app-shell.html", "/product-shell.html", "/cart-shell.html", "/checkout-shell.html", "/checkout-return-shell.html", "/operations-shell.html"].includes(assetPath) ||
+        /^\/\.localized(?:\/|$)/.test(assetPath)
+      )
         throw new DomainError(404, "Ruta no encontrada");
       const linkedProduct = path === "/menu" && url.searchParams.get("product");
       if (linkedProduct && isProductPagePath(`/menu/${linkedProduct}`)) {
@@ -1167,25 +1179,25 @@ export async function startServer(
       }
       // Public pages use the same V3.2 layout before and after scripts load.
       const productPage = isProductPagePath(path);
-      if (path === "/" || prerenderedPages.some((page) => page === path) || productPage) {
-        const page = productPage ? "product-shell" : path === "/" ? "index" : path.slice(1);
-        const language = url.searchParams.get("lang");
-        const localeDirectory = !productPage && (language === "ar" || language === "es")
-          ? `.localized/${language}`
-          : ".";
+      const transactionShell = path === "/cart" ? "cart-shell" :
+        path === "/checkout" ? "checkout-shell" :
+        path === "/checkout/return" ? "checkout-return-shell" : null;
+      if (path === "/" || prerenderedPages.some((page) => page === path) || productPage || transactionShell) {
+        const page = transactionShell ?? (productPage ? "product-shell" : path === "/" ? "index" : path.slice(1));
+        const localeDirectory = locale === "en" ? "." : `.localized/${locale}`;
         const file = resolve(root, localeDirectory, page + ".html");
         if (!existsSync(file))
           throw new DomainError(404, "Ejecuta el build para servir la aplicación");
         const html = markDynamicCatalog(file);
         const body = productPage
-          ? renderProductPage(html.toString("utf8"), path, store.read(), storefrontCatalogMode(process.env))
+          ? renderProductPage(html.toString("utf8"), path, store.read(), storefrontCatalogMode(process.env), locale)
           : html;
         res.writeHead(200, {
           "Content-Type": "text/html",
           "X-Content-Type-Options": "nosniff",
           "Referrer-Policy": "same-origin",
           "Content-Security-Policy": customerCsp,
-          ...(productPage ? { "Cache-Control": "no-cache" } : {}),
+          ...(transactionShell ? { "Cache-Control": "no-store" } : productPage ? { "Cache-Control": "no-cache" } : {}),
         });
         return res.end(req.method === "HEAD" ? undefined : body);
       }
@@ -1228,7 +1240,10 @@ export async function startServer(
       const file =
         existsSync(candidate) && statSync(candidate).isFile()
           ? candidate
-          : resolve(root, "app-shell.html");
+          : resolve(
+              root,
+              path.startsWith("/operations/") ? "operations-shell.html" : "app-shell.html",
+            );
       if (!existsSync(file))
         throw new DomainError(
           404,
@@ -1239,6 +1254,7 @@ export async function startServer(
         ".js": "text/javascript",
         ".css": "text/css",
         ".png": "image/png",
+        ".avif": "image/avif",
         ".webp": "image/webp",
         ".jpg": "image/jpeg",
         ".jpeg": "image/jpeg",
@@ -1307,7 +1323,10 @@ export async function startServer(
             ? 400
             : 500;
       const message =
-        error instanceof DomainError
+        status === 404 && publicDocumentLocale && error instanceof DomainError &&
+        (error.message === "Ruta no encontrada" || error.message === "Product not found")
+          ? storefrontLabels[publicDocumentLocale].notFound
+          : error instanceof DomainError
           ? error.message
           : error instanceof ZodError
             ? "Datos inválidos; revisa los campos"

@@ -248,12 +248,16 @@ export function MediaRotation({
   sizes,
   className,
   bundledProduct = false,
+  focusable = true,
+  paused = false,
 }: {
   frames: MediaAsset[];
   alt: string;
   sizes: string;
   className?: string;
   bundledProduct?: boolean;
+  focusable?: boolean;
+  paused?: boolean;
 }) {
   const root = useRef<HTMLSpanElement>(null);
   const [turn, setTurn] = useState(0);
@@ -272,7 +276,7 @@ export function MediaRotation({
     return () => observer.disconnect();
   }, []);
   useEffect(() => {
-    if (held || !visible || frames.length < 2) return;
+    if (held || paused || !visible || frames.length < 2) return;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let timer: ReturnType<typeof setInterval> | undefined;
     const update = () => {
@@ -298,7 +302,7 @@ export function MediaRotation({
       if (timer) clearInterval(timer);
       motion.removeEventListener("change", update);
     };
-  }, [held, visible, frames.length]);
+  }, [held, paused, visible, frames.length]);
   const current = turn % frames.length;
   return (
     <span
@@ -312,9 +316,10 @@ export function MediaRotation({
       onPointerLeave={() => setHeld(false)}
       onFocus={() => setHeld(true)}
       onBlur={() => setHeld(false)}
-      tabIndex={0}
+      tabIndex={focusable ? 0 : undefined}
       role="group"
-      aria-label={alt}
+      aria-label={alt || undefined}
+      aria-hidden={alt ? undefined : true}
     >
       {frames
         .slice(0, Math.min(frames.length, turn + 2))

@@ -37,9 +37,10 @@ type Page = {
   sections: Section[];
 };
 
-const L = ({ to, children }: { to: PolicyPath; children: ReactNode }) => (
-  <a href={to}>{children}</a>
-);
+function L({ to, children }: { to: PolicyPath; children: ReactNode }) {
+  const { language } = useCustomerLanguage();
+  return <a href={language === "en" ? to : `${to}?lang=${language}`}>{children}</a>;
+}
 const who = () => business.legalName ?? business.tradingName;
 // Short aliases for the confirmed cancellation rule, used across several pages.
 const cutoff = cancellationCutoffHours;

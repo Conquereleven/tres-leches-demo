@@ -63,6 +63,8 @@ async function noPageOverflow(page: Page, name: string) {
   );
 }
 async function saveDownload(page: Page, label: string, name: string) {
+  const exportMenu = page.locator(".oms-export-trigger");
+  if (await exportMenu.isVisible()) await exportMenu.click();
   const waiting = page.waitForEvent("download");
   await page.getByRole("button", { name: label, exact: true }).click();
   const download = await waiting;
@@ -165,14 +167,13 @@ for (const width of [1440, 390])
       }
       await page.getByRole("searchbox").fill("TL-RT01-HELD0");
       await expect(page.locator(".oms-table tbody tr")).toHaveCount(1);
-      await expect(bulk.locator("strong")).toHaveText(
-        translateOps(language, "{{count}} selected", { count: 0 }),
-      );
+      await expect(bulk).toHaveCount(0);
       await page.locator('.oms-table tbody input[type="checkbox"]').check();
       for (const [label, ext] of [
         ["Export orders CSV", "csv"],
         ["Delivery notes (ZIP)", "zip"],
       ]) {
+        await page.locator(".oms-export-trigger").click();
         const waiting = page.waitForEvent("download");
         await page
           .getByRole("button", {

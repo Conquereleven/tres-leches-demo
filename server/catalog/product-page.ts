@@ -3,7 +3,8 @@ import { applyHead, headTags, SITE_ORIGIN } from "../../shared/seo";
 import { hiddenConcha } from "../../shared/storefront-visibility";
 import bundledMenu from "../../src/brand/menu-data.json";
 import bundledProducts from "../../shared/storefront-products.json";
-import { breadcrumbJsonLd, siteName, socialImage } from "../../src/seo/pages";
+import { breadcrumbJsonLd, productMetadata, siteName, socialImage, storefrontLabels } from "../../src/seo/pages";
+import { localizedSource, type Locale } from "../../src/brand/locales/engine";
 import { DomainError, type State } from "../domain/model";
 import { storefrontCatalog, type StorefrontMode } from "./storefront-api";
 
@@ -29,6 +30,7 @@ export function renderProductPage(
   path: string,
   state: State,
   mode: StorefrontMode,
+  locale: Locale = "en",
 ) {
   const slug = path.slice("/menu/".length);
   const now = new Date();
@@ -44,12 +46,13 @@ export function renderProductPage(
   const skuIds =
     published?.options.map((option) => option.id) ?? bundled?.optionIds ?? [];
   const category = published?.categoryId ?? family?.category;
-  const name = published?.content.en.name ?? bundled?.title;
-  const description = published?.content.en.description ?? "";
+  const sourceName = published?.content.en.name ?? bundled?.title;
+  const name = published?.content[locale].name ?? (sourceName && (locale === "en" ? sourceName : localizedSource(sourceName, locale)));
+  const description = published?.content[locale].description ?? "";
 
   if (!productId || !name || hiddenConcha(productId, skuIds))
     throw new DomainError(404, "Product not found");
-  if (category === "pan" || category === "panettone") {
+  if (category === "pan") {
     const current = state.catalog ?? [];
     const hasAvailableOption = published
       ? published.options.some((option) => option.available && option.orderable)
@@ -71,18 +74,18 @@ export function renderProductPage(
   const head = headTags(
     {
       path,
-      title: `${name} — ${siteName}`,
-      description: description || `${name} · ${siteName}`,
-      jsonLd: [breadcrumbJsonLd(SITE_ORIGIN, path, name)],
+      ...productMetadata(name, description),
+      jsonLd: [breadcrumbJsonLd(SITE_ORIGIN, path, name, locale)],
     },
-    { origin: SITE_ORIGIN, name: siteName, image: socialImage },
+    { origin: SITE_ORIGIN, name: siteName, image: locale === "en" ? socialImage : { ...socialImage, alt: storefrontLabels[locale].wordmark } },
+    locale,
   );
   // Product discovery works without JS. Offers are resolved by the runtime
   // storefront and checkout rather than written into page metadata.
   return applyHead(shell, head).replace(
     '<main id="main" data-product-slot="true"></main>',
     () =>
-      `<main class="v32-new-page v32-product-page" id="main"><a href="/bakery">Menu</a><h1>${escapeHtml(name)}</h1>${description ? `<p>${escapeHtml(description)}</p>` : ""}<noscript><p>Enable JavaScript to view available options and order online.</p></noscript></main>`,
+      `<main class="v32-new-page v32-product-page" id="main"><a href="/bakery${locale === "en" ? "" : `?lang=${locale}`}">${storefrontLabels[locale].menu}</a><h1>${escapeHtml(name)}</h1>${description ? `<p>${escapeHtml(description)}</p>` : ""}<noscript><p>${storefrontLabels[locale].productOptions}</p></noscript></main>`,
   );
 }
 

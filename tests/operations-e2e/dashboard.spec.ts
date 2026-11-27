@@ -78,11 +78,15 @@ for (const width of [390, 768, 1440])
           language,
         );
         await expect(page.locator(".ops-topbar")).toBeVisible();
-        expect(
-          await page.evaluate(
-            () => document.documentElement.scrollWidth <= innerWidth,
-          ),
-        ).toBe(true);
+        await expect
+          .poll(
+            () =>
+              page.evaluate(
+                () => document.documentElement.scrollWidth - innerWidth,
+              ),
+            { message: screen + " must fit within the viewport" },
+          )
+          .toBeLessThanOrEqual(0);
         // Route UI visibility does not imply its image requests have finished.
         // Keep the exact completeness/nonzero-width predicate and assertion budget.
         await expect

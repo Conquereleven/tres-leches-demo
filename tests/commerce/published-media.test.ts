@@ -29,14 +29,14 @@ test("product media uses only published assignments, including empty, replaced a
   ).foundation;
   const catalog = storefrontCatalog(state) as LiveCatalog;
   const target = catalog.products.find(
-    (p) => p.id === "conchas-filled--pistache",
+    (p) => p.id === "conchas-traditional--vainilla",
   )!;
   const unrelated = catalog.products.find(
     (p) => p.id === "pan-de-muerto-filled-pack",
   )!;
   const id = target.id,
     family = target.familyId,
-    flavor = "Pistache";
+    flavor = "Vainilla";
   const selected = () => selectedProductMedia(id, family, flavor);
   const gallery = () => productGalleryMedia(id, family, flavor);
   assert.equal(publishedMediaAuthority(), false);
@@ -161,18 +161,19 @@ test("dynamic HTML removes only marked bundled product images before hydration",
 
 test("Conchas category carousel excludes withdrawn pistachio board artwork", () => {
   const editorial = categoryEditorialMedia("conchas");
-  // 3L-MEDIA-002 photographs open; the two retained frames follow.
+  // RT01.3 and MEDIA-002 precede the two retained frames.
+  assert.deepEqual(editorial.slice(0, 4).map((image) => image.sourceId), [
+    "rt013-conchas-editorial-26",
+    "3l-media-002-conchas-m002-026",
+    "3l-media-002-conchas-m002-027",
+    "3l-media-002-conchas-m002-024",
+  ]);
   assert.deepEqual(
-    editorial.slice(3).map((image) => image.sourceId),
+    editorial.slice(4).map((image) => image.sourceId),
     [
       "3l-conchas-final-docena_de_conchas_de_chocolate_envuelta-opening-horizontal",
       "3l-conchas-final-conchas_de_pistache_envueltas_en_celofán-opening-horizontal",
     ],
-  );
-  assert.ok(
-    editorial
-      .slice(0, 3)
-      .every((image) => image.sourceId.startsWith("3l-media-002-conchas-")),
   );
   assert.ok(
     editorial.every((image) =>

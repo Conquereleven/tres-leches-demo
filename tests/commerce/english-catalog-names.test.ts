@@ -47,7 +47,7 @@ test("Spanish and Arabic keep their own wording", () => {
     translatedCopy(source, "es"),
     "Pan de Muerto tradicional · Azúcar",
   );
-  assert.equal(translatedCopy(source, "ar"), "Pan de Muerto تقليدي · سكر");
+  assert.equal(translatedCopy(source, "ar"), "خبز بان دي مويرتو التقليدي · سكر");
 });
 
 test("founder-corrected Pistachio names and unknown sources are shown exactly as authored", () => {

@@ -286,36 +286,21 @@ test("public projection excludes drafts, archival records and private fields, lo
       (p) => p.id === "pan-de-muerto-traditional--azucar",
     )!
     .media.find((m) => m.role === "primary")!;
-  assert.ok(
-    plan()
-      .foundation.assets.find((a) => a.id === primary.assetId)!
-      .derivatives[0]!.src.includes("official-pan-08"),
+  assert.equal(
+    plan().foundation.assets.find((a) => a.id === primary.assetId)!.derivatives[0]!.src,
+    "/brand/rt013/rt013-pan-de-muerto-traditional-azucar-480.webp",
   );
 });
-test("read projection uses existing seasonal restrictions without changing commercial state", () => {
+test("published Pan de Muerto remains available year-round and projection leaves state unchanged", () => {
   const s = state();
-  const summer = publicCatalog(
-    s,
-    { category: "pan", limit: 100 },
-    undefined,
-    new Date("2026-07-01T08:00:00+04:00"),
-  );
-  assert.equal(
-    summer.products.find((p) => p.id === "pan-de-muerto-traditional--azucar")!
-      .variants[0]!.available,
-    false,
-  );
-  const autumn = publicCatalog(
-    s,
-    { category: "pan", limit: 100 },
-    undefined,
-    new Date("2026-10-11T08:00:00+04:00"),
-  );
-  assert.equal(
-    autumn.products.find((p) => p.id === "pan-de-muerto-traditional--azucar")!
-      .variants[0]!.available,
-    true,
-  );
+  const before = catalogDigest(s);
+  for (const date of ["2026-07-01", "2026-10-11", "2026-11-25"]) {
+    const response = publicCatalog(s, { category: "pan", limit: 100 }, undefined, new Date(date + "T08:00:00+04:00"));
+    const product = response.products.find((p) => p.id === "pan-de-muerto-traditional--azucar")!;
+    assert.ok(product.variants.length > 0);
+    assert.ok(product.variants.every((variant) => variant.available));
+  }
+  assert.equal(catalogDigest(s), before);
 });
 test("HTTP read contract supports ETag, bounded queries, no writes, no side effects and disabled feature", async () => {
   let enabled = true;

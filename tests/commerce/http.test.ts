@@ -4,10 +4,23 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createServer } from "node:net";
 import { randomUUID, scryptSync } from "node:crypto";
 import { HmacVerifier } from "../../server/adapters/providers";
 const secret = "http-test-webhook-secret-24-characters";
-async function start(port: number, production = false) {
+async function unusedLoopbackPort() {
+  const probe = createServer();
+  return new Promise<number>((resolve, reject) => {
+    probe.once("error", reject);
+    probe.listen(0, "127.0.0.1", () => {
+      const address = probe.address();
+      assert.ok(address && typeof address !== "string");
+      probe.close((error) => error ? reject(error) : resolve(address.port));
+    });
+  });
+}
+async function start(production = false) {
+  const port = await unusedLoopbackPort();
   const dir = mkdtempSync(join(tmpdir(), "tl-http-"));
   const salt = "salt-at-least-16-characters";
   const child = spawn(
@@ -16,6 +29,8 @@ async function start(port: number, production = false) {
     {
       env: {
         ...process.env,
+        HOST: "127.0.0.1",
+        PORT: String(port),
         API_PORT: String(port),
         APP_ORIGIN: `http://127.0.0.1:${port}`,
         DB_PATH: join(dir, "db.sqlite"),
@@ -58,7 +73,7 @@ async function stop(child: ChildProcess, dir: string) {
   rmSync(dir, { recursive: true });
 }
 test("HTTP validates raw signatures, duplicate events, origin, payload and missing API routes", async () => {
-  const f = await start(3102);
+  const f = await start();
   try {
     const body = JSON.stringify({
       type: "message",
@@ -110,7 +125,7 @@ test("HTTP validates raw signatures, duplicate events, origin, payload and missi
   }
 });
 test("production sandbox requires login and enforces agent role server-side", async () => {
-  const f = await start(3103, true);
+  const f = await start(true);
   try {
     let r = await fetch(f.base + "/api/workspace");
     assert.equal(r.status, 401);

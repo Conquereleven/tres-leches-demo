@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import manifest from "../../data-imports/rt012-panettone/manifest.json" with { type: "json" };
 
 const languages = {
@@ -7,8 +7,15 @@ const languages = {
   ar: { panettone: "بانيتوني" },
 };
 
+async function revealCategories(page: Page) {
+  const trigger = page.locator(".category-trigger");
+  await page.locator("button[data-product-id]").first().waitFor();
+  if (await trigger.isVisible()) await trigger.click();
+}
+
 test("three flavors, six sizes and prices, correct photo identity, persistent cart and server quote", async ({ page, request }, info) => {
   await page.goto("/bakery?lang=en");
+  await revealCategories(page);
   const tab = page.getByRole("button", { name: languages.en.panettone, exact: true });
   await expect(tab).toBeVisible();
   const labels = await tab.locator("..").getByRole("button").allTextContents();
@@ -24,9 +31,9 @@ test("three flavors, six sizes and prices, correct photo identity, persistent ca
   const cart = [];
   for (const product of manifest.products) {
     const card = page.locator(`.ref32-product[data-product-id="${product.id}"]`);
-    await expect(card.getByRole("img")).toHaveAttribute("src", `/brand/hub/${product.previewPhoto.sha256}.webp`);
+    await expect(card.locator("img")).toHaveAttribute("src", `/brand/hub/${product.previewPhoto.sha256}.webp`);
     await card.scrollIntoViewIfNeeded();
-    await expect.poll(() => card.getByRole("img").evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+    await expect.poll(() => card.locator("img").evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
     for (const size of manifest.sizes) {
       await card.click();
       const dialog = page.getByRole("dialog", { name: product.name.en });
@@ -71,6 +78,7 @@ for (const language of ["es", "ar"] as const) {
   test(`localized Panettone product, size and allergen copy in ${language}`, async ({ page }) => {
     const product = manifest.products[2]!;
     await page.goto(`/bakery?category=panettone&lang=${language}`);
+    await revealCategories(page);
     await expect(page.getByRole("button", { name: languages[language].panettone, exact: true })).toHaveAttribute("aria-pressed", "true");
     await page.locator(`.ref32-product[data-product-id="${product.id}"]`).click();
     const dialog = page.getByRole("dialog", { name: product.name[language] });

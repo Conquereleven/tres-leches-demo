@@ -454,7 +454,7 @@ test("google overrides manipulated area with trusted community and never falls b
       ...input,
       lines: [
         { productId: sku, quantity: 20 },
-        { productId: "conchas-filled-pistache-mini", quantity: 6 },
+        { productId: "conchas-traditional-vainilla-mini-40-g", quantity: 20 },
       ],
       delivery: {
         ...input.delivery,
