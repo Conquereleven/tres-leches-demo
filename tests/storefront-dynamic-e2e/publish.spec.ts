@@ -110,7 +110,7 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   // The storefront shows the published catalog, not the build's.
   await shop.goto("/bakery?category=cakes&lang=en");
   await expect(shop.locator("html")).toHaveAttribute("data-catalog", "dynamic");
-  await expect(shop.locator(".ref32-grid")).toBeVisible();
+  await expect(shop.locator(".structural-grid")).toBeVisible();
   const card = shop.locator(`.ref32-product[data-product-id="${target.id}"]`);
   await expect(card).toBeEnabled();
   const cardName = async () =>
@@ -129,7 +129,7 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   const beforeDialog = await openDialog();
   await beforeDialog.locator(`[data-sku="${first!.id}"]`).click();
   await expect(beforeDialog.locator(".ref32-buy")).toBeEnabled();
-  await expect(beforeDialog.locator(".ref32-buy")).toContainText(
+  await expect(beforeDialog.locator(".ref32-price strong")).toContainText(
     aed(first!.priceFils),
   );
   await beforeDialog.locator(".ref32-buy").click();
@@ -214,7 +214,7 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
     timeout: 15000,
   });
   await shop.reload();
-  await expect(shop.locator(".ref32-grid")).toBeVisible();
+  await expect(shop.locator(".structural-grid")).toBeVisible();
   // The card carries the published price from the server's own configuration.
   await expect(card).toContainText(aed(price));
   // The card rotates the published photographs; the new main one comes first.
@@ -240,7 +240,7 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   );
   await afterDialog.locator(`[data-sku="${first!.id}"]`).click();
   await expect(afterDialog.locator(".ref32-buy")).toBeEnabled();
-  await expect(afterDialog.locator(".ref32-buy")).toContainText(
+  await expect(afterDialog.locator(".ref32-price strong")).toContainText(
     aed(price),
   );
   await afterDialog.locator(".ref32-close").click();
@@ -290,7 +290,7 @@ test("publishing in Product Hub updates the open storefront, a fresh visit, the 
   await hub.getByRole("button", { name: "Publish catalog" }).click();
   await expect(hub.getByText("Catalog published")).toBeVisible();
   await shop.goto("/bakery?category=cakes&lang=en");
-  await expect(shop.locator(".ref32-grid")).toBeVisible();
+  await expect(shop.locator(".structural-grid")).toBeVisible();
   // The V3.2 card falls back to the approved pending placeholder.
   await expect(card.locator(".ref32-photo-pending")).toBeVisible({
     timeout: 15000,

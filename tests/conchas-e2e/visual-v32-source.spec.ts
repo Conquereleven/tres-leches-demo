@@ -9,7 +9,7 @@ import { mkdirSync } from "node:fs";
 test("source REF_C: four-column desktop cards with anchored original popup",async ({page},info)=>{
  await page.setViewportSize({width:1440,height:900});
  await page.goto("/visual-v32/bakery?category=bakery&lang=es");
- const grid=page.locator(".ref32-grid");
+ const grid=page.locator(".structural-grid");
  await expect(grid).toBeVisible();
  expect(await grid.evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(" ").length)).toBe(4);
  const product=page.locator('.ref32-product:not([disabled])').first();
@@ -23,7 +23,7 @@ test("source REF_C: four-column desktop cards with anchored original popup",asyn
  const anchor=await product.boundingBox(),box=await dialog.boundingBox();
  expect(anchor).not.toBeNull();expect(box).not.toBeNull();
  expect(box!.x).toBeGreaterThanOrEqual(0);expect(box!.x+box!.width).toBeLessThanOrEqual(1441);
- await expect(dialog).toHaveAttribute("data-anchor-side",/right|left|overlap/);
+ await expect(dialog).toHaveAttribute("data-placement","side");
  if(info.project.name==="chromium"){
   mkdirSync("docs/brand/brand02/conchas",{recursive:true});
   await page.screenshot({path:"docs/brand/brand02/conchas/v32-source-REF-C-1440.png",animations:"disabled"});
@@ -60,36 +60,53 @@ test("source REF_D: selected card image stays visibly linked above popup",async 
  const pop=await dialog.boundingBox();
  expect(box).not.toBeNull();expect(pop).not.toBeNull();
  expect(box!.y+box!.height).toBeLessThanOrEqual(pop!.y+24);
- await expect(card).toHaveClass(/ref32-product-active/);
- expect(await page.locator(".ref32-grid").evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(" ").length)).toBe(3);
+ await expect(card).toHaveAttribute("aria-expanded","true");
+ await expect(card.locator("..")).toHaveClass(/is-selected/);
+ expect(await page.locator(".structural-grid").evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(" ").length)).toBe(2);
  const action=dialog.locator(".ref32-buy");
- await expect(action).toBeVisible();
+ await action.scrollIntoViewIfNeeded();
+ await expect(action).toBeInViewport();
  expect((await action.boundingBox())!.y+(await action.boundingBox())!.height).toBeLessThanOrEqual(845);
  if(info.project.name==="chromium"){
   mkdirSync("docs/brand/brand02/conchas",{recursive:true});
   await page.screenshot({path:"docs/brand/brand02/conchas/v32-source-REF-D-390.png",animations:"disabled"});
  }
+ await page.setViewportSize({width:600,height:900});
+ expect(await page.locator(".structural-grid").evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(" ").length)).toBe(3);
 });
-test("short REF_D: footer stays in viewport while only details scroll",async ({page},info)=>{
+test("short REF_D: contextual controls remain reachable without moving the product grid",async ({page},info)=>{
  for(const size of [{width:375,height:667},{width:320,height:568}]){
   await page.setViewportSize(size);
   await page.goto("/visual-v32/bakery?category=bakery&lang=es");
-  await page.locator('.ref32-product:not([disabled])').first().click();
-  const dialog=page.getByRole("dialog"),action=dialog.locator(".ref32-buy");
-  await expect(action).toBeVisible();
-  // Measure final geometry only after the source spring entrance completes.
-  await expect.poll(()=>dialog.evaluate(el=>el.getAnimations().filter(a=>a.playState==="running").length)).toBe(0);
-  const before=await action.boundingBox();
-  await dialog.locator(".ref32-details").evaluate(el=>{el.scrollTop=el.scrollHeight;});
-  const after=await action.boundingBox();
-  expect(before).not.toBeNull();expect(after).not.toBeNull();
-  expect(Math.abs(before!.y-after!.y)).toBeLessThanOrEqual(2);
-  expect(after!.y+after!.height).toBeLessThanOrEqual(size.height+1);
+  const cards=page.locator(".structural-grid .tile");
+  const product=cards.locator('button:not([disabled])').first();
+  await expect(product).toBeEnabled();
+  await product.evaluate(async()=>{await document.fonts.ready;});
+  const positions=()=>cards.evaluateAll(nodes=>nodes.map(node=>{
+   const box=node.getBoundingClientRect();
+   return [box.left+scrollX,box.top+scrollY,box.width,box.height].map(Math.round);
+  }));
+  const before=await positions();
+  await product.click();
+  const dialog=page.getByRole("dialog"), action=dialog.locator(".ref32-buy");
+  await expect(dialog).toHaveCSS("position","absolute");
+  await expect(dialog).toHaveAttribute("data-placement",/above|below/);
+  expect(await positions()).toEqual(before);
+  const bounds=await dialog.boundingBox();
+  expect(bounds).not.toBeNull();
+  expect(bounds!.x).toBeGreaterThanOrEqual(-1);
+  expect(bounds!.x+bounds!.width).toBeLessThanOrEqual(size.width+1);
+  await action.scrollIntoViewIfNeeded();
+  await expect(action).toBeInViewport();
+  await expect(action).toBeEnabled();
+  expect(await positions()).toEqual(before);
   if(info.project.name==="chromium"){
    mkdirSync("docs/brand/brand02/conchas",{recursive:true});
    await page.screenshot({path:"docs/brand/brand02/conchas/v32-source-REF-D-"+size.width+".png",animations:"disabled"});
   }
   await page.keyboard.press("Escape");
+  await expect(product).toBeFocused();
+  expect(await positions()).toEqual(before);
  }
 });
 test("real purchase: Orejas selected box SKU and amount reach canonical cart",async ({page})=>{
@@ -123,8 +140,8 @@ test("Founder 8.7: cakes use Mini/Small/Medium with 15/20/30 characters and serv
  const options=popup.locator(".ref32-options .ref32-option");
  await expect(options).toHaveCount(3);
  await expect(options.nth(0)).toContainText("Mini");
- await expect(options.nth(1)).toContainText("Small");
- await expect(options.nth(2)).toContainText("Medium");
+ await expect(options.nth(1)).toContainText("Pequeño");
+ await expect(options.nth(2)).toContainText("Mediano");
  await expect(popup.locator("[data-cake-serves]")).toHaveText("Para 1–3 personas");
  await expect(popup.locator("[data-cake-message-count]")).toHaveText("0/15");
  await options.nth(1).click();
@@ -176,6 +193,8 @@ test("Founder 8.7 mobile: three cake sizes, 15/20/30 limits and visible CTA",asy
  await popup.locator(".ref32-note input").fill("Happy Birthday 3L");
  const action=popup.locator(".ref32-buy");
  await expect(action).toBeEnabled();
+ await action.scrollIntoViewIfNeeded();
+ await expect(action).toBeInViewport();
  const rect=await action.boundingBox();
  expect(rect).not.toBeNull();
  expect(rect!.y+rect!.height).toBeLessThanOrEqual(845);

@@ -8,7 +8,7 @@ test("TL27 sidebar, drawer keyboard, responsive widths and history", async ({
   await expect(
     page.getByRole("heading", { name: "Inbox", exact: true }),
   ).toBeVisible();
-  await expect(page.locator(".ops-sidebar")).toHaveCSS("width", "252px");
+  await expect(page.locator(".ops-sidebar")).toHaveCSS("width", "226px");
   await page.getByRole("button", { name: "Collapse sidebar" }).click();
   await expect(page.locator(".ops-sidebar")).toHaveCSS("width", "80px");
   await page.reload();
@@ -40,7 +40,7 @@ test("TL27 sidebar, drawer keyboard, responsive widths and history", async ({
   await page.keyboard.press("Escape");
   await expect(page.getByRole("button", { name: "Open menu" })).toBeFocused();
   await page.getByRole("button", { name: "Open menu" }).click();
-  await page.getByRole("button", { name: "Orders", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Orders", exact: true }).click();
   await expect(page).toHaveURL(/\/operations\/orders$/);
   await expect(page.getByRole("dialog")).toBeHidden();
   await page.goBack();

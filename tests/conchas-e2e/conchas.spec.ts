@@ -114,7 +114,7 @@ test("conchas SKU-to-photo mapping: real photo per SKU, never a wrong one", asyn
 
 async function readyCatalog(page: Page, url: string) {
   await page.goto(url);
-  await expect(page.locator(".ref32-grid")).toBeVisible();
+  await expect(page.locator(".structural-grid")).toBeVisible();
   await expect(page.locator(".ref32-product").first()).toBeVisible();
 }
 
@@ -124,7 +124,7 @@ async function capture(page: Page, path: string) {
     await frame.scrollIntoViewIfNeeded();
     await expect
       .poll(() => frame.evaluate((node) =>
-        !!node.querySelector(".ref32-photo-pending") ||
+        !!node.querySelector('.ref32-photo-pending, [data-media-state="load-error"]') ||
         (node.querySelector("img")?.naturalWidth ?? 0) > 0,
       ))
       .toBe(true);
@@ -184,7 +184,7 @@ for (const width of [390, 768, 1440])
       ).toEqual([]);
       const buy = dialog.locator(".ref32-buy");
       await expect(buy).toBeEnabled();
-      await expect(dialog.locator(".ref32-price strong")).toContainText("AED");
+      await expect(dialog.locator(".ref32-price strong")).toContainText(locale === "ar" ? /د\.إ/ : /AED/);
       await buy.click();
       await expect(page.getByRole("dialog")).toHaveCount(0);
       await expect(card).toHaveAttribute("aria-expanded", "false");
@@ -193,7 +193,7 @@ for (const width of [390, 768, 1440])
       await page.goto(`/cart?lang=${locale}`);
       await expect(page.locator('[data-new-ui="cart"]')).toBeVisible();
       const row = page.locator(".v32-new-cart-items .v32-new-cart-row").first();
-      await expect(row).toContainText("AED");
+      await expect(row).toContainText(locale === "ar" ? /د\.إ/ : /AED/);
       await expect(row.locator('input[type="number"]')).toHaveAttribute(
         "max",
         "100",
@@ -201,7 +201,7 @@ for (const width of [390, 768, 1440])
       await shot("cart");
       await page.goto(`/checkout?lang=${locale}`);
       await expect(page.locator(".b-shop .b-co-header")).toBeVisible();
-      await expect(page.locator("main")).toContainText(/concha/i);
+      await expect(page.locator("main")).toContainText(locale === "ar" ? /كونشا|كونتشا/ : /concha/i);
       await shot("checkout");
       expect(errors).toEqual([]);
       expect(
@@ -216,11 +216,13 @@ for (const width of [390, 768, 1440])
   }
 
 if (!process.env.CONCHAS_BASELINE)
-  for (const mode of ["webp", "family"])
+  for (const mode of ["avif", "webp", "family"])
     test(`digital image fallback ${mode}`, async ({ page, request }) => {
       const errors: string[] = [];
       page.on("pageerror", (e) => errors.push(e.message));
-      if (mode === "webp")
+      if (mode === "avif")
+        await page.route("**/*.avif", (r) => r.abort());
+      else if (mode === "webp")
         await page.route("**/*.webp", (r) => r.abort());
       else
         await page.route("**/brand/menu/conchas-*.webp", (r) => r.abort());
@@ -237,10 +239,17 @@ if (!process.env.CONCHAS_BASELINE)
       // family aborts the authored conchas photos. Read all frames in one
       // browser snapshot because onError replaces images as requests finish.
       const frames = page.locator(".ref32-photo");
+      if (mode === "avif") {
+        const approvedArt = cards.locator('picture[data-media-kind="digital-illustration"] img');
+        await approvedArt.scrollIntoViewIfNeeded();
+        await expect.poll(() => approvedArt.evaluate((photo: HTMLImageElement) =>
+          photo.naturalWidth > 0 ? new URL(photo.currentSrc).pathname : "",
+        )).toMatch(/^\/brand\/approved\/docena_de_conchas_de_chocolate_envuelta-square-v2-\d+\.webp$/);
+      }
       for (const frame of await frames.all()) {
         await frame.scrollIntoViewIfNeeded();
         await expect.poll(() => frame.evaluate((node) =>
-          !!node.querySelector(".ref32-photo-pending") ||
+          !!node.querySelector('.ref32-photo-pending, [data-media-state="load-error"]') ||
           (node.querySelector("img")?.naturalWidth ?? 0) > 0,
         )).toBe(true);
       }
@@ -249,7 +258,7 @@ if (!process.env.CONCHAS_BASELINE)
           frames.evaluateAll((nodes) =>
             nodes.flatMap((frame, index) => {
               const content = frame.querySelectorAll(
-                "img, .ref32-photo-pending",
+                'img, .ref32-photo-pending, [data-media-state="load-error"]',
               );
               if (content.length !== 1)
                 return [`frame ${index}: ${content.length} elements`];
@@ -319,7 +328,7 @@ for (const width of [390, 768, 1440])
     if (info.project.name === "chromium")
       await capture(page, `docs/brand/brand02/conchas/reference-conchas-${width}.png`);
     expect(
-      (await new AxeBuilder({ page }).include(".ref32-grid").analyze())
+      (await new AxeBuilder({ page }).include(".structural-grid").analyze())
         .violations,
     ).toEqual([]);
   });
@@ -519,19 +528,22 @@ for (const width of [390, 768, 1440])
           radius: css.borderRadius,
           overflow: css.overflow,
           fit: img ? getComputedStyle(img).objectFit : "pending",
+          mediaKind: img?.closest("picture")?.dataset.mediaKind,
           pending: img === null,
         };
       }),
     );
     for (const f of frames) {
-      expect(f.ratio).toBe("4 / 3");
-      expect(f.radius).toBe("21px 21px 0px 0px");
+      expect(f.ratio).toBe(width < 1024 ? "1.045 / 1" : "auto");
+      expect(f.radius).toBe(frames[0]!.radius);
+      expect(Number.parseFloat(f.radius.split(" ").find(value => Number.parseFloat(value) > 0) ?? "0")).toBeGreaterThan(0);
       expect(f.overflow).toBe("hidden");
       // Approved photography fills the frame; the approved pending
       // placeholder is the only imageless state (RC-06).
-      expect(f.fit === "cover" || f.pending).toBe(true);
+      expect(f.fit).toBe(f.pending ? "pending" : f.mediaKind === "digital-illustration" ? "contain" : "cover");
       expect(f.width).toBeCloseTo(frames[0]!.width, 0);
-      expect(f.width / f.height).toBeCloseTo(4 / 3, 1);
+      if (width < 1024) expect(f.width / f.height).toBeCloseTo(1.045, 2);
+      else expect(f.height).toBeCloseTo(frames[0]!.height, 1);
     }
     for (const a of frames)
       for (const b of frames)

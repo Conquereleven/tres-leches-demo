@@ -108,12 +108,13 @@ for (const width of [390, 768, 1440])
       const replaced = page.locator(
         `.ref32-product[data-product-id="${target.id}"] .ref32-photo img`,
       );
-      // The approved card renders the first webp derivative.
-      await expect(replaced).toHaveAttribute(
-        "src",
-        other.derivatives.find((d) => d.format === "webp")?.src ??
-          other.derivatives[0]!.src,
-      );
+      // The browser may choose any derivative of this exact published asset.
+      await replaced.scrollIntoViewIfNeeded();
+      const activeSrc = await replaced.evaluate(async (photo: HTMLImageElement) => {
+        await photo.decode();
+        return new URL(photo.currentSrc).pathname;
+      });
+      expect(other.derivatives.map(derivative => derivative.src)).toContain(activeSrc);
       // Exactly the new primary: no gallery expansion in V3.2 by design.
       await expect(
         page.locator(
@@ -214,7 +215,7 @@ test("a failed published image shows a neutral placeholder instead of an authore
     })(),
   ]);
   expect(failedImage.status()).toBe(404);
-  await expect(card.locator(".ref32-photo-pending")).toBeVisible();
+  await expect(card.locator('.ref32-photo [data-media-state="load-error"]')).toBeVisible();
   await expect(card.locator(".ref32-photo img")).toHaveCount(0);
 });
 
@@ -234,9 +235,9 @@ test("homepage named products follow publication while category/editorial previe
   )!;
   const homeBefore = await (await request.get("/")).text();
   const editorialBefore = homeBefore.match(
-    /\/brand\/reference\/mexico-dubai\.png/g,
+    /\/brand\/vr008\/(?:mexico\.png|dubai\.jpg)/g,
   );
-  expect(editorialBefore?.length).toBeGreaterThan(0);
+  expect([...new Set(editorialBefore)]).toEqual(["/brand/vr008/mexico.png", "/brand/vr008/dubai.jpg"]);
   expect(homeBefore).not.toContain("/brand/hub/");
   target.media = [];
   await page.route("**/api/storefront/catalog", (route) =>
@@ -250,7 +251,7 @@ test("homepage named products follow publication while category/editorial previe
   await expect(card.locator(".ref32-photo img")).toHaveCount(0);
   const homeAfter = await (await request.get("/")).text();
   expect(
-    homeAfter.match(/\/brand\/reference\/mexico-dubai\.png/g),
+    homeAfter.match(/\/brand\/vr008\/(?:mexico\.png|dubai\.jpg)/g),
   ).toEqual(editorialBefore);
   expect(homeAfter).not.toContain("/brand/hub/");
 });
@@ -258,10 +259,9 @@ test("homepage named products follow publication while category/editorial previe
 test("product cards keep one approved primary, with no gallery and no editorial showcase", async ({
   page,
 }) => {
-  // V3.2: every card frame is the approved 4/3 cover (the retired
-  // illustration/contain vs photograph/cover split and the `picture`
-  // rotation are gone by approved design); there is no gallery UI and no
-  // category showcase. A gallery-role asset must never surface anywhere.
+  await page.setViewportSize({ width: 1280, height: 900 });
+  // The grid keeps one responsive primary photo per card. Gallery slides
+  // belong to the dedicated product detail, never the grid or quick purchase.
   const catalog: LiveCatalog = await (
     await page.request.get("/api/storefront/catalog")
   ).json();
@@ -301,13 +301,14 @@ test("product cards keep one approved primary, with no gallery and no editorial 
     const b = el.getBoundingClientRect();
     return b.width / b.height;
   });
-  expect(ratio).toBeGreaterThan(4 / 3 - 0.02);
-  expect(ratio).toBeLessThan(4 / 3 + 0.02);
+  // Approved REF_C frame at 1280px, measured on the reviewed storefront.
+  expect(Math.abs(ratio - 1.267)).toBeLessThan(0.02);
   const photo = card.locator(".ref32-photo img");
   await expect(photo).toBeVisible();
   await expect(photo).toHaveCSS("object-fit", "cover");
   await expect(card.locator(".ref32-photo img")).toHaveCount(1);
-  await expect(card.locator(".ref32-photo picture")).toHaveCount(0);
+  await expect(card.locator(".ref32-photo picture")).toHaveCount(1);
+  await expect(card.locator(".b-official-rotation")).toHaveCount(0);
   // A failing gallery-role asset never surfaces on any card either.
   await expect(card.locator(".ref32-photo-pending")).toHaveCount(0);
   // The same approved frame contract holds for the pan family.
@@ -343,6 +344,7 @@ test("dynamic homepage HTML cannot show stale bundled product photos before Java
   const html = await response.text();
   expect(html).toContain('data-catalog="dynamic"');
   expect(html).not.toContain('data-product-media="bundled"');
-  expect(html).toContain("/brand/reference/mexico-dubai.png");
+  expect(html).toContain("/brand/vr008/mexico.png");
+  expect(html).toContain("/brand/vr008/dubai.jpg");
   expect(html).not.toContain("/brand/hub/");
 });

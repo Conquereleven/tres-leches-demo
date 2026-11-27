@@ -22,7 +22,7 @@ const openPackDialog = async (
   let state = "waiting";
   await expect
     .poll(async () => {
-      if (await page.locator(".ref32-grid").count()) state = "ready";
+      if (await page.locator(".structural-grid").count()) state = "ready";
       else if (await retry.count()) state = "unavailable";
       return state;
     }, { timeout: 20000 })
@@ -32,9 +32,9 @@ const openPackDialog = async (
     // mid-click, so a detach-race here must not fail the test. The grid
     // assertion below stays the strict gate.
     await retry.first().click({ timeout: 5000 }).catch(() => {});
-    await expect(page.locator(".ref32-grid")).toBeVisible({ timeout: 15000 });
+    await expect(page.locator(".structural-grid")).toBeVisible({ timeout: 15000 });
   } else {
-    await expect(page.locator(".ref32-grid")).toBeVisible();
+    await expect(page.locator(".structural-grid")).toBeVisible();
   }
   const pan = page.locator('.v32-subcategories [data-category-id="pan"]');
   if (await pan.count()) await pan.click();

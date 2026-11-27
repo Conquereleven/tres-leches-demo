@@ -201,7 +201,8 @@ Build app UI in `src/`. Keep `.openai/hosting.json`, `worker/index.js`, `scripts
   silently switch back to the earlier storefront UI.
 - The desktop catalog retains exactly four columns; mobile responsive acceptance
   covers 390×844, 375×667 and 320×568, including anchored product dialog,
-  scrollable variant content and continuously visible Add to Cart.
+  and all fields and Add to Cart reachable by scrolling when needed, as
+  specified in VR007 and preserved in the Founder-approved VR009 storefront.
 - Use original founder-approved imagery and source typography when accessible.
   Until verified reference-derived files are available, do not claim pixel fidelity
   or fabricate photos/fonts. Use live catalog authority, published media mapping

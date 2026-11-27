@@ -160,6 +160,7 @@ export function MediaPicture({
   active,
   fallback,
   bundledProduct = false,
+  placeholderOnError = false,
 }: {
   asset: MediaAsset;
   alt: string;
@@ -168,12 +169,13 @@ export function MediaPicture({
   active?: boolean;
   fallback?: string | null;
   bundledProduct?: boolean;
+  placeholderOnError?: boolean;
 }) {
   const [failed, setFailed] = useState(0);
   const published = asset.sourceId.startsWith("published-");
   const digital =
     "mediaKind" in asset && asset.mediaKind === "digital-illustration";
-  if (published && failed >= 2)
+  if ((published || placeholderOnError) && failed >= 2)
     return (
       <picture
         className={active ? "is-active" : undefined}
@@ -193,6 +195,7 @@ export function MediaPicture({
       </picture>
     );
   const webp = asset.derivatives.filter((d) => d.format === "webp");
+  const canRetryWebp = webp.length > 0 && asset.derivatives.some((d) => d.format === "avif");
   return (
     <picture
       className={active ? "is-active" : undefined}
@@ -227,8 +230,10 @@ export function MediaPicture({
         decoding="async"
         style={digital ? { objectFit: "contain" } : undefined}
         onError={
-          (digital || published) && failed < 2
-            ? () => setFailed((value) => (published ? 2 : value + 1))
+          (digital || published || placeholderOnError) && failed < 2
+            ? () => setFailed((value) => (
+                published || (placeholderOnError && !canRetryWebp) ? 2 : value + 1
+              ))
             : undefined
         }
       />

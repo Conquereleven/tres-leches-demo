@@ -123,7 +123,7 @@ for (const width of [390, 768, 1440])
         .all()) {
         await expect(plus).toBeDisabled();
       }
-      await expect(dialog.locator(".ref32-price strong")).toContainText(/235/);
+      await expect(dialog.locator(".ref32-price strong")).toContainText(lang === "ar" ? /٢٣٥/ : /235/);
       const config = await (
         await page.request.get("/api/checkout/config")
       ).json();
@@ -175,8 +175,8 @@ for (const width of [390, 768, 1440])
       await expect(save).toBeEnabled();
       await save.click();
       const rows = page.locator(".v32-new-cart-row");
-      await expect(rows).toContainText(`${componentName(pistachio)} × 7`);
-      await expect(rows).toContainText(`${componentName(chocolate)} × 5`);
+      await expect(rows).toContainText(`${componentName(pistachio, lang)} × 7`);
+      await expect(rows).toContainText(`${componentName(chocolate, lang)} × 5`);
       await expect(rows.first()).toContainText(/235|٢٣٥/);
       // Server authority: the edited composition quotes the fixed box price.
       expect(await quoteCart(page)).toBe(23500);

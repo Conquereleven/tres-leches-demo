@@ -53,6 +53,7 @@ export function ApprovedProductCard({product,familyId,variant,price,active,onSel
  const media=selectedProductMedia(product.id,familyId,variant);
  const additional=gallery&&media?productGalleryMedia(product.id,familyId,variant):[];
  const [photoHeld,setPhotoHeld]=useState(false);
+ const [failedFallback,setFailedFallback]=useState<string|null>(null);
  const sizes="(max-width:599px) 46vw, (max-width:1099px) 30vw, 22vw";
  const fallback=publishedMediaAuthority()?null:family?.image;
  const category=family?.category;
@@ -61,8 +62,9 @@ export function ApprovedProductCard({product,familyId,variant,price,active,onSel
    <span className="ref32-photo tile-photo" data-fit={family?.category==="panettone"?"whole":undefined}>
      {media&&additional.length?<MediaRotation key={media.sourceId} frames={[media,...additional]} alt=""
        className="product-media" sizes={sizes} focusable={false} paused={active||photoHeld}/>:
-       media?<MediaPicture key={media.sourceId} asset={media} alt="" className="product-media" fallback={fallback} sizes={sizes}/>:
-       fallback?<img className="product-media" src={fallback} alt="" loading="lazy" decoding="async"/>:
+       media?<MediaPicture key={media.sourceId} asset={media} alt="" className="product-media" sizes={sizes} placeholderOnError/>:
+       fallback&&fallback!==failedFallback?<img className="product-media" src={fallback} alt="" loading="lazy" decoding="async"
+         onError={()=>setFailedFallback(fallback)}/>:
        <span className="ref32-photo-pending" role="img" aria-label={title}>
          <strong>✧ 3L</strong><small>{language==="es"?"Fotografía pendiente":language==="ar"?"الصورة قيد الإعداد":"Photo pending"}</small>
        </span>}
