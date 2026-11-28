@@ -1,0 +1,22 @@
+{
+  "productId": "111",
+  "sku": "B111",
+  "scope": "product",
+  "file": "mexican-bolillo.webp",
+  "source": "BOLILLO/03.jpg",
+  "sourceSha256": "625b7dd3136b9e9aa31d844fb1132e010b49098134ef4e41da43806e65a4e05d",
+  "sourceDimensions": [
+    1728,
+    2160
+  ],
+  "rotateDegreesCounterclockwise": 26,
+  "rotatedCrop": [
+    620,
+    460,
+    1740,
+    1105
+  ],
+  "sha256": "cbc7a948c849ef6fc3a224f01babdf9cd1530a3235fce5e57827b4bdedc08b49",
+  "width": 960,
+  "height": 553
+}

@@ -6,10 +6,13 @@ import type { Actor } from "../../server/domain/model";
 import {
   hubCommand,
   hubUpload,
+  hubView,
   type HubCommand,
   type HubFlags,
 } from "../../server/catalog/product-hub";
 import manifest from "../../data-imports/rt012-panettone/manifest.json";
+import bolillo from "../../data-imports/commercial-hotfix/ph-media.json";
+import { prepareBolilloMedia } from "../../data-imports/commercial-hotfix/prepare";
 
 const admin: Actor = { id: "fixture-panettone-admin", role: "admin" };
 const flags: HubFlags = { enabled: true, publishEnabled: true, publishBlocked: null };
@@ -31,7 +34,9 @@ function content(name: Localized, description?: Localized, size?: Localized, fla
   return Object.fromEntries(entries) as Content;
 }
 
-export function draftPanettoneFixture(store: Store, { release = false } = {}) {
+export function draftPanettoneFixture(
+  store: Store, { release = false, legacyAttributes = false, disabledSkus = [] as string[] } = {},
+) {
   const before = store.read();
   const revision = before.catalogFoundation?.revision.id;
   assert.ok(revision);
@@ -64,7 +69,10 @@ export function draftPanettoneFixture(store: Store, { release = false } = {}) {
     const releaseAvailability = product.releaseAvailability;
     assert.equal(releaseAvailability, "unavailable");
     const availability = release ? releaseAvailability : "available";
-    const media = [product.previewPhoto, ...product.galleryPhotos].map((photo, index) => {
+    const photos = legacyAttributes
+      ? product.galleryPhotos
+      : [product.previewPhoto, ...product.galleryPhotos];
+    const media = photos.map((photo, index) => {
       const bytes = readFileSync(new URL(`../../data-imports/rt012-panettone/${photo.file}`, import.meta.url));
       assert.equal(createHash("sha256").update(bytes).digest("hex"), photo.sha256);
       const output = hubUpload(store, admin, randomUUID(), bytes, "image/webp",
@@ -93,17 +101,19 @@ export function draftPanettoneFixture(store: Store, { release = false } = {}) {
         };
         return {
           skuId: `${product.id}-${size.id}`,
-          flavor: product.name.en,
+          flavor: legacyAttributes ? product.name.en : product.flavor.en,
           size: size.en,
           packQuantity: null,
           commercialState: "published",
-          translations: content(name, undefined, size, product.name),
+          translations: legacyAttributes
+            ? content(name, undefined, product.name, size)
+            : content(name, undefined, size, product.flavor),
           media: [],
           catalogName: name.en,
           operationsName: name.en,
           priceFils: size.priceFils,
           active: true,
-          availability,
+          availability: disabledSkus.includes(`${product.id}-${size.id}`) ? "unavailable" : availability,
         };
       }),
     });
@@ -115,4 +125,48 @@ export function draftPanettoneFixture(store: Store, { release = false } = {}) {
       expectedPublishedRevision: revision,
     }),
   };
+}
+
+export function publishBolilloPhotoFixture(store: Store) {
+  const command = (raw: HubCommand) => hubCommand(store, admin, randomUUID(), raw, flags);
+  const readHub = () => {
+    const hub = hubView(store.read(), admin, flags);
+    assert.ok(hub.available);
+    return hub;
+  };
+  const publish = () => {
+    const hub = readHub();
+    command({ type: "publish", expectedVersion: hub.version, expectedPublishedRevision: hub.published.id });
+  };
+  const terms = {
+    en: { name: "Mexican Bolillo", description: null, variantLabel: null },
+    es: { name: "Bolillo Mexicano", description: null, variantLabel: null },
+    ar: { name: null, description: null, variantLabel: null },
+  };
+  const initialHub = readHub();
+  command({
+    type: "saveProduct",
+    expectedVersion: initialHub.version,
+    product: { id: bolillo.productId, slug: bolillo.productId, name: "Mexican Bolillo", description: null,
+      categoryId: "bakery", familyId: "bisquets", commercialState: "published", translations: terms, media: [] },
+    variants: [{ skuId: bolillo.sku, catalogName: "Bolillos", operationsName: "Bolillos",
+      commercialState: "published", flavor: null, size: null, packQuantity: null,
+      translations: terms, media: [], priceFils: 500, active: true, availability: "available" }],
+  });
+  publish();
+  const before = store.read();
+  const hub = readHub();
+  const product = hub.products.find((item) => item.id === bolillo.productId)!;
+  const bytes = readFileSync(new URL(`../../data-imports/commercial-hotfix/${bolillo.file}`, import.meta.url));
+  assert.equal(createHash("sha256").update(bytes).digest("hex"), bolillo.sha256);
+  const { assetId } = hubUpload(store, admin, randomUUID(), bytes, "image/webp",
+    { expectedVersion: hub.version, alt: terms }, flags) as { assetId: string };
+  const uploaded = readHub();
+  const delta = prepareBolilloMedia(product, uploaded.version, assetId);
+  command(delta);
+  const draft = readHub();
+  assert.deepEqual(draft.changes.map(({ kind, field }) => [kind, field]).sort(),
+    [["asset", "created"], ["product", "media"]]);
+  publish();
+  return { before, after: store.read(), product, assetId };
 }

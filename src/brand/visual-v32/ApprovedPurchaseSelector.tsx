@@ -15,9 +15,9 @@ import { tricolorSpec, TRICOLOR_COLORS, tricolorCopy, type TricolorColor } from 
 import "./approved-source.css";
 
 const words={
- es:{size:"Tamaño",variant:"Variante",presentation:"Presentación",price:"Precio",quantity:"Cantidad",boxes:"Cantidad de cajas",note:"Personalización",optional:"(opcional)",placeholder:'Ej. "Feliz cumpleaños"',add:"Agregar al carrito",unavailable:"No disponible",notReady:"Selecciona todos los sabores antes de continuar",noteHold:"La inscripción supera el límite del tamaño seleccionado.",pieces:"piezas por caja",unit:"pieza",close:"Cerrar",min:"Pedido mínimo",select:"Seleccionar color",contains:"Contenido de la caja",decrease:"Reducir cantidad",increase:"Aumentar cantidad"},
- en:{size:"Size",variant:"Choose a variant",presentation:"Presentation",price:"Price",quantity:"Quantity",boxes:"Number of boxes",note:"Personalization",optional:"(optional)",placeholder:"e.g. Happy birthday",add:"Add to cart",unavailable:"Unavailable",notReady:"Select every flavor before continuing",noteHold:"The inscription exceeds the character limit for this size.",pieces:"pieces per box",unit:"piece",close:"Close",min:"Minimum order",select:"Select color",contains:"Pieces in box",decrease:"Decrease quantity",increase:"Increase quantity"},
- ar:{size:"الحجم",variant:"اختر النوع",presentation:"الحجم",price:"السعر",quantity:"الكمية",boxes:"عدد العلب",note:"التخصيص",optional:"(اختياري)",placeholder:"مثلاً عيد ميلاد سعيد",add:"أضف إلى السلة",unavailable:"غير متاح",notReady:"اختر الأصناف للمتابعة",noteHold:"الكتابة تتجاوز الحد المسموح لهذا الحجم.",pieces:"قطع في العلبة",unit:"قطعة",close:"إغلاق",min:"الحد الأدنى للطلب",select:"اختر اللون",contains:"محتويات العلبة",decrease:"تقليل الكمية",increase:"زيادة الكمية"}
+ es:{size:"Tamaño",variant:"Variante",presentation:"Presentación",price:"Precio",quantity:"Cantidad",boxes:"Cantidad de cajas",note:"Personalización",optional:"(opcional)",placeholder:'Ej. "Feliz cumpleaños"',add:"Agregar al carrito",unavailable:"No disponible",notReady:"Selecciona todos los sabores antes de continuar",noteHold:"La inscripción supera el límite del tamaño seleccionado.",pieces:"piezas por caja",unit:"pieza",close:"Cerrar",min:"Pedido mínimo",select:"Seleccionar color",contains:"Contenido de la caja",decrease:"Reducir cantidad",increase:"Aumentar cantidad",fullSizePhoto:"Foto del tamaño Normal"},
+ en:{size:"Size",variant:"Choose a variant",presentation:"Presentation",price:"Price",quantity:"Quantity",boxes:"Number of boxes",note:"Personalization",optional:"(optional)",placeholder:"e.g. Happy birthday",add:"Add to cart",unavailable:"Unavailable",notReady:"Select every flavor before continuing",noteHold:"The inscription exceeds the character limit for this size.",pieces:"pieces per box",unit:"piece",close:"Close",min:"Minimum order",select:"Select color",contains:"Pieces in box",decrease:"Decrease quantity",increase:"Increase quantity",fullSizePhoto:"Photo shows the Normal size"},
+ ar:{size:"الحجم",variant:"اختر النوع",presentation:"الحجم",price:"السعر",quantity:"الكمية",boxes:"عدد العلب",note:"التخصيص",optional:"(اختياري)",placeholder:"مثلاً عيد ميلاد سعيد",add:"أضف إلى السلة",unavailable:"غير متاح",notReady:"اختر الأصناف للمتابعة",noteHold:"الكتابة تتجاوز الحد المسموح لهذا الحجم.",pieces:"قطع في العلبة",unit:"قطعة",close:"إغلاق",min:"الحد الأدنى للطلب",select:"اختر اللون",contains:"محتويات العلبة",decrease:"تقليل الكمية",increase:"زيادة الكمية",fullSizePhoto:"الصورة للحجم العادي"}
 } as const;
 
 export const storefrontMoney = (amount: number, language: Locale) =>
@@ -58,8 +58,9 @@ export function ApprovedProductCard({product,familyId,variant,price,active,onSel
  const fallback=publishedMediaAuthority()?null:family?.image;
  const category=family?.category;
  const feature=category==="pan"?" tile-pan":category==="conchas"?" tile-conchas":category==="panettone"?" tile-panettone":category==="cakes"?" tile-cake":/oreja/i.test(product.slug)?" tile-orejas":"";
+ const showWholePhoto=category==="panettone"||product.id==="111";
  const body=<>
-   <span className="ref32-photo tile-photo" data-fit={family?.category==="panettone"?"whole":undefined}>
+   <span className="ref32-photo tile-photo" data-fit={showWholePhoto?"whole":undefined}>
      {media&&additional.length?<MediaRotation key={media.sourceId} frames={[media,...additional]} alt=""
        className="product-media" sizes={sizes} focusable={false} paused={active||photoHeld}/>:
        media?<MediaPicture key={media.sourceId} asset={media} alt="" className="product-media" sizes={sizes} placeholderOnError/>:
@@ -96,8 +97,9 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const [variantId,setVariantId]=useState(product.id);
  const category=menuProductFamily(menu,product).category;
  const optionsFor=(item:StorefrontProduct)=>purchasableOptions(menuProductFamily(menu,item),menu.status,config,now);
- const variants=category==="pan"||category==="panettone"
-  ? menu.products.filter(item=>item.familyId===product.familyId&&optionsFor(item).length>0)
+ const panettone=category==="panettone";
+ const variants=category==="pan"||panettone
+  ? menu.products.filter(item=>item.familyId===product.familyId&&(panettone||optionsFor(item).length>0))
   : [];
  const current=variants.find(item=>item.id===variantId)??product;
  const family=menuProductFamily(menu,current);
@@ -119,20 +121,22 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  };
  const cakeSizing=family.category==="cakes" && allowed.length>0 &&
    allowed.every(option=>cakeSizeForSku(option.id)!==null);
- const showSize=cakeSizing||family.category==="panettone";
+ const showSize=cakeSizing||panettone;
  const rank={mini:0,small:1,medium:2};
- const sorted=[...allowed].sort((a,b)=>{
+ const sorted=[...(panettone?family.options:allowed)].sort((a,b)=>{
   if(cakeSizing) return rank[cakeSizeForSku(a.id)!.key]-rank[cakeSizeForSku(b.id)!.key];
   return toPackChoice(a).pieces-toPackChoice(b).pieces||
    (toPackChoice(a).presentation==="mini"?-1:toPackChoice(b).presentation==="mini"?1:0);
  });
- const initial=sorted[0]?.id??"";
+ const firstAvailable=sorted.find(option=>allowed.some(item=>item.id===option.id));
+ const initial=firstAvailable?.id??"";
  const [sku,setSku]=useState(initial);
  const [qty,setQty]=useState(initial?minQty(initial):1);
  const [note,setNote]=useState("");
  const [color,setColor]=useState<TricolorColor|null>(null);
  const [composition,setComposition]=useState<Composition>([]);
- const chosen=allowed.find(o=>o.id===sku)??sorted[0];
+ const chosen=allowed.find(o=>o.id===sku)??firstAvailable;
+ const variantPhoto=panettone?selectedProductMedia(current.id,family.id,current.variant,chosen?.size):undefined;
  const productId=chosen?.id??"";
  const selected=chosen?toPackChoice(chosen):null;
  const activeCake=cakeSizing?cakeSizeForSku(productId):null;
@@ -164,11 +168,16 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
   (!tricolor||tricolor.kind==="fixed"||!!color);
  const dialog=useRef<HTMLElement>(null);const closeControl=useRef<HTMLButtonElement>(null);
  const amount=Number.isFinite(total)?storefrontMoney(total,language):"—";
- const chooseSku=(id:string)=>{
-  const option=allowed.find(o=>o.id===id);
-  if(!option)return;
-  setSku(id);setQty(minQty(id));setComposition([]);setColor(null);
+ const chooseSku=(option:MenuOption)=>{
+  setSku(option.id);setQty(minQty(option.id));setComposition([]);setColor(null);
   setPresentation(toPackChoice(option).presentation);
+ };
+ const chooseVariant=(item:StorefrontProduct,options:MenuOption[])=>{
+  setVariantId(item.id);setNote("");
+  if(panettone){
+   const next=options.find(option=>option.size===chosen?.size)??options.find(option=>toPackChoice(option).presentation==="mini")??options[0];
+   if(next)chooseSku(next);
+  }
  };
  const selectedOption=(style:string,pieces:number)=>
   grouped?.choices.find(x=>x.presentation===style&&x.pieces===pieces);
@@ -258,12 +267,16 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  return <section className="ref32-dialog config glass" id="product-panel" ref={dialog} role="dialog" lang={language} dir={language==="ar"?"rtl":"ltr"}
     data-selected-sku={productId} data-product-id={product.id} data-variant-product-id={current.id} aria-label={title}>
    <div className="ref32-details">
-    <div className="ref32-dialog-heading">
+    <div className={"ref32-dialog-heading"+(variantPhoto?" ref32-panettone-intro":"")}>
      <div>
       <h2>{title}</h2>
       {description&&<p className="config-description">{description}</p>}
       {serving&&<p className="ref32-servings" data-cake-serves>{serving}</p>}
      </div>
+     {variantPhoto&&<figure className="ref32-panettone-figure">
+       <MediaPicture key={variantPhoto.sourceId} asset={variantPhoto} alt="" className="ref32-panettone-preview" sizes="90px"/>
+       {selected?.presentation==="mini"&&<figcaption>{t.fullSizePhoto}</figcaption>}
+     </figure>}
      <button className="ref32-close close-config" type="button" ref={closeControl} aria-label={t.close} onClick={onClose}>×</button>
     </div>
     {variants.length>1&&<>
@@ -273,9 +286,11 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
           const content=publishedProduct(item,published)?.options[0]?.content[language];
           const label=content?.variantLabel??localizedSource(item.variant,language);
           const active=item.id===current.id;
+          const options=panettone?optionsFor(item):[];
           return <button type="button" key={item.id} data-variant-id={item.id} aria-pressed={active}
+            disabled={panettone&&options.length===0}
             className={active?"ref32-option ref32-option-active":"ref32-option"}
-            onClick={()=>{setVariantId(item.id);setNote("");}}>
+            onClick={()=>chooseVariant(item,options)}>
             <span>{label}</span>
           </button>;
         })}
@@ -289,7 +304,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
         <button type="button" key={choice.option.id} data-sku={choice.option.id}
          data-pack-pieces={choice.pieces} aria-pressed={productId===choice.option.id}
          className={productId===choice.option.id?"ref32-option ref32-option-active":"ref32-option"}
-         onClick={()=>chooseSku(choice.option.id)}>
+         onClick={()=>chooseSku(choice.option)}>
          <span>{packQtyLabel(choice.pieces,language)}
            {["mini","individual"].includes(choice.presentation)?` (${presentationLabel(choice.presentation,language)})`:""}</span>
          <small>{storefrontMoney(choice.option.priceFils,language)}</small>
@@ -301,7 +316,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
         {grouped.presentations.map(name=><button type="button" key={name} data-pack-presentation={name}
           aria-pressed={presentation===name} onClick={()=>{
             const next=selectedOption(name,selected?.pieces??1)??grouped.choices.find(x=>x.presentation===name);
-            if(next)chooseSku(next.option.id);
+            if(next)chooseSku(next.option);
           }}>{presentationLabel(name,language)}</button>)}
        </div>
        <div className="ref32-options ref32-options-three" role="group" aria-label={t.variant}>
@@ -310,17 +325,18 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
          return <button type="button" key={pieces} data-pack-pieces={pieces}
           aria-pressed={option?.option.id===productId}
           className={option?.option.id===productId?"ref32-option ref32-option-active":"ref32-option"}
-          disabled={!option} onClick={()=>option&&chooseSku(option.option.id)}>
+          disabled={!option} onClick={()=>option&&chooseSku(option.option)}>
           <span>{packQtyLabel(pieces,language)}</span><small>{option?storefrontMoney(option.option.priceFils,language):"—"}</small>
          </button>;
         })}
        </div>
       </div>:
-      <div className={"ref32-options "+(cakeSizing&&sorted.length===3?"ref32-options-three":"ref32-options-four")} role="group" aria-label={showSize||variants.length>1?t.size:t.variant} data-cake-sizes={cakeSizing?"Mini-Small-Medium":undefined}>
+      <div className={"ref32-options "+(panettone?"ref32-options-two":cakeSizing&&sorted.length===3?"ref32-options-three":"ref32-options-four")} role="group" aria-label={showSize||variants.length>1?t.size:t.variant} data-cake-sizes={cakeSizing?"Mini-Small-Medium":undefined}>
        {sorted.map(option=><button type="button" key={option.id} data-sku={option.id}
          aria-pressed={option.id===productId}
          className={option.id===productId?"ref32-option ref32-option-active":"ref32-option"}
-         onClick={()=>chooseSku(option.id)}>
+         disabled={panettone&&!allowed.some(item=>item.id===option.id)}
+         onClick={()=>chooseSku(option)}>
          <span>{localizedOption(option,cakeSizing?cakeSizeName(cakeSizeForSku(option.id)!):option.size)}</span>
          <small>{storefrontMoney(option.priceFils,language)}</small>
        </button>)}
