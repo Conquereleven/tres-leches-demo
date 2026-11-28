@@ -116,8 +116,12 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
     const page = await context.newPage();
     await page.goto(origin);
     await expect(page.locator(".mast")).toBeVisible();
-    await expect(page.locator('a[href^="/operations"]')).toHaveCount(0);
-    await page.goto(origin + "/operations/inbox");
+    await expect(page.locator('a[href^="/operations"]')).toHaveCount(1);
+    await expect(page.locator('.mast a[href^="/operations"]')).toHaveCount(0);
+    const staffAccess = page.locator(".v32-site-footer").getByRole("link", { name: "Staff Access", exact: true });
+    await expect(staffAccess).toHaveAttribute("href", "/operations/orders");
+    await staffAccess.click();
+    await expect(page).toHaveURL(/\/operations\/orders$/);
     await page.getByLabel("Agent", { exact: true }).fill("test-admin");
     await page
       .getByLabel("Password", { exact: true })
@@ -128,6 +132,7 @@ test("TL18 HTTPS staging login, readiness RBAC, TEST seeds and responsive", asyn
         exact: true,
       }),
     ).toBeVisible();
+    await page.goto(origin + "/operations/inbox");
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
     page.on("console", (m) => {

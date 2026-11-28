@@ -28,6 +28,18 @@ test("three flavors, six sizes and prices, correct photo identity, persistent ca
   await expect(page.locator(".ref32-product")).toHaveCount(3);
   await page.screenshot({ path: info.outputPath("panettone-category.png"), fullPage: true });
 
+  const anchor = page.locator('.ref32-product[data-product-id="panettone-normal"]');
+  await anchor.click();
+  const panel = page.getByRole("dialog", { name: "Panettone Normal" });
+  await panel.locator('[data-sku="panettone-normal-normal"]').click();
+  for (const product of manifest.products.slice(1)) {
+    await page.locator("#product-panel").locator(`[data-variant-id="${product.id}"]`).click();
+    await expect(page.locator("#product-panel")).toHaveAttribute("data-selected-sku", `${product.id}-normal`);
+    await expect(page.locator("#product-panel img.ref32-panettone-preview")).toHaveAttribute("src",
+      `/brand/hub/${product.previewPhoto.sha256}.webp`);
+  }
+  await page.locator("#product-panel").getByRole("button", { name: "Close" }).click();
+
   const cart = [];
   for (const product of manifest.products) {
     const card = page.locator(`.ref32-product[data-product-id="${product.id}"]`);
@@ -40,10 +52,23 @@ test("three flavors, six sizes and prices, correct photo identity, persistent ca
       const sku = `${product.id}-${size.id}`;
       const option = dialog.locator(`[data-sku="${sku}"]`);
       await expect(dialog.getByRole("group", { name: "Size", exact: true }).getByRole("button")).toHaveCount(2);
-      await expect(option).toContainText(size.en);
+      await expect(option.locator("span")).toHaveText(size.en);
+      const flavorGroup = dialog.getByRole("group", { name: "Choose a variant", exact: true });
+      await expect(flavorGroup.locator("button > span")).toHaveText(manifest.products.map(item => item.flavor.en));
       await expect(option).toContainText(String(size.priceFils / 100));
       await option.click();
       await expect(dialog).toHaveAttribute("data-selected-sku", sku);
+      const photo = dialog.locator("img.ref32-panettone-preview");
+      await expect(photo).toHaveAttribute("src", `/brand/hub/${product.previewPhoto.sha256}.webp`);
+      const dimensions = await photo.evaluate(async (img: HTMLImageElement) => {
+        await img.decode();
+        const bitmap = await createImageBitmap(await (await fetch(img.currentSrc)).blob());
+        try { return [bitmap.width, bitmap.height]; }
+        finally { bitmap.close(); }
+      });
+      expect(dimensions).toEqual([960, 960]);
+      await expect(card.locator("img")).toHaveCSS("object-fit", "cover");
+      if (size.id === "mini") await expect(dialog.getByText("Photo shows the Normal size")).toBeVisible();
       if (product.id === "panettone-pistacchio" && size.id === "normal")
         await page.screenshot({ path: info.outputPath("pistacchio-normal-dialog.png"), animations: "disabled" });
       await dialog.getByRole("button", { name: /Add to cart/ }).click();
@@ -73,6 +98,14 @@ test("three flavors, six sizes and prices, correct photo identity, persistent ca
   expect(await quote.json()).toMatchObject({ eligible: true, subtotalFils: 61800 });
   expect((await send([{ ...cart[0], priceFils: 1 }])).ok()).toBeFalsy();
   expect((await send([{ productId: "panettone-missing-mini", quantity: 1 }])).status()).toBe(422);
+  await page.getByRole("link", { name: /^Checkout/ }).click();
+  await page.getByRole("radio", { name: "PICKUP", exact: true }).check();
+  const summary = page.getByRole("complementary", { name: "Order summary" });
+  const summaryToggle = summary.getByRole("button", { name: /Show order summary/i });
+  if (await summaryToggle.isVisible()) await summaryToggle.click();
+  for (const product of manifest.products)
+    for (const size of manifest.sizes)
+      await expect(summary.getByText(`${product.name.en} · ${size.en}`, { exact: true })).toBeVisible();
 });
 
 for (const language of ["es", "ar"] as const) {
@@ -84,8 +117,28 @@ for (const language of ["es", "ar"] as const) {
     await page.locator(`.ref32-product[data-product-id="${product.id}"]`).click();
     const dialog = page.getByRole("dialog", { name: product.name[language] });
     await expect(dialog).toContainText(product.description[language]);
+    await expect(dialog.locator("button[data-variant-id] > span")).toHaveText(manifest.products.map(item => item.flavor[language]));
     for (const size of manifest.sizes)
-      await expect(dialog.locator(`[data-sku="${product.id}-${size.id}"]`)).toContainText(size[language]);
+      await expect(dialog.locator(`[data-sku="${product.id}-${size.id}"] > span`)).toHaveText(size[language]);
     await expect(dialog).toHaveAttribute("dir", language === "ar" ? "rtl" : "ltr");
   });
 }
+
+test("shows unavailable Panettone choices and cannot add an unavailable SKU", async ({ page, request }) => {
+  test.skip(process.env.PANETTONE_FIXTURE_MIXED !== "true", "Mixed availability fixture");
+  await page.goto("/bakery?category=panettone&lang=en");
+  await page.locator('.ref32-product[data-product-id="panettone-normal"]').click();
+  const dialog = page.locator("#product-panel");
+  await expect(dialog.locator('[data-variant-id="panettone-pistacchio"]')).toBeDisabled();
+  await dialog.locator('[data-variant-id="panettone-chocolate"]').click();
+  await expect(dialog.locator('[data-sku="panettone-chocolate-mini"]')).toBeDisabled();
+  await expect(dialog).toHaveAttribute("data-selected-sku", "panettone-chocolate-normal");
+  await dialog.getByRole("button", { name: /Add to cart/ }).click();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("3l-cart") ?? "[]")))
+    .toEqual([{ productId: "panettone-chocolate-normal", quantity: 1 }]);
+  const quote = await request.post("/api/checkout/quote", {
+    headers: { Origin: "http://127.0.0.1:4178" },
+    data: { lines: [{ productId: "panettone-chocolate-mini", quantity: 1 }], fulfillmentMethod: "pickup" },
+  });
+  expect((await quote.json()).eligible).toBe(false);
+});

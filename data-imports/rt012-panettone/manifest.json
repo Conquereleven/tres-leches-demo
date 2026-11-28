@@ -36,17 +36,16 @@
       "previewPhoto": {
         "source": "photos/panettone/09.webp",
         "file": "normal.webp",
-        "sha256": "77fac0a97469093a60a45b3d70a3626338637f2ab0be597cd2d3e96a8610c3a6",
+        "sha256": "6952b801d6d7b6ac6b44d492decf38f18478d91edb71ca848265cf720fa540ca",
         "size": "normal",
-        "sourceDerivativeSha256": "9461041764870d56b1fbdacb31a6aa80ba305d909cf7b2629510e6d88f153608",
-        "crop": {
-          "x": 0,
-          "y": 496,
-          "width": 1067,
-          "height": 1104
-        },
         "sourceOriginalSha256": "7e01bed2a62906220b1aa926c2ededd5fdcd8f235b290a8cdca40a3d9b2bc271",
-        "sourceOriginalFile": "PANETONE/09.jpg"
+        "sourceOriginalFile": "PANETONE/09.jpg",
+        "sourceOriginalCrop": {
+          "x": 0,
+          "y": 833,
+          "width": 1728,
+          "height": 1728
+        }
       },
       "galleryPhotos": [
         {
@@ -72,7 +71,12 @@
           "sourceOriginalFile": "PANETONE/10.jpg"
         }
       ],
-      "releaseAvailability": "unavailable"
+      "releaseAvailability": "unavailable",
+      "flavor": {
+        "en": "Normal",
+        "es": "Normal",
+        "ar": "عادي"
+      }
     },
     {
       "id": "panettone-chocolate",
@@ -89,17 +93,16 @@
       "previewPhoto": {
         "source": "photos/panettone/14.webp",
         "file": "chocolate.webp",
-        "sha256": "979fe632de3598e898fd099b3d05f5ed83bdd72e6c8f68833806b8c8a247aaf9",
+        "sha256": "0d701a41a15cd2b19aa9ac566aa3a9129f24b41b975f7017fec07cdf100ddad5",
         "size": "normal",
-        "sourceDerivativeSha256": "8b1f1d253b46d306d9a66fb7026aaf86cd85bd9bf223466c7a28305828308385",
-        "crop": {
-          "x": 0,
-          "y": 432,
-          "width": 1067,
-          "height": 1168
-        },
         "sourceOriginalSha256": "b6fd5da4f6e30c675458655f8a3c729d86f61e5e1e0b72454230bc0f5e3abcc4",
-        "sourceOriginalFile": "PANETONE/14.jpg"
+        "sourceOriginalFile": "PANETONE/14.jpg",
+        "sourceOriginalCrop": {
+          "x": 0,
+          "y": 781,
+          "width": 1728,
+          "height": 1728
+        }
       },
       "galleryPhotos": [
         {
@@ -158,7 +161,12 @@
           "sourceOriginalFile": "PANETONE/15.jpg"
         }
       ],
-      "releaseAvailability": "unavailable"
+      "releaseAvailability": "unavailable",
+      "flavor": {
+        "en": "Chocolate",
+        "es": "Chocolate",
+        "ar": "شوكولاتة"
+      }
     },
     {
       "id": "panettone-pistacchio",
@@ -175,17 +183,16 @@
       "previewPhoto": {
         "source": "photos/panettone/11.webp",
         "file": "pistacchio.webp",
-        "sha256": "d38c6746273823b3ce463459a5dfce7081eef595fb53ce6fd8716c4b7869fc0a",
+        "sha256": "742ba51dda9daaad192218ae8110e7b8a6cbcb1b3acd5763373491db8681dcec",
         "size": "normal",
-        "sourceDerivativeSha256": "c4e2013b5c11d92727281bbc82f3a6b6ea889990ffe09bc8a7550ec2f9ff76a7",
-        "crop": {
-          "x": 0,
-          "y": 416,
-          "width": 1067,
-          "height": 1184
-        },
         "sourceOriginalSha256": "0d658b71b09b13b14e7b2543bb9523bf685328fa27c9aaa7eb90d32dd5feee01",
-        "sourceOriginalFile": "PANETONE/11.jpg"
+        "sourceOriginalFile": "PANETONE/11.jpg",
+        "sourceOriginalCrop": {
+          "x": 0,
+          "y": 768,
+          "width": 1728,
+          "height": 1728
+        }
       },
       "galleryPhotos": [
         {
@@ -222,7 +229,12 @@
           "sourceOriginalFile": "PANETONE/06.jpg"
         }
       ],
-      "releaseAvailability": "unavailable"
+      "releaseAvailability": "unavailable",
+      "flavor": {
+        "en": "Pistacchio",
+        "es": "Pistacho",
+        "ar": "فستق"
+      }
     }
   ],
   "releaseAvailabilityReason": "Confirmed disclosures remain in product copy. Purchase is held for Mini and Normal pending verification of mandatory allergen information for each SKU."

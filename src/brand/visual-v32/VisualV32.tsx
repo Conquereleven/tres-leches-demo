@@ -114,9 +114,9 @@ const categoryFor=(category:string):Filter=>
   category==="pan"||category==="conchas"?"mexican":"special";
 
 const navigationLabels = {
- en: { language: "Language", open: "Open navigation", close: "Close navigation", menu: "Mobile navigation", skip: "Skip to content", categories: "Categories", collections: "Published 3L categories", searchBakery: "Search the bakery", searchMenu: "Search the menu", footer: "V3.2 footer navigation" },
- es: { language: "Idioma", open: "Abrir navegación", close: "Cerrar navegación", menu: "Navegación móvil", skip: "Saltar al contenido", categories: "Categorías", collections: "Categorías publicadas de 3L", searchBakery: "Buscar en la panadería", searchMenu: "Buscar en el menú", footer: "Navegación al pie de página" },
- ar: { language: "اللغة", open: "فتح قائمة التنقل", close: "إغلاق قائمة التنقل", menu: "قائمة التنقل", skip: "انتقل إلى المحتوى", categories: "الفئات", collections: "فئات 3L المنشورة", searchBakery: "ابحث في المخبز", searchMenu: "ابحث في القائمة", footer: "روابط تذييل الصفحة" },
+ en: { language: "Language", open: "Open navigation", close: "Close navigation", menu: "Mobile navigation", skip: "Skip to content", categories: "Categories", collections: "Published 3L categories", searchBakery: "Search the bakery", searchMenu: "Search the menu", footer: "V3.2 footer navigation", staff: "Staff Access" },
+ es: { language: "Idioma", open: "Abrir navegación", close: "Cerrar navegación", menu: "Navegación móvil", skip: "Saltar al contenido", categories: "Categorías", collections: "Categorías publicadas de 3L", searchBakery: "Buscar en la panadería", searchMenu: "Buscar en el menú", footer: "Navegación al pie de página", staff: "Acceso para el personal" },
+ ar: { language: "اللغة", open: "فتح قائمة التنقل", close: "إغلاق قائمة التنقل", menu: "قائمة التنقل", skip: "انتقل إلى المحتوى", categories: "الفئات", collections: "فئات 3L المنشورة", searchBakery: "ابحث في المخبز", searchMenu: "ابحث في القائمة", footer: "روابط تذييل الصفحة", staff: "دخول الموظفين" },
 } as const;
 
 function Icon({name}:{name:"menu"|"bag"|"search"|"arrow"|"chat"|"home"|"catalogue"|"journal"}){
@@ -533,6 +533,7 @@ function VisualFooter(){
       <a href={href("/cart")}>{labels.cart}</a>
       <a href={href("/terms")}>{t.legalTerms}</a>
       <a href={href("/privacy")}>{t.privacy}</a>
+      <a href="/operations/orders">{navigationLabels[language].staff}</a>
     </nav>
   </footer>;
 }
