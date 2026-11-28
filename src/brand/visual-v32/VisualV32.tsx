@@ -416,7 +416,7 @@ function Bakery({search,staticPage=false,compact}:{search:string;staticPage?:boo
           active={active?.id===product.id} onSelect={element=>{
             trigger.current=element;setAddedMessage("");setSelected(product.id);
           }}>
-          {active?.id===product.id&&<ApprovedPurchasePopup key={product.id} product={product} onClose={close} onAdded={afterAdd} anchor={trigger.current}/>}
+          {active?.id===product.id&&<ApprovedPurchasePopup key={product.id} product={product} onClose={close} onAdded={afterAdd} anchor={trigger.current} showGalleryLink={origin===""}/>}
         </ApprovedProductCard>)}
       </div>}
   </div>;

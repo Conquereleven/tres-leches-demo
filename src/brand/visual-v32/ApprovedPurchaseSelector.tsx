@@ -40,6 +40,13 @@ export function useProductTitle(product: StorefrontProduct) {
  return productTitle(product,language,useLiveCatalog(),text);
 }
 
+const isManualGalleryProduct=(id:string,category?:string)=>category==="panettone"||id==="111"||id==="croissant--plain";
+const galleryLabels = {
+ en:{photos:"Product photographs", link:"View photo gallery", previous:"Previous photo", next:"Next photo", position:(n:string,total:string)=>`Photo ${n} of ${total}`},
+ es:{photos:"Fotos del producto", link:"Ver galería de fotos", previous:"Foto anterior", next:"Foto siguiente", position:(n:string,total:string)=>`Foto ${n} de ${total}`},
+ ar:{photos:"صور المنتج", link:"عرض معرض الصور", previous:"الصورة السابقة", next:"الصورة التالية", position:(n:string,total:string)=>`الصورة ${n} من ${total}`},
+};
+
 export function ApprovedProductCard({product,familyId,variant,price,active,onSelect,children,gallery=false,detailsHref}:{
  product:StorefrontProduct;familyId:string;variant:string;price:number|null;
  active:boolean;onSelect:(element:HTMLButtonElement)=>void;children?:ReactNode;gallery?:boolean;detailsHref?:string;
@@ -53,16 +60,27 @@ export function ApprovedProductCard({product,familyId,variant,price,active,onSel
  const media=selectedProductMedia(product.id,familyId,variant);
  const additional=gallery&&media?productGalleryMedia(product.id,familyId,variant):[];
  const [photoHeld,setPhotoHeld]=useState(false);
+ const [photoIndex,setPhotoIndex]=useState(0);
  const [failedFallback,setFailedFallback]=useState<string|null>(null);
- const sizes="(max-width:599px) 46vw, (max-width:1099px) 30vw, 22vw";
  const fallback=publishedMediaAuthority()?null:family?.image;
  const category=family?.category;
+ const manualGallery=additional.length>0&&isManualGalleryProduct(product.id,category);
+ const count=additional.length+1;
+ const currentPhoto=photoIndex%count;
+ const galleryCopy=galleryLabels[language];
+ const slideNumber=manualGallery?(currentPhoto+1).toLocaleString(language):"";
+ const totalPhotos=manualGallery?count.toLocaleString(language):"";
+ const slideAlt=(currentPhoto===0?media:additional[currentPhoto-1])?.localizedAlt?.[language]?.name??title;
+ const changePhoto=(direction:number)=>setPhotoIndex(index=>(index%count+direction+count)%count);
+ const sizes=manualGallery?"(max-width:440px) calc(100vw - 40px), 390px":
+  "(max-width:599px) 46vw, (max-width:1099px) 30vw, 22vw";
  const feature=category==="pan"?" tile-pan":category==="conchas"?" tile-conchas":category==="panettone"?" tile-panettone":category==="cakes"?" tile-cake":/oreja/i.test(product.slug)?" tile-orejas":"";
  const showWholePhoto=category==="panettone"||product.id==="111";
  const body=<>
    <span className="ref32-photo tile-photo" data-fit={showWholePhoto?"whole":undefined}>
      {media&&additional.length?<MediaRotation key={media.sourceId} frames={[media,...additional]} alt=""
-       className="product-media" sizes={sizes} focusable={false} paused={active||photoHeld}/>:
+       className="product-media" sizes={sizes} focusable={false} paused={active||photoHeld}
+       selectedFrame={manualGallery?currentPhoto:undefined}/>:
        media?<MediaPicture key={media.sourceId} asset={media} alt="" className="product-media" sizes={sizes} placeholderOnError/>:
        fallback&&fallback!==failedFallback?<img className="product-media" src={fallback} alt="" loading="lazy" decoding="async"
          onError={()=>setFailedFallback(fallback)}/>:
@@ -80,16 +98,29 @@ export function ApprovedProductCard({product,familyId,variant,price,active,onSel
    </span>
  </>;
  const attributes={className:"ref32-product tile-button","data-product-id":product.id,"data-category-id":family?.category??""};
- return <><article className={"tile"+feature+(active?" is-selected":"")}>
+ return <><article className={"tile"+feature+(active?" is-selected":"")+(manualGallery?" detail-photo-gallery":"")}>
    {detailsHref?<a {...attributes} href={detailsHref}>{body}</a>:
     <button {...attributes} type="button" data-selected-product={active} aria-haspopup="dialog" aria-expanded={active}
       aria-controls={active?"product-panel":undefined} disabled={price===null} onClick={event=>onSelect(event.currentTarget)}
       onFocus={gallery?()=>setPhotoHeld(true):undefined} onBlur={gallery?()=>setPhotoHeld(false):undefined}>{body}</button>}
+   {manualGallery&&<div className="v32-photo-controls" role="group" aria-label={galleryCopy.photos}
+     onKeyDown={event=>{
+       if(event.key!=="ArrowLeft"&&event.key!=="ArrowRight")return;
+       event.preventDefault();
+       changePhoto((event.key==="ArrowRight")!==(language==="ar")?1:-1);
+     }}>
+     <button type="button" aria-label={galleryCopy.previous} onClick={()=>changePhoto(-1)}><span aria-hidden="true">‹</span></button>
+     <span role="status" aria-live="polite" aria-atomic="true">
+       <bdi aria-hidden="true">{slideNumber} / {totalPhotos}</bdi>
+       <span className="v32-photo-announcement">{galleryCopy.position(slideNumber,totalPhotos)}. {slideAlt}</span>
+     </span>
+     <button type="button" aria-label={galleryCopy.next} onClick={()=>changePhoto(1)}><span aria-hidden="true">›</span></button>
+   </div>}
  </article>{children}</>;
 }
 
-export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
- product:StorefrontProduct;anchor:HTMLElement|null;onClose:()=>void;onAdded:()=>void;
+export function ApprovedPurchasePopup({product,anchor,onClose,onAdded,showGalleryLink=false}:{
+ product:StorefrontProduct;anchor:HTMLElement|null;onClose:()=>void;onAdded:()=>void;showGalleryLink?:boolean;
 }){
  const {language}=useLanguage();const t=words[language];
  const menu=useMenu();
@@ -107,6 +138,9 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
  const title=useProductTitle(current);
  const published=useLiveCatalog();
  const description=productDescription(current,language,published);
+ const galleryHref=showGalleryLink&&isManualGalleryProduct(current.id,category)&&
+   productGalleryMedia(current.id,family.id,current.variant).length>0
+   ? `/menu/${encodeURIComponent(current.slug)}?lang=${language}` : undefined;
  const allowed=optionsFor(current);
  const grouped=packChoices(allowed);
  const liveOptions=publishedProduct(current,published)?.options;
@@ -271,6 +305,7 @@ export function ApprovedPurchasePopup({product,anchor,onClose,onAdded}:{
      <div>
       <h2>{title}</h2>
       {description&&<p className="config-description">{description}</p>}
+      {galleryHref&&<a className="v32-photo-gallery-link" href={galleryHref}>{galleryLabels[language].link}</a>}
       {serving&&<p className="ref32-servings" data-cake-serves>{serving}</p>}
      </div>
      {variantPhoto&&<figure className="ref32-panettone-figure">

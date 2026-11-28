@@ -38,10 +38,18 @@ test("verified product galleries keep variant identity and respect reduced motio
   await page.keyboard.press("Escape");
 
   await page.emulateMedia({ reducedMotion:"no-preference" });
+  await page.goto("/menu/orejas?lang=en");
+  await expect(rotation).toHaveAttribute("data-frame", "1", { timeout: 15_000 });
+
+  await page.clock.install();
   await page.goto("/menu/panettone-normal?lang=en");
   const pan = page.locator(".v32-product-page-card .b-official-rotation");
   await expect(pan).toBeVisible();
-  await expect(pan).toHaveAttribute("data-frame", "1", { timeout: 15_000 });
+  await expect(pan).toHaveAttribute("data-frame", "0");
+  await page.clock.fastForward(4_000);
+  await expect(pan).toHaveAttribute("data-frame", "0");
+  await page.getByRole("button", { name: "Next photo", exact: true }).press("Enter");
+  await expect(pan).toHaveAttribute("data-frame", "1");
   await expect.poll(() => pan.locator("picture.is-active img").evaluate((element:HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
   expect(await pan.locator("picture.is-active img").evaluate((element: HTMLImageElement) => element.currentSrc)).toContain("/brand/hub/");
 });
