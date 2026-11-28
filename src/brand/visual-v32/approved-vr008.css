@@ -1567,6 +1567,20 @@
 }
 
 /* Product detail reuses the approved editorial gallery transition. */
+
+.vr009 .v32-photo-gallery-link {display:inline-flex;align-items:center;min-height:44px;color:#593725;font:600 14px/1.3 var(--ui);text-underline-offset:3px}
+.vr009 .v32-photo-controls {display:flex;align-items:center;justify-content:center;gap:12px;padding:4px 10px 8px;color:#593725;font:600 13px/1 var(--ui)}
+.vr009 .v32-photo-controls button {display:grid;place-items:center;min-width:44px;min-height:44px;border:1px solid #fff5e9;border-radius:50%;background:#fff4e8;color:inherit;font:inherit}
+.vr009 .v32-photo-controls button span {font-size:24px;line-height:1}
+.vr009[dir=rtl] .v32-photo-controls button span {transform:scaleX(-1)}
+.vr009[dir=rtl] .detail-photo-gallery .tile-copy {padding-inline-end:66px}
+.vr009[dir=rtl] .detail-photo-gallery .tile-copy>i {right:auto;inset-inline-end:18px;transform:scaleX(-1)}
+.vr009 .v32-photo-controls button:focus-visible {outline:2px solid #78324b;outline-offset:2px}
+.vr009 .v32-photo-announcement {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.vr009 .v32-product-page .detail-photo-gallery :is(
+  .b-official-rotation:not([data-frame="0"]),
+  [data-product-id="croissant--plain"] .b-official-rotation
+) .product-media {object-fit:contain}
 .v32-product-page .b-official-rotation picture { position: absolute; inset: 0; width: 100%; height: 100%; background: var(--v2-white); opacity: 0; transition: opacity 0s linear 800ms; }
 .v32-product-page .b-official-rotation picture.is-active { opacity: 1; z-index: 1; transition: opacity 800ms ease; }
 .v32-product-page .b-official-rotation picture img { width: 100%; height: 100%; object-fit: cover; object-position: center; }

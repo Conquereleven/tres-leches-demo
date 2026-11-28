@@ -39,7 +39,7 @@ const send = (res: ServerResponse, status: number, value: unknown) => {
  * same-origin rule for writes and resolved the signed-in actor.
  *   GET  /api/product-hub            admin, manager
  *   POST /api/product-hub/commands   admin/manager drafts; admin publish
- *   POST /api/product-hub/media      admin, manager (raw image body)
+ *   POST /api/product-hub/media      admin, manager (raw image or responsive WebP files)
  */
 export async function serveProductHub(
   req: IncomingMessage,
@@ -82,19 +82,27 @@ export async function serveProductHub(
       throw new DomainError(400, "Invalid upload description");
     }
     const bytes = await body(req, MAX_UPLOAD_BYTES);
-    send(
-      res,
-      200,
-      hubUpload(
-        store,
-        actor,
-        key,
-        bytes,
-        String(req.headers["content-type"] ?? ""),
-        meta,
-        flags,
-      ),
-    );
+    const type = String(req.headers["content-type"] ?? "");
+    if (type.split(";")[0]?.trim().toLowerCase() !== "multipart/form-data") {
+      send(res, 200, hubUpload(store, actor, key, bytes, type, meta, flags));
+      return true;
+    }
+    let form: FormData;
+    try {
+      form = await new Response(new Uint8Array(bytes), { headers: { "Content-Type": type } }).formData();
+    } catch {
+      throw new DomainError(400, "Invalid responsive image upload");
+    }
+    const files = form.getAll("image");
+    if (files.length < 2 || files.length > 4 || [...form.keys()].some((name) => name !== "image") ||
+        files.some((file) => typeof file === "string"))
+      throw new DomainError(400, "Provide two to four responsive image files");
+    const inputs = await Promise.all(files.map(async (file) => {
+      const upload = file as File;
+      return { bytes: Buffer.from(await upload.arrayBuffer()), declaredType: upload.type };
+    }));
+    const [master, ...responsive] = inputs;
+    send(res, 200, hubUpload(store, actor, key, master!.bytes, master!.declaredType, meta, flags, undefined, responsive));
     return true;
   }
   throw new DomainError(404, "Not found");

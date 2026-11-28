@@ -1165,22 +1165,41 @@ export function hubUpload(
   rawMeta: unknown,
   flags: HubFlags,
   now = new Date(),
+  responsive: readonly { bytes: Buffer; declaredType: string }[] = [],
 ) {
   if (!["admin", "manager"].includes(actor.role))
     throw new DomainError(403, "Only catalog staff can edit drafts");
   if (!flags.enabled) throw new DomainError(404, "Not found");
   if (!/^[A-Za-z0-9_-]{8,128}$/.test(key))
     throw new DomainError(400, "Idempotency-Key required");
-  if (!bytes.length || bytes.length > MAX_UPLOAD_BYTES)
+  const inputs = [{ bytes, declaredType }, ...responsive];
+  if (responsive.length > 3)
+    throw new DomainError(422, "At most four image sizes per asset");
+  if (inputs.some((input) => !input.bytes.length) ||
+      inputs.reduce((total, input) => total + input.bytes.length, 0) > MAX_UPLOAD_BYTES)
     throw new DomainError(413, "Image is larger than 5 MB");
   const meta = uploadMeta.parse(rawMeta);
-  const info = inspectImage(bytes);
-  if (declaredType.split(";")[0]!.trim().toLowerCase() !== info.type)
-    throw new DomainError(415, "The file does not match its declared type");
-  const sha = createHash("sha256").update(bytes).digest("hex");
-  const hash = createHash("sha256")
-    .update(JSON.stringify([actor.id, sha, meta]))
-    .digest("hex");
+  const images = inputs.map((input) => {
+    const info = inspectImage(input.bytes);
+    if (input.declaredType.split(";")[0]!.trim().toLowerCase() !== info.type)
+      throw new DomainError(415, "The file does not match its declared type");
+    return { ...info, bytes: input.bytes, sha: createHash("sha256").update(input.bytes).digest("hex") };
+  });
+  const master = images[0]!;
+  const widths = new Set([master.width]);
+  for (const image of images.slice(1)) {
+    const aspectDifference = Math.abs(image.width * master.height - image.height * master.width);
+    if (master.type !== "image/webp" || image.type !== master.type ||
+        image.width >= master.width || image.height >= master.height ||
+        widths.has(image.width) || aspectDifference > Math.max(master.width, master.height))
+      throw new DomainError(422, "Responsive WebP images must be smaller with matching proportions");
+    widths.add(image.width);
+  }
+  const sha = master.sha;
+  const inputIdentity = responsive.length
+    ? [actor.id, sha, meta, images.slice(1).map((image) => image.sha)]
+    : [actor.id, sha, meta];
+  const hash = createHash("sha256").update(JSON.stringify(inputIdentity)).digest("hex");
   const assetId = `hub-${sha.slice(0, 24)}`;
   return store.write((s) => {
     const h = hub(s);
@@ -1202,12 +1221,12 @@ export function hubUpload(
     if (draft.foundation.assets.some((a) => a.id === assetId))
       throw new DomainError(409, "This image is already in the library");
     // Same transaction as the draft write: both land or neither does.
-    store.putMedia({
-      sha256: sha,
-      contentType: info.type,
-      bytes,
-      width: info.width,
-      height: info.height,
+    for (const image of images) store.putMedia({
+      sha256: image.sha,
+      contentType: image.type,
+      bytes: image.bytes,
+      width: image.width,
+      height: image.height,
       createdAt: now.toISOString(),
       createdBy: actor.id,
     });
@@ -1215,19 +1234,12 @@ export function hubUpload(
       id: assetId,
       version: sha,
       alt: meta.alt,
-      derivatives: [
-        {
-          src: `${HUB_MEDIA_PREFIX}${sha}.${info.ext}`,
-          format:
-            info.ext === "webp"
-              ? "webp"
-              : info.ext === "avif"
-                ? "avif"
-                : "legacy",
-          width: info.width,
-          height: info.height,
-        },
-      ],
+      derivatives: images.map((image) => ({
+        src: `${HUB_MEDIA_PREFIX}${image.sha}.${image.ext}`,
+        format: image.ext === "webp" ? "webp" : image.ext === "avif" ? "avif" : "legacy",
+        width: image.width,
+        height: image.height,
+      })),
     });
     h.version += 1;
     const result = { ok: true, version: h.version, assetId };
@@ -1235,7 +1247,7 @@ export function hubUpload(
       at: now.toISOString(),
       actor: actor.id,
       action: "draft.media",
-      summary: `Uploaded image ${assetId} (${info.width}×${info.height})`,
+      summary: `Uploaded image ${assetId} (${master.width}×${master.height})`,
       version: h.version,
     });
     h.commands[key] = { hash, result };

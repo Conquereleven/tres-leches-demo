@@ -40,7 +40,7 @@ function authoredProductMedia(
     ) ?? selectedMedia(family, variant, size)
   );
 }
-type MediaAsset = (typeof approvedMedia)[number];
+type MediaAsset = (typeof approvedMedia)[number] & { localizedAlt?: LiveAsset["alt"] };
 /**
  * null means bundled mode; [] means the published product explicitly has no media.
  * Product assignments (including removals) are authoritative. Variant/category
@@ -85,6 +85,7 @@ function publishedProductMedia(
           family,
           variant,
           alt: asset.alt.en.name ?? "",
+          localizedAlt: asset.alt,
           width: main.width,
           height: main.height,
           derivatives: asset.derivatives,
@@ -99,7 +100,7 @@ export function selectedProductMedia(
   family: string,
   variant: string,
   size?: string,
-) {
+): MediaAsset | undefined {
   const published = publishedProductMedia(productId, family, variant);
   if (published !== null) return published[0];
   if (
@@ -255,6 +256,7 @@ export function MediaRotation({
   bundledProduct = false,
   focusable = true,
   paused = false,
+  selectedFrame,
 }: {
   frames: MediaAsset[];
   alt: string;
@@ -263,6 +265,7 @@ export function MediaRotation({
   bundledProduct?: boolean;
   focusable?: boolean;
   paused?: boolean;
+  selectedFrame?: number;
 }) {
   const root = useRef<HTMLSpanElement>(null);
   const [turn, setTurn] = useState(0);
@@ -281,7 +284,7 @@ export function MediaRotation({
     return () => observer.disconnect();
   }, []);
   useEffect(() => {
-    if (held || paused || !visible || frames.length < 2) return;
+    if (selectedFrame !== undefined || held || paused || !visible || frames.length < 2) return;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let timer: ReturnType<typeof setInterval> | undefined;
     const update = () => {
@@ -307,8 +310,11 @@ export function MediaRotation({
       if (timer) clearInterval(timer);
       motion.removeEventListener("change", update);
     };
-  }, [held, paused, visible, frames.length]);
-  const current = turn % frames.length;
+  }, [held, paused, visible, frames.length, selectedFrame]);
+  const current = selectedFrame ?? turn % frames.length;
+  const mounted = selectedFrame === undefined
+    ? frames.slice(0, Math.min(frames.length, turn + 2))
+    : frames.slice(current, current + 1);
   return (
     <span
       ref={root}
@@ -326,16 +332,14 @@ export function MediaRotation({
       aria-label={alt || undefined}
       aria-hidden={alt ? undefined : true}
     >
-      {frames
-        .slice(0, Math.min(frames.length, turn + 2))
-        .map((asset, index) => (
+      {mounted.map((asset, index) => (
           <MediaPicture
             key={asset.sourceId}
             asset={asset}
             alt={alt}
             sizes={sizes}
             className={className}
-            active={index === current}
+            active={selectedFrame !== undefined || index === current}
             bundledProduct={bundledProduct}
           />
         ))}
