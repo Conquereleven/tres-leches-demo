@@ -1,4 +1,26 @@
-# Prototype Instructions
+# 3L Agent Instructions
+
+## CornerTech AI Execution Standard
+
+## 3L corporate Anti-Friction + REG-01 adoption (CTAI-REG-01 2026-11-22)
+
+**3L adopts** CornerTech AI Execution 1.0, CT-WCOS v1.1 + 9D, AMAE v0.1 and [Anti-Friction v0.1 + REG-01](https://github.com/Conquereleven/cornertech-ai/blob/db31f24032b87371e650b54a3f2ae6da5a05c4bf/docs/governance/anti-friction-amendment.md), pinned to corporate commit `db31f24032b87371e650b54a3f2ae6da5a05c4bf`. Read the relevant canonical policies before execution; a link alone is not proof an agent loaded the policy. **All stricter 3L customer, production, visual-approval, payment, data and release gates below prevail.** No GO or product changes follow from this document.
+
+**Make this operational, not bureaucratic:** one DRI, minimal qualified agents, direct execution within existing GO, no repeated handoffs/GO/test suites for the same SHA, and outcome-first updates. Before model work confirm actual capability and quota (UNKNOWN if unobservable). Two REVISE rounds for the same root cause => diagnose before another cycle. Preserve required independent review for high-risk payment/production changes. Distinguish PREPARED / EXECUTED / VERIFIED / CLOSED; do not call CI, mock or preview a Production acceptance.
+
+**Today's storefront priority:** use the Founder-approved visual references as acceptance targets; provide an actual browser preview, test positive/negative flows, and never substitute a different layout or reuse unapproved legacy frontend components. Keep all Production and merchant/payment modifications outside this governance task.
+
+For every task here, read and follow [Execution Standard 1.0](https://github.com/Conquereleven/cornertech-ai/blob/7bb1b4766180b0090ddba71741e4ed8d4a7d2990/docs/governance/execution-standard.md). It is the canonical source for ownership, evidence and closure; do not copy it into this repository. Report work as **PREPARED → EXECUTED → VERIFIED → CLOSED**, or **BLOCKED** when evidence or authorization is missing. A merge, green CI, a deployment or a handoff never closes work by itself. The more restrictive rule wins; the dated decisions below stay in force unless a newer founder decision replaces them. CT-WCOS v1.1 is adopted for 3L through this scoped local instructions update; corporate PR #109 is merged. The more restrictive 3L gates below take precedence.
+
+3L specifics:
+
+- **Tracking:** GitHub is the authoritative technical tracker (master issue #56). Linear team TPL is coordination only. Keep the task contract in the existing issue or PR; do not create duplicates.
+- **Founder gates:** merges, deployments, Railway source or variable changes, Production data writes, Product Hub publication, credentials, DNS, payments, customer or staff notifications, Meta activation and Flexible Delivery each need specific authorization for the exact scope. A PR approval is not a Production GO. Railway Production is pinned to a commit, so a merge does not deploy, and a Redeploy reuses the old image.
+- **Client isolation:** 3L data, credentials and private evidence never go into CornerTech or other client repositories, Linear or logs. GitHub and Linear receive aggregates only, never customer data or secrets.
+- **Production acceptance:** VERIFIED means checked on the real target. Prove the deployed version from Railway and the container, never from a merge, CI or the `/api/health` revision. Label local, CI and synthetic results as such. Native device checks and client acceptance by Lisa and Sebastiano stay human steps. Never create LIVE payments or synthetic paid orders to test.
+- **Evidence and rollback:** record exact SHAs, deployment and revision IDs, a verified recovery point and the rollback before Production changes. Roll back code only; never restore a database over newer orders or payments. Close with the Standard's five-line receipt.
+
+# Prototype Instructions (historical; newer dated sections supersede earlier ones)
 
 ## Durable Design Direction
 
